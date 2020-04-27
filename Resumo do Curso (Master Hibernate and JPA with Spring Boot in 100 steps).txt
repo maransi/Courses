@@ -1,0 +1,3277 @@
+https://howtodoinjava.com/spring-boot2/
+
+
+
+Aula No. 5 - Master Hibernate and JPA with Spring Bott - GIT Repository
+=======================================================================
+
+. O link do repositorio:
+
+    https://github.com/in28minutes/jpa-with-hibernate
+
+
+
+Aula 13 - Create a simple REST controller
+=========================================
+. Crie um projeto Spring Boot com a library Web
+
+. Crie as classes abaixo:
+
+package net.stambul.basic;
+
+public class Book {
+	Long id;
+	String title;
+	String author;
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+
+
+	public Book() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Book(Long id, String title, String author) {
+		super();
+		this.id = id;
+		this.title = title;
+		this.author = author;
+	}
+	
+	
+
+}
+
+
+
+package net.stambul.controller;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import net.stambul.basic.Book;
+
+@RestController
+public class BookController {
+
+	public BookController() {
+		// TODO Auto-generated constructor stub
+	}
+
+	@GetMapping("/books")
+	public List<Book> getAllBooks(){
+		return Arrays.asList(new Book(1l, "Bible","John Almeida"), new Book(2l, "The Great Man","Unknowloge"));
+	}
+}
+
+
+
+. Execute o link abaixo:
+
+http://localhost:8080/books
+
+
+
+
+
+Aula No. 18 - Spring Boot Actuator
+==================================
+Spring Boot Actuator
+
+. Spring Boot Actuator é uma biblioteca para monitorar e gerenciar a aplicação através de "endpoints" ( locais de informações de recursos para interagirmos com eles ).
+
+. Existem 3 tipos de caracteristicas do Spring Boot Actuator:
+
+    Endpoints;
+    Metrics
+    Audit
+
+. Exemplo de como acessar as informações do actuator:
+
+    http://localhost:8080/actuator
+    http://localhost:8080/actuator/health
+    
+. Para habilitar o Spring Actuator no projeto, precisamos incluir a dependência abaixo no pom.xml:
+
+    <dependency>  
+        <groupId>org.springframework.boot</groupId>  
+        <artifactId>spring-boot-starter-actuator</artifactId>  
+        <version>2.2.2.RELEASE</version>  
+    </dependency>  
+
+. Exemplos de Endpoints:
+
+    Id 	            Usage 	                                                                                                                                            Default
+    actuator 	    It provides a hypermedia-based discovery page for the other endpoints. It requires Spring HATEOAS to be on the classpath. 	                        True
+    auditevents 	It exposes audit events information for the current application. 	                                                                                True
+    autoconfig 	    It is used to display an auto-configuration report showing all auto-configuration candidates and the reason why they 'were' or 'were not' applied. 	True
+    beans 	        It is used to display a complete list of all the Spring beans in your application. 	                                                                True
+    configprops 	It is used to display a collated list of all @ConfigurationProperties. 	                                                                            True
+    dump 	        It is used to perform a thread dump. 	                                                                                                            True
+    env 	        It is used to expose properties from Spring's ConfigurableEnvironment. 	                                                                            True
+    flyway 	        It is used to show any Flyway database migrations that have been applied. 	                                                                        True
+    health 	        It is used to show application health information. 	                                                                                                False
+    info 	        It is used to display arbitrary application info. 	                                                                                                False
+    loggers 	    It is used to show and modify the configuration of loggers in the application. 	                                                                    True
+    liquibase 	    It is used to show any Liquibase database migrations that have been applied. 	                                                                    True
+    metrics 	    It is used to show metrics information for the current application. 	                                                                            True
+    mappings 	    It is used to display a collated list of all @RequestMapping paths. 	                                                                            True
+    shutdown 	    It is used to allow the application to be gracefully shutdown. 	                                                                                    True
+    trace 	        It is used to display trace information. 	                                                                                                        True
+
+    For Spring MVC, the following additional endpoints are used.
+
+    Id 	            Description 	                                                                                                                                    Default
+    docs 	        It is used to display documentation, including example requests and responses for the Actuator's endpoints. 	                                    False
+    heapdump 	    It is used to return a GZip compressed hprof heap dump file. 	                                                                                    True
+    jolokia 	    It is used to expose JMX beans over HTTP (when Jolokia is on the classpath). 	                                                                    True
+    logfile 	    It is used to return the contents of the logfile. 	                                                                                                True
+    prometheus 	    It is used to expose metrics in a format that can be scraped by a prometheus server. It requires a dependency on micrometer-registry- prometheus. 	True
+
+. Para habilitar todos os endpoints acrescente no application.properties as linhas abaixo:
+
+    management.security.enabled=true  
+    management.security.roles=ADMIN  
+    security.basic.enabled=true  
+    security.user.name=admin  
+    security.user.passowrd=admin 
+
+. Tutorial projeto Spring Boot Actuator:
+
+    . Crie um projeto Spring Boot Web;
+
+        Step 1: Provide the Group name. We have provided com.javatpoint.
+
+        Step 2: Provide the Artifact Id. We have provided the spring-boot-actuator-example.
+
+        Step 3: Add the following dependencies: Spring Web, Spring Boot Starter Actuator, and Spring Data Rest HAL Browser.
+
+    . Crie a classe abaixo:
+
+    package com.javatpoint;  
+    import org.springframework.web.bind.annotation.GetMapping;  
+    import org.springframework.web.bind.annotation.RestController;  
+
+    @RestController  
+    public class DemoRestController {  
+
+        @GetMapping("/hello")  
+        public String hello(){  
+            return "Hello User!";  
+        }  
+    }      
+
+    . Insira a linha abaixo no arquivo application.properties:
+
+        management.security.enabled=false      
+		management.endpoints.web.exposure.include=*
+    
+    . Execute o projeto como Spring Application
+
+    . Acesse o link abaixo:
+
+        http://localhost:8080/actuator/health
+		http://localhost:8080/browser/index.html#/
+
+	. Quando executamos o link .../browser/index.html# ele abre uma tela amigável para consultar
+		as informações dos diversos links disponiveis no context actuator.
+
+	. No campo abaixo do titulo EXPLORES digite "actuator" e acione o botão Go!
+
+	
+
+Aula No. 19 = Spring Boot Developer Tools
+=========================================
+Contéudo basead no link https://howtodoinjava.com/spring-boot2/developer-tools-module-tutorial/
+
+Spring Boot Devtools
+
+. O Spring Boot Devtools abre a possibilidade para:
+    . Realizar a auto iniciação do projeto conforme ocorrem mudnanças no código fonte;
+    . Debug remoto da aplicação;
+
+. Para habilitar o Spring Devtools no projeto, precisamos incluir a dependência abaixo no pom.xml:
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+. Conteúdos estaticos podem ser desconsiderados do auto reload automático, como por exemplo: jsp, css, js, etc.
+    Para fazermos isto basta inserir no arquivo application.properties as linhas abaixo:
+
+        spring.freemarker.cache = false //set false in development environment; It is false by default.
+    
+        //Other such properties
+    
+        spring.thymeleaf.cache = false
+        spring.mustache.cache = false
+        spring.groovy.template.cache = false
+        spring.devtools.restart.additional-paths=.
+
+
+        spring.devtools.restart.exclude=static/**,public/**
+
+        
+        # Por padrão os arquivos padrão para ser desconsiderados do auto restart e podem ser colocados no parágrafo 
+        # spring.devtools.restart.exclude são:
+
+        /META-INF/maven
+        /META-INF/resources
+        /resources
+        /static
+        /public
+        /templates
+
+
+. Caso queira desconsiderar o auto start do conteúdo estatico, sem ter que modificar os parametros já configurados podemos ativar
+    a seguinte comando:
+
+        spring.devtools.restart.enabled = false    
+
+. Liveload é um plugin do Chorme, Firefox e Safari que auxilia no auto reload da aplicação, instale-o para melhorar ainda mais a produtividade.
+
+. Tutorial Spring Devtools
+
+    . Crie um projeto Spring Boot Project 
+        . Ctrl + N
+        . Spring Boot Starter
+        . Escolha as bibliotecas Web, thymeleaf e Devtools
+
+    . Inclua a classe abaixo:
+
+
+        package net.springbootdevtools;
+
+        import org.springframework.stereotype.Controller;
+        import org.springframework.ui.Model;
+        import org.springframework.web.bind.annotation.GetMapping;
+        import org.springframework.web.bind.annotation.RequestMapping;
+        import org.springframework.web.bind.annotation.RequestMethod;
+
+        @Controller
+        public class HomeController {
+
+            @GetMapping("/")
+            public String home(Model model) {
+
+                model.addAttribute("text", "Spring Boot DevTools example");
+
+                return "home";
+            }
+        }    
+
+    . Na pasta templates inclua o html abaixo:
+
+        <!DOCTYPE html>
+        <html xmlns:th="http://www.thymeleaf.org">
+        <head>
+        <title>Home</title>
+        </head>
+        <body>
+            <label th:text="${text}"></label>
+        </body>
+        </html>    
+
+    . Va no site https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=pt-BR
+        e instale a extensão LiveReload e deixe ela habilitada.
+
+    . Execute o link abaixo e faça alterações na classe HomeController e veja se está sendo 
+        feito atualizações automáticas.
+
+        http://localhost:8080/
+
+
+
+
+Aulas No. 21 ate 27
+===================
+
+https://www.codejava.net/frameworks/spring/spring-namedparameterjdbctemplate-examples
+
+
+. Crie um projeto Spring Boot com as seguintes dependências:
+
+    JDBC
+    JPA
+    Web
+    H2
+    
+
+. Adicione as linhas abaixo no arquivo application.properties
+
+    spring.datasource.url=jdbc:h2:mem:testdb
+    spring.datasource.driverClassName=org.h2.Driver
+    spring.datasource.username=sa
+    spring.datasource.password=
+    spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+    # Enabling H2 Console
+    spring.h2.console.enabled=true
+    
+    # Custom H2 Console URL
+    spring.h2.console.path=/h2
+
+    # temporary data storage
+    spring.datasource.url = jdbc:h2:mem:testdb
+    
+    # temporary data storage ( only you wish to persist data in disk )
+    spring.datasource.url = jdbc:h2:file:/data/sample
+    spring.datasource.url = jdbc:h2:file:C:/data/sample (Windows only)
+
+. Crie os arquivos abaixo na pasta /source/main/resources
+
+    schema.sql
+
+DROP TABLE IF EXISTS EMPLOYEES;
+  
+CREATE TABLE EMPLOYEES (
+  id INT AUTO_INCREMENT  PRIMARY KEY,
+  first_name VARCHAR(250) NOT NULL,
+  last_name VARCHAR(250) NOT NULL,
+  email VARCHAR(250) DEFAULT NULL
+);
+
+DROP TABLE IF EXISTS player;
+
+CREATE TABLE player (
+  playerId     INT NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(50) NOT NULL,
+  age           INT NOT NULL,
+  matches       INT NOT NULL,
+  PRIMARY KEY (playerId)
+);
+
+DROP TABLE IF EXISTS customer;
+
+CREATE TABLE customer(  id        INT           NOT NULL  AUTO_INCREMENT  PRIMARY KEY,
+                        name      VARCHAR(50)   NOT NULL,
+                        rating    VARCHAR(4)    NOT NULL,
+                        numberPhone VARCHAR(9)   );
+
+data.sql
+
+INSERT INTO EMPLOYEES (first_name, last_name, email) VALUES
+  ('Lokesh', 'Gupta', 'abc@gmail.com'),
+  ('Deja', 'Vu', 'xyz@email.com'),
+  ('Caption', 'America', 'cap@marvel.com');
+
+INSERT INTO player(name, age, matches) VALUES ('Sachin Tendulkar',41,200);
+INSERT INTO player(name, age, matches) VALUES ('Shane Warne',44,145);
+INSERT INTO player(name, age, matches) VALUES ('Kevin Pietersen',34,104);
+INSERT INTO player(name, age, matches) VALUES ('Shahid Afridi',35,27);
+INSERT INTO player(name, age, matches) VALUES ('Brian Lara',45,131);
+INSERT INTO player(name, age, matches) VALUES ('Graeme Smith',34,117);
+INSERT INTO player(name, age, matches) VALUES ('Mahela Jayawardene',37,145);
+
+
+INSERT INTO customer( name, rating, numberPhone )
+VALUES('BV Financial', 'B','22323419'),
+      ('EASYNVEST Corretora','A','43336789'),
+      ('BANCO ITAU','A','08001234'),
+      ('MRV Construtora','HH1','32459675');
+
+
+. Acione o link abaixo:
+
+    http://localhost:8080/h2
+
+. Na tela que se abrir altere o conteúdo do campo JDBC URL para:
+
+    jdbc:h2:mem:testdb
+
+. Acione o Connect
+
+. Faça select e update na tabela do banco, pare a aplicação e verifique que o banco foi reiniciado
+    com os valores iniciais do arquivo data.sql.
+
+. Tutorial No. 1
+
+
+package net.springbooth2.entity;
+
+public class Employee {
+	private int id;
+	private String first_name;
+	private String last_name;
+	private String email;
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getFirst_name() {
+		return first_name;
+	}
+
+	public void setFirst_name(String first_name) {
+		this.first_name = first_name;
+	}
+
+	public String getLast_name() {
+		return last_name;
+	}
+
+	public void setLast_name(String last_name) {
+		this.last_name = last_name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public Employee(int id, String first_name, String last_name, String email) {
+		super();
+		this.id = id;
+		this.first_name = first_name;
+		this.last_name = last_name;
+		this.email = email;
+	}
+
+
+
+	public Employee() {
+		// TODO Auto-generated constructor stub
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "\nEmployee [id=" + id + ", first_name=" + first_name + ", last_name=" + last_name + ", email=" + email
+				+ "]";
+	}
+
+	
+}
+
+
+
+
+
+package net.springbooth2.jdbc;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+
+import net.springbooth2.entity.Employee;
+
+@Repository
+public class EmployeeJdbcDao {
+	class EmployeeRowMapper implements RowMapper{
+
+		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Employee emp = new Employee(10, "Marco", "Silva", "marco.silva@gmail.com");
+
+			emp.setId(rs.getInt("id"));
+			emp.setFirst_name(rs.getString("first_name"));
+			emp.setLast_name(rs.getString("last_name"));
+			emp.setEmail(rs.getString("email"));
+
+			return emp;
+		}
+	}
+
+	@Autowired
+	JdbcTemplate jdbcTemplate;
+
+	public EmployeeJdbcDao() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public List<Employee> findAll() {
+
+		return jdbcTemplate.query("SELECT * FROM EMPLOYEES", new BeanPropertyRowMapper(Employee.class));
+
+	}
+
+	public Employee findById(int id) {
+
+		return jdbcTemplate.queryForObject("SELECT * FROM employees WHERE id = ?", new Object[] { id },
+				new BeanPropertyRowMapper<Employee>(Employee.class));
+	}
+
+	public int deleteById(int id) {
+
+		return jdbcTemplate.update("DELETE FROM employees WHERE id = ?", new Object[] { id });
+	}
+
+	public int updateById(Employee employee) {
+
+		return jdbcTemplate.update(
+				"UPDATE employees " + "SET first_name = ?, " + "	last_name = ?, " + "	email = ? "
+						+ "WHERE id = ? ",
+				new Object[] { employee.getFirst_name(), employee.getLast_name(), employee.getEmail(),
+						employee.getId() });
+	}
+
+	public int insert(Employee employee) {
+
+		return jdbcTemplate.update("INSERT INTO employees(first_name, last_name, email) " + "VALUES( ?, ?, ?)",
+				new Object[] { employee.getLast_name(), employee.getEmail(), employee.getId() });
+	}
+
+	public List<Employee> findByIdWithRowMapper(int id) {
+
+		RowMapper mapper = new RowMapper() {
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Employee emp = new Employee(10, "Marco", "Silva", "marco.silva@gmail.com");
+
+				emp.setId(rs.getInt("id"));
+				emp.setFirst_name(rs.getString("first_name"));
+				emp.setLast_name(rs.getString("last_name"));
+				emp.setEmail(rs.getString("email"));
+
+				return emp;
+			}
+		};
+
+		return jdbcTemplate.query("SELECT * FROM employees WHERE id = ?", new Object[] { id }, mapper);
+
+	}
+	
+	public List<Employee> findAllWithRowMapper(){
+		return jdbcTemplate.query("SELECT * FROM employees", new EmployeeRowMapper() );
+	}
+
+}
+
+. Verifique se a classe lançadora do aplicativo ficou como abaixo:
+
+package net.springbooth2;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import net.springbooth2.jdbc.EmployeeJdbcDao;
+
+// Implemente a interface CommandLineRunner
+@SpringBootApplication
+public class SpringBootH2Application implements CommandLineRunner {
+
+    // Incluir esta linha
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+    // Incluir esta linha
+	@Autowired
+	private EmployeeJdbcDao dao;
+	
+	public static void main(String[] args) {
+		SpringApplication.run(SpringBootH2Application.class, args);
+	}
+
+    // Incluir este metodo, ele é uma herança da interface CommandLineRunner implementada na classe
+	@Override
+	public void run(String... args) throws Exception {
+
+		logger.info("\n FindById(1) -> {}\n", dao.findById(1));
+		logger.info("\n DeleteById(1) -> {}\n", dao.deleteById(1));
+		logger.info("\n UpdateById(2) -> {}\n", dao.updateById( new Employee(2,"JOSE","SILVA","jose.silva@gmail.com")));
+		logger.info("\n insert(2) -> {}\n", dao.insert( new Employee(0,"MARIA","SILVA","maria.silva@gmail.com")));
+		logger.info("\n All Employees -> {}\n", dao.findAll());
+		logger.info("\n findByIdWithRowMapper(2) -> {}\n", dao.findByIdWithRowMapper(2));
+		logger.info("\n findAllWithRowMapper() -> {}\n", dao.findAllWithRowMapper());
+		
+		
+	}
+
+}
+
+. Execute a aplicação e verifique o log da consulta para ver se a lista  de empregados version
+
+
+
+
+. Tutorial No. 2 - Utilizando Interface com Generics
+
+
+package net.springbooth2.entity;
+
+public class Player {
+
+    // member variables
+    private Integer playerId;
+    private String name;
+    private Integer age;
+    private Integer matches;
+
+    // default constructor
+    public Player() {
+        super();
+    }
+
+    public Player(Integer playerId, String name, Integer age, Integer matches) {
+        super();
+        this.playerId = playerId;
+        this.name = name;
+        this.age = age;
+        this.matches = matches;
+    }
+
+    // getter and setter
+    public Integer getPlayerId() {
+        return playerId;
+    }
+    public void setPlayerId(Integer playerId) {
+        this.playerId = playerId;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public Integer getAge() {
+        return age;
+    }
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+    public Integer getMatches() {
+        return matches;
+    }
+    public void setMatches(Integer matches) {
+        this.matches = matches;
+    }
+
+	@Override
+	public String toString() {
+		return "Player [playerId=" + playerId + ", name=" + name + ", age=" + age + ", matches=" + matches + "]";
+	}
+    
+    
+}
+
+
+
+
+
+package net.springbooth2.jdbc;
+
+import java.util.List;
+
+
+public interface GenericDAO<T, K> {
+
+    public T findById(K id);
+    public int insert(T obj);
+    public List<T> findAll();
+    public int update(T obj);
+    public int delete(K id);
+}
+
+
+
+
+
+
+
+package net.springbooth2.jdbc;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+
+import net.springbooth2.entity.Player;
+
+@Repository
+public class PlayerDAO implements GenericDAO<Player, Integer>{
+	
+	@SuppressWarnings("rawtypes")
+	class PlayerRowMapper implements RowMapper{
+
+		@Override
+		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+			Player p = new Player();
+			
+			p.setPlayerId(rs.getInt("playerId"));
+			p.setAge(rs.getInt("age"));
+			p.setName(rs.getString("name"));
+			p.setMatches(rs.getInt("matches"));
+			
+			return p;
+		}
+		
+	}
+
+	@Autowired
+	JdbcTemplate jdbcTemplate;
+	
+	public PlayerDAO() {
+		// TODO Auto-generated constructor stub
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Player findById(Integer id) {
+		return (Player) jdbcTemplate.queryForObject("SELECT * FROM player WHERE playerId = ?", 
+											new Object[] { id }, 
+											new PlayerRowMapper() );
+	}
+
+
+	@Override
+	public int insert(Player obj) {
+		return jdbcTemplate.update("INSERT INTO player(name, age, matches) " + "VALUES( ?, ?, ?)",
+				new Object[] { obj.getName(), obj.getAge(), obj.getMatches() });
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Player> findAll() {
+		return jdbcTemplate.query("SELECT * FROM player", new PlayerRowMapper() );
+	}
+
+	@Override
+	public int update(Player obj) {
+		return jdbcTemplate.update(	"UPDATE player " + 
+									"SET name = ?, " + 
+									"	age = ?, " + 
+									"	matches = ? " +
+									"WHERE playerId = ? ",
+									new Object[] { obj.getName(), obj.getAge(), obj.getMatches(),
+											obj.getPlayerId() });
+	}
+
+	@Override
+	public int delete(Integer id) {
+		return jdbcTemplate.update("DELETE FROM player WHERE playerId = ?", new Object[] { id });
+	}
+
+}
+
+
+
+
+
+package net.springbooth2;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import net.springbooth2.entity.Customer;
+import net.springbooth2.jdbc.CustomerDAO;
+import net.springbooth2.jdbc.EmployeeJdbcDao;
+import net.springbooth2.jdbc.PlayerDAO;
+
+@SpringBootApplication
+public class SpringBootH2Application implements CommandLineRunner {
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired
+	private EmployeeJdbcDao dao;
+	
+	@Autowired
+	private PlayerDAO playerDAO;
+	
+	@Autowired
+	private CustomerDAO customerDAO;
+	
+	public static void main(String[] args) {
+		
+		SpringApplication.run(SpringBootH2Application.class, args);
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		logger.info("\n PlayerDAO.findById(1) -> {} \n", playerDAO.findById(1));
+		logger.info("\n PlayerDAO.delete(1) -> {} \n", playerDAO.delete(1));
+		logger.info("\n PlayerDAO.update(2) -> {} \n", playerDAO.update( new Player(2,"MARCO",53,100 )));
+		logger.info("\n PlayerDAO.insert -> {} \n", playerDAO.insert( new Player(0,"Catia", 55, 0)));
+		logger.info("\n PlayerDAO.findAll() -> {} \n", playerDAO.findAll());
+
+	}
+
+}
+
+
+
+
+. Tutorial No. 3 - Classe Abstrata, Generic e NamedParameterJdbcTemplate
+
+
+package net.springbooth2.entity;
+
+public class Customer {
+
+	private Integer id;
+	private String name;
+	private String rating;
+	private String numberPhone;
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+	public String getRating() {
+		return rating;
+	}
+
+	public void setRating(String rating) {
+		this.rating = rating;
+	}
+
+	public String getNumberPhone() {
+		return numberPhone;
+	}
+
+	public void setNumberPhone(String numberPhone) {
+		this.numberPhone = numberPhone;
+	}
+
+	public Customer() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Customer(Integer id, String name, String rating, String numberPhone) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.rating = rating;
+		this.numberPhone = numberPhone;
+	}
+
+	public Customer(Integer id) {
+		super();
+		this.id = id;
+	}
+	
+	@Override
+	public String toString() {
+		return "\n Customer [id=" + id + ", name=" + name + ", rating=" + rating + ", numberPhone=" + numberPhone + "]";
+	}
+
+	
+	
+}
+
+
+
+
+
+package net.springbooth2.jdbc;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.springframework.stereotype.Repository;
+
+import net.springbooth2.entity.Customer;
+
+@Repository
+public class CustomerDAO extends GenericJDBCTemplateDAO<Customer, Integer> {
+
+	public CustomerDAO() {
+		this.setSqlFindById("SELECT * FROM customer WHERE id = :id");
+		
+		this.setSqlFindAll("SELECT * FROM customer");
+		
+		this.setSqlInsert("INSERT INTO customer(name, rating, numberPhone) " +
+							"VALUES(:name, :rating, :numberPhone) ");
+		
+		this.setSqlUpdate("UPDATE customer " +
+						  "SET name = :name, " +
+						  "		rating = :rating, " +
+						  "		numberPhone = :numberPhone " +
+						  "WHERE id = :id");
+		
+		this.setSqlDelete("DELETE FROM customer WHERE id = :id");
+	
+	}
+
+	@Override
+	public Customer unpackage(ResultSet rs) {
+		
+		Customer c = new Customer();
+		
+		try {
+			c.setId(rs.getInt("id"));
+			c.setName(rs.getString("name"));
+			c.setRating(rs.getString("rating"));
+			c.setNumberPhone(rs.getString("numberPhone"));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return c;
+	}
+
+}
+
+
+
+
+
+package net.springbooth2.jdbc;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+public abstract class GenericJDBCTemplateDAO< T, K > {
+
+	@Autowired
+	JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	NamedParameterJdbcTemplate namedJdbcTemplate;
+	
+	private String sqlFindById; 
+	private String sqlFindAll;
+	private String sqlInsert;
+	private String sqlUpdate;
+	private String sqlDelete;
+	
+	public String getSqlDelete() {
+		return sqlDelete;
+	}
+
+	public void setSqlDelete(String sqlDelete) {
+		this.sqlDelete = sqlDelete;
+	}
+
+	public String getSqlUpdate() {
+		return sqlUpdate;
+	}
+
+	public void setSqlUpdate(String sqlUpdate) {
+		this.sqlUpdate = sqlUpdate;
+	}
+
+	public String getSqlInsert() {
+		return sqlInsert;
+	}
+
+	public void setSqlInsert(String sqlInsert) {
+		this.sqlInsert = sqlInsert;
+	}
+	
+	public String getSqlFindById() {
+		return sqlFindById;
+	}
+
+	public void setSqlFindById(String sqlFindById) {
+		this.sqlFindById = sqlFindById;
+	}
+
+	public String getSqlFindAll() {
+		return sqlFindAll;
+	}
+
+	public void setSqlFindAll(String sqlFindAll) {
+		this.sqlFindAll = sqlFindAll;
+	}
+
+	public GenericJDBCTemplateDAO() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	@SuppressWarnings("rawtypes")
+	class GenericRowMapper implements RowMapper<T>{
+
+		GenericJDBCTemplateDAO caller;
+		
+		public GenericJDBCTemplateDAO getCaller() {
+			return caller;
+		}
+
+		public void setCaller(GenericJDBCTemplateDAO caller) {
+			this.caller = caller;
+		}
+
+		public GenericRowMapper( GenericJDBCTemplateDAO caller ) {
+			this.caller = caller;
+		}
+		
+		@Override
+		public T mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+			try {
+				@SuppressWarnings("unchecked")
+				T obj = (T) this.caller.unpackage(rs);
+				
+				return obj;
+				
+			} catch (Exception e) {
+				return null;
+			}			
+		}
+		
+	}
+	
+	public abstract T unpackage( ResultSet rs);
+	
+    public T findById(T obj) {
+    	return (T) namedJdbcTemplate.queryForObject(getSqlFindById(), 
+    												new BeanPropertySqlParameterSource(obj),
+    												new GenericRowMapper(this) );
+    }
+
+    public List<T> findAll(){
+		return namedJdbcTemplate.query(getSqlFindAll(), new GenericRowMapper(this) );
+    }
+    
+    public int insert(T obj) {
+    	return namedJdbcTemplate.update(this.sqlInsert, new BeanPropertySqlParameterSource(obj));
+    }
+
+    public int update(T obj) {
+    	return namedJdbcTemplate.update(this.sqlUpdate, new BeanPropertySqlParameterSource(obj));
+    }
+    
+    public int delete(T obj) {
+    	return namedJdbcTemplate.update(this.sqlDelete, new BeanPropertySqlParameterSource(obj));
+    }
+}
+
+
+
+
+
+package net.springbooth2;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import net.springbooth2.entity.Customer;
+import net.springbooth2.jdbc.CustomerDAO;
+import net.springbooth2.jdbc.EmployeeJdbcDao;
+import net.springbooth2.jdbc.PlayerDAO;
+
+@SpringBootApplication
+public class SpringBootH2Application implements CommandLineRunner {
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired
+	private EmployeeJdbcDao dao;
+	
+	@Autowired
+	private PlayerDAO playerDAO;
+	
+	@Autowired
+	private CustomerDAO customerDAO;
+	
+	public static void main(String[] args) {
+		
+		SpringApplication.run(SpringBootH2Application.class, args);
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		logger.info("\nCustomerDAO.findById(1) -> {}", customerDAO.findById(new Customer(1)));
+		logger.info("\nCustomerDAO.insert() -> {} ", customerDAO.insert( new Customer(0,"CIELO Cartoes","B","987652341")));
+		logger.info("\nCustomerDAO.update(1) -> {} ", customerDAO.update( new Customer(1,"KLABIN Celulose","D","1234567")));
+		logger.info("\nCustomerDAO.delete(2) -> {} ", customerDAO.delete(new Customer(2)));
+		logger.info("\nCustomerDAO.findAll() -> {} ", customerDAO.findAll());
+	}
+
+}
+
+
+
+
+
+Aula 33 a 54
+------------
+
+https://www.treinaweb.com.br/blog/entendendo-o-metodo-merge-do-jpa/
+https://www.devmedia.com.br/java-persistence-api-salvando-objetos-com-entitymanager-do-jpa/30499
+https://blog.algaworks.com/tutorial-jpa/
+https://www.devmedia.com.br/hibernate-flush-write-behind/29870
+
+
+
+
+.  Crie um projeto Spring Boot com as seguintes dependências:
+
+    JDBC
+    JPA
+    Web
+    H2
+    
+
+. Adicione as linhas abaixo no arquivo application.properties
+
+#Enabled H2 COnsole
+spring.h2.console.enabled=true
+
+# Custom H2 Console URL
+spring.h2.console.path=/h2
+
+#Turn Stastic on
+spring.jpa.properties.hibernate.generate_statistics=true
+logging.level.org.hibernate.stat=debug
+
+#Show all queries
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+logging.level.org.hibernate.type=debug
+
+
+. Crie os arquivos abaixo na pasta /src/main/resources
+
+    schema.sql
+    ----------
+
+DROP TABLE IF EXISTS EMPLOYEES;
+  
+CREATE TABLE product (
+  id INT AUTO_INCREMENT  PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
+);
+
+    data.sql
+    --------
+    
+INSERT INTO product( id, name ) 
+VALUES( 1000,'PARAFUSO'),
+        (1001,'PREGO'),
+        (1002,'CORRENTE');
+
+. Execute o projeto como Spring Boot Application. 
+
+. Acione o link abaixo:
+
+    http://localhost:8080/h2
+
+. Na tela que se abrir altere o conteúdo do campo JDBC URL para:
+
+    jdbc:h2:mem:testdb
+
+. Acione o Connect
+
+. Faça select e update na tabela do banco, pare a aplicação e verifique que o banco foi reiniciado
+    com os valores iniciais do arquivo data.sql.
+
+. Tutorial 
+
+
+    . Crie a classe Bean abaixo:
+/*
+    @Temporal 
+    
+    configuramos como mapear um Calendar para o banco, aqui usamos apenas a data (sem hora), mas poderíamos ter usado apenas a hora (TemporalType.TIME) ou timestamp (TemporalType.TIMESTAMP).
+    
+    Exemplo:
+
+    @Temporal(TemporalType.DATE)
+    private Calendar dataFinalizacao;
+
+
+	Total classe model é obrigatorio ser anotada com @Entity;
+	@Table será utilizada para configurar o nome da tabela caso for diferente do nome da classe;
+	Toda classe model tem que ter um construtor sem parametros;
+	@Column não é obrigatorio é necessário apenas um @Id
+
+*/
+
+package net.marco.bean;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+
+
+@Entity
+@NamedQuery(query = "select p from Product p where name like :name", name = "query_find_by_name")
+public class Product {
+	
+	@Id
+	@GeneratedValue
+	private Long id;
+	
+	@Column
+	private String name;
+	
+	
+	
+	public Product(String name) {       // O Construtor não está com o id de proposito, pois por ser AUTO_INCREMENT ele não precisa ter um valor
+		super();
+		this.name = name;
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", name=" + name + "]\n";
+	}
+
+
+
+	public String getName() {
+		return name;
+	}
+
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+
+	public Product() {
+		// TODO Auto-generated constructor stub
+	}
+
+}
+
+
+
+    . Crie a classe DAO abaixo:
+
+/*
+    @Transactional
+
+    Quando o método “persist()”, ou "merge()" é chamado, há uma obrigatoriedade 
+    em existir uma transação corrente, caso contrário, 
+    a exceção TransactionRequiredException é lançada, 
+    pois qualquer operação que modifique a base de dados 
+    (com o EntityManager) exige que esteja dentro de uma transação.
+
+    Metodo "flush" do EntityManager
+
+    Vale lembrar que o flush() apenas gera as DMLs de updates, inserts e deletes que 
+    serão feitos mais tarde, quando executarmos o commit. Assim o EntityManager torna-se
+	uma fábrica de DMLs.
+
+*/
+
+package net.marco.dao;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import net.marco.bean.Product;
+
+
+@Repository
+@Transactional                  
+public class ProductDAO {
+
+	@Autowired
+	EntityManager em;
+	
+	public ProductDAO() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public Product findById( Long id ) {
+		
+		return em.find(Product.class, id);
+	}
+
+	public List<Product> findAll(){
+		Query q = em.createQuery("SELECT p FROM Product p", Product.class);
+		
+		return q.getResultList();
+	}
+	
+	public Product save( Product product) {
+		
+		if (product.getId() == null) {
+			em.persist(product);
+		} else {
+			em.merge(product);
+		}
+			
+		em.flush();
+		
+		em.clear();
+		
+		return product;
+		
+	}
+	
+	// Para que este metodo funcione é necessário anotar na classe o @Transactional
+	public void delete(Long id) {
+		Product p = findById(id);
+		
+		em.remove( p );
+	}
+	
+	public List<Product> findByName( String name ){
+//		Query query = em.createQuery("select p from Product p where name like :name", Product.class);
+//		TypedQuery<Product> query = em.createQuery("select p from Product where name like :name", Product.class );
+		Query query = em.createNamedQuery("query_find_by_name", Product.class);
+		
+		return query.setParameter("name",name).getResultList();
+	}
+
+	/*
+		Importante: No metodo PlayWithEntityManager foi criado novo objeto, persistido e neste caso foi
+					atachado no EntityManager, assim toda alterações nas propriedades dessa classe serão
+					efetivadas no banco de dados ao final do metodo, pois a classe está marcada com controle
+					transacional @Transactional. 
+
+	*/
+
+	public void PlayWithEntityManager() {
+		Product product = new Product("ROSCA");
+		
+		em.persist( product );
+		
+        product.setName("ROSCA Updated");
+	}
+
+
+}
+
+
+. Certifique que a classe lançadora do projeto esteja como abaixo:
+
+package net.marco;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import net.marco.bean.Product;
+import net.marco.dao.ProductDAO;
+
+@SpringBootApplication
+public class SpringBootDataH2Application implements CommandLineRunner {
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired
+	ProductDAO productDAO;
+	
+	public static void main(String[] args) {
+		SpringApplication.run(SpringBootDataH2Application.class, args);
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+
+		logger.info("\n Product {}", productDAO.findById(1000L) );
+		logger.info("\n findAll Products {}", productDAO.findAll());
+		
+		Product p = new Product("TAMPA");
+		logger.info("\n save {}", productDAO.save(p) );
+		
+		logger.info("\n deleting Code 1000");
+		productDAO.delete(1000L);
+		
+		logger.info("\n findAll Products {}", productDAO.findAll());
+		
+		logger.info("\n findByName Products{}", productDAO.findByName("%AMP%"));
+		
+	}
+
+}
+
+
+. Execute o projeto como Spring Boot Application e verifique os resultados no log da aplicação.
+
+. Criação do teste automático da aplicação.
+
+. Commente as linhas do metodo run da classe SpringBootDataH2Application, pois a classe de teste fará isso.
+
+...
+	public void run(String... args) throws Exception {
+/*
+		logger.info("\n Product {}", productDAO.findById(1000L) );
+		logger.info("\n findAll Products {}", productDAO.findAll());
+		
+		Product p = new Product("TAMPA");
+		logger.info("\n save {}", productDAO.save(p) );
+		
+		logger.info("\n deleting Code 1000");
+		productDAO.delete(1000L);
+		
+		logger.info("\n findAll Products {}", productDAO.findAll());
+		
+		logger.info("\n findByName Products{}", productDAO.findByName("%AMP%"));
+*/		
+	}
+...
+
+
+. Dentro da pasta src\test\java\net\marco\dao\ crie a classe de teste abaixo:
+
+
+package net.marco.dao;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import net.marco.SpringBootDataH2Application;
+import net.marco.bean.Product;
+
+@TestMethodOrder(OrderAnnotation.class)		// Annotation para informar que a ordem da execução dos testes será pela annotation @Order
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes=SpringBootDataH2Application.class)
+class ProductDAOTest {
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired
+	ProductDAO productDAO;
+
+	@Autowired
+	EntityManager em;
+	
+	@Test
+	@Order(2)		// Direciona a ordem da execução dos testes
+	void findById() {
+		logger.info("Testing is Running findById()");
+		
+		Product product = productDAO.findById(1001L);
+		
+		assertEquals("PREGO", product.getName());
+		
+		
+	}
+
+	@Test
+	@Order(1)
+	@DirtiesContext		// Irá funcionar como um rollback do teste, ao termino não é efetivado as mudanças
+	void deleteById() {
+		logger.info("Testing is Running deleteById()");
+		
+		productDAO.delete(1001L);		
+		
+		assertNull( productDAO.findById(1001L));
+		
+		
+	}
+
+	@Test
+	@Order(1)
+	@DirtiesContext		// Irá funcionar como um rollback do teste, ao termino não é efetivado as mudanças
+	void saveTest() {
+		logger.info("Testing is Running saveTest()");
+		
+
+		Product product = productDAO.findById(1000L);
+
+		assertEquals("PARAFUSO", product.getName());
+
+        product.setName("PARAFUSO Updated");
+
+        productDAO.save( product );
+
+		Product product1 = productDAO.findById(1000L);
+
+		assertEquals("PARAFUSO Updated", product1.getName());
+		
+	}
+
+
+
+}
+
+. Execute a classe acima, ou cada metodo, como JUnit.
+
+
+Aula 63
+-------
+
+. Utilização das annotations @UpdateTimestamp e @CreationTimestamp
+
+@Entity
+public class MyEntity {
+ 
+    @Id
+    @GeneratedValue
+    private Long id;
+ 
+    private String value;
+ 
+	// É atualizado a data atual da JVM quando o objeto for persistido pela primeira vez
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+ 
+	// É atualizado sempre que houver uma atualização no objeto e neste momento a propriedade
+	// anotada como @CreationTimestamp não sofrerá nenhuma alteração.
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
+ 
+    …
+ 
+}
+
+
+
+Aula 64
+-------
+
+. Maneiras de se declarar "NamedQuery"
+
+@Entity
+@Table(name = "atp_players")
+@NamedQuery(
+    name = "Player.findAllUnordered",
+    query = "SELECT p FROM Player p")
+public class Player implements Serializable {
+    ...
+}
+
+
+ou
+
+
+@Entity
+@Table(name = "atp_players")
+@NamedQueries({
+    @NamedQuery(
+        name = "Player.findAllUnordered",
+        query = "SELECT p FROM Player p"),
+    @NamedQuery(
+        name = "Player.findAllOrderedByName",
+        query = "SELECT p FROM Player p ORDER BY p.name")
+})
+public class Player implements Serializable {
+    ...
+    @Column(name = "player_name")
+    private String name;
+    ...
+}
+
+
+. Maneira de se declarar "NamedNativeQuery"
+
+https://thoughts-on-java.org/jpa-native-queries/
+
+@Entity
+@Table(name = "atp_players")
+@NamedNativeQuery(
+    name = "Player.countAllwithSQL",
+    query = "SELECT COUNT(*) AS total FROM atp_players")
+public class Player implements Serializable {
+    ...
+}
+
+ou
+
+@Entity
+@Table(name = "atp_players")
+@NamedNativeQuery(
+    name = "Player.findAllUnorderedWihSQL",
+    query = "SELECT * FROM atp_players",
+    resultClass = Player.class)
+public class Player implements Serializable {
+    ...
+}
+
+
+ou
+
+
+@Entity
+@Table(name = "atp_players")
+@NamedNativeQueries({
+    @NamedNativeQuery(
+        name = "Player.countAllwithSQL",
+        query = "SELECT COUNT(*) AS total FROM atp_players"),
+    @NamedNativeQuery(
+        name = "Player.findAllUnorderedWihSQL",
+        query = "SELECT * FROM atp_players",
+        resultClass = Player.class)
+})
+public class Player implements Serializable {
+    ...
+}
+
+
+. Formas de executar uma Query:
+
+@Named("bean")
+@Stateless
+public class SampleBean {
+ 
+    @PersistenceContext(unitName = "EclipseLink_NamedQuery-ejbPU")
+    private EntityManager em;
+ 
+    private List players;
+ 
+    ...
+ 
+    @SuppressWarnings("unchecked")
+    public void findAllUnordered() {
+        players = em.createNamedQuery("Player.findAllUnordered")
+                .getResultList();
+    }
+ 
+    @SuppressWarnings("unchecked")
+    public void findAllUnorderedFromXML() {
+        players = em.createNamedQuery("Player.findAllUnorderedFromXML")
+                .getResultList();
+    }
+ 
+    @SuppressWarnings("unchecked")
+    public void findAllOrderedByName() {
+        players = em.createNamedQuery("Player.findAllOrderedByName")
+                .getResultList();
+    }
+ 
+    @SuppressWarnings("unchecked")
+    public void findAllOrderedByNameFromXML() {
+        players = em.createNamedQuery("Player.findAllOrderedByNameFromXML")
+                .getResultList();
+    }
+ 
+    @SuppressWarnings("unchecked")
+    public void findAllUnorderedWihSQL() {
+        players = em.createNamedQuery("Player.findAllUnorderedWihSQL")
+                .getResultList();
+    }
+ 
+    @SuppressWarnings("unchecked")
+    public void findAllUnorderedWihSQLfromXML() {
+        players = em.createNamedQuery("Player.findAllUnorderedWihSQLfromXML")
+                .getResultList();
+    }
+ 
+    public BigInteger countAllwithSQL() {
+		
+		// Obrigatorio que o tipo de retorno seja BigInteger
+
+        BigInteger total = (BigInteger) em.createNamedQuery("Player.countAllwithSQL")
+                .getSingleResult();
+        return total;
+    }
+ 
+    public BigInteger countAllwithSQLfromXML() {
+        BigInteger total = (BigInteger) em.createNamedQuery("Player.countAllwithSQLfromXML")
+                .getSingleResult();
+        return total;
+    }
+ 
+    ...
+ 
+}
+
+
+. Utilização de Parametros em Queries:
+
+
+// imports
+ 
+@Entity
+@Table(name = "atp_players")
+@NamedQuery(
+        name = "Player.findByAge",
+        query = "SELECT p FROM Player p WHERE p.age = :age")
+public class Player implements Serializable {
+    ...
+    @Column(name = "player_age")
+    private int age;
+    ...
+}
+
+
+...
+    @SuppressWarnings("unchecked")
+    public void findByAge() {
+        players = em.createNamedQuery("Player.findByAge")
+                .setParameter("age", 27)
+                .getResultList();
+    }
+...
+
+
+ou
+
+// imports
+ 
+@Entity
+@Table(name = "atp_players")
+@NamedQuery(
+        name = "Player.findBetweenAge",
+        query = "SELECT p FROM Player p WHERE p.age BETWEEN ?1 AND ?2")
+public class Player implements Serializable {
+    ...
+    @Column(name = "player_age")
+    private int age;
+    ...
+}
+
+...
+    @SuppressWarnings("unchecked")
+    public void findBetweenAge() {
+        players = em.createNamedQuery("Player.findBetweenAge")
+                .setParameter(1, 24)
+                .setParameter(2, 28)
+                .getResultList();
+    }
+...
+
+
+
+
+ou 
+
+@NamedQueries({
+				@NamedQuery(name="select.from.pessoa", query="select p from Pessoa p"),
+				@NamedQuery(name="select.by.id", query="select p from Pessoa p where id = :id")
+				})
+@Entity
+public class Pessoa 
+
+....
+
+	public Pessoa findById( Long id ) {
+
+		// Importante: Observe o uso do parametro e o metodo getSingleResult para trazer um unico objeto
+		return (Pessoa) em.createNamedQuery("select.by.id").setParameter("id", 1L).getSingleResult();
+	}
+
+
+
+
+. Update, ou Delete com NamedNativeQuery
+
+@SqlResultSetMapping(name="deleteResult", columns = { @ColumnResult(name = "count")})
+@NamedQueries({
+				@NamedQuery(name="select.from.pessoa", query="select p from Pessoa p"),
+				@NamedQuery(name="select.by.id", query="select p from Pessoa p where id = :id")
+				})
+
+@NamedNativeQuery( name = "findCountPessoa", query="select COUNT(*) AS totalPessoa from Pessoa")
+@NamedNativeQuery(
+        name    =   "deletePessoaById",
+        query   =   "DELETE FROM pessoa WHERE id = :id"
+        ,resultSetMapping = "deleteResult"
+)
+@Entity
+@Table(name="Pessoa")
+public class Pessoa {
+{
+    //more code
+} 
+
+
+...
+
+@Repository
+@Transactional
+public class PessoaDAO {
+
+	@Autowired
+	EntityManager em;
+	
+ 
+	public void PlayPessoa() {
+		try {
+			
+
+			// Quando utilizamos o metodo "createNamedQuery" para realizar um deleção, ou atualizaçao,
+			// somos obrigados declarar na classe POJO, Bean, etc. dentro da annotation @NamedNativeQuery
+			// o parâmetro resultSetMapping associado com a annotation @SqlResultSetMapping, senão fazermos
+			// isso é levantado uma exception com ArrayBoundException
+			// O segundo parametro "Pessoa.class" é opcional
+			int nrRowsAffected = em.createNamedQuery("deletePessoaById", Pessoa.class)
+			        .setParameter("id", 1L)
+			        .executeUpdate();
+
+
+			// Podemos realizar a mesma ação de forma mais ágil com o metodo createNativeQuery sem se 
+			// preocupar com os detalhes do metodo createNamedQuery.
+			// Nos testes não consegui utilizar o metodo createNativeQuery com o apelido da query informada
+			// na classe POJO, ou Bean. Conflitou no momento de informar o parâmetro, não aceita de forma nenhuma
+			// a informação do parâmetro. Quando utilizamos explicitamente funciona corretamente
+			int nrRowsAffected = em.createNativeQuery("DELETE FROM pessoa WHERE id = :id")
+			        .setParameter("id", 2L)
+			        .executeUpdate();
+		}
+	    catch( Exception e ) {
+	    	e.printStackTrace();
+	    }
+		
+	}
+}
+
+
+
+Aula 66 a 74
+------------
+
+. As annotations mais utilizadas:
+
+@Entity			Identifica a classe como associada a uma entidade/tabela
+@Table			Associa a classe a uma entidade, normalmente qdo o nome da classe difere do nome da entidade. 
+				Neste caso seria utilizado @Table(name="xyz")
+@Id				Indica qual coluna é a chave de identificação (primary key). Esta annotation quase sempre e 
+				utilizada junto com a annotation @GeneratedValue.
+@GeneratedValue	Utiliza para identificar a forma como será incrementada/atualizada o valor da chave primaria.
+				Esta annotation utiliza um parâmetro para utilizar durante o incremento:
+					strategy = GenerationType.IDENTITY
+					strategy = GenerationType.AUTO
+					strategy = GenerationType.TABLE
+					strategy = GenerationType.SEQUENCE
+
+				Exemplo: @GeneratedValue(strategy = GenerationType.IDENTITY)					
+@Column			Utilizada para associar uma propriedade da classe com um campo da tabela
+@NamedQuery		Utilizada para declarar query no cabeçalho das classes Entities, ou Beans.
+				Exemplo: @NamedQuery( name = "Player.findAllUnordered",
+										query = "SELECT p FROM Player p")
+@NamedQueries	Utilizada para agrupar declaracoes de @NamedQuery.										
+				Exemplo: @NamedQueries(	{ @NamedQuery(name="select.from.pessoa", query="select p from Pessoa p"),
+											@NamedQuery(name="select.by.id", query="select p from Pessoa p where id = :id")
+										})
+@Transient		Identifica colunas que não devem ser salvas no contexto do EntityManager, colunas com esta annotation
+				serão consideradas como propriedade da classe e não da tabela.
+			
+
+. Estados de uma entidade
+
+	Uma entidade pode assumir alguns estados com relação ao EntityManager. Os estados podem ser:
+
+		Novo (new ou transient)
+		Gerenciado (managed)
+		Removido (removed)
+		Desanexado (detached)
+
+	O estado “novo” é o mais natural. É simplesmente quando construímos um objeto qualquer usando o operador new.
+
+	Para estar no estado “gerenciado”, podemos chamar os métodos persist, 
+	merge ou buscar a entidade usando o EntityManager.
+
+	O estado “removido” é alcançado quando chamamos o método remove.
+
+	Por último, uma entidade fica no estado “desanexado” quando é passada para o método detach.
+
+	Importante notar que entidades desanexadas podem voltar a ser gerenciadas com a chamada do método merge.
+
+	Exemplo:
+
+	public static void main(String... args) {
+		EntityManagerFactory entityManagerFactory 
+				= Persistence.createEntityManagerFactory("Clientes-PU");
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+			
+		// Estado novo
+		Cliente cliente = new Cliente();
+		cliente.setNome("Construtora Silva");
+		
+		entityManager.getTransaction().begin();
+		
+		// Estado gerenciado
+		entityManager.persist(cliente);
+		
+		// Estado desanexado (nenhuma operação será feita)
+		entityManager.detach(cliente);
+		
+		// Volta ao estado gerenciado 
+		cliente = entityManager.merge(cliente);
+		
+		// Estado removido (será removido da base de dados)
+		entityManager.remove(cliente);
+		
+		entityManager.getTransaction().commit();
+		
+		entityManager.close();
+		entityManagerFactory.close();
+	}
+
+. Annotations para criar relacionamentos entre classes de entidades:
+
+	@OneToOne	Associa relação de duas classes de um pra um
+	@OneToMany
+	@ManyToOne
+    @ManyToMany
+    @JoinColumn Especifica uma coluna para auxiliar na união entre uma entidade é uma coleção. Mais abaixo veja como é gerado informações default para encontrar o nome da coluna.
+    mappedBy    The field that owns the relationship. Required unless the relationship is unidirectional.
+                
+                Exemplo:
+
+                @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "employer")
+                private Set employees = new HashSet();
+
+                @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+                @JoinColumn(name = "EMPLOYER_ID", nullable = false)
+                private Employer employer;
+
+    fetch       Parâmetro utilizado nas associações para otimizar a busca das informações no banco de dados (@OneToOne, @ManyToOne, @OneToMany ou @ManyToMany).
+                Pode ser Lazy (Deixando para obter as informações somente quando uma propriedade da classe for utilizada), 
+                ou EAGER ( Assim que a classe pai for populada com as informações as outras classes associadas serão automaticamente atualizadas ).
+                Por padrão, nas anotações @ManyToOne e @OneToOne o tipo da fetch será EAGER, enquanto @OneToMany e @ManyToMany serão LAZY.
+
+                Exemplo:
+
+                    @ManyToOne(fetch = FetchType.LAZY)
+                    @JoinColumn(name = "id_endereco")
+                    private Endereco endereco;
+                        
+                    @ManyToOne(fetch = FetchType.LAZY)
+                    @JoinColumn(name = "id_contato")
+                    private Contato contato;
+                        
+                    @ManyToOne(fetch = FetchType.LAZY)
+                    @JoinColumn(name = "id_funcao")
+                    private Funcao funcao;
+                        
+                    @ManyToOne(fetch = FetchType.LAZY)
+                    @JoinColumn(name = "id_departamento")
+                    private Departamento departamento;
+                        
+                    @OneToMany(fetch = FetchType.LAZY)      
+                    private List<HistoricoPonto> batidasDePonto;
+
+    cascade         Com o CascadeType podemos definir a forma como serão propagadas as operações em cascata de uma Entity para suas referencias.
+
+                    CascadeType.PERSIST     Quando salvar a Entidade A, também será salvo todas as Entidades B associadas.
+                    CascadeType.MERGE       Quando atual as informações da Entidade A, também será atualizado no banco de dados todas as informações das Entidades B associadas.
+                    CascadeType.REMOVE      Quando remober a Entidade A, também será removida todas as entidades B associadas.
+                    CascadeType.REFRESH     Quando houver atualização no banco de dados na Entidade A, todas as entidades B associadas serão atualizadas.
+                    CascadeType.ALL         Corresponde a todas as operações acima (MERGE, PERSIST, REFRESH e REMOVE).
+                    CascadeType.DETACH      cascade type detach detaches all related entities if a “manual detach” occurs.
+    
+                    There is no default cascade type in JPA. By default no operations are cascaded.
+
+                    Exemplo:
+
+                        The cascade configuration option accepts an array of CascadeTypes; thus, to include only refreshes and merges in the cascade operation for a One-to-Many relationship as in our example, you might see the following:
+
+                        @OneToMany(cascade={CascadeType.REFRESH, CascadeType.MERGE}, fetch = FetchType.LAZY)
+                        @JoinColumn(name="EMPLOYEE_ID")
+                        private Set<AccountEntity> accounts;
+
+                    Nos testes o parâmetro cascade mostre-se bem util para auxiliar na propagação dos DMLs, se o pai for eliminado os filhos também poderão ser eliminados automaticamente; assim também de inserções nas coleções, ou
+                    atualizações nas informações de algum objeto existente em algumas das coleções. Desta forma não será necessário se preocupar em fazer manualmente essas ações, deixando sob a responsabilidade do framework fazer iso.        
+
+    orphanRemoval   Se a propriedade for marcada como true, sempre que houver uma operação de exclusão na tabela principal todas as informações associadas a coleção também serão excluidas.
+
+                    Exemplo:
+
+                    @OneToMany(orphanRemoval = true, mappedBy = "employee")
+                    private Set<AccountEntity> accounts;
+
+
+. Relacionamento Um para Um @OneToOne:
+
+	Cria-se a classe de Entidade principal:
+
+	@Entity
+	public class EmployeeEntity implements Serializable {
+		private static final long serialVersionUID = 1L;
+	
+		@Id
+		@GeneratedValue( strategy = GenerationType.IDENTITY)
+		private Long id;
+
+		private String firstName;
+
+		private String lastName;
+
+		private String email;
+		
+		@OneToOne( fetch = FetchType.LAZY)
+		// Force the column name to be "login_id", othercase will be "login_login_id" in this case. The default is,
+		// [class table name] + [_] + [field primary key class table name ]
+        // @JoinColumn Specifies a column for joining an entity association or element collection.
+		@JoinColumn(name = "login_id")		
+		private Login login;
+		
+		// Getters, Setters, Constructor, Equals, HashCode and toString methods
+		
+	}
+
+
+	Cria-se a classe de entidade fraca:
+
+	package net.model;
+
+	import javax.persistence.Entity;
+	import javax.persistence.FetchType;
+	import javax.persistence.GeneratedValue;
+	import javax.persistence.GenerationType;
+	import javax.persistence.Id;
+	import javax.persistence.OneToOne;
+
+	@Entity
+	public class Login {
+
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Long loginId;	
+		
+		private String loginName;
+		
+		private String password;
+
+		// Não é obrigatorio utilizar a identificação da classe dona do login, isto se faz somente se houver a 
+		// necessidade de um relacionamento bidirecional. 
+		// Neste caso utilizamos dentro da annotation o paramentro mappedBy para identificar na classe pai o nome
+		// do atributo que utiliza esta classe (Login) como relacionamento.
+		// Poderiamos ao invés de utilizar o parametro "mappedBy" a annotation @JoinColumn(name = "login_id"),
+		// Neste caso simulariamos um relacionamento unidirecional para a classe pai
+        // Ao utilizar o parâmetro mappedBy estamos tornando o relacionamento bidirecional
+		@OneToOne(fetch = FetchType.LAZY, mappedBy = "login")
+		private EmployeeEntity employee;
+	}
+
+
+. Relacionamento @OneToMany
+
+		@Entity
+		public class Funcionario {
+			@Id
+			@GeneratedValue( strategy = GenerationType.IDENTITY)
+			private Long id;
+			
+			private String nome;
+			
+			@OneToOne(optional = false)
+			private Departamento departamento;
+			
+			public Funcionario() {
+				// TODO Auto-generated constructor stub
+			}
+
+		// Getters and Setters
+
+		}
+
+	. Na classe Departamento identificamos a coleção de funcionarios com a annotation @OneToMany.
+		
+		Podemos trabalhar de duas formas:
+
+		a.) Quando utilizamos @OneToMany(mappedBy = "..." ) nos referimos diretamente a configuração da propriedade
+			da classe Funcionario.departamento. Como ela está anotada com a annotation @OneToOne, a JPA associa este
+			atributo ao campo departamento_id seguinte o padrão explicado anteriormente.
+		b.) Caso não utilizassemos o parâmetro mappedBy, o JPA criaria uma tabela de entidade relacionamento para conter
+			as chaves de relacionamento entre as tabelas automaticamente. Neste caso poderia configurar as chaves através 
+			da annotation @JoinTable:
+
+			@JoinTable( name = "FUNCIONARIO_DEPARTAMENTO", 
+						joinColumns = @JoinColumn(name = "departamento_id"),
+						inverseJoinColumns = @JoinColumn(name="funcionario_id"))
+
+			Por padrão, o nome da join table é a concatenação com “_” dos nomes das duas entidades. No
+			exemplo de departamentos e funcionários, o nome do join table seria Departamento_Funcionario.
+			Essa tabela possuirá duas colunas vinculadas às entidades que formam o relacionamento. No exem-
+			plo, a join table Departamento_Funcionario possuirá uma coluna chamada Departamento_id e ou-
+			tra chamada funcionarios_id.
+
+
+
+		public class Departamento {
+
+			@Id
+			@GeneratedValue( strategy = GenerationType.IDENTITY)
+			private Long id;
+			
+			private String nome;
+
+			@OneToMany(mappedBy = "departamento")
+		//	@JoinTable( name = "FUNCIONARIO_DEPARTAMENTO", 
+		//				joinColumns = @JoinColumn(name = "departamento_id"),
+		//				inverseJoinColumns = @JoinColumn(name="funcionario_id"))
+			List<Funcionario> funcionarios = new ArrayList<>();
+
+		// Getters and Setters
+
+		}
+
+. Relacionamento @ManyToOne
+
+    @Entity
+    public class Item {
+        
+        @ManyToOne(fetch = FetchType.LAZY)
+        private PurchaseOrder order;
+    
+        ...
+    }
+        
+    @Entity
+    public class PurchaseOrder {
+        
+        @OneToMany(mappedBy = "order")
+        // @JoinColumn(name = “order_id”) 
+        // Utilize esta anotação caso não for utilizar o mappedBy. Relacionamento unidirecional
+        private List<Item> items = new ArrayList<Item>();
+    
+        ...
+    }
+
+
+. Relacionamento @ManyToMany
+
+    @Entity
+    public class Stock {
+
+        @Id
+        @GeneratedValue( strategy=GenerationType.IDENTITY)
+        private Long id;
+        
+        @ManyToMany( cascade = {CascadeType.PERSIST, CascadeType.REMOVE}) 
+        @JoinTable(	name="stock_product",
+                    joinColumns=@JoinColumn(name = "stock_id"),
+                    inverseJoinColumns = @JoinColumn(name="product_id"),
+                    uniqueConstraints = @UniqueConstraint( columnNames = {"stock_id", "product_id"} ) )
+        private List<Product> stockProduct = new ArrayList<>();
+
+    }
+
+
+// Pesquisar o que é JoinTable
+
+
+
+Aulas 92 - 99 ( Hierarquia de herança )
+---------------------------------------
+
+. Existem 3 tipos de hierarquias:
+
+	Tabela Única por Hierarquia de Classes
+	Tabela por Subclasse
+	Tabela por Classe Concreta
+
+. Tabela única por hierarquia de classes - Cria uma única tabela no banco de dados. Todas as classes extendidas
+											irão referenciar a mesmas classes e os campos da tabela que não 
+											pertencerem a classe irão ficar com valores nulos ao serem persistidas.
+											Ela é representada pela tipagem "InheritanceType.SINGLE_TABLE".
+
+	/* 
+	
+		Classe Principal
+		
+		@Inheritance(strategy = InheritanceType.SINGLE_TABLE): 	Identifica que a estratégia de herança será 
+																de uma única tabela, ou se preferir, 
+																um “tabelão” para tudo.
+		@DiscriminatorColumn(	name = "tipo", 
+								length = 1, 
+								discriminatorType = DiscriminatorType.STRING): Identifica que o campo 
+																				que armazenará o discriminator é 
+																				o “tipo”, de tamanho 1,	do tipo String.
+		@Table(name="nome da tabela") : Indica o nome da tabela que irá representar o conjunto de classes. 
+ 	
+	 */
+
+	Entity
+	@Table(name = "topic")
+	@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+	@DiscriminatorColumn(
+		discriminatorType = DiscriminatorType.STRING,
+		name = "topic_type",
+		columnDefinition = "VARCHAR(1)"
+	)
+	public class Topic implements Serializable {
+	
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Long id;
+	
+		private String title;
+	
+		private String owner;
+	
+		@Temporal(TemporalType.TIMESTAMP)
+		private Date createdOn = new Date();
+
+		// getters and setters
+		public Topic(String title, String owner, Date createdOn) {
+			super();
+			this.title = title;
+			this.owner = owner;
+			this.createdOn = createdOn;
+		}
+
+		public Topic() {
+			super();
+		}
+		
+		@Override
+		public String toString() {
+			return "\n Topic [id=" + id + ", title=" + title + ", owner=" + owner + ", createdOn=" + createdOn + "]";
+		}
+	}
+
+
+	/* 
+		
+		Classe Extendida 
+
+		@DiscriminatorValue("P"): Identifica que a Post Pessoa será identifica com o atributo “P” 
+								na tabela Topic, ou seja, onde tiver “P” é porque aquele registro é uma Post.
+	*/
+
+	@Entity
+	@DiscriminatorValue("P")
+	public class Post extends Topic {
+	
+		private String content;
+
+		// getters and setters
+	
+		public Post(String title, String owner, Date createdOn, String content) {
+			super(title, owner, createdOn);
+			this.content = content;
+		}
+
+		
+		public Post() {
+			super();
+		}
+
+		@Override
+		public String toString() {
+			return "\n Post [content=" + content + ", getId()=" + getId() + ", getTitle()=" + getTitle() + ", getOwner()="
+					+ getOwner() + ", getCreatedOn()=" + getCreatedOn() + ", toString()=" + super.toString()
+					+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + "]";
+		}
+	}
+
+
+	/* Classe Extendida */
+
+	@Entity(name = "Announcement")
+	@DiscriminatorValue("A")
+	public class Announcement extends Topic {
+	
+		@Temporal(TemporalType.TIMESTAMP)
+		private Date validUntil;
+
+		public Announcement(String title, String owner, Date createdOn, Date validUntil) {
+			super(title, owner, createdOn);
+			this.validUntil = validUntil;
+		}
+
+		public Announcement() {
+			super();
+		}
+
+		@Override
+		public String toString() {
+			return "\n Announcement [validUntil=" + validUntil + ", getId()=" + getId() + ", getTitle()=" + getTitle()
+					+ ", getOwner()=" + getOwner() + ", getCreatedOn()=" + getCreatedOn() + ", toString()="
+					+ super.toString() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + "]";
+		}
+	}
+
+. Tabela por Subclasse - Nessa estratégia nós teremos a Classe Principal e todas suas filhas geradas no 
+						banco de dados fisicamente (employee, retired_employee e active_employee), 
+						sendo que em todas as classes filhas teremos 
+						uma chave estrangeira que apontará para a classe pai. Representada pela 
+						tipagem InheritanceType.JOINED.
+						Nos nossos exemplos abaixo, todas as classes extendidas terão o campo "ID",
+						o mesmo da tabela pai para realizar a associação/join entre tabelas.
+	/* 
+		Classe Principal
+		
+		@Inheritance(strategy = InheritanceType.JOINED): Identifica que a estratégia de herança 
+														 será “JOINED”, ou seja, será feita uma 
+														 junção através de chaves estrangeiras.
+	*/
+
+		@Entity
+		@Inheritance(strategy = InheritanceType.JOINED)
+		public class Employee implements Serializable {
+
+			private static final long serialVersionUID = 1L;
+			
+			@Id
+			@GeneratedValue( strategy = GenerationType.IDENTITY )
+			private Long id;
+			private String name;
+
+			public Employee(String name) {
+				super();
+				this.name = name;
+			}
+
+			public Employee() {
+				super();
+
+			}
+
+			// Getters and Setters
+		}
+
+
+
+
+		*/
+			Classe Extendida
+		
+			@PrimaryKeyJoinColumn(name="id"): Identifica qual campo fará essa “junção” entre a tabela 
+												employee e retired_employee. Neste caso não foi necessária 
+												porque o nome dos campos gerados ficaram sendo o default dos
+												atributos das classes.
+		*/
+
+		@Entity
+		// @PrimaryKeyJoinColumn(name="id")
+		public class RetiredEmployee extends Employee {
+
+			private static final long serialVersionUID = -4573850784352158034L;
+			
+			private BigDecimal pension;  
+			
+			public RetiredEmployee() {
+				// TODO Auto-generated constructor stub
+			}
+
+			public RetiredEmployee(BigDecimal pension) {
+				super();
+				this.pension = pension;
+			}
+
+			// Getters and Setters
+		}
+
+		*/
+			Classe Extendida
+		*/
+
+		@Entity  
+		public class ActiveEmployee extends Employee {  
+		
+			/**
+			* 
+			*/
+			private static final long serialVersionUID = -8047689041220268193L;
+			
+			private BigDecimal salary;  
+			private int experience;  
+			
+			public ActiveEmployee(String name, BigDecimal salary, int experience) {
+				super(name);
+				this.salary = salary;
+				this.experience = experience;
+			}
+
+			public ActiveEmployee() {  
+				super();  
+				
+			}
+
+			// Getters and Setters
+		}
+
+
+. Tabela por classe concreta : Essa estratégia define que apenas as classes concretas geram 
+								suas respectivas tabelas, ou seja, em nosso exemplo apenas 
+								Person, CompanyPerson e Contributor. Se a classe Person fosse 
+								abstrata ela não seria criada. 
+								Para ser criada a classe Person também podemos utilizar a annotation
+								@MappedSuperclass no lugar da @Inheritance( strategy = InheritanceType.TABLE_PER_CLASS).
+								Importante: nos testes não foi possivel utilizar o tipo 
+											GenerationType.IDENTITY, pois estava dando erro. 
+
+	/*
+
+		Classe Principal
+
+	*/
+
+	// @MappedSuperclass
+	@Inheritance( strategy = InheritanceType.TABLE_PER_CLASS)
+	public class Person implements Serializable {
+
+		private static final long serialVersionUID = 8475640398662281671L;
+
+		@Id
+		@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="pessoa_sequence")
+		@SequenceGenerator(name="pessoa_sequence", sequenceName="pes_seq",initialValue = 1, allocationSize = 1)
+		private Long id;
+		
+		private String name;
+		
+		public Person() {
+			// TODO Auto-generated constructor stub
+		}
+
+		public Person(String name) {
+			super();
+			this.name = name;
+		}
+
+			// Getters and Setters
+	}
+
+
+	@Entity
+	public class CompanyPerson extends Person {
+
+		/**
+		* 
+		*/
+		private static final long serialVersionUID = -2130106796723626887L;
+
+		private String EIN;
+		
+		@Temporal(TemporalType.DATE)
+		private Calendar foundationDate;
+		
+		public CompanyPerson() {
+			super();
+		}
+
+		public CompanyPerson(String name, String eIN, Calendar foundationDate) {
+			super(name);
+			EIN = eIN;
+			this.foundationDate = foundationDate;
+		}
+
+			// Getters and Setters
+	}
+
+
+
+	@Entity
+	public class Contributor extends Person {
+
+		/**
+		* 
+		*/
+		private static final long serialVersionUID = 2315603624314038422L;
+
+		private String socialSecurityNumber;
+		
+		@Temporal(TemporalType.DATE)
+		private Calendar birthdayDate;
+
+		public Contributor() {
+			super();
+		}
+
+		public Contributor(String name, String socialSecurityNumber, Calendar birthdayDate) {
+			super(name);
+			this.socialSecurityNumber = socialSecurityNumber;
+			this.birthdayDate = birthdayDate;
+		}
+
+			// Getters and Setters
+	}
+
+
+Aulas 108 - 113
+---------------
+
+
+. O conceito de transação pode ser descrito com a sigla ACID abaixo:
+
+	Atomicidade: A transação deve ser tratada como uma operação singular, isso significa que 
+				todos os comandos presentes neste transação podem ser concluídos com sucesso ou sem sucesso. 
+				Nada será salvo se pelo menos 1 comando de 100 der errado, todos devem executar com sucesso, 
+				sem erros.
+
+	Consistência: Este representa a consistência de integridade da base de dados, 
+					são elas: chaves primarias únicas e etc.
+
+	Isolação: Muitas transação podem ser executadas ao mesmo tempo, a isolação garante que cada 
+				transação é isolada da outra, prevenindo corrupção de dados.
+
+	Durabilidade: Uma transação depois de persistida deve continuar persistida e não pode 
+					ser apagada por falhas no sistema.
+
+. Read-Only
+
+	Uma outra propriedade muito importante no uso de transações é o read-only, 
+	identificando que determinada transação não pode realizar operações de 
+	escrita ou alterações, apenas leitura, como mostra o código a seguir:
+
+	@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+
+
+. Isolamento da transação:
+
+	O padrão SQL define quatro níveis de isolamento de transação em termos de três fenômenos 
+	que devem ser evitados entre transações simultâneas. Os fenômenos não desejados são:
+
+	dirty read (leitura suja)
+	
+		A transação lê dados escritos por uma transação simultânea não efetivada (uncommitted).
+
+	nonrepeatable read (leitura que não pode ser repetida)
+
+		A transação lê novamente dados lidos anteriormente, e descobre que os dados foram 
+		alterados	por outra transação (que os efetivou após ter sido feita a leitura anterior).
+
+	phantom read (leitura fantasma)
+		
+		A transação executa uma segunda vez uma consulta que retorna um conjunto de linhas que 
+		satisfazem uma determinada condição de procura, e descobre que o conjunto de linhas que 
+		satisfazem a condição é diferente por causa de uma outra transação efetivada recentemente.
+
+. Níveis de isolamento:
+
+	Default: Usa o padrão do banco de dados;
+
+	Read Uncommited: Este é o nível menos isolado e o como o próprio nome já sugere, 
+						ele permite a leitura antes da confirmação. Neste nível de isolação 
+						todos os problemas (Dirty Reads, Nonrepeatable reads e Phatom Reads) 
+						podem ocorrer sem restrição. É muito difícil que esse nível seja 
+						aplicado na prática pois poderiamos ter sérios problemas de consistência, 
+						por isso ele é considerado mais acadêmico, apenas para fins de estudos;
+
+	Read Commited: Neste nível de isolação não podem ocorrer Dirty Reads mas são permitidos 
+					Nonrepeatable reads e Phantom Reads;
+
+	Repeatable Readed: Aqui apenas ocorrem Phantom Reads. O SGBD bloqueia o conjunto de dados 
+						lidos de uma transação, não permitindo leitura de dados alterados ou 
+						deletados mesmo que comitados pela transação concorrente, 
+						porém ele permite a leitura de novos registros comitados 
+						por outras transações;
+
+	Serializable: Este é o nível mais isolado que não permite nenhum tipo de problema 
+					(Dirty Read, Nonrepeatable read e Phantom Read);
+
+	A ideia para usar o nível de isolação é muito parecida com a propagação da transação, 
+	você deve usar as constantes presentes na classe Isolation, como mostra a Listagem 4.
+
+	Listagem 4. Usando isolation
+
+		@Transactional(readOnly = true, propagation = Propagation.SUPPORTS, isolation = Isolation.DEFAULT)
+		@Transactional(readOnly = true, propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED)
+		@Transactional(readOnly = true, propagation = Propagation.SUPPORTS, isolation = Isolation.READ_UNCOMMITTED)
+		@Transactional(readOnly = true, propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
+		@Transactional(readOnly = true, propagation = Propagation.SUPPORTS, isolation = Isolation.SERIALIZABLE)
+
+	Nível de isolamento		Dirty Read		Nonrepeatable Read		Phantom Read
+	-------------------		----------		------------------		------------
+	Read uncommitted		Possível		Possível				Possível
+	Read committed			Impossível		Possível				Possível
+	Repeatable read			Impossível		Impossível				Possível
+	Serializable			Impossível		Impossível				Impossível		
+
+. Propagation
+
+Este atributo definir o nível de propagação de determinada transação, que pode ser:
+
+	PROPAGATION_REQUIRED: Este definir que obrigatoriamente aquele bloco de código deve ser 
+							executado dentro de uma transação. Se uma transação já existir então 
+							ele usará esta existente, caso contrário ele criará uma nova. 
+							Este é o padrão quando não definido nenhum nível de propagação explicitamente.
+	PROPAGATION_SUPPORTS: Se uma transação já existir então ela será utilizada caso contrário 
+							nenhuma será criada.
+	PROPAGATION_MANDATORY: Caso exista uma transação ela será utilizada, caso contrário uma exceção 
+							será lançada, TransactionRequiredException, pois este tipo de propagação 
+							requer que uma transação já esteja criada previamente.
+	PROPAGATION_REQUIRED_NEW: Sempre cria uma nova transação. Se nenhuma transação existir então 
+								ela será criada, porém se uma já existir ela será suspensa e uma nova 
+								será criada. Quando esta transação é finalizada então a transação 
+								original é recuperada.
+	PROPAGATION_NOT_SUPPORTED: Uma transação não será necessária no bloco de código anotado com 
+								este atributo. Se alguma transação existir então ela será suspensa 
+								até o fim do bloco e só depois será retomada.
+	PROPAGATION_NEVER: Muito semelhante ao PROPAGATION_NOT_SUPPORTED, não permitindo o uso de 
+								transações no bloco de código, com a única diferença que caso 
+								uma transação exista uma exceção será lançada.
+	PROPAGATION_NESTED: O bloco de código será executado em uma transação aninhada se uma outra transação 
+						já existir, caso contrário será criada uma nova transação.
+
+	Listagem 3. Usando o atributo propagation
+
+	@Transactional(propagation = Propagation.MANDATORY)
+	@Transactional(propagation = Propagation.NESTED)
+	@Transactional(propagation = Propagation.NEVER)
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	@Transactional(propagation = Propagation.REQUIRED)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional(propagation = Propagation.SUPPORTS)
+
+. Timeout
+
+	Define o tempo limite para a transação ser abortada automaticamente, por padrão 
+	é utilizado o timeout do banco de dados corrente.	
+
+	@Transactional(timeout=40)
+
+
+Aulas 114 a 120
+---------------
+
+. Três tipos de interface para se trabalhar com Sprint Data Repository:
+
+	CrudRepository				Disponibiliza funções CRUD;
+	PagingAndSortingRepository	Disponibiliza metodos para paginação e ordenação de ocorrências;
+	JpaRepository				Disponibiliza metodos relacionados descarregamento de contexto de 
+								persistência e deleção de ocorrências em "batch".
+
+	Quando precisarmos de todos os recursos de CRUD e paginação usaremos a interface JpaRepository,
+	caso contrário usar a simplicidade do CrudRepository e o PagingAndSortingRepository.
+
+. Exemplo da utilização das interface JpaRepository:
+
+package net.model;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+
+@Entity
+@NamedQuery(name="findAllArticle", query="Select a from Article a")
+public class Article {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	private String title;
+	
+	private String category;
+
+	public Article() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Article(String title, String category) {
+		super();
+		this.title = title;
+		this.category = category;
+	}
+
+	// ToString, Getter and Setters
+}
+
+
+
+package net.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import net.model.Article;
+
+public interface ArticleRepository extends JpaRepository<Article, Long>  {
+    List<Article> findByTitle(String title);
+    List<Article> findDistinctByCategory(String category);
+    List<Article> findByTitleAndCategory(String title, String category);
+    List<Article> findByCategoryOrderByTitleDesc(String category);
+    List<Article> deleteByCategory(String name);
+    
+    @Query("Select a From Article a where category like 'Java%'")
+    List<Article> articleCategoryWithJava(String category);
+    
+    @Query(value="SELECT * FROM article WHERE title like '%Spring%'", nativeQuery = true )
+    List<Article> articleTitleWithSpring();
+    
+    @Query(name="findAllArticle")
+    List<Article> articleQueryByName();
+} 
+
+. Metodos da interface CrudRepository:
+
+	save(…) – save an Iterable of entities. Here, we can pass multiple objects to save them in a batch
+	findOne(…) – get a single entity based on passed primary key value
+	findAll() – get an Iterable of all available entities in database
+	count() – return the count of total entities in a table
+	delete(…) – delete an entity based on the passed object
+	exists(…) – verify if an entity exists based on the passed primary key value
+
+	This interface looks quite generic and simple, but actually, it provides all 
+	basic query abstractions needed in an application.
+
+. Métodos da interface JpaRepository:
+
+	findAll() – get a List of all available entities in database
+	findAll(…) – get a List of all available entities and sort them using the provided condition
+	save(…) – save an Iterable of entities. Here, we can pass multiple objects to save them in a batch
+	flush() – flush all pending task to the database
+	saveAndFlush(…) – save the entity and flush changes immediately
+	deleteInBatch(…) – delete an Iterable of entities. Here, we can pass multiple objects to delete them in a batch
+
+
+. Metodos da interface para se utilizar as classes Sort e Pageble:
+
+	{JpaRepository}.findAll(Sort sort)
+	{JpaRepository}.findAll(Pageable pageable)
+
+	Exemplo do uso da classe Pageable :
+
+		PageRequest pageRequest = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "title") );
+		
+		Page<Article> firstPage = articleRepository.findAll(pageRequest);
+
+	Exemplo do uso da Classe Sort:
+
+		List<Article> articles = (List<Article>) articleRepository.findAll(Sort.by(Sort.Direction.ASC, "title"));
+
+. Exemplo de Utilização dos métodos:
+
+	. Metodo findById() e findBy{ColumnName}:
+
+		O método findById já vem automaticamente nas interfaces CrudRepository e JpaRepository. Se 
+		quisermos fabricar outros metodos de Crud (find e delete), basta seguir a regra:
+
+		findBy{ColumnName}{And}{ColumnName}(? params...)
+		deleteBy{ColumnName}{And}{ColumnName}(? params...)
+
+		A interface Optional<?> é um recurso muito interessante de se utilizar nos métodos findBy... Essa 
+		interface disponibiliza metodos para averiguar se foi encontrado ocorrências, por exemplo:
+
+			Optional<Article> article = articleRepository.findById(1L);
+
+			article.isPresent();
+
+		Caso saiba que sempre retornará uma ocorrência utilize o método "get()" do findBy..., por exemplo:
+
+			Article article = articleRepository.findById(1L).get();
+
+		Exemplo:
+			
+			// Interface Repository
+			public interface ArticleRepository extends JpaRepository<Article, Long>  {
+				List<Article> findByTitle(String title);
+				List<Article> deleteByCategory(String name);
+			}
+
+
+
+			// Classe de Teste
+			@TestMethodOrder(OrderAnnotation.class) // Annotation para informar que a ordem da execução dos testes será pela
+													// annotation @Order
+			@RunWith(SpringRunner.class)
+			@SpringBootTest(classes = BootJpaAllRelationApplication.class)
+			@Transactional
+			class ArticleRepositoryTests {
+				@Autowired
+				ArticleRepository articleRepository;
+
+				@Test
+				void contextLoads() {
+				}
+
+				@Test
+				@Order(1) // Direciona a ordem da execução dos testes
+				void testFindById() throws Exception {
+					try {
+						Optional<Article> article = articleRepository.findById(1L);
+
+						assertTrue(article.isPresent());
+
+						Article articleTitle = articleRepository.findByTitle("Spring Boot Getting Started").get(0);
+
+						assertNotNull(articleTitle);
+					} catch (Exception e) {
+						e.printStackTrace();
+
+						throw new Exception(e.getMessage()); // TODO: handle exception
+					}
+
+				}
+
+				@Test
+				@Order(2) // Direciona a ordem da execução dos testes
+				void testFindAll() throws Exception {
+					try {
+						List<Article> articles = (List<Article>) articleRepository.findAll(Sort.by(Sort.Direction.ASC, "title"));
+
+			//			articleRepository.findAll(Sort.by("title","category" ));
+			//			articleRepository.findAll(Sort.by(Sort.Direction.ASC, "title"));
+			//			articleRepository.findAll(Sort.by(Sort.Direction.DESC, "title"));
+						
+						assertNotEquals(0, articles.size());
+
+						PageRequest pageRequest = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "title") );
+						
+						Page<Article> firstPage = articleRepository.findAll(pageRequest);
+						
+						assertFalse(firstPage.isEmpty());
+
+						List<Article> articleByName = (List<Article>) articleRepository.findByTitle("Lambda Expressions Java 8 Example");
+						
+						assertFalse(articleByName.isEmpty());
+
+						List<Article> articleByCategory = (List<Article>) articleRepository.findByCategoryOrderByTitleDesc("Spring Boot");
+						
+						assertFalse(articleByCategory.isEmpty());
+
+						List<Article> articleCategoryWithJava = articleRepository.articleCategoryWithJava("Java");
+
+						assertFalse( articleCategoryWithJava.isEmpty() );
+
+						List<Article> articleTitleWithSpring = articleRepository.articleTitleWithSpring();
+
+						assertFalse( articleTitleWithSpring.isEmpty() );
+
+						List<Article> articleQueryByName = articleRepository.articleQueryByName();
+
+						assertFalse( articleQueryByName.isEmpty() );
+					} catch (Exception e) {
+						e.printStackTrace();
+
+						throw new Exception(e.getMessage()); // TODO: handle exception
+					}
+				}
+
+				@Test
+				@Rollback(true)
+				@Order(3)
+				public void testUpdateArticle() throws Exception {
+					try {
+						Article article = articleRepository.findById(1L).get();
+
+						article.setTitle("Java Concurrency Updated");
+
+						article = articleRepository.save(article);
+
+						assertEquals("Java Concurrency Updated", article.getTitle());
+					} catch (Exception e) {
+						e.printStackTrace();
+
+						throw new Exception(e.getMessage()); // TODO: handle exception
+					}
+				}
+
+				@Test
+				@Rollback(true)
+				@Order(4)
+				public void testInsertArticle() throws Exception {
+					try {
+						Article article = new Article("Teste", "Teste");
+
+						article = articleRepository.save(article);
+
+						assertNotEquals(0, article.getId());
+					} catch (Exception e) {
+						e.printStackTrace();
+
+						throw new Exception(e.getMessage()); // TODO: handle exception
+					}
+				}
+
+				@Test
+				@Rollback(true)
+				@Order(5)
+				public void testDeleteArticle() throws Exception {
+					logger.info("\n Testing is Running delete()");
+
+					try {
+						articleRepository.deleteById(1L);
+
+						Optional<Article> article2 = articleRepository.findById(1L);
+
+						assertFalse(article2.isPresent());
+
+						logger.info("\n ArticleRepository.delete() Order by title {}",
+								articleRepository.findAll(Sort.by("title")));
+						
+						articleRepository.deleteByCategory("Spring Boot");
+						
+						List<Article> articleByCategory = articleRepository.findByCategoryOrderByTitleDesc("Spring Boot");
+						
+						assertTrue(articleByCategory.isEmpty());
+					} catch (Exception e) {
+						e.printStackTrace();
+
+						throw new Exception(e.getMessage()); // TODO: handle exception
+					}
+				}
+			}
+
+. Spring Data Rest
+
+	. Implementar as dependências do pom.xml como abaixo:
+
+		<dependencies>
+			...
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-rest</artifactId>
+			</dependency>
+		</dependencies>
+
+	. Acesse a classe de implementação repositorio e implemente a annotation @RepositoryRestResource.
+
+		package net.repository;
+
+		// imports ...
+
+		@RepositoryRestResource( path="articles" )
+		public interface ArticleRepository extends JpaRepository<Article, Long>  {
+			...
+		}
+
+	. Execute o projeto e acesse o link abaixo:
+
+		http:localhost:8080/articles
+
+	. Caso haja alguma lista de objetos associado a alguma propriedade/metodo da classe model, isto
+		poderá ocasionar num loop infinito. Para inibir esse problema coloque a annotation
+		@JsonIgnore neste metodo.
+
+		@ManyToMany(mappedBy="...")
+		@JsonIgnore
+		private List<...> nameProperty = new ArrayList<>();
+
+
+Aulas 122 a 125 - CAching with Hibernate and JPA
+------------------------------------------------
+
+	. Implementar as dependências do pom.xml como abaixo:
+
+		<dependencies>
+			...
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-ehcache</artifactId>
+			</dependency>
+		</dependencies>
+
+	. Implemente as linhas abaixo no arquivo application.properties:
+
+	# Second Level Cache - EhCache
+
+	# 1. Enable second level cache
+	spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+
+	# 2. Specify the caching framework - EhCache
+	spring.jpa.properties.hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.EhCacheRegionFactory
+
+	# 3. Only cache what I tell to cache
+	spring.jpa.properties.javax.persistence.sharedCache.mode=ENABLE_SELECTIVE
+
+	logging.level.net.sf.ehcache=debug
+
+	. Acesse a classe model desejada e insera a annotation @Cacheable como abaixo:
+
+		@Entity
+		@NamedQuery(name="findAllArticle", query="Select a from Article a")
+		@Cacheable
+		public class Article {
+			...
+		}
+
+	
+Aulas 126 a 132 - Hibernate and Tips
+------------------------------------
+
+. @SQLDelete and @Where
+
+	. Caso precisemos trabalhar num ambiente que não se deseja apagar fisicamente os
+		registros, podemos simular uma remoção lógica. 
+
+		a. Crie a propriedade que será utilizado se o registro está eliminado;
+		b. Insira a annotation @SQLDelete()
+		c. Insira a annotation @Where
+	
+		@Entity
+		@NamedQuery(name="findAllArticle", query="Select a from Article a")
+		@Cacheable
+		@SQLDelete(sql = "update article set is_deleted = true where id = ?)	// b
+		@Where(clause = "is_delete = false")									// c
+		public class Article {
+
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)
+			private Long id;
+			
+			private String title;
+			
+			private String category;
+
+			private boolean isDeleted;											// a
+
+			...	// Getters, Setters and Constructor
+		}
+
+		Sempre que houver uma ação de remoção, pelo metodo delete... será executado a DML
+		do argumento @SQLDelete e não a DML "delete from ...".
+
+		Todas as vezes que qualquer metodo find... for envocado será utilizado o conteúdo do 
+		argumento da annotation @Where.
+
+	. @Embedded e @Embeddable
+
+		A annotation @Embedded é utilizada na classe principal no atributo que faz referência
+		a uma determinada classe.
+
+		A annotation @Embeddable é utilizada na classe que será declarada como sendo uma classe
+		para ser usada de forma embutida em alguma outra classe.
+
+		A annotation @AttributeOverrides declara uma lista de annotations que associa as propriedades
+		da classe com os campos da tabela, caso haja divergência de nomes.
+
+		Exemplo:
+
+			@Entity
+			public class Company {
+
+				@Id
+				@GeneratedValue( strategy = GenerationType.IDENTITY)
+				private Long id;
+
+				private String name;
+				
+				@Embedded
+				@AttributeOverrides({
+					@AttributeOverride(name = "postcode", column = @Column(name = "zip")),
+					@AttributeOverride(name = "city", column = @Column(name = "town"))
+				})	
+				private Address address;
+
+				...
+			}
+
+
+			@Embeddable
+			public class Address {
+
+				private String postcode;
+				
+				private String street;
+			
+				private String city;
+			
+				private String country;
+			
+				...
+			}
+
+	. @EmbeddeId
+
+		Utilizada para construir chaves compostas.
+
+		Exemplo:
+
+			@Entity
+			public class Company {
+
+				@EmbeddedId
+				private CompanyId id;
+
+				...
+			}
+
+
+
+			@Embeddable
+			public class CompanyId implements Serializable{
+
+				private Long id;
+				
+				private String EIN;
+
+				...	// Getters, Setters, Constructor(...), equals and hashCode
+
+			}
+
+
+		Exemplo de uso:
+
+			CompanyId id = new CompanyId(1L,"999.999.999-9999");
+			Optional<Company> company = companyRepository.findById( id );
+
+
+Aulas Adicionais
+----------------
+
+. Conexão com o banco Postgres
+
+	. Acrescente as configurações abaixo no arquivo application.properties:
+
+		logging.level.org.springframework=ERROR
+
+		spring.datasource.url=jdbc:postgresql://localhost:5432/desenv
+		spring.datasource.username=supervisor
+		spring.datasource.password=brasil2
+
+		spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+		# Fará somente os update das diferenças entre as classes model com o BD
+		spring.jpa.hibernate.ddl-auto=update
+
+		spring.jpa.show-sql=true
+		spring.jpa.properties.hibernate.format_sql=true
+
+	. @Qualifier - Essa annotation ajuda a definir qual objeto será feito a injeção de dependência
+					quando houver a possibilidade de mais de um objeto estiver disponivel para isso.
+					Podemos suprimir a annotation @Qualifier se colocarmos o parâmetro informando o
+					nome identificador da classe dentro da annotation @Component, ou @Service
+
+		Exemplo:
+
+			//@Component
+			@Service
+			public class Conta {
+
+				private Long id;
+				private String nomeCorrentista;
+				private Float saldo;
+				private String nrConta;
+
+				... // Getters and Setters
+			}
+
+			@Service("corrente")
+			//@Component("corrente")
+			//@Qualifier("corrente")
+			public class Corrente extends Conta {
+
+				private Float limite;
+
+				... // Getters and Setters
+
+				@Override
+				public String toString() {
+					return "\n Corrente [limite=" + limite + ", getId()=" + getId() + ", getNomeCorrentista()=" + getNomeCorrentista()
+							+ "]";
+				}
+			}
+
+			@Service("poupanca")
+			//@Component("poupanca")
+			//@Qualifier("poupanca")
+			public class Poupanca extends Conta{
+				private int diaAniversario;
+				
+				private Float taxaRemuneracao;
+				
+				... // Getters and Setters
+
+				@Override
+				public String toString() {
+					return "\n Poupanca [diaAniversario=" + diaAniversario + ", taxaRemuneracao=" + taxaRemuneracao
+							+ ", getDiaAniversario()=" + getDiaAniversario() + ", getTaxaRemuneracao()=" + getTaxaRemuneracao()
+							+ "]";
+				}
+			}
+
+
+
+			@SpringBootTest
+			class JpaWithPostgresApplicationTests {
+
+				private Logger logger = LoggerFactory.getLogger(this.getClass());
+				
+				@Autowired
+				@Qualifier("corrente")
+				private Conta contaCorrente;
+				
+				@Autowired
+				@Qualifier("poupanca")
+				private Conta contaPoupanca;
+				
+				@Test
+				void contextLoads() {
+					logger.info(" Conta Corrente {} ", contaCorrente.toString());
+					logger.info(" Conta Poupanca {} ", contaPoupanca.toString());
+					
+					
+				}
+
+			}
