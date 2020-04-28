@@ -1,0 +1,523 @@
+1. Instalação do VIM
+--------------------
+
+. Abra o terminal e digite os comandos abaixo:
+
+	sudo apt-get update
+	sudo apt-get install vim
+
+
+2. Instalação do Postgres e do IDE SQL do Postgres
+--------------------------------------------------
+
+. Abra o terminal e execute os comandos abaixo:
+
+		# Se for no Ubuntu 19 em diante instale a versão 11 do postgres
+		
+		sudo apt-get update && sudo apt-get upgrade
+		sudo apt-get install postgresql-10 postgresql-contrib	
+		sudo apt-get install pgadmin3
+		sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+		sudo -u postgres psql -c "CREATE DATABASE testdb;"
+
+
+. Após a instalação altere as configurações do banco para permitir melhor controle de acessso. Abra o arquivo da seguinte forma:
+
+		sudo vim /etc/postgresql/10/main/pg_hba.conf
+
+. Altere as configurações da seguinte forma:
+
+		 # TYPE  	DATABASE        USER		ADDRESS		METHOD
+		 # "local" is for Unix domain socket connections only
+		 local   	all        	all                         	peer
+		 # IPv4 local connections:
+		 host    	all        	all         	127.0.0.1/32  	md5
+		 # IPv6 local connections:
+		 host    	all         	all         	::1/128         md5
+
+		to
+
+		 # TYPE  	DATABASE  	USER       	ADDRESS        	METHOD
+		 # "local" is for Unix domain socket connections only
+		 local   	all         	all                           	md5
+		 # IPv4 local connections:
+		 host    	all          	all         	0.0.0.0/0       md5
+		 # IPv6 local connections:
+		 host    	all         	all         	::1/128         md5
+ 
+
+. Abra outro arquivo de configurações:
+
+		sudo vim /etc/postgresql/10/main/postgresql.conf
+
+. Altere as seguintes configurações:
+
+		#listen_addresses = 'localhost'
+
+		Para
+
+		listen_addresses = '*'
+		# Isto libera o banco para ser conectado de outras estações.
+	
+. Reinicialize o serviço:
+
+		sudo /etc/init.d/postgresql restart
+		ou
+		sudo service postgresql restart
+
+. Acesse o banco da seguinte forma, utilizando a senha “postgres”:
+
+		sudo -su postgres
+		psql [Database Name] [User Name]
+		Exemplo: psql testdb postgres
+
+. Criação de Usuários:
+
+		# [Database Name] = desenv
+		# User Name] = supervisor
+		sudo -u postgres createuser --interactive --password [User Name]
+		sudo -u postgres createdb [Database Name] -O [User Name]
+		sudo service postgresql restart
+		sudo -u postgres psql postgres
+		
+		postgres=# \password [User Name]
+
+		\q
+
+		sudo -su postgres
+		psql -U [User Name] -d [Database Name] -W
+
+3. Instalação do banco de dados MySQL:
+-------------------------------------
+
+. Abra o terminal e execute os comandos abaixo:
+
+		sudo apt update 
+		sudo apt upgrade
+
+		# No passo abaixo use <Tab> para mover entre as opções e dê <OK> para finalizar a escolha
+		wget http://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
+
+		sudo dpkg -i mysql-apt-config_0.8.13-1_all.deb
+		sudo apt update 
+		sudo apt install mysql-server
+		sudo systemctl restart mysql
+
+		# Passo opcional caso queira melhorar o nivel de segurança do banco
+		# sudo mysql_secure_installation
+
+		mysql -u root -p
+
+
+4. Instalação do Java
+---------------------
+
+. Tentativa de instalar o JDK via linha de comando, caso não dê certo siga os passos seguintes:
+
+	# os comandos abaixo será para habilitar o "sudo apt-get" que não vem por default no Debian
+	sudo apt-get update
+
+	sudo apt-get upgrade
+
+	sudo apt-get install software-properties-common
+
+	sudo add-apt-repository ppa:webupd8team/java
+
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C2518248EEA14886
+
+	# Ir no arquivo /etc/apt/sources.lists.d/webupd8team-ubuntu-java-eoan.list e altere o conteudo por:
+
+	deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main 
+	deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
+	
+	# SE quiser altere o nome do arquivo para webupd8team-ubuntu-java-trusty.list
+
+	sudo apt update
+
+	sudo apt install oracle-java8-installer
+
+	# Para escolher a versão do java que será utilizado
+	sudo update-alternatives --config java
+	sudo update-alternatives --config javac
+
+	#Abra o arquivo de variaveis e  insira as vars abaixo
+	sudo vim /etc/environment
+	JAVA_HOME="..."
+	JRE_HOME="..."
+
+	# Se quiser podemos colocar as variaveis ambientais no arquivo ~/.bashrc, ou /etc/bash.bashrc
+
+
+
+. Outra maneira de instalar o java e acessar o site da oracle e baixar o jdk8. Consulte no google "Download jdk 8";
+
+. Após a instalação abra o terminal.
+
+. Acesse a pasta de Downloads:
+	cd ~/Downloads
+
+. Execute os comandos abaixo:
+	sudo mv ~/jdk-*-linux-x64.tar.gz /opt
+	sudo cd /opt
+	sudo tar -zxf jdk-[versao]-linux-x64.tar.gz 
+    sudo mv jdk-*-linux* jdk8
+
+	sudo update-alternatives --install /usr/bin/java java /opt/jdk8/bin/java 100
+	sudo update-alternatives --install /usr/bin/javac javac /opt/jdk8/bin/javac 100
+	sudo rm /opt/jdk8/jdk-*-linux-x64.tar.gz
+
+. Escolher a versão do java default caso tenha mais de uma instalada:
+
+	sudo update-alternatives --config java
+    sudo update-alternatives --config javac
+
+. Configuração das variaveis ambientais. Coloque as duas linhas abaixo num dos arquivos /etc/bash.bashrc, 
+	~/.bashrc ou /etc/environment
+
+	export JAVA_HOME=/opt/jdk/jdk1.8.0_221/
+	export JRE_HOME=/opt/jdk/jdk1.8.0_221/
+
+
+5. Instalação do Tomcat
+-----------------------
+
+. Acessar o site do apache e baixar o pacote tomcat.
+
+. Mover o arquivo da pasta de Downloads e executar os comandos abaixo:
+
+	sudo mv apache-tomcat*.tar-gz /opt
+	cd /opt
+	sudo tar xfzv apache-tomcat-9.0.24.tar.gz 
+	sudo mv apache-tomcat-9.0.24/* tomcat-9/
+	sudo chmod 777 tomcat-9/* -R
+	cd tomcat-9/bin
+
+	./startup.sh
+
+. Acessar o browser para testar o servidor com o endereço http://localhost:8080
+
+. Edite o arquivo tomcat-users.xml, descomente a tag <tomcat-users> e deixe como abaixo: 
+
+	sudo vim /opt/tomcat-9/conf/tomcat-users.xml
+
+
+	<role rolename="tomcat"/>
+	<role rolename="manager-gui"/>
+	<role rolename="admin-gui"/>
+	<user username="tomcat" password="tomcat" roles="manager-gui"/>
+	<user username="admin" password="password" roles="manager-gui,admin-gui"/>
+
+6. Instalação do Eclipse:
+------------------------
+
+. Realizar download do Eclipse STS
+
+. Mover o arquivo da pasta de Downloads e executar os comandos abaixo:
+
+	sudo mv spring-tool-suite-3.9.9*.tar-gz /opt
+	cd /opt
+	sudo tar xfzv spring-tool-suite-3.9.9*.tar-gz
+    sudo mv spring-tool-suite-3.9.9*.tar-gz eclipse-sts
+	sudo chmod 777 eclipse-sts -R
+
+. Criar um lançador no desktop com o Eclipse STS
+
+
+7. Instalação do VSCode:
+-----------------------
+
+. Acessar a pagina de download da microsoft:
+
+https://code.visualstudio.com/download
+
+. Baixar o arquivo .deb 
+
+. Abrir o terminal e acessar a pasta Downloads
+
+. Executar o comando abaixo:
+
+	sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+
+8. Instalacao do Adobe Reader
+
+. Acesse a pagina de download do Adobe ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x/
+
+. Execute o comando abaixo:
+
+	cd ~/Downloads
+	sudo apt-get install -f ./AdbeRdr9.5.5-1_i386linux_enu.deb 
+
+
+8. Instalção do FoxIt:
+---------------------
+
+. Acesse a página de Download da FoxIt e realizar o download do Foxit Reader:
+
+https://www.foxitsoftware.com/pt-br/downloads/
+
+. Abrir o Terminal e acessar a pasta de Downloads.
+
+. Executar os comandos abaixo:
+
+	sudo tar xfzv FoxitReader.enu.setup.2.4.4.0911.x64.run.tar.gz 
+	sudo ./FoxitReader.enu.setup.2.4.4.0911\(r057d814\).x64.run
+
+9. Instalação do Google Chrome:
+-------------------------------
+
+. Acesse a página de Download do Google Chrome e realizar o download:
+
+https://www.google.pt/intl/pt-PT/chrome/?brand=CHBD&gclid=CjwKCAjwtajrBRBVEiwA8w2Q8LMLXaxT25WX8kLko_sxgV3UlwFkvO1IKlCtmYXEjk8TItXZGLx0wRoCCRYQAvD_BwE&gclsrc=aw.ds
+
+. Abrir o Terminal e acessar a pasta de Downloads.
+
+. Executar os comandos abaixo:
+
+	sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+
+10. Aplicativo instalador de pacotes, concorrente do "sudo install"
+
+sudo apt update
+sudo apt install -y snapd
+
+snap find <search terms>
+sudo snap install <snapname>
+sudo snap remove <snapname> 
+snap info <snapname>
+sudo snap revert <snap name>
+snap list
+sudo snap remove <snapname>
+
+
+
+11. Como instalar o postman
+
+. Baixar o postman no link:
+
+https://www.getpostman.com/downloads/canary
+
+. Descompactar o arquivo tar:
+
+sudo tar xvfz PostmanCanary-linux-x64-7.7.0-canary02.tar.gz 
+
+. Mover a pasta do postman para /opt
+
+. Criar no desktop o lançador abaixo
+
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Postman
+Exec=/opt/postman/PostmanCanary
+Type=Application
+Icon=/opt/postman/app/resources/app/assets/icon.png
+
+
+12. Instalaçao do PopCorn-Time
+
+. Baixe a ultima versão do cliente através do site oficial. https://popcorntime.sh/pt_BR
+
+. Acessa a pasta onde o arquivo foi baixado.
+
+. Como root, execute a sequencia abaixo
+
+    sudo mkdir /opt/popcorn && tar xvf -C Popcorn-Time-0.3.10-Linux-64.tar.xz /opt/popcorn
+    sudo wget -q -O /opt/popcorn/popcorntime.png https://upload.wikimedia.org/wikipedia/commons/6/6c/Popcorn_Time_logo.png    
+
+. Agora iremos criar o link simbólico que permitirá que usuários executem o programa sem privilégios adicionais.
+
+    sudo ln -s /opt/popcorn/Popcorn-Time /usr/bin/popcorn
+
+. Instalaçao do aptitude
+
+    sudo apt-get install aptitude
+
+. Instalaçao de mais bibliotecas
+
+    sudo aptitude install libgconf-2-4
+
+. Crie manualmente no desktop do seu computador o lançador, ou crie o arquivo na Área de Trabalho com os parâmetros abaixo:
+
+[Desktop Entry] Name=popcorn
+GenericName=PopCorn Client
+Comment=Cliente POPCORN
+Exec=popcorn
+Versão=1.0
+Type=Application
+Terminal=false
+Icon=/opt/popcorn/popcorntime.png
+Categories=Aplicativo;Network;
+
+
+13. Instalaçao do aMule
+
+	sudo apt-get install amule
+
+14. Instalaçao do PyCharm
+
+. Download from JetBrains
+	Install PyCharm. The standard and recommended location is /opt, although you can modify this selection if necessary. Run the following command:
+
+	sudo tar xfz pycharm-*.tar.gz -C /opt/
+
+. Run pycharm.sh from the bin subdirectory:
+
+	cd /opt/pycharm-*/bin
+	./pycharm.sh
+
+. Complete the first-time-run wizard to get started.
+
+	sudo snap install pycharm-community --classic	
+
+
+
+15. Instalaçao da linguagem R
+
+	sudo apt-get install r-base
+
+16. Instalaçao do RStudio
+
+. Ir na página https://rstudio.com/products/rstudio/download/#download
+
+. Acessar o terminal na pasta de Downloads e Executar o comando abaixo:
+
+	sudo apt install ./rstudio-1.2.5001-amd64.deb  --fix-broken
+
+
+17. Instalacao do Scala
+
+	. Fazer atualizaçao:
+
+		sudo apt-get update && sudo apt-get upgrade
+
+	. Ir na página de Download do Scala e baixar a versao:
+
+		https://www.scala-lang.org/download/2.12.10.html
+
+	. Executar os comandos abaixo:
+
+  		cd Downloads/
+  		tar zxf scala-2.13.1.tgz
+		sudo mv scala-2.13.1 /usr/share/scala
+		sudo ln -s /usr/share/scala/bin/scala /usr/bin/scala
+		sudo ln -s /usr/share/scala/bin/scalac /usr/bin/scalac
+		sudo ln -s /usr/share/scala/bin/fsc /usr/bin/fsc
+		sudo ln -s /usr/share/scala/bin/sbaz /usr/bin/sbaz
+		sudo ln -s /usr/share/scala/bin/sbaz-setup /usr/bin/sbaz-setup
+		sudo ln -s /usr/share/scala/bin/scaladoc /usr/bin/scaladoc
+		sudo ln -s /usr/share/scala/bin/scalap /usr/bin/scalap
+		scalac
+		scala
+
+	. Para sair do scala digite:
+
+		:q
+
+18. Instalação maven
+
+	. Acesse a página do Maven e faça o download:
+
+		https://maven.apache.org/download.cgi
+
+	. Acesse a pasta de Download, faça a descompactação do arquivo maven e 
+		copie-o para a pasta /opt
+
+		cd ~/Downloads
+		jar xvfz apache-maven[versao do maven]bin.tar.gz
+		sudo mv apache-maven-[versao] /opt
+
+	. Crie o arquivo /etc/profile.d/environment_java.sh conforme abaixo:
+
+		sudo vi /etc/profile.d/environment_java.sh
+
+		# Adicione as linhas abaixo
+		export M2_HOME=/opt/apache-maven-3.6.3
+		export MAVEN_HOME=/opt/apache-maven-3.6.3
+		export PATH=${PATH}:/opt/apache-maven-3.6.3/bin
+
+	. Carregue as configurações como abaixo:
+
+		source /etc/profile.d/environment_java.sh
+
+	. Teste o maven:
+
+		mvn -version
+
+
+19. Instalação do Spring Boot CLI
+
+	. Acesse a página de download do Spring:
+
+	https://repo.spring.io/release/org/springframework/boot/spring-boot-cli/
+
+	. Baixe a versão mais recente, ou estável.
+
+	. Descompacte o arquivo spring-boot-cli[versao]-bin.tar.gz na pasta /opt
+
+	. Crie, ou atualize, o arquivo /etc/profile.d/environment_java.sh conforme abaixo:
+
+		sudo vi /etc/profile.d/environment_java.sh
+
+		# Adicione as linhas abaixo
+		export SPRING_HOME=/opt/spring-2.2.4.RELEASE
+		export PATH=${PATH}:/opt/spring-2.2.4.RELEASE/bin
+
+	. Carregue as configurações como abaixo:
+
+		source /etc/profile.d/environment_java.sh
+
+	. Teste o spring:
+
+		spring --version
+
+20. Instalação Teamviewer
+
+	sudo apt update
+
+	sudo apt install wget
+
+
+	### 64 Bit ###
+
+	wget https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
+
+	### 32 Bit ###
+
+	wget https://download.teamviewer.com/download/linux/teamviewer_i386.deb
+
+
+
+	### 64 Bit ###
+
+	sudo apt install ./teamviewer_amd64.deb
+
+	### 32 Bit ###
+
+	sudo apt install ./teamviewer_i386.deb
+
+
+21. Instalação do Remmina ( Acesso Remoto Área de Trabalho Windows)
+
+sudo apt-add-repository ppa:remmina-ppa-team/remmina-next
+sudo apt update
+sudo apt install remmina remmina-plugin-rdp remmina-plugin-secret
+
+
+22. Instalação do Nodejs
+
+sudo apt-get install curl python-software-properties
+curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+sudo apt-get install -y nodejs
+node -v
+npm -v
+
+23. Instalação do Git
+
+sudo apt-get install git
+git --version
+git config --global user.name "maransi"
+git config --global user.email "maransi"
+git config --list
+

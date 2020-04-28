@@ -1,0 +1,152 @@
+Integração Git com Eclipse
+--------------------------
+
+1. Verificar as configurações do Git dentro do Eclipse:
+
+    . Acesse o item de menu Windows -> Preferences
+
+    . Digite no campo de busca "git"
+        . Observe o local onde o git armazenará os arquivos/projetos "Default Repository Folder":
+            /home/marco/git
+        . Acesse o local "Configuration" e insira os parâmetros 
+            user.name = Marco Antonio da Silva
+            user.email = maransi
+
+
+2. Vá no site do git para criar um repositorio:
+
+    . Acesse o link https://github.com/ e faça o login da sua conta
+
+    . Clique no botão "Create Repository"
+
+    . Informe o nome do repositorio
+
+    . Acione o check com nome "Initialize this Repository with a README"
+
+    . Na lista "Add .gitignore" escolha o item "Java"
+
+    . Clique no botão "Create Repository"
+
+    . Ao ser desviado para a nova tela do repositorio, clique no botão "Clone or Download" e
+        copia a URL que será mostrada Ctrl+c
+
+
+3. Configuração do novo repositorio no Eclipse:
+
+    . No eclipse mude para a perspectiva do Git
+
+    . Somente a primeira vez (Quando não temos nenhum repositorio configurado) será apresentado os links:
+
+        Add an existing local git repository
+        Clone git repository
+        Create a new local git repository
+
+    . Clique no link "Clone Git Repository", será apresentado a tela "Source Git Repository"
+
+        . Por causa do Ctrl+c anterior as informações de localização de URLs já serão preenchidas
+
+        . Coloque o usuário, senha e clique o check "Store in Secure Store"
+
+    . Clique em Next > nas telas seguintes "Branch Selection" e "Local Destination"
+
+        . Na tela "Local Destination" já vem configurado as informações das pastas de armazenamento
+            local do git configurado no item 1
+        . Na tela "Local Destination" clique no botão "Finish"
+        . Se precisar clonar novos repositorios acesse a aba da esquerda "Git Repositories" e clique
+            no botão "Clone a Git Repository and add the clone to this view"
+
+4. Adicionando o projeto ao repositorio do Git:
+
+    . Volte para a perspectiva Java
+
+    . Clique com o botão direito no nó principal do projeto na estrutura de projetos e escolha a opção
+        "Team -> Share Project..."
+
+    . Será apresentado a tela "Configure Git Repository"
+
+        . Escolha na lista "Repository" o repositorio criado anteriormente
+
+        . Clique em "Finish". Ao termino da ação o Plugin do eclipse irá informar que o projeto será controlado
+            pelo Github, adicionando ele a esse controle. Todos os icones dos nós do projeto com o simbolo de "?", 
+            indicando que cada arquivo do projeto não está ainda no repositorio local do Github
+
+    . Para transferir o projeto para a pasta local do Github, clique com o botão direito no nó principal 
+        do projeto acesse a opção Team -> Synchronize Workspace
+
+        . Importante: ao termino desta ação o eclipse irá mudar a perspectiva para "Team Sinchronizing"
+            e é nesta perspectiva que aparecerá as informações abaixo
+
+    . Nem todos os arquivos deverão ir para a nuvem, para desconsiderar esses arquivos clique com botão direito 
+        em cada um dos arquivos do tipo abaixo e escolha o item "Ignore":
+
+        . A pasta "Settings"
+        . .classpath
+        . .project
+
+        * Detalhe no projeto Spring boot no STS nenhum destes arquivos aparecerão.
+
+    . Clique com o botão direito e escolha a opção "Commit"
+
+        . Selecione todos os itens da caixa "Unstaged Changes" e arraste para a pasta abaixo "Staged Changes",
+            ou clique no botão "++"
+
+        . Clique no botão "Commit and Push" se quiser levar os arquivos para a pasta na nuvem do Github
+
+        . Ou clique no botão "Commit" se quiser levar os arquivos para a pasta local do Github
+
+        . Clique em "Close" na tela de resposta, o projeto foi transferido para o Github
+
+5. Verificando o projeto na nuvem:
+
+    . Retorne ao navegador e atualize a URL do projeto recém commitado.
+
+6. Proximos passos:
+
+    . Sempre que quiser atualizar o projeto para o Github dê Push (Enviar para o github local), 
+        Commit (Enviar para o github na nuvem) e Pull (Trazer do servidor).
+
+    . Acesse um dos arquivos no servidor web do Github, realize uma alteração. Acesse o projeto
+        no Eclipse, botão direito no nó principal, acione a opção "Pull" e confira a alteração.
+
+    . Faça alteração no Eclipse, realize um Commit e confira no site do Github se a alteração foi realizada 
+        com sucesso.
+
+    . Certifique-se que o seu projeto está no padrão de "Encoding" UTF8. Clique com o botão direito do
+        mouse no nó principal do projeto, acesse o item Properties / Resource / Text File Encoding e 
+        deixe como UTF8
+
+    
+
+    
+
+Github em linha de comando:
+---------------------------
+
+1. Vá no site do git para criar um repositorio:
+
+    . Acesse o link https://github.com/ e faça o login da sua conta
+
+    . Clique no botão "Create Repository"
+
+    . Informe o nome do repositorio
+
+    . Acione o check com nome "Initialize this Repository with a README"
+
+    . Na lista "Add .gitignore" escolha o item "Java"
+
+    . Clique no botão "Create Repository"
+
+    . Ao ser desviado para a nova tela do repositorio, clique no botão "Clone or Download" e
+        copia a URL que será mostrada Ctrl+c
+
+2. Gerenciamento da pasta local:
+
+    . Acesse o prompt de comandos do sistema operacional.
+
+    . Digite o comando abaixo para clonar a pasta criado como repositorio no Github
+
+        $ git close https://github.com/maransi/{nome do repositorio.git}
+
+    . Acesse a pasta criada e crie os arquivos que deseja ser gerenciado pelo github.
+
+    

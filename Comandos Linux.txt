@@ -1,0 +1,291 @@
+1. Listar o tamanho das pastas do diretorio atual
+
+    du -h --max-depth=1 | sort -hr
+    du -sh *
+
+    df -h 
+    df -h .
+
+
+
+2. Consultar espaço em memoria
+
+    free -h
+
+
+
+3. Alterar arquivo de inicialização de váriaveis ambientais
+
+    cd ~
+    vim .bashrc
+
+
+
+4. Procurar um arquivo especifico
+
+    find . |grep -i 'texto'
+
+    find . -iname "*.pdf"
+
+
+
+
+5. Como mudar as permissões de vários arquivos
+
+    find . -name "*.pdf" | while read f; do chmod 640 "$f"; done
+
+    Observação : O comando while irá iterar em cada nova entrada do comando read, e este, por sua vez, 
+                    irá ler cada ‘linha’ da saída do comando find e gravar na variável f. 
+                    A variável f pode ser usada com qualquer tipo de comando dentro do bloco “do … done”. 
+                    Tudo se encaixa
+
+    # Mudar as permissões apenas de diretórios
+    find . -type d | while read f; do chmod 775 "$f"; done
+    
+    # Procurar um texto em apenas um tipo de arquivo
+    find . -iname "*.xml" | while read f; do grep "palavra" "$f"; done
+    
+    # remover diretórios .svn de um projeto
+    find . -iname ".svn" -type d | while read d; do rm -rf "$d"; done
+
+    # listar diretorios
+    find /home/marco/Downloads/ -type d| while read f; do printf "\n\nDIRETORIO -> $f\n\n" && ls -l "$f"; done
+
+    # Instalação do verificador de velocidade da internet
+
+    sudo apt install speedtest-cli
+
+
+
+
+6. Como descompactar arquivos:
+
+
+
+    # Descompactar um arquivo com extensão "zip" 
+
+    unzip nomedoarquivo.zip 
+    gunzip nomedoarquivo.zip
+
+    # Descompactar um arquivo com extensão "rar"
+
+    unrar x nomedoarquivo.rar
+
+    # Descompactar um arquivo com extensão "tar"
+
+    tar -xvf nomedoarquivo.tar
+
+    # Descompactar um arquivo com extensão "tar.gz"
+
+    tar -vzxf nomedoarquivo.tar.gz
+
+    # Descompactar um arquivo com extensão "bz2"
+
+    bunzip nomedoarquivo.bz2
+
+    # Descompactar um arquivo com extensão "tar.bz2"
+
+    tar -jxvf nomedoarquivo.tar.bz2
+
+    # Descompactar um arquivo com extensão "tar.xz"
+
+    tar -Jxf nomedoarquivo.tar.xz
+
+    # Descompactar um arquivo com extensão ".deb"
+
+        # Opção No. 1
+
+        sudo apt install {file.deb}
+
+        # Opção No. 2
+
+        sudo dpkg -i {file.deb}
+
+        # Caso ocorrer erros de dependências durante os comandos acima podemos fixar as dependências através:
+
+        sudo apt install -f
+
+
+7. Como criar um usuário SUDO:
+
+    # Opção 1
+
+        # Criar usuário:
+
+        adduser {user}
+
+        # Adicionar o usuário ao grupo "sudo"
+
+        usermod -aG sudo {user}
+
+        # Para testar:
+
+        su - {user}
+        sudo ls -la /root
+
+    # Opção 2
+
+        sudo vim /etc/sudoers
+
+        # Acesse o paragrafo "User privilege specification" e 
+        # acrescente o usuário
+
+        {user}	ALL=(ALL:ALL) ALL
+
+
+8. Uso do editor vi ou vim:
+
+    # Teclas de movimentação do cursor:
+
+    hjkl
+
+    # Edição dentro do vi
+
+    ESC                 modo normal
+    :q!                 Fechar o vi sem salvar
+    :wq                 Fechar o vi salvando
+    :w                  Só salvar e continuar dentro do vi
+    x                   Apaga o caracter da posição do cursor
+    i                   Entra em modo edição
+    dd                  Apaga toda a linha
+    u                   Defaz o último comando UNDO
+    /                   Busca a palavra digitada, exemplo: "/quando" + ENTER 
+    n                   Após usar o "/" para localizar uma palavra se quiser ir p/a prox digite "n"
+    :s/{old}/{new}/g    Substituição de palavras na linha. Parâmetro "g" executar em toda a linha, parametro g pode ser suprimido
+    :%s/{old}/{new}/g   Substituição de palavras no arquivo. Parâmetro "g" executar em todo o arquivo, parametro g pode ser suprimido
+    :!{command}         Executa um comando externo
+
+9. No prompt de comandos do linux você poderá utilizar hotkeys para apagar o conteúdo da linha ou da tela:
+
+ctrl + u        Apaga todo o conteúdo da linha
+ctrl + l        Apaga todo o conteúdo da tela
+
+
+10. Excelentes comandos complementares
+
+# Comandos de busca de arquivos substituindo o comando "grep"
+
+sudo apt-get install ack
+sudo apt-get install silversearcher-ag
+
+Exemplos:   ack 'texto' /home/marco/
+            ag 'texto' /home/marco/
+
+
+# Comando para verificar o tamanho dos discos
+
+sudo apt install pydf
+
+pydf -h
+
+# Consulta aos processos em memoria
+
+sudo apt install htop
+
+# Q sai do programa
+htop
+
+
+11. Como listar os pacotes disponiveis para apt
+
+apt-cache search {nome do pacote/aplicação}
+
+
+12. Como limpar os pacotes já utilizados para instalação:
+
+sudo apt-get clean
+
+
+13. Aplicativo instalador de pacotes, concorrente do "sudo install"
+
+sudo apt update
+sudo apt install -y snapd
+
+snap find <search terms>
+sudo snap install <snapname>
+sudo snap remove <snapname> 
+snap info <snapname>
+sudo snap revert <snap name>
+snap list
+sudo snap remove <snapname>
+
+
+14. Como consultar o historico de comandos:
+    
+    . Para consultar o historico de comandos
+    
+    history
+
+    . Para executar um comando já executado:
+
+    ![No. da Linha]
+
+15. Como alterar a senha do usuário root:
+
+    sudo passwd root
+
+16. Montagem de um cartão de memoria
+
+    . Antes de inserir o cartão de memória digite os comandos abaixo:
+
+        # Primeiro entre com o usuário "root"
+        
+        modprobe mmc_block
+        modprobe wbsd
+
+    . Insira o cartão de memória
+
+17. Comando para descobrir o IP da máquina
+
+    hostname -I
+    ifconfig
+    ip a
+
+18. Como inserir uma variavel ambiental
+
+    . Para listar as varivaveis:
+
+        env
+
+    . Para exibir uma variavel ambiental:
+
+        echo $HOME
+
+    . Para criar uma váriavel ambiental:
+
+        export VAR=/home/marco/Documents
+
+        export VAR=${VAR}:${PATH}
+
+    . Para apagar o conteúdo da variável:
+
+        unset VAR
+
+    . Para deixar registrado a variável no seu login sempre que logar:
+
+        vi ~/.bash_profile
+        # Ou
+        vi ~/.bashrc
+
+        # Adicione a linha abaixo:
+        export VAR=/home/marco/Documents
+
+        # Grave, saia do .bash_profile e execute a linha abaixo no prompt:
+        source ~/.bash_profile
+
+    . Primeira forma de criar variável ambientais de forma global para todos os usuários:
+
+        cd /etc/profile.d
+
+        sudo vi [nome do arquivo].sh
+
+        # Adicione a linha abaixo:
+        export VAR=/home/marco/Documents
+
+        # Grave, saia do .bash_profile e execute a linha abaixo no prompt:
+        source [nome do arquivo].sh
+
+        # Ou reinicialize a sessão com qualquer usuário
+
+
+
