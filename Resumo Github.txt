@@ -139,7 +139,7 @@ Github em linha de comando:
     . Ao ser desviado para a nova tela do repositorio, clique no botão "Clone or Download" e
         copia a URL que será mostrada Ctrl+c
 
-2. Gerenciamento da pasta local:
+2. Iniciando um repositorio local:
 
     . Acesse o prompt de comandos do sistema operacional.
 
@@ -161,6 +161,19 @@ Github em linha de comando:
 
         $ git push -u origin master
 
+3. Outra Maneira de iniciar um repositorio local:
+
+    . Crie uma pasta no disco:
+
+        $ mkdir Courses
+        $ cd Courses
+
+    . Inicialize a pasta no git:
+
+        $ git init
+
+    
+
 3. Situações diversas:
 
     . Para atualizar um repositorio local em situações que a pasta está desatualizada:
@@ -169,5 +182,20 @@ Github em linha de comando:
 
             $ git pull
 
-    .
+    . Atualizar os arquivos no repositorio do github:
+
+        # Se o arquivo for novo, ou seja, é a primeira vez que ele irá para o git
+        $ git add .
+
+        # Envia os arquivos alterados para o repositorio local
+        $ git commit -a -m "Versão Inicial"
+
+        # Envia os arquivos da fila para o repositorio na nuvem do github
+        $ git push -u origin master
+
+    . Para saber a situação da sua pasta:
+
+        $ git status
+
+        
         
