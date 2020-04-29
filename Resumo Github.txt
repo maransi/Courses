@@ -195,7 +195,77 @@ Github em linha de comando:
 
     . Para saber a situação da sua pasta:
 
-        $ git status
+        # Mostra a situação dos arquivos que estão pendentes de serem commitados
+
+            $ git status
+            No ramo master
+            Your branch is up to date with 'origin/master'.
+
+            Changes not staged for commit:
+            (utilize "git add <arquivo>..." para atualizar o que será submetido)
+            (utilize "git checkout -- <arquivo>..." para descartar mudanças no diretório de trabalho)
+
+                modified:   Resumo Github.txt
+
+            nenhuma modificação adicionada à submissão (utilize "git add" e/ou "git commit -a")
+
+    
+        # Mostra os commit e pushes feitos
+
+            $ git log
+            commit 1fb6e7f07669f2376a00abeead4567e2a55d4283 (HEAD -> master, origin/master, origin/HEAD)
+            Author: Marco <maransi>
+            Date:   Tue Apr 28 00:41:41 2020 -0300
+
+                Alteração do Resumo do Curso de Git
+
+            commit 6451bbc957dc0513cfb756bb3679e2e7a4206df5
+            Author: Marco <maransi>
+            Date:   Tue Apr 28 00:10:10 2020 -0300
+
+                Nova Alteração
+
+
+        # Apresenta os commits e pushes resumidamente
+
+            $ git shortlog
+            Marco (7):
+                Versão Inicial
+                Versão Inicial da Carta
+                Versão Carta
+                Alteração da Carta
+                Segunda Alteração da Carta
+                Nova Alteração
+                Alteração do Resumo do Curso de Git
+
+            maransi (3):
+                Initial commit
+                Versão Inicial
+                Arquivos Removidos
+
+
+        # Apresenta as mudanças de uma determinada hash de alteração
+
+            $ git show 1fb6e7f07669f2376a00abeead4567e2a55d4283
 
         
         
+        # Para verificar as diferenças dos arquivos que ainda não foram comitados
+
+            $ git status    # Mostrará os arquivos que ainda não foram comitados
+
+            No ramo master
+            Your branch is up to date with 'origin/master'.
+
+            Changes not staged for commit:
+            (utilize "git add <arquivo>..." para atualizar o que será submetido)
+            (utilize "git checkout -- <arquivo>..." para descartar mudanças no diretório de trabalho)
+
+                modified:   Resumo Github.txt
+
+            nenhuma modificação adicionada à submissão (utilize "git add" e/ou "git commit -a")
+
+            $ git diff      # Mostra as diferenças do arquivo "modified"
+
+
+            
