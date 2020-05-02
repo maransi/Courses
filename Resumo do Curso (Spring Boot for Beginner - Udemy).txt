@@ -1,0 +1,561 @@
+Aula No. 3 Spring Initialz
+--------------------------
+
+1. Acesse o site https://start.spring.io/
+
+2. Neste site podemos configurar e gerar projetos com Spring Boot.
+
+3. Pode escolher diversas configurações de versões, como: linguagem (java, groovy), spring boot version, 
+    dependencias ( Spring Web, Spring MVC, Spring Security, etc).
+
+4. No caso para se escolher as bibliotecas do spring que desejamos trabalhar no projeto, basta clicar no
+    item "Dependencies", que abrirá a possibilidade de escolhermos quais desejamos trabalhar.
+
+5. Vá na sessão Web das Dependencies e escolha a opção Web e clique no botão "Generate Project". O site fará
+    o dowload do projeto zipado.
+
+
+Aula No. 4 - App Structure WalkThrougt
+--------------------------------------
+
+1. Descompacte o projeto gerado na aula anterior.
+
+2. Acesse o Eclipse, vá na opção File / Import. Acesse a opção Maven / Existing Project Maven.
+
+3. Localize a pasta do projeto descompactado e acione o botão Abrir.
+
+4. Ao acessar as pastas no projeto /src/main/java e /src/main/resources encontraremos a mesma
+    estrutura dos projetos feito no maven convencional
+
+5. Dentro da pasta /src/main/java localize a package que contém a classe SpringBootCourseApplication.
+    Esta classe é a responsável por inicializar a aplicação/projeto.
+
+6. Dentro da pasta /src/main/test/java temos a classe responsável por realizar os testes da aplicação.
+    Dentro dela faremos a nossa suite de testes.
+
+
+
+Aula No. 5 - Defining the Student Model
+---------------------------------------
+
+1. Va na package com.example.demo e crie a package model.
+
+2. Dentro da package model crie a classe abaixo:
+
+package com.example.demo.model;
+
+import java.util.UUID;
+
+public class Student {
+	private final UUID id; 
+	private final Integer age;
+	private final String firstName; 
+	private final String lastName;
+	private final String course;
+
+	
+	public UUID getId() {
+		return id;
+	}
+
+
+	public Integer getAge() {
+		return age;
+	}
+
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+
+	public String getLastName() {
+		return lastName;
+	}
+
+
+	public String getCourse() {
+		return course;
+	}
+
+
+	public Student(UUID id, Integer age, String firstName, String lastName, String course) {
+		super();
+		this.id = id;
+		this.age = age;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.course = course;
+	}
+}
+
+
+6. Aula No. 6 - Defining DAO StudentDAO
+---------------------------------------
+
+1. Va na package com.example.demo e crie a package dao.
+
+2. Dentro da package model crie a classe abaixo:
+
+package com.example.demo.dao;
+
+import java.util.List;
+import java.util.UUID;
+
+import com.example.demo.model.Student;
+
+public interface StudentDAO {
+
+	void insertNewStudent(UUID studentId, Student student);
+
+	Student selectStudentById(UUID studentId);
+
+	List<Student> selectAllStudents();
+
+	int updateStudentById(UUID studentId, Student student);
+
+	int deleteStudentById(UUID studentId);
+
+}
+
+
+7. Aula No. 7 - Lets Implement an in Memory Database
+----------------------------------------------------
+
+1. Dentro da package model crie a classe abaixo:
+
+package com.example.demo.dao;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import com.example.demo.model.Student;
+
+public class StudentDAOImpl implements StudentDAO {
+	Map<UUID, Student> database;
+
+	public StudentDAOImpl() {
+		database = new HashMap<>();
+		
+		UUID studentId = UUID.randomUUID();
+		
+		database.put( studentId, new Student(studentId, 14, "Marco","Silva","Data Sciency" ));
+	}
+
+	@Override
+	public int insertNewStudent(UUID studentId, Student student) {
+		database.put(studentId, student);
+
+		return 1;
+	}
+
+	@Override
+	public Student selectStudentById(UUID studentId) {
+		return database.get( studentId );
+	}
+
+	@Override
+	public List<Student> selectAllStudents() {
+		return new ArrayList<>(database.values());
+	}
+
+	@Override
+	public int updateStudentById(UUID studentId, Student student) {
+		// student.setId(studentId); // Logo mais essa linha será descomentada
+		
+		database.put(studentId, student);
+		
+		return 1;
+	}
+
+	@Override
+	public int deleteStudentById(UUID studentId) {
+		database.remove( studentId );
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+}
+
+
+Aula No. 8 - Lets Implements the Service Layer ( Business Logic )
+-----------------------------------------------------------------
+
+. Crie a package com.example.demo.service;
+
+. Dentro da package recém criada crie a classe abaixo:
+
+package com.example.demo.service;
+
+import java.util.List;
+import java.util.UUID;
+
+import com.example.demo.dao.StudentDAO;
+import com.example.demo.model.Student;
+
+@Service
+public class StudentService {
+	private StudentDAO studentDAO;
+	
+	public int persistNewStudent(UUID studentId, Student student) {
+		UUID studentUId = studentId == null ? UUID.randomUUID() : studentId;
+		
+		return studentDAO.insertNewStudent(studentUId, student);
+	}
+
+	public Student getStudentById(UUID studentId) {
+		return studentDAO.selectStudentById(studentId);
+	}
+
+	public List<Student> getAllStudents(){
+		return studentDAO.selectAllStudents();
+	}
+
+	public int updateStudentById(UUID studentId, Student student) {
+		return studentDAO.updateStudentById(studentId, student);
+	}
+
+	public int deleteStudentById(UUID studentId) {
+		return studentDAO.deleteStudentById(studentId);
+	}
+
+	public StudentService(StudentDAO studantDAO) {
+		this.studentDAO = studantDAO;
+	}
+
+}
+
+
+
+
+Aula No. 9 - Dependency Injection with @Autowired and @Repository and @Qualifier
+--------------------------------------------------------------------------------
+
+. Informações relevantes sobre os assuntos que iremos abordar nesta aula:
+
+	<!-- As tags context abaixo são utilizadas no ApplicationContext.xml da aplicação -->
+
+	<!-- Seta anotaçoes para serem usadas pelo Spring -->
+	<context:annotation-config />
+
+	<!-- Define o pacote onde o Spring vai procurar por beans anotados -->
+	<context:component-scan base-package="br" />
+
+	@Component is a generic stereotype for any Spring-managed component or bean. 
+
+	@Repository is a stereotype for the persistence layer (DAOs).
+
+	@Service is a stereotype for the service layer (SERVICEs).
+
+	@Controller is a stereotype for the presentation layer (spring-MVC).
+
+	@Qualifier annotation is used to resolve the autowiring conflict, when there are multiple beans of same type.
+
+. Acesse a classe StudentDAOImpl e atualize as annotation como abaixo:
+
+...
+@Repository("studentDAOImpl")
+public class StudentDAOImpl implements StudentDAO {
+...
+
+. Acesse a classe StudentService e atualize no construtor da classe como abaixo:
+
+...
+	@Autowired
+	public StudentService(@Qualifier("studentDAOImpl") StudentDAO studantDAO) {
+		this.studentDAO = studantDAO;
+	}
+...
+
+
+
+Aula No. 10 - API / Controller / Resource Layer && HTTP Get
+-----------------------------------------------------------
+
+Informações Complementares:
+---------------------------
+The job of @Controller is to create a Map of model object and find a view but @RestController simply 
+return the object and object data is directly written into HTTP response as JSON or XML.
+
+This can also be done with traditional @Controller and use @ResponseBody annotation but since 
+this is the default behavior of RESTful Web services, Spring introduced @RestController which combined 
+the behavior of @Controller and @ResponseBody together.
+
+In short, the following two code snippet are equal in Spring MVC:
+
+@Controller
+@ResponseBody
+public class MVCController { 
+   .. your logic
+}
+
+@RestController
+public class RestFulController { 
+  .... your logic
+}
+
+
+Read more: https://javarevisitedThe job of @Controller is to create a Map of model object and find a view but @RestController simply return the object and object data is directly written into HTTP response as JSON or XML.
+
+This can also be done with traditional @Controller and use @ResponseBody annotation but since this is the default behavior of RESTful Web services, Spring introduced @RestController which combined the behavior of @Controller and @ResponseBody together.
+
+In short, the following two code snippet are equal in Spring MVC:
+
+@Controller
+@ResponseBody
+public class MVCController { 
+   .. your logic
+}
+
+@RestController
+public class RestFulController { 
+  .... your logic
+}
+
+
+Read more: https://javarevisited.blogspot.com/2017/08/difference-between-restcontroller-and-controller-annotations-spring-mvc-rest.html#ixzz69doFiSVG.blogspot.com/2017/08/difference-between-restcontroller-and-controller-annotations-spring-mvc-rest.html#ixzz69doFiSVG
+
+
+. Crie a package com.example.demo.controller;
+
+. Dentro da package criada crie a classe StudentResource.
+
+. Acesse a classe StudentService e adicione a annotation @Service:
+
+...
+@Service
+public class StudentService{
+...
+
+. Insira a classe abaixo:
+
+package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.Student;
+import com.example.demo.service.StudentService;
+import org.springframework.http.MediaType;
+
+@RestController
+@RequestMapping("api/v1/students")
+public class StudentResource {
+
+	private final StudentService studentService;
+	
+	@Autowired
+	public StudentResource( StudentService studentService) {
+		this.studentService = studentService;
+	}
+	
+	@RequestMapping(
+			method=RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE 
+	)
+	public List<Student> getAllStudents(){
+		return studentService.getAllStudents();
+	}
+}
+
+Aula No. 11
+-----------
+
+Informações Complementares
+--------------------------
+Uma das maneiras para executar a aplicação seria gerar um jar. Clique com o botão direito no root do projeto e escolha
+a opção Run As / Maven build.. Informe no parâmetro Goals "clean build". Isto criará uma jar dentro da pasta target da
+workspace do projeto. Execute o jar gerado como:
+
+java -jar [application].jar
+
+Vá até o browse e chame a aplicação.
+
+Acesse o link https://www.tutorialspoint.com/spring_boot/spring_boot_tomcat_deployment.htm e faça o resumo para gerar
+um war
+
+
+
+
+
+. A maneira mais facil de executar um projeto Spring Boot seria clicar com o botão direito do mouse
+	acessar a opção Run As -> Spring Boot App
+
+Aula No. 13 - HTTP Post
+-----------------------
+
+. Acesse a classe StudentResource e implemente o metodo abaixo:
+
+	@RequestMapping(
+			method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE 
+	)
+	public void insertNewStudent( @RequestBody Student student ){
+		studentService.persistNewStudent(UUID.randomUUID(), student );
+	}
+
+. Acesse a Classe Student e altere o metodo construtor como abaixo:
+
+	public Student( @JsonProperty("id") UUID id, 
+					@JsonProperty("age") Integer age, 
+					@JsonProperty("firstName") String firstName, 
+					@JsonProperty("lastName") String lastName, 
+					@JsonProperty("course") String course) {
+		super();
+		this.id = id;
+		this.age = age;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.course = course;
+	}
+
+. Acesse o Postman execute o link abaixo com o metodo GET e verifique se está funcionando a API.
+
+	http://localhost:8080/api/v1/students
+
+. No mesmo postman altere os parâmetros de pesquisa deixando:
+
+Method : POST
+Body : raw JSON
+
+{
+	"age": 22,
+	"firstName": "Gustavo",
+	"lastName": "Rocha",
+	"course": "Chemical Engennier"
+}
+
+. Execute a consulta e veja o resultado no id veio com nulo. Para resolver isto siga os passos abaixo:
+
+	a. Acesse a classe Student, vá no atributo id e retire o acesso "final" delet deixando:
+
+		private UUID id;
+
+	b. Nesta mesma classe inclua o metodo setter do atributo "id":
+
+		public void setId(UUID id) {
+			this.id = id;
+		}
+
+	c. Acesse a StudentService, utilize o metodo "setId" para atualizar o "id" da classe Student:
+
+		public int persistNewStudent(UUID studentId, Student student) {
+			UUID studentUId = studentId == null ? UUID.randomUUID() : studentId;
+			
+			student.setId(studentUId); // linha incluida
+			
+			return studentDAO.insertNewStudent(studentUId, student);
+		}
+
+. Execute novamente o metodo GET e POST novamente para verificar o resultado do atributo "id";
+
+
+Aula No. 14 - Path Variable
+---------------------------
+
+. Insira o metodo abaixo na classe StudentResource:
+
+	@RequestMapping(
+			method=RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE,
+			path = "{studentId}"
+	)
+	public Student getStudentsById(@PathVariable("studentId") UUID studentId){
+		return studentService.getStudentById(studentId);
+	}
+
+. No Postman execute o link abaixo:
+
+	http://localhost:8080/api/v1/students
+
+	Pra pegar o studentId e joga lo como parâmetro no link abaixo.
+
+	http://localhost:8080/api/v1/students/[ba5fc4c9-6698-476a-9a50-636cbec457e4]
+
+	O parâmetro ba5fc4c9-6698-476a-9a50-636cbec457e4 é captado pelo parâmetro "path={studentId}" e inserido 
+	como parâmetro no metodo getStudentById pela annotation @PathVariable.
+	Como o id é sempre atualizado quando reiniciamos
+
+Aula No. 15 - Metodo update e delete
+------------------------------------
+
+. Metodo updateStudentById:
+===========================
+
+. Acesse a classe StudentDAOImpl e altere o metodo updateStudentById como abaixo:
+
+	@Override
+	public int updateStudentById(UUID studentId, Student student) {
+		student.setId(studentId);
+		
+		database.put(studentId, student);
+		
+		return 1;
+	}
+
+. Acesse a classe StudentResource e implemente o metodo abaixo:
+
+	@RequestMapping(
+			method=RequestMethod.PUT, 
+			consumes=MediaType.APPLICATION_JSON_VALUE,
+			path = "{studentId}"
+	)
+	
+	public void updateStudent( @PathVariable UUID studentId, @RequestBody Student student ){
+		studentService.updateStudentById(studentId, student);
+	}
+
+. No Postman execute o link abaixo:
+
+ 	http://localhost:8080/api/v1/students
+
+	Pra pegar o studentId e joga lo como parâmetro no link abaixo.
+
+	http://localhost:8080/api/v1/students/[ba5fc4c9-6698-476a-9a50-636cbec457e4]
+
+. No mesmo postman altere os parâmetros de pesquisa deixando:
+
+Method : PUT
+Body : raw JSON
+
+{
+	"age": 22,
+	"firstName": "Gustavo",
+	"lastName": "Rocha",
+	"course": "Chemical Engennier"
+}
+
+
+Metodo deleteStudentById
+========================
+
+. Acesse a classe StudentResource e altere o metodo deleteStudentsById como abaixo:
+
+	@RequestMapping(
+			method=RequestMethod.DELETE, produces=MediaType.APPLICATION_JSON_VALUE,
+			path = "{studentId}"
+	)
+	public void deleteStudentsById(@PathVariable("studentId") UUID studentId){
+		studentService.deleteStudentById(studentId);
+	}
+
+. No Postman execute o link abaixo:
+
+ 	http://localhost:8080/api/v1/students
+
+. No mesmo postman altere os parâmetros de pesquisa deixando:
+
+	Method : DELETE
+	
+.Pegue o studentId e jogue-o como parâmetro no link abaixo.
+
+	http://localhost:8080/api/v1/students/[ba5fc4c9-6698-476a-9a50-636cbec457e4]
+
+. No Postman execute novamente o link abaixo, observe o desaparecimento do registro.
+
+ 	http://localhost:8080/api/v1/students
+
+

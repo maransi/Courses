@@ -1,0 +1,2069 @@
+Aula 3.1 - Criando um projeto Maven
+Aula 3.3 - Configurando o Spring	
+-----------------------------------
+
+Padrão XML abaixo como exemplo de um esqueleto de POM.XML:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>com.algaworks</groupId>
+	<artifactId>brewer</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	
+	<packaging>war</packaging>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Para não deixar obrigatório a existência do arquivo web.xml. Isto será
+             usado quando houver classes de configuração spring -->
+
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+
+		<!-- Spring MVC -->
+		<spring-framework.version>4.3.0.RELEASE</spring-framework.version>
+		
+		<!-- Servlet API -->
+		<servlet.version>3.1.0</servlet.version>
+
+		<java.version>1.8</java.version>
+		<maven-compiler-pluging.version>3.2</maven-compiler-pluging.version>
+	</properties>
+	
+    <!-- Para que estas configurações do plugin funcione é necessário ir na opção do eclipse
+        clique direito no projeto Maven/Update Project... Marque a opção "Force Update..."
+        Uma das coisas que isto resolve é o aviso de erro no projeto devido a versão do java
+    -->
+    
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-pluging.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- A tag dependencyManagement evitará de colocarmos dentro da tag dependency a version da library
+		 sem contar com a compatibilidade entre as bibliotecas que ajudará manter, como no caso quando
+		 temos varias libraries do spring dentro do projeto
+	-->
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>${spring-framework.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!-- Spring MVC -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+		
+		<!-- Servlet API -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	
+</project>
+
+
+Na versão do servlet 3.0 em dia e no Tomcat 8.0 em diante as configurações de servlets não
+precisa mais ser feita no web.xml, pode ser feito em classes de configuração.
+Como devemos configurar o nosso "dispatcherServlet" do spring dentro do web.xml faremos isso
+dentro de uma classe de configuração que extende a interface "AbstractAnnotationConfigDispatcherServletInitializer"
+que seria a classe abaixo:
+
+
+
+package com.algaworks.brewer.config.init;
+
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+import com.algaworks.brewer.config.WebConfig;
+import javax.servlet.Filter;
+import org.springframework.web.filter.CharacterEncodingFilter;
+
+public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+	@Override
+	protected Class<?>[] getRootConfigClasses() {
+		return null;
+	}
+
+	@Override
+	protected Class<?>[] getServletConfigClasses() {
+		return new Class<?>[] { WebConfig.class }; // É a classe que servirá para encontrar os nossos controller
+	}
+
+	@Override
+	protected String[] getServletMappings() {
+		return new String[] { "/" };	// Diz ao servlet "dispatcherServlet" que qq url que comece do / é p/ser entregue a ele
+										// equivale a tag <url-pattern> do web.xml
+	}
+
+	protected Filter[] getServletFilters(){		// Servirá para forçar o encoding para UTF-8 e sair os caracteres com acentos, etc.
+		CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+
+		characterEncodingFilter.setEncoding("UTF-8");
+		characterEncodingFilter.setForceEncoding(true);
+
+		return new Filter[]{ characterEncodingFilter };
+	}
+}
+
+
+
+
+Esta classe depende da classe WebConfig, atenção, dentro dos parametros da annotation ComponentScan para colocarmos
+as classes do seu projeto.
+
+Um detalhe importante é a classe que o WebConfig extende "WebMvcConfigurerAdapter" ele contem varios metodos que podem
+ser sobreposto dependendo da nossa necessidade. Ser como isso funciona na aula 3.3 no tempo 18:32
+
+
+package com.algaworks.brewer.config;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import com.algaworks.brewer.controller.CervejasController;
+
+@Configuration
+@ComponentScan(basePackageClasses = { CervejasController.class })
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+}
+
+
+package com.algaworks.brewer.controller;
+
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class CervejasController {
+
+}
+
+
+
+Aula 3.4 - Configurando o ViewResolver do Spring
+--------
+
+1. Adicionando a dependência do Thymeleaf no pom.xml. 
+	. Insira a version nas properties
+	
+		<!-- Thymeleaf -->
+		<thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
+
+	. Insira as dependências na tag <dependencies>
+
+		<!-- Thymeleaf -->
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+			<version>${thymeleaf.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf-spring4</artifactId>
+			<version>${thymeleaf.version}</version>
+		</dependency>
+
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.algaworks</groupId>
+	<artifactId>brewer</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+
+		<java.version>1.8</java.version>
+		<maven-compiler-pluging.version>3.2</maven-compiler-pluging.version>
+
+		<!-- Spring MVC -->
+		<spring-framework.version>4.3.0.RELEASE</spring-framework.version>
+
+		<!-- Servlet API -->
+		<servlet.version>3.1.0</servlet.version>
+		
+		<!-- Thymeleaf -->
+		<thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-pluging.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>${spring-framework.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!-- Spring MVC -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+
+		<!-- Servlet API -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Thymeleaf -->
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+			<version>${thymeleaf.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf-spring4</artifactId>
+			<version>${thymeleaf.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
+
+
+
+2. Atualize a classe WebConfig como abaixo:
+
+package com.algaworks.brewer.config;
+
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ITemplateResolver;
+
+import com.algaworks.brewer.controller.CervejasController;
+
+@Configuration
+@ComponentScan(basePackageClasses = { CervejasController.class })
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationContextAware {
+
+	private ApplicationContext applicationContext;
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
+	@Bean
+	public ViewResolver viewResolver() {
+		ThymeleafViewResolver resolver = new ThymeleafViewResolver();
+		resolver.setTemplateEngine(templateEngine());
+		resolver.setCharacterEncoding("UTF-8");
+		return resolver;
+	}
+
+	@Bean
+	public TemplateEngine templateEngine() {
+		SpringTemplateEngine engine = new SpringTemplateEngine();
+		engine.setEnableSpringELCompiler(true);
+		engine.setTemplateResolver(templateResolver());
+		return engine;
+	}
+
+	private ITemplateResolver templateResolver() {
+		SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
+		resolver.setApplicationContext(applicationContext);
+		resolver.setPrefix("classpath:/templates/");	// Localiza-se dentro do main/src/resources
+		resolver.setSuffix(".html");
+		resolver.setTemplateMode(TemplateMode.HTML);
+		return resolver;
+	}
+
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addViewController("/").setViewName("CadastroCerveja"); // Página de welcome
+	}
+	
+
+}
+
+
+	. Dentro da pasta main/src/resources crie a pasta templates e depois crie as sub-pastas do projeto, neste caso
+		"cerveja". Ja em seguida crie o template CadastroCerveja.html
+
+
+3. Dentro da pasta main/src/resources/template crie o HTML CadastroCerveja.html abaixo:
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+	<h1>Olá! Thymeleaf configurado!</h1>
+</body>
+
+</html>
+
+
+4. Atualize a classe CervejasController como abaixo:
+
+package com.algaworks.brewer.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class CervejasController {
+
+	@RequestMapping("/cervejas/novo")
+	public String novo() {
+		return "cerveja/CadastroCerveja"; 	// Aqui o correto era inserir .html no final da string, como no WebConfig ja tem 
+	}										// a configuração resolver.setSuffix(".html") isto não será necessario. 
+	
+}
+
+
+5. Publique o projeto e chame a URL http://localhost:8080/brewer/cervejas/novo
+
+
+
+
+Aula 3.6
+--------
+
+1. Crie a classe model abaixo:
+
+package com.algaworks.brewer.model;
+
+public class Cerveja {
+
+	private String sku;
+	private String nome;
+	
+	public String getSku() {
+		return sku;
+	}
+
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	
+}
+
+
+2. Altere a classe controller CervejasController como abaixo. Existem dois metodos diferentes com a mesma URL de 
+	request "cervejas/novo", o que os diferenciam é o "method". O default é o Get, quando não fornecemos o parâmetro.
+	No metodo cadastrar( Cerveja cerveja), quando a página chamar esse metodo, os campos da página irão automaticamente p/os 
+	atributos da classe. Atenção, se você criar um construtor com parâmetros crie outro sem parâmetros, pois o spring ao
+	criar automaticamente a classe nesse processo utiliza o construtor sem parâmetros.
+
+
+package com.algaworks.brewer.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.algaworks.brewer.model.Cerveja;
+
+@Controller
+public class CervejasController {
+
+	@RequestMapping("/cervejas/novo")	// Vem pelo Method Get
+	public String novo() {
+		return "cerveja/CadastroCerveja";
+	}
+	
+	@RequestMapping(value = "/cervejas/novo", method = RequestMethod.POST) // Vem pelo Post, é obrigatório 
+																			// inserção da assinatura value e method
+	public String cadastrar(Cerveja cerveja) {
+		System.out.println(">>> sku: " + cerveja.getSku());
+		return "cerveja/CadastroCerveja";
+	}
+	
+}
+
+
+3. Alere a pagina html CadastroCerveja.html como abaixo:
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<body>
+	<h1>Olá! Thymeleaf configurado!</h1>
+</body>
+
+	<form method="POST" action=">
+		<label for="sku">SKU</label>
+		<input type="text" id="sku" name="sku">
+		<br>
+		
+		<input type="submit" value="Salvar">
+	</form>
+
+</html>
+
+4. Execute a URL http://localhost:8080/brewer/cadastro/novo
+
+
+
+
+Aula 3.7 e 3.8 - Validação de Formulários
+-----------------------------------
+
+1. Altere o pom.xml colocando inicialmente nas <properties> o valor:
+
+		<!-- Bean Validation / Hibernate Validator -->
+		<hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
+
+2. Nas dependencies coloque a dependencia abaixo:
+
+		<!-- Bean Validation / Hibernate Validator -->
+  		<dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+3. O pom.xml ficará:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.algaworks</groupId>
+	<artifactId>brewer</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+
+		<java.version>1.8</java.version>
+		<maven-compiler-pluging.version>3.2</maven-compiler-pluging.version>
+
+		<!-- Spring MVC -->
+		<spring-framework.version>4.3.0.RELEASE</spring-framework.version>
+
+		<!-- Servlet API -->
+		<servlet.version>3.1.0</servlet.version>
+		
+		<!-- Thymeleaf -->
+		<thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
+		
+		<!-- Bean Validation / Hibernate Validator -->
+		<hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-pluging.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>${spring-framework.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!-- Spring MVC -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Servlet API -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Thymeleaf -->
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+			<version>${thymeleaf.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf-spring4</artifactId>
+			<version>${thymeleaf.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<!-- Bean Validation / Hibernate Validator -->
+  		<dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+            <scope>compile</scope>
+        </dependency>
+		
+	</dependencies>
+
+</project>
+
+4. Altere o Bean Cerveja como abaixo, observe a annotation @NotBlank
+
+package com.algaworks.brewer.model;
+
+import org.hibernate.validator.constraints.NotBlank;
+
+public class Cerveja {
+
+	@NotBlank				// Validará se houver nulo, ou somente espaços
+	private String sku;
+	
+	private String nome;
+	
+	public String getSku() {
+		return sku;
+	}
+
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	
+}
+
+
+5. Altere o CervejasController como abaixo, observe:
+	. A annotation @Valid. Quando é chamado o metodo cadastrar indiretamente
+		pelo Spring MVC, o spring valida o conteúdo do objeto e descarrega as inconsistências no objeto result do tipo BindingResult;
+	. O model do tipo Model, que servirá para registrar objetos na sessão;
+	. O attributes do tipo RedirectAttributes, que ajudará repassar para a sessão do cliente o model. Se usarmos o model da forma 
+		tradicional "model.addAttribute(...)" quando há um redirect ele não será visivel na sessão do cliente. Ao invés disso iremos
+		utilizar o objeto attributes.addFlashAttribute(..) para armazenar o objeto na sessão.
+	. Observe o redirect existente nos metodos cadastrar, verifique como isto se comporta no devTools do chrome.
+
+package com.algaworks.brewer.controller;
+
+import javax.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.algaworks.brewer.model.Cerveja;
+
+@Controller
+public class CervejasController {
+
+	@RequestMapping("/cervejas/novo")
+	public String novo() {
+		return "cerveja/CadastroCerveja";
+	}
+	
+	@RequestMapping(value = "/cervejas/novo", method = RequestMethod.POST)
+	public String cadastrar(@Valid Cerveja cerveja, BindingResult result, Model model, RedirectAttributes attributes) {
+		if (result.hasErrors()) {
+			model.addAttribute("mensagem", "Erro no formulário");
+			return "cerveja/CadastroCerveja";
+		}
+		
+		// Salvar no banco de dados...
+		attributes.addFlashAttribute("mensagem", "Cerveja salva com sucesso!");
+		System.out.println(">>> sku: " + cerveja.getSku());
+		return "redirect:/cervejas/novo";
+	}
+	
+}
+
+7. Altere a página CadastroCerveja.html como abaixo, observe:
+	. Que já estamos trabalhando com Thymeleaf declarando na tag <html> xmlns:th="http://www.thymeleaf.org" e utilizando
+		logo abaixo para imprimir o conteúdo da mensagem registrada na sessão do cliente pelo objeto model do controller
+		"<span th:text="${mensagem}"></span>"
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org">
+
+<body>
+	<h1>Olá! Thymeleaf configurado!</h1>
+</body>
+
+	<form method="POST">
+		<span th:text="${mensagem}"></span>
+		<br>
+		
+		<label for="sku">SKU</label>
+		<input type="text" id="sku" name="sku">
+		<br>
+		
+		<input type="submit" value="Salvar">
+	</form>
+
+</html>	
+
+
+6. Execute a URL http://localhost:8080/brewer/cadastro/novo, submita o formulario sem conteúdo, ou com somente com espaços.
+
+
+
+  Aula 4.3 - Mantendo os dados no formulário
+  ------------------------------------------
+
+  . Inicialmente o código abaixo foi colocado dentro da tag HTML <form> como abaixo:
+
+<form method="POST"  th:object="${cerveja}">
+	<span th:text="${#fields.hasAnyErros()}">
+
+	...
+</form>
+
+	. O atributo th:text="${#fields.hasAnyErrors()} está relacionado com o atributo  th:object="${cerveja} da tag HTML form.
+		O primeiro atributo pergunta ao segundo "se existe algum erro no objeto do primeiro atributo".
+
+	. Dessa forma inicial a execução da página dará erro, é necessário colocar o objeto cerveja no model do controler para que não
+		ocorra erro na carga inicial da página. Podemos iniciar o objeto cerveja com "new". Para isso passamos o metodo novo da aula 
+		anterior para receber o objeto Model na sua assinatura.
+
+	ANTES
+	-----
+	@RequestMapping("/veiculo/novo")
+	public String novo() {
+		return "veiculo/CadastroVeiculo"; 	// Aqui o correto era inserir .html no final da string, como no WebConfig ja tem 
+	}										// a configuração resolver.setSuffix(".html") isto não será necessario. 
+
+	DEPOIS
+	------
+	@RequestMapping("/cervejas/novo")
+	public String novo(Model model) {
+		model.addAttribute(new Cerveja()); 	// Se quiser podemos colocar a identificação do objeto na chamado do metodo "addAttribute"
+											// addAttribute("cerveja", new Cerveja()). Se não fizermos isso o spring considera o nome
+											// o atributo o mesmo do objeto.
+
+		return "cerveja/CadastroCerveja";
+	}
+		
+	. Após a implementação acima o objeto irá existir e a página consiguirá acessar o objeto na sessão.
+
+	. Para mostrarmos os erros de validação faremos como abaixo inicialmente:
+
+<form method="POST"  th:object="${cerveja}">
+	<span th:text="${#fields.hasAnyErros()}">
+
+	<div th:each= "erro: ${#fields.detailedErrors()}">
+		<span th:text="${erro.message}"><span>
+	<div>
+	...
+</form>
+		
+	. No metodo CervejasController.cadastrar pode eliminar a linha model.addAttribute("mensagem", "Erro no formulário"). Agora pegaremos
+		os erros direto da validação das annotations do nosso Bean
+
+	@RequestMapping(value = "/cervejas/novo", method = RequestMethod.POST)
+	public String cadastrar(@Valid Cerveja cerveja, BindingResult result, Model model, RedirectAttributes attributes) {
+		if (result.hasErrors()) {
+//			model.addAttribute("mensagem", "Erro no formulário");
+			return "cerveja/CadastroCerveja";
+		}
+	
+	. Aproveite e deixe as mensagens de erro de validação mais amigáveis, informando o nome do campo e a obrigatoriedade.
+
+	. Apresentando as mensagens de erro de valiação de cada atributo do Bean, deixou de ser necessário a linha do HTML que informa se temos
+		erro. Então podemos apagá-la:
+
+<form method="POST"  th:object="${cerveja}">
+	<!-- <span th:text="${#fields.hasAnyErros()}"> Aqui está comentada, mas pode ser eliminada -->
+
+	<div th:each= "erro: ${#fields.detailedErrors()}">
+		<span th:text="${erro.message}"><span>
+	<div>
+	...
+</form>
+		
+	. Colocamos o forEach de erro fora da tag HTML <form>. Ao fazer isso devemos identificar o objeto na assinatura 
+		do metodo detailedErrors('${cerveja.*}'). Dessa forma ele saberá qual objeto (cerveja) deverá pegar e quais os atributo do objeto (.*)
+
+<div th:each= "erro: ${#fields.detailedErrors('${cerveja.*}')}">
+	<span th:text="${erro.message}"><span>
+<div>
+
+<form method="POST"  th:object="${cerveja}">
+	...
+</form>
+
+	. O problema a ser resolvido é deixar o contéudo dos campos digitados presentes após a submissão do formulário e a validação.
+		Primeira coisa que devemos fazer é colocar na sessão o objeto preenchido automaticamente na chamado do metodo cadastrar do
+		controller:
+
+@RequestMapping(value = "/cervejas/novo", method = RequestMethod.POST)
+public String cadastrar(@Valid Cerveja cerveja, BindingResult result, Model model, RedirectAttributes attributes) {
+	if (result.hasErrors()) {
+		model.addAttribute( cerveja ); // ESSA LINHA NÃO EXISTIA, FOI NECESSARIA PARA PERMANECER O OBJETO NA SESSAO
+		return novo(cerveja);
+	}
+	
+	// Salvar no banco de dados...
+	attributes.addFlashAttribute("mensagem", "Cerveja salva com sucesso!");
+	System.out.println(">>> sku: " + cerveja.getSku());
+	return "redirect:/cervejas/novo";
+}
+
+	. Após isso devemos alterar a página para resgatar automaticamente os valores do objeto. Eliminamos o atributo "name" das tags input e 
+		colocamos no lugar o atributo do Thymeleaf "th:field="*{...}">. O simbolo "*" fará referencia ao objeto cerveja da tab 
+		"<form method="POST" th:object="${cerveja}">":
+
+
+
+		<label for="sku">SKU</label>
+		<input type="text" id="sku" th:field="*{sku}">
+		<br>
+		
+		<label for="nome">Nome</label>
+		<input type="text" id="nome" th:field="*{nome}">
+		<br>
+		
+		<label for="descricao">Descrição</label>
+		<textarea rows="3" cols="30" id="descricao" th:field="*{descricao}"></textarea>
+		<br>
+	
+	. Por fim iremos fazer um refactory na classe CervejasController. 
+		No método novo alteramos a assinatura para receber o objeto cerveja e não colocamos mais o objeto cerveja na sessão;
+		No método cadastrar invocaremos o metodo novo passando o objeto com erro caso ocorra erro.
+
+	Importante: Verificar se ao eliminar o comando model.addAttribute("cerveja", cerveja) do metodo cadastrar se isso irá funcionar
+				corretamente. Segundo o orientador, quando colocamos o objeto cerveja no metodo novo "novo(Cerveja cerveja)" o spring
+				armazenará automaticamente o objeto na sessão.
+
+@RequestMapping("/cervejas/novo")
+public String novo(Cerveja cerveja) {
+	return "cerveja/CadastroCerveja";
+}
+
+@RequestMapping(value = "/cervejas/novo", method = RequestMethod.POST)
+public String cadastrar(@Valid Cerveja cerveja, BindingResult result, Model model, RedirectAttributes attributes) {
+	if (result.hasErrors()) {
+		return novo(cerveja);		// saiu return "cerveja/CadastroCerveja";
+	}
+	
+	// Salvar no banco de dados...
+	attributes.addFlashAttribute("mensagem", "Cerveja salva com sucesso!");
+	System.out.println(">>> sku: " + cerveja.getSku());
+	return "redirect:/cervejas/novo";
+}
+	
+
+
+Aula 4.6 - Plugin do Eclipse para o Thymeleaf
+--------------------------------------------
+
+1. Acesse no Eclipse a opção Help->Install new software
+
+2. Acione o botão Add e informe na tela o link abaixo:
+
+ http://www.thymeleaf.org/eclipse-plugin-update-site/
+
+3. Inicie a instalação.
+
+. Para encontrar o link acima vá no google e consulta "Thymeleaf Plugin Eclipse". Acesse o link que direciona para 
+	o github e localize o link acima.
+
+	
+
+
+Aula 5.2 - Conhecendo o Layout do projeto
+-----------------------------------------
+
+Baixar o arquivo de layout Bootstrap no link "http://alga.works/sws-layout" ou vá na pasta do curso que la estará
+	o arquivo "layout-bootstrap-atacama-1.0.0.zip"
+
+Aula 5.3 - Metendo a mão na massa
+---------------------------------
+
+. Abra o zip, acesse a pasta dist/assets. Copie todas as sub-pastas para dentro dela para dentro do projeto, antes crie uma
+	folder (static/layout) no projeto dentro da folder "/src/main/resources" com o nome de "static" e copie as sub-pastas dentro da
+	"static/layout".
+
+. Copie o arquivo "cadastro-produto.html" do zip e cole dentro da folder "/src/main/resources/template/cerveja".
+
+. Dentro da classe "CervejasController" insira o metodo abaixo:
+
+	@RequestMapping("/cervejas/cadastro")
+	public String cadastro() {
+		return "cerveja/cadastro-produto";
+	}
+
+
+. Para que a aplicação encontre o conteúdo estatico (css, js, images, etc) será necessário algumas configurações no arquivo "WebConfig".
+	Insira na classe WebConfig o metodo abaixo:
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
+	}
+
+. Acesse a pagina "cadastro-produto.html" do projeto e altere todas urls de conteúdo estático de "assets/" para "brewer/layout/".
+
+. Reinicie o servidor e execute a aplicação.
+
+Aula 5.4 - Prototipando o cadastro de cervejas
+
+. Altere o arquivo CadastroCerveja.html com o código abaixo:
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+	<title>Brewer</title>
+
+	<link rel="stylesheet" type="text/css" href="/nice/layout/stylesheets/vendors.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/nice/layout/stylesheets/algaworks.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/nice/layout/stylesheets/application.css"/>
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+<div class="aw-layout-page">
+	<nav class="navbar  navbar-fixed-top  navbar-default  js-sticky-reference" id="main-navbar">
+		<div class="container-fluid">
+
+	    <div class="navbar-header">
+	     	<a class="navbar-brand  hidden-xs" href="#">
+	        	<img alt="AlgaWorks" src="/nice/images/logo.png"/>
+	      	</a>
+
+	      	<ul class="nav  navbar-nav">
+	        	<li>
+	          		<a href="#" class="js-sidebar-toggle"><i class="fa  fa-bars"></i></a>
+	        	</li>
+	      	</ul>
+	    </div>
+
+	    <ul class="nav navbar-nav  navbar-right">
+	    	<li>
+	        	<a href="#"><em class="fa  fa-sign-out"></em></a>
+	      	</li> 
+	    </ul>
+
+	  </div>
+	</nav>
+	
+	<aside class="aw-layout-sidebar  js-sidebar">
+		<div class="aw-layout-sidebar__content">
+
+	    	<nav class="aw-menu  js-menu">
+	      		<ul class="aw-menu__list">
+	
+	        		<li class="aw-menu__item">
+	          			<a href="dashboard.html"><i class="fa  fa-fw  fa-home"></i><span>Dashboard</span></a>
+	        		</li>
+	
+	        		<li class="aw-menu__item  is-active">
+	          			<a href="#">
+	            			<i class="fa  fa-fw  fa-file-text"></i><span>Cadastros</span>
+	            			<i class="aw-menu__navigation-icon  fa"></i>
+	          			</a>
+	      
+	          			<ul class="aw-menu__list  aw-menu__list--sublist">
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="cadastro-produto.html">Cadastro de produto</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link  is-active"><a href="pesquisa-produtos.html">Pesquisa de produtos</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="tabela-sem-dados.html">Tabela sem dados</a></li>
+	          			</ul>
+	        		</li>
+	
+	        		<li class="aw-menu__item  is-expanded">
+	          			<a href="#">
+	            			<i class="fa  fa-fw  fa-file-text"></i><span>Páginas comuns</span>
+	            			<i class="aw-menu__navigation-icon  fa"></i>
+	          			</a>
+	
+	          			<ul class="aw-menu__list  aw-menu__list--sublist">
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="pagina-vazia.html">Página vazia</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="login.html">Login</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="esqueceu-a-senha.html">Esqueceu a senha</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="403.html">403</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="404.html">404</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="500.html">500</a></li>
+	          			</ul>
+	        		</li>
+	
+	      		</ul>
+	    	</nav>
+		</div>
+	</aside>
+	
+	<section class="aw-layout-content  js-content">
+
+		<div class="page-header">
+			<div class="container-fluid">
+				<h1>
+					Cadastro de cerveja
+				</h1>
+			</div>
+		</div>
+
+		<div class="container-fluid">
+
+			<!-- <div class="alert  alert-danger  alert-dismissible" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<i class="fa  fa-exclamation-circle"></i> Já existe um produto com o nome informado.
+			</div> -->
+
+			<form method="POST" th:object="${veiculoBean}" class="form-vertical  js-form-loading">
+		
+				<div class="row">
+					<div class="col-sm-2  form-group">
+						<label for="sku">SKU</label>
+						<input id="sku" type="text" class="form-control"/>
+					</div>
+					
+					<div class="col-sm-10  form-group">
+						<label for="nome">Nome</label>
+						<input id="nome" type="text" class="form-control"/>
+					</div>
+				</div>
+	
+				<div class="form-group">
+					<label for="descricao">Descrição</label>
+					<textarea id="descricao" rows="3" class="form-control"></textarea>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-3  form-group">
+						<label for="estilo">Estilo</label>
+						<select id="estilo" class="form-control">
+							<option value="">Selecione o estilo</option>
+							<option value="1">Pale lager</option>
+						</select>
+					</div>
+					
+					<div class="col-sm-3  form-group">
+						<label for="sabor">Sabor</label>
+						<select id="sabor" class="form-control">
+							<option value="">Selecione o sabor</option>
+							<option value="1">Adocicada</option>
+						</select>
+					</div>
+					
+					<div class="col-sm-3  form-group">
+						<label for="teorAlcoolico">Teor alcoólico</label>
+						<div class="input-group">
+							<input id="teorAlcoolico" type="text" class="form-control"/>
+							<div class="input-group-addon">%</div>
+						</div>
+					</div>
+					
+					<div class="col-lg-3  col-sm-6  form-group">
+						<label for="origem">Origem</label>
+						<div>
+							<div class="radio  radio-inline">
+								<input type="radio" name="origem"> 
+								<label>Nacional</label>
+							</div>
+							<div class="radio  radio-inline">
+								<input type="radio" name="origem"> 
+								<label>Internacional</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="col-sm-3  form-group">
+						<label for="preco">Preço</label>
+						<div class="input-group">
+							<div class="input-group-addon">R$</div>
+							<input id="preco" type="text" class="form-control"/>
+						</div>
+					</div>
+					
+					<div class="col-sm-3  form-group">
+						<label for="comissao">Comissão</label>
+						<div class="input-group">
+							<input id="comissao" type="text" class="form-control"/>
+							<div class="input-group-addon">%</div>
+						</div>
+					</div>
+					
+					<div class="col-sm-3  form-group">
+						<label for="estoque">Estoque</label>
+						<input id="estoque" type="text" class="form-control"/>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<button class="btn  btn-primary" type="submit">Salvar</button>
+				</div>
+		
+			</form>
+		</div>
+	</section>
+	
+	<footer class="aw-layout-footer  js-content">
+		<div class="container-fluid">
+			<span class="aw-footer-disclaimer">&copy; 2016 AlgaWorks. Todos os direitos reservados.</span>
+		</div>
+	</footer>
+</div>
+
+<script src="/nice/layout/javascripts/vendors.min.js"></script>
+<script src="/nice/layout/javascripts/algaworks.min.js"></script>
+</body>
+</html>
+
+
+Aula 5.5 - Melhorando a organização do Layout
+
+. No link https://www.thymeleaf.org/doc/articles/layouts.html podemos encontrar informações como o Thymeleaf trabalha com templates
+
+. Existe duas formas de trabalharmos com templates:
+	. Include-style ( reaproveitamento de código, incluindo ele através de "insert" dentro da página template )
+
+		<body>
+			<div th:insert="footer :: copy">...</div>
+		</body>
+
+	. Hierarchical-style
+
+		O projeto desta biblioteca encontra-se no link https://github.com/ultraq/thymeleaf-layout-dialect/tree/master 
+
+. Inicialmente iremos trabalhar com o Hierarchical-style
+
+. Adicionamos no pom.xml, logo após a tag </dependencies> o código abaixo:
+
+	<repositories>
+		<repository>
+			<id>sonatype-nexus-snapshots</id>
+    		<name>Sonatype Nexus Snapshots</name>
+    		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    		<snapshots>
+      			<enabled>true</enabled>
+    		</snapshots>
+		</repository>
+	</repositories>
+
+	. Importante : No video informa que isto não é mais necessário, testar para ver se isso funciona. Realmente isso não precisa mais.
+
+. Dentro da tag <dependency> inclua o código abaixo:
+
+        <!-- Thymeleaf - Layout Dialect -->
+		<dependency>
+    		<groupId>nz.net.ultraq.thymeleaf</groupId>
+    		<artifactId>thymeleaf-layout-dialect</artifactId>
+    		<version>${thymeleaf-layout-dialect.version}</version>
+		</dependency>
+
+. Dentro da tag <properties> insira o código abaixo:
+
+		<!-- Thymeleaf - Layout Dialect -->
+		<thymeleaf-layout-dialect.version>2.0.0-SNAPSHOT</thymeleaf-layout-dialect.version>
+
+	. Importante - O video informa que não há mais a necessidade de colocar a versão SNAPSHOT, pode deixar somente 2.0.0.
+					No site do maven a versão que funcionou foi a 2.2.2
+
+. Proximo passo é configurar o dialeto do thymeleaf. Acesse a classe WebConfig.java, vá no método templateEngine e deixe como abaixo:
+
+	@Bean
+	public TemplateEngine templateEngine() {
+		SpringTemplateEngine engine = new SpringTemplateEngine();
+		engine.setEnableSpringELCompiler(true);
+		engine.setTemplateResolver(templateResolver());
+		
+		engine.addDialect(new LayoutDialect());				// Essa linha precisa ser inserida
+		return engine;
+	}
+
+
+. Acesse a folder templates e crie uma folder com o nome layout.
+
+. Dentro da folder layout crie a página HTML abaixo, com o nome LayoutPadrao.html . Detalhe, esta página foi originada da página CadastroCerveja.html, trazendo somente o 
+	contéudo fixo, que apareceria na maioria da páginas.
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="UTF-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+	<title>Brewer</title>
+
+	<link rel="stylesheet" type="text/css" href="/brewer/layout/stylesheets/vendors.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/brewer/layout/stylesheets/algaworks.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/brewer/layout/stylesheets/application.css"/>
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+<div class="aw-layout-page">
+	<nav class="navbar  navbar-fixed-top  navbar-default  js-sticky-reference" id="main-navbar">
+		<div class="container-fluid">
+
+	    <div class="navbar-header">
+	     	<a class="navbar-brand  hidden-xs" href="#">
+	        	<img alt="AlgaWorks" src="/brewer/images/logo.png"/>
+	      	</a>
+
+	      	<ul class="nav  navbar-nav">
+	        	<li>
+	          		<a href="#" class="js-sidebar-toggle"><i class="fa  fa-bars"></i></a>
+	        	</li>
+	      	</ul>
+	    </div>
+
+	    <ul class="nav navbar-nav  navbar-right">
+	    	<li>
+	        	<a href="#"><em class="fa  fa-sign-out"></em></a>
+	      	</li> 
+	    </ul>
+
+	  </div>
+	</nav>
+	
+	<aside class="aw-layout-sidebar  js-sidebar">
+		<div class="aw-layout-sidebar__content">
+
+	    	<nav class="aw-menu  js-menu">
+	      		<ul class="aw-menu__list">
+	
+	        		<li class="aw-menu__item">
+	          			<a href="dashboard.html"><i class="fa  fa-fw  fa-home"></i><span>Dashboard</span></a>
+	        		</li>
+	
+	        		<li class="aw-menu__item  is-active">
+	          			<a href="#">
+	            			<i class="fa  fa-fw  fa-file-text"></i><span>Cadastros</span>
+	            			<i class="aw-menu__navigation-icon  fa"></i>
+	          			</a>
+	      
+	          			<ul class="aw-menu__list  aw-menu__list--sublist">
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="cadastro-produto.html">Cadastro de produto</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link  is-active"><a href="pesquisa-produtos.html">Pesquisa de produtos</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="tabela-sem-dados.html">Tabela sem dados</a></li>
+	          			</ul>
+	        		</li>
+	
+	        		<li class="aw-menu__item  is-expanded">
+	          			<a href="#">
+	            			<i class="fa  fa-fw  fa-file-text"></i><span>Páginas comuns</span>
+	            			<i class="aw-menu__navigation-icon  fa"></i>
+	          			</a>
+	
+	          			<ul class="aw-menu__list  aw-menu__list--sublist">
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="pagina-vazia.html">Página vazia</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="login.html">Login</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="esqueceu-a-senha.html">Esqueceu a senha</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="403.html">403</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="404.html">404</a></li>
+				            <li class="aw-menu__item  aw-menu__item--link"><a href="500.html">500</a></li>
+	          			</ul>
+	        		</li>
+	
+	      		</ul>
+	    	</nav>
+		</div>
+	</aside>
+	
+	<section class="aw-layout-content  js-content" layout:fragment="conteudo"></section>
+	
+	<footer class="aw-layout-footer  js-content">
+		<div class="container-fluid">
+			<span class="aw-footer-disclaimer">&copy; 2016 AlgaWorks. Todos os direitos reservados.</span>
+		</div>
+	</footer>
+</div>
+<script src="/brewer/layout/javascripts/vendors.min.js"></script>
+<script src="/brewer/layout/javascripts/algaworks.min.js"></script>
+</body>
+</html>
+
+
+. Observe que no cabeçalho do html foi incluido a identificação da tag
+
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+. Antes da tag <footer...> colocamos o código html abaixo para trazer o conteudo:
+
+	<section class="aw-layout-content  js-content" layout:fragment="conteudo"></section>
+
+
+. A página CadastroCerveja.html será totalmente modificada diminuindo o código dentro dela, deixando somente o conteúdo:
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="'layout/LayoutPadrao'">
+	
+<head></head>
+
+<body>
+<section layout:fragment="conteudo">
+
+	<div class="page-header">
+		<div class="container-fluid">
+			<h1>
+				Cadastro de cerveja
+			</h1>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+
+		<!-- <div class="alert  alert-danger  alert-dismissible" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<i class="fa  fa-exclamation-circle"></i> Já existe um produto com o nome informado.
+		</div> -->
+
+		<form method="POST" th:object="${cerveja}" class="form-vertical  js-form-loading">
+	
+			<div class="row">
+				<div class="col-sm-2  form-group">
+					<label for="sku">SKU</label>
+					<input id="sku" type="text" class="form-control"/>
+				</div>
+				
+				<div class="col-sm-10  form-group">
+					<label for="nome">Nome</label>
+					<input id="nome" type="text" class="form-control"/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="descricao">Descrição</label>
+				<textarea id="descricao" rows="3" class="form-control"></textarea>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-3  form-group">
+					<label for="estilo">Estilo</label>
+					<select id="estilo" class="form-control">
+						<option value="">Selecione o estilo</option>
+						<option value="1">Pale lager</option>
+					</select>
+				</div>
+				
+				<div class="col-sm-3  form-group">
+					<label for="sabor">Sabor</label>
+					<select id="sabor" class="form-control">
+						<option value="">Selecione o sabor</option>
+						<option value="1">Adocicada</option>
+					</select>
+				</div>
+				
+				<div class="col-sm-3  form-group">
+					<label for="teorAlcoolico">Teor alcoólico</label>
+					<div class="input-group">
+						<input id="teorAlcoolico" type="text" class="form-control"/>
+						<div class="input-group-addon">%</div>
+					</div>
+				</div>
+				
+				<div class="col-lg-3  col-sm-6  form-group">
+					<label for="origem">Origem</label>
+					<div>
+						<div class="radio  radio-inline">
+							<input type="radio" name="origem"> 
+							<label>Nacional</label>
+						</div>
+						<div class="radio  radio-inline">
+							<input type="radio" name="origem"> 
+							<label>Internacional</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-sm-3  form-group">
+					<label for="preco">Preço</label>
+					<div class="input-group">
+						<div class="input-group-addon">R$</div>
+						<input id="preco" type="text" class="form-control"/>
+					</div>
+				</div>
+				
+				<div class="col-sm-3  form-group">
+					<label for="comissao">Comissão</label>
+					<div class="input-group">
+						<input id="comissao" type="text" class="form-control"/>
+						<div class="input-group-addon">%</div>
+					</div>
+				</div>
+				
+				<div class="col-sm-3  form-group">
+					<label for="estoque">Estoque</label>
+					<input id="estoque" type="text" class="form-control"/>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<button class="btn  btn-primary" type="submit">Salvar</button>
+			</div>
+	
+		</form>
+	</div>
+</section>
+	
+</body>
+</html>
+
+
+. No cabecalho foi inserido a identificação da tag
+
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+. Foi retirado tudo que não fosse conteúdo e colocado na página de layout
+
+. A tag fragment do CadastroCerveja.html identifica o qual é o contéudo, com a tag:
+
+<section layout:fragment="conteudo">
+
+. Assim a página de layout conseguirá inserir o código do CadastroCerveja.html através da tag:
+
+	<section class="aw-layout-content  js-content" layout:fragment="conteudo"></section>
+
+
+. Importante, na página CadastroCerveja.html o video alerta para não retirar as tags <head> <body>. Depois fazer
+	teste retirando essas tags para ver se a versão atual está funcionando somente com o contéudo
+
+
+	
+Aula 5.6 - Links com URL e Expressões
+
+. Muitas vezes deixamos fixo no context da URL o nome do projeto e isto poderá causar problemas na implantação se isto for mudado.
+	Para solucionar esse problema o Thymeleaf oferece uma expression que resolve isso, deixando o context conforme a configuração do 
+	projeto.
+
+. Para entender melhor essa situação podemos acessar as propriedades do projeto, na opção "Web Project Settings" altere o nome do contexto.
+	Após isso faça a publicação do projeto e veremos que o projeto deixou de ser acessado pelo link antigo e somente possivel seu acesso 
+	utilizando no contexto o nome informado na opção do "Web Project Settings".
+
+. A mudança para deixar o projeto mais flexivel seria alterar em todos os pathname pela expression do Thymeleaf, como abaixo:
+
+	Antes:
+
+	<link rel="stylesheet" type="text/css" href="/nice/layout/stylesheets/vendors.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/nice/layout/stylesheets/algaworks.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/nice/layout/stylesheets/application.css"/>
+	...
+   	<img alt="AlgaWorks" th:src="/nice/layout/images/logo4.png" height="30" width="128"/>
+	...	
+	<script src="/nice/layout/javascripts/vendors.min.js"></script>
+	<script src="/nice/layout/javascripts/algaworks.min.js"></script>
+	
+
+	Depois:
+
+	<link rel="stylesheet" type="text/css" th:href="@{/layout/stylesheets/vendors.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/layout/stylesheets/algaworks.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/layout/stylesheets/application.css}"/>
+	..
+   	<img alt="AlgaWorks" th:src="@{/layout/images/logo4.png}" height="30" width="128"/>
+	...	
+	<script th:src="@{/layout/javascripts/vendors.min.js}"></script>
+	<script th:src="@{/layout/javascripts/algaworks.min.js}"></script>
+	
+Aula 5.7 - Configurando a mascara de dinheiro com JQuery.
+
+. Baixar a biblioteca de mascara jquery-maskmoney
+
+npm install --save @types/jquery-maskmoney
+
+. Copie o arquivo jquery-maskmoney dentro da pasta static/layout/vendors
+
+. Crie um arquivo .js com nome brewer.js na pasta static/layout/javascripts e copie o conteúdo abaixo:
+
+$(function() {
+	var decimal = $('.js-decimal');
+	decimal.maskMoney();
+	
+	var plain = $('.js-plain');
+	plain.maskMoney({ precision: 0 });
+});
+
+. É possivel identificar o objeto pelo id dos campos, porém por ser uma biblioteca que servirá para varios campos
+	é mais interessante configurar uma classe nos campos e referencia-la no arquivo javascript:
+
+	var decimal = $('.js-decimal');
+	...
+	<input id="teorAlcoolico" type="text" class="form-control  js-decimal"/>
+
+
+	var plain = $('.js-plain');
+	...
+	<input id="estoque" type="text" class="form-control  js-plain"/>
+	
+
+. No final do arquivo LayoutPadrao.html adicione as referencias aos arquivos javascript, sempre após a referencia das classes jquery por ultimo:
+
+<script th:src="@{/layout/vendors/jquery.maskMoney.min.js}"></script>
+
+<script th:src="@{/layout/javascripts/brewer.js}"></script>
+
+
+
+
+Aula 5.8 - Organizando o Layout com Fragmentos
+
+. Crie a pasta templates/layout/fragments
+
+. Dentro da pasta criada crie os arquivos abaixo:
+
+BarraNavegacao.html 
+-------------------
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org">
+	
+<body>
+<nav class="navbar  navbar-fixed-top  navbar-default  js-sticky-reference" id="main-navbar" th:fragment="navbar">
+	<div class="container-fluid">
+
+    <div class="navbar-header">
+     	<a class="navbar-brand  hidden-xs" href="#">
+        	<img alt="AlgaWorks" th:src="@{/images/logo.png}"/>
+      	</a>
+
+      	<ul class="nav  navbar-nav">
+        	<li>
+          		<a href="#" class="js-sidebar-toggle"><i class="fa  fa-bars"></i></a>
+        	</li>
+      	</ul>
+    </div>
+
+    <ul class="nav navbar-nav  navbar-right">
+    	<li>
+        	<a href="#"><em class="fa  fa-sign-out"></em></a>
+      	</li> 
+    </ul>
+
+  </div>
+</nav>
+
+</body>
+</html>
+
+
+Footer.html
+-----------
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org">
+	
+<body>
+<footer class="aw-layout-footer  js-content" th:fragment="layout-footer">
+	<div class="container-fluid">
+		<span class="aw-footer-disclaimer">&copy; 2016 AlgaWorks. Todos os direitos reservados.</span>
+	</div>
+</footer>
+
+</body>
+</html>
+
+MenuLateral.html
+----------------
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org">
+	
+<body>
+<aside class="aw-layout-sidebar  js-sidebar" th:fragment="layout-sidebar">
+	<div class="aw-layout-sidebar__content">
+
+    	<nav class="aw-menu  js-menu">
+      		<ul class="aw-menu__list">
+
+        		<li class="aw-menu__item">
+          			<a href="dashboard.html"><i class="fa  fa-fw  fa-home"></i><span>Dashboard</span></a>
+        		</li>
+
+        		<li class="aw-menu__item  is-active">
+          			<a href="#">
+            			<i class="fa  fa-fw  fa-file-text"></i><span>Cadastros</span>
+            			<i class="aw-menu__navigation-icon  fa"></i>
+          			</a>
+      
+          			<ul class="aw-menu__list  aw-menu__list--sublist">
+			            <li class="aw-menu__item  aw-menu__item--link"><a href="cadastro-produto.html">Cadastro de produto</a></li>
+			            <li class="aw-menu__item  aw-menu__item--link  is-active"><a href="pesquisa-produtos.html">Pesquisa de produtos</a></li>
+			            <li class="aw-menu__item  aw-menu__item--link"><a href="tabela-sem-dados.html">Tabela sem dados</a></li>
+          			</ul>
+        		</li>
+
+        		<li class="aw-menu__item  is-expanded">
+          			<a href="#">
+            			<i class="fa  fa-fw  fa-file-text"></i><span>Páginas comuns</span>
+            			<i class="aw-menu__navigation-icon  fa"></i>
+          			</a>
+
+          			<ul class="aw-menu__list  aw-menu__list--sublist">
+			            <li class="aw-menu__item  aw-menu__item--link"><a href="pagina-vazia.html">Página vazia</a></li>
+			            <li class="aw-menu__item  aw-menu__item--link"><a href="login.html">Login</a></li>
+			            <li class="aw-menu__item  aw-menu__item--link"><a href="esqueceu-a-senha.html">Esqueceu a senha</a></li>
+			            <li class="aw-menu__item  aw-menu__item--link"><a href="403.html">403</a></li>
+			            <li class="aw-menu__item  aw-menu__item--link"><a href="404.html">404</a></li>
+			            <li class="aw-menu__item  aw-menu__item--link"><a href="500.html">500</a></li>
+          			</ul>
+        		</li>
+
+      		</ul>
+    	</nav>
+	</div>
+</aside>
+</body>
+</html>
+
+
+. Altere o arquivo LayoutPadrao.html como abaixo. 
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="UTF-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+	<title>Brewer</title>
+
+	<link rel="stylesheet" type="text/css" th:href="@{/layout/stylesheets/vendors.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/layout/stylesheets/algaworks.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/layout/stylesheets/application.css}"/>
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+<div class="aw-layout-page">
+	
+	<div th:replace="layout/fragments/BarraNavegacao :: navbar"></div>
+	
+	<div th:replace="layout/fragments/MenuLateral :: layout-sidebar"></div>
+	
+	<section class="aw-layout-content  js-content" layout:fragment="conteudo"></section>
+	
+	<div th:replace="layout/fragments/Footer :: layout-footer"></div>
+</div>
+<script th:src="@{/layout/javascripts/vendors.min.js}"></script>
+<script th:src="@{/layout/javascripts/algaworks.min.js}"></script>
+
+<script th:src="@{/javascripts/vendors/jquery.maskMoney.min.js}"></script>
+
+<script th:src="@{/javascripts/brewer.js}"></script>
+</body>
+</html>
+
+
+
+. Importante: observe que o html teve seu código reduzido, através das tags é feito a referência aos arquivos externos:
+
+	<div th:replace="layout/fragments/BarraNavegacao :: navbar"></div>
+	
+	<div th:replace="layout/fragments/MenuLateral :: layout-sidebar"></div>
+	
+	<section class="aw-layout-content  js-content" layout:fragment="conteudo"></section>
+	
+	<div th:replace="layout/fragments/Footer :: layout-footer"></div>
+
+
+. Importante: Para que os htmls "replaciado" no LayoutPadrao.html não venha com trechos de códigos
+				indesejados como (html, body, etc), daremos um apelido ao trecho nos htmls (BarraNavegacao, Footer, etc), 
+				com a identificação th:fragment="name" que queremos 
+				incorporar no LayoutPadrao.html e ao fazer o th:replace informamos o mesmo apelido para que o Thymeleaf redenderize
+				o trecho desejado. Exemplo:
+
+<!-- Trecho do html BarraNavegacao.html -->
+<nav class="navbar  navbar-fixed-top  navbar-default  js-sticky-reference" id="main-navbar" th:fragment="navbar">
+<!-- Observe que foi incluido o parâmetro th:fragment="navbar" -->
+
+
+<!-- Trecho do html LayoutPadrao.html -->
+	<div th:replace="layout/fragments/BarraNavegacao :: navbar"></div>
+<!-- Observe que foi utilizado o parâmetro ":: navbar" para informar ao Thymeleaf rederizar o BarraNavegacao.html a partir
+		do parâmetro th:fragment="navbar" -->
+
+. Importante : Poderiamos ao invés de criar os arquivo BarraNavegacao.html, Footer.html e o MenuLateral.html criar um único 
+				identificando cada ponto com th:fragment="navbar/footer/side-bar" e "replaciando" da mesma forma como foi feito
+				no código do LayoutPadrao.html
+
+
+. Altere/Crie um arquivo html abaixo. 
+
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="'layout/LayoutPadrao'">
+
+<head></head>
+
+<body>
+	<section layout:fragment="conteudo">
+
+		<div class="page-header">
+			<div class="container-fluid">
+				<h1>Cadastro de Veiculos</h1>
+			</div>
+		</div>
+
+		<div class="container-fluid">
+
+			<!-- <div class="alert  alert-danger  alert-dismissible" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<i class="fa  fa-exclamation-circle"></i> Já existe um produto com o nome informado.
+		</div> -->
+
+			<form method="POST" th:object="${veiculoBean}"
+				class="form-vertical  js-form-loading">
+
+				<div class="row">
+					<div class="col-sm-2  form-group">
+						<label for="sku">SKU</label> <input id="sku" type="text"
+							class="form-control" />
+					</div>
+
+					<div class="col-sm-10  form-group">
+						<label for="nome">Nome</label> <input id="nome" type="text"
+							class="form-control" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="descricao">Descrição</label>
+					<textarea id="descricao" rows="3" class="form-control"></textarea>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-3  form-group">
+						<label for="estilo">Estilo</label> <select id="estilo"
+							class="form-control">
+							<option value="">Selecione o estilo</option>
+							<option value="1">Pale lager</option>
+						</select>
+					</div>
+
+					<div class="col-sm-3  form-group">
+						<label for="sabor">Sabor</label> <select id="sabor"
+							class="form-control">
+							<option value="">Selecione o sabor</option>
+							<option value="1">Adocicada</option>
+						</select>
+					</div>
+
+					<div class="col-sm-3  form-group">
+						<label for="teorAlcoolico">Teor alcoólico</label>
+						<div class="input-group">
+							<input id="teorAlcoolico" type="text" class="form-control js-decimal" />
+							<div class="input-group-addon">%</div>
+						</div>
+					</div>
+
+					<div class="col-lg-3  col-sm-6  form-group">
+						<label for="origem">Origem</label>
+						<div>
+							<div class="radio  radio-inline">
+								<input type="radio" name="origem"> <label>Nacional</label>
+							</div>
+							<div class="radio  radio-inline">
+								<input type="radio" name="origem"> <label>Internacional</label>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-3  form-group">
+						<label for="preco">Preço</label>
+						<div class="input-group">
+							<div class="input-group-addon">R$</div>
+							<input id="preco" type="text" class="form-control js-decimal" />
+						</div>
+					</div>
+
+					<div class="col-sm-3  form-group">
+						<label for="comissao">Comissão</label>
+						<div class="input-group">
+							<input id="comissao" type="text" class="form-control js-decimal" />
+							<div class="input-group-addon">%</div>
+						</div>
+					</div>
+
+					<div class="col-sm-3  form-group">
+						<label for="estoque">Estoque</label> <input id="estoque"
+							type="text" class="form-control js-decimal" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<button class="btn  btn-primary" type="submit">Salvar</button>
+				</div>
+
+			</form>
+		</div>
+	</section>
+
+</body>
+</html>
+
+
+. Importante: observe as tags:
+
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="'layout/LayoutPadrao'">
+
+<section layout:fragment="conteudo">
+
+	Dessa forma que é feito o relacionamento entre os arquivos.
+
+
+
+
+5.9. Prototipando o cadastro rápido de estilo
+
+. Altere o arquivo CadastroCerveja.html como abaixo. Observe que foi alterado o trecho do código "estilo" 
+
+--------------------------------------------------------------------
+				<div class="col-sm-3  form-group">
+					<label for="estilo">Estilo</label>
+					<div class="bw-field-action">
+						<select id="estilo" class="form-control">
+							<option value="">Selecione o estilo</option>
+							<option value="1">Pale lager</option>
+						</select>
+						
+						<div class="bw-field-action__icon">
+							<a href="#" data-toggle="modal" data-target="#modalCadastroRapidoEstilo">
+								<i class="glyphicon  glyphicon-plus-sign  bw-glyphicon-large"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+--------------------------------------------------------------------
+
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="'layout/LayoutPadrao'">
+	
+<head></head>
+
+<body>
+<section layout:fragment="conteudo">
+
+	<div class="page-header">
+		<div class="container-fluid">
+			<h1>
+				Cadastro de cerveja
+			</h1>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+
+		<!-- <div class="alert  alert-danger  alert-dismissible" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<i class="fa  fa-exclamation-circle"></i> Já existe um produto com o nome informado.
+		</div> -->
+
+		<form method="POST" th:object="${cerveja}" class="form-vertical  js-form-loading">
+	
+			<div class="row">
+				<div class="col-sm-2  form-group">
+					<label for="sku">SKU</label>
+					<input id="sku" type="text" class="form-control"/>
+				</div>
+				
+				<div class="col-sm-10  form-group">
+					<label for="nome">Nome</label>
+					<input id="nome" type="text" class="form-control"/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="descricao">Descrição</label>
+				<textarea id="descricao" rows="3" class="form-control"></textarea>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-3  form-group">
+					<label for="estilo">Estilo</label>
+					<div class="bw-field-action">
+						<select id="estilo" class="form-control">
+							<option value="">Selecione o estilo</option>
+							<option value="1">Pale lager</option>
+						</select>
+						
+						<div class="bw-field-action__icon">
+							<a href="#" data-toggle="modal" data-target="#modalCadastroRapidoEstilo">
+								<i class="glyphicon  glyphicon-plus-sign  bw-glyphicon-large"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-sm-3  form-group">
+					<label for="sabor">Sabor</label>
+					<select id="sabor" class="form-control">
+						<option value="">Selecione o sabor</option>
+						<option value="1">Adocicada</option>
+					</select>
+				</div>
+				
+				<div class="col-sm-3  form-group">
+					<label for="teorAlcoolico">Teor alcoólico</label>
+					<div class="input-group">
+						<input id="teorAlcoolico" type="text" class="form-control  js-decimal"/>
+						<div class="input-group-addon">%</div>
+					</div>
+				</div>
+				
+				<div class="col-lg-3  col-sm-6  form-group">
+					<label for="origem">Origem</label>
+					<div>
+						<div class="radio  radio-inline">
+							<input type="radio" name="origem"> 
+							<label>Nacional</label>
+						</div>
+						<div class="radio  radio-inline">
+							<input type="radio" name="origem"> 
+							<label>Internacional</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-sm-3  form-group">
+					<label for="preco">Preço</label>
+					<div class="input-group">
+						<div class="input-group-addon">R$</div>
+						<input id="preco" type="text" class="form-control  js-decimal"/>
+					</div>
+				</div>
+				
+				<div class="col-sm-3  form-group">
+					<label for="comissao">Comissão</label>
+					<div class="input-group">
+						<input id="comissao" type="text" class="form-control  js-decimal"/>
+						<div class="input-group-addon">%</div>
+					</div>
+				</div>
+				
+				<div class="col-sm-3  form-group">
+					<label for="estoque">Estoque</label>
+					<input id="estoque" type="text" class="form-control  js-plain"/>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<button class="btn  btn-primary" type="submit">Salvar</button>
+			</div>
+	
+		</form>
+	</div>
+	
+	<div th:replace="estilo/CadastroRapidoEstilo :: modal"></div>
+</section>
+	
+</body>
+</html>
+
+
+. Dentro da pasta "static/stylesheets" inclua o arquivo "brewer.css" como abaixo:
+
+/*
+######################
+# UTILIDADES
+######################
+*/
+.bw-glyphicon-large {
+	font-size: 18px;
+}
+
+
+/*
+######################
+# COMPONENTES
+######################
+*/
+
+/* Field Action */
+.bw-field-action {
+	display: flex;
+}
+
+.bw-field-action__icon {
+	margin: 6px 0 0 5px;
+}
+
+. Crie a pasta "templates/estilo" e inclua o arquivo CadastroRapidoEstilo.html como abaixo:
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<body>
+	<div class="modal fade" id="modalCadastroRapidoEstilo" tabindex="-1" role="dialog"  th:fragment="modal">
+		<div class="modal-dialog  modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Cadastro de estilo</h4>
+				</div>
+				
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-2  control-label" for="nomeEstilo">Nome</label>
+							<div class="col-sm-10">
+								<input id="nomeEstilo" type="text" class="form-control" autofocus="autofocus">
+							</div>
+						</div>
+					</form>
+					
+					<button type="button" class="btn btn-primary">Salvar</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
+
+
+10.30
