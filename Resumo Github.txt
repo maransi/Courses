@@ -1,3 +1,22 @@
+Estágios do Git
+---------------
+
+untracked           unmodified          modified            staged
+=========           ==========          ========            ======
+                            Edit the file
+                        ------------------->
+
+        Add file
+    ------------------->                        Stage the file
+                                            ------------------>
+        Remove the file
+    <--------------------
+
+                                        Commit
+                        <--------------------------------------
+
+
+
 Integração Git com Eclipse
 --------------------------
 
@@ -149,11 +168,11 @@ Github em linha de comando:
 
     . Acesse a pasta criada e crie os arquivos que deseja ser gerenciado pelo github.
 
-    . Adicione os arquivos no controle de versão do github:
+    . Adicione os arquivos no controle de versão do github (Staged):
 
         $ git add .
         
-    . Copie os arquivos alterados para o repositorio local do github:
+    . Copia os arquivos alterados para o repositorio local do github (unmodified):
 
         $ git commit -a -m "Primeira Versão"
 
@@ -283,5 +302,128 @@ Github em linha de comando:
 
             $ git diff      # Mostra as diferenças do arquivo "modified"
 
+
+4. Como retornar uma versão do arquivo:
+
+    . Retornando para uma versão especifica com "git checkout...":
+
+        $ git log --oneline Controle\ de\ Versão.txt
+        2bb713e (HEAD) Versão 2
+        53dd1e7 Versão 1
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        # Retorna o conteúdo do arquivo para a versão escolhida
+        $  git checkout 53dd1e7 Controle\ de\ Versão.txt
+        
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+        
+        # Não atualiza a fila de log permanece em "2bb713e (HEAD) Versão 2", não apaga nenhuma fila e
+        # atualiza o conteúdo do arquivo com a versão do log escolhido
+        $ git log --oneline Controle\ de\ Versão.txt
+        2bb713e (HEAD) Versão 2
+        53dd1e7 Versão 1
+
+
+
+    . Voltando para a situação antes do último commit, fazendo revert das alterações antes do último commit
+
+        $ git log --oneline
+        5ae7fe1 (HEAD -> master, origin/master, origin/HEAD) Versao 4
+        48ac462 Versao 3
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        Versão 3
+
+        Versão 4        
+
+        # Inclua mais uma linha no arquivo acima e salve o arquivo
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        Versão 3
+
+        Versão 4        
+
+        Versão 5
+
+
+        $ git checkout -- Controle\ de\ Versão.txt 
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        Versão 3
+
+        Versão 4        
+
+
+
+    . Retornando para uma versão especifica com "git reset...":
+
+        Exemplo 1:
+
+        $ git log --oneline
+        f93f808 (HEAD) Versão 2
+        4c3aca9 Versão 1
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        $ git reset --soft 4c3aca9
+        ou
+        $ git reset --mixed 4c3aca9
+
+        # Neste caso o git apagou a versão f93f808 da fila e colocou como versão atual 4c3aca9
+        # e devido aos parâmetros --soft ou --mixed o conteúdo do arquivo permaneceu o mesmo
+        $ git log --oneline
+        4c3aca9 (HEAD) Versão 1
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+
+
+        Exemplo 2:
+
+        $ git log --oneline
+        3eaaab6 (HEAD) Versão 2
+        537a994 Versão 1
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        $ git reset --hard 537a994        
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        # Além de apagar a versão "3eaaab6 (HEAD) Versão 2" da fila o git trouxe o conteúdo da versão 1
+        # dos arquivos 
+        $ git log --oneline
+        537a994 (HEAD) Versão 1
+
+        . Todos os parâmetros --soft --mixed --hard apagam a versão da fila de log, porém com os parâmetros
+            --soft --mixed não altera o conteúdo do arquivo deixando com o valor da última versão. Já o 
+            parâmetro --hard atualiza o conteúdo do arquivo com o da versão do log.
 
             
