@@ -1,0 +1,129 @@
+1. Instalar o SDK do java 1.8, acesse o terminal e execute os comandos abaixo:
+
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
+
+2. instalação do Python 3.7 ( Passo opcional )
+
+sudo apt-get install build-essential checkinstall
+
+sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev 
+    libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
+
+cd /usr/src
+
+sudo wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
+
+sudo tar xfzv Python-3.7.4.tgz
+
+cd Python-3.7.4
+
+sudo ./configure --enable-optimizations
+
+sudo make altinstall
+
+python3.7
+
+
+2. Acesse o link abaixo e baixe o arquivo para linux do Anaconda 3.6
+
+https://www.anaconda.com/download/
+
+3. Acesse o terminal novamente e execute os comandos abaixo:
+
+cd ~
+sudo ./home/marco/Download/Anaconda3-xxx-x86-64.sh
+
+Importante: Aceite a pasta para instalação default que ele informou durante a instalação
+
+4. Após a inslação do anaconda, acesse outro terminal e execute a linha abaixo:
+
+sudo chmod  +x /home/marco/anaconda3/bin/conda
+sudo ./conda install -c conda-forge findspark
+
+Importante: Caso não esteja no path o arquivo conda, vá até a pasta bin onde esta o anaconda:
+
+cd /home/marco/Anaconda3/bin
+sudo chmod  +x conda
+sudo ./conda install -c conda-forge findspark
+
+
+6. Acesse o link abaixo e baixe o Hadoop
+
+http://spark.apache.org/downloads.html
+
+    Importante: o arquivo baixo tem a extensão .tgz. Esse arquivo pode ser descompatado com os aplicativos 7-Zip ou WinRAR
+
+7. Descompacte o arquivo baixo no item 6 na pasta /home/marco/spark-27
+
+cd ~
+sudo tar xvfz Download/spark-2.3.0-bin-hadoop2.7.tgz
+sudo mv spark-2.3.0-bin-hadoop2.7 /home/marco/spark-27
+sudo chmod 777 -R /home/marco/spark-27
+
+8. Acesse a pasta spark-27\conf, altere o nome do arquivo log4j.properties.template, para log4j.properties.
+
+9. Abra o arquivo log4j.properties, localize o parâmetro "rootCategory=INFO" e altere para "rootCategory=ERROR".
+
+10. Crie o Anaconda.desktop na área de trabalho conforme abaixo:
+
+[Desktop Entry]
+Encoding=UTF-8
+Name=Anaconda 3
+Type=Application
+Categories=Application;Utility;
+Path=/home/marco/anaconda3/bin/
+Exec=/home/marco/anaconda3/bin/anaconda-navigator
+StartupNotify=false
+Terminal=false
+Icon=/home/marco/anaconda3/lib/python3.6/site-packages/anaconda_navigator/static/images/anaconda.png
+
+
+11. Edite o arquivo $HOME/.bashrc e inclua as linhas abaixo:
+
+# Spark
+
+export SPARK_HOME=/home/marco/spark-27
+export PATH=$SPARK_HOME/bin:$PATH
+export PYSPARK_DRIVER_PYTHON=jupyter
+export PYSPARK_DRIVER_PYTHON_OPTS=notebook
+
+12. No prompt do terminal execute:
+
+    source .bashrc
+
+    conda activate
+
+    pyspark
+
+13. Testar o programa abaixo:
+
+    import pyspark
+    from pyspark.sql import SQLContext
+
+    data=[("Newton",1643),("Einsten",1879),("Gaus",1777)]
+
+    sqlContext = SQLContext(sc)
+
+    df=sqlContext.createDataFrame(data,["name","birth"])
+
+    df.printSchema()
+
+
+14. Ir no portal da transparencia para baixar os arquivos para teste
+
+    http://portaltransparencia.gov.br/download-de-dados
+
+    . Baixar o arquivo de Viagens de Serviços
+
+    . Utilize o comando abaixo para transforma-lo no padrão UTF8, que é o padrão do spark
+
+    iconv -f ISO-8859-1 -t UTF-8 2018_Viagem.csv > 2018_Viagem.utf8.csv
+
+
+
+
+
+
+

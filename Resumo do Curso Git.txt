@@ -1,0 +1,442 @@
+Estágios do Git
+---------------
+
+untracked           unmodified          modified            staged
+=========           ==========          ========            ======
+                            Edit the file
+                        ------------------->
+
+        Add file
+    ------------------->                        Stage the file
+                                            ------------------>
+        Remove the file
+    <--------------------
+
+                                        Commit
+                        <--------------------------------------
+
+
+
+Integração Git com Eclipse
+--------------------------
+
+1. Verificar as configurações do Git dentro do Eclipse:
+
+    . Acesse o item de menu Windows -> Preferences
+
+    . Digite no campo de busca "git"
+        . Observe o local onde o git armazenará os arquivos/projetos "Default Repository Folder":
+            /home/marco/git
+        . Acesse o local "Configuration" e insira os parâmetros 
+            user.name = Marco Antonio da Silva
+            user.email = maransi
+
+
+2. Vá no site do git para criar um repositorio:
+
+    . Acesse o link https://github.com/ e faça o login da sua conta
+
+    . Clique no botão "Create Repository"
+
+    . Informe o nome do repositorio
+
+    . Acione o check com nome "Initialize this Repository with a README"
+
+    . Na lista "Add .gitignore" escolha o item "Java"
+
+    . Clique no botão "Create Repository"
+
+    . Ao ser desviado para a nova tela do repositorio, clique no botão "Clone or Download" e
+        copia a URL que será mostrada Ctrl+c
+
+
+3. Configuração do novo repositorio no Eclipse:
+
+    . No eclipse mude para a perspectiva do Git
+
+    . Somente a primeira vez (Quando não temos nenhum repositorio configurado) será apresentado os links:
+
+        Add an existing local git repository
+        Clone git repository
+        Create a new local git repository
+
+    . Clique no link "Clone Git Repository", será apresentado a tela "Source Git Repository"
+
+        . Por causa do Ctrl+c anterior as informações de localização de URLs já serão preenchidas
+
+        . Coloque o usuário, senha e clique o check "Store in Secure Store"
+
+    . Clique em Next > nas telas seguintes "Branch Selection" e "Local Destination"
+
+        . Na tela "Local Destination" já vem configurado as informações das pastas de armazenamento
+            local do git configurado no item 1
+        . Na tela "Local Destination" clique no botão "Finish"
+        . Se precisar clonar novos repositorios acesse a aba da esquerda "Git Repositories" e clique
+            no botão "Clone a Git Repository and add the clone to this view"
+
+4. Adicionando o projeto ao repositorio do Git:
+
+    . Volte para a perspectiva Java
+
+    . Clique com o botão direito no nó principal do projeto na estrutura de projetos e escolha a opção
+        "Team -> Share Project..."
+
+    . Será apresentado a tela "Configure Git Repository"
+
+        . Escolha na lista "Repository" o repositorio criado anteriormente
+
+        . Clique em "Finish". Ao termino da ação o Plugin do eclipse irá informar que o projeto será controlado
+            pelo Github, adicionando ele a esse controle. Todos os icones dos nós do projeto com o simbolo de "?", 
+            indicando que cada arquivo do projeto não está ainda no repositorio local do Github
+
+    . Para transferir o projeto para a pasta local do Github, clique com o botão direito no nó principal 
+        do projeto acesse a opção Team -> Synchronize Workspace
+
+        . Importante: ao termino desta ação o eclipse irá mudar a perspectiva para "Team Sinchronizing"
+            e é nesta perspectiva que aparecerá as informações abaixo
+
+    . Nem todos os arquivos deverão ir para a nuvem, para desconsiderar esses arquivos clique com botão direito 
+        em cada um dos arquivos do tipo abaixo e escolha o item "Ignore":
+
+        . A pasta "Settings"
+        . .classpath
+        . .project
+
+        * Detalhe no projeto Spring boot no STS nenhum destes arquivos aparecerão.
+
+    . Clique com o botão direito e escolha a opção "Commit"
+
+        . Selecione todos os itens da caixa "Unstaged Changes" e arraste para a pasta abaixo "Staged Changes",
+            ou clique no botão "++"
+
+        . Clique no botão "Commit and Push" se quiser levar os arquivos para a pasta na nuvem do Github
+
+        . Ou clique no botão "Commit" se quiser levar os arquivos para a pasta local do Github
+
+        . Clique em "Close" na tela de resposta, o projeto foi transferido para o Github
+
+5. Verificando o projeto na nuvem:
+
+    . Retorne ao navegador e atualize a URL do projeto recém commitado.
+
+6. Proximos passos:
+
+    . Sempre que quiser atualizar o projeto para o Github dê Push (Enviar para o github local), 
+        Commit (Enviar para o github na nuvem) e Pull (Trazer do servidor).
+
+    . Acesse um dos arquivos no servidor web do Github, realize uma alteração. Acesse o projeto
+        no Eclipse, botão direito no nó principal, acione a opção "Pull" e confira a alteração.
+
+    . Faça alteração no Eclipse, realize um Commit e confira no site do Github se a alteração foi realizada 
+        com sucesso.
+
+    . Certifique-se que o seu projeto está no padrão de "Encoding" UTF8. Clique com o botão direito do
+        mouse no nó principal do projeto, acesse o item Properties / Resource / Text File Encoding e 
+        deixe como UTF8
+
+    
+
+    
+
+Github em linha de comando:
+---------------------------
+
+1. Vá no site do git para criar um repositorio:
+
+    . Acesse o link https://github.com/ e faça o login da sua conta
+
+    . Clique no botão "Create Repository"
+
+    . Informe o nome do repositorio
+
+    . Acione o check com nome "Initialize this Repository with a README"
+
+    . Na lista "Add .gitignore" escolha o item "Java"
+
+    . Clique no botão "Create Repository"
+
+    . Ao ser desviado para a nova tela do repositorio, clique no botão "Clone or Download" e
+        copia a URL que será mostrada Ctrl+c
+
+2. Iniciando um repositorio local:
+
+    . Acesse o prompt de comandos do sistema operacional.
+
+    . Digite o comando abaixo para clonar a pasta criado como repositorio no Github
+
+        $ git clone https://github.com/maransi/{nome do repositorio.git}
+
+    . Acesse a pasta criada e crie os arquivos que deseja ser gerenciado pelo github.
+
+    . Adicione os arquivos no controle de versão do github (Staged):
+
+        $ git add .
+        
+    . Copia os arquivos alterados para o repositorio local do github (unmodified):
+
+        $ git commit -a -m "Primeira Versão"
+
+    . Copie os arquivos para o repositorio na nuvem do github:
+
+        $ git push -u origin master
+
+3. Outra Maneira de iniciar um repositorio local:
+
+    . Crie uma pasta no disco:
+
+        $ mkdir Courses
+        $ cd Courses
+
+    . Inicialize a pasta no git:
+
+        $ git init
+
+    
+
+3. Situações diversas:
+
+    . Para atualizar um repositorio local em situações que a pasta está desatualizada:
+
+        . Acesse a pasta e execute o comando abaixo:
+
+            $ git pull -u
+
+    . Atualizar os arquivos no repositorio do github:
+
+        # Se o arquivo for novo, ou seja, é a primeira vez que ele irá para o git
+        $ git add .
+
+        # Envia os arquivos alterados para o repositorio local
+        $ git commit -a -m "Versão Inicial"
+
+        # Envia os arquivos da fila para o repositorio na nuvem do github
+        $ git push -u origin master
+
+    . Para saber a situação da sua pasta:
+
+        # Mostra a situação dos arquivos que estão pendentes de serem commitados
+
+            $ git status
+            No ramo master
+            Your branch is up to date with 'origin/master'.
+
+            Changes not staged for commit:
+            (utilize "git add <arquivo>..." para atualizar o que será submetido)
+            (utilize "git checkout -- <arquivo>..." para descartar mudanças no diretório de trabalho)
+
+                modified:   Resumo Github.txt
+
+            nenhuma modificação adicionada à submissão (utilize "git add" e/ou "git commit -a")
+
+    
+        # Mostra os commit e pushes feitos
+
+            $ git log
+            commit 1fb6e7f07669f2376a00abeead4567e2a55d4283 (HEAD -> master, origin/master, origin/HEAD)
+            Author: Marco <maransi>
+            Date:   Tue Apr 28 00:41:41 2020 -0300
+
+                Alteração do Resumo do Curso de Git
+
+            commit 6451bbc957dc0513cfb756bb3679e2e7a4206df5
+            Author: Marco <maransi>
+            Date:   Tue Apr 28 00:10:10 2020 -0300
+
+                Nova Alteração
+
+
+        # Apresenta os commits e pushes resumidamente
+
+            $ git shortlog
+            Marco (7):
+                Versão Inicial
+                Versão Inicial da Carta
+                Versão Carta
+                Alteração da Carta
+                Segunda Alteração da Carta
+                Nova Alteração
+                Alteração do Resumo do Curso de Git
+
+            maransi (3):
+                Initial commit
+                Versão Inicial
+                Arquivos Removidos
+
+
+
+            $ git log --oneline
+            4593c75 (HEAD -> master, origin/master, origin/HEAD) Atualização Teste
+            87ea50d Alterações Diversas
+            1fb6e7f Alteração do Resumo do Curso de Git
+            6451bbc Nova Alteração
+            6e99b5a Segunda Alteração da Carta
+            e11ad40 Alteração da Carta
+            d4c459f Versão Carta
+            be63454 Versão Inicial da Carta
+            6cfe9f5 Versão Inicial
+            99720f5 Arquivos Removidos
+            1a67e96 Versão Inicial
+            08f8762 Initial commit
+
+
+        # Apresenta as mudanças de uma determinada hash de alteração
+
+            $ git show 1fb6e7f07669f2376a00abeead4567e2a55d4283
+
+        
+        
+        # Para verificar as diferenças dos arquivos que ainda não foram comitados
+
+            $ git status    # Mostrará os arquivos que ainda não foram comitados
+
+            No ramo master
+            Your branch is up to date with 'origin/master'.
+
+            Changes not staged for commit:
+            (utilize "git add <arquivo>..." para atualizar o que será submetido)
+            (utilize "git checkout -- <arquivo>..." para descartar mudanças no diretório de trabalho)
+
+                modified:   Resumo Github.txt
+
+            nenhuma modificação adicionada à submissão (utilize "git add" e/ou "git commit -a")
+
+            $ git diff      # Mostra as diferenças do arquivo "modified"
+
+        # Para eliminar um arquivo nos repositorios do git:
+
+            $ git rm [nome do arquivo]
+            $ git commit -am "Exclusão do arquivo"
+            $ git push origin master
+
+        # Como renomear um arquivo nos repositorios do git:
+
+            $ git mv [nome do arquivo atual] [nome para o novo arquivo]
+            $ git commit -am "Mudança do nome do arquivo"
+            $ git push origin master
+
+        # Pesquisar o git fetch
+https://metring.com.br/para-que-serve-o-git-fetch-vs-pull        
+
+
+4. Como retornar uma versão do arquivo:
+
+    . Retornando para uma versão especifica com "git checkout...":
+
+        $ git log --oneline Controle\ de\ Versão.txt
+        2bb713e (HEAD) Versão 2
+        53dd1e7 Versão 1
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        # Retorna o conteúdo do arquivo para a versão escolhida
+        $  git checkout 53dd1e7 Controle\ de\ Versão.txt
+        
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+        
+        # Não atualiza a fila de log permanece em "2bb713e (HEAD) Versão 2", não apaga nenhuma fila e
+        # atualiza o conteúdo do arquivo com a versão do log escolhido
+        $ git log --oneline Controle\ de\ Versão.txt
+        2bb713e (HEAD) Versão 2
+        53dd1e7 Versão 1
+
+    . Voltando para a situação antes do último commit, fazendo revert das alterações antes do último commit
+
+        $ git log --oneline
+        5ae7fe1 (HEAD -> master, origin/master, origin/HEAD) Versao 4
+        48ac462 Versao 3
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        Versão 3
+
+        Versão 4        
+
+        # Inclua mais uma linha no arquivo acima e salve o arquivo
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        Versão 3
+
+        Versão 4        
+
+        Versão 5
+
+
+        $ git checkout -- Controle\ de\ Versão.txt 
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        Versão 3
+
+        Versão 4        
+
+
+
+    . Retornando para uma versão especifica com "git reset...":
+
+        Exemplo 1:
+
+        $ git log --oneline
+        f93f808 (HEAD) Versão 2
+        4c3aca9 Versão 1
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        $ git reset --soft 4c3aca9
+        ou
+        $ git reset --mixed 4c3aca9
+
+        # Neste caso o git apagou a versão f93f808 da fila e colocou como versão atual 4c3aca9
+        # e devido aos parâmetros --soft ou --mixed o conteúdo do arquivo permaneceu o mesmo
+        $ git log --oneline
+        4c3aca9 (HEAD) Versão 1
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+
+
+        Exemplo 2:
+
+        $ git log --oneline
+        3eaaab6 (HEAD) Versão 2
+        537a994 Versão 1
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        Versão 2
+
+        $ git reset --hard 537a994        
+
+        $ cat Controle\ de\ Versão.txt 
+        Versão 1
+
+        # Além de apagar a versão "3eaaab6 (HEAD) Versão 2" da fila o git trouxe o conteúdo da versão 1
+        # dos arquivos 
+        $ git log --oneline
+        537a994 (HEAD) Versão 1
+
+        . Todos os parâmetros --soft --mixed --hard apagam a versão da fila de log, porém com os parâmetros
+            --soft --mixed não altera o conteúdo do arquivo deixando com o valor da última versão. Já o 
+            parâmetro --hard atualiza o conteúdo do arquivo com o da versão do log.
+
+            
