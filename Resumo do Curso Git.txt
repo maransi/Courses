@@ -442,14 +442,64 @@ https://metring.com.br/para-que-serve-o-git-fetch-vs-pull
 
         Exemplo 3:
 
+        # Crie um arquivo com o conteúdo "Versão 1"
+
+        $ git add .
+
         $ git commit -am "Versão 1"
 
+        # Edite o mesmo arquivo e acrescente o conteúdo "Versão 2"
+
         $ git log
+        commit f6d9cd6c5d46fd072b732efd0286e919676f922d (HEAD -> master)
+        Author: Marco <maransi>
+        Date:   Sun May 3 18:20:38 2020 -0300
 
-        # O git irá reverter a situação dos arquivos antes do  [codigo da ultima versão commitada]
-        $ git revert [codigo da ultima versão commitada]
+            Versão 2
 
-        $ 
+        commit b4f24be0c567854df8395330b5a96f3198126ce8
+        Author: Marco <maransi>
+        Date:   Sun May 3 18:19:01 2020 -0300
+
+            Versão 1
+
+        $ cat ControleVersao.txt 
+        Versão 1
+        Versão 2
+
+        # O git irá reverter a situação dos arquivos antes da 
+        # versão f6d9cd6c5d46fd072b732efd0286e919676f922d
+        $ git revert f6d9cd6c5d46fd072b732efd0286e919676f922d
+
+        $ cat ControleVersao.txt 
+        Versão 1
+ 
+        # Importante: O comando revert além de reverter a versão criou um novo commit 
+        # automaticamente 21f3ef9d6f49edf157520cb1ea06b6dee9293ab5
+        $ git log
+        commit 21f3ef9d6f49edf157520cb1ea06b6dee9293ab5 (HEAD -> master)
+        Author: Marco <maransi>
+        Date:   Sun May 3 18:22:17 2020 -0300
+
+            Revert "Versão 2"
+            
+            This reverts commit f6d9cd6c5d46fd072b732efd0286e919676f922d.
+
+        commit f6d9cd6c5d46fd072b732efd0286e919676f922d
+        Author: Marco <maransi>
+        Date:   Sun May 3 18:20:38 2020 -0300
+
+            Versão 2
+
+        commit b4f24be0c567854df8395330b5a96f3198126ce8
+        Author: Marco <maransi>
+        Date:   Sun May 3 18:19:01 2020 -0300
+
+            Versão 1
+
+        # Se usarmos o parâmetro -n não é gerado o commit
+        $ git revert f6d9cd6c5d46fd072b732efd0286e919676f922d -n
+
 5. Extras
 
     . Para desconsiderar arquivos para não serem controlados pelo github basta criar um arquivo
