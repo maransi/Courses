@@ -1,0 +1,516 @@
+Curso Spring Boot && MVC com Thymeleaf
+
+
+Informações Complementares
+--------------------------
+
+    . Como configurar a página default quando for chamado o contexto "/" do site:
+
+        Page index.html will be default if one this possibilities:
+
+        Solution 1: index.html page inside public
+
+        create an index.html page inside resources/public/index.html
+
+        Solution 2: index.html page inside static
+
+        create an index.html page inside resources/static/index.html
+
+        Solution 3: Using controller Mapping
+
+        Create a controller with@RequestMapping("/") which will return view name but for this requires any view configuration. Here is spring boot jsp example
+
+        package com.javadeveloperzone.controller;
+        import org.springframework.stereotype.Controller;
+        import org.springframework.web.bind.annotation.RequestMapping;
+        /**
+        * Created by Java Developer Zone on 19-07-2017.
+        */
+        @Controller
+        public class IndexController {
+            @RequestMapping("/")
+            public String index() {
+                return "Spring Boot Example";
+            }
+        }
+
+    . Principais propriedades do arquivo application.properties
+
+        spring.main.banner-mode=off
+        logging.level.org.springframework=error
+
+        spring.jpa.hibernate.ddl-auto=none
+
+        spring.datasource.initialization-mode=always
+        spring.datasource.platform=postgres
+        spring.datasource.url=jdbc:postgresql://localhost:5432/desenv
+        spring.datasource.username=supervisor
+        spring.datasource.password=brasil2
+
+        spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
+        #Show all queries
+        spring.jpa.show-sql=true
+        spring.jpa.properties.hibernate.format_sql=true
+        #logging.level.org.hibernate.type=error
+
+        #spring.mvc.view.prefix=/templates/
+        spring.thymeleaf.suffix=.jsp
+
+        # Allow Thymeleaf templates to be reloaded at dev time
+        spring.thymeleaf.cache: false
+        spring.thymeleaf.mode: html
+
+
+
+Aula 3 - Anotações Spring Framework
+
+    . Principais anoteações para objetos componentes:
+
+        @Component 
+        
+        É uma anotação básica para criar qualquer tipo de bean gerenciado pelo Spring Framework.
+        Normalmente usada quando não se define um bean como @Repository ou @Service.
+
+        @Repository
+
+        Define um bean como sendo do tipo persistente para uso em classes de acesso a banco de
+        dados. A partir desta anotação o Spring pode usar recursos referentes a persistência, como
+        tratar as exceções específicas para este fim.
+
+        @Service
+
+        Usado para classes do tipo serviço (Service Layer), que possuem, por
+        exemplo, regras de negócios.
+
+        @Autowired
+
+        Anotação usada para informar ao Spring que ele deve injetar a variável
+        anotada na classe em que está declarada
+
+        Exemplo 1
+
+        @Service
+        public class ComputadorService {
+            @Autowired
+            private ComputadorDao dao;
+
+            public void salvar(Computador computador) {
+                dao.saveOrUpdate(computador);
+            }
+        }
+
+        @Autowired pode ser declarada sobre variáveis de instancia, métodos set()
+        das variáveis de instancia e sobre métodos construtores.
+
+
+        Exemplo 2
+
+        @Service
+        public class ComputadorService{
+            private ComputadorDao dao;
+
+            @Autowired
+            public void setComputadorDAO(ComputadorDao dao){
+                this.dao = dao;
+            }
+
+            public void salvar(Computador computador) {
+                dao.saveOrUpdate(computador);
+            }
+        }
+
+        Exemplo 3
+
+        @Service
+        public class ComputadorService{
+            private ComputadorDao dao;
+
+            @Autowired
+            public ComputadorService(ComputadorDao dao) {
+                this.dao = dao;
+            }
+
+            public void salvar(Computador computador) {
+                dao.saveOrUpdate(computador);
+            }
+        }                
+
+Aula 6 - Anotações do Spring MVC
+
+    . @Controller 
+    
+        Transforma a classe em um bean do tipo controller do MVC.
+
+        Exemplo:
+
+        @Controller
+        public class ComputadorController {
+            //métodos e atributos omitidos
+        }
+
+    . @RequestMapping 
+        
+        Usada para mapear URLs de acesso a um controller e aos métodos contidos nele;
+        Também podemos definir verbos HTTP (POST, GET, ...) de acesso aos métodos.
+
+        Exemplo:
+
+        @Controller
+        @RequestMapping(“/computadores”)
+        public class ComputadorController {
+            @RequestMapping(path = “/listagem”, method = RequestMethod.GET)
+            public String getComputadores() { 
+
+            }
+        }    
+
+        Outras opções que podem ser usadas no lugar do @RequestMapping:
+
+        @GetMapping
+        @PostMapping
+        @PutMapping
+        @DeleteMapping
+        @PatchMapping            
+
+    . @PathVariable
+
+        Tem o objetivo de extrair da URL um parâmetro que foi incluído como path da
+        URL.
+
+        Exemplo:
+
+        http://localhost:8080/demo/computadores/listagem/ibm
+
+        @Controller
+        @RequestMapping(“/computadores”)
+        public class ComputadorController {
+            @RequestMapping(path = “/listagem/{marca}”, method = RequestMethod.GET)
+            public String getComputadoresPorMarca(@PathVariable(“marca”) String marca) {
+                System.out.println( marca );
+            }
+        }        
+
+    . @RequestParam
+
+        Tem o objetivo capturar um parâmetro de consulta (Query Param) enviado por
+        uma solicitação.
+
+        http://localhost:8080/demo/computadores/listagem?marca=ibm
+
+        @Controller
+        @RequestMapping(“/computadores”)
+        public class ComputadorController {
+            @RequestMapping(path = “/listagem”, method = RequestMethod.GET)
+            public String getComputadoresPorMarca(@RequestParam(name = “marca”) String marca) {
+            
+            }
+        }
+
+    . @ModelAttribute
+
+        Pode ser usado sobre a assinatura de um método ou como argumento de um método.
+
+        Quando utilizado no metodo, ao executar a classe através de alguma das outras annotation nela
+        como: @RequestMapping, ou @GetMapping, ou @PostMapping, etc. O metodo da annotation @ModelAttribute
+        será executa antes de qualquer outra annotation, para somente depois ir para a annotation destino.
+
+        Exemplo - Uso no metodo
+
+        @Controller
+        public class MyController {
+
+            @Autowired
+            private IMessageService messageService;
+
+            @GetMapping("/pageOne")
+            public String getPageOne() {
+
+                return "pageOne";
+            }
+
+            @GetMapping("/pageTwo")
+            public String getPageTwo() {
+
+                return "pageTwo";
+            }
+
+            @ModelAttribute("motd")
+            public String message() {
+
+                return messageService.getMessage();
+            }
+        }
+
+        Quando utilizado na assinatura associa os parâmetros, geralmente vindo de formulários, 
+        com os atributos do componente.
+
+        Exemplo - Uso na assinatura
+
+        @Controller
+        @RequestMapping(“/computadores”)
+        public class ComputadorController {
+            @PostMapping(“/save”)
+            public String salvar(@ModelAttribute Computador computador) {
+        
+            }
+       
+        }
+
+    . @Valid
+        
+        Anotação responsável por injetar a validação back-end via Hibernate Validator,
+        Bean Validation ou Spring Validator.
+
+        Exemplo:
+
+        @Controller
+        @RequestMapping(“/computadores”)
+        public class ComputadorController {
+            @PostMapping(“/save”)
+            public String salvar(@Valid Computador computador) {
+            
+            }
+        }
+
+    
+    Aula 7 - Objetos de Resposta MVC
+
+    . ModelMap, ModelAndView, Model - Todos são objetos "forward", ou seja, são objetos levados
+        para as páginas.
+
+    . ModelMap 
+
+        Objeto usado para enviar dados a página como resposta de uma solicitação.
+        Trabalha como uma resposta do tipo forward.
+
+        Exemplo
+
+        @Controller
+        @RequestMapping(“/computadores”)
+        public class ComputadorController {
+
+            @Autowired
+            private ComputadorDao dao;
+
+            @GetMapping(“/listagem”)
+            public String getComputadores(ModelMap model) {
+                List<Computador> computadores = dao.findAll();
+                model.addAttribute(“computadores”, computadores);
+                return “lista”;
+            }
+        }
+
+    . ModelAndView
+
+        Objeto usado para enviar dados a página como resposta de uma solicitação.
+
+        @Controller
+        @RequestMapping(“/computadores”)
+        public class ComputadorController {
+
+            @Autowired
+            private ComputadorDao dao;
+
+            @GetMapping(“/listagem”)
+            public ModelAndView getComputadores() {
+                List<Computador> computadores = dao.findAll();
+
+                ModelAndView model = new ModelAndView(“lista”);
+
+                model.addObject(“computadores”, computadores);
+
+                return model;
+            }
+        }
+
+    . Model
+
+        @Controller
+        public class GreetingController {
+
+            @RequestMapping(path = "/getWithModel", method = RequestMethod.GET)
+            public String getWithModel(@RequestParam("name") String name, Model model) {
+                Greeting greeting = new Greeting(name);
+                model.addAttribute("greeting", greeting);
+
+                return "greet";
+            }
+        }    
+
+        ...
+
+        greet.html
+        ----------
+
+        <!DOCTYPE html>
+        <html>
+            <body>
+                Hello <span th:text="${greeting.name}"/>!
+            </body>
+        </html>
+
+
+    . Map
+
+        @GetMapping("/getMessageAndTime")
+        public String getMessageAndTime(ModelMap map) {
+
+            var ldt = LocalDateTime.now();
+
+            var fmt = DateTimeFormatter.ofLocalizedDateTime(
+                    FormatStyle.MEDIUM);
+
+            fmt.withLocale(new Locale("sk", "SK"));
+            fmt.withZone(ZoneId.of("CET"));
+            String time = fmt.format(ldt);
+
+            map.addAttribute("message", message).addAttribute("time", time);
+
+            return "show";
+        }    
+
+        ...
+
+        show.fthl   Página Fremaker
+        ---------
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Message</title>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body>
+                <p>
+                    Message: ${message}
+                </p>
+
+                <#if time??>
+                    <p>Date and time: ${time}</p>
+                </#if>
+
+            </body>
+        </html>
+
+    . ModelMap & ModelAndView
+
+        Adicionamos parâmetros de resposta no objeto ModelMap e retornamos um
+        ModelAndView.
+
+        @Controller
+        @RequestMapping(“/computadores”)
+        public class ComputadorController {
+            @Autowired
+            private ComputadorDao dao;
+
+            @GetMapping(“/listagem”)
+            public ModelAndView getComputadores(ModelMap model) {
+                List<Computador> computadores = dao.findAll();
+                model.addAttribute(“computadores”, computadores);
+                return new ModelAndView(“lista”, model);
+            }
+        }
+
+    . Redirect 
+        
+        É uma operação usada para redirecionar a resposta de uma solicitação a outra
+        solicitação.
+
+            @Controller
+            @RequestMapping(“/computadores”)
+            public class ComputadorController {
+                @Autowired
+                private ComputadorDao dao;
+
+                @GetMapping(“/listagem”)
+                public ModelAndView getComputadores(ModelMap model) {
+                    List<Computador> computadores = dao.findAll();
+                    model.addAttribute(“computadores”, computadores);
+                    return new ModelAndView(“lista”, model);
+                }
+
+                @PostMapping(“/save”)
+                public String addComputador(Computador computador) {
+                    dao.save(computador);
+                    return “redirect:/computadores/listagem”
+                }
+            }
+
+        Importante: o redirect não consegue levar os objetos de parâmetos, pois esses são
+                    forward.
+
+        Redirect é uma operação usada para redirecionar a resposta de uma solicitação a outra
+        solicitação.
+
+        Importante: Para levar parâmetos através de redirect precisamos utilizar o objeto 
+                    RedirectAttributes
+
+            @Controller
+            @RequestMapping(“/computadores”)
+            public class ComputadorController {
+                @Autowired
+                private ComputadorDao dao;
+
+                @GetMapping(“/listagem”)
+                public ModelAndView getComputadores(ModelMap model) {
+                    List<Computador> computadores = dao.findAll();
+                    model.addAttribute(“computadores”, computadores);
+                    return new ModelAndView(“lista”, model);
+                }
+
+                @PostMapping(“/save”)
+                public String addComputador(Computador computador, RedirectAttributes attrib) { // <--
+                    dao.save(computador);
+                    attrib.addFlashAttribute(“mensagem”, “Computador inserido com sucesso”);    // <--
+                    return “redirect:/computadores/listagem”
+                }
+            }    
+
+Aulas 9 a 13 - Iniciando o desenvolvimento do projeto
+
+. Crie um projeto Maven com os parâmetros abaixo:
+
+    Name : demo-mvc
+    Group : com.mballem.curso.boot
+    Artifact : demo-mvc
+    Package : com.mballem.curso.boot
+
+    Dependencias : Devtools, Thymeleaf, JPA, Web, Postgres
+
+. Importar as páginas de exemplos para dentro do projeto
+
+    . Acesse a pasta de Material do Curso Spring Boot && MVC...
+    . Copie as pastas Cargo, Departamento e Funcionario; e a página home.html 
+        para dentro da pasta resources/templates
+    . Copie todas as subpastas da pasta "static" para dentro da pasta static do projeto.
+
+. Acesse o arquivo application.properties e acrescente o conteúdo abaixo:
+
+    spring.main.banner-mode=off
+    logging.level.org.springframework=error
+
+    spring.jpa.hibernate.ddl-auto=none
+
+    spring.datasource.initialization-mode=always
+    spring.datasource.platform=postgres
+    spring.datasource.url=jdbc:postgresql://localhost:5432/desenv
+    spring.datasource.username=supervisor
+    spring.datasource.password=brasil2
+
+    spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
+    #Show all queries
+    spring.jpa.show-sql=true
+    spring.jpa.properties.hibernate.format_sql=true
+    #logging.level.org.hibernate.type=error
+
+    #spring.mvc.view.prefix=/templates/
+    #spring.thymeleaf.suffix=.jsp
+
+    # Allow Thymeleaf templates to be reloaded at dev time
+    spring.thymeleaf.cache: false
+    spring.thymeleaf.mode: html
+
+
+
