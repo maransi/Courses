@@ -512,5 +512,601 @@ Aulas 9 a 13 - Iniciando o desenvolvimento do projeto
     spring.thymeleaf.cache: false
     spring.thymeleaf.mode: html
 
+. Acesse o link abaixo para verificar o site do webjars:
 
+    https://www.webjars.org/
+    https://useiconic.com/open    
+
+    https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.pdf
+
+    . Neste link é possível localizar as bibliotecas disponíveis no 
+        maven e pegar as versões mais recentes delas para linkar nos
+        nossos projetos.
+
+    . Observe que as bibliotecas vem associada ao <groupId>org.webjars</groupId>
+        o que faz do webjars um grande associador de bibliotecas.
+
+    . O site useiconic é o site onde encontra-se informações sobre os icones da biblioteca
+        open-iconic
+
+. Acesse o pom.xml e coloque as linhas abaixo nele:
+
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>webjars-locator-core</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap</artifactId>
+        <version>4.4.1-1</version>
+    </dependency>
+
+        
+    <dependency>
+        <groupId>org.webjars.bower</groupId>
+        <artifactId>open-iconic</artifactId>
+        <version>1.1.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>3.5.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.webjars.bower</groupId>
+        <artifactId>jquery-mask-plugin</artifactId>
+        <version>1.14.15</version>
+    </dependency>
+
+. Como definir o path das bibliotecas dentro das paginas (<script src="..." e <link rel="...")
+    de acordo com as definições do webjars.
+
+    Na página HTML teremos as seguintes associações:
+
+    <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+                ---------
+                    1    ----------
+                            2      -------------
+                                        3
+
+        1. A primeira parte é fixa "/webjars"
+        2. Ao acessar as informações da biblioteca no site do webjar, para isso basta localizar a 
+            biblioteca, acessar o seu interior clicando no link dela, vá na pasta 
+            "/src/main/resources/webjars-requirejs.js" e lá encontraremos a informação abaixo:
+
+            requirejs.config({
+                paths: { 
+                    "bootstrap": webjars.path("bootstrap", "js/bootstrap"),
+                    "bootstrap-css": webjars.path("bootstrap", "css/bootstrap")  
+                },
+                shim: { "bootstrap": [ "jquery" ] }
+            });
+
+            Nos parâmetros do webjars.path("bootstrap", "css/bootstrap") a primeira definição "bootstrap"
+            será a que irá no quadrante 2.
+        3. Já a segunda definição "css/bootstrap" será a que vai na terceira definição acrescido do nome da 
+            bibliotes ".min.js"
+
+
+Aulas 14 a 19 - Classes de Dominio
+
+. Starter para JPA
+
+    Durante a Seção 3 vamos realizar o mapeamento objeto relacional com base em anotação da JPA. 
+    Porém, para que isso seja possível, será necessário incluir no projeto as bibliotecas da JPA, 
+    para se ter acesso as anotações. Por conta disso, vamos incluir o módulo de JPA do Spring 
+    Framework, via starter do Spring Boot. O starter em questão será o spring-boot-starter-data-jpa, 
+    como pode ser visto a seguir:
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>  
+
+    Com a inclusão desta dependencia termos então acesso a todos os recursos da JPA e Hibernate para 
+    os mapeamentos, operações de CRUD e até mesmo para validações com Hibernate Validator.
+
+. Classes de Entidades
+
+    O pacote com.mballem.curso.boot.domain vai conter as classes de entidades da aplicação. 
+    Classes de entidades são aquelas que têm relação com as tabelas do banco de dados. 
+    Em um banco de dados, cada linha de uma tabela é também chamada de entidade, sendo assim, 
+    uma classe é conhecida como classe de entidade porque representa uma linha de uma tabela.
+
+    As classes de entidades serão mapeadas via anotações da especificação JPA, 
+    algumas dessas anotações estão descritas a seguir:
+
+        @Entity: Usada sobre a assinatura da classe para marcá-la perante o
+        Hibernate/JPA que esta é uma classe de mapeamento objeto relacional;
+
+        @Table: Informa ao Hibernate/JPA que a tabela que está sendo mapeada
+        é aquela com o nome descrito na propriedade name da anotação. A
+        anotação ainda possui a propriedade indexes, onde foi configurado um
+        índice que não permite que mais de uma linha na tabela contenha
+        registros com o mesmo título e mesma data de início;
+
+        @Id: Usada para mapear a coluna referente à chave primária da tabela.
+        Esta anotação é obrigatória no mapeamento. Caso não seja adicionada
+        uma exceção será lançada em tempo de execução;
+
+        @GeneratedValue: É utilizada para informar que a geração da chave
+        primária da entidade será gerenciada pelo Hibernate e deve ser
+        adicionada junto a anotação @Id. Quando não anotamos o campo com
+        essa opção, significa que a responsabilidade de gerar e gerenciar as
+        chaves primárias serão da aplicação;
+
+        @Column: Seu uso tem como finalidade mapear uma coluna da tabela. Se
+        essa anotação não for declarada, o nome do atributo deverá ter o
+        mesmo nome da coluna. Essa anotação possui alguns atributos para
+        definir, por exemplo, se a coluna aceita valores nulos ou não
+        (nullable), o tamanho de uma coluna varchar (length), entre outros;
+
+        @Enumerated: Usada para mapear uma coluna a partir de um atributo do
+        tipo enum. Assim, podemos indicar se vamos gravar esse dado de forma ordinal, 
+        a partir da posição do tipo declarado no enum, ou pelo da constante.
+
+        @OneToOne: Sua função é mapear o relacionamento entre duas tabelas no banco de 
+        dados que tenha relação do tipo 1x1.
+
+        @OneToMany: Para mapear o lado fraco da relação um para muitos. O lado fraco é o 
+        lado 1, já lado forte seria o lado N da relação. Nessa anotação devemos incluir 
+        o atributo mappedBy com o nome do atributo que representa o lado fraco lá no 
+        mapeamento da classe de lado forte.
+
+        @ManyToOne: Tem como objetivo mapear o atributo referente a chave estrangeira 
+        em um relacionamento 1xN. A classe anotada com essa anotação é considerada o 
+        lado forte da relação 1xN.
+
+        @JoinColumn: Uma de suas funções é nomear a chave estrangeira de um relacionamento 
+        1xN ou 1x1. Deve ser declarada sobre o atributo que representa a chave estrangeira.
+
+    As classes de entidades neste projeto vão herdar da classe 
+    com.mballem.curso.boot.domain.AbstractEntity algumas características 
+    como os métodos getId() e setId(), além dos métodos toString(), equals() e hashCode().
+
+    Deste modo, não será necessário implementar em cada classe de entidade a 
+    propriedade id nem os métodos citados acima. Outro ponto importante é em relação a 
+    interface java.io.Serializable a qual deve ser implementada em classes de entidades 
+    como uma boa pratica. Essa interface será implementada em AbstractEntity, assim, 
+    automaticamente as classes filhas herdarão essa característica.
+
+. Código Fonte da classe AbstractEntity:
+
+    package com.mballem.curso.boot.domain;
+
+    import java.io.Serializable;
+    import javax.persistence.*;
+
+    @SuppressWarnings("serial") // Coloque esta annotation para suprimir o Warning da implementação "Serializable"
+    @MappedSuperclass
+    public abstract class AbstractEntity<ID extends Serializable> implements Serializable {
+
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private ID id;
+        public ID getId() {
+            return id;
+        }
+
+        public void setId(ID id) {
+            this.id = id;
+        }
+        
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((id == null) ? 0 : id.hashCode());
+            return result;
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            
+            AbstractEntity<?> other = (AbstractEntity<?>) obj;  // Corrigir a Warning colocando <?>
+                                                                // que vem sem qdo fazemos a geração pelo eclipse
+            if (id == null) {
+                if (other.id != null)
+                    return false;
+            } else if (!id.equals(other.id))
+                return false;
+            return true;
+        }
+        @Override
+        public String toString() {
+            return "id = " + id;
+        }    
+    }
+
+    As classes de entidades que irão estender AbstractEntity são Departamento, Cargo, 
+    Endereco e Funcionario. No banco de dados essas classes estão, respectivamente, 
+    representadas pelas tabelas: departamentos, cargos, enderecos e funcionarios. 
+    E o relacionamento entre elas estão descritos a seguir:
+
+    Departamentos (1) x (N) Cargos
+    Cargos (1) x (N) Funcionarios
+    Funcionarios (1) x (1) Enderecos
+
+            +---------------------+
+            |   DEPARTAMENTOS     |
+            +---------------------+
+            | id : bigint(20)     |
+            +---------------------+
+            | nome : Varchar(60)  |
+            +---------------------+
+                    ^
+                    |
+                    |   id_departamento_fk : id
+                    |
+                    |
+    +----------------------------------+
+    |              CARGOS              |
+    +----------------------------------+
+    | id : bigint(20)                  |
+    +----------------------------------+
+    | nome : Varchar(60)               |
+    | id_departamento_fk : bigint(20)  |
+    +----------------------------------+
+                    ^
+                    |
+                    |   cargo_id_fk : id
+                    |
+                    |
+    +----------------------------------+
+    |         FUNCIONARIOS             |
+    +----------------------------------+
+    | id : bigint(20)                  |
+    +----------------------------------+
+    | data_entrada : date              |
+    | data_saida : date                |
+    | nome : varchar(255)              |
+    | salario : decimal(7,2)           |
+    | cargo_id_fk : bigint(20)         |
+    | endereco_id_fk : bigint(20)      |
+    +----------------------------------+
+                    ^
+                    |
+                    |   endereco_id_fk : id
+                    |
+                    |
+    +----------------------------------+
+    |         ENDERECOS                |
+    +----------------------------------+
+    | id : bigint(20)                  |
+    +----------------------------------+
+    | bairro : varchar(255)            |
+    | cep : varchar(9)                 |
+    | cidade : varchar(255)            |
+    | complemento : varchar(255)       |
+    | logradouro : varchar(255)        |
+    | numero : int(11)                 |
+    | uf : varchar(2)                  |
+    +----------------------------------+
+
+
+
+    Para mapear o relacionamento entre as tabelas departamentos e cargos, 
+    usamos as classes Departamento e Cargo. Na classe Departamento usamos a 
+    anotação @OneToMany sobre a declaração do atributo cargos.
+
+        @Entity
+        @Table(name = "DEPARTAMENTOS")
+        public class Departamento extends AbstractEntity<Long> {
+            @Column(name = "nome", nullable = false, unique = true, length = 60)
+            private String nome;
+            
+            @OneToMany(mappedBy = "departamento")
+            private List<Cargo> cargos;
+            
+            // métodos get/set omitidos
+        }
+
+    Já no mapeamento da classe Cargo, a anotação @ManyToOne deve ser declarada 
+    junto ao atributo departamento. Ainda sobre este atributo, declaramos a anotação 
+    @JoinColumn, para informar o nome da coluna que armazena as chaves estrangeiras 
+    do relacionamento na tabela de cargos.
+
+        @Entity
+        @Table(name = "CARGOS")
+        public class Cargo extends AbstractEntity<Long> {
+            @Column(name = "nome", nullable = false, unique = true, length = 60)
+            private String nome;
+            
+            @ManyToOne
+            @JoinColumn(name = "id_departamento_fk")
+            private Departamento departamento;
+            
+            @OneToMany(mappedBy = "cargo")
+            private List<Funcionario> funcionarios;
+            // métodos get/set omitidos    
+        }
+
+    A classe Cargo também deve possuir o mapeamento do lado fraco entre os relacionamento 
+    1xN com Funcionario. Sendo assim, o atributo funcionarios, do tipo java.util.List, 
+    é anotado com @OneToMany.
+
+    O valor do propriedade mappedBy deve coincidir com o nome do atributo mapeado na classe 
+    Funcionario que representa a chave estrangeira deste relacionamento. 
+    Este atributo é o cargo, anotado com @ManyToOne e @JoinColumn.
+
+        @Entity
+        @Table(name = "FUNCIONARIOS")
+        public class Funcionario extends AbstractEntity<Long> {
+            @Column(nullable = false, unique = true)
+            private String nome;
+            
+            @Column(nullable = false, columnDefinition = "DECIMAL(7,2) DEFAULT 0.00")
+            private BigDecimal salario;
+            
+            @Column(name= "data_entrada", nullable = false, columnDefinition = "DATE")
+            private LocalDate dataEntrada;
+            
+            @Column(name = "data_saida", columnDefinition = "DATE")
+            private LocalDate dataSaida;
+            
+            @OneToOne(cascade = CascadeType.ALL)
+            @JoinColumn(name = "endereco_id_fk")
+            private Endereco endereco;
+            
+            @ManyToOne
+            @JoinColumn(name = "cargo_id_fk")
+            private Cargo cargo; 
+            
+            // métodos get/set omitidos    
+        }
+
+    Veja ainda que na classe Funcionario está declarado o mapeamento 1x1 com a classe Endereco. 
+    Este relacionamento será mapeado apenas em Funcionario, já que neste projeto não será 
+    preciso acessar um funcionário pelo lado de endereço.
+
+    Veja a seguir a classe Endereco, que possui um tipo enum para unidades federativas.
+
+        @Entity
+        @Table(name = "ENDERECOS")
+        public class Endereco extends AbstractEntity<Long> {
+            @Column(nullable = false)
+            private String logradouro;
+            
+            @Column(nullable = false)
+            private String bairro;
+            
+            @Column(nullable = false)
+            private String cidade;
+            
+            @Column(nullable = false, length = 2)
+            @Enumerated(EnumType.STRING)
+            private UF uf;
+            
+            @Column(nullable = false, length = 9)
+            private String cep;
+            
+            @Column(nullable = false, length = 5)
+            private Integer numero;
+            
+            private String complemento;
+            
+            // métodos get/set omitidos     
+        }
+
+    O objeto UF é um enum declarado a partir do seguinte código fonte:
+
+        public enum UF {
+            AC("AC", "Acre"), AL("AL", "Alagoas"),
+            AM("AM", "Amazonas"), BA("BA", "Bahia"),
+            CE("CE", "Ceará"), DF("DF", "Distrito Federal"),
+            ES("ES", "Espírito Santo"), GO("GO", "Goiás"),
+            MA("MA", "Maranhão"), MT("MT", "Mato Grosso"),
+            MS("MS", "Mato Grosso do Sul"), MG("MG", "Minas Gerais"),
+            PA("PA", "Pará"), PB("PB", "Paraíba"),
+            PR("PR", "Paraná"), PE("PE", "Pernambuco"),
+            PI("PI", "Piauí"), RJ("RJ", "Rio de Janeiro"),
+            RN("RN", "Rio Grande do Norte"), RS("RS", "Rio Grande do Sul"),
+            RO("RO", "Rondônia"), RR("RR", "Roraima"),
+            SC("SC", "Santa Catarina"), SP("SP", "São Paulo"),
+            SE("SE", "Sergipe"), TO("TO", "Tocantins");
+            
+            private String sigla;
+            private String descricao;
+            
+            UF(String sigla, String descricao) {
+                this.sigla = sigla;
+                this.descricao = descricao;
+            }
+            public String getSigla() {
+                return sigla;
+            }
+            public String getDescricao() {
+                return descricao;
+            }
+        }
+
+    . Possível Erro
+
+    Durante esta seção incluímos no projeto o spring-boot-starter-data-jpa, o qual pode 
+    vir a prejudicar a inicialização do projeto. Sendo assim, caso tenha tentado 
+    inicializar a aplicação após a inclusão deste starter, possivelmente 
+    você teve um erro exibido no console.
+
+    Esse erro acontece porque o starter busca por um configuração de conexão com um 
+    banco de dados e também por um driver de conexão, itens que ainda não foram 
+    incluídos no projeto. Então, não se preocupe, na Seção 4, vamos trabalhar na camada 
+    de persistência e nesse momento vamos configurar o banco de dados.
+
+    . Código Fonte
+
+    Caso tenha tido algum tipo de dificuldade para acompanhar a desenvolvimento do código 
+    fonte até o final desta seção, ele está disponível para download na área Materiais para download.
+
+
+
+Aulas 20 a 23 - Camada de persistência
+
+. Configurando o Acesso ao Banco de Dados
+
+    O projeto desenvolvido neste curso terá Hibernate/JPA para realizar as operações de 
+    CRUD (create, retrieve, update, delete). Por conta disso, é necessário configurar 
+    o acesso ao banco de dados, informando, por exemplo, a URL de conexão.
+
+    No Spring Boot essas informações devem ser passadas como propriedades no arquivo 
+    application.properties, localizado no diretório src/main/resources do projeto. 
+    Porém, estas propriedades são convencionadas pelo Spring Boot, ou seja, o nome 
+    das propriedades já estão pré-definidos. Para encontrar a lista de propriedades, 
+    do Spring Boot, devemos acessar o guia de referência, mais especificamente 
+    no Apêndice A.
+
+    As propriedades que serão utilizadas neste projeto são as seguintes:
+
+    #DATASOURCE
+    spring.datasource.platform=postgres
+    spring.datasource.url=jdbc:postgresql://localhost:5432/desenv
+    spring.datasource.username=supervisor
+    spring.datasource.password=brasil2
+    
+    #JPA
+    spring.jpa.hibernate.ddl-auto = update
+    spring.jpa.show-sql = true
+    spring.jpa.open-in-view = true
+    spring.jpa.hibernate.use-new-id-generator-mappings = false
+
+    No grupo de propriedades spring.datasource é onde informamos os dados para a conexão 
+    com o banco de dados, como url, usuário e senha.
+
+    Observe que na url declarada tem o símbolo de interrogação. Ele indica que um parâmetro 
+    será adicionada a esta url. No caso o parâmetro createDatabaseIfNotExist, 
+    setado como true, vai fazer com que no primeiro acesso ao MySQL, 
+    caso o banco de dados demo_mvc não exista, seja então criado.
+
+    Você deve ter percebido que a propriedade com o nome da classe do driver de conexão 
+    não aparece entre estas propriedades. Isso porque, o Spring Boot consegue 
+    reconhece-la a partir do driver de conexão adicionado como dependência no arquivo pom.xml.
+
+    Por fim, as propriedades do grupo spring.jpa são para definir alguns recursos no uso da 
+    JPA com o Hibernate. Entre elas informamos que as tabelas e colunas devem ser criadas 
+    no banco de dados a partir dos mapeamentos adicionados nas classes de entidades.
+
+    A propriedade xxx.show-sql setada como true vai imprimir no log as operações de CRUD, 
+    ou seja, as instruções SQL geradas pelo Hibernate que são enviadas para o banco de dados.
+
+    A xxx.open-in-view habilita o filtro do Spring responsável por manter aberta uma transação 
+    até que o request esteja encerrado. Isso vai garantir que não haja exceções do tipo 
+    Lazy Exception em operações com Fetch.LAZY. Esse tipo de situação pode ocorrer quando 
+    mapeamos um atributo com uma anotação do tipo @OneToMany ou @ManyToMany.
+
+    Por fim, a propriedade xxx.hibernate.use-new-id-generator-mappings, quando recebe o valor true, 
+    faz com que o Hibernate gere as chaves primárias nas tabelas conforme o tipo padrão do SGDB. 
+    Se você não deseja esse comportamento, deve setar essa propriedade como false, assim, 
+    o Hibernate vai gerar as chaves primárias conforme o que foi definido em cada classe 
+    de entidade pela anotação @GeneratedValue.
+
+
+. Camada de Persistência
+
+    A camada de persistência do projeto apresentado neste curso será baseada no padrão de projetos 
+    Data Access Object (DAO). Existem algumas diferentes formas de implementar este padrão e a 
+    adotada no curso vai trabalhar com um classe genérica, que irá fornecer aos DAO’s específicos 
+    alguns métodos comuns como: save, update, delete, findById e findAll.
+
+    Desta forma, não será necessário criar estes métodos repetidamente em cada classe de DAO que 
+    representará uma entidade. Outra característica da implementação do padrão DAO é criar uma 
+    interface para cada classe concreta de DAO. Assim, poderemos injetar via Spring, as interfaces 
+    e não as classes concretas, respeitando os princípios da injeção de dependências.
+
+    A classe que usaremos com um tipo genérico de DAO é a AbstractDao. Parte desta classe pode 
+    ser visualizada a seguir:
+
+    public abstract class AbstractDao<T, PK extends Serializable> {
+    
+        @SuppressWarnings("unchecked")
+        private final Class<T> entityClass = (Class<T>) 
+            ( (ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        
+        @PersistenceContext
+        private EntityManager entityManager;
+    
+        protected EntityManager getEntityManager() {
+            return entityManager;
+        }
+        
+        public void save(T entity) {     
+            // código omitido
+        }
+        
+        public void update(T entity) {            
+            // código omitido
+        }
+        
+        public void delete(PK id) {            
+            // código omitido
+        }
+        
+        public T findById(PK id) {            
+            // código omitido
+        }
+        
+        public List<T> findAll() {
+            // código omitido
+        }    
+        
+        protected List<T> createQuery(String jpql, Object... params) {            
+            // código omitido
+        }
+    }
+
+    Na assinatura da classe temos dois tipos genéricos de dados, o T que representa o 
+    tipo de entidade que está sendo enviado para a operação de CRUD e o PK representa o 
+    tipo de dado referente ao identificador.
+
+    Já o atributo entityClass vai ser responsável por fornecer a classe referente ao tipo 
+    de entidade que está sendo persistida. Por exemplo, ao persistir um objeto cargo, o tipo 
+    de classe de objeto é Cargo.class. Essa informação é importante principalmente para as 
+    operações de leitura. Essa informação é então recuperada a partir da API Reflection do Java.
+
+    Outro ponto importante é o acesso ao objeto EntityManager da JPA, o qual é injetado na 
+    classe via anotação @PersistenceContext da própria especificação JPA.
+
+    E o método getEntityManager() vai retornar uma instancia de EntityManager para qualquer 
+    classe de DAO especifico que fizer a chamada a ele. Assim, se for necessário criar um novo 
+    método de CRUD, que não seja fornecido pela classe AbstractDao, ele poderá ser criado 
+    especificamente na classe concreta CargoDao, DepartamentoDao ou FuncionarioDao.
+
+    Agora veja um exemplo do restante da implementação do padrão DAO nesta camada de persistência, 
+    o qual é apresentado para persistir entidades do tipo Departamento.
+
+    Primeiro temos um interface que define os métodos que serão implementados para Departamento.
+
+    public interface DepartamentoDao {
+    
+        void save(Departamento departamento);
+    
+        void update(Departamento departamento);
+    
+        void delete(Long id);
+    
+        Departamento findById(Long id);
+    
+        List<Departamento> findAll();
+    }
+
+    A interface deverá então, ser implementada na classe DepartamentoDaoImpl. Esta classe também 
+    vai estender AbstractDao e assim, herdará a implementação de seus métodos.
+
+    @Repository
+    public class DepartamentoDaoImpl 
+        extends AbstractDao<Departamento, Long> implements DepartamentoDao {
+        // demais métodos
+    }
+
+    Qualquer método adicional, seja de escrita ou leitura, deverá ter a assinatura declarada 
+    na interface DepartamentoDao e ser implementado em DepartamentoDaoImpl.
+
+    Por fim, transformamos a classe DepartamentoDaoImpl em um bean do Spring com o uso da 
+    anotação @Repository.
 
