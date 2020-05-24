@@ -467,6 +467,39 @@ Aula 6 - Anotações do Spring MVC
                 }
             }    
 
+        A classe RedirectAttributes também poderá ser utilizada para armazenar objetos na sessão
+        para que após o redirecionamento possa ser utilizado, por exemplo:
+
+            @PostMapping("/salvar")
+            public String salvar(@ModelAttribute Departamento departamento, RedirectAttributes attr) {
+
+                try {
+                    service.salvar(departamento);
+                    
+                    attr.addFlashAttribute("success", "Departamento salvo com sucesso.");
+                }catch( Exception e) {
+                    e.printStackTrace();
+                }
+                
+                return "redirect:/departamentos/cadastrar";
+            }
+
+            // Na página ficaria:
+
+            <div th:if="${success} != null">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="oi oi-check"></i>
+                <span>
+                    <strong th:text="${success}"></strong> 
+                </span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+            </div>
+
+
+
 Aulas 9 a 13 - Iniciando o desenvolvimento do projeto
 
 . Crie um projeto Maven com os parâmetros abaixo:
@@ -1110,3 +1143,2161 @@ Aulas 20 a 23 - Camada de persistência
     Por fim, transformamos a classe DepartamentoDaoImpl em um bean do Spring com o uso da 
     anotação @Repository.
 
+
+Aulas 24 a 27 - Camada de persistência
+
+. Gerenciando Transações
+
+    O Spring Framework fornece um sistema de gerenciamento de transações baseado no uso da 
+    anotação @Transactional. Essa anotação pode ser utilizada tanto sobre a assinatura da 
+    classe quanto sobre a assinatura dos métodos da classe. Além disso, se pode também 
+    anotar a classe e sobrescrever o comportamento transacional dos métodos anotando 
+    individualmente cada um dos métodos dessa classe.
+
+    Veja a seguir um exemplo de como fazer uso do sistema de gerenciamento transacional do 
+    Spring Framework:
+
+    @Transactional(readOnly = false)    
+    public  class  FooServiceImpl  implements  FooService {
+        
+        @Autowired    
+        private  DefaultFooDao  dao;
+    
+        @Transactional(readOnly = true)    
+        Foo  getFoo(String  fooName) {
+    
+        };
+    
+        @Transactional(readOnly = true)    
+        Foo  getFoo(String  fooName, String  barName) {
+    
+        };
+    
+        void  insertFoo(Foo  foo) {
+    
+        };
+    
+        void  updateFoo(Foo  foo) {
+    
+        };    
+    }
+
+    No código apresentado a @Transactional da assinatura da classe tem um atributo setado como false. 
+    Esse atributo, o readOnly, vai informar ao Spring que a transação não é apenas de leitura, ou seja, 
+    ela deve ser usada tanto em métodos de consulta como de escrita.
+
+    Já nos métodos getFoo() a anotação da classe foi sobrescrita e readOnly foi setado como true. 
+    Nesse caso, os métodos getFoo() serão específicos para leitura. Esse comportamento vai fazer 
+    com que não seja aberta uma transação quando o método de consulta for executado, 
+    liberando assim, o acesso a tabela em questão para outras operações. 
+    Essa prática melhora a performance do banco de dados.
+
+    É importante ressaltar que o valor padrão de readOnly é false, sendo assim, não é necessário 
+    declarar o readOnly como false a não seja que seja para sobrescrever um readOnly setado 
+    como true na assinatura da classe.
+
+    A @Transactional fornece outras configurações baseadas em atributos como de isolamento, 
+    comportamento de roll-back, tempo para time-out, entre outras, as quais podem ser 
+    consultadas na documentação do Spring Framework. Essas propriedades adicionais já são pré 
+    configuradas por valores padrões. Tenha certeza que sabe o que está fazendo se resolver 
+    alterar estes valores, já que isso vai impactar diretamente no processo transacional de 
+    seus métodos.
+
+. Diferença entre transações no DAO e Service
+
+
+    Embora pareça trivial adicionar o processo de transações nas classes da camada de persistência, 
+    é muito comum colocar esse gerenciamento em uma camada acima, como exemplo, a camada de serviço.
+
+    Um exemplo do porquê não trabalhar com a @Transactional na camada de persistência é que as 
+    fazes uma mesma operação vai precisar ser controlada pela mesma transação. Suponha assim, 
+    que você tenha duas classes do tipo DAO e em uma classe do tipo Service um mesmo método 
+    faz uso da operação de insert dos dois DAO’s. Veja um exemplo a seguir:
+
+    @Transactional    
+    public  class  ArtigoDaoImpl  implements  ArtigoDao  {        
+        void  insert(Artigo artigo) {
+            // código omitido
+        };    
+    }
+    
+    @Transactional    
+    public  class  RevistaDaoImpl  implements  RevistaDao  {    
+        void  insert(Revista  revista) {
+            // código omitido        
+        };    
+    }
+    
+    public  class  RevistaServiceImpl  implements  RevistaService  {    
+        @Autowired        
+        private  ArtigoDao  artigoDao;        
+        @Autowired        
+        private  RevistaDao  revistaDao;
+        
+        void  insert(Artigo artigo, Revista revista) {        
+            artigoDao.insert(artigo);
+            
+            revista.setArtigo(artigo);
+            
+            revistaDao.insert(revista);
+        
+        };    
+    }
+
+    Analisando este cenário, quando o método insert() do Service faz a chamada ao insert() 
+    de ArtigoDao, uma transação lá no DAO será aberta, comitada e fechada. O fluxo do 
+    processo volta então para o método insert() do Service. Nesse momento o artigo inserido 
+    na base de dados será setado como valor no objeto revista via método setArtigo(). 
+    Em seguida, revistaDao vai persistir o objeto revista onde uma nova transação será 
+    aberta, comitada e fechada em RevistaDao.
+
+    Até aqui tudo bem, mas se vier a ocorrer um erro qualquer na operação de insert() 
+    de RevistaDao, um roll back seria executado. Esse roll back atingiria apenas 
+    RevistaDAO e não ArtigoDAO. Esse comportamento se deve por ArtigoDao já ter sido 
+    comitado e não estar dividindo a mesma transação com RevistaDao. Nesse caso as duas 
+    transações estão isoladas, ou seja, uma não sabe que a outra existe. Por isso, o 
+    roll back não vai atingir a transação de ArtigoDao e teríamos assim, um artigo salvo na 
+    base de dados sem qualquer vinculo com uma revista.
+
+    Para resolver situações como essa, usamos o gerenciamento de transações em uma 
+    camada superior, normalmente a de serviço. Dessa forma, o método da camada de 
+    serviço será o responsável por gerenciar as transações e, caso o mesmo erro venha 
+    a ocorrer, o roll back vai alcançar as duas operações de insert() realizadas
+    nos DAO’s, já que elas estão dividindo o mesmo gerenciamento transacional da camada 
+    de serviço. Veja como o código seria nesse novo cenário:
+
+    public  class  ArtigoDaoImpl  implements  ArtigoDao  {        
+        void  insert(Artigo artigo) {
+            // código omitido
+        };    
+    }
+    
+    public  class  RevistaDaoImpl  implements  RevistaDao  {    
+        void  insert(Revista  revista) {
+            // código omitido
+        };    
+    }
+    
+    @Transactional   
+    public  class  RevistaServiceImpl  implements  RevistaService  {    
+        @Autowired        
+        private  ArtigoDao  artigoDao;        
+        @Autowired        
+        private  RevistaDao  revistaDao;
+        
+        void  insert(Artigo artigo, Revista revista) {        
+            artigoDao.insert(artigo);
+            
+            revista.setArtigo(artigo);
+            
+            revistaDao.insert(revista);
+        
+        };    
+    }
+
+. Camada de Serviço
+
+    No projeto abordado neste curso a camada de serviço vai conter as interfaces 
+    DepartamentoService, CargoService e FuncionarioService. Essas interfaces serão 
+    implementadas em classes concretas que são, respectivamente: DepartamentoServiceImpl, 
+    CargoServiceImpl e FuncionarioServiceImpl.
+
+    Veja a seguir um exemplo, da camada de serviço, apresentado a partir da 
+    interface CargoService e sua implementação:
+
+    public interface CargoService {        
+        void salvar(Cargo cargo);        
+        void editar(Cargo cargo);        
+        void excluir(Long id);        
+        Cargo buscarPorId(Long id);            
+        List<Cargo> buscarTodos();  
+    }
+    
+    @Service @Transactional(readOnly = false)
+    public class CargoServiceImpl implements CargoService {    
+        @Autowired
+        private CargoDao dao;
+    
+        @Override
+        public void salvar(Cargo cargo) {
+            dao.save(cargo);        
+        }
+        
+        @Override
+        public void editar(Cargo cargo) {
+            dao.update(cargo);        
+        }
+        
+        @Override
+        public void excluir(Long id) {
+            dao.delete(id);        
+        }
+    
+        @Override @Transactional(readOnly = true)
+        public Cargo buscarPorId(Long id) {            
+            return dao.findById(id);        
+        }
+        
+        @Override @Transactional(readOnly = true)
+        public List<Cargo> buscarTodos() {        
+            return dao.findAll();
+        }    
+    }
+
+    Observe que a classe CargoServiceImpl tem em sua assinatura duas anotações. 
+    A @Service é responsável por transformar a classe em um bean gerenciado pelo Spring.
+    Já a @Transactional está trazendo para os métodos dessa classe o gerenciamento das 
+    transações. Esta anotação está com o valor padrão false atribuído ao atributo 
+    readOnly. Dessa forma todos os métodos da classe vão exigir uma transação, 
+    sendo eles de leitura ou de escrita.
+
+    Porém, os método buscarPorId() e buscarTodos() sobrescrevem o readOnly para true, 
+    fazendo com que as operações executadas por eles não usem transações para as 
+    operações de leitura.
+
+    Use essa mesma estrutura para desenvolver as interfaces e suas classes de 
+    implementação para Departamento e Funcionario.
+
+. Testes automáticos
+
+    . Construa as classes abaixo no pacote de testes /src/test/java
+
+    Classe No. 1 - DepartamentoServiceTests
+    ---------------------------------------
+
+        package com.mballem.curso.boot;
+
+        import static org.junit.Assert.assertEquals;
+        import static org.junit.jupiter.api.Assertions.assertNotEquals;
+        import static org.junit.jupiter.api.Assertions.assertNull;
+
+        import java.util.List;
+
+        import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+        import org.junit.jupiter.api.Order;
+        import org.junit.jupiter.api.Test;
+        import org.junit.jupiter.api.TestMethodOrder;
+        import org.junit.runner.RunWith;
+        import org.slf4j.Logger;
+        import org.slf4j.LoggerFactory;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.boot.test.context.SpringBootTest;
+        import org.springframework.test.annotation.Rollback;
+        import org.springframework.test.context.junit4.SpringRunner;
+        import org.springframework.transaction.annotation.Transactional;
+
+        import com.mballem.curso.boot.domain.Departamento;
+        import com.mballem.curso.boot.service.DepartamentoServiceImpl;
+
+
+        @TestMethodOrder(OrderAnnotation.class)		// Annotation para informar que a ordem da execução dos testes será pela annotation @Order
+        @RunWith(SpringRunner.class)
+        @SpringBootTest(classes=DemoMvcApplication.class)
+        @Transactional
+        class DepartamentoServiceTests {
+            private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+            @Autowired
+            DepartamentoServiceImpl service;
+            
+            @Test
+            void contextLoads() {
+            }
+            
+            @Test
+            @Order(1)		// Direciona a ordem da execução dos testes
+            void testFindById() throws Exception {
+                logger.info("\n Testing is Running findById()");
+                
+                try {
+                    Departamento departamento = service.buscarPorId(1L);
+                    
+                    logger.info("\n DepartamentoServiceImpl.buscarPorId(1) {}", departamento );
+                    
+                    assertEquals("Contabilidade", departamento.getNome());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            @Test
+            @Order(2)		// Direciona a ordem da execução dos testes
+            void testFindAll() throws Exception {
+                logger.info("\n Testing is Running findAll()");
+                
+                try {
+                    List<Departamento> departamentos = service.buscarTodos();
+                    
+                    assertNotEquals(0, departamentos.size());
+                    
+                    logger.info("\n DepartamentoService.findAll() {}", departamentos );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            
+            @Test
+            @Rollback(true)
+            @Order(3)
+            public void testUpdateDepartamento() throws Exception {
+                logger.info("\n Testing is Running update()");
+                
+                try {
+                    Departamento departamento = service.buscarPorId(1L);
+                    
+                    departamento.setNome("Contabilidade Updated");
+                    
+                    service.editar(departamento);
+                    
+                    departamento = service.buscarPorId(1L);
+                    
+                    assertEquals("Contabilidade Updated", departamento.getNome());		
+
+                    logger.info("\n DepartamentoService.editar() {}", departamento );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            
+            @Test
+            @Rollback(true)
+            @Order(4)
+            public void testInsertDepartamento() throws Exception {
+                logger.info("\n Testing is Running insert()");
+
+                try {
+                    Departamento departamento = new Departamento("DEPARTAMENTO Inserted", null);
+                    
+                    service.salvar(departamento);
+                    
+                    assertNotEquals(0, departamento.getId());		
+
+                    logger.info("\n DepartamentoService.salvar() {}", departamento );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+
+            @Test
+            @Rollback(true)
+            @Order(5)
+            public void testDeleteDepartamento() throws Exception {
+                logger.info("\n Testing is Running delete()");
+                
+                try {
+                    Departamento departamento = new Departamento("DEPARTAMENTO Inserted", null);
+                    
+                    service.salvar(departamento);
+                    
+                    
+                    service.excluir(departamento.getId());
+                    
+                    
+                    Departamento departamento2 = service.buscarPorId(departamento.getId());
+                    
+                    assertNull( departamento2 );		
+                    
+                    logger.info("\n DepartamentoService.excluir() {}", service.buscarTodos() );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+        }
+
+
+
+    Classe No. 2 - CargoServiceTests
+    --------------------------------
+
+        package com.mballem.curso.boot;
+
+        import static org.junit.Assert.assertEquals;
+        import static org.junit.jupiter.api.Assertions.assertNotEquals;
+        import static org.junit.jupiter.api.Assertions.assertNull;
+
+        import java.util.List;
+
+        import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+        import org.junit.jupiter.api.Order;
+        import org.junit.jupiter.api.Test;
+        import org.junit.jupiter.api.TestMethodOrder;
+        import org.junit.runner.RunWith;
+        import org.slf4j.Logger;
+        import org.slf4j.LoggerFactory;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.boot.test.context.SpringBootTest;
+        import org.springframework.test.annotation.Rollback;
+        import org.springframework.test.context.junit4.SpringRunner;
+        import org.springframework.transaction.annotation.Transactional;
+
+        import com.mballem.curso.boot.domain.Cargo;
+        import com.mballem.curso.boot.domain.Departamento;
+        import com.mballem.curso.boot.service.CargoServiceImpl;
+
+
+        @TestMethodOrder(OrderAnnotation.class)		// Annotation para informar que a ordem da execução dos testes será pela annotation @Order
+        @RunWith(SpringRunner.class)
+        @SpringBootTest(classes=DemoMvcApplication.class)
+        @Transactional
+        class CargoServiceTests {
+            private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+            @Autowired
+            CargoServiceImpl service;
+            
+            @Test
+            void contextLoads() {
+            }
+            
+            @Test
+            @Order(1)		// Direciona a ordem da execução dos testes
+            void testFindById() throws Exception {
+                logger.info("\n Testing is Running findById()");
+                
+                try {
+                    Cargo cargo = service.buscarPorId(1L);
+                    
+                    logger.info("\n CargoServiceImpl.buscarPorId(1) {}", cargo );
+                    
+                    assertEquals("Auxiliar Contábil", cargo.getNome());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            @Test
+            @Order(2)		// Direciona a ordem da execução dos testes
+            void testFindAll() throws Exception {
+                logger.info("\n Testing is Running findAll()");
+                
+                try {
+                    List<Cargo> cargos = service.buscarTodos();
+                    
+                    assertNotEquals(0, cargos.size());
+                    
+                    logger.info("\n CargoService.findAll() {}", cargos );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            
+            @Test
+            @Rollback(true)
+            @Order(3)
+            public void testUpdateCargo() throws Exception {
+                logger.info("\n Testing is Running update()");
+                
+                try {
+                    Cargo cargo = service.buscarPorId(1L);
+                    
+                    cargo.setNome("Auxiliar Contábil Updated");
+                    
+                    service.editar(cargo);
+                    
+                    cargo = service.buscarPorId(1L);
+                    
+                    assertEquals("Auxiliar Contábil Updated", cargo.getNome());		
+
+                    logger.info("\n CargoService.editar() {}", cargo );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            
+            @Test
+            @Rollback(true)
+            @Order(4)
+            public void testInsertCargo() throws Exception {
+                logger.info("\n Testing is Running insert()");
+
+        /*
+        * Acrescentar a inclusão do departamento		
+        */
+                
+                
+                try {
+                    Cargo cargo = new Cargo("CARGO Inserted", null);
+                    
+                    service.salvar(cargo);
+                    
+                    assertNotEquals(0, cargo.getId());		
+
+                    logger.info("\n CargoService.salvar() {}", cargo );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+
+            @Test
+            @Rollback(true)
+            @Order(5)
+            public void testDeleteCargo() throws Exception {
+                logger.info("\n Testing is Running delete()");
+                
+                try {
+                    Cargo cargo = new Cargo("CARGO Inserted", null);
+                    
+                    service.salvar(cargo);
+                    
+                    
+                    service.excluir(cargo.getId());
+                    
+                    
+                    Cargo cargo2 = service.buscarPorId(cargo.getId());
+                    
+                    assertNull( cargo2 );		
+                    
+                    logger.info("\n CargoService.excluir() {}", service.buscarTodos() );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+        }
+
+
+    Classe No. 3 - FuncionarioServiceTests
+    --------------------------------------
+
+        package com.mballem.curso.boot;
+
+        import static org.junit.Assert.assertEquals;
+        import static org.junit.jupiter.api.Assertions.assertNotEquals;
+        import static org.junit.jupiter.api.Assertions.assertNull;
+
+        import java.math.BigDecimal;
+        import java.time.LocalDate;
+        import java.util.List;
+
+        import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+        import org.junit.jupiter.api.Order;
+        import org.junit.jupiter.api.Test;
+        import org.junit.jupiter.api.TestMethodOrder;
+        import org.junit.runner.RunWith;
+        import org.slf4j.Logger;
+        import org.slf4j.LoggerFactory;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.boot.test.context.SpringBootTest;
+        import org.springframework.test.annotation.Rollback;
+        import org.springframework.test.context.junit4.SpringRunner;
+        import org.springframework.transaction.annotation.Transactional;
+
+        import com.mballem.curso.boot.domain.Cargo;
+        import com.mballem.curso.boot.domain.Endereco;
+        import com.mballem.curso.boot.domain.Funcionario;
+        import com.mballem.curso.boot.domain.UF;
+        import com.mballem.curso.boot.service.CargoServiceImpl;
+        import com.mballem.curso.boot.service.FuncionarioServiceImpl;
+
+
+        @TestMethodOrder(OrderAnnotation.class)		// Annotation para informar que a ordem da execução dos testes será pela annotation @Order
+        @RunWith(SpringRunner.class)
+        @SpringBootTest(classes=DemoMvcApplication.class)
+        @Transactional
+        class FuncionarioServiceTests {
+            private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+            @Autowired
+            FuncionarioServiceImpl service;
+            
+            @Autowired
+            CargoServiceImpl serviceCargo;
+            
+            @Test
+            void contextLoads() {
+            }
+            
+            @Test
+            @Order(1)		// Direciona a ordem da execução dos testes
+            void testFindById() throws Exception {
+                logger.info("\n Testing is Running findById()");
+                
+                try {
+                    Funcionario funcionario = service.buscarPorId(1L);
+                    
+                    logger.info("\n FuncionarioServiceImpl.buscarPorId(1) {}", funcionario );
+                    
+                    assertEquals("Jorge da Silva", funcionario.getNome());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            @Test
+            @Order(2)		// Direciona a ordem da execução dos testes
+            void testFindAll() throws Exception {
+                logger.info("\n Testing is Running findAll()");
+                
+                try {
+                    List<Funcionario> funcionarios = service.buscarTodos();
+                    
+                    assertNotEquals(0, funcionarios.size());
+                    
+                    logger.info("\n FuncionarioService.findAll() {}", funcionarios );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            
+            @Test
+            @Rollback(true)
+            @Order(3)
+            public void testUpdateFuncionario() throws Exception {
+                logger.info("\n Testing is Running update()");
+                
+                try {
+                    Funcionario funcionario = service.buscarPorId(1L);
+                    
+                    funcionario.setNome("Jorge da Silva Updated");
+                    
+                    service.editar(funcionario);
+                    
+                    funcionario = service.buscarPorId(1L);
+                    
+                    assertEquals("Jorge da Silva Updated", funcionario.getNome());		
+
+                    logger.info("\n FuncionarioService.editar() {}", funcionario );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+            
+            @Test
+            @Rollback(true)
+            @Order(4)
+            public void testInsertFuncionario() throws Exception {
+                logger.info("\n Testing is Running insert()");
+
+        /*
+        * Acrescentar a inclusão do departamento		
+        */
+                
+                
+                try {
+                    Endereco endereco = new Endereco("JD CARLU","02423100","SAO PAULO","CASA C","R CARIOBA", 360, UF.SP);
+                    
+                    Cargo cargo = serviceCargo.buscarPorId(2L);
+                    
+                    Funcionario funcionario = new Funcionario();
+        //new Funcionario("MARCO ANTONIO DA SILVA", new BigDecimal("11000,00"), new LocalDate(0, 0, 0), null, cargo, endereco);
+                    
+                    funcionario.setCargo(cargo);
+                    funcionario.setDataEntrada(LocalDate.now());
+                    funcionario.setDataSaida(null);
+                    funcionario.setEndereco(endereco);
+                    funcionario.setNome("MARCO ANTONIO DA SILVA");
+                    funcionario.setSalario(new BigDecimal("11000.00"));
+                    
+                    service.salvar(funcionario);
+                    
+                    assertNotEquals(0, funcionario.getId());		
+
+                    logger.info("\n FuncionarioService.salvar() {}", funcionario );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+
+            @Test
+            @Rollback(true)
+            @Order(5)
+            public void testDeleteFuncionario() throws Exception {
+                logger.info("\n Testing is Running delete()");
+                
+                try {
+                    Endereco endereco = new Endereco("JD CARLU","02423100","SAO PAULO","CASA C","R CARIOBA", 360, UF.SP);
+                    
+                    Cargo cargo = serviceCargo.buscarPorId(2L);
+                    
+                    Funcionario funcionario = new Funcionario();
+        //new Funcionario("MARCO ANTONIO DA SILVA", new BigDecimal("11000,00"), new LocalDate(0, 0, 0), null, cargo, endereco);
+                    
+                    funcionario.setCargo(cargo);
+                    funcionario.setDataEntrada(LocalDate.now());
+                    funcionario.setDataSaida(null);
+                    funcionario.setEndereco(endereco);
+                    funcionario.setNome("MARCO ANTONIO DA SILVA");
+                    funcionario.setSalario(new BigDecimal("11000.00"));
+                    
+                    service.salvar(funcionario);
+                    
+                    service.excluir(funcionario.getId());
+                    
+                    Funcionario funcionario2 = service.buscarPorId(funcionario.getId());
+                    
+                    assertNull( funcionario2 );		
+                    
+                    logger.info("\n FuncionarioService.excluir() {}", service.buscarTodos() );
+                }catch( Exception e) {
+                    e.printStackTrace();
+                    
+                    throw new Exception( e.getMessage() ); // TODO: handle exception
+                }
+            }
+        }
+
+
+Aulas 29 a 35 - Thymeleaf para as Views
+---------------------------------------
+
+. Thyemeleaf Layout
+
+    Durante esta seção o tópico principal será baseado em criar um template para nossas páginas 
+    baseado em um layout padrão. Deste modo, todas aquelas partes das páginas que se repetem 
+    como cabeçalho, rodapé, sidebar e até mesmo o corpo das páginas, serão transformados 
+    em fragmentos.
+
+    Estes fragmentos são divididos em páginas separadas e importados em um página principal, 
+    que será a página de layout padrão. Para trabalhar com esse tipo de recurso o 
+    Thymeleaf fornece alguns componentes para este fim, que são:
+
+        th:insert - é o mais simples: ele simplesmente vai inserir o fragmento como o corpo 
+                        de uma tag na página de destino.
+        th:replace - substitui a tag da página de destino pelo fragmento.
+        th:include - é semelhante ao th: insert, mas em vez de inserir o fragmento, ele apenas 
+                        insere o conteúdo desse fragmento.
+        th:fragment - define um trecho de html como um fragmento de página.
+
+    Agora que conhecemos os componentes para lidar com fragmentos, vamos ver um breve exemplo 
+    de código. Para isso, suponha que a html exibido a seguir esteja presente na página footer.html:
+
+        <div class="footer-css">
+            <span class="text-muted">©  2018 Udemy</span>
+        </div>
+
+    Para transformar esse código em um fragmento, se deve adicionar a tag principal o 
+    componente th:fragment tendo como valor o nome dado ao fragmento. 
+
+    Veja o exemplo no código a seguir:
+
+        <div class="footer-css" th:fragment="rodape">
+            <span class="text-muted">©  2018 Udemy</span>
+        </div>
+
+    Desta forma, a página footer.html tem um fragmento que pode ser incluído em outras páginas, 
+    ao invés, de ficar repetindo esse trecho código em cada página da aplicação.
+
+    Agora, suponha que temos a página index.html e nela vamos incluir o fragmento de rodapé.
+
+        <!DOCTYPE html>    
+        <html xmlns:th="http://www.thymeleaf.org">    
+        <head>    
+            <meta http-equiv="Content-Type" 
+                content="text/html; charset=UTF-8">    
+            <title>Thymeleaf</title>    
+        </head>    
+        <body>    
+            <div>    
+                <div>Qualquer outro contéudo aqui</div>   
+            </div>    
+            <div class="container">    
+                <div>O corpo da página poderia estar aqui</div>   
+            </div>    
+            <footer th:replace="footer :: rodape">    
+                <span>O rodapé será inserido aqui!</span>    
+            </footer>    
+        </body>    
+        </html>
+
+    Analisando o código apresentado veja que em <footer> foi adicionado o componente 
+    th:replace. Esse componente tem como valor uma string separada por ::. 
+    Ao lado esquerdo da instrução temos o nome da página que contém o fragmento e ao 
+    lado direito temos o nome dado ao fragmento. Desta forma, sempre que a página index.html 
+    for aberta o fragmento de rodapé vai substituir a tag <footer> pelo código do rodapé 
+    que temos na página footer.html.
+
+    Observe também, que em <html> temos a instrução que nos da acesso ao componentes do 
+    Thymeleaf. Essa instrução é o namespace: xmlns:th="http://www.thymeleaf.org"
+
+    Há também um projeto secundário que foi oficializado pelo Thyemeleaf para a inclusão 
+    de fragmentos quando estes dependem de páginas que devem ser abertas por meio de 
+    requisições. Ou seja, o fragmento de rodapé é um fragmento fixo, ele não se modifica 
+    a cada diferente página que será aberta em sua aplicação. Já o corpo das páginas, 
+    que contém os formulários ou tabelas de dados podem ser modificados conforme cada 
+    página que se abre. Uma página de cadastro do funcionários pode ter o formulário 
+    diferente da página de cadastro de departamentos. Para que este tipo de situação se 
+    torne mais fácil de se lidar entre o controller, as requisições e os fragmento do 
+    corpo das páginas, foi criado este projeto secundário.
+
+    Inserir no application.properties as linhas abaixo:
+
+        spring.thymeleaf.cache=false
+
+
+    O projeto em questão precisa ser incluído a aplicação na forma de uma dependência 
+    do Maven e a partir dai vamos ter acesso aos componentes deste projeto que devem ser 
+    incluídos nas páginas para lidar com os layouts.
+
+        <dependency>
+            <groupId>nz.net.ultraq.thymeleaf</groupId>
+            <artifactId>thymeleaf-layout-dialect</artifactId>
+        </dependency>
+
+    A primeira instrução que deve ser adicionada as páginas é o 
+    namespace: xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout". Com sua inclusão 
+    teremos acesso a dois importantes componentes:
+
+    layout:fragment - tem como finalidade criar e nomear o fragmento de página, tem um propósito similar 
+                        ao th:fragment. Porém, ele também deve ser usado para carregar o fragmento 
+                        na página de destino, em substituição ao th:replace.
+    layout:decorate - deve ser incluído na tag <html> da página de fragmento. Seu objetivo é 
+                        informar a página de fragmento qual será a página de destino deste fragmento. 
+                        Sendo assim, como valor passamos a instrução ~{nome da página de destino}.
+
+    Veja agora um exemplo da página cadastro.html que será usado como um fragmento:
+
+        <!DOCTYPE html>    
+        <html xmlns:th="http://www.thymeleaf.org"
+            xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+            layout:decorate="~{index}">    
+        <head>    
+            <meta http-equiv="Content-Type" 
+                content="text/html; charset=UTF-8">    
+        </head>    
+        <body>    
+            <div class="container" layout:fragment="corpo">    
+                <form action="#" method="post">
+                    <!--código omitido -->
+                </form>   
+            </div>    
+        </body>    
+        </html>
+
+    Agora, na página index.html importamos este fragmento da seguinte forma:
+
+        <!DOCTYPE html>    
+        <html xmlns:th="http://www.thymeleaf.org"
+            xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">    
+        <head>    
+            <meta http-equiv="Content-Type" 
+                content="text/html; charset=UTF-8">    
+        </head>    
+        <body>    
+            <div>    
+                <div>Qualquer outro contéudo aqui</div>   
+            </div>    
+            <div class="container" layout:fragment="corpo">    
+                <div>O corpo da página poderia estar aqui</div>   
+            </div>    
+            <footer th:replace="footer :: rodape">    
+                <span>O rodapé será inserido aqui!</span>    
+            </footer>    
+        </body>    
+        </html>
+
+    Observe que no <div> referente ao corpo da página temos a instrução 
+    layout:fragment="corpo". Esta instrução está dizendo que um fragmento nomeado 
+    como corpo deverá ser incluído neste local. Assim, qualquer página de fragmento, 
+    referente ao corpo de uma página, como a cadastro.html, 
+    será aberta neste local se a requisição for direcionada a ela.
+
+    Pesquise mais sobre fragmentos na documentação oficial do Thymeleaf:
+
+    Difference between th:insert and th:replace (and th:include)
+    Thymeleaf Page Layouts
+    Habilitando o plugin do Thymeleaf
+
+    O Spring Tools Suite permite que um plugin seja utilizado para facilitar o 
+    acesso aos componentes do Thymeleaf ao clicar ctrl+space nas páginas html, 
+    como mostra a figura 1. O nome do plugin é "thymeleaf-extras-eclipse-plugin".
+
+
+    Figura 1 - Exibindo a lista de componentes do Thymeleaf via ctrl+space.
+
+    Caso esse plugin não esteja instalado no STS, faça a instalação através dos 
+    seguintes passos:
+
+    Na barra de tarefas vai vá até Help > Install New Software
+
+    Em seguida clique em Add
+
+    No formulário que será aberto digite no campo Name um nome para o plugin, como exemplo, Thymeleaf.
+
+    Já no campo Location inclua a url do repositório referente ao plugin: 
+
+    https://github.com/thymeleaf/thymeleaf-extras-eclipse-plugin ou 
+    https://www.thymeleaf.org/eclipse-plugin-update-site/
+
+    Confirme estas informações e prossiga com a instalação.
+
+    Talvez seja necessário reiniciar a IDE ao final do processo. Por fim, para 
+    habilitar o uso do ctrl+space como tecla de atalho aos componentes do plugin, 
+    clique sobre o titulo do projeto com o botão direito do mouse e vá até a opção 
+    Thymeleaf então clique no item Add Thymeleaf Nature .
+
+    Ok, o processo está concluído!
+
+    Se você estiver tendo problemas com a instalação baseada no link, pode tentar 
+    instalar o plugin pelo pacote .zip que está disponivel para download nesta 
+    página: https://bintray.com/thymeleaf/downloads/thymeleaf-extras-eclipse-plugin/
+
+    O processo de instalação é similar, porém, ao invés de incluir a url no campo Location , 
+    clique no botão Archive  que está ao lado desse campo e selecione o arquivo .zip.
+
+
+    . Desenvolvimento das páginas Thymeleaf:
+
+        . Configurações no projeto:
+
+            Inserir no application.properties as linhas abaixo:
+
+                spring.thymeleaf.cache=false
+
+
+            O projeto em questão precisa ser incluído a aplicação na forma de uma dependência 
+            do Maven e a partir dai vamos ter acesso aos componentes deste projeto que devem ser 
+            incluídos nas páginas para lidar com os layouts.
+
+                <dependency>
+                    <groupId>nz.net.ultraq.thymeleaf</groupId>
+                    <artifactId>thymeleaf-layout-dialect</artifactId>
+                </dependency>
+
+
+        . Criar a pasta "fragments" dentro de templates, crie a página HTML com conteúdo abaixo:
+
+            fragments/footer.html
+            ---------------------
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            </head>
+            <body>
+                <footer class="layout-footer" th:fragment="rodape">
+                    <div class="container">
+                        <span class="footer-copy">&copy; 2018 MBallem. Todos os	direitos reservados.</span>
+                    </div>
+                </footer>
+
+            </body>
+            </html>
+
+
+            fragments/header.html
+            ---------------------
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            </head>
+            <body>
+                <header th:fragment="cabecalho">
+                    <nav class="navbar navbar-inverse navbar navbar-dark bg-dark fixed-top">
+                        <div class="container-fluid">
+                            <div class="navbar-header">
+                                <button type="button" class="btn btn-dark navbar-toggle pull-left">
+                                    <i class="oi oi-menu"></i>
+                                </button>
+                                <a class="navbar-brand " href="#">Curso Spring Boot</a>
+                            </div>
+                        </div>
+                    </nav>
+                </header>
+
+            </body>
+            </html>
+
+            fragments/sidebar.html
+            ----------------------
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            </head>
+            <body>
+
+                        <nav class="sidebar sidebar-open" th:fragment="nav-sidebar">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><a class="nav-link " href="/"> <i
+                                        class="oi oi-home"></i> <span>Home</span>
+                                </a></li>
+                            </ul>
+
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><span class="nav-link active" >Departamentos</span></li>
+                                <li class="nav-item"><a class="nav-link"
+                                    href="/departamentos/cadastrar"> <i class="oi oi-plus"></i> <span>Cadastrar</span>
+                                </a></li>
+                                <li class="nav-item"><a class="nav-link"
+                                    href="/departamentos/listar"> <i class="oi oi-spreadsheet"></i>
+                                        <span>Listar </span>
+                                </a></li>
+                            </ul>
+
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><span class="nav-link active" >Cargos</span></li>
+                                <li class="nav-item"><a class="nav-link" 
+                                    href="/cargos/cadastrar"> <i class="oi oi-plus"></i> <span>Cadastrar </span>
+                                </a></li>
+                                <li class="nav-item"><a class="nav-link" 
+                                    href="/cargos/listar"> <i
+                                        class="oi oi-spreadsheet"></i> <span>Listar </span>
+                                </a></li>
+                            </ul>
+
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><span class="nav-link active">Funcionários</span></li>
+                                <li class="nav-item"><a class="nav-link" 
+                                    href="/funcionarios/cadastrar"> <i class="oi oi-plus"></i> <span>Cadastrar </span>
+                                </a></li>
+                                <li class="nav-item"><a class="nav-link" 
+                                    href="/funcionarios/listar"> <i class="oi oi-spreadsheet"></i> <span>Listar </span>
+                                </a></li>
+                            </ul>
+                        </nav>
+            </body>
+            </html>
+
+            layout.html
+            ---------------------
+
+            <!DOCTYPE html>
+            <html lang="pt" xmlns="http://www.w3.org/1999¹xhtml" 
+                            xmlns:th="http://www.thymeleaf.org"
+                            xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+            <head>
+                <title>Spring-Boot Básico</title>
+                <meta charset="UTF-8" />
+                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+                <meta name="description" content="" />
+                <meta name="author" content="" />
+                <link rel="icon" href="/image/favicon.png" />
+
+                <!-- Bootstrap core CSS -->
+                <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+                <link href="/webjars/open-iconic/font/css/open-iconic-bootstrap.min.css" rel="stylesheet" />
+                
+                <!-- Custom styles for this template -->
+                <link href="/css/style.css" rel="stylesheet" />
+            </head>
+            <body>
+                <header th:replace="fragments/header :: cabecalho">
+                    <div>Header</div>
+                </header>
+                
+                <div  class="layout-main">
+                    <aside>
+                        <nav th:replace="fragments/sidebar :: nav-sidebar">
+                            <span>menu</span>
+                        </nav>
+                    </aside>
+                    
+                    <section layout:fragment="corpo">
+                        <div>Conteúdo do Corpo das Páginas</div>
+                    </section>
+                </div>
+                
+                <footer th:replace="fragments/footer :: rodape">
+                    <div>Footer</div>
+                </footer>
+                
+                <!-- Bootstrap core JavaScript
+                ================================================== -->
+                <!-- Placed at the end of the document so the pages load faster -->
+                <script src="/webjars/jquery/jquery.min.js"></script>
+                <script src="/webjars/jquery-mask-plugin/dist/jquery.mask.min.js"></script>
+                <script	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+                <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+                <script type="text/javascript">
+                    
+                    $(function() {
+                        $('[data-toggle="popover"]').popover();
+                    });
+                    
+                    $(document).ready(function(){
+                        $(".navbar-toggle").click(function(){
+                            $(".sidebar").toggleClass("sidebar-open");
+                        })
+                    });
+
+                </script>
+                
+            </body>
+            </html>
+
+            home.html
+            ---------
+
+            <!DOCTYPE html>
+            <html layout:decorate="~{layout}">
+            <head>
+                <meta charset="UTF-8" />
+            </head>
+            <body>
+                
+                <section class="layout-content" layout:fragment="corpo">
+                
+                    <nav class="navbar navbar-expand-md bg-light">
+                        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                            <ul class="navbar-nav mr-auto">
+                                <li class="nav-item active">
+                                    <i class="oi oi-caret-right"></i>
+                                    <span>Home</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                    
+                    <div class="container">
+                        <div id="list-home" class="row">
+                            <div class="col-4">
+                                <div class="list-group" id="list-tab" role="tablist">
+                                    <a class="list-group-item list-group-item-action active"
+                                        id="list-spring-boot-list" data-toggle="list" href="#spring-boot"
+                                        role="tab" aria-controls="spring-boot">Spring-Boot</a> <a
+                                        class="list-group-item list-group-item-action" id="list-sts-list"
+                                        data-toggle="list" href="#sts" role="tab" aria-controls="sts">Spring
+                                        Tool Suite</a> <a class="list-group-item list-group-item-action"
+                                        id="list-thymeleaf-list" data-toggle="list" href="#thymeleaf"
+                                        role="tab" aria-controls="thymeleaf">Thymeleaf</a> <a
+                                        class="list-group-item list-group-item-action"
+                                        id="list-webjars-list" data-toggle="list" href="#webjars"
+                                        role="tab" aria-controls="webjars">WebJars</a> <a
+                                        class="list-group-item list-group-item-action"
+                                        id="list-hibernate-list" data-toggle="list" href="#hibernate"
+                                        role="tab" aria-controls="hibernate">Hibernate</a> <a
+                                        class="list-group-item list-group-item-action"
+                                        id="list-bootstrap-list" data-toggle="list" href="#bootstrap"
+                                        role="tab" aria-controls="bootstrap">Bootstrap 4</a>
+                                </div>
+                            </div>
+                            <div class="col-8">
+                                <div class="tab-content" id="nav-tabContent">
+                                    <div class="tab-pane fade show active" id="spring-boot"
+                                        role="tabpanel" aria-labelledby="list-spring-boot-list">
+                                        <a href="https://projects.spring.io/spring-boot/">Spring Boot</a>
+                                        makes it easy to create stand-alone, production-grade Spring
+                                        based Applications that you can "just run". We take an
+                                        opinionated view of the Spring platform and third-party libraries
+                                        so you can get started with minimum fuss. Most Spring Boot
+                                        applications need very little Spring configuration.
+                                    </div>
+                                    <div class="tab-pane fade" id="sts" role="tabpanel"
+                                        aria-labelledby="list-sts-list">
+                                        The <a href="https://spring.io/tools">Spring Tool Suite</a> is an
+                                        Eclipse-based development environment that is customized for
+                                        developing Spring applications. It provides a ready-to-use
+                                        environment to implement, debug, run, and deploy your Spring
+                                        applications, including integrations for Pivotal tc Server,
+                                        Pivotal Cloud Foundry, Git, Maven, AspectJ, and more.
+                                    </div>
+                                    <div class="tab-pane fade" id="thymeleaf" role="tabpanel"
+                                        aria-labelledby="list-thymeleaf-list">
+                                        <a href="http://www.thymeleaf.org/">Thymeleaf</a> is a modern
+                                        server-side Java template engine for both web and standalone
+                                        environments. With modules for Spring Framework, a host of
+                                        integrations with your favourite tools, and the ability to plug
+                                        in your own functionality, Thymeleaf is ideal for modern-day
+                                        HTML5 JVM web development — although there is much more it can
+                                        do.
+                                    </div>
+                                    <div class="tab-pane fade" id="webjars" role="tabpanel"
+                                        aria-labelledby="list-webjars-list">
+                                        <a href="https://www.webjars.org/">WebJars</a> are client-side
+                                        web libraries (e.g. jQuery ; Bootstrap) packaged into JAR (Java
+                                        Archive) files.
+                                    </div>
+                                    <div class="tab-pane fade" id="hibernate" role="tabpanel"
+                                        aria-labelledby="list-hibernate-list">
+                                        <a href="http://hibernate.org/orm/">Hibernate ORM</a> enables
+                                        developers to more easily write applications whose data outlives
+                                        the application process. As an Object/Relational Mapping (ORM)
+                                        framework, Hibernate is concerned with data persistence as it
+                                        applies to relational databases (via JDBC). <br />In addition to
+                                        its own "native" API, Hibernate is also an implementation of the
+                                        Java Persistence API (JPA) specification. As such, it can be
+                                        easily used in any environment supporting JPA including Java SE
+                                        applications, Java EE application servers, Enterprise OSGi
+                                        containers, etc.
+                                    </div>
+                                    <div class="tab-pane fade" id="bootstrap" role="tabpanel"
+                                        aria-labelledby="list-bootstrap-list">
+                                        <a href="https://getbootstrap.com/">Bootstrap</a> is an open
+                                        source toolkit for developing with HTML, CSS, and JS. Quickly
+                                        prototype your ideas or build your entire app with our Sass
+                                        variables and mixins, responsive grid system, extensive prebuilt
+                                        components, and powerful plugins built on jQuery.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>		
+            </body>
+            </html>
+
+    . Atualização das páginas de cadastro.html e lista.html
+
+        Atualização das página templates/cargo/lista.html 
+
+            <!DOCTYPE html>
+            <html layout:decorate="~{layout}">
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <body>
+
+                
+                    <section class="layout-content" layout:fragment="corpo">
+                
+                        <nav class="navbar navbar-expand-md bg-light">
+                            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                                <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item active">
+                                        <i class="oi oi-caret-right"></i>
+                                        <span>Lista de Cargos</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <a class="btn btn-primary btn-md" href="/cargos/cadastrar" role="button">
+                                <span class="oi oi-plus" title="Cadastro" aria-hidden="true"></span>
+                                <span>Novo Cargo</span>
+                            </a>
+                        </nav>
+                
+                        <div class="container" id="listagem">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Cargo</th>
+                                        <th>Departamento</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Auxiliar Contábil</td>
+                                        <td>Contabilidade</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/1" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Auxiliar Administrativo</td>
+                                        <td>Administração</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/2" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Contador</td>
+                                        <td>Contabilidade</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/3" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Adminitrador</td>
+                                        <td>Administração</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/4" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>Programado PHP</td>
+                                        <td>Tecnologia da Informação</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/5" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>Desenvolvedor Java Jr.</td>
+                                        <td>Tecnologia da Informação</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/6" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>Desenvolvedor Java Pleno</td>
+                                        <td>Tecnologia da Informação</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/7" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td>Desenvolvedor Java Senior</td>
+                                        <td>Tecnologia da Informação</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/8" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td>Auxiliar de RH</td>
+                                        <td>Recursos Humanos</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/9" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td>Coordenador de RH</td>
+                                        <td>Recursos Humanos</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/10" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>11</td>
+                                        <td>Psicologo</td>
+                                        <td>Recursos Humanos</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/cargos/editar/11" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </section>
+
+
+            </body>
+            </html>		
+
+        Atualização da página templates/cargo/cadastro.html
+
+            <!DOCTYPE html>
+            <html layout:decorate="~{layout}">
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <body>
+                    <section class="layout-content" layout:fragment="corpo">
+                
+                        <nav class="navbar navbar-expand-md bg-light">
+                            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                                <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item active">
+                                        <i class="oi oi-caret-right"></i>
+                                        <span>Cadastrar Cargos</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <a class="btn btn-primary btn-md" href="/cargos/listar" role="button">
+                                <span class="oi oi-spreadsheet" title="Cadastro" aria-hidden="true"></span>
+                                <span>Listar Cargos</span>
+                            </a>
+                        </nav>
+                
+                        <div class="container" id="cadastro">
+                            <form action="/cargos/salvar" method="POST">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="nome">Nome do Cargo</label>
+                                        <input type="text" class="form-control" id="nome" placeholder="Nome Cargo" autofocus="autofocus"
+                                            name="nome" value=""/>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="departamento">Departamento</label>
+                                        <select id="departamento" class="form-control" name="departamento">
+                                            <option value="">Selecione</option>
+                                            <option value="3">Administração</option>
+                                            <option value="2">Contabilidade</option>
+                                            <option value="1">Recursos Humanos</option>
+                                            <option value="4">Tecnologia da Informação</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="id" name="id" value=""/>
+                                <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+                            </form>
+                        </div>
+                    </section>
+
+
+            </body>
+            </html>		
+
+        Atualização da página templates/departamento/lista.html
+
+            <!DOCTYPE html>
+            <html layout:decorate="~{layout}">
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <body>
+                
+                    <section class="layout-content" layout:fragment="corpo">
+                
+                        <nav class="navbar navbar-expand-md bg-light">
+                            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                                <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item active">
+                                        <i class="oi oi-caret-right"></i>
+                                        <span>Lista de Departamentos</span>
+                                    </li>
+                                </ul>
+                                <a class="btn btn-primary btn-md" href="/departamentos/cadastrar" role="button">
+                                    <span class="oi oi-plus" title="Cadastro" aria-hidden="true"></span>
+                                    <span>Novo Departamento</span>
+                                </a>
+                            </div>
+                        </nav>
+                
+                        <div class="container" id="listagem">
+                
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nome</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Administração</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/departamentos/editar/3" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button id="btn_departamentos/excluir/3" type="button" class="btn btn-danger btn-sm">
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Contabilidade</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/departamentos/editar/2" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm">
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Recursos Humanos</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/departamentos/editar/1" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Tecnologia da Informação</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/departamentos/editar/4" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" >
+                                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+            </body>
+            </html>		
+
+        Atualização da página templates/departamento/cadastro.html
+
+            <!DOCTYPE html>
+            <html layout:decorate="~{layout}">
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <body>
+                
+                    <section class="layout-content" layout:fragment="corpo">
+                
+                        <nav class="navbar navbar-expand-md bg-light">
+                            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                                <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item active">
+                                        <i class="oi oi-caret-right"></i>
+                                        <span>Cadastrar Departamentos</span>
+                                    </li>
+                                </ul>
+                                <a class="btn btn-primary btn-md" href="/departamentos/listar" role="button">
+                                    <span class="oi oi-spreadsheet" title="Listar" aria-hidden="true"></span>
+                                    <span>Listar Departamentos</span>
+                                </a>
+                            </div>
+                        </nav>
+                
+                        <div class="container" id="cadastro">
+                            <form action="/departamentos/salvar" method="POST">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="nome">Departamento</label>
+                                        <input type="text" class="form-control" id="nome"
+                                            placeholder="Nome Departamento" autofocus="autofocus" name="nome" value=""/>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="id" name="id" value=""/>
+                                <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+                            </form>
+                        </div>
+                    </section>
+            </body>
+            </html>
+
+        Atualização da página templates/funcionarios/lista.html
+
+            <!DOCTYPE html>
+            <html layout:decorate="~{layout}">
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <body>
+                
+                    <section class="layout-content" layout:fragment="corpo">
+                        <nav class="navbar navbar-expand-md bg-light">
+                            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                                <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item active">
+                                        <i class="oi oi-caret-right"></i>
+                                        <span>Lista de Funcionários</span>
+                                    </li>
+                                </ul>
+                                <a class="btn btn-primary btn-md" href="/funcionarios/cadastrar" role="button">
+                                    <span class="oi oi-plus" title="Cadastro" aria-hidden="true"></span>
+                                    <span>Cadastrar Funcionários</span>
+                                </a>
+                            </div>
+                        </nav>
+                
+                        <div class="container">
+                
+                            <p>
+                                <i class="oi oi-magnifying-glass"></i><span></span>
+                                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseNome"
+                                        aria-controls="collapseNome">Nome
+                                </button>
+                                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseCargo"
+                                        aria-controls="collapseCargo">Cargo
+                                </button>
+                                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseData"
+                                        aria-controls="collapseData">Datas
+                                </button>
+                            </p>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="collapse" id="collapseNome">
+                
+                                        <nav class="navbar navbar-light bg-light">
+                                            <form class="form-inline" method="GET" action="/funcionarios/buscar/nome">
+                                                <input class="form-control mr-sm-2" type="search" placeholder="nome" aria-label="Search"
+                                                    name="nome" />
+                                                <button class="btn btn-outline-success my-2 my-sm-0">Search</button>
+                                            </form>
+                                        </nav>
+                
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="collapse" id="collapseCargo">
+                
+                                        <nav class="navbar navbar-light bg-light">
+                                            <form class="form-inline" method="GET" action="/funcionarios/buscar/cargo">
+                                                <select class="form-control mr-sm-2" name="cargo" aria-label="Search">
+                                                    <option value="">Cargo</option>
+                                                    <option value="1">Auxiliar Contábil</option>
+                                                    <option value="2">Auxiliar Administrativo</option>
+                                                    <option value="3">Contador</option>
+                                                    <option value="4">Adminitrador</option>
+                                                    <option value="5">Programado PHP</option>
+                                                    <option value="6">Desenvolvedor Java Jr.</option>
+                                                    <option value="7">Desenvolvedor Java Pleno</option>
+                                                    <option value="8">Desenvolvedor Java Senior</option>
+                                                    <option value="9">Auxiliar de RH</option>
+                                                    <option value="10">Coordenador de RH</option>
+                                                    <option value="11">Psicologo</option>
+                                                </select>
+                                                <button class="btn btn-outline-success my-2 my-sm-0">Search</button>
+                                            </form>
+                                        </nav>
+                
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="collapse" id="collapseData">
+                
+                                        <nav class="navbar navbar-light bg-light">
+                                            <form class="form-inline" method="GET" action="/funcionarios/buscar/data">
+                                                <input class="form-control mr-sm-2" type="date" aria-label="Search"
+                                                    name="entrada" />
+                                                <input class="form-control mr-sm-2" type="date" aria-label="Search"
+                                                    name="saida" />
+                                                <button class="btn btn-outline-success my-2 my-sm-0">Search</button>
+                                            </form>
+                                        </nav>
+                
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nome</th>
+                                        <th>Salário</th>
+                                        <th>Departamento</th>
+                                        <th>Cargo</th>
+                                        <th>Endereço</th>
+                                        <th>Data de Entrada</th>
+                                        <th>Data de Saída</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Jorge da Silva</td>
+                                        <td>R$ 3.500,99</td>
+                                        <td>Recursos Humanos</td>
+                                        <td>Auxiliar de RH</td>
+                                        <td>
+                                            <button type="button" class="btn btn-secondary btn-sm" data-container="body"
+                                                    data-toggle="popover" data-placement="top"
+                                                    data-content="Rua das Oliveiras, 260 Fundos - Centro, Porto Alegre - RS - 97050-015">
+                                                <span class="oi oi-eye" title="Visualizar" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                        <td>01/10/2014</td>
+                                        <td></td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/funcionarios/editar/1" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button id="btn_funcionarios/excluir/1" type="button" class="btn btn-danger btn-sm"
+                                                    data-toggle="modal" data-target="#myModal">
+                                                <span class="oi oi-circle-x" title="Excluir" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Ana Maria Lindoval</td>
+                                        <td>R$ 3.560,70</td>
+                                        <td>Administração</td>
+                                        <td>Auxiliar Administrativo</td>
+                                        <td>
+                                            <button type="button" class="btn btn-secondary btn-sm" data-container="body"
+                                                    data-toggle="popover" data-placement="top"
+                                                    data-content="Av. dos Palmares, 320  - Ribeirão, Canoas - RS - 98050-908">
+                                                <span class="oi oi-eye" title="Visualizar" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                        <td>01/08/2014</td>
+                                        <td>02/03/2015</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/funcionarios/editar/2" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button id="btn_funcionarios/excluir/2" type="button" class="btn btn-danger btn-sm"
+                                                    data-toggle="modal" data-target="#myModal">
+                                                <span class="oi oi-circle-x" title="Excluir" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Juan Perez</td>
+                                        <td>R$ 4.060,99</td>
+                                        <td>Tecnologia da Informação</td>
+                                        <td>Desenvolvedor Java Jr.</td>
+                                        <td>
+                                            <button type="button" class="btn btn-secondary btn-sm" data-container="body"
+                                                    data-toggle="popover" data-placement="top"
+                                                    data-content="Rua Senador Cassiano do Nascimento, 135 AP. 106 - Noroeste, Porto Alegre - RS - 90798-099">
+                                                <span class="oi oi-eye" title="Visualizar" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                        <td>05/01/2015</td>
+                                        <td></td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/funcionarios/editar/3" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button id="btn_funcionarios/excluir/3" type="button" class="btn btn-danger btn-sm"
+                                                    data-toggle="modal" data-target="#myModal">
+                                                <span class="oi oi-circle-x" title="Excluir" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Marcio Silva</td>
+                                        <td>R$ 2.890,99</td>
+                                        <td>Contabilidade</td>
+                                        <td>Auxiliar Contábil</td>
+                                        <td>
+                                            <button type="button" class="btn btn-secondary btn-sm" data-container="body"
+                                                    data-toggle="popover" data-placement="top"
+                                                    data-content="Av. Maracanã, 309 AP. 108 - Maracanã, Rio de Janeiro - RJ - 91050-980">
+                                                <span class="oi oi-eye" title="Visualizar" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                        <td>18/10/2013</td>
+                                        <td>06/09/2015</td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/funcionarios/editar/4" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button id="btn_funcionarios/excluir/4" type="button" class="btn btn-danger btn-sm"
+                                                    data-toggle="modal" data-target="#myModal">
+                                                <span class="oi oi-circle-x" title="Excluir" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>Joana Prado</td>
+                                        <td>R$ 3.804,00</td>
+                                        <td>Recursos Humanos</td>
+                                        <td>Coordenador de RH</td>
+                                        <td>
+                                            <button type="button" class="btn btn-secondary btn-sm" data-container="body"
+                                                    data-toggle="popover" data-placement="top"
+                                                    data-content="Rua Gomes Carneiro, 909  - Centro, Porto Alegre - RS - 98080-999">
+                                                <span class="oi oi-eye" title="Visualizar" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                        <td>01/05/2015</td>
+                                        <td></td>
+                                        <td colspan="2">
+                                            <a class="btn btn-info btn-sm" href="/funcionarios/editar/5" role="button">
+                                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+                                            </a>
+                                            <button id="btn_funcionarios/excluir/5" type="button" class="btn btn-danger btn-sm"
+                                                    data-toggle="modal" data-target="#myModal">
+                                                <span class="oi oi-circle-x" title="Excluir" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+            </body>
+            </html>		
+
+        Atualização da página templates/funcionarios/cadastro.html
+
+            <!DOCTYPE html>
+            <html layout:decorate="~{layout}">
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <body>
+                
+                    <section class="layout-content" layout:fragment="corpo">
+                        <div class="page-header">
+                            <nav class="navbar navbar-expand-md navbar-top bg-light">
+                                <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                                    <ul class="navbar-nav">
+                                        <li class="nav-item active">
+                                            <i class="oi oi-caret-right"></i>
+                                            <span>Cadastrar Funcionários</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <a class="btn btn-primary btn-md" href="/funcionarios/listar" role="button">
+                                    <span class="oi oi-spreadsheet" title="Cadastro" aria-hidden="true"></span>
+                                    <span>Listar Funcionários</span>
+                                </a>
+                            </nav>
+                        </div>
+                
+                        <div class="container" id="cadastro">
+                            <form action="/funcionarios/salvar" method="POST">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="nome">Nome do Funcionário</label>
+                                        <input type="text" class="form-control" id="nome" placeholder="Nome Completo"
+                                            autofocus="autofocus" name="nome" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="salario">Salário Bruto</label>
+                                        <input type="text" class="form-control" id="salario" data-mask="#.##0,00"
+                                            data-mask-reverse="true" name="salario" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="dataEntrada">Data de Entrada</label>
+                                        <input type="date" class="form-control" id="dataEntrada" name="dataEntrada" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="dataSaida">Data de Saída</label>
+                                        <input type="date" class="form-control" id="dataSaida" name="dataSaida" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="cargo">Cargo</label>
+                                        <select id="cargo" class="form-control" name="cargo">
+                                            <option value="">Selecione...</option>
+                                            <option value="1">Auxiliar Contábil</option>
+                                            <option value="2">Auxiliar Administrativo</option>
+                                            <option value="3">Contador</option>
+                                            <option value="4">Adminitrador</option>
+                                            <option value="5">Programado PHP</option>
+                                            <option value="6">Desenvolvedor Java Jr.</option>
+                                            <option value="7">Desenvolvedor Java Pleno</option>
+                                            <option value="8">Desenvolvedor Java Senior</option>
+                                            <option value="9">Auxiliar de RH</option>
+                                            <option value="10">Coordenador de RH</option>
+                                            <option value="11">Psicologo</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="cidade">Cidade</label>
+                                        <input type="text" class="form-control" id="cidade" name="endereco.cidade" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="logradouro">Logradouro</label>
+                                        <input type="text" class="form-control" id="logradouro" placeholder="logradouro sem número"
+                                            name="endereco.logradouro" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="numero">Número</label>
+                                        <input type="text" class="form-control" id="numero" name="endereco.numero" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="complemento">Complemento</label>
+                                        <input type="text" class="form-control" id="complemento" placeholder="fundos, casa, AP. 102, .."
+                                            name="endereco.complemento" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="bairro">Bairro</label>
+                                        <input type="text" class="form-control" id="bairro" name="endereco.bairro" value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="uf">UF</label>
+                                        <select id="uf" class="form-control" name="endereco.uf">
+                                            <option value="">Selecione...</option>
+                                            <option value="AC">AC</option>
+                                            <option value="AL">AL</option>
+                                            <option value="AM">AM</option>
+                                            <option value="BA">BA</option>
+                                            <option value="CE">CE</option>
+                                            <option value="DF">DF</option>
+                                            <option value="ES">ES</option>
+                                            <option value="GO">GO</option>
+                                            <option value="MA">MA</option>
+                                            <option value="MT">MT</option>
+                                            <option value="MS">MS</option>
+                                            <option value="MG">MG</option>
+                                            <option value="PA">PA</option>
+                                            <option value="PB">PB</option>
+                                            <option value="PR">PR</option>
+                                            <option value="PE">PE</option>
+                                            <option value="PI">PI</option>
+                                            <option value="RJ">RJ</option>
+                                            <option value="RN">RN</option>
+                                            <option value="RS">RS</option>
+                                            <option value="RO">RO</option>
+                                            <option value="RR">RR</option>
+                                            <option value="SC">SC</option>
+                                            <option value="SP">SP</option>
+                                            <option value="SE">SE</option>
+                                            <option value="TO">TO</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label for="cep">Cep</label>
+                                        <input type="text" class="form-control" id="cep" data-mask="00000-000" name="endereco.cep"
+                                            value=""/>
+                                        <div class="invalid-feedback">
+                
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="id" name="id" value=""/>
+                                <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+                            </form>
+                        </div>
+                    </section>
+
+            </body>
+            </html>		
+
+Aulas 36 a 42 - Departamento Controller & View
+----------------------------------------------
+
+. Componentes do Thymeleaf
+
+    O Thymeleaf tem uma lista com vários componentes que podem ser incluídos nas páginas 
+    para a realização de diversas ações. Alguns destes componentes serão abordados no 
+    curso para o uso em formulários de cadastros e listagem de dados.
+
+    Entre estes, podemos destacar os seguintes:
+
+        th:action - substitui o atributo action padrão do HTML. Desta forma é possível usar uma 
+                    expressão do tipo @{/departamento/save} contendo como valor a URI de destino.
+        th:href - substitui o atributo href padrão do HTML para o uso de URIs ou URLs. 
+                    A expressão declarado como valor deste componente é @{/departamento/save}.
+        th:object - o componente deve receber como valor uma expressão contendo o objeto que 
+                    representa a entidade que está sendo manipulada pelo formulário: ${departamento}
+        th:field - seu objetivo é ser usado em campos de entrada de dados em formulários 
+                    para que ele capture dos dados lançados no campo e vincule esses dados 
+                    com o objeto declarado na expressão do th:object. O valor de th:field deve 
+                    ser uma expressão do tipo *{nome} onde o valor da expressão é o nome do 
+                    atributo da classe de entidade que o campo do formulário representa.
+        th:text - usado para exibir valores nas páginas.
+        th:if - util para realizar algum tipo de teste condicional do tipo se.
+        th:each - sua função é executar uma instrução de foreach sobre uma variável que tem 
+                    como valor uma lista de dados.
+
+    Outros componentes podem ser encontrados na documentação oficial do 
+
+    Thymeleaf - https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#setting-value-to-specific-attributes
+
+    Veja a seguir um trecho de código que demonstra como trabalhar com uma lista junto 
+    ao th:each para criar uma tabela na página:
+
+    <table class="table table-striped table-hover table-sm">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Nome</th>
+        <th>Ação</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="d : ${departamentos}">
+        <td th:text="${d.id}">3</td>
+        <td th:text="${d.nome}">Administração</td>
+        <td colspan="2">
+            <button th:href="@{/departamentos/editar/{id} (id=${d.id}) }">
+                <span class="oi oi-brush" title="Editar"></span>
+            </button >
+            <button th:href="@{/departamentos/excluir/{id} (id=${d.id}) }">
+                <span class="oi oi-circle-x" title="Excluir"></span>
+            </button>
+        </td>
+    </tr>
+    </tbody>
+    </table>
+
+    No th:each declaramos uma expressão onde o valor mais a esquerda é a variável que vai 
+    receber o valor do objeto na posição atual do foreach. Já o valor mais a direita é a 
+    expressão padrão do Java para recuperar valores que estão no contexto da aplicação. 
+    Esta expressão contém a variável departamentos que é uma lista de departamento do 
+    tipo java.util.List.
+
+    Esta lista foi enviada para a página pelo controller, com um método similar ao descrito a seguir:
+
+    @GetMapping("/listar")
+    public String listar(ModelMap model) {
+        List<Departamento> listDeparts = service.buscarTodos();
+        model.addAttribute("departamentos", listDeparts);
+        return "/departamento/lista"; 
+    }
+
+    Observe que a instrução model.addAttribute() possui dois parâmetros. O primeiro é o 
+    nome da variável que espera pela lista na página. O segundo é a própria lista que será 
+    enviada como valor desta variável.
+
+    Outros componentes estão exemplificados no código HTML da tabela. Como exemplo, o th:text 
+    que imprime nas colunas os respectivos valores capturados a partir da variável d, que 
+    representa um objeto do tipo Departamento.
+
+    <td th:text="${d.id}">3</td>
+
+    Já o th:href está declarado nos botões de Editar e Excluir. 
+    Este componente recebe como valor a expressão que possui como a URI de destino de cada botão.
+
+    Veja com atenção como o valor do identificador de um departamento foi incluído nas URIs.
+
+    <button th:href="@{/departamentos/excluir/{id} (id=${d.id}) }" type="button" class="btn btn-danger btn-sm">
+
+    Na URI a expressão {id} foi adicionada como o path que vai conter o valor do 
+    identificador que deve ser levado até o controller. Mas para que essa expressão 
+    contenha o valor do identificador, foi usado um recurso do Thymeleaf para captura-lo 
+    a partir da variável d e atribui-lo a expressão. Esse recurso é (id=${d.id}) onde id 
+    é a variável que representa o valor da expressão {id}. E essa variável é atribuída 
+    pelo valor da variável ${d.id}.
+
+    Já o th:action, th:object e th:field têm seu uso descrito logo a seguir:
+
+    <form th:action="@{/departamentos/salvar}" 
+        th:object="${departamento}" method="POST">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="nome">Departamento</label>
+                <input th:field="*{nome}" type="text" id="nome" />
+            </div>
+        </div>
+        <input type="hidden" id="id" th:field="*{id}"/>
+        <button type="submit" class="btn btn-primary>Salvar</button>
+    </form>
+
+    No formulário apresentado, o th:action e o th:object são incluídos na tag form. 
+    Já o th:field foi incluído nas tags de input.
+
+    No código a seguir, veja o uso do componente th:if.
+
+    <div th:if="${success} != null">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="oi oi-check"></i>
+        <span>
+            <strong th:text="${success}"></strong> 
+        </span>
+        </div>
+    </div>
+
+    Este componente recebe como valor a variável success, envida pelo controller. 
+    O th:if testa então se a condição ${success != null} é verdadeira. 
+    Caso seja, o <div> será incluído na página. Caso a condição seja falsa,
+    o <div> não será incluído na página. Ou seja, o th:if garante que a tag só 
+    seja visível na página se a condição for verdadeira, caso contrário o <div> 
+    será omitido.
