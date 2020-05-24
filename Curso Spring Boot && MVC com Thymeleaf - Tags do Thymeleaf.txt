@@ -1,0 +1,222 @@
+https://spring.io/guides/gs/caching/
+
+
+Tags do Thymeleaf
+-----------------
+
+. th:action 
+
+    Exemplo: 
+    
+        <form action="#" th:action="@{/greeting}" th:object="${greeting}" method="POST">
+            <p>Id: <input type="text" th:field="*{id}" /></p>
+            <p>Message: <input type="text" th:field="*{content}" /></p>
+            <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+        </form>
+
+
+    Responsável por chamar uma URL quando o formulário for submetido
+
+.  th:object
+
+    Exemplo: <form action="#" th:action="@{/greeting}" th:object="${greeting}" method="post">
+
+    Responsável por encapsular os campos do formulário num objeto e enviá-lo quando
+    o formulário for submetido. 
+
+    Importante: Para evitar erro na chamada da URL que irá abrir a página inicial, por exemplo:
+
+                http://localhost:8080/greeting
+
+                Quando usarmos a tag th:object devemos colocar na assinatura do método do controller 
+                o objeto equivalente ao colocado no th:object, por exemplo:
+
+                @GetMapping("/greeting")
+                public String greetingSubmit(Greeting greeting) {
+                    return "greeting";
+                }
+
+
+
+
+
+
+th:each - sua função é executar uma instrução de foreach sobre uma variável 
+            que tem como valor uma lista de dados.
+e
+th:text - usado para exibir valores nas páginas.
+
+    Exemplo:
+
+    . Uma chamada para o controller "listar":
+
+    <li class="nav-item"><a class="nav-link"
+        href="/departamentos/listar"> <i class="oi oi-spreadsheet"></i>
+            <span>Listar </span>
+    </a></li>
+
+    . O controller gera uma lista de objetos, deixa armazenado na sessão e chama a página lista.html:
+
+	@GetMapping("/listar")
+	public String listar(ModelMap model) {
+		model.addAttribute("departamentos", service.buscarTodos());
+		
+		return "/departamento/lista";
+	}
+
+    . A página lista pega a lista de objetos da sessão e lista através da tag th:each:
+
+    <tr th:each="d : ${departamentos}">
+        <td th:text="${d.id}">3</td>
+        <td th:text="${d.nome}">Administração</td>
+        <td colspan="2">
+            <a class="btn btn-info btn-sm" th:href="@{/departamentos/editar/{id} (id=${d.id}) }" role="button">
+                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+            </a>
+            <button th:id="${'btn_departamentos/excluir/' + d.id}" type="button" class="btn btn-danger btn-sm"
+                    data-toggle="modal" data-target="#myModal">
+                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+            </button>
+        </td>
+
+
+. th:field
+
+    Exemplo: <input type="text" th:field="*{id}" />
+
+    th:field informa em qual atributo o objeto model irá parar o valor do "input text"
+
+    Para que as tags th:object e th:field funcionem corretamente é necessário que na assinatura
+    do método do controller exista a annotation @ModelAttribute como abaixo:
+
+        @PostMapping("/greeting")
+        public String greetingSubmit(@ModelAttribute Greeting greeting) {
+            return "result";
+        }    
+
+        ou
+
+        @PostMapping("/greeting")
+        public String greeting(@RequestParam(name = "content", required = false, defaultValue = "World") String content,
+                                @RequestParam(name= "id", required = false, defaultValue = "0" ) Long id,
+                Model model) {
+            
+            Greeting greeting = new Greeting();
+            
+            greeting.setContent(content);
+            greeting.setId(id);
+            
+            model.addAttribute("greeting", greeting);
+            return "result";
+        }
+
+    th:if - util para realizar algum tipo de teste condicional do tipo se.
+
+    Exemplo:
+
+        A página de cadastro ao realizar a edição do cadastro chamará a url de gravar, ou insersão:
+
+        <div th:replace="fragments/alert">
+        </div>
+
+        <form 	th:action="${departamento.id == null} ?  @{/departamentos/salvar} : @{/departamentos/editar}" 
+                th:object="${departamento}" method="POST">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="nome">Departamento</label>
+                    <input type="text" class="form-control" id="nome"
+                            placeholder="Nome Departamento" autofocus="autofocus" th:field="*{nome}"/>
+                </div>
+            </div>
+            <input type="hidden" id="id" th:field="*{id}"/>
+            <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+        </form>
+
+
+        Após a gravação das informações, atualizamos a informação de sucesso numa váriavel de sessão,
+        logo em seguida é chamado novamente a página de edição para uma nova ocorrência. Observe o th:replace
+        que informará o resultado da operação, neste caso "...salvo com sucesso":
+
+        @PostMapping("/salvar")
+        public String salvar(@ModelAttribute Departamento departamento, RedirectAttributes attr) {
+
+            try {
+                service.salvar(departamento);
+                
+                attr.addFlashAttribute("success", "Departamento salvo com sucesso.");
+            }catch( Exception e) {
+                e.printStackTrace();
+            }
+            
+            return "redirect:/departamentos/cadastrar";
+        }
+
+        O th:replace utilizará o pedaço de código abaixo para utilizar no th:replace da página de edição:
+
+        <div th:if="${success} != null">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="oi oi-check"></i>
+            <span>
+                <strong th:text="${success}"></strong> 
+            </span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+        </div>
+
+    https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#setting-value-to-specific-attributes
+    http://itutorial.thymeleaf.org/
+    https://spring.io/guides/gs/handling-form-submission/
+    https://spring.io/guides/gs/serving-web-content/    
+
+    . URLs
+
+        https://www.thymeleaf.org/doc/articles/standardurlsyntax.html
+
+        . URLs Absolutas
+
+            A URL começa com (http:// or https://), por exemplo:
+
+                <a th:href="@{http://www.thymeleaf/documentation.html}">
+
+                // Equivale
+
+                <a href="http://www.thymeleaf/documentation.html">
+
+        . URLs com contexto relativo
+
+            São URLs que pressupõe o contexto inicial do servidor web onde está 
+            publicado a aplicação, por exemplo:
+
+                <a th:href="@{/order/list}">
+
+                // Equivale
+
+                <a href="/myapp/order/list"> 
+
+
+            O contexto relativo poderia ser http://localhost:8080/myapp/order/list no 
+            caso do Thymeleaf
+
+        . Passando parâmetros
+
+            <a th:href="@{/order/details(id=3)}">
+
+            // Equivale
+
+            <a href="/order/details?id=3">
+
+            ou
+
+            <a th:href="@{/order/{id}/details(id=3,action='show_all')}">
+
+            // Equivale
+
+            <a href="/order/3/details?action=show_all">
+
+
+
+        
+
+
