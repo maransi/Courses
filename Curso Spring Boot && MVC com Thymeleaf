@@ -3301,3 +3301,380 @@ Aulas 36 a 42 - Departamento Controller & View
     o <div> não será incluído na página. Ou seja, o th:if garante que a tag só 
     seja visível na página se a condição for verdadeira, caso contrário o <div> 
     será omitido.
+
+
+
+Aulas 43 a 48 - Cargo - Controller e View
+-----------------------------------------
+
+Convertendo objetos
+
+Algumas vezes ao trabalhar com o Spring MVC será necessário converter alguns 
+tipos de objetos que são enviados da página para o controller. Podemos dizer 
+que existem dois tipos de objetos, os objetos simples e os complexos. Objetos 
+simples são aqueles como String, Long, Integer, entre outros, onde apenas se 
+atribuí um único valor. Já objetos complexos são aqueles que contém outros 
+objetos internamente, como as classes de entidades. Classes de entidades podem 
+ter objetos simples na forma de atributos como também, objetos complexos.
+
+Na classe Cargo, além do id (Long) e nome (String), temos um objeto complexo 
+que é o Departamento. Outra classe de entidade que possui internamente 
+outros tipos de objetos.
+
+Sendo assim, veja o código a seguir que exemplifica na página a criação de 
+um combobox no formulário para cadastro de cargos:
+
+    <form th:action="${@{/cargos/editar}" th:object="${cargo}" method="POST">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="nome">Nome do Cargo</label>
+                <input type="text" id="nome" th:field="*{nome}"/>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="departamento">Departamento</label>
+                <select id="departamento" class="form-control" th:field="*{departamento}">
+                    <option value="">Selecione</option>
+                    <option th:each="d : ${departamentos}" 
+                            th:value="${d.id}" th:text="${d.nome}"></option>
+                </select>
+            </div>
+        </div>
+        <input type="hidden" id="id" th:field="*{id}"/>
+        <button type="submit">Salvar</button>
+    </form>
+
+O código contido na tag select representa a criação do combobox 
+que vai listar os departamentos cadastrados. Nessa tag temos o 
+componente th:field que deverá enviar para o controller um objeto 
+departamento como parte do objeto cargo. Porém, em o componente do 
+Thymeleaf th:value foi setado com o valor d.id, ou seja, com o valor 
+do identificador do departamento selecionado no combobox.
+
+Esse id acaba sendo enviado pelo formulário para o controller, porém, o 
+controller espera por um objeto departamento. Nesse caso, a operação vai 
+resultar em um exceção com a mensagem a seguir:
+
+    Field error in object 'cargo' on field 'departamento': rejected value [2]; 
+    codes [typeMismatch.cargo.departamento,
+    typeMismatch.departamento,
+    typeMismatch.com.mballem.curso.boot.domain.Departamento,
+    typeMismatch]; 
+    arguments [org.springframework.context.support.DefaultMessageSourceResolvable: 
+    codes [cargo.departamento,departamento]; arguments []; 
+    default message [departamento]]; 
+    default message [Failed to convert property value of type 'java.lang.String' to 
+                     required type 'com.mballem.curso.boot.domain.Departamento' 
+                     for property 'departamento'; 
+    nested exception is java.lang.IllegalStateException: 
+    Cannot convert value of type 'java.lang.String' to required 
+    type 'com.mballem.curso.boot.domain.Departamento' 
+    for property 'departamento': no matching editors or conversion strategy found]
+
+Esta exceção está dizendo que ouve um erro na operação, já que a operação esperava por 
+um objeto departamento sendo enviado para cargo, porém recebeu um objeto String. 
+Este objeto String é o valor do id selecionado no combobox.
+
+Para resolver este erro, o Spring fornece a interface 
+org.springframework.core.convert.converter.Converter para que possamos 
+trabalhar na conversão do id em um departamento. Esta interface deve ser 
+implementada em um classe, a qual o Spring vai interceptar toda 
+vez que CargoController for acessado por uma requisição:
+
+    <code>@Component
+    public class StringToDepartamentoConverter implements Converter<String, Departamento> {        
+        @Autowired
+        private DepartamentoService service;
+    
+        @Override
+        public Departamento convert(String text) {
+            if (text.isEmpty()) {
+                return null;
+            }
+            Long id = Long.valueOf(text);
+            return service.buscarPorId(id);
+        }    
+    }
+    </code>
+
+A classe StringToDepartamentoConverter implementa a interface Converter e como valor 
+genérico essa interface recebe um String e um Departamento. O Spring é para informar 
+o tipo de dado que será recebido da página. No caso, o id vem da página na forma de 
+um String. Já o Departamento é para informar qual o tipo de dado que será criado 
+após a conversão.
+
+No método convert(), da interface Converter, o argumento de sua assinatura é o valor 
+recebido da página. Aquele selecionado lá no combobox.
+
+Para realizar a conversão precisamos primeiro transformar o valor de text 
+em um Long, para então, usar o valor do id selecionado na página como parâmetro 
+da consulta que vai localizar no banco de dados o departamento referente a este 
+identificador.
+
+Para realizar a consulta no banco vamos trabalhar com a injeção de interface 
+DepartamentoService para acessar o método buscarPorId(). O retorno desta operação 
+será um objeto departamento que vai então ser atribuído ao objeto cargo esperado 
+pelo controller. Assim, não haverá nenhum erro na operação de cadastro de um cargo.
+
+. Expressão utilitária do Thymeleaf
+
+O Thymeleaf possui uma lista de expressões utilitárias as quais têm vários 
+métodos que podem ser usados nas páginas para vários tipos de operações como 
+formatação, concatenação, entre outros.
+
+Um exemplo desse tipo de expressão é a #strings a qual pode ser usada para 
+concatenar textos, como o exemplo a seguir:
+
+<button th:id="${#strings.concat('btn_cargos/excluir/', c.id)  }">
+    <span class="oi oi-circle-x" aria-hidden="true"></span>
+</button>
+
+Veja no componente th:id que a expressão #strings foi adicionada dentro da 
+expressão ${}. Assim, você terá acesso a uma lista de métodos para manipulação 
+de strings, muito similares aqueles da classe java.lang.String.
+
+No caso apresentado, o método utilizado foi o concat(), para realizar a 
+concatenação da URL com o valor do identificador. Cada string deve ser adicionada 
+como um parâmetro do método concat() e dessa forma, os parâmetro serão 
+concatenados em uma única string.
+
+Para conhecer mais métodos utilitários da expressão #string, acesse a 
+documentação do Thymeleaf:
+
+Strings - https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#strings
+
+
+
+
+Aulas 49 a 56 - Funcionario: Controller and View
+------------------------------------------------
+
+Para trabalharmos com o formulário de cadastro de funcionários será necessário adicionar 
+no lado servidor da aplicação três conversores de dados. Um deles, será para o identificador 
+do cargo selecionado no combobox. Esse identificador deve ser convertido em um objeto 
+do tipo Cargo para que o Spring MVC insira esse cargo como valor da variável cargo da 
+classe Funcionario. E assim, o método salvar() de FuncionarioController vai poder 
+receber os dados do formulário encapsulados na variável funcionario.
+
+Para realizar essa conversão se pode usar a interface Converter do pacote 
+org.springframework.core.convert.converter.Converter, como exemplificado a seguir:
+
+    @Component
+    public class StringToCargoConversor implements Converter {    
+        @Autowired
+        private CargoService service;
+                
+        @Override
+        public Cargo convert(String text) {
+            if (text.isEmpty()) {
+                return null;
+            }
+            Long id = Long.valueOf(text);
+            return service.buscarPorId(id);
+        }
+    }
+
+Analisando o código podemos verificar que:
+
+@Component - transforma a classe em um bean do Spring, assim, por meio da interface 
+Converter o Spring MVC reconhece esse bean e o utiliza para realizar a conversão.
+
+Converter - esta interface fornece o método convert() para implementarmos as regras 
+da conversão de tipos. O String, como genérico, representa o tipo de dado que está 
+chegado na classe. Já o Cargo indica qual o tipo de dado que deve ser o resultado 
+deste processo.
+
+@Autowired - usada para injetar a dependência CargoService, a qual será necessário 
+para retornar um objeto cargo por meio do id recebido da página.
+
+convert() - é o método que contém a lógica de conversão de tipos. Ele recebe o valor 
+enviado pela página, na forma de um String, e deve retornar um cargo. Para se obter 
+esse retorno, usamos o método buscarPorId() da da interface UsuarioService.
+
+A partir do processo apresentado o Spring MVC consegue ter acesso ao objeto cargo 
+selecionado pelo usuário no combobox da página de cadastro. A interface Converter 
+pode ser usada para a conversão de qualquer tipo de dado, como exemplo, de String 
+para LocalDate, de String para BigDecimal, de String para Calendar, entre outros.
+
+Outros três campos do formulário vão precisar de um processo de conversão, são eles, 
+os campos para o cadastro de salário, data de entrada e da data de saída. Estes campos 
+enviam um tipo String para o controller, porém, a classe Funcionario espera por um 
+tipo BigDecimal para o salário e LocalDate para as datas.
+
+Para essas situações a interface Converter serviria perfeitamente para se criar 
+as regras de conversões entre estes tipos de dados. Entretanto, o Spring fornece 
+duas anotações especificas para essas conversões referentes ao salários e as datas. 
+As anotação são:
+
+@NumberFormat - usada para converter valores inseridos na página que deve ser 
+transformados em objetos de domínio que representam tipos monetários, porcentagens e 
+outros tipos de números em geral.
+
+@DateTimeFormat - transformar e formatar uma data envida pela página em objetos 
+java.time.LocalDate, java.util.Date e java.util.Calendar.
+
+Essas anotações devem ser incluídas nas variáveis de destino dos valores enviados pelo 
+formulário. No caso do formulário de funcionários, as anotações devem ser incluídas na 
+classe Funcionario sobre as devidas variáveis de instancia, como o exemplo a seguir:
+
+    public class Funcionario {
+        
+        @NumberFormat(style = Style.CURRENCY, pattern = "#,##0.00")
+        private BigDecimal salario;
+        
+        @DateTimeFormat(iso = ISO.DATE)
+        private LocalDate dataEntrada;
+        
+        @DateTimeFormat(iso = ISO.DATE)
+        private LocalDate dataSaida;    
+    }
+
+Observe que a anotação @NumberFormat tem dois atributos internos. O style recebe o 
+tipo de formato desejado que pode ser: Style.CURRENCY, Style.NUMBER e Style.PERCENT. 
+Já o atributo pattern é para se definir o padrão de formatação do valor desta variável 
+após a conversão.
+
+Nos campos de datas a @DateTimeFormat possui o atributo iso. Este atributo vai indicar 
+a conversão o formato desejado da data. As opções são ISO.DATE, para data; ISO.DATE_TIME; 
+para data e hora e ISO.TIME para hora.
+
+Com a simples inclusão destas anotações sobre os atributos da classe Funcionario, o 
+processo de conversão estará ativado e o Spring MVC vai converter os valores 
+enviados pelo formulário.
+
+
+Formatando dados na página
+
+Algumas vezes você pode querer formatar os valores que serão exibidos na página. 
+O Thymeleaf fornece alguns recursos para isso. Um exemplo interessante que pode ser 
+citado é o de formatação de valores monetários. O Thymeleaf exibe estes valores no 
+formato americano (4050.60 ou 4,050.60), mas você pode alterar este comportamento 
+usando uma simples expressão como está: ${‌{valor}}
+
+Ao fazer uso dessa expressão o valor monetário informado vai ser automaticamente exibido 
+na página com o formato local onde a aplicação está instalada. Se ela estiver rodando no 
+Brasil, o formato será o brasileiro (4.050,60), se estiver rodando na Alemanha o 
+formato será o alemão.
+
+Só que algumas vezes, uma aplicação feita para brasileiros pode estar rodando em uma 
+nuvem ou servidor fora do Brasil e assim, o formato final da expressão seria o do local 
+referente a nuvem ou ao servidor. Então, seria necessário definir um padrão Locale na 
+aplicação, para que ele seja usado independentemente do local em que a aplicação 
+está instalada.
+
+Este Locale pode ser incluído como um bean na própria classe de inicialização do 
+Spring Boot, como no exemplo a seguir:
+
+    @SpringBootApplication  
+    public class DemoMvcApplication {        
+    public static void main(String[] args) {  
+        SpringApplication.run(DemoMvcApplication.class, args);  
+    }  
+        
+    @Bean  
+    public LocaleResolver localeResolver(){  
+        return new FixedLocaleResolver(new Locale("pt", "BR"));  
+    }  
+
+
+Veja que o método localeResolver retorna um Locale configurado com o padrão pt_br 
+o qual vai indicar o formato final dos valores monetários após a formatação.
+
+O uso da declaração do Locale em Pt-Br também evita erros durante a conversão 
+de dados. Por exemplo, se a mascara do componente de salário na página for no 
+formato monetário do Brasil, mas o seu sistema operacional não está no idioma 
+Português, a conversão irá gerar um erro devido o formato da mascara. 
+Para evitar o erro, a mascara deve estar no formato monetário padrão do 
+idioma do sistema operacional. Se o sistema operacional for o Windows em 
+Inglês a mascara deve estar no formato americano, se estiver no formato 
+brasileiro um erro será lançado.
+
+Isso porque, o Spring Boot usa o Locale conforme o idioma do Sistema Operacional. 
+Para usar a mascara no formato monetário brasileiro é necessário então, 
+configurar o Locale neste formato, como mostrado no código acima. Isso 
+também é útil para componentes de datas que estejam apresentando a data 
+no formato americano. Ao configurar o Locale para Pt-br a data será 
+exibida no padrão brasileiro.
+
+Podemos também concatenar valores monetários que são exibidos na página com o 
+tipo de moeda que este valor representa. Para isso, declaramos no componente 
+th:text um par de pipes com uma string, contento o tipo de moeda mais 
+a expressão de formatação:
+
+    <p th:text="|R$ ${‌{valor}}|"/>
+
+O resultado seria: R$ 4.050,60
+
+Para as datas o padrão de saída do Thymeleaf também é o americano (2017/11/20), 
+sendo assim, para exibir na página uma data com o formato brasileiro (20/11/2017) 
+será necessário trabalhar com uma formatação.
+
+Na classe Funcionario existem dois campos do tipo java.time.LocalDate. 
+Este tipo de dado utiliza a expressão utilitária #temporals do Thymeleaf. 
+
+Veja no exemplo a seguir:
+
+<p th:text="${#temporals.format(f.dataEntrada, 'dd/MM/yyyy')}" />
+
+A expressão é incluída como valor da expressão ${} e fornece o método format() 
+para o processo de formatação. O método em questão recebe dois parâmetros. 
+O primeiro é o valor da data e o segundo é o formato ao qual a 
+expressão #temporals deve formata-lo.
+
+Ressaltando que o #temporals só trabalha com objetos de datas derivados do 
+pacote java.time. Tipos como java.util.Date ou java.util.Calendar podem ser 
+formatados com a expressão ${‌{}}, onde o Locale será levado em consideração 
+para a formatação final.
+
+Editando funcionários
+
+Algo que devemos dar atenção no formulário de funcionários é a parte 
+referente ao endereço. Como temos um relacionamento 1:1 no banco de dados, 
+entre funcionários e endereços, e estamos usando o mesmo formulário para 
+salvar ambos os dados, no processo de atualização é importante enviar 
+de volta ao controller não só o identificador do funcionário que está 
+sendo alterado como também o identificador do endereço.
+
+Caso o o identificador do endereço não seja enviado para o controller, 
+o Hibernate não vai identificar este endereço na base de dados e então 
+vai concluir que é um novo endereço e assim, o insere novamente. 
+Esse processo vai gerar uma nova linha na tabela de endereços.
+
+Na Aula 52, onde trabalhos com a operação de update de funcionários, 
+incluímos a seguinte instrução para enviar o identificador do funcionário 
+ao controller após submeter o formulário:
+
+<input type="hidden" id="id" th:field="*{id}"/>
+
+O mesmo processo deve ser realizado para também enviar o identificador 
+do endereço:
+
+    <input type="hidden" id="endereco.id" th:field="*{endereco.id}"/>
+
+Dessa forma, quando houver uma operação de update, sendo o endereço 
+editado ou não, garantimos que não será adicionada uma nova linha na 
+tabela de endereços. Caso essa instrução não seja incluída, a 
+cada submissão do formulário em uma operação de update, teremos 
+um novo endereço salvo no banco.
+
+Sendo assim, não deixe de incluir tal instrução na página 
+templates/funcionario/cadastro.html.
+
+    <form th:action="${funcionario.id == null} ? @{/funcionarios/salvar} : @{/funcionarios/editar}" 
+        th:object="${funcionario}" method="POST">
+            <!-- código omitido -->
+        <input type="hidden" id="id" th:field="*{id}"/>
+        <input type="hidden" id="endereco.id" th:field="*{endereco.id}"/>
+        <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+    </form>
+
+Saiba mais sobre o Thymeleaf:
+
+Data Conversion / Formatting - 
+https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#data-conversion-formatting
+
+Literal substitutions - 
+https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#literal-substitutions
+
+Module for Java 8 Time API compatibility - 
+https://github.com/thymeleaf/thymeleaf-extras-java8time
+
