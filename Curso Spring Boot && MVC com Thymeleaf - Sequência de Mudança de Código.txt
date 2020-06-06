@@ -1,0 +1,297 @@
+Sequência de Mudança de Código
+------------------------------
+
+1. Acessar o arquivo cadastro.html e alterar a div cadastro como abaixo:
+
+    . Alteração dos campos do formulário cadastro.html:
+
+	        <div class="container" id="cadastro">
+	        	<div th:replace="fragments/alert">
+	        	</div>
+
+                <!-- Alterar os atributos action para th:action e incluir th:object -->
+
+                <form th:action="${cargo.id == null} ? @{/cargos/salvar} : @{/cargos/editar}" 
+                        th:object="${cargo}" method="POST">
+	                <div class="form-row">
+	                    <div class="form-group col-md-6">
+	                        <label for="nome">Nome do Cargo</label>
+
+                            <!-- Substituir os atributos name e value por th:field -->
+
+	                        <input type="text" 
+                                    class="form-control" 
+                                    id="nome" placeholder="Nome Cargo" 
+                                    autofocus="autofocus"
+	                                th:field="*{nome}"/>
+	                    </div>
+
+	                    <div class="form-group col-md-4">
+	                        <label for="departamento">Departamento</label>
+                            
+                            <!-- Substituir o atributo name por th:field="*{departamento}" -->
+
+	                        <select id="departamento" class="form-control" th:field="*{departamento}">
+	                            <option value="">Selecione</option>
+
+                                <!-- Substituir text por th:each="d : ${departamentos}" 
+                                                        th:value="{d.id}"  
+                                                        th:text="${d.nome}" -->
+
+	                            <option th:each="d : ${departamentos}" 
+                                        th:value="${d.id}" 
+                                        th:text="${d.nome}">Administração</option>
+	                        </select>
+	                    </div>
+	                </div>
+
+                    <!-- Insirir o th:field no lugar do atributo value -->
+	                <input type="hidden" id="id" name="id" th:field="*{id}"/>
+	                <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+	            </form>
+	        </div>
+
+2. Acessar o controller CargoController.java e implementar os códigos abaixo:
+
+        . Alterar a classe controller como abaixo:
+
+            package com.mballem.curso.boot.web.controller;
+
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.stereotype.Controller;
+            import org.springframework.web.bind.annotation.GetMapping;
+            import org.springframework.web.bind.annotation.RequestMapping;
+
+            import com.mballem.curso.boot.service.CargoServiceImpl;
+            import com.mballem.curso.boot.service.DepartamentoServiceImpl;
+
+            @Controller
+            @RequestMapping("/cargos")
+            public class CargoController {
+
+                // Incluir as classes services abaixo
+
+                @Autowired
+                private CargoServiceImpl cargoService;
+                
+                // Incluir as classes services abaixo
+                
+                @Autowired
+                private DepartamentoServiceImpl departamentoService;
+                
+                public CargoController() {
+                    // TODO Auto-generated constructor stub
+                }
+
+                // Colocar o objeto Cargo na assinatura do método
+
+                @GetMapping("/cadastrar")
+                public String cadastrar(Cargo cargo) {
+                    return "/cargo/cadastro";
+                }
+                
+                // Alterar o metodo listar pelo abaixo
+
+                @GetMapping("/listar")
+                public String listar(ModelMap model) {
+                    model.addAttribute("cargos", cargoService.buscarTodos());
+                    
+                    return "/cargo/lista";
+                }
+
+                // Insira o metodo salvar como abaixo
+
+                @PostMapping("/salvar")
+                public String salvar( Cargo cargo, RedirectAttributes attr) {
+                    try {
+                        cargoService.salvar(cargo);
+                        
+                        attr.addFlashAttribute("success", "Cargo inserido com sucesso.");
+                    } catch( Exception e) {
+                        attr.addFlashAttribute("fail", "Ocorreu o seguinte erro ( " + e.getMessage() + " )");
+                    }
+                    
+                    return "redirect:/cargos/cadastrar";
+                }
+
+                // Insira o metodo preEditar como abaixo
+
+                @GetMapping("/editar/{id}")
+                public String preEditar( @PathVariable("id") Long id, ModelMap model ) {
+                    try {
+                        model.addAttribute("cargo", cargoService.buscarPorId(id));
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    
+                    return "/cargo/cadastro";
+                }
+
+                // Incluir o métod excluir como abaixo
+
+                @GetMapping("/excluir/{id}")
+                public String excluir(@PathVariable("id") Long id, ModelMap model) {
+                    
+                    try {
+                        if (cargoService.departamentoTemFuncionario(id)) {
+                            model.addAttribute("fail", "Cargo não removido. Possui departamento(s) vinculado(s).");
+                        } else {
+                            cargoService.excluir(id);
+                        
+                            model.addAttribute("success", "Cargo excluído com sucesso.");
+                        }
+
+                    }catch( Exception e ) {
+                        e.printStackTrace();
+                    }
+                    
+                    return listar(model);
+                }
+
+                // Insira o método editar como abaixo
+                
+                @PostMapping("/editar")
+                public String editar( Cargo cargo, RedirectAttributes attr ) {
+                    try {
+                        cargoService.editar(cargo);
+                        
+                        attr.addFlashAttribute("success", "Cargo editado com sucesso.");
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    
+                    return "redirect:/cargos/cadastrar";
+                }
+
+
+                // Insira o método abaixo
+
+                @ModelAttribute("departamentos")
+                public List<Departamento> listaDeDepartamentos(){
+                    return departamentoService.buscarTodos();
+                }
+
+
+            }
+
+        . Incluir a classe Converter abaixo:
+
+            
+            // Dentro da tag <form th:action="@{/cargos/salvar}" th:object="${cargo}" method="POST">
+            // existe a informação do objeto th:object que deverá ser empacotado as informações
+
+            // Dentro da Classe Cargo existe o atributo Cargo.Departamento. Porém, o que vem
+            // para o método CargoController.salvar( Cargo cargo ) não é o objeto Departamento e 
+            // sim o id registrado na tag HTML:
+            //                  <option th:each="d : ${departamentos}" 
+            //                          th:value="${d.id}" 
+            //                          th:text="${d.nome}">Administração</option>            
+
+            // Esta classe tem a missão de transformar o id da tag HTML option 
+            // para um objeto valido dentro do método CargoController.salvar(...)
+
+            package com.mballem.curso.boot.web.controller;
+
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.core.convert.converter.Converter;
+            import org.springframework.stereotype.Component;
+
+            import com.mballem.curso.boot.domain.Departamento;
+            import com.mballem.curso.boot.service.DepartamentoServiceImpl;
+
+            @Component
+            public class StringToDepartamentoConverter implements Converter< String, Departamento > {
+
+                @Autowired
+                DepartamentoServiceImpl departamentoService;
+                
+                public StringToDepartamentoConverter() {
+                    // TODO Auto-generated constructor stub
+                }
+
+                @Override
+                public Departamento convert(String text) {
+                    if (text.isEmpty()) {
+                        return null;
+                    }
+                    
+                    try {
+                        Long id = Long.valueOf(text);
+                        
+                        return departamentoService.buscarPorId(id);
+                    } catch( Exception e) {
+                        e.printStackTrace();
+                        
+                        return null;
+                    }
+                }
+
+            }
+
+3. Alteração no HTML lista.html
+
+    . Altere a div de listagem e deixe desta maneira:
+
+	        <div class="container" id="listagem">
+				<div th:replace="fragments/alert"></div>
+
+	            <div class="table-responsive">
+	                <table class="table table-striped table-hover table-sm">
+	                    <thead>
+	                    <tr>
+	                        <th>#</th>
+	                        <th>Cargo</th>
+	                        <th>Departamento</th>
+	                        <th>Ação</th>
+	                    </tr>
+	                    </thead>
+	                    <tbody>
+
+                        <!-- Insira os attributos th:each th:text -->
+
+	                    <tr th:each="c : ${cargos}">
+	                        <td th:text="${c.id}">1</td>
+	                        <td th:text="${c.nome}">Auxiliar Contábil</td>
+	                        <td th:text="${c.departamento.nome}">Contabilidade</td>
+	                        <td colspan="2">
+
+                                <!-- Alterar o atributo href pelo th:href  -->
+
+	                            <a class="btn btn-info btn-sm" th:href="@{/cargos/editar/{id} (id=${c.id}) }" role="button">
+	                                <span class="oi oi-brush" title="Editar" aria-hidden="true"></span>
+	                            </a>
+
+                                <!-- inserir o atributo th:id -->
+
+	                            <button th:id="${#strings.concat('btn_cargos/excluir/', c.id) }" 
+	                            		type="button" 
+                                        class="btn btn-danger btn-sm" 
+                                        data-toggle="modal" 
+                                        data-target="#myModal">
+	                                <span class="oi oi-circle-x" title="Exclusão desabilitada" aria-hidden="true"></span>
+	                            </button>
+	                        </td>
+	                    </tr>
+	                    </tbody>
+	                </table>
+	            </div>
+	        </div>
+
+	        <div th:replace="fragments/modal :: modal"></div>
+
+
+    . Inclua o método cargoTemFuncionario na classe CargoServiceImpl
+
+        public boolean cargoTemFuncionario(Long id) {
+            try {
+                if (buscarPorId(id).getFuncionarios().isEmpty() )
+                    return false;
+            } catch( Exception e) {
+                e.printStackTrace();
+            }
+            
+            return true;
+        }
+

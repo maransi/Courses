@@ -257,7 +257,7 @@
     sudo mv spring-tool-suite-3.9.9*.tar-gz eclipse-sts
 	sudo chmod 777 eclipse-sts -R
 
-. Criar um lançador no desktop com o Eclipse STS
+. Criar um lançador na pasta /usr/share/applications/eclipse.desktop 
 
 	[Desktop Entry]
 	Type=Application
@@ -269,6 +269,10 @@
 	Categories=Development;IDE;Java;
 	StartupWMClass=STS
 	
+. Torne o app executável:
+
+	sudo chmod +x /usr/share/applications/eclipse.desktop
+
 . Instalação de PlugIn no Eclipse:
 
 	. Acesse Help -> Install New Software
@@ -278,6 +282,22 @@
 		ou "https://github.com/thymeleaf/thymeleaf-extras-eclipse-plugin"
 
 
+	. Add...
+	. No "Name" insira "Emmet"
+	. No "Location" insira "http://download.emmet.io/eclipse/updates/"
+
+
+. Acesse Windows -> Preferences -> Java -> Installed JREs -> Edit
+
+    Escolha a pasta onde encontra-se a instação do JRE
+
+. Acesse Windows -> Preferences -> General -> Key
+
+	Localize o item Match Pair Outword e apague o shortcut
+	Localize o item Delete Line e verifique se:
+	
+		Binding : Ctrl+D
+		When : Edit Text
 
 7. Instalação do VSCode:
 -----------------------
@@ -360,7 +380,7 @@ sudo tar xvfz PostmanCanary-linux-x64-7.7.0-canary02.tar.gz
 
 . Mover a pasta do postman para /opt
 
-. Criar no desktop o lançador abaixo
+. Criar no desktop o lançador abaixo na pasta /usr/share/applications/postman.desktop
 
 [Desktop Entry]
 Comment=
@@ -370,6 +390,9 @@ Exec=/opt/postman/PostmanCanary
 Type=Application
 Icon=/opt/postman/app/resources/app/assets/icon.png
 
+. Execute o comando abaixo:
+
+	sudo chmod +x /usr/share/applications/postman.desktop
 
 12. Instalaçao do PopCorn-Time
 
@@ -577,3 +600,8 @@ git config --global user.name "maransi"
 git config --global user.email "maransi"
 git config --list
 
+24. Instalação do speedtest-cli
+
+sudo apt-get install speedtest-cli
+speedtest-cli --list
+speedtest-cli --server 12838

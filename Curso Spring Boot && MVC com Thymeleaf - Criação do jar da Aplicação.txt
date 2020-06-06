@@ -1,0 +1,22 @@
+1. Acesse Windows -> Preferences -> Java -> Installed JREs -> Edit
+
+    Escolha a pasta onde encontra-se a instação do JRE
+
+2. Clique direito no nó principal do projeto e escolha a opção:
+
+    Run As... -> maven build
+
+3. Na tela "Edit Configuration", coloque nos campos:
+
+    Name:   demo-mvc - mvn package 
+    Goals:  package -e
+
+4. Clique no botão;
+
+    Apply -> Run
+
+5. Acesse as classes abaixo e retire a barra inicial de endereços URL, com excessão
+    das que são chamadas através de redirect:/...
+
+    MyErrorView ( deixar o modelAndView assim: ModelAndView model = new ModelAndView("error"); )
+    [all]Controller ( deixar os retornos dos metodos sem a barra inicial: return "cargo/cadastro"; )

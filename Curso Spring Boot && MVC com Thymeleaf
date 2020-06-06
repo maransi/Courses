@@ -3170,6 +3170,14 @@ Aulas 29 a 35 - Thymeleaf para as Views
             </body>
             </html>		
 
+
+${...} : Variable expressions.
+*{...} : Selection expressions.
+#{...} : Message (i18n) expressions.
+@{...} : Link (URL) expressions.
+~{...} : Fragment expressions.
+
+
 Aulas 36 a 42 - Departamento Controller & View
 ----------------------------------------------
 
@@ -3602,6 +3610,10 @@ a expressão de formatação:
 
     <p th:text="|R$ ${‌{valor}}|"/>
 
+    ou
+
+    <td th:text="${#numbers.formatCurrency(f.salario)}">0,00</td>
+
 O resultado seria: R$ 4.050,60
 
 Para as datas o padrão de saída do Thymeleaf também é o americano (2017/11/20), 
@@ -3677,4 +3689,504 @@ https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#literal-substitu
 
 Module for Java 8 Time API compatibility - 
 https://github.com/thymeleaf/thymeleaf-extras-java8time
+
+
+
+
+Aulas 57 a 62 - Validação no Back end
+-------------------------------------
+
+A validação back-end é a validação de dados no lado servidor da aplicação. Esse é 
+considerado o meio mais seguro de validação, já que, diferente de validação front-end, 
+baseada em JavaScript, pode ser burlada.
+
+No Java existe uma especificação para validação back-end a qual tem o nome de Bean 
+Validation. Esse tipo de validação é baseado em anotação incluídas nas classes de 
+entidades. Os atributos dessas classes são marcados com anotações do tipo @NotNull, 
+@NotBlank, @Size, entre outras. Para que Bean Validations trabalhe é necessário 
+incluir uma biblioteca que represente a implementação dessa especificação, 
+como exemplo, temos a Hibernate-Validator.
+
+. Bean Validation
+
+    Atualmente a Bean Validations está na versão 2.0 (JSR 380) a qual trouxe algumas novas 
+    anotações de validação como: @Email, @Positive, @PositiveOrZero, @PastOrPresent, 
+    entre outras que podem ser estudas no site Bean Validation mantido pela 
+    RedHat - http://beanvalidation.org
+
+    Quando usamos o Spring MVC a validação back-end pode ser facilmente integrada ao Bean 
+    Validation. Para isso, comece anotando os atributos de suas classes de entidades, 
+    como no exemplo a seguir:
+
+    @Entity
+    @Table(name = "CARGOS")
+    public class Cargo extends AbstractEntity<Long> {
+    
+        @NotBlank(message = "O nome do cargo é obrigatório.")
+        @Size(max = 60, message = "O nome do cargo deve conter no máximo 60 caracteres.")
+        @Column(name = "nome", nullable = false, unique = true, length = 60)
+        private String nome;
+        
+        @NotNull(message = "Selecione o departamento relativo ao cargo.")
+        @ManyToOne
+        @JoinColumn(name = "id_departamento_fk")
+        private Departamento departamento;
+        
+        @OneToMany(mappedBy = "cargo")
+        private List<Funcionario> funcionarios;
+    }
+
+    Veja que na classe Cargo os atributos nome e departamento foram marcados com as anotações da 
+    Bean Validation, que estão disponíveis no pacote javax.validation.constraints.*. 
+    Observando com atenção, se pode notar que essas anotações possuem alguns atributos como o 
+    message, para a inclusão da mensagem que será exibida ao usuário, max e min de limitam 
+    uma quantidade minima e máxima de caracteres permitidos para o atributo.
+
+    All of the annotations used in the example are standard JSR annotations:
+
+    @NotNull – validates that the annotated property value is not null
+    @AssertTrue – validates that the annotated property value is true
+    @Size – validates that the annotated property value has a size between the attributes 
+            min and max; can be applied to String, Collection, Map, and array properties
+    @Min – vValidates that the annotated property has a value no smaller than the value attribute
+    @Max – validates that the annotated property has a value no larger than the value attribute
+    @Email – validates that the annotated property is a valid email address
+
+    Some annotations accept additional attributes, but the message attribute is common to all 
+    of them. This is the message that will usually be rendered when the value of the respective 
+    property fails validation.
+
+    Some additional annotations that can be found in the JSR are:
+
+    @NotEmpty – validates that the property is not null or empty; can be applied to String, 
+                Collection, Map or Array values
+    @NotBlank – can be applied only to text values and validated that the property is 
+                not null or whitespace
+    @Positive and @PositiveOrZero – apply to numeric values and validate that they 
+                                    are strictly positive, or positive including 0
+    @Negative and @NegativeOrZero – apply to numeric values and validate that they are 
+                                    strictly negative, or negative including 0
+    @Past and @PastOrPresent – validate that a date value is in the past or the past 
+                                including the present; can be applied to date types 
+                                including those added in Java 8
+    @Future and @FutureOrPresent – validates that a date value is in the future, or 
+                                    in the future including the present
+
+    Diferentes anotações podem ter diferentes atributos, mas em todas elas teremos o atributo 
+    message para a inclusão da mensagem. Essa mensagem pode ser incluída literalmente com 
+    um valor string ou por chaves existentes em arquivos de propriedades. As mensagens possuem 
+    também uma mensagem padrão caso nenhum seja inserida na anotação.
+
+    Ao trabalhar com um arquivo de propriedades, estes arquivo deve ser nomeado como 
+    ValidationMessages.properties e estar inserido no classpath do projeto. 
+    Em um projeto Maven seria em src/main/resources.
+
+    Neste arquivo podemos trabalhar de duas formas. Uma delas é criar um padrão de mensagem para 
+    cada tipo de anotação. Por exemplo, se no arquivo for incluída a propriedade:
+
+        javax.validation.constraints.NotBlank.message = um valor é requerido.
+
+    O valor dessa propriedade será adicionada como mensagem em todas as anotações do tipo @NotBlank. 
+    Isso porque, a instrução como chave da propriedade aponta para essa anotação, já que é 
+    formada pelo nome do pacote, nome da anotação e nome do atributo de mensagem. Assim, seria 
+    necessário adicionar nas anotações @NotBlank o atributo message.
+
+    Ainda no arquivo de propriedades poderíamos criar mensagens especificas para cada atributo 
+    anotado na classe de entidade. Seria como adicionar nessas anotações o atributo message 
+    com a mensagem, porém, a mensagem estaria no arquivo de propriedades. Veja um exemplo:
+
+        NotNull.funcionario.cargo = Selecione um cargo.
+
+    Com a propriedade inserida no arquivo basta agora referencia-la na anotação da classe. 
+    Para isso, no atributo message insira a expressão "{}" com a chave da propriedade 
+    como valor da expressão:
+
+        @NotNull(message = "{NotNull.funcionario.cargo}")
+        private Cargo cargo;
+
+    Agora que você já sabe incluir regras de validação via anotações, é necessário integrar 
+    esse recurso ao Spring MVC. Esse passo é bastante simples. Nos métodos dos controllers, 
+    que recebem a submissão dos formulários, inclua a anotação @Valid ao lado do argumento 
+    que representa o objeto que está sendo enviado pelos formulário. Essa anotação é do 
+    pacote javax.validation.
+
+        @Controller
+        @RequestMapping("/cargos")
+        public class CargoController {
+            
+            @Autowired
+            private CargoService cargoService;
+        
+            @PostMapping("/salvar")
+            public String salvar(@Valid Cargo cargo, 
+                                BindingResult result, 
+                                RedirectAttributes attr) {
+                
+                if (result.hasErrors()) {
+                    return "/cargo/cadastro";
+                }
+                
+                cargoService.salvar(cargo);
+                attr.addFlashAttribute("success", "Cargo inserido com sucesso.");
+                return "redirect:/cargos/cadastrar";
+            }
+        }
+
+    No código apresentado, da classe CargoController, veja que o método salvar() tem 
+    como primeiro argumento  um objeto da classe Cargo. Ao lado esquerdo desse 
+    argumento foi adicionada a anotação @Valid. Agora, toda vez que o formulário 
+    de cargo for submetido ao método salvar() ele será validado pelas anotações 
+    dos atributos da classe Cargo.
+
+    Porém, caso algum campo do formulário não passe pela validação, será necessário 
+    exibir uma mensagem na página informando isso. Para esse processo temos o objeto 
+    BindingResult inserido como segundo argumento do método salvar(). Veja que no 
+    corpo do método há um teste condicional sobre a variável result. Essa variável 
+    fornece o método hasErros() que retorna um valor true caso algum campo do 
+    formulário não tenha passado na validação. Quando isso acontecer, o processo 
+    será um retorno de volta a página do formulário.
+
+    De volta a página é necessário então exibir as mensagens referentes aos campos 
+    que não passaram na validação. Este passo agora depende do Thymeleaf o qual 
+    fornece a expressão utilitária #fields. Esta expressão tem o método 
+    detailedErrors() que retorna uma lista contendo todas as mensagens referentes 
+    aqueles campos que não passaram na validação. Agora então, basta imprimir 
+    na página essas mensagens. Para isso, faça um foreach em detailedErrors() 
+    e imprima no componente th:text a variável message:
+
+        <div th:each="error : ${#fields.detailedErrors()}">
+            <span th:text="${error.message}"></span>
+        </div>
+
+    Este processo é interessante para exibir as mensagens de validação em um único 
+    bloco de mensagens. Mas caso queira exibi-las diretamente nos campos do 
+    formulário se pode usar o componente th:erros, sem precisar manipular o 
+    detailedErrors(), como mostra o exemplo a seguir:
+
+        <form th:action="@{/funcionarios/salvar}" th:object="${funcionario}" method="POST">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="nome">Nome do Funcionário</label>
+                    <input type="text" id="nome" th:field="*{nome}"/>
+                </div>    
+                <div class="invalid-feedback">
+                    <span th:errors="*{nome}"></span>
+                </div>
+            </div> 
+            <button type="submit">Salvar</button>
+        </form>
+
+. Spring Validator
+
+    Outra forma de validação back-end é o Spring Validator. Esse recurso é nativo 
+    do Spring e não tem vinculo com a especificação Bean Validation. Para fazer 
+    uso desse recurso é necessário criar uma classe que implemente a interface 
+    Validator do pacote org.springframework.validation.
+
+    A interface exige que sejam implementados dois métodos o supports() e o 
+    validate(). O primeiro tem como objetivo verificar que o objeto enviado 
+    pelo formulário é do mesmo tipo esperado pela classe de validação. Para isso, 
+    bastar incluir um teste simples de verificação como corpo do método:
+
+        @Override
+        public boolean supports(Class<?> clazz) {        
+            return Funcionario.class.equals(clazz);
+        }
+
+    Já o método validate() é onde a lógica de validação dos campos serão realizadas. 
+    O método tem dois argumentos, um do tipo Object que contém a variável 
+    enviada pelo formulário e outro do tipo Errors. Este objeto Errors será usado 
+    para lançar as mensagens de validação nos respectivos campos.
+
+        @Override
+        public void validate(Object object, Errors errors) {
+                
+            Funcionario f = (Funcionario) object;        
+                
+            if (f.getNome() == null) {
+                errors.rejectValue("nome", "O nome é obrigatório");
+            }        
+        
+        }
+
+    Veja que no método validate() a partir da variável object foi criada uma variável 
+    Funcionario por meio de um cast.  Agora é possível criar qualquer lógica de validação 
+    sobre os campos de Funcionario.  No exemplo apresentado temos um teste para verificar 
+    se o campo nome enviado pelo formulário está nulo. Caso esteja, usamos a variável 
+    errors para criar a mensagem de validação e avisar ao controller que um error ocorreu. 
+    Isso é feito pelo método rejectValue() o qual como primeiro parâmetro recebe o nome do 
+    campo validado e como segundo parâmetro a mensagem de validação.
+
+    Desta forma você pode criar qualquer tipo de teste ou lógica para validar qualquer 
+    campo do formulário. O Spring Validator também fornece um método para verificar se o 
+    campo do formulário está em branco ou se possui apenas espaços em branco.  
+    Veja um exemplo:
+
+        @Override
+        public void validate(Object object, Errors errors) {
+                
+            Funcionario f = (Funcionario) object;        
+                
+            ValidationUtils
+                .rejectIfEmptyOrWhitespace(errors, "nome", "Nome é obrigatório.");    
+        
+        }
+
+    As mensagens do Spring Validator podem também ser armazenadas em um arquivo de 
+    propriedades, mas este arquivo deve ser o messages.properties. E para carregar 
+    as mensagens basta substituir a string com a mensagem no método rejectValue() e 
+    rejectIfEmptyOrWhitespace() pela chave da propriedade.
+
+        errors.rejectValue("nome", "NotNull.funcionario.nome");
+
+    Para finalizar o processo com o Spring Validator é preciso dizer ao controller 
+    que ele deve usar a classe que implementou a interface Validator como validador 
+    do formulário. Para isso, insira no controller o método initBinder(), como 
+    no exemplo a seguir:
+
+        @Controller
+        @RequestMapping("/funcionarios")
+        public class FuncionarioController {        
+            @Autowired
+            private FuncionarioService funcionarioService;
+            
+            @InitBinder
+            public void initBinder(WebDataBinder binder) {
+                binder.addValidators(new FuncionarioValidator());
+            }
+        
+            @PostMapping("/salvar")
+            public String salvar(@Valid Funcionario funcionario, BindingResult result, RedirectAttributes attr) {
+                
+                if (result.hasErrors()) {
+                    return "/funcionario/cadastro";
+                }
+                
+                funcionarioService.salvar(funcionario);
+                attr.addFlashAttribute("success", "Funcionário inserido com sucesso.");
+                return "redirect:/funcionarios/cadastrar";
+            }
+        }
+
+    Veja que o método em questão foi marcado com a anotação @InitBinder. Esta 
+    anotação vai instruir o Spring a executar este método como o primeiro da 
+    classe. Assim, a classe FuncionarioValidator vai ser executada antes da 
+    requisição chegar ao método salvar().  Quando então a requisição chegar ao 
+    salvar() o Spring Validator já terá validado o formulário e em caso de 
+    algum campo não ter passado na validação o teste condicional do 
+    hasErrors() retornará true.
+
+
+
+Aulas 63 e 64 - Mensagens via messages.properties
+-------------------------------------------------
+
+
+. Nomeando os componentes do HTML
+
+    Um método bastante recomendado para incluir a descrição em componentes HTML como 
+    botões, colunas de tabelas, menos, entre outros, é por meio de um arquivo de 
+    propriedades. Desta forma, as descrições dos componentes ficam localizadas em 
+    um único ponto, facilitando assim a manutenção das páginas.
+
+    Mas é importante que as chaves das propriedades que contém as descrições dos 
+    componentes, sejam nomeadas de forma organizada, de modo que, o nome de 
+    cada propriedade remeta diretamente para o componentes referente.
+
+    Por exemplo, para nomear um componente da pagina funcionario.html, use o nome 
+    da página como parte da chave da propriedade, como também, usar o nome do 
+    componente que será nomeado irá ajudar bastante:
+
+    tabela.funcionario.col.nome = Nome
+
+    ou
+
+    funcionario.tabela.coluna.nome = Nome
+
+    Já no componente HTML da página será preciso incluir uma expressão do tipo
+    #{} com a chave da propriedade referente e essa expressão deverá ser incluída 
+    em um componente th:text do Thymeleaf:
+
+        <table>
+            <thead>
+                <tr>
+                    <th th:text="#{tabela.funcionario.col.nome}"></th>
+                    <th th:text="#{tabela.funcionario.col.salthario}"></th>    
+                    <th th:text="#{tabela.funcionario.col.departamento}"></>        
+                </tr>
+            </thead>
+            ...
+        </table>
+
+    Sobre arquivos de propriedades é importante destacar que eles não trabalham 
+    muito bem com caracteres especiais, entre eles, acentos e cê-cedilhas. Esses 
+    caracteres quando incluídos no arquivo de propriedades podem ser substituídos 
+    na página HTML por outros caracteres não correspondentes. Por exemplo, 
+    a palavra Funcionário poderia aparecer na página como Funcionário.
+
+    Isso ocorre porque não podemos definir uma declarativa com a instrução do 
+    charset/encoding como fazemos em arquivos .html ou .xml. Por esse motivo 
+    o charset será aquele referente ao sistema operacional. Para quem usa 
+    Windows o charset/encoding é o windows-1252 o que pode gerar os 
+    problemas citados quando incluído em uma página .html com charset UTF-8.
+
+    Existem duas forma de se resolver essa questão, uma delas é alterar na 
+    IDE o charset/encoding que ela vai salvar o arquivo de propriedades, o ideal 
+    é setá-lo para UTF-8. Porém, mesmo assim, fica difícil saber quando um 
+    arquivo de propriedades foi criado com um ou com outro tipo charset/encoding. 
+    Então, você pode acabar abrindo um projeto com o arquivo em UTF-8, alterar 
+    algo nesse arquivo e salva-lo como windows-1252 se não configurou sua IDE 
+    para UTF-8 e assim, voltará a ter problemas.
+
+    Para evitar essa confusão, outro forma, talvez a mais indicada para resolver 
+    este problema, é substituir o caractere especial por um caractere Unicode. 
+    Na web existem diversos sites com tabelas Unicodes, essas tabelas têm o 
+    código unicode referente ao caractere especial. Um desses sites é 
+    o https://unicode-table.com/pt/.
+
+    Para incluir o código unicode no arquivo de propriedades é necessário 
+    inicia-lo pelos caracteres \u, como apresentado no exemplo a seguir:
+
+    tabela.funcionario.col.salario = Sal\u00E1rio
+    tabela.funcionario.col.endereço = Endere\u00E7o
+
+    Veja que nas propriedades apresentadas o caractere á de Salário, foi 
+    substituído pelo codificação \u00E1. Já o ç de Endereço foi alterado 
+    por \u00E7.
+
+
+
+Aulas 65 a 67 - Página de Erro
+------------------------------
+
+. Personalizando a página de erro
+
+    O Spring Boot tem uma página padrão para exibição de erros que ocorrem durante a execução de 
+    uma aplicação. A página é similar a exibida na figura 1:
+
+    Está página possuir algumas poucas informações distribuídas em cinco variáveis que são:
+
+    timestamp - contém a data e hora da geração do erro
+    status - contém o código do Status do erro (400, 404, 500, 503, …)
+    error - vai conter a descrição do status de erro (Not Found, Internal Server Error, …)
+    message - contém uma mensagem sobre o erro
+    path - cai conter o path da URL ou URI que gerou o erro
+
+    Conhecendo estas variáveis é possível criar uma página de erro personalizada, nomeada 
+    como error.html e adicionado no diretório templates. É importante o nome do arquivo 
+    e seu local, já que estas serão as referencias procuradas pelo Spring Boot para 
+    substituir sua página de erro padrão. Veja a seguir um pseudo-código apresentado 
+    esta operação:
+
+        <code><body class="text-center">
+            <div>
+                <h1 class="h3 mb-3 font-weight-normal">
+                    <i class="oi oi-warning"></i> 
+                    <span th:text="${status}"></span>
+                </h1>
+                
+                <h2 th:text="${error}"></h2>
+                
+                <div>
+                    <span th:text="${message}"></span><br/><br/>
+                </div>
+            </div>
+        </body>
+        </code>
+
+    Observe que nas tags span de h1, h2 e div temos o componente th:text do Thymeleaf e 
+    como valor este componente recebe as variáveis status, error e message. Assim temos 
+    um exemplo de como incluir as variáveis de mensagens da operação de erro em uma página 
+    que vai substituir a página padrão do Spring Boot. Esta página poderia ser como a 
+    da figura 2:
+
+    Entretanto, veja que as mensagens apresentadas tanto na página padrão quando na página 
+    personalizada, estão em Inglês e com um descrição do erro muito técnica. Sendo assim, 
+    poderíamos alterar as mensagens de erro para mensagens mais claras e em Português. 
+    Para isso, é necessário criar uma classe que implemente a interface ErrorViewResolver 
+    do pacote org.springframework.boot.autoconfigure.web.servlet.error 
+    (na versão Spring Boot 2.0).
+
+    Esta interface exige a implementação do método resolveErrorView() o qual tem a 
+    seguinte assinatura:
+
+    <code>
+
+        public ModelAndView resolveErrorView(HttpServletRequest request,
+                                            HttpStatus status,
+                                            Map<String, Object> map); 
+
+    </code>
+
+    O método possui três argumentos que são:
+
+    HttpRequest - este objeto vai conter as informações atuais do request que gerou a página de erro
+    HttpStatus - aqui você terá acesso ao código e a descrição do status do erro.
+    Map<String, Object> - contém aquelas cinco variáveis com as informações referentes ao erro.
+    Veja agora como implementar a interface ErrorViewResolver em uma classe nomeada como MyErrorView:
+
+        <code>
+            @Component
+            public class MyErrorView implements ErrorViewResolver {
+            
+                @Override
+                public ModelAndView resolveErrorView(HttpServletRequest request, 
+                                                        HttpStatus status, 
+                                                        Map<String, Object> map) {
+                    
+                    ModelAndView model = new ModelAndView("error");
+                    model.addObject("status", status.value());
+                    switch (status.value()) {
+                            case 404:
+                                model.addObject("error", "Página não encontrada.");
+                                model.addObject("message", 
+                                                "A url para a página '" + map.get("path") + "' não existe.");
+                                break;
+                            case 500:
+                                model.addObject("error", "Ocorreu um erro interno no servidor.");
+                                model.addObject("message", "Ocorreu um erro inexperado, tente mais tarde.");
+                                break;
+                            default:
+                                model.addObject("error", map.get("error"));
+                                model.addObject("message", map.get("message"));
+                                break;
+                    }        
+                    return model;
+                }    
+            }
+        </code>
+
+    Usamos aqui um objeto ModelAndView para substituir as mensagens padrões de erro do Spring 
+    Boot. Porém, para determinar qual mensagem deve ser apresentada na página de erro, 
+    usamos o código do status de erro, obtido a partir do argumento HttpStatus. Assim é 
+    possível saber se o erro gerado é um 404, 500, ou qualquer outro e adicionar ao 
+    ModelAndView uma mensagem especifica e em Português.
+
+
+Aulas 68 a 69 - Criação do jar da aplicação
+-------------------------------------------
+
+1. Acesse Windows -> Preferences -> Java -> Installed JREs -> Edit
+
+    Escolha a pasta onde encontra-se a instação do JRE
+
+2. Clique direito no nó principal do projeto e escolha a opção:
+
+    Run As... -> maven build
+
+3. Na tela "Edit Configuration", coloque nos campos:
+
+    Name:   demo-mvc - mvn package 
+    Goals:  package -e
+
+4. Clique no botão;
+
+    Apply -> Run
+
+5. Acesse as classes abaixo e retire a barra inicial de endereços URL, com excessão
+    das que são chamadas através de redirect:/...
+
+    MyErrorView ( deixar o modelAndView assim: ModelAndView model = new ModelAndView("error"); )
+    [all]Controller ( deixar os retornos dos metodos sem a barra inicial: return "cargo/cadastro"; )
+
 

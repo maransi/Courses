@@ -1,0 +1,311 @@
+Curso Spring Boot && MVC com Thymeleaf - Validação de BackEnd no topo da tela
+-----------------------------------------------------------------------------
+
+    1. Configurar a classe model com as annotations de validação:
+
+        import javax.validation.constraints.NotBlank;
+
+        ...
+        public class Departamento extends AbstractEntity<Long>{
+
+            @NotBlank(message="Informe um nome.")                                   // Annotation de validação
+            @Size(  max=60, 
+                    message="O nome do cargo deve ter no máximo 60 caracteres.")
+            private String name;
+
+            ...
+        }
+
+    2. Construa o código do HTML responsável pela exibição do erro na página.
+        Neste caso será uma página de fragmento:
+
+        <html>
+        <head><meta charset="UTF-8"></head>
+        <body>
+            <div th:if="${#fields.hasAnyErrors()}" th:fragment="validacao">	
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div th:each="error : ${#fields.detailedErrors()}">
+                    <i class="oi oi-warning"></i>
+                    <span th:text="${error.message}"></span>
+                </div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+            </div>			
+        </body>
+        </html>	
+
+        . A tag  <div th:if="${#fields.hasAnyErrors()}... verifica se houve erros de 
+            inconsistência.
+
+        . A tag <div th:each="error : ${#fields.detailedErrors()}"> itera entre os erros.
+
+        . A tag <span th:text="${error.message}"> apresenta o erro.
+
+    3. Adicionamos o fragmento acima na página cadastro.html:
+
+        <div class="container" id="cadastro">
+            <div th:replace="fragments/alert">
+            </div>
+        
+            <form th:action="${cargo.id == null} ? @{/cargos/salvar} : @{/cargos/editar}" 
+                    th:object="${cargo}" method="POST">
+
+                <!-- Local de inclusão do fragmento que apresenta os erros de validação -->
+                <!-- Importante: A tag com esse fragmento deverá ficar dentro da tag <form> -->
+
+                <div th:replace="fragments/validacao :: validacao"></div>                        
+                    
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="nome">Nome do Cargo</label>
+                        <input type="text" class="form-control" id="nome" placeholder="Nome Cargo" autofocus="autofocus"
+                                th:field="*{nome}"/>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="departamento">Departamento</label>
+                        <select id="departamento" class="form-control" th:field="*{departamento}">
+                            <option value="">Selecione</option>
+                            <option th:each="d : ${departamentos}" th:value="${d.id}" th:text="${d.nome}">Administração</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" id="id" name="id" th:field="*{id}"/>
+                <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+            </form>
+        </div>
+
+        Importante: A identificação de qual objeto estamos trabalhando é feito pela th:object="${cargo}".
+                    O nome do atributo da classe é feito pelo th:field="*{nome}".
+                    Desta forma, quando o objeto é submitido, na assinatura dos métodos MVC é recebido
+                        o objeto "public String salvar(@Valid Cargo cargo,..." e já validado.
+
+    4. Configure as classes controller com as annotations e objetos que trataram as inconsistências
+        de erro:
+        
+        import javax.validation.Valid;
+        import org.springframework.validation.BindingResult;
+
+        @PostMapping("/salvar")
+        public String salvar(@Valid Cargo cargo, BindingResult result, RedirectAttributes attr) {
+            if (result.hasErrors()) {
+                return "/cargo/cadastro";
+            }
+
+            ...
+        }
+
+        ...
+
+        @PostMapping("/editar")
+        public String editar( @Valid Cargo cargo, BindingResult result, RedirectAttributes attr ) {
+
+            if (result.hasErrors()) {
+                return "/cargo/cadastro";
+            }
+
+            ...
+        }
+
+        . @Valid - Adicionamos a anotação @Valid no parâmetro do nosso controller. 
+                    Essa anotação serve para indicar que o objeto será validado tendo como base 
+                    as anotações de validação que atribuímos aos campos.
+
+        . O objeto BindingResult que armazerá os erros de validação.
+
+        . O if (result.hasErrors())  testa o objeto result para conferir se existe erro de valição.
+            Em caso positivo, a classe desvia o fluxo novamente para a página de cadastro para que
+            o usuário digite corretamente a informação.
+
+
+
+Curso Spring Boot && MVC com Thymeleaf - Validação de BackEnd ao lado de cada campo
+-----------------------------------------------------------------------------------
+
+    1. Crie o arquivo ValidationMessages.properties na pasta /src/main/resources:
+
+        # Messages refer as annotations
+        javax.validation.constraints.Size.message= Deve estar entre {min} e {max} caracteres.
+        javax.validation.constraints.NotBlank.message= \u00C9 obrigat\u00F3rio.
+        javax.validation.constraints.NotNull.message= \u00C9 obrigat\u00F3rio.
+        javax.validation.constraints.Digits.message= Deve conter no máximo {integer} digitos.
+
+        #Validacao campos de funcionario
+        NotNull.funcionario.cargo=Selecione um cargo.
+        PastOrPresent.funcionario.dataEntrada=Data deve ser igual ou anterior a atual.
+
+        #Validacao campos de endereço
+        NotNull.endereco.numero=Número é obrigatório. Informe 0 para s/n.
+        NotNull.endereco.uf=Selecione uma UF.
+        Size.endereco.cep=Deve conter {max} caracteres.
+
+    2. Configuramos as classes model com as annotations de validação:
+
+        import javax.validation.Valid;
+
+        public class Funcionario extends AbstractEntity<Long> {
+            
+            @NotBlank
+            @Size(max = 255, min = 3)
+            @Column( nullable = false)
+            private String nome;
+            
+            @Positive( message="Salário deve ser maior que zero")
+            @NotNull
+            @NumberFormat(style = Style.CURRENCY, pattern = "#,##0.00")
+            @Column( nullable = false, columnDefinition = "DECIMAL(7,2) DEFAULT 0.00")
+            private BigDecimal salario;
+
+            @NotNull
+            @PastOrPresent(message = "{PastOrPresent.funcionario.dataEntrada}") // Nome da chave do 
+            @DateTimeFormat(iso = ISO.DATE)                                     // arquivo de propriedades
+            @Column( nullable = false, columnDefinition = "DATE")
+            private LocalDate dataEntrada;
+
+            ....
+
+            @Valid		// Informa que deve ser validado conforme as validações na classe de Endereco
+            @OneToOne( cascade = CascadeType.ALL, orphanRemoval = true)
+            @JoinColumn( name = "endereco_id_fk",
+                            foreignKey = @ForeignKey(name = "fkFunc_Endereco") )	
+            private Endereco endereco;
+
+            ...
+
+        . Importante: Observe que o @Valid fará com que as validações do objeto seja feito nele mesmo
+
+    3. Configure as classes controller com as annotations e objetos que trataram as inconsistências
+        de erro:
+        
+        import javax.validation.Valid;
+        import org.springframework.validation.BindingResult;
+
+        @PostMapping("/salvar")
+        public String salvar(@Valid Funcionario funcionario, BindingResult result, RedirectAttributes attr) {
+            
+            if (result.hasErrors()) {
+                return "/funcionario/cadastro";
+            }
+            
+        ...
+
+        @PostMapping("/editar")
+        public String editar( @Valid Funcionario funcionario, BindingResult result, RedirectAttributes attr) {
+            if ( result.hasErrors() ) {
+                return "/funcionario/cadastro";
+            }
+        ...
+
+    4. Inclua em baixo de cada campo da tela a mensagem de erro:
+
+        <form th:action="${funcionario.id == null} ? @{/funcionarios/salvar} : @{/funcionarios/editar}" 
+                th:object="${funcionario}" method="POST">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="nome">Nome do Funcionário</label>
+                    <input 	type="text" 
+                            class="form-control form-control-sm" 
+                            id="nome" 
+                            placeholder="Nome Completo"
+                            autofocus="autofocus" 
+                            th:field="*{nome}"
+                            th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'" />
+                    <div class="invalid-feedback">
+                        <span th:errors="*{nome}"></span>
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="salario">Salário Bruto</label>
+                    <input type="text" class="form-control  form-control-sm" id="salario" data-mask="#.##0,00"
+                            data-mask-reverse="true" 
+                            th:field="*{salario}"
+                            th:classappend="${#fields.hasErrors('salario')} ? 'is-invalid'" />
+                    <div class="invalid-feedback">
+                        <span th:errors="*{salario}"></span>
+                    </div>
+                </div>
+            </div>
+
+            ...
+        </form>
+
+        . O atributo th:classappend adiciona no style da tag a informação dependendo da condição:
+
+            The following example shows how to use it conditionally:
+
+            <div class="panel" th:classappend="${condition} ? 'white' : 'black'"></div>
+
+            If ${condition} is true the rendered website will look like the following:
+
+            <div class="panel white"></div>
+
+            when ${condition} is false the result will be:
+
+            Copy
+            <div class="panel black"></div>        
+
+        . Se a condição for satisfeita a borda do campo irá ficar avermelhada.
+
+        . A tag <span th:errors="*{salario}"></span> exibe o(s) erro(s) ao lado do campo
+
+    
+    5. Criação de uma validação personalizada de validação com Spring Validator:
+
+        . Crie a classe de validação como abaixo:
+
+            package com.mballem.curso.boot.web.validator;
+
+            import org.springframework.validation.Errors;
+            import org.springframework.validation.Validator;
+
+            import com.mballem.curso.boot.domain.Funcionario;
+
+
+            public class FuncionarioValidator implements Validator {
+
+                public FuncionarioValidator() {
+                    // TODO Auto-generated constructor stub
+                }
+                
+                public boolean supports( Class<?> clazz) {
+                    
+                    return Funcionario.class.equals( clazz );
+                }
+                
+                public void validate( Object object, Errors errors ) {
+                    Funcionario f = (Funcionario) object;
+                    
+                    LocalDate entrada = f.getDataEntrada();
+                    
+                    if (f.getDataSaida() != null ) {
+                        if (f.getDataSaida().isBefore(entrada) ) {
+                            errors.rejectValue("dataSaida", "PosteriorDataEntrada.funcionario.dataSaida");
+                        }
+                    }
+                }
+
+            }
+
+        . Dentro da pasta /src/main/resources crie o arquivo messages.properties com o conteúdo abaixo:
+
+            PosteriorDataEntrada.funcionario.dataSaida=Data de saída não pode ser inferior a entrada.        
+
+        . Inclua o método abaixo na classe de controller, no nosso caso FuncionarioController:
+
+            // Esse método com essa anotação será executado quando a classe for iniciada.
+            // A execução deste método configura a chamada da classe validator
+            @InitBinder
+            public void initBinder( WebDataBinder binder ) {
+                binder.addValidators(new FuncionarioValidator());
+            }
+
+        . Outra forma de se trabalhar com Spring Validator está na URL abaixo:
+
+            https://howtodoinjava.com/spring-mvc/spring-mvc-custom-validator-example/        
+
+            No link acima é chamado manualmente a classe de validação e não automaticamente com a
+            annottation @InitBinder.
+
+
+

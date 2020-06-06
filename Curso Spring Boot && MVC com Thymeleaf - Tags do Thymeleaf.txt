@@ -41,10 +41,10 @@ Tags do Thymeleaf
 
 
 
-th:each - sua função é executar uma instrução de foreach sobre uma variável 
+. th:each - sua função é executar uma instrução de foreach sobre uma variável 
             que tem como valor uma lista de dados.
-e
-th:text - usado para exibir valores nas páginas.
+  e
+. th:text - usado para exibir valores nas páginas.
 
     Exemplo:
 
@@ -110,6 +110,16 @@ th:text - usado para exibir valores nas páginas.
             return "result";
         }
 
+
+    Outra forma de se utilizar th:field
+
+        <select th:field="*{countries}">
+            <option th:each="country: ${countries}"
+                    th:value="${country.id}"
+                    th:text="#{${'selected.label.' + country.name}}"/>
+        </select>
+
+
     th:if - util para realizar algum tipo de teste condicional do tipo se.
 
     Exemplo:
@@ -165,6 +175,19 @@ th:text - usado para exibir valores nas páginas.
             </div>
         </div>
 
+        Outras formas de Condicional:
+
+        <div th:if="${#strings.contains(#httpServletRequest.requestURI, 'email')}">
+            <div th:replace="fragments/email::welcome">
+        </div>
+
+        <div th:if="*{userMessage!=null and #strings.length(userMessage)>0}">
+            <label th:text = "*{userMessage}"/>
+        </div>
+
+
+    https://frontbackend.com/thymeleaf/1
+    https://frontbackend.com/thymeleaf/thymeleaf-tutorial    
     https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#setting-value-to-specific-attributes
     http://itutorial.thymeleaf.org/
     https://spring.io/guides/gs/handling-form-submission/
@@ -215,8 +238,60 @@ th:text - usado para exibir valores nas páginas.
 
             <a href="/order/3/details?action=show_all">
 
+. Utilizar utilitarias de objetos:
+
+    Date:
+
+    <p>
+        Today: <span th:text="${#calendars.format(today,'dd MMMM yyyy')}">30 May 2017</span>
+    </p>
+
+    Get year from date
+
+    <p>
+    Year: <span th:text="${#dates.year(today)}">2017</span>
+    </p>
+
+    Get month
+
+    <p>
+    Month number: <span th:text="${#dates.month(today)}">8</span>
+    Month: <span th:text="${#dates.monthName(today)}">August</span>
+    Month short name: <span th:text="${#dates.monthNameShort(today)}">Aug</span>  
+    </p>
+
+    Get day
+
+    <p>
+    Day: <span th:text="${#dates.day(today)}">26</span>
+    </p>
+
+    Get day of week
+
+    <p>
+        Day: <span th:text="${#dates.dayOfWeek(today)}">1</span>
+        Day: <span th:text="${#dates.dayOfWeekName(today)}">Monday</span>
+        Day: <span th:text="${#dates.dayOfWeekNameShort(today)}">Mo</span>
+    </p>
+
+    Get time
+
+    <p>
+        Hour: <span th:text="${#dates.hour(today)}">10</span>
+        Minute: <span th:text="${#dates.minute(today)}">50</span>
+        Second: <span th:text="${#dates.second(today)}">48</span>
+        Millisecond: <span th:text="${#dates.millisecond(today)}">48</span>
+    <p>
 
 
-        
+    Decimal:
+
+    <p>
+        Order sum: <span th:text="${#numbers.formatDecimal(orderSum, 0, 'COMMA', 2, 'POINT')}">1,145,000.52</span>
+    </p>
+
+
+
+
 
 
