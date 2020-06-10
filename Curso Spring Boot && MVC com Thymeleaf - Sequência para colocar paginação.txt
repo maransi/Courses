@@ -1,0 +1,180 @@
+. Acesse a página do bootstrap com exemplo de paginação 
+    https://getbootstrap.com/docs/4.0/components/pagination/ 
+    e retire o seguinte código:
+
+					<nav aria-label="Page navigation example">
+					  <ul class="pagination justify-content-center">
+					    <li th:class="page-item">
+					      <a 	class="page-link" 
+					      		th:href="@{/cargos/listar( page = ${1}, dir=${pageCargo.direcao})}" 
+					      		tabindex="-1" 
+					      		aria-disabled="true">Primeiro</a>
+					    </li>
+					  
+					  
+					    <li th:class="${pageCargo.pagina == 1} ? 'page-item disabled' : 'page-item'">
+					      <a 	class="page-link" 
+					      		th:href="@{/cargos/listar( page = ${pageCargo.pagina - 1}, dir=${pageCargo.direcao})}" 
+					      		tabindex="-1" 
+					      		aria-disabled="true">Prev</a>
+					    </li>
+	
+						<li class="page-item">
+							<span class="page-link" th:text="|${pageCargo.pagina} de ${pageCargo.totalDePaginas}|"></span>
+						</li>				    
+
+					    <li th:class="${pageCargo.pagina == pageCargo.totalDePaginas} ? 'page-item disabled' : 'page-item'">
+					      <a class="page-link"
+							 th:href="@{/cargos/listar( page = ${pageCargo.pagina + 1}, dir=${pageCargo.direcao})}">Next</a>
+					    </li>
+
+					    <li th:class="page-item">
+					      <a 	class="page-link" 
+					      		th:href="@{/cargos/listar( page = ${pageCargo.totalDePaginas}, dir=${pageCargo.direcao})}" 
+					      		tabindex="-1" 
+					      		aria-disabled="true">Último</a>
+					    </li>
+					  </ul>
+					</nav>
+
+. No projeto spring acesse a página lista.html e abaixo da tag </table> insira
+    o código acima.
+
+. Insira a classe abaixo:
+
+    package com.mballem.curso.boot.util;
+
+    import java.util.List;
+
+    public class PaginacaoUtil<T> {
+
+        private int tamanho;
+        
+        private int pagina;
+        
+        private long totalDePaginas;
+        
+        private String direcao;
+        
+        private List<T> registros;
+        
+        public PaginacaoUtil() {
+            // TODO Auto-generated constructor stub
+        }
+
+
+        public PaginacaoUtil(int tamanho, int pagina, long totalDePaginas, String direcao, List<T> registros) {
+            super();
+            this.tamanho = tamanho;
+            this.pagina = pagina;
+            this.totalDePaginas = totalDePaginas;
+            this.direcao = direcao;
+            this.registros = registros;
+        }
+
+        
+        public String getDirecao() {
+            return direcao;
+        }
+
+
+        public void setDirecao(String direcao) {
+            this.direcao = direcao;
+        }
+
+
+        public int getTamanho() {
+            return tamanho;
+        }
+
+        public int getPagina() {
+            return pagina;
+        }
+
+        public long getTotalDePaginas() {
+            return totalDePaginas;
+        }
+
+        public List<T> getRegistros() {
+            return registros;
+        }
+
+    }
+
+. Acesse a DAO e implemente os métodos abaixo:
+
+	public PaginacaoUtil<Cargo> buscaPaginada( int pagina, String direcao ){
+		int tamanho = 5;
+		int inicio = (pagina - 1) * tamanho;
+		
+		List<Cargo> cargos = getEntityManager()
+								.createQuery("select c from Cargo c order by c.nome " + direcao, Cargo.class)
+								.setFirstResult(inicio)
+								.setMaxResults(tamanho)
+								.getResultList();
+		
+		long totalRegistro = count();
+		
+		long totalPagina = (totalRegistro + (tamanho - 1)) / tamanho;
+		
+		return new PaginacaoUtil<>(tamanho, pagina, totalPagina, direcao, cargos);
+	}
+	
+	public long count() {
+		return getEntityManager().createQuery("select count(*) from Cargo", Long.class).getSingleResult();
+	}
+
+. Acesse a classe Service e implemente o método abaixo:
+
+	public PaginacaoUtil<Cargo> buscarPorPagina( int pagina, String direcao){
+		
+		return dao.buscaPaginada(pagina, direcao);
+	}
+
+. Acesse a classe controller e deixe o método listar como abaixo:
+
+	@GetMapping("/listar")
+	public String listar(ModelMap model, 
+							@RequestParam("page") Optional<Integer> page,
+							@RequestParam("dir") Optional<String> dir) {
+		
+		int paginaAtual = page.orElse(1);
+		String ordem = dir.orElse("asc");
+		
+		PaginacaoUtil<Cargo> pageCargo = cargoService.buscarPorPagina(paginaAtual, ordem);
+		
+		model.addAttribute("pageCargo", pageCargo );
+
+		return "cargo/lista";
+	}
+
+. Altere o return do metodo excluir para :
+
+	@GetMapping("/excluir/{id}")
+	public String excluir(@PathVariable("id") Long id, RedirectAttributes attr) {
+		
+		try {
+            cargoService.excluir(id);
+
+            attr.addFlashAttribute("success", "Cargo excluido com sucesso.");
+		}catch( Exception e ) {
+			e.printStackTrace();
+		}
+		
+		return "redirect:/cargos/listar";
+	}
+
+. Alterar o forEach da página lista.html conforme abaixo:
+
+    <tr th:each="d : ${pageCargo.registros} "
+
+. No lista.html alterar o cabeçalho das colunas da tag <table> com a ordenação:
+
+	                        	<a class="" th:href="@{/cargos/listar(page=${pageCargo.pagina}, dir=desc)}" tabindex="-1">
+	                        		<span class="oi oi-caret-bottom"></span>
+	                        	</a>
+	                        	<a class="" th:href="@{/cargos/listar(page=${pageCargo.pagina}, dir=asc)}" tabindex="-1">
+	                        		<span class="oi oi-caret-top"></span>
+	                        	</a>
+
+

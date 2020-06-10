@@ -299,6 +299,8 @@
 		Binding : Ctrl+D
 		When : Edit Text
 
+	Localize o item Merge Lines e apague o shortcut
+
 7. Instalação do VSCode:
 -----------------------
 
@@ -313,6 +315,17 @@ https://code.visualstudio.com/download
 . Executar o comando abaixo:
 
 	sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+. Instale as seguinte Extensões:
+
+	SQL Formatter			- Shortcut Shift+Alt+F
+	open-in-browser			- Shortcut Ctrl+Alt+O
+	Delphi Extension Pack	- Key Map Delphi, Number Bookmark
+	Bootstrap v4 Snippets
+	VS Code Printing Free
+	Material Icon Theme
+	Numbered Bookmarks		- Shortcut Ctrl+Shit+1,2,3... , Ctrl+1,2,3...
+	Power Mode
 
 
 8. Instalacao do Adobe Reader
@@ -605,3 +618,16 @@ git config --list
 sudo apt-get install speedtest-cli
 speedtest-cli --list
 speedtest-cli --server 12838
+
+23. Instalação do Navegador Brave
+
+sudo apt install apt-transport-https curl
+
+curl -s https://brave-browser-apt-release.s3.brave.com/brave-core.asc | sudo apt-key --keyring /etc/apt/trusted.gpg.d/brave-browser-release.gpg add -
+
+echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+
+sudo apt update
+
+sudo apt install brave-browser
+
