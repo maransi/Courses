@@ -138,3 +138,255 @@ Aula 2.9. Elementos Estruturais
             color: white;
         }                       
     </style>
+
+
+Aula 3.1. 3.2. 3.3. O que é CSS
+---------------------
+
+. Digitação inline do estilo, dentro da tag.
+
+    <!-- Estilo inline -->
+    <p style="color : red">Texto</p>
+
+. Estilo incorporado do estilo:
+
+    <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+
+            <!-- Estilo Incorporado -->
+            <stile>
+                h1  { 
+                        color : blue; 
+                    }
+
+                p   {
+                        color : red;
+                    }
+            </stile>
+        </head>
+        <body>
+            <form action="" method="" >
+                <h1>Titulo</h1>
+                
+                <p>Texto</p>
+            </form>
+
+        </body>
+    </html>
+
+. Estilo com arquivos externos.
+
+    . Criar um arquivo separado .css
+
+                h1  { 
+                        color : blue; 
+                    }
+
+                p   {
+                        color : red;
+                    }
+
+    . Referencia dentro da página o css:
+
+        <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+
+                <!-- Estilo Arquivo Externo -->
+                <link rel="stylesheet" href="css/estilo.css">
+            </head>
+            <body>
+                <form action="" method="" >
+                    <h1>Titulo</h1>
+                    
+                    <p>Texto</p>
+                </form>
+
+            </body>
+        </html>
+
+Aula 3.4. Seletores de tipo, classe e ID
+----------------------------------------
+
+. Seletor por id do objeto:
+
+    <style>
+        #myHeader {
+            background-color: lightblue;
+            color: black;
+            padding: 40px;
+            text-align: center;
+        }
+    </style>
+
+    <h1 id="myHeader">My Header</h1>
+
+. Seletor por classe do objeto:
+
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <style>
+                .cities {
+                    background-color: black;
+                    color: white;
+                    margin: 20px;
+                    padding: 20px;
+                }
+
+                .destaque{
+                    font-family : Arial;
+
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class="cities">
+                <h2>London</h2>
+                <p>London is the capital of England.</p>
+            </div>
+        </body>
+    </html>
+
+. Podemos utilizar mais de um item nas definições das classes, por exemplo:
+
+    <div class="cities destaque">
+        <h2>London</h2>
+        <p>London is the capital of England.</p>
+    </div>
+
+
+
+<link rel="stylesheet" href="style.css">
+
+<script src=""></script>
+
+<img src="" width="" height="" alt="">
+
+<a href="http://www.google.com.br" target="_blank">Google</a>
+
+
+Aula 3.5 - Agrupando seletores
+------------------------------
+
+Podemos agrupar os seletores:
+
+<style>
+    .warning, .title, #error{
+        font-color : blue;
+    }
+</style>
+
+
+Aula 3.6 - Seletores descendentes
+---------------------------------
+
+Exemplo
+
+. Note que o estilo vai entrando na árvore para encontrar a tag. Os seletores 
+    descendentes servem para aplicar estilo CSS somente em tags específicas 
+    que são descendentes de outras tags.
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            #header #sub-header h1 {
+                color: blue;
+            }
+            
+            .content  h1 {
+                color: red;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="header">
+            <div id="sub-header">
+                <h1>Cabeçalho</h1>
+            </div>
+        </div>
+        <div class="content">
+            <h1>Este cabeçalho h1 está no conteúdo</h1>
+        </div>
+        <div class="content">
+    </body>
+
+    </html>
+
+
+
+3.7. Seletores de filhos diretos
+--------------------------------
+
+    . Qdo utilizamos o simbolo ">" será para identificar um item especifico. 
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            #header #sub-header h1 {
+                color: blue;
+            }
+            
+            .content>h1 {
+                color: red;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="header">
+            <div id="sub-header">
+                <h1>Cabeçalho</h1>
+            </div>
+        </div>
+        
+        <!-- o estilo .content>h1 só funcionará para a tag abaixo -->
+        <div class="content">
+            <h1>Este cabeçalho h1 está no conteúdo</h1>
+        </div>
+        
+        <!-- para funcionar na tag abaixo deveria ser .content>p -->
+        <div class="content">
+            <p>Este cabeçalho está no conteúdo</p>
+        </div>
+    </body>
+
+    </html>
+
+
+Aula 3.8 - Cores
+----------------
+
+. Acesse o link abaixo para encontrar as cores em Hexadecimal:
+
+    https://www.colorschemer.com/hex-color-codes/
+    https://www.flextool.com.br/tabela_cores.html
+
+. Exemplo
+
+    <style>
+        h1{
+            background-color : #919191;
+            color : #000000;        
+        }
+    </style>
+
