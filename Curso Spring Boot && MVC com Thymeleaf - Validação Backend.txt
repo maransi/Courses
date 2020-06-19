@@ -270,7 +270,7 @@ Curso Spring Boot && MVC com Thymeleaf - Validação de BackEnd ao lado de cada 
                 
                 public boolean supports( Class<?> clazz) {
                     
-                    return Funcionario.class.equals( clazz );
+                    return Funcionario.class.equals( clazz ) || PaginacaoUtil.class.equals( clazz );
                 }
                 
                 public void validate( Object object, Errors errors ) {
@@ -280,7 +280,11 @@ Curso Spring Boot && MVC com Thymeleaf - Validação de BackEnd ao lado de cada 
                     
                     if (f.getDataSaida() != null ) {
                         if (f.getDataSaida().isBefore(entrada) ) {
+
+                            // Importante: o segundo parâmetro deve sempre ser a chave do arquivo messages.properties
                             errors.rejectValue("dataSaida", "PosteriorDataEntrada.funcionario.dataSaida");
+
+                            // Consultar mais possibilidades de criar validaçoes com o objeto "ValidationUtils"
                         }
                     }
                 }
@@ -298,6 +302,24 @@ Curso Spring Boot && MVC com Thymeleaf - Validação de BackEnd ao lado de cada 
             @InitBinder
             public void initBinder( WebDataBinder binder ) {
                 binder.addValidators(new FuncionarioValidator());
+
+                // Importante: Caso haja dentro do objeto Validator (FuncionarioValidator) a injeçao de algum
+                //              objeto pelo @Autowired. Deve-se fazer os seguintes acertos:
+                //
+                //              . Colocar o FuncionarioValidator como @Component
+                //              . Injetar o objeto validator na classe chamadora com o @Autowired
+                //
+                //                      @Autowired
+                //                      private FuncionarioValidator funcionarioValidator
+                //
+                //              . Trocar a chamada do metodo addValidators enviando como parâmetro o 
+                //                  objeto injetado da classe chamadora
+                //                  
+                //                  binder.addValidators( funcionarioValidator );
+                //
+                //              . Para mais detalhes consulta o link 
+                //
+                //          https://cursos.alura.com.br/forum/topico-nullpointerexception-ao-utilizar-autowired-68904
             }
 
         . Outra forma de se trabalhar com Spring Validator está na URL abaixo:

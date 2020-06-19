@@ -1,6 +1,10 @@
 Curso Algawork - Web Responsivo com HTML5, CSS3 e BEM
 
 
+Site de frases do mussum: https://mussumipsum.com/
+
+
+
 Aula 2.2 - Estrutura básica de documentos
 -----------------------------------------
     
@@ -389,4 +393,182 @@ Aula 3.8 - Cores
             color : #000000;        
         }
     </style>
+
+Aula 3.9 - Formatação de Texto
+------------------------------
+
+<style>
+    .nome{
+        color : #ff0000;
+
+        /*  
+            . Sempre que o nome for composto coloque o entre aspas
+            . Utilize o recurso de mais de uma fonte separadas por virgula
+                para priorizar o uso da fonte. Caso a primeira não for 
+                encontrada para uso vai para a próxima
+        */
+
+        font-family : "Trebuchet MS", Arial;
+
+        font-size : 16px;
+
+        font-style : italic;    /*  normal; italic; oblique; */
+
+        font-weight : normal;   /*  normal; bold; bolder; lighter; 
+                                    100; 200; 300; 400; 500; 600; 700; 800; 900; */
+
+        text-decorate : underline;  /* none; underline; overline; line-through; blink; */
+
+        text-align : right;     /* right; left; center; justify */
+
+    
+    }
+
+    .segmento{
+            
+            /*  
+                Ao invés de declarar propriedade por propriedade podemos construir um
+                atalho seguindo a ordem:
+
+                    font-style 
+                    font-weight
+                    font-size
+                    font-family
+            */
+
+        font : italic bold 24px "Trebuchet MS", Arial;
+
+    }
+
+
+</style>
+
+
+Aula 3.10 - Inspecionando com Chrome Devtools
+---------------------------------------------
+
+. Dentro do navegador se acionarmos as teclas F12, Botao Direito "Inspecionar", 
+    ou Ctrl+Shift+I é apresentado a ferramenta de desenvolvimento para debugar e
+    verificar o código da página.
+
+3.11. Entendendo a propriedade display
+--------------------------------------
+
+display - Define se um elemento deve ser apresentado ou não, e a sua forma de apresentação.
+Valores - none; inline; block; list-item; run-in; compact; marker; table; inline-table; 
+            table-row-group; table-header-group; table-footer-group; table-row; 
+            table-column-group; table-column; table-cell; table-caption;
+
+Os objetos já vem configurado implicitamente essa propriedade CSS. No caso dos link <a href="...">
+o display é "inline"; já os "text" é block.
+
+inline = um ao lado do outro e ocupa somente o espaço do conteúdo. 
+            Height e Weight nâo tem efeito no inline.
+block = um debaixo do outro e ocupa toda a linha.
+none = oculta o objeto na hora de redenrizar, mas o objeto permanece no lugar.
+
+
+3.12. Adicionando bordas
+------------------------
+
+    {
+        /*  thin;       fina
+            medium;     media
+            thick;      grossa
+            unidades_css=99px; 
+        */
+        border-with : thick;  
+        border-color : red;
+
+        /* 
+            Tipo do traço - pontuada, tracejada, etc.
+
+            none; hidden; dotted; dashed; solid; double; groove; ridge; inset; outset; 
+        */
+        border-style : dashed;
+
+        /*  
+            Ao invés de declarar propriedade por propriedade podemos construir um
+            atalho seguindo a ordem: border-style; border-width; border-color;
+        */
+        border : #000 solid 2px;
+
+        border-bottom : 5px blue dashed;
+        border-right : 10px yellow double;
+
+        /* Cantos arredondados, pode ser utilizado com atalhos também */
+        border-radius : 20px;
+        border-radius : 20px 10px 20px 10px; /* Começando pelo canto superior esquerdo no sentido horário */
+
+        background-color : #cccccc; 
+
+
+    }
+
+Aula 3.13. Espaçamento interno (padding)
+----------------------------------------
+
+padding = Define o espaço entre o conteúdo e os 4 limites ou bordas de um elemento. 
+            Aceita de 1 a 4 valores.
+
+padding-top; padding-right; padding-bottom; padding-left = Definem o espaço entre o 
+                                                            conteúdo e os limites ou bordas 
+                                                            superior, direito, inferior e 
+                                                            esquerdo.
+
+{
+    /*
+        espaçamento nos 4 lados de dentro
+    */
+    padding : 10px;
+
+    /*
+        left right = 5px
+        top bottom = 50px
+    */
+    padding : 5px 50px;
+
+    /*
+      Começa no top e vai no sentido horário
+    */
+    padding:5px 10px 20px 30px;
+
+
+}
+
+
+3.14. Margens de elementos
+--------------------------
+
+margin = Define as 4 margens do elemento. Aceita de 1 a 4 valores. Começando pela top, na seguida left
+
+margin-top; margin-right; margin-bottom; margin-left = Definem as margens superior, direita, 
+                                                        inferior e esquerda de um elemento.
+
+{
+    /*
+        Coloca 50px nas margem do lado de fora no top right bottom left
+    */
+    margin : 50px;
+
+    /*
+        Coloca 200px no top bottom e 100px no left right
+    */
+    margin: 200px 100px;
+
+    /*
+        Coloca 50px no top e bottom e centraliza nos lados left e right
+    */
+    margin: 50px auto;
+
+    /*
+        Coloca 15px no top e o restante no sentido horário
+    */
+    margin: 15px 5px 5px 15px;
+
+}                                                        
+
+
+3.15. Box model e a propriedade box-sizing
+------------------------------------------
 
