@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+        .divPrincipal {
+            background: #eee;
+            margin: 200px 200px;
+            width: 300px;
+            height: 300px;
+            top: 200px;
+            left: 200px;
+            border: 1px solid black;
+        }
+        
+        .div1 {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: green;
+        }
+        
+        .div2 {
+            position: relative;
+            top: 150px;
+            left: 150px;
+            background: yellow;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="divPrincipal">
+        <div class="div1">
+            Esta DIV utiliza o css {position : absolute;}. Quando utilizamos esta diretiva significa que o elemento procurará um elemento acima dele, no qual ele está inserido, com a propriedade { position : relative } p/se posicionar. Caso não encontre, o posicionamento
+            permancerá no elemento principal, ou seja, na screen.
+        </div>
+        <div class="div2">
+            Esta div UTILIZA o atributo {position : relative;} Ela utiliza a DIV principal para encontrar as coordenadas e posicionar o elemento
+        </div>
+    </div>
+</body>
+
+</html>

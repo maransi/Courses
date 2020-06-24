@@ -1,0 +1,440 @@
+Propriedade display
+-------------------
+
+
+https://www.maujor.com/tutorial/propriedade-css-display.php
+
+
+A propriedade display permite que você defina a maneira como determinado 
+elemento HTML deve ser renderizado.
+
+    display : [block / inline / none / inline-block / list-item / run-in / compact / table / ]
+
+Colocar a propriedade css sempre para os componentes HTML filhas, nunca para o pai.
+
+display : block
+---------------
+
+    Este é o display padrão quando a página e iniciada. o display : block informa ao navegador
+    para exibir os componentes um debaixo do outro.
+
+    Exemplo: 
+
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+            <style>
+                .principal {
+                    border: 1px solid black;
+                    width: 400px;
+                    height: 400px;
+                }
+                
+                .principal>div {
+                    border: 1px solid blue
+                    display : block;    /* display : block já é o default, não é necessário
+                                            explicitar, só foi feito por questão didática */
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class="principal">
+                <div>
+                    Primeira Div
+                </div>
+
+                <div>
+                    Segunda Div
+                </div>
+                <div>
+                    Terceira Div
+                </div>
+        </body>
+
+        </html>
+
+    Saída:
+
+        +------------------------------------------------+
+        |+---------------+                               |
+        ||Primeira Div   |                               |
+        |+---------------+                               |
+        |+---------------+                               |
+        ||Segunda Div    |                               |
+        |+---------------+                               |
+        |+---------------+                               |
+        ||Terceira Div   |                               |
+        |+---------------+                               |
+        +------------------------------------------------+
+
+
+display : inline
+---------------
+
+    Este display coloca os componentes um lado do outro:
+
+    Exemplo:
+
+        .principal>div{
+            display : inline;
+        }
+
+    Saída:
+
+        +--------------------------------------------------------+
+        |+---------------+ +---------------+ +---------------+   |
+        ||Primeira Div   | |Segunda Div    | |Terceira       |   |
+        |+---------------+ +---------------+ +---------------+   |
+        +--------------------------------------------------------+
+
+
+    Importante: O display : [block / inline] deve ser colocada nas divs filhas.
+
+
+Como usar a propriedade Position - CSS
+--------------------------------------
+
+Nesse artigo vou ensinar a usar a propriedade Position do CSS. Lembrando
+que essa é uma propriedade do CSS 2.1 e funciona perfeitamente em todos
+os navegadores (browsers) modernos.
+
+Olá pessoal, nesse artigo vou ensinar a usar a propriedade Position do CSS. 
+Lembrando que essa é uma propriedade do CSS 2.1 e funciona perfeitamente em 
+todos os navegadores (browsers) modernos.
+
+Após entender a propriedade position tenha cuidado ao utilizar ela. O foco 
+dessa propriedade é posicionar pequenos detalhes do layout, para diagramar 
+o site utilize o bom e velho Float.
+
+A propriedade position pode assumir 4 valores diferentes: Static, Relative, 
+Absolute e Fixed. Segue abaixo a explicação para de cada uma:
+
+CSS Position Static:
+--------------------
+
+    Esse é o valor default de todo elemento HTML, ou seja, ele vai seguir o 
+    fluxo comum da sua página. Ex:
+
+    Listagem 1: Valor default
+
+        h1 { position: static }
+
+CSS Position Relative:
+----------------------
+    Utilizando o position Relative o elemento passa a aceitar as propriedades 
+    Top, Bottom, Left e Right. Com elas você pode alterar o posicionamento 
+    do elemento. Ex:        
+
+    Listagem 2: Html
+
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+            <title>Document</title>
+            <style type="text/css">
+                .divPrincipal {
+                    background: #eee;
+                    margin: 200px 200px;
+                    width: 300px;
+                    height: 300px;
+                    top: 50px;
+                    left: 100px;
+                }
+                
+                .div1 {
+                    position: relative;
+                    top: 50px;
+                    left: 50px;
+                    background: green;
+                }
+                
+                .div2 {
+                    top: 20px;
+                    left: 20px;
+                    background: yellow;
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class="divPrincipal">
+                <div class="div1">
+                    Esta DIV utiliza o css {position : relative;}. Quando utilizamos esta diretiva 
+                    significa que podemos posicionar um elemento num ponto especifico dentro do 
+                    elemento pai. Ou seja, abre-se a possibilidade de utilizarmos os 
+                    atributos {top: ; left: ; bottom: ; right : ; }
+                </div>
+                <div class="div2">
+                    Esta div NÃO UTILIZA o atributo {position : relative;} Observe que mesmo 
+                    usando as propriedades top e left, isso não influenciou no posicionamento, 
+                    justamente por não utilizar {postion : relative; }
+                </div>
+            </div>
+        </body>
+
+        </html>
+
+    Vide resultado no arquivo ../Position Relative (Em coordenadas especificas)/index.html
+
+    Importante: o style display : relative deve ser colocado nas divs filhas.
+
+Position absolute
+-----------------
+
+    Quando utilizamos esta diretiva significa que o elemento procurará um elemento acima dele, 
+    no qual ele está inserido, com a propriedade { position : relative } p/se posicionar. 
+
+    Caso não encontre, o posicionamento permancerá no elemento principal, ou seja, na screen.
+
+    Exemplo 
+
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+            <title>Document</title>
+            <style type="text/css">
+                .divPrincipal {
+                    background: #eee;
+                    margin: 200px 200px;
+                    width: 300px;
+                    height: 300px;
+                    top: 50px;
+                    left: 100px;
+                }
+                
+                .div1 {
+                    position: absolute;
+                    top: 50px;
+                    left: 50px;
+                    background: green;
+                }
+                
+                .div2 {
+                    position: relative;
+                    top: 20px;
+                    left: 20px;
+                    background: yellow;
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class="divPrincipal">
+                <div class="div1">
+                    Esta DIV utiliza o css {position : absolute;}. Quando utilizamos esta diretiva significa que o elemento procurará um elemento acima dele, no qual ele está inserido, com a propriedade { position : relative } p/se posicionar. Caso não encontre, o posicionamento
+                    permancerá no elemento principal, ou seja, na screen.
+                </div>
+                <div class="div2">
+                    Esta div UTILIZA o atributo {position : relative;} Ela utiliza a DIV principal para encontrar as coordenadas e posicionar o elemento
+                </div>
+            </div>
+        </body>
+
+        </html>
+
+Position fixed
+--------------
+
+    Essa diretiva funciona semelhante ao absolute, porém ela a div diretamente para
+    as coordenadas da screen.
+
+    Exemplo
+
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <style type="text/css">
+            .divPrincipal {
+                background: #eee;
+                margin: 200px 200px;
+                width: 300px;
+                height: 300px;
+                top: 200px;
+                left: 200px;
+                border: 1px solid black;
+            }
+            
+            .div1 {
+                /* position: absolute; */
+                top: 10px;
+                left: 10px;
+                background: green;
+            }
+            
+            .div2 {
+                /* position: relative; */
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: yellow;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="divPrincipal">
+            <div class="div1">
+                Esta DIV utiliza o css {position : absolute;}. Quando utilizamos esta diretiva significa que o elemento procurará um elemento acima dele, no qual ele está inserido, com a propriedade { position : relative } p/se posicionar. Caso não encontre, o posicionamento
+                permancerá no elemento principal, ou seja, na screen.
+            </div>
+            <div class="div2">
+                Esta div UTILIZA o atributo {position : relative;} Ela utiliza a DIV principal para encontrar as coordenadas e posicionar o elemento
+            </div>
+        </div>
+    </body>
+
+    </html>
+
+
+
+Como usar o Float
+-----------------
+
+O float contém três opções "float : [left / right / none]". Quando utilizado
+essa diretiva o objeto irá se posicionar no top do objeto pai ao qual ele está
+contido e com a propriedade [left / right ] irá deslocá-lo para a esquerda, ou 
+a direita.
+
+Caso existe mais de um objeto a ser flutuado do mesmo lado ele irá posicionando
+um ao lado do outro e passa para baixo caso não tenha mais espaços para flutuar 
+mais objetos.
+
+O valor none leva o objeto para o top ao lado esquerdo.
+
+Exemplo
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <style type="text/css">
+            .divPrincipal {
+                background: #eee;
+                width: 800px;
+                height: 500px;
+                border-style: solid;
+                border-width: thin;
+            }
+            
+            .div1 {
+                width: 200px;
+                height: 200px;
+                margin: 10px;
+                float: left;
+                background: blue;
+            }
+            
+            .div2 {
+                width: 200px;
+                height: 200px;
+                margin: 10px;
+                float: right;
+                background: blue;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="divPrincipal">
+            <div class="div1">
+                Esta DIV utiliza a propriedade { float : left} para posicionar a esquerda
+            </div>
+            <div class="div2">
+                Esta DIV utiliza a propriedade { float : right} para posicionar a direita
+            </div>
+            <div>
+                lasjçalskfjçalskjfaçslfjasçdlfjasçlfkjasçlfkjsdflkj
+            </div>
+
+        </div>
+    </body>
+
+    </html>
+
+
+Como usar o margin e padding
+----------------------------
+
+margin = Define as 4 margens do elemento. Aceita de 1 a 4 valores. Começando pela top, na seguida left
+
+margin-top; margin-right; margin-bottom; margin-left = Definem as margens superior, direita, 
+                                                        inferior e esquerda de um elemento.
+
+{
+    /*
+        Coloca 50px nas margem do lado de fora no top right bottom left
+    */
+    margin : 50px;
+
+    /*
+        Coloca 200px no top bottom e 100px no left right
+    */
+    margin: 200px 100px;
+
+    /*
+        Coloca 50px no top e bottom e centraliza nos lados left e right
+    */
+    margin: 50px auto;
+
+    /*
+        Coloca 15px no top e o restante no sentido horário
+    */
+    margin: 15px 5px 5px 15px;
+
+}        
+
+Como usar o padding
+-------------------
+
+padding = Define o espaço entre o conteúdo e os 4 limites ou bordas de um elemento. 
+            Aceita de 1 a 4 valores.
+
+padding-top; padding-right; padding-bottom; padding-left = Definem o espaço entre o 
+                                                            conteúdo e os limites ou bordas 
+                                                            superior, direito, inferior e 
+                                                            esquerdo.
+
+{
+    /*
+        espaçamento nos 4 lados de dentro
+    */
+    padding : 10px;
+
+    /*
+        left right = 5px
+        top bottom = 50px
+    */
+    padding : 5px 50px;
+
+    /*
+      Começa no top e vai no sentido horário
+    */
+    padding:5px 10px 20px 30px;
+
+
+}
+
+
