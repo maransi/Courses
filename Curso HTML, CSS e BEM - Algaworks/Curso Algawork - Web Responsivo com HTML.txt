@@ -498,7 +498,8 @@ none = oculta o objeto na hora de redenrizar, mas o objeto permanece no lugar.
 
         /* Cantos arredondados, pode ser utilizado com atalhos também */
         border-radius : 20px;
-        border-radius : 20px 10px 20px 10px; /* Começando pelo canto superior esquerdo no sentido horário */
+        /* Começando pelo canto superior esquerdo no sentido horário */
+        border-radius : 20px 10px 20px 10px; 
 
         background-color : #cccccc; 
 
@@ -572,3 +573,589 @@ margin-top; margin-right; margin-bottom; margin-left = Definem as margens superi
 3.15. Box model e a propriedade box-sizing
 ------------------------------------------
 
+Exemplo
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            body {
+                margin: 0px;
+            }
+            
+            .content {
+                background-color: grey;
+                width: 500px;
+                text-align: justify;
+                border: 10px solid black;
+                padding: 10px;
+                /* propriedade acrescida */
+            }
+            
+            .extra {
+                background-color: yellow;
+                width: 500px;
+                text-align: justify;
+                margin-bottom: 10px;
+            }
+        </style>
+
+
+
+    </head>
+
+    <body>
+        <div class="extra">
+            Mussum Ipsum, cacilds vidis litro abertis. Viva Forevis aptent taciti sociosqu ad 
+            litora torquent. Casamentiss faiz malandris se pirulitá. Sapien in monti palavris 
+            qui num significa nadis i pareci latim. Mé faiz elementum girarzis, nisi eros vermeio.
+        </div>
+
+        <div class="extra">
+            Mussum Ipsum, cacilds vidis litro abertis. Viva Forevis aptent taciti sociosqu ad 
+            litora torquent. Casamentiss faiz malandris se pirulitá. Sapien in monti palavris 
+            qui num significa nadis i pareci latim. Mé faiz elementum girarzis, nisi eros vermeio.
+        </div>
+
+        <div class="content">
+        </div>
+
+    </body>
+
+    </html>
+
+    . Se deixarmos as divs sem classes identificadas, todas elas ocuparam os mesmos tamanho e altura.
+
+    . Porém, se as identificarmos com as classes "content" e "extra" observaremos que a que está com 
+        a classe "content" ocupará um espaço maior que as demais. Mesmo especificando os mesmo tamanho
+        para todas "width : 500px;" elas acabaram ficando diferentes devido as bordas ficarem
+        do lado de fora, mas a parte interna essas ficaram com 500px. Visualmente não deveria ser assim,
+        pois todas deveriam ficar com o mesmo tamanho.
+
+    . Se colocarmos outra propriedade para as divs como o "padding" a diferença ficará mais evidente ainda.
+        Adicione a propriedade "padding : 10px;" para a classe content;
+
+        .content {
+            background-color: grey;
+            width: 500px;
+            text-align: justify;
+            border: 10px solid black;
+            padding: 10px;
+            /* propriedade acrescida */
+        }
+
+    . Tanto a propriedade border e padding serão acrescidas na div no lado de fora deixando a div do lado de 
+        dentro.
+
+        +-----------------------+
+        |                       |
+        |                       |
+        |     width :  500px;   |
+        |     heigth : 200px;   |
+        |                       |
+        |                       |
+        +-----------------------+
+
+        +-----------------------+
+        |                       |
+        |                       |
+        |     width :  500px;   |
+        |     heigth : 200px;   |
+        |                       |
+        |                       |
+        +-----------------------+
+
+        +-----------------------------+
+        | | P                       | |
+        | | A +----------------+    | |
+        |B| D |                |    | |
+        |O| D | width :  500px;|    | |
+        |R| I | heigth : 200px;|    | |
+        |D| N |                |    | |
+        |E| D |                |    | |
+        |R|   +----------------+    | |
+        | |                         | |
+        +-----------------------------+
+            Div com a class "content"
+
+    . Se quiser que a div com a classe "content" fique visualmente com as mesmas dimensões das demais, 
+        basta acrescentar a propriedade "box-sizing : border-box". Isso fará que as propriedades
+        padding e border permaneçam dentro da div e não do lado de fora. 
+
+    . Ao utilizarmos o recurso do "box-sizing : border-box" o width da div é alterada. Será subtraido
+        dele os tamanhos do border e padding, então nesse caso o que era 500px passará automaticamente
+        para 460, ou seja 10px 10px 460px 10px 10px = ( border; padding; width; padding; border )
+
+    . O padrão do box-sizing é sempre content-box, se quisermos que a borda e o padding permaneçam dentro
+        das dimensoes da div temos que alterá-la para border-box.
+
+    . Importante: para simplificar podemos colocar uma propriedade no nosso style para que todos objetos
+                    considere a propriedade box-sizing : border-box da seguinte forma:
+
+                    *{
+                        box-sizing : border-box;
+                    }
+
+    . Assim o resultado final do nosso style poderia ficar da seguinte forma:
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            
+            body {
+                margin: 0px;
+            }
+            
+            .content {
+                background-color: grey;
+                width: 500px;
+                text-align: justify;
+                border: 10px solid black;
+                /* propriedade acrescida */
+                padding: 10px;
+                /* [content-box / border-box ] */
+                /* box-sizing: border-box; */
+            }
+            
+            .extra {
+                background-color: yellow;
+                width: 500px;
+                text-align: justify;
+                margin-bottom: 10px;
+            }
+        </style>
+
+4.3. Listas ordenadas e não-ordenadas
+-------------------------------------
+
+Exemplo
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <style>
+        body {
+            font-size: 18px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        
+        ul.menu {
+            /* Sumir os bollets */
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        ul.menu>li {
+            display: inline-block;
+            border: 3px solid red;
+            padding: 5px;
+        }
+    </style>
+
+    <body>
+        <ul class="menu">
+            <li>Arquivo</li>
+            <li>Editar</li>
+            <li>Ajuda</li>
+        </ul>
+    </body>
+
+    </html>
+
+Aula 4.4. Adicionando os planos
+-------------------------------
+
+. Inserção da tag <article> no index.html e mudança nos estilos dos componentes desta tag
+
+Exemplo
+
+. index.html atualizado
+
+    <!DOCTYPE html>
+    <html lang="pt">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Connect Assessoria</title>
+        <link rel="stylesheet" type="text/css" href="style/estilo.css">
+    </head>
+
+    <body>
+        <header>
+            <div class="container">
+                <img src="image/logo.png" width="100" height="35" alt="Connect">
+            </div>
+
+        </header>
+
+        <div id="planos">
+            <div class="container">
+                <article>
+                    <h2>Autônomo</h2>
+                    <div>R$ 59,00 por mês</div>
+                    <ul>
+                        <li>Até <strong>2 usuários</strong></li>
+                        <li><strong>500MB</strong> de armazenamento</li>
+                        <li>Lançamento ilimitados</li>
+                        <li>Acesso seguro</li>
+                        <li>Sem fidelidade</li>
+                    </ul>
+
+                    <footer>
+                        <a href="assine.html">Assine</a>
+                    </footer>
+                </article>
+                <article>
+                    <h2>Micro</h2>
+                    <div>R$ 89,00 por mês</div>
+                    <ul>
+                        <li>Até <strong>5 usuários</strong></li>
+                        <li><strong>1GB</strong> de armazenamento</li>
+                        <li>Lançamento ilimitados</li>
+                        <li>Acesso seguro</li>
+                        <li>Sem fidelidade</li>
+                    </ul>
+
+                    <footer>
+                        <a href="assine.html">Assine</a>
+                    </footer>
+                </article>
+                <article>
+                    <h2>Pequena</h2>
+                    <div>R$ 99,00 por mês</div>
+                    <ul>
+                        <li>Até <strong>10 usuários</strong></li>
+                        <li><strong>5GB</strong> de armazenamento</li>
+                        <li>Lançamento ilimitados</li>
+                        <li>Acesso seguro</li>
+                        <li>Sem fidelidade</li>
+                    </ul>
+
+                    <footer>
+                        <a href="assine.html">Assine</a>
+                    </footer>
+                </article>
+            </div>
+        </div>
+    </body>
+
+    </html>
+
+. estilo.css atualizado
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: small;
+    }
+
+    header {
+        height: 60px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    header img {
+        margin-top: 12px;
+    }
+
+    .container {
+        width: 1200px;
+        margin: 0 auto;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    #planos {
+        padding: 80px 0;
+    }
+
+    article {
+        padding: 10px;
+        border: 1px solid #95a4a5;
+        width: 370px;
+    }
+
+    article>h2 {
+        background-color: #95a4a5;
+        /* Cor da fonte */
+        color: #fff;
+        text-align: center;
+        /* Altura da linha equivalerá a 2,5 vezes o tamanho da fonte */
+        line-height: 2.5;
+        /* Senão colocarmos a margem negativa ficará um espaço em branco
+            entre o conteúdo e a borda. Ao colocar a margem negativa esse
+            espaço some, mas o texto a partir do R$59,00 por mês tb sobe.
+            Para resolver esse último problema faremos a configuração do
+            margin-bottom
+        */
+        margin: -10px;
+        margin-bottom: 0;
+        font-weight: normal;
+        font-size: 28px;
+    }
+
+    article>div {
+        text-align: center;
+        font-size: 28px;
+        /* Margem superior e inferior 20px e esquerda e direita 0 */
+        margin: 20px 0;
+    }
+
+    article>ul {
+        /* Para retirar os bollets da list ul */
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+
+    article>ul>li {
+        text-align: center;
+    }
+
+    article>footer {
+        text-align: center;
+    }
+
+
+
+Aula 4.5. Flutuando elementos
+----------------------------
+
+Como usar o Float
+-----------------
+
+O float contém três opções "float : [left / right / none]". Quando utilizado
+essa diretiva o objeto irá se posicionar no top do objeto pai ao qual ele está
+contido e com a propriedade [left / right ] irá deslocá-lo para a esquerda, ou 
+a direita.
+
+Importante: o float deve ser colocado nos elementos filhos que se deseja flutuar,
+            nunca no elemento pai pensando que assim os filhos herdarão essa propriedade.
+
+Caso existe mais de um objeto a ser flutuado do mesmo lado ele irá posicionando
+um ao lado do outro e passa para baixo caso não tenha mais espaços para flutuar 
+mais objetos.
+
+O valor none leva o objeto para o top ao lado esquerdo.
+
+Exemplo
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <style type="text/css">
+            .divPrincipal {
+                background: #eee;
+                width: 800px;
+                height: 500px;
+                border-style: solid;
+                border-width: thin;
+            }
+            
+            .div1 {
+                width: 200px;
+                height: 200px;
+                margin: 10px;
+                float: left;
+                background: blue;
+            }
+            
+            .div2 {
+                width: 200px;
+                height: 200px;
+                margin: 10px;
+                float: right;
+                background: blue;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="divPrincipal">
+            <div class="div1">
+                Esta DIV utiliza a propriedade { float : left} para posicionar a esquerda
+            </div>
+            <div class="div2">
+                Esta DIV utiliza a propriedade { float : right} para posicionar a direita
+            </div>
+            <div id="content">
+                lasjçalskfjçalskjfaçslfjasçdlfjasçlfkjasçlfkjsdflkj
+            </div>
+
+        </div>
+    </body>
+
+    </html>
+
+. Quando ativamos o float os elementos em seguinda continuam flutuando automaticamente. Para
+    acabar com essa ação é possível utilizar a propriedade "clear : both"
+
+    Exemplo:
+
+    Altere a tag <div id="content"> para <div id="content" style="clear : both">. Isto fará
+    que o texto ao invés de sair entre as divs como anteriormente, sairam embaixo delas.
+
+
+
+Aula 4.6. Usando pseudo-elementos
+---------------------------------
+
+. Pseudo elementos é representado com "::" dentro das configurações do style. Elas servem para
+    realizar alguma mudança nos atributos do conteúdo do elemento, por exemplo:
+
+    <style>
+        article > p::first-letter{
+            font-size : 60px;
+            color : red;
+        }
+    </style>
+
+    ...
+    <article>
+        <p>Teste de pseudo-elementos</p>
+    </article>
+    ...
+
+    A primeira letra do parágrafo sair com tamanho diferenciado e em vermelho.
+
+. Adicionando texto no inicio do conteúdo com "::before" :
+
+    <style>
+        article > p::before{
+            content : "Como Fazer um ";
+        }
+    </style>
+
+    ...
+    <article>
+        <p>Teste de pseudo-elementos</p>
+    </article>
+    ...
+
+    . Ao executar a página sairá a mensagem "Como Fazer um Teste de pseudo-elemento".
+
+. Uma forma de trabalhar sem "clear : both":
+
+    . Retornando ao exemplo da aula 4.5. Retire o "clear:both" do css da div com id=content 
+        e crie no arquivo css o código abaixo:
+
+        ...
+        <style>
+            div>#content::before {
+                /* Inclusão de um texto vazio no inicio do conteúdo da div */
+                content: "";
+                /* Força a disposição dos elementos um debaixo do outro */
+                display: block;
+                /* Acaba com a flutuação dos elementos */
+                clear: both;
+            }
+        </style>
+        ...
+        <div class="divPrincipal">
+            <div class="div1">
+                Esta DIV utiliza a propriedade { float : left} para posicionar a esquerda
+            </div>
+            <div class="div2">
+                Esta DIV utiliza a propriedade { float : right} para posicionar a direita
+            </div>
+            <div id="content">
+                lasjçalskfjçalskjfaçslfjasçdlfjasçlfkjasçlfkjsdflkj
+            </div>
+
+        </div>
+
+    . O resultado será a apresentação do conteúdo da div "content" debaixo das divs div1 e div2
+        e não entre elas.
+
+
+Aula 4.8. Configuração CSS para o botão
+---------------------------------------
+
+. Crie a configuração no arquivo de CSS como abaixo:
+
+    .botao {
+        display: inline-block;
+        padding: 12px 16px;
+        background-color: green;
+        color: white;
+        text-decoration: none;
+    }
+
+. Coloque nos elementos links a identificação da classe como abaixo:
+
+    <footer>
+        <a href="assine.html" class="botao">Assine</a>
+    </footer>
+
+
+
+Aula 4.9. Usando pseudo-elementos
+---------------------------------
+
+. Uma pseudo-classe CSS é uma palavra-chave adicionada a seletores que especifica um estado 
+    especial do elemento selecionado. Por exemplo, :hover pode ser usado para alterar a cor de 
+    um botão quando o usuário passar o cursor sobre ele. É representado por um simples ":".
+
+. Continuando o exemplo da aula 4.8, crie a configuração no arquivo CSS como abaixo:
+
+    .botao:hover,
+    .botao:focus {
+        background-color: darkgreen;
+    }
+
+
+Aula 4.10.  Reset CSS e Normalize.css
+-------------------------------------
+
+. Cada navegador existe um padrão de layout CSS, para evitar conflito da sua página com a 
+    variedade de navegadores o melhor a se fazer é resetar todas as configurações padrões 
+    de CSS. 
+
+. Para inicilizar todas essas configurações iremos baixar dois arquivos e utilizar um deles
+    em nossas páginas. Eles podem ser baixados em:
+
+    http://www.bit.ly/resetcss
+
+    e
+
+    http://www.bit.ly/normalizecss
+
+. Feito o download de um destes arquivos, insera-os na pasta de estilos do seu projeto e 
+    o referencie na sua página.
+
+    <link rel="stylesheet" type="text/css" ref="estilo/normalize.css>
+
+    ou
+
+    <link rel="stylesheet" type="text/css" ref="estilo/resset.css>
+
+    . Dessa forma teremos certeza que as configurações existentes serão sempre as suas e não
+        a padrão do navegador.
+
+    . Importante: A declaração dessas classes css devem ser sempre a primeira, antes de qq outra.
+                    Dê preferencia ao uso do arquivo normalize.css, pois é o que é utilizado no 
+                    bootstrap
+
+
+Aula 5.1.

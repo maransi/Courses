@@ -314,6 +314,9 @@ essa diretiva o objeto irá se posicionar no top do objeto pai ao qual ele está
 contido e com a propriedade [left / right ] irá deslocá-lo para a esquerda, ou 
 a direita.
 
+Importante: o float deve ser colocado nos elementos filhos que se deseja flutuar,
+            nunca no elemento pai pensando que assim os filhos herdarão essa propriedade.
+
 Caso existe mais de um objeto a ser flutuado do mesmo lado ele irá posicionando
 um ao lado do outro e passa para baixo caso não tenha mais espaços para flutuar 
 mais objetos.
@@ -365,7 +368,7 @@ Exemplo
             <div class="div2">
                 Esta DIV utiliza a propriedade { float : right} para posicionar a direita
             </div>
-            <div>
+            <div id="content">
                 lasjçalskfjçalskjfaçslfjasçdlfjasçlfkjasçlfkjsdflkj
             </div>
 
@@ -373,6 +376,14 @@ Exemplo
     </body>
 
     </html>
+
+. Quando ativamos o float os elementos em seguinda continuam flutuando automaticamente. Para
+    restringir essa ação é possível utilizar a propriedade "clear : both"
+
+    Exemplo:
+
+    Altere a tag <div id="content"> para <div id="content" style="clear : both">. Isto fará
+    que o texto ao invés de sair entre as divs como anteriormente, sairam embaixo delas.
 
 
 Como usar o margin e padding
