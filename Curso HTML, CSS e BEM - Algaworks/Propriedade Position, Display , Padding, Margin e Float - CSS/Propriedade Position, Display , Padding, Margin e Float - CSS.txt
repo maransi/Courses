@@ -128,7 +128,12 @@ CSS Position Relative:
 ----------------------
     Utilizando o position Relative o elemento passa a aceitar as propriedades 
     Top, Bottom, Left e Right. Com elas você pode alterar o posicionamento 
-    do elemento. Ex:        
+    do elemento. 
+    
+    O position : relative posicionará o elemento nas coordenadas subsequentes ao elemento
+    anterior, o que o antecedeu.
+    
+    Ex:        
 
     Listagem 2: Html
 
@@ -151,13 +156,14 @@ CSS Position Relative:
                 }
                 
                 .div1 {
-                    position: relative;
+                    position: static;
                     top: 50px;
                     left: 50px;
                     background: green;
                 }
                 
                 .div2 {
+                    position : relative
                     top: 20px;
                     left: 20px;
                     background: yellow;
@@ -168,22 +174,22 @@ CSS Position Relative:
         <body>
             <div class="divPrincipal">
                 <div class="div1">
-                    Esta DIV utiliza o css {position : relative;}. Quando utilizamos esta diretiva 
-                    significa que podemos posicionar um elemento num ponto especifico dentro do 
-                    elemento pai. Ou seja, abre-se a possibilidade de utilizarmos os 
-                    atributos {top: ; left: ; bottom: ; right : ; }
+                    Div position : static
                 </div>
                 <div class="div2">
-                    Esta div NÃO UTILIZA o atributo {position : relative;} Observe que mesmo 
-                    usando as propriedades top e left, isso não influenciou no posicionamento, 
-                    justamente por não utilizar {postion : relative; }
+                    Esta DIV utiliza o css {position : relative;}. Quando utilizamos esta diretiva 
+                    significa que podemos posicionar um elemento num ponto especifico após ao elemento
+                    anterior. Assim, abre-se a possibilidade de utilizarmos os 
+                    atributos {top: ; left: ; bottom: ; right : ; } referente ao elemento anterior
                 </div>
             </div>
         </body>
 
         </html>
 
-    Vide resultado no arquivo ../Position Relative (Em coordenadas especificas)/index.html
+    Caso venhamos alterar o position da div1 para absolute, esse irá para fora do container que está 
+    contido, indo para fora. Já a div2 irá subir, porque o elemento anterior a ele passa ser a 
+    divPrincipal e adotará as coordenadas deste elemento para utilizar o top, left, ... e reposicionar
 
     Importante: o style display : relative deve ser colocado nas divs filhas.
 
@@ -303,6 +309,30 @@ Position fixed
     </body>
 
     </html>
+
+. z-index
+
+    . Existe uma propriedade que ordena a sequência de exibição das divs (z-index). Ela começa pelo número 1, de acordo 
+        com a sequência de disposição das divs. Porém, se mudarmos a ordem, colocando o z-index no css 
+        para mudar a ordem natural de exibição:
+
+        .div1 {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            background: green;
+            z-index : 2;
+        }
+        
+        .div2 {
+            position: relative;
+            top: 20px;
+            left: 20px;
+            background: yellow;
+            z-index : 1;
+        }
+
+    . A exibição das divs nesse caso iniciará pela div2, sobrepondo sobre a div1
 
 
 

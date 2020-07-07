@@ -5,8 +5,8 @@ Site de frases do mussum: https://mussumipsum.com/
 
 
 
-Aula 2.2 - Estrutura básica de documentos
------------------------------------------
+Aula 2.2 - Estrutura de uma página HTML
+---------------------------------------
     
     . Digitando "!" temos o seguinte código criado:
 
@@ -28,7 +28,7 @@ Aula 2.2 - Estrutura básica de documentos
     . Digitando "html:5" temos:
 
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="pt-br">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,6 +38,7 @@ Aula 2.2 - Estrutura básica de documentos
             
         </body>
         </html>
+
 
 Aula 2.3. DOCTYPE e codificação
 -------------------------------
@@ -49,6 +50,183 @@ Aula 2.3. DOCTYPE e codificação
     . Se não for colocado esta tag o browser irá pelo encoding padrão dele e 
         consequentemente letras acentuadas não serão apresentados como deveriam
         e sim com caracteres especiais.
+
+    . Tag Link
+
+        <link rel="stylesheet" type="text/css" href="estilo.css" >
+
+    . Scripts
+
+        <script src="scripts/seu-script.js"></script>
+
+    . Semântica do HTML 5
+
+        +-----------------------------------------------------------------------+
+        |                           <header>                                    |
+        |                             <nav>                                     |
+        +-----------------------------------------------------------------------+
+        |                  <section>                    |        <aside>        |
+        |     +------------------------------------+    |                       |
+        |     |            <article>               |    |                       |
+        |     |     +-----------------------+      |    |                       |
+        |     |     |      <header>         |      |    |                       |
+        |     |     +-----------------------+      |    |                       |
+        |     +------------------------------------+    |                       |
+        |                                               |                       |
+        |     +------------------------------------+    |                       |
+        |     |            <article>               |    |                       |
+        |     |     +-----------------------+      |    |                       |
+        |     |     |      <header>         |      |    |                       |
+        |     |     +-----------------------+      |    |                       |
+        |     +------------------------------------+    |                       |
+        +-----------------------------------------------------------------------+
+        |                          <footer>                                     |
+        +-----------------------------------------------------------------------+
+        
+    . Uma estrutura inicial completa para páginas HTML 5, com header, section, article, etc.
+
+        <!DOCTYPE HTML>
+        <html lang="pt-br">
+        <head>
+            <meta charset="utf-8"/>
+            <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+            <title>Título da Página (Estrutura básica de uma página com HTML 5)</title>
+            <link href="css/seu-stylesheet.css" rel="stylesheet"/>
+            <script src="scripts/seu-script.js"></script>
+        </head>
+        <body>
+            <header>
+                <nav>
+                    <ul>
+                        <li>Home</li>
+                        <li>Contato</li>
+                    </ul>
+                </nav>
+            </header>
+
+            <section>
+                <article>
+                    <header>
+                        <h2>O título do artigo é aqui</h2>
+                        <p>Publicado em <time datetime="2015-03-09T13:00:24+01:00">09 de Março de 2015</time> 
+                            por <a href="#">Author</a> - <a href="#comments">30 comentários</a></p>
+                    </header>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+                    tempor incididunt ut labore et dolore magna aliqua.</p>
+                </article>
+
+                <article>
+                    <header>
+                        <h2>O título do artigo é aqui</h2>
+                        <p>Publicado em <time datetime="2015-03-09T13:00:24+01:00">09 de Março de 2015</time> por 
+                        <a href="#">Author</a> - <a href="#comments">15 comentários</a></p>
+                    </header>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+                    incididunt ut labore et dolore magna aliqua.</p>
+                </article>
+            </section>
+
+            <aside>
+                <h2>Entre em contato</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt 
+                ut labore et dolore magna aliqua.</p>
+            </aside>
+
+            <footer>
+                <p>Copyright 2015 Código Fonte©</p>
+            </footer>
+        </body>
+        </html>
+
+    . <header>
+
+        O novo elemento <header> do HTML5 é usado para definir o cabeçalho de uma página ou seção, 
+        e pode conter logo, títulos, menu de navegação, campo de busca, etc.
+
+        <header>
+            <nav>
+                <ul class="menu">
+                    <li><a href="inicio.html">Início</a></li>
+                    <li><a href="quem-somos.html">Quem somos</a></li>
+                    <li><a href="servicos.html">Serviços</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                </ul>
+            </nav>
+
+    . <nav>
+
+        O novo elemento <nav> do HTML5 serve para agrupar uma lista de links para outras partes do site, 
+        seja essa lista de navegação local ou global. Esses blocos de links podem estar em diferentes 
+        partes do layout, como no cabeçalho ou no rodapé.
+
+    . <section>
+
+        O novo elemento <section> do HTML5 é o menos especifico entre as novas tags. A diferença do 
+        <section> para um <div> é que o primeiro serve para dividir o conteúdo em diferentes seções, 
+        que podem conter elementos como <header> ou <article>, enquanto o segundo divide qualquer 
+        conteúdo, sem uma finalidade específica.
+
+        <section>
+            <article>
+                <header>
+
+                </header>
+            </article>
+        </section>
+
+    . <article>
+
+        O novo elemento <article> do HTML5 serve para identificar um conteúdo independente e de maior 
+        relevância dentro da página, que pode ser distribuido via feed, como um post, artigo ou bloco 
+        de comentários.
+
+        O elemento <article> pode conter outros elementos como <header> ou <footer>.
+
+        <article>
+            <header>
+                <h1>Entendendo o elemento Article</h1>
+                <p>Publicado em <time pubdate datetime="2011-09-01">01 de Setembro de 2011</time></p>
+            </header>
+            ...conteúdo...
+            <footer>
+                <small>© Todos os direitos reservados.</small>
+            </footer>
+        </article>
+
+    . <aside>
+
+        O elemento <aside> é utilizado quando precisamos criar um conteúdo de apoio/adicional ao conteúdo 
+        principal. Por exemplo, ao falar de HTML semântico, podemos indicar ao leitor outros conteúdos 
+        sobre a linguagem HTML como sugestão de leitura complementar.
+
+        <div id="primary">
+            <article>
+                <header>
+                    <h1>Entendendo o elemento Aside</h1>
+                    <p>Publicado em <time pubdate datetime="2011-09-01">01 de Setembro de 2011</time></p>
+                </header>
+                (...)
+                <aside>
+                    <h2>Curiosidades sobre o Aside</h2>
+                    (...)
+                </aside>
+                <footer>
+                     <p>Esse post foi publicado na categoria <a href="#" title="HTML5">HTML5</a>
+                </footer>
+            </article>
+        </div>
+        
+    . <footer>
+
+        O elemento <footer> representa um rodapé de um documento, como a área presente no final de uma página web. 
+        Normalmente é utilizado para descrever informações de autoria, como nome e contato do autor, e data de 
+        criação do conteúdo.
+
+        <footer>
+            <p>Escrito por Estevão Dias</p>
+            <p>Publicado em 25/03/2017 </p>
+        </footer>    
+
 
 Aula 2.4. Primeiras Tags: Títulos, quebras de linhas e parágrafos
 -----------------------------------------------------------------
@@ -144,6 +322,44 @@ Aula 2.9. Elementos Estruturais
     </style>
 
 
+Aula 3.0 - overflow
+-------------------
+
+. A propriedade overflow especifica quando o conteúdo de um elemento de nível de bloco deve ser cortado, 
+    exibido com barras de rolagem ou se transborda do elemento.
+
+. Valores possiveis:
+
+    overflow:  visible | hidden | scroll | auto | inherit
+
+    visible - Valor padrão. O conteúdo não é cortado e pode ser renderizado para fora da caixa de conteúdo.
+    hidden - O conteúdo é cortado e nenhuma barra de rolagem é exibida.
+    scroll - O conteúdo é acessível através de barras de rolagem que são exibidas mesmo que o conteúdo não 
+                precise. Isso evita o problema de barras de rolagem aparecendo e desaparecendo quando o 
+                conteúdo é dinâmico. Impressoras podem imprimir o conteúdo vazado.
+    auto - Depende do navegador utilizado. Navegadores desktop como o Firefox geralmente exibem barras de 
+            rolagem apenas quando necessário.
+
+. Exemplo: 
+
+    p {  
+        width: 12em;
+        border: dotted;
+        overflow: visible;   /* Exibe o conteúdo de forma vazada, fora da caixa de conteúdo */ 
+    }
+
+    p { overflow: hidden; /* Esconde o conteúdo excedente */ }
+
+    p { overflow: scroll; /* Sempre exibe barras de rolagem */ }
+
+    p { overflow: auto; /* Exibe barras de rolagem apenas se necessário */ }
+
+. Ainda podemos utilizar os eixos x e y para definir o scroll:
+
+    overflow-x specifies what to do with the left/right edges of the content.
+    overflow-y specifies what to do with the top/bottom edges of the content.
+
+
 Aula 3.1. 3.2. 3.3. O que é CSS
 ---------------------
 
@@ -215,6 +431,16 @@ Aula 3.1. 3.2. 3.3. O que é CSS
 
             </body>
         </html>
+
+. A especificidade/prioridade entre os estilos:
+
+    1. Inline
+    2. Incorporado
+    3. Externo
+
+    Se um estilo for especificado em mais de uma dessas camadas a prioridade ocorrerá conforme
+    acima.
+
 
 Aula 3.4. Seletores de tipo, classe e ID
 ----------------------------------------
@@ -458,14 +684,19 @@ display - Define se um elemento deve ser apresentado ou não, e a sua forma de a
 Valores - none; inline; block; list-item; run-in; compact; marker; table; inline-table; 
             table-row-group; table-header-group; table-footer-group; table-row; 
             table-column-group; table-column; table-cell; table-caption;
-
+ 
 Os objetos já vem configurado implicitamente essa propriedade CSS. No caso dos link <a href="...">
 o display é "inline"; já os "text" é block.
 
 inline = um ao lado do outro e ocupa somente o espaço do conteúdo. 
             Height e Weight nâo tem efeito no inline.
-block = um debaixo do outro e ocupa toda a linha.
+block = um debaixo do outro e ocupa toda a linha. E ele é o default
 none = oculta o objeto na hora de redenrizar, mas o objeto permanece no lugar.
+ 
+table-cell = Faz com que o comportamento do elemento ocorra como uma celula de uma tabela. Qdo ativado
+                podemos utilizar alguma propriedades de CSS que só funciona para table-cell:
+
+                vertical-align : middle; / bottom;
 
 
 3.12. Adicionando bordas
@@ -502,6 +733,13 @@ none = oculta o objeto na hora de redenrizar, mas o objeto permanece no lugar.
         border-radius : 20px 10px 20px 10px; 
 
         background-color : #cccccc; 
+
+
+        /* Especificação da borda para cada lado */
+        border-top: #000 solid 10px;
+        border-right : #fff solid 10px;
+        border-bottom: #0c0 solid 10px;
+        border-left: #e0e dotted 10px;
 
 
     }
@@ -541,6 +779,9 @@ padding-top; padding-right; padding-bottom; padding-left = Definem o espaço ent
 3.14. Margens de elementos
 --------------------------
 
+Importante: Para que nossa página seja responsiva é interessante dar preferência na utilização da 
+    unidade "%" ao invés de "px"
+
 margin = Define as 4 margens do elemento. Aceita de 1 a 4 valores. Começando pela top, na seguida left
 
 margin-top; margin-right; margin-bottom; margin-left = Definem as margens superior, direita, 
@@ -567,7 +808,25 @@ margin-top; margin-right; margin-bottom; margin-left = Definem as margens superi
     */
     margin: 15px 5px 5px 15px;
 
+
+    /* Para centralizar o elemento utilizamos o margin : auto, porém é necessário indicar
+        o width */
+    width: 30%;
+    margin: auto;
+
 }                                                        
+
+padding = define margem interna do elemento
+
+{
+    /* Define o padding para os quatro lados do elemento */
+    padding : 5% / 5px;
+
+    /* Define o padding para cada lado do elemento, começando pelo 
+        topo, direita, bottom e left */
+    padding : 5px, 10px, 20px, 25px;
+
+}
 
 
 3.15. Box model e a propriedade box-sizing
@@ -1140,6 +1399,7 @@ Aula 4.10.  Reset CSS e Normalize.css
     e
 
     http://www.bit.ly/normalizecss
+    
 
 . Feito o download de um destes arquivos, insera-os na pasta de estilos do seu projeto e 
     o referencie na sua página.
@@ -1158,4 +1418,433 @@ Aula 4.10.  Reset CSS e Normalize.css
                     bootstrap
 
 
-Aula 5.1.
+Aula 5.2. Unidade de medida : Pixel
+-----------------------------------
+
+. O tamanho dos elementos e tela são configurados por pixel, percentual, etc.
+
+    font-size : 16px;
+
+. O tamnho da fonte pode ser configurado no navegador, informando se queremos pequeno, médio e grande.
+    Todos os elementos da página herdaram essa configuração;
+
+. Pixel é uma unidade que deve ser evitada em layout responsivos. Usada com exceção em tamanho de bordas
+    porque só aceita unidade pixel.
+
+
+Aula 5.3. Unidade de medida: Percentual
+---------------------------------------
+
+. Quando utilizamos percentual como unidade de medida estamos dizendo ao navegador que queremos x% do 
+    tamanho em relação ao pai daquele elemento. Caso o elemento a ser configurado for uma fonte, o 
+    navegador verificará a relação de elementos em que o objeto está inserido, chegando até as 
+    configurações do navegador se for o caso, para definir o tamanho da fonte percentualmente.
+
+    Exemplo:
+
+        . Considere que o browser está com o tamanho de fonte médio (16px), então o tamanho da fonte
+            da div será de 32px e dos parágrafos ficará em 64px.
+
+        <!DOCTYPE html>
+        <html lang="pt-br">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+            <style>
+                /* Tam da fonte padrão 16px */
+                div {
+                    /* 16 * 200% = 32 */
+                    font-size: 200%
+                    border: 1px solid black;
+                    width: 80%;
+                }
+                
+                p {
+                    /* 32 * 200% = 64px */
+                    font-size: 200%;
+                }
+            </style>
+        </head>
+
+        <body>
+            <div>
+                <p>Ipsum, cacilds vidis litro abertis. Cevadis im ampola pa arma uma pindureta. </p>
+                <p>Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis </p>
+                <p>nisl. Em pé sem cair, deitado sem dormir, sentado sem cochilar e fazendo pose. Leite</p>
+                <p>de capivaris, leite de mula manquis sem cabeça.</p>
+            </div>
+        </body>
+
+        </html>
+
+    . Se quisermos alterar o tamanho da fonte padrão da página, podemos colocar no style a seguinte definição:
+
+        <style>
+            html{
+                font-size : 16px;            
+            }
+        </style>
+
+    . O problema de definir em pixels seria que ao alterar o tamanho da fonte no navegador (pequeno, médio, grande)
+        não irá surtir efeito. Outro detalhe, que a página deixa de ser responsiva.
+
+
+Aula 5.4. Meta tag viewport
+----------------------
+
+. Sempre que formos desenvolver uma página responsiva devemos definir o "viewport" no cabeçalho da página:
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+. O "width" informa para pegar o tamanho do device e o "initial-scale=1.0" diz ao navegador que deverá ser de 100%
+    o zoom da página.
+
+
+Aula 5.5. Layout Fluido
+Aula 5.6. Layout responsivo e media queries
+-----------------------
+
+. Altere as propriedades que estão com unidade px para % no arquivo estilo.css:
+
+    .container {
+        width: 100%;
+        ...
+    }
+
+    ...
+
+    article {
+        width: 30%;
+        margin-right: 5%;
+        ...
+    }
+
+    ...
+
+. Inclua a media query abaixo:
+
+    @media( min-width: 800px) {
+        article {
+            width: 30%;
+            float: left;
+            margin-right: 5%;
+        }
+    }
+
+    . Elimine as propriedade do @media do css origem article deixando ele da seguinte forma:
+
+        article {
+            padding: 10px;
+            border: 1px solid #95a4a5;
+        }
+
+
+    . Media query diz ao navegador para utilizar as configurações dentro do @media a partir do tamanho
+        configurado em "min-width", no nosso exemplo 800px
+
+. Insira no cabeçalho da página o "viewport":
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+Aula 5.7. Como funcionar um sistema de Grid CSS
+-----------------------------------------------
+
+https://getbootstrap.com.br/docs/4.1/layout/grid/#:~:text=como%20container%20flex.-,Par%C3%A2metros%20grid,mudan%C3%A7a%20no%20tamanho%20de%20fonte.
+https://getbootstrap.com.br/docs/4.1/components/forms/#:~:text=row%20por%20.,para%20conseguir%20layouts%20mais%20compactos.
+https://www.w3schools.com/bootstrap/bootstrap_grid_system.asp
+
+
+. Acesse a página do bootstrap http://getbootstrap.com baixa a versão atual. Ou utilize o "npm" para 
+    baixar a biblioteca: 
+
+    npm install bootstrap
+
+. Detalhe, o bootstrap já vem intrínseco o reset da página, assim não precisamos referenciar mais o 
+    arquivo reset.css, ou o normalizecss.css
+
+. Copie o arquivo "bootstrap.min.css" para dentro do seu projeto e o referencie na página como abaixo:
+
+    <!DOCTYPE html>
+    <html lang="pt-br">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" href="/css/bootstrap-grid.min.css">
+        <link rel="stylesheet" href="/css/estilo.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>Algaworks</h1>
+        </div>
+
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm">
+                    Uma de três colunas
+                </div>
+                <div class="col-sm">
+                    Uma de três colunas
+                </div>
+                <div class="col-sm">
+                    Uma de três colunas
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+    </html>
+
+. O container adicionou margens laterais ao conteúdo, e centralizou na tela. 
+    Além disso, ele já definiu a largura máxima do conteúdo.
+
+. Você pode escolher entre dois tipos de containers para usar em suas páginas: 
+    o container simples e o container fluído.
+
+. O container simples, que é o padrão, cria uma área responsiva e de largura fixa, 
+    que fica centralizada na tela (ou no elemento-pai). No código abaixo, 
+    temos um exemplo do container simples:
+
+    <div class="container">	  ...	</div>
+
+. Já o container fluído também cria uma área responsiva, mas que ocupa toda a tela 
+    (também conhecido como full width).
+
+    <div class="container-fluid">	  ...	</div>
+
+. O sistema de grid do Bootstrap  possui 4 classes:
+
+    xs ( para celulares - Telas com tamanho menores de 768px)
+    sm ( para tablets - Telas com tamanho igual ou maior que 768px )
+    md ( para notebooks - Telas com tamanho igual, ou maior que 992px)
+    lg ( para notebooks - Telas com tamanho igual, ou maior que 1200px)
+
+. Para utilizar o sistema de grid acima elas precisam seguir o padrão abaixo:
+
+    <!-- class="container / container-fluid -->
+    <div class="container-fluid">
+        
+        <!-- Há possibilidade de utilizar outra classe como: <div class="form-row"> -->
+        <!-- Se utilizar o form-row teremos que ter na div com classe col-* outra classe -->
+        <!-- que agrupe os objetos seria form-group <div class="form-group col-xs-3 col-sm-5"> -->
+        <div class="row">
+            <div class="col-xs-3 col-sm-5">
+                <div style="background-color: green; color: #fff;">
+                    <h1>Logo</h1>
+                </div>
+            </div>
+            <div class="col-xs-9 col-sm-7">
+                <div style="background-color: blue; color: #fff;">
+                    <h1>Menu</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    Exemplo
+    -------
+
+    <!DOCTYPE html>
+    <html lang="pt-br">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-grid.css">
+        <link rel="stylesheet" href="css/estilo.css">
+    </head>
+
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-3 col-sm-5">
+                    <div style="background-color: green; color: #fff;">
+                        <h1>Logo</h1>
+                    </div>
+                </div>
+                <div class="col-xs-9 col-sm-7">
+                    <div style="background-color: blue; color: #fff;">
+                        <h1>Menu</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div style="background-color: darkblue; color: #fff;">
+                        <h1>Banner 1</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div style="background-color: orange; color: #fff;">
+                        <h1>Banner 2</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div style="background-color: red; color: #fff;">
+                        <h1>Banner 3</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+    </html>
+
+
+Aula 5.8 - Ajustando o projeto para usar o Grid CSS do Bootstrap
+----------------------------------------------------------------
+
+. Comente no arquivo estilo.css o item .container e o @media
+
+    /*
+        Vamos desconsiderar para utilizar o 
+        sistema de grid do bootstrap
+    .container {
+        width: 100%;
+        margin: 0 auto;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    */
+
+    /* Diz para considerar as configurações 
+    a partir do tamanho apontado em "min-width"
+
+    @media( min-width: 800px) {
+        article {
+            width: 30%;
+            float: left;
+            margin-right: 5%;
+        }
+    }
+    */
+
+
+. Na página index.html substitua o link para o css reset.css pelo bootstrap-grid.css
+
+    <link rel="stylesheet" type="text/css" href="style/bootstrap-grid.css">
+
+. Deixe o conteúdo da página index.html como abaixo:
+
+    <div class="container-fluid">
+
+        <!-- Inserido -->
+        <div class="row">   
+            <!-- Inserido -->
+            <div class="col-md-4 col-sm-4">
+                <article>
+                    <h2>Autônomo</h2>
+                    <div>R$ 59,00 por mês</div>
+                    <ul>
+                        <li>Até <strong>2 usuários</strong></li>
+                        <li><strong>500MB</strong> de armazenamento</li>
+                        <li>Lançamento ilimitados</li>
+                        <li>Acesso seguro</li>
+                        <li>Sem fidelidade</li>
+                    </ul>
+
+                    <footer>
+                        <a href="assine.html" class="botao">Assine</a>
+                    </footer>
+                </article>
+            </div>
+
+            <!-- Inserido -->
+            <div class="col-md-4 col-sm-4">
+                <article>
+                    <h2>Micro</h2>
+                    <div>R$ 89,00 por mês</div>
+                    <ul>
+                        <li>Até <strong>5 usuários</strong></li>
+                        <li><strong>1GB</strong> de armazenamento</li>
+                        <li>Lançamento ilimitados</li>
+                        <li>Acesso seguro</li>
+                        <li>Sem fidelidade</li>
+                    </ul>
+
+                    <footer>
+                        <a href="assine.html" class="botao">Assine</a>
+                    </footer>
+                </article>
+            </div>
+
+            <!-- Inserido -->
+            <div class="col-md-4 col-sm-4">
+                <article>
+                    <h2>Pequena</h2>
+                    <div>R$ 99,00 por mês</div>
+                    <ul>
+                        <li>Até <strong>10 usuários</strong></li>
+                        <li><strong>5GB</strong> de armazenamento</li>
+                        <li>Lançamento ilimitados</li>
+                        <li>Acesso seguro</li>
+                        <li>Sem fidelidade</li>
+                    </ul>
+
+                    <footer>
+                        <a href="assine.html" class="botao">Assine</a>
+                    </footer>
+                </article>
+            </div>
+        </div>
+    </div>
+
+Aula - 6.1. Especificidade do CSS
+---------------------------------
+
+. A ordem de especificidade/consideração dos elementos de um arquivo de estilos css segue
+    a sequência abaixo:
+
+    1. "#" id
+
+    2. "." classe
+
+    3. Tag html (h1, p, ...)
+
+. Se houver o mesmo item declarado mais de uma vez dentro do arquivo css, o que será considerado
+    na página HTML será sempre o último do arquivo.
+
+. Se uma tag na página tiver no arquivo css mais de uma definição, a especificidade obedecerá a 
+    regra ( #, ., elemento html), exemplo:
+
+    <h1 class="verde" id="SaoPaulo">
+
+    . O estilo a ser adotado seria o do SaoPaulo por ser o mais especifico.
+
+. O estilo inline <div id="banner" style="background-color:yellow;"> sempre terá precedência sobre
+    o id, classe, ou tag declarado no arquivo css.
+
+
+
+Aula 6.3. Metodologia BEM
+-------------------------
+
+. Site da metodologia BEM www.getbem.com
+
+. BEM Block Element Modifier
+
+. Na metodologia BEM tudo é considerado como bloco (conjunto de elementos), elemento (itens que compoe um bloco)
+    e modificador (item que divergem do bloco origem, se estivermos reaproveitando um bloco).
+
+
+ 
+
+
+Aula 26 - https://www.youtube.com/watch?v=lRSkBbLYfY8&list=PLx4x_zx8csUi47Bnugpk78nqJN6rYvEnV&index=26
+
+
+d
