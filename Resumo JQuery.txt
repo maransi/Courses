@@ -1,0 +1,415 @@
+Resumo JQuery
+-------------
+
+. Principais caracteristicas do JQuery:
+
+    DOM manipulation − The jQuery made it easy to select DOM elements, negotiate 
+                        them and modifying their content by using cross-browser 
+                        open source selector engine called Sizzle.
+
+    Event handling − The jQuery offers an elegant way to capture a wide variety of 
+                        events, such as a user clicking on a link, without the 
+                        need to clutter the HTML code itself with event handlers.
+
+    AJAX Support − The jQuery helps you a lot to develop a responsive and featurerich 
+                    site using AJAX technology.
+
+    Animations − The jQuery comes with plenty of built-in animation effects which you 
+                    can use in your websites.
+
+    Lightweight − The jQuery is very lightweight library - about 19KB in size 
+                    (Minified and gzipped).
+
+    Cross Browser Support − The jQuery has cross-browser support, and works well in 
+                                IE 6.0+, FF 2.0+, Safari 3.0+, Chrome and Opera 9.0+
+
+    Latest Technology − The jQuery supports CSS3 selectors and basic XPath syntax.
+
+
+. Installation JQuery:
+
+    CLI command:
+
+        npm install jquery
+
+        or
+
+        yarn add jquery
+
+        or
+
+        bower install jquery
+
+. Forms to use JQuery:
+
+    . Local Installation − You can download jQuery library on your local machine and include it in your 
+                            HTML code.
+
+        . Download JQuery https://jquery.com/download/, save in local folder and reference in your page:
+
+            <html>
+            <head>
+                <title>The jQuery Example</title>
+                <script type = "text/javascript" src = "/jquery/jquery-2.1.3.min.js">
+                </script>
+                    
+                <script type = "text/javascript">
+                    $(document).ready(function() {
+                        document.write("Hello, World!");
+                    });
+                </script>
+            </head>
+                
+            <body>
+                <h1>Hello</h1>
+            </body>
+            </html>
+
+    . CDN Based Version − You can include jQuery library into your HTML code directly from Content 
+                        Delivery Network (CDN).
+
+        . To be easy go to in page and see about actual declaration CDN:
+
+            https://code.jquery.com/        
+
+        . Using JQuery with CDN (Content Delivery Network):
+
+            <html>
+            <head>
+                <title>The jQuery Example</title>
+            </head>
+                
+            <body>
+                <h1>Hello</h1>
+            </body>
+
+            <script src="https://code.jquery.com/jquery-3.5.1.min.js" 
+                    integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" 
+                    crossorigin="anonymous"></script>                    
+            <script type = "text/javascript">
+                $(document).ready(function() {
+                    document.write("Hello, World!");
+                });
+            </script>
+            </html>
+
+. How to call JQuery library function:
+
+    . Everything inside it will load as soon as the DOM is loaded and before the page contents are loaded.
+
+        $(document).ready( function {
+            // to do         
+        });
+
+    . Example:
+
+        <html>
+        <head>
+            <title>The jQuery Example</title>
+            <script type = "text/javascript" 
+                src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+            </script>
+
+            <script type = "text/javascript" language = "javascript">
+                $(document).ready(function() {
+                    $("div").click(function() {alert("Hello, world!");});
+                });
+            </script>
+        </head>
+            
+        <body>
+            <div id = "mydiv">
+                Click on this to see a dialogue box.
+            </div>
+        </body>
+        </html>
+
+
+
+. Variable Scope
+
+    ...
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Global vars
+            msgInitial = "Hello";
+
+            $("div").click(function(e) {
+                // Local vars
+                msgFinish = " World";
+
+                alert(msgInitial + msgFinish);
+            });
+        });
+    </script>
+    ...
+
+. Functions Callback
+
+        $("body").click(function(event) {
+            // Say in console the message for example:
+            //
+            // clicked: [object HTMLBodyElement]
+            //
+            console.log("clicked: " + event.target);
+        });
+
+        $("#myform").submit(function() {
+            // In this case is require return value
+            return false;
+        });
+
+        $(".send").on("click", function(){
+            var code = $(".code").val();
+
+            $(".result").html("Input val -> " + code);
+        
+        });
+
+. Following are important JavaScript functions −
+
+    charAt() - Returns the character at the specified index.
+
+        alert( $("#codigo).val().charAt(0));
+
+    concat() - Combines the text of two strings and returns a new string.
+
+
+    indexOf() - Returns the index within the calling String object of the first occurrence of the 
+                specified value, or -1 if not found.
+
+        var str = "If the facts don't fit the theory, change the facts.";
+        var pos = str.indexOf("facts");
+        alert(pos); 
+
+    length() - Returns the length of the string.
+
+    pop() - Removes the last element from an array and returns that element.
+
+    push() - Adds one or more elements to the end of an array and returns the new length of the array.
+
+    replace() - You can use the replace() method to replace part of a string with another string
+
+        var str = "Color red looks brighter than color blue.";
+        var result = str.replace("color", "paint");
+        alert(result);
+
+
+    reverse() - Reverses the order of the elements of an array -- the first becomes the last, and the last becomes the first.
+
+    sort() - Sorts the elements of an array.
+
+    split() - The split() method can be used to splits a string into an array of strings, using the syntax 
+                str.split(separator, limit)
+
+        var fruitsStr = "Apple, Banana, Mango, Orange, Papaya";
+        var fruitsArr = fruitsStr.split(", ");
+        document.write(fruitsArr[0]); // Prints: Apple
+        document.write(fruitsArr[2]); // Prints: Mango    
+
+        var str = "INTERSTELLAR";
+        var strArr = str.split("");
+        document.write(strArr[0]); // Prints: I
+        document.write(strArr[1]); // Prints: N
+
+    substr() - Returns the characters in a string beginning at the specified location through the specified number of characters.
+
+        var str = "The quick brown fox jumps over the lazy dog.";
+        document.write(str.substring(4, 15)); // Prints: quick brown
+
+    toLowerCase() - Returns the calling string value converted to lower case.
+
+    toString() - Returns the string representation of the number's value.
+
+    toUpperCase() - Returns the calling string value converted to uppercase.
+
+    loops
+
+        var i = 1;
+        while(i <= 5) {    
+            document.write("<p>The number is " + i + "</p>");
+            i++;
+        }
+
+        for(var i=1; i<=5; i++) {
+            document.write("<p>The number is " + i + "</p>");
+        }
+
+
+        var fruits = ["Apple", "Banana", "Mango", "Orange", "Papaya"];
+        
+        // Loop through all the elements in the array 
+        for(var i=0; i<fruits.length; i++) {
+            document.write("<p>" + fruits[i] + "</p>");
+        }
+
+
+        // An object with some properties 
+        var person = {"name": "Clark", "surname": "Kent", "age": "36"};
+        
+        // Loop through all the properties in the object  
+        for(var prop in person) {  
+            document.write("<p>" + prop + " = " + person[prop] + "</p>"); 
+        }
+
+        // name = Clark
+        // surname = Kent
+        // page = 36
+
+
+        var fruits = ["Apple", "Banana", "Mango", "Orange", "Papaya"];
+        
+        // Loop through all the elements in the array 
+        for(var i in fruits) {  
+            document.write("<p>" + fruits[i] + "</p>");
+        }
+
+
+        $.each([ 52, 97 ], function( index, value ) {
+            alert( index + ": " + value );
+        });
+
+        This produces two messages:
+
+        0: 52
+        1: 97
+
+
+        If an object is used as the collection, the callback is passed a key-value pair each time:
+
+        var obj = {
+            "flammable": "inflammable",
+            "duh": "no duh"
+        };
+
+        $.each( obj, function( key, value ) {
+            alert( key + ": " + value );
+        });
+
+. Podemos optar por escolher os simbolos ($ ou JQuery) para construir uma função JQuery:
+
+    $
+
+        <script type = "text/javascript">
+            $(document).ready(function() {
+                document.write("Hello, World!");
+            });
+        </script>
+
+    JQuery
+
+        <script type = "text/javascript">
+            JQuery(document).ready(function() {
+                document.write("Hello, World!");
+            });
+        </script>
+
+
+
+. Example Selectors Element
+
+    1	$('*') - This selector selects all elements in the document.
+
+    2	$("p > *") - This selector selects all elements that are children of a paragraph element.
+
+    3	$("#specialID") - This selector function gets the element with id="specialID".
+
+    4	$(".specialClass") - This selector gets all the elements that have the class of specialClass.
+
+    5	$("li:not(.myclass)") - Selects all elements matched by <li> that do not have class = "myclass".
+
+    6	$("a#specialID.specialClass") - This selector matches links with an id of specialID and a 
+            class of specialClass.
+
+    7	$("p a.specialClass") - This selector matches links with a class of specialClass declared 
+        within <p> elements.
+
+    8	$("ul li:first") - This selector gets only the first <li> element of the <ul>.
+
+    9	$("#container p") - Selects all elements matched by <p> that are descendants of an element 
+        that has an id of container.
+
+    10	$("li > ul") - Selects all elements matched by <ul> that are children of an element matched by <li>
+
+    11	$("strong + em") - Selects all elements matched by <em> that immediately follow a sibling element 
+        matched by <strong>.
+
+    12	$("p ~ ul") - Selects all elements matched by <ul> that follow a sibling element matched by <p>.
+
+    13	$("code, em, strong") - Selects all elements matched by <code> or <em> or <strong>.
+
+    14	$("p strong, .myclass") - Selects all elements matched by <strong> that are descendants of an 
+            element matched by <p> as well as all elements that have a class of myclass.
+
+    15	$(":empty") - Selects all elements that have no children.
+
+    16	$("p:empty") - Selects all elements matched by <p> that have no children.
+
+    17	$("div[p]") - Selects all elements matched by <div> that contain an element matched by <p>.
+
+    18	$("p[.myclass]") - Selects all elements matched by <p> that contain an element with a class of myclass.
+
+    19	$("a[@rel]") - Selects all elements matched by <a> that have a rel attribute.
+
+    20	$("input[@name = myname]") - Selects all elements matched by <input> that have a name value exactly 
+        equal to myname.
+
+    21	$("input[@name^=myname]") - Selects all elements matched by <input> that have a name value beginning 
+        with myname.
+
+    22	$("a[@rel$=self]") - Selects all elements matched by <a> that have rel attribute value ending with self.
+
+    23	$("a[@href*=domain.com]") - Selects all elements matched by <a> that have an href value containing 
+        domain.com.
+
+    24	$("li:even") - Selects all elements matched by <li> that have an even index value.
+
+    25	$("tr:odd") - Selects all elements matched by <tr> that have an odd index value.
+
+    26	$("li:first") - Selects the first <li> element.
+
+    27	$("li:last") - Selects the last <li> element.
+
+    28	$("li:visible") - Selects all elements matched by <li> that are visible.
+
+    29	$("li:hidden") - Selects all elements matched by <li> that are hidden.
+
+    30	$(":radio") - Selects all radio buttons in the form.
+
+    31	$(":checked") - Selects all checked box in the form.
+
+    32	$(":input") - Selects only form elements (input, select, textarea, button).
+
+    33	$(":text") - Selects only text elements (input[type = text]).
+
+    34	$("li:eq(2)") - Selects the third <li> element.
+
+    35	$("li:eq(4)") - Selects the fifth <li> element.
+
+    36	$("li:lt(2)") - Selects all elements matched by <li> element before the third one; in other 
+        words, the first two <li> elements.
+
+    37	$("p:lt(3)") - selects all elements matched by <p> elements before the fourth one; in other 
+        words the first three <p> elements.
+
+    38	$("li:gt(1)") -Selects all elements matched by <li> after the second one.
+
+    39	$("p:gt(2)") - Selects all elements matched by <p> after the third one.
+
+    40	$("div/p") - Selects all elements matched by <p> that are children of an element matched by <div>.
+
+    41	$("div//code") - Selects all elements matched by <code>that are descendants of an element 
+        matched by <div>.
+
+    42	$("//p//a") - Selects all elements matched by <a> that are descendants of an element matched by <p>
+
+    43	$("li:first-child") - Selects all elements matched by <li> that are the first child of their parent.
+
+    44	$("li:last-child") - Selects all elements matched by <li> that are the last child of their parent.
+
+    45	$(":parent") - Selects all elements that are the parent of another element, including text.
+
+    46	$("li:contains(second)") - Selects all elements matched by <li> that contain the text second.
+
