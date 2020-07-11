@@ -1,0 +1,183 @@
+Propriedade display
+-------------------
+
+
+https://www.maujor.com/tutorial/propriedade-css-display.php
+
+
+A propriedade display permite que você defina a maneira como determinado 
+elemento HTML deve ser renderizado.
+
+    display : [block / inline / none / inline-block / list-item / run-in / compact / table / ]
+
+Colocar a propriedade css sempre para os componentes HTML filhas, nunca para o pai.
+
+display : block
+---------------
+
+    Este é o display padrão quando a página e iniciada. o display : block informa ao navegador
+    para exibir os componentes um debaixo do outro.
+
+    Exemplo: 
+
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+            <style>
+                .principal {
+                    border: 1px solid black;
+                    width: 400px;
+                    height: 400px;
+                }
+                
+                .principal>div {
+                    border: 1px solid blue
+                    display : block;    /* display : block já é o default, não é necessário
+                                            explicitar, só foi feito por questão didática */
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class="principal">
+                <div>
+                    Primeira Div
+                </div>
+
+                <div>
+                    Segunda Div
+                </div>
+                <div>
+                    Terceira Div
+                </div>
+        </body>
+
+        </html>
+
+    Saída:
+
+        +------------------------------------------------+
+        |+---------------+                               |
+        ||Primeira Div   |                               |
+        |+---------------+                               |
+        |+---------------+                               |
+        ||Segunda Div    |                               |
+        |+---------------+                               |
+        |+---------------+                               |
+        ||Terceira Div   |                               |
+        |+---------------+                               |
+        +------------------------------------------------+
+
+
+diplay : inline
+---------------
+
+    Este display coloca os componentes um lado do outro:
+
+    Exemplo:
+
+        .principal>div{
+            display : inline;
+        }
+
+    Saída:
+
+        +--------------------------------------------------------+
+        |+---------------+ +---------------+ +---------------+   |
+        ||Primeira Div   | |Segunda Div    | |Terceira       |   |
+        |+---------------+ +---------------+ +---------------+   |
+        +--------------------------------------------------------+
+
+display : none 
+--------------
+
+    Este display some com todas as renderizações:
+
+    Exemplo:
+
+        .principal>div{
+            display : inline;
+        }
+
+    Saída:
+
+        +--------------------------------------------------------+
+        +--------------------------------------------------------+
+
+        
+
+
+
+
+
+Como usar a propriedade Position - CSS
+--------------------------------------
+
+Nesse artigo vou ensinar a usar a propriedade Position do CSS. Lembrando
+que essa é uma propriedade do CSS 2.1 e funciona perfeitamente em todos
+os navegadores (browsers) modernos.
+
+Olá pessoal, nesse artigo vou ensinar a usar a propriedade Position do CSS. 
+Lembrando que essa é uma propriedade do CSS 2.1 e funciona perfeitamente em 
+todos os navegadores (browsers) modernos.
+
+Após entender a propriedade position tenha cuidado ao utilizar ela. O foco 
+dessa propriedade é posicionar pequenos detalhes do layout, para diagramar 
+o site utilize o bom e velho Float.
+
+A propriedade position pode assumir 4 valores diferentes: Static, Relative, 
+Absolute e Fixed. Segue abaixo a explicação para de cada uma:
+
+CSS Position Static:
+--------------------
+
+    Esse é o valor default de todo elemento HTML, ou seja, ele vai seguir o 
+    fluxo comum da sua página. Ex:
+
+    Listagem 1: Valor default
+
+        h1 { position: static }
+
+CSS Position Relative:
+----------------------
+    Utilizando o position Relative o elemento passa a aceitar as propriedades 
+    Top, Bottom, Left e Right. Com elas você pode alterar o posicionamento 
+    do elemento. Ex:        
+
+    Listagem 2: Html
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <style type="text/css">
+            .divPrincipal { background: #eee; margin: 200px 200px; width: 300px; height: 300px; top : 50px; left : 100px; }
+            .div1 { position: relative; top : 50px; left : 50px; background: green;}
+            .div2 { top: 20px; left: 20px; background: yellow; }
+        </style>
+        </head>
+        <body>
+        <div class="divPrincipal">
+            <div class="div1">
+            Esta DIV utiliza o css {position : relative;}.
+            Quando utilizamos esta diretiva significa que podemos posicionar um elemento
+            num ponto especifico dentro do elemento pai. Ou seja, abre-se a possibilidade
+            de utilizarmos os atributos {top: ; left: ; bottom: ; right : ; }
+            </div>
+            <div class="div2" >
+            Esta div NÃO UTILIZA o atributo {position : relative;}
+            Observe que mesmo usando as propriedades top e left, isso não influenciou
+            no posicionamento, justamente por não utilizar {postion : relative; }
+            </div>
+        </div>
+        </body>
+        </html>
+
+    Vide resultado no arquivo ../Position Relative (Em coordenadas especificas)/index.html

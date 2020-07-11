@@ -1,6 +1,15 @@
 1. Listar o tamanho das pastas do diretorio atual
 
+
+    # Apresenta o tamanho das pastas ocultas
     du -h --max-depth=1 | sort -hr
+
+    # Ordenado pelo tamanho do arquivo crescente
+    sudo du -sh * printf "%s\t%p\n" | sort -nr
+
+    # Ordenado pelo tamanho do arquivo descrente
+    sudo du -sh * printf "%s\t%p\n" | sort -nr
+
     du -sh *
 
     df -h 
@@ -288,4 +297,81 @@ sudo snap remove <snapname>
         # Ou reinicialize a sessão com qualquer usuário
 
 
+19. Limpeza de arquivos temporários:
+
+    . Identificação dos locais que mais ocupam espaço:
+
+        # Mostra resumo do espaço em disco
+        df -h .
+
+        # Apresenta o tamanho das pastas ocultas
+        du -h --max-depth=1 | sort -hr
+
+        # Ordenado pelo tamanho do arquivo crescente
+        sudo du -sh * printf "%s\t%p\n" | sort -nr
+
+        # Ordenado pelo tamanho do arquivo descrente
+        sudo du -sh * printf "%s\t%p\n" | sort -nr
+
+    . Limpeza dos pacotes desnecessários do sistema via linha de comando:
+
+        # remover apenas dependências que não são mais necessárias ou pacotes que 
+        # foram inicialmente instalados e que após uma atualização estão com mais de 
+        # uma versão instaladas, e assim, a versão mais antiga será deletada
+        sudo apt autoremove    
+
+        # Esvaziar a lixeira
+        sudo apt clean
+        sudo apt autoclean
+
+
+    . Limpeza dos pacotes desnecessários do sistema via software:
+
+        Instale o Bleachbit, acesse a appStore e faça a instalação, cuidado, escolha somente as
+        opções que não deem alertas.
+
+    . Acesse o arquivo logrotate.conf e deixe-o como o arquivo abaixo do comando "sudo" abaixo
+
+        Para maiores detalhes acesse o pdf "Utilizando logrotate.pdf"
+
+        sudo vim /etc/logrotate.conf    
+
+        Exemplo:
+
+        # see "man logrotate" for details
+        # rotate log files weekly
+        monthly
+
+        # use the adm group by default, since this is the owning group
+        # of /var/log/syslog.
+        su root adm
+
+        # Inserir data no nome do arquivo de log rotacionado
+        dateext
+
+        # Email para enviar qdo for rotacionado
+        mail maransi@gmail.com
+
+        # keep 4 weeks worth of backlogs
+        rotate 0
+
+        # create new (empty) log files after rotating old ones
+        create
+
+        # use date as a suffix of the rotated file
+        #dateext
+
+        # uncomment this if you want your log files compressed
+        compress
+
+        # retarta a compactação dos arquivos de logs
+        delaycompress
+
+        # packages drop log rotation information into this directory
+        include /etc/logrotate.d
+
+
+    . Por fim, atenção especial com a pasta de logs ( /var/log ). Nesta pasta encontram-se os arquivos
+        de log, que de uma hora para outra eles crescem de tamanho. Busque apagar os maiores .log, mas com
+        muito cuidado:
 
