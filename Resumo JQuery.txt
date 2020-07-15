@@ -413,3 +413,237 @@ Resumo JQuery
 
     46	$("li:contains(second)") - Selects all elements matched by <li> that contain the text second.
 
+. Seletores de filtros básicos:
+
+    :eq()
+
+        <!doctype html>
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <title>eq demo</title>
+        <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+        </head>
+        <body>
+            <table border="1">
+                <tr><td>TD #0</td><td>TD #1</td><td>TD #2</td></tr>
+                <tr><td>TD #3</td><td>TD #4</td><td>TD #5</td></tr>
+                <tr><td>TD #6</td><td>TD #7</td><td>TD #8</td></tr>
+            </table>
+            
+            <ul class="nav">
+            <li>List 1, item 1</li>
+            <li>List 1, item 2</li>
+            <li>List 1, item 3</li>
+            </ul>
+            <ul class="nav">
+            <li>List 2, item 1</li>
+            <li>List 2, item 2</li>
+            <li>List 2, item 3</li>
+            </ul>
+        </body>
+        <script>
+            /* Deixará em vermelho a TD #2 */
+            $( "td:eq( 2 )" ).css( "color", "red" );
+
+            // Applies yellow background color to a single <li>
+            $( "ul.nav li:eq(1)" ).css( "backgroundColor", "#ff0" );
+            
+            // Applies italics to text of the second <li> within each <ul class="nav">
+            $( "ul.nav" ).each(function( index ) {
+            $( this ).find( "li:eq(1)" ).css( "fontStyle", "italic" );
+            });
+            
+            // Applies red text color to descendants of <ul class="nav">
+            // for each <li> that is the second child of its parent
+            $( "ul.nav li:nth-child(2)" ).css( "color", "red" );
+
+        </script>
+        </html>
+
+    :even :odd
+
+        <!doctype html>
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <title>even demo</title>
+        <style>
+        table {
+            background: #eee;
+        }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+        </head>
+        <body>
+        
+            <table border="1">
+                <tr><td>Row with Index #0</td></tr>
+                <tr><td>Row with Index #1</td></tr>
+                <tr><td>Row with Index #2</td></tr>
+                <tr><td>Row with Index #3</td></tr>
+            </table>
+        
+        <script>
+            // Mudará o fundo das TRs pares
+            $( "tr:even" ).css( "background-color", "#bbf" );
+
+            // Mudará o fundo das TRs impares
+            $( "tr:odd" ).css( "background-color", "#bbbbff" );
+        </script>
+        
+        </body>
+        </html>
+
+    :gt :lt
+
+        // Aplica a regra nas celulas maiores que 
+        $( "td:gt(4)" ).css( "backgroundColor", "yellow" );
+
+        // Aplica a regra nas celulas menores que 
+        $( "td:gt(4)" ).css( "backgroundColor", "blue" );
+
+    : not
+
+        <body>
+        
+            <div>
+                <input type="checkbox" name="a">
+                <span>Mary</span>
+            </div>
+            <div>
+                <input type="checkbox" name="b">
+                <span>lcm</span>
+            </div>
+            <div>
+                <input type="checkbox" name="c" checked="checked">
+                <span>Peter</span>
+            </div>
+            
+            <script>
+                /* Aplicará a regra para os não checados
+                $( "input:not(:checked) + span" ).css( "background-color", "yellow" );
+                
+                $( "input").attr( "disabled", "disabled" );
+            </script>
+        </body>
+                
+. Seletores Filtros de Contúdo
+
+    . :contains(text)
+
+        text: A string of text to look for. It's case sensitive.
+
+        <!doctype html>
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <title>contains demo</title>
+        <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+        </head>
+        <body>
+        
+            <div>John Resig</div>
+            <div>George Martin</div>
+            <div>Malcom John Sinclair</div>
+            <div>J. Ohn</div>
+
+        </body>
+
+        <script>
+            $( "div:contains('John')" ).css( "text-decoration", "underline" );
+        </script>
+        </html>
+
+    . :empty
+
+        Verifica se não tem conteúdo dentro do elemento, se está vazio
+
+        <!doctype html>
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <title>empty demo</title>
+        <style>
+        td {
+            text-align: center;
+        }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+        </head>
+        <body>
+        
+            <table border="1">
+            <tr><td>TD #0</td><td></td></tr>
+            <tr><td>TD #2</td><td></td></tr>
+            <tr><td></td><td>TD#5</td></tr>
+            </table>
+        
+        
+        </body>
+        <script>
+            $( "td:empty" ).text( "Was empty!" ).css( "background", "rgb(255,220,200)" );
+        </script>
+        </html>
+
+    . :has
+
+        Selects elements which contain at least one element that matches the specified selector.    
+
+        <!doctype html>
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <title>has demo</title>
+        <style>
+        .test {
+            border: 3px inset red;
+        }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+        </head>
+        <body>
+        
+            <div><p>Hello in a paragraph</p></div>
+            <div>Hello again! (with no paragraph)</div>
+        
+        
+        </body>
+        <script>
+        $( "div:has(p)" ).addClass( "test" );
+        </script>
+        </html>
+
+    :parent
+
+        O contrário de :empty, verifica se dentro do elemento tem conteúdo
+
+        <!doctype html>
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <title>parent demo</title>
+        <style>
+        td {
+            width: 40px;
+            background: green;
+        }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+        </head>
+        <body>
+        
+        <table border="1">
+        <tr><td>Value 1</td><td></td></tr>
+        <tr><td>Value 2</td><td></td></tr>
+        </table>
+        
+        <script>
+        $( "td:parent" ).fadeTo( 1500, 0.3 );
+        </script>
+        
+        </body>
+        </html>
+
+
+
