@@ -679,3 +679,38 @@ sudo apt install net-tools
 	sudo dpkg -i stremio_4.4.106-1_amd64.deb
 	sudo apt install -f
 	sudo dpkg -i stremio_4.4.106-1_amd64.deb
+
+27. Configurações Adicionais para convidado do Virtualbox:
+
+	. Instale o Virtualbox
+
+	. Crie uma VM
+		
+		. Na configuração das pastas compartilhadas adicione uma pasta do hospedeiro para 
+			compartilhar
+		. Na configuração da Área de transferência compartilhada escolha a opção Bi-direcional
+		. Na configuração do Arrastar e soltar escolha a opção Bi-direcional
+
+	. Após a instalação e configuração da VM, acesse dentro da VM criada o link abaixo:
+
+		https://download.virtualbox.org/virtualbox/
+
+	. Acesse a versão do Virtualbox desejada e faça o download do link
+
+		VBoxGuestAdditions_xxx.iso
+
+	. Após o download, carregue o .iso com o app de montagem e execute o software de inicial dele.
+
+	. Na VM criada acione o terminal e digite o comando abaixo:
+
+		# Para adicionar o grupo da library "Adicionais para convidado do VB" para montar a pasta compartilhada
+		sudo usermod -g vboxsf {user}
+
+		# Passo opcional, caso queira reiniciar a máquina, isso será feito automaticamente na próxima carga
+		# sudo mount -t vboxsf
+
+
+	
+		
+
+

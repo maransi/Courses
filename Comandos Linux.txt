@@ -375,3 +375,23 @@ sudo snap remove <snapname>
         de log, que de uma hora para outra eles crescem de tamanho. Busque apagar os maiores .log, mas com
         muito cuidado:
 
+20. Trabalhando com grupos
+
+    # To create a new group, enter the following:
+    sudo groupadd new_group
+
+    # Add user
+    sudo useradd user_name
+
+    # Use the adduser command to add a user to a group:
+    sudo useradd –g new_group user_name
+
+    # Add user in a group
+    sudo adduser user_name new_group
+
+    # Add user in multiple groups
+    sudo usermod –a –G new_group,new_group2,new_group3 user_name
+
+    # To list all groups and users
+    sudo tail /etc/group
+
