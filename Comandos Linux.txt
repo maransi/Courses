@@ -318,6 +318,7 @@ sudo snap remove <snapname>
         # remover apenas dependências que não são mais necessárias ou pacotes que 
         # foram inicialmente instalados e que após uma atualização estão com mais de 
         # uma versão instaladas, e assim, a versão mais antiga será deletada
+        sudo apt remove
         sudo apt autoremove    
 
         # Esvaziar a lixeira
@@ -383,6 +384,9 @@ sudo snap remove <snapname>
     # Add user
     sudo useradd user_name
 
+    # To create password for new user
+    sudo passwd user_name
+
     # Use the adduser command to add a user to a group:
     sudo useradd –g new_group user_name
 
@@ -393,5 +397,5 @@ sudo snap remove <snapname>
     sudo usermod –a –G new_group,new_group2,new_group3 user_name
 
     # To list all groups and users
-    sudo tail /etc/group
+    sudo less /etc/group
 
