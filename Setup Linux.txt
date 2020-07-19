@@ -103,7 +103,7 @@
 . Criação de Usuários:
 
 		# [Database Name] = desenv
-		# User Name] = supervisor
+		# [User Name] = supervisor
 		sudo -u postgres createuser --interactive --password [User Name]
 		sudo -u postgres createdb [Database Name] -O [User Name]
 		sudo service postgresql restart
@@ -115,6 +115,14 @@
 
 		sudo -su postgres
 		psql -U [User Name] -d [Database Name] -W
+
+. Executar script .sql:
+
+	psql -q -h [hostname] -d [database] -U [user] -f [file SQL]
+
+	Exemplo:
+
+	psql -q -h localhost -d desenv -U supervisor -f ~/Downloads/pessoa.sql	
 
 3. Instalação do banco de dados MySQL:
 -------------------------------------
