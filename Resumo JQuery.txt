@@ -646,4 +646,257 @@ Resumo JQuery
         </html>
 
 
+. Montagem formulário HTML já com os links para os principais scritps js:
 
+    . Baixando as bibliotecas javascript:
+
+        npm install jquery-mask-plugin
+        npm install jquery
+        npm install bootstrap // Procurar como instalar a versão 4
+
+        http://plentz.github.io/jquery-maskmoney/
+
+
+        * Embora existe a possibilidade de baixar os arquivos para inseri los no projeto, sempre dê preferência pelo uso
+            do cdn
+
+    . Crie o arquivo style.css como abaixo:
+
+        /*
+        * Base structure
+        */
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            padding-top: 56px;
+            padding-left: 0;
+        } 
+
+        /*
+        * main layout
+        */
+        .layout-main {
+            display: flex;
+            min-height: calc(100vh - 52px);
+            overflow: hidden;
+        }
+
+        /*
+        * Content
+        */
+        .layout-content {
+            width: 100%;
+            padding-top: 0px;
+        }
+
+        .container {
+            width: 100%;
+            padding-top: 20px;
+        }
+
+        /*
+        * Sidebar
+        */
+        .sidebar {
+            width: 0px;
+            height: 100vh;
+            border-top: 1px solid #eee;
+            border-right: 1px solid #eee;    
+            background-color: #f8f9fa;
+            flex-shrink: 0;
+            overflow: hidden;
+            transition: width .5s;
+        }
+
+        .sidebar .nav {
+            margin-bottom: 0px;
+        }
+
+        .sidebar .nav-item {
+            width: 100%;
+        }
+
+        .sidebar .nav-item {
+            margin-left: 0;
+        }
+
+        .sidebar .nav-link {
+            border-radius: 0;
+        } 
+
+        .sidebar ul li:hover a, .menu ul li.active a{
+            color: #777777;
+        }
+
+        .sidebar ul{
+            list-style: none;
+            padding: 10px 0px;
+        }
+
+        .sidebar ul li a{
+            display: block;
+            color:#1a1a1a;
+            padding: 10px 15px;
+            white-space: nowrap;
+        }
+
+        .sidebar.sidebar-open {
+            width: 300px;
+        }
+
+        /*
+        * nav-pills home
+        */
+        .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+            color: #fff;
+            background-color: #1e94d2;
+        }
+
+        /*
+        * toogle do navbar do menu
+        */ 
+
+        .navbar-toggle {
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        /*
+        * Footer
+        */
+        .layout-footer {
+            position: relative;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: 0;
+            height: 50px;
+            border-top: 1px solid #eeeeee;
+        }
+
+        .footer-copy {
+            font-size: 92%;
+            display: block;
+            color: #777777;
+            text-align: center;
+        }
+
+
+    . Colocar os arquivos .js na pasta js e os .css na pasta css.
+
+    . Criar o arquivo html como abaixo:
+
+        <!DOCTYPE HTML>
+        <html lang="pt-br">
+
+        <head>
+            <meta charset="utf-8" />
+            <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+            <title>Título da Página (Estrutura básica de uma página com HTML 5)</title>
+            <link href="css/bootstrap-grid.min.css" rel="stylesheet" />
+            <link rel="stylesheet" href="css/bootstrap.min.css">
+            <link rel="stylesheet" href="css/style.css">
+        </head>
+
+        <body>
+            <section>
+                <article>
+                    <div class="container">
+                        <header>
+                            <h1>SERCOI</h1>
+                        </header>
+                    </div>
+
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-2 form-group">
+                                <label for="cpf">CPF</label>
+                                <input type="text" id="cpf" class="form-control form-control-sm" placeholder="Digite o CPF..."
+                                    name="cpf" data-mask="000.000.000-00" autofocus="autofocus">
+                            </div>
+                            <div class="col-sm-4 form-group">
+                                <label for="nome">Nome</label>
+                                <input type="text" id="nome" class="form-control form-control-sm"
+                                    placeholder="Digite o nome...">
+                            </div>
+                            <div class="col-sm-3 form-group">
+                                <label for="salario">Salário</label>
+                                <input type="text" id="salario" class="form-control form-control-sm moeda"
+                                    placeholder="Digite o salário...">
+                            </div>
+                        </div>
+                        <div class="form-check row" style="padding-top : 10px; padding-bottom : 10px;">
+                            <label class="form-check-label col-sm-2">
+                                <input type="checkbox" id="situacao" class="form-check-input" value="A">Ativo
+                            </label>
+                            <label class="form-check-label col-sm-2">
+                                <input type="checkbox" id="pendencia" class="form-check-input" value="S">Tem Pendências
+                            </label>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div class="card">
+                                    <div class="card-header">
+                                        Experiência
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-check-inline">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="form-check-input" name="optradio">Junior
+                                            </label>
+                                        </div>
+                                        <div class="form-check-inline">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="form-check-input" name="optradio">Pleno
+                                            </label>
+                                        </div>
+                                        <div class="form-check-inline disabled">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="form-check-input" name="optradio">Sênior
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-9 form-group">
+                                <label for="observacao">Observação</label>
+                                <textarea id="observacao" rows="10" class="form-control  form-control-sm"
+                                    placeholder="Digite a observação..."></textarea>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </article>
+            </section>
+
+            <footer>
+                <p>Copyright 2020 Código Fonte©</p>
+            </footer>
+        </body>
+
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/jquery.mask.min.js"></script>
+        <!-- <script src="js/jquery.maskMoney.js"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-maskmoney/3.0.2/jquery.maskMoney.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('#cpf').mask('000.000.000-00');
+                $('.moeda').maskMoney({ prefix: 'R$ ', allowNegative: true, thousands: '.', decimal: ',', affixesStay: false });
+            });
+
+        </script>
+
+        </html>
+
+
+
+    

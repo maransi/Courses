@@ -152,18 +152,25 @@ Aula 6 - Anotações do Spring MVC
     . @RequestMapping 
         
         Usada para mapear URLs de acesso a um controller e aos métodos contidos nele;
-        Também podemos definir verbos HTTP (POST, GET, ...) de acesso aos métodos.
 
         Exemplo:
 
         @Controller
         @RequestMapping(“/computadores”)
         public class ComputadorController {
+            
+            // Também podemos definir verbos HTTP (POST, GET, ...) de acesso aos métodos.
             @RequestMapping(path = “/listagem”, method = RequestMethod.GET)
             public String getComputadores() { 
 
             }
         }    
+
+        . Alguns atributos da annotation @RequestMapping:
+
+            headers : @RequestMapping( headers=["Accept=application/json; text/html"] ["Accept="*/*"])
+            produces: 
+
 
         Outras opções que podem ser usadas no lugar do @RequestMapping:
 
@@ -172,6 +179,57 @@ Aula 6 - Anotações do Spring MVC
         @PutMapping
         @DeleteMapping
         @PatchMapping            
+
+        . Exemplo de uso a partir do cliente e testando com Postman
+
+            . Declare a função javascript na página web:
+
+                $(document).ready(
+                        function() {
+                            var objPessoa =  { "nome" : "", "cpf" : "106.523.608-58"} ;
+
+                            $("#send").on("click",function(){ 
+                                $.ajax({
+                                    type: "GET",
+                                    url: "../pessoa/api",
+                                    data:   objPessoa ,
+                                    headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                    },
+                                    contentType: "application/json; charset=utf-8",
+                                    dataType: "json",
+                                    success: function(response){ 
+                                        alert(response[0].nome) 
+                                    }, 
+                                    failure: function (response) {
+                                        alert(response.d);
+                                    },
+                                    error: function (response) {
+                                        alert(response.d);
+                                    }
+                                });
+                            });
+                        });
+
+            . Declare o metodo na classe restful
+
+                @RestController
+                @RequestMapping("pessoa/api")
+                public class PessoaResource {
+
+                    @Autowired
+                    PessoaService pessoaService;
+
+                    @RequestMapping(method = RequestMethod.GET, 
+                                    produces = MediaType.APPLICATION_JSON_VALUE, 
+                                    headers = "Accept=*/*")
+                    public @ResponseBody List<Pessoa> findPessoa( Pessoa pessoa) {
+                        ...
+                    }
+                }
+
+            . No Postman, ir na aba .form-data e colocar o parâmetro "cpf" com value "106.523.608-58"
 
     . @PathVariable
 
@@ -206,6 +264,61 @@ Aula 6 - Anotações do Spring MVC
             
             }
         }
+
+
+    . @RequestBody
+    
+        Mapeia o corpo HttpRequest para um objeto de transferência ou domínio, permitindo a 
+        desserialização automática do corpo HttpRequest de entrada em um objeto Java.
+
+
+        public class LoginForm {
+            private String username;
+            private String password;
+        //...
+        }
+
+        ...
+
+        @PostMapping("/request")
+        public ResponseEntity postController( @RequestBody LoginForm loginForm) {
+
+            exampleService.fakeAuthenticate(loginForm);
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
+
+        ...
+
+        curl -i \
+        -H "Accept: application/json" \
+        -H "Content-Type:application/json" \
+        -X POST --data
+        '{"username": "johnny", "password": "password"}' "https://localhost:8080/.../request"
+
+
+
+    . @ResponseBody
+    
+        Informa a um controlador que o objeto retornado é serializado automaticamente no JSON e passado 
+        de volta ao objeto HttpResponse
+
+        public class ResponseTransfer {
+            private String text;
+
+        //standard getters/setters
+        }
+
+        ...
+
+        @PostMapping("/response")
+        @ResponseBody
+        public ResponseTransfer postResponseController(
+        @RequestBody LoginForm loginForm) {
+            return new ResponseTransfer("Thanks For Posting!!!");
+        }        
+
+
+        // {"text":"Thanks For Posting!!!"}
 
     . @ModelAttribute
 

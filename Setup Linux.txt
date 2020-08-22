@@ -124,6 +124,14 @@
 
 	psql -q -h localhost -d desenv -U supervisor -f ~/Downloads/pessoa.sql	
 
+2. Instalação do pgAdmin4
+
+	su
+	curl https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo apt-key add
+	sudo sh -c 'echo "deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+	sudo apt install pgadmin4
+	sudo apt install pgadmin4-desktop
+
 3. Instalação do banco de dados MySQL:
 -------------------------------------
 
@@ -718,7 +726,12 @@ sudo apt install net-tools
 		# sudo mount -t vboxsf
 
 
-	
+27. Instalação do CPU-G
+
+	sudo add-apt-repository ppa:atareao/atareao
+	sudo apt-get update
+	sudo apt-get install cpu-g
+
 		
 
 
