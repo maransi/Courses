@@ -19,5 +19,30 @@ Aula 2 - Criando um projeto Spring Boot
         <version>2.4.1</version>
     </dependency>
 
+Aula 3 - Configurando as propriedades do projeto
+------------------------------------------------
 
+. Acesse o arquivo pom.xml e atualize com o conteudo abaixo:
+
+    spring.main.banner-mode=off
+    logging.level.org.springframework=error
+
+    spring.datasource.initialization-mode=always
+    spring.datasource.platform=postgres
+    spring.datasource.url=jdbc:postgresql://localhost:5432/desenv
+    spring.datasource.username=supervisor
+    spring.datasource.password=brasil2
+
+    spring.jpa.hibernate.ddl-auto=create-drop 
+    spring.jpa.show-sql=true
+    spring.jpa.properties.hibernate.format_sql=true
+    spring.jpa.open-in-view=true
+
+    # Por padrão o Spring Boot trás essa propriedade habilitada (true), 
+    # o que não é bom para o modo de desenvolvimento, por isso, vamos 
+    # desabilita-la (false).
+    spring.thymeleaf.cache: false
+
+    # Este filtro habilitado evita exceções do tipo Lazy entre relacionamentos 1:N e N:N.
+    spring.thymeleaf.mode: html
 
