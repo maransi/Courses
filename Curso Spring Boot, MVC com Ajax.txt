@@ -46,3 +46,368 @@ Aula 3 - Configurando as propriedades do projeto
     # Este filtro habilitado evita exceções do tipo Lazy entre relacionamentos 1:N e N:N.
     spring.thymeleaf.mode: html
 
+
+
+
+
+
+
+
+. Trabalhando com DataTables
+
+Aula 53
+-------
+
+. É necessário fazer a referência dos arquivos de estilo e javascript no arquivo HTML:
+
+	<link rel="stylesheet"
+			href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script	src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+
+. Criar as tags "<table>" com id:
+
+
+    <table id="pessoaTable" class="display" cellspacing="0" width="100%">
+        <!-- style="width: 100%;" -->
+        <!-- Header Table -->
+        <thead>
+            <tr>
+                <th>CPF</th>
+                <th>Nome</th>
+                <th>Endereço</th>
+                <th>Cidade</th>
+                <th>UF</th>
+                <th>CEP</th>
+                <th>Dt Nasc</th>
+                <th>Telefone</th>
+                <th>Salário</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+    </table>
+
+. Criar o script javascript para associar a table com a biblioteca DataTables:
+
+    $('#pessoaTable').DataTable( {
+        data: data,
+        "columns": [
+            {"defaultContent":"<div class='text-center'>"+
+                                "<div class='btn-group'>"+
+                                    "<button class='btn btn-light btn-sm btnEditar'><i class='material-icons'>edit</i></button>&nbsp;"+
+                                    "<button class='btn btn-light btn-sm btnBorrar'><i class='material-icons'>delete</i></button>"+
+                                "</div>"+
+                                "</div>"}, 
+            { "data" : "sequencial" }, 
+            { "data" : "cpf" }, 
+            { "data" : "nome" }, 
+            { "data" : "endereco" }, 
+            {"data" : "cidade" }, 
+            { "data" : "estado" }, 
+            { "data" : "cep" }, 
+            {"data" : "datNasc" }, 
+            {"data" : "foneRes"}, 
+            {"data" : "salario", render: $.fn.dataTable.render.number( '.', ',', 2, 'R$' )}
+        ]
+    } );
+
+
+
+
+{
+    "data": [
+        {
+            "cpf": "075.237.002-25",
+            "nome": "MARCO AURELIO LOPES",
+            "datNasc": "1955-11-23",
+            "endereco": "R 145 NUM 02 QD 264",
+            "cidade": "MANAUS",
+            "cep": "69097380",
+            "foneRes": "",
+            "salario": null,
+            "estado": "AM",
+            "sequencial": 66937
+        },
+        {
+            "cpf": "069.862.018-69",
+            "nome": "MARCOS  CEZAR BEZERRA LOPES",
+            "datNasc": null,
+            "endereco": "",
+            "cidade": "",
+            "cep": "",
+            "foneRes": "",
+            "salario": null,
+            "estado": "SP",
+            "sequencial": 62833
+        },
+        {
+            "cpf": "000.827.014-74",
+            "nome": "MARCOS ANTONIO DA SILVA LOPES",
+            "datNasc": "1975-07-03",
+            "endereco": "RUA POENTE",
+            "cidade": "JOAO PESSOA",
+            "cep": "58027602",
+            "foneRes": "",
+            "salario": 822.00,
+            "estado": "PB",
+            "sequencial": 699
+        },
+        {
+            "cpf": "032.376.218-20",
+            "nome": "MARCO ANTONIO LOPES",
+            "datNasc": "1943-12-10",
+            "endereco": "R. CHILE , 118",
+            "cidade": "PINDAMONHANGABA",
+            "cep": "12420430",
+            "foneRes": "36452270",
+            "salario": 3031.37,
+            "estado": "SP",
+            "sequencial": 31763
+        },
+        {
+            "cpf": "004.401.163-68",
+            "nome": "ALUISIO MARCOS LOPES MAIA",
+            "datNasc": "1938-05-21",
+            "endereco": "RUA 13 QD 13",
+            "cidade": "SAO LUIS",
+            "cep": "65061730",
+            "foneRes": "",
+            "salario": 2045.00,
+            "estado": "MA",
+            "sequencial": 4358
+        },
+        {
+            "cpf": "040.783.996-81",
+            "nome": "RENATA BEVILACQUA MARCONDES LOPES",
+            "datNasc": "1980-11-11",
+            "endereco": "AV DOS FERREIRAS ",
+            "cidade": "UBERL�NDIA",
+            "cep": "38406136",
+            "foneRes": "32256253",
+            "salario": 1088.32,
+            "estado": "MG",
+            "sequencial": 39395
+        },
+        {
+            "cpf": "056.209.054-11",
+            "nome": "MARCOS LOPES DE BRITO",
+            "datNasc": "1983-11-09",
+            "endereco": "R CARMELA DUTRA ",
+            "cidade": "OLINDA",
+            "cep": "53230115",
+            "foneRes": "",
+            "salario": 1442.00,
+            "estado": "PE",
+            "sequencial": 52504
+        },
+        {
+            "cpf": "165.281.498-10",
+            "nome": "MARCOS HENRIQUE LOPES",
+            "datNasc": "1971-09-30",
+            "endereco": "R ILHA DOS SETE ENGENHOS ",
+            "cidade": "SAO PAULO",
+            "cep": "05185100",
+            "foneRes": "39423244",
+            "salario": 0.00,
+            "estado": "SP",
+            "sequencial": 114890
+        },
+        {
+            "cpf": "074.637.584-00",
+            "nome": "MARCOS ANTONIO LOPES DOS SANTOS GALVAO",
+            "datNasc": "1955-07-13",
+            "endereco": "R. ELISA DIAS FERREIRA,  87",
+            "cidade": "RECIFE",
+            "cep": "51170390",
+            "foneRes": "34225269",
+            "salario": 0.00,
+            "estado": "PE",
+            "sequencial": 66474
+        },
+        {
+            "cpf": "084.014.736-83",
+            "nome": "MARCO TULIO LOPES MOREIRA",
+            "datNasc": "1987-08-26",
+            "endereco": "R SANTOS DUMONT ",
+            "cidade": "JUIZ DE FORA",
+            "cep": "36010510",
+            "foneRes": "",
+            "salario": 2377.00,
+            "estado": "MG",
+            "sequencial": 73078
+        },
+        {
+            "cpf": "073.990.169-92",
+            "nome": "MARCOS ANTONIO LOPES DE OLIVEIRA",
+            "datNasc": "1994-06-13",
+            "endereco": "R JAIR ROLIM DE MOURA ",
+            "cidade": "CASTRO",
+            "cep": "84174060",
+            "foneRes": "88606668",
+            "salario": null,
+            "estado": "PR",
+            "sequencial": 65969
+        },
+        {
+            "cpf": "097.017.167-60",
+            "nome": "MARCO ANTONIO LOPES DA SILVA",
+            "datNasc": "1979-10-11",
+            "endereco": "RUA JONAS COSTA PEREIRA ",
+            "cidade": "RIO DE JANEIRO",
+            "cep": "23815100",
+            "foneRes": "72326547",
+            "salario": 1015.00,
+            "estado": "RJ",
+            "sequencial": 80788
+        },
+        {
+            "cpf": "100.177.203-20",
+            "nome": "GUILHERME MARCONI CERQUEIRA LOPES",
+            "datNasc": "1954-05-31",
+            "endereco": "AV. JAPONESA 4 QD 04",
+            "cidade": "SAO JOSE DE RIBAMAR",
+            "cep": "65110000",
+            "foneRes": "",
+            "salario": 0.00,
+            "estado": "MA",
+            "sequencial": 82883
+        },
+        {
+            "cpf": "308.344.904-63",
+            "nome": "MARCOS ANTONIO LOPES DO NASCIMENTO",
+            "datNasc": "1956-05-17",
+            "endereco": "R. 36 , 214",
+            "cidade": "PAULISTA",
+            "cep": "53421210",
+            "foneRes": "34465371",
+            "salario": 0.00,
+            "estado": "PE",
+            "sequencial": 168156
+        },
+        {
+            "cpf": "201.072.422-49",
+            "nome": "MARCO AURELIO LOPES DA SILVA",
+            "datNasc": "1965-12-10",
+            "endereco": "R JAMBU ",
+            "cidade": "MANAUS",
+            "cep": "69088423",
+            "foneRes": "",
+            "salario": 1671.61,
+            "estado": "AM",
+            "sequencial": 127539
+        },
+        {
+            "cpf": "185.004.938-60",
+            "nome": "MARCOS LOPES PEREIRA",
+            "datNasc": "1974-07-04",
+            "endereco": "R ALDEIA DE JOANES ",
+            "cidade": "SAO PAULO",
+            "cep": "05814110",
+            "foneRes": "5851-6505",
+            "salario": null,
+            "estado": "SP",
+            "sequencial": 122639
+        },
+        {
+            "cpf": "185.910.028-73",
+            "nome": "MARCO ANTONIO LOPES MAGALHAES",
+            "datNasc": "1973-06-19",
+            "endereco": "R ANAPURUS ",
+            "cidade": "GUARULHOS",
+            "cep": "07053170",
+            "foneRes": "4307-2753",
+            "salario": null,
+            "estado": "SP",
+            "sequencial": 123035
+        },
+        {
+            "cpf": "214.901.518-85",
+            "nome": "MARCOS JESUS LOPES DE OLIVEIRA",
+            "datNasc": "1979-04-25",
+            "endereco": "R FORTE GRASSI ",
+            "cidade": "BAURU",
+            "cep": "17021861",
+            "foneRes": "98106151",
+            "salario": 0.00,
+            "estado": "SP",
+            "sequencial": 132022
+        },
+        {
+            "cpf": "221.417.688-88",
+            "nome": "MARCOS VINICIUS LOPES MARCELINO",
+            "datNasc": "1976-09-25",
+            "endereco": "R NOVE DE JULHO ",
+            "cidade": "FERRAZ DE VASCONCELOS",
+            "cep": "08505000",
+            "foneRes": "46752844",
+            "salario": 1229.00,
+            "estado": "SP",
+            "sequencial": 135129
+        },
+        {
+            "cpf": "315.704.248-37",
+            "nome": "MARCOS LOPES CAMARGO",
+            "datNasc": "1982-09-15",
+            "endereco": "Rua Waldemar Greg�rio de Moraes",
+            "cidade": "Bauru",
+            "cep": "17055080",
+            "foneRes": null,
+            "salario": 1613.00,
+            "estado": "SP",
+            "sequencial": 171103
+        }
+    ]
+}
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999¹xhtml" 
+				xmlns:th="http://www.thymeleaf.org"
+				xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="utf-8" />
+<title>Spring Boot + JPA + Datatables</title>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="" />
+	<meta name="author" content="" />
+
+	<link rel="stylesheet"
+			href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+</head>
+
+<body>
+	<div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <table id="pessoaTable" class="display" cellspacing="0" width="100%">
+                    <!-- style="width: 100%;" -->
+                    <!-- Header Table -->
+                    <thead>
+                        <tr>
+                            <th>CPF</th>
+                            <th>Nome</th>
+                            <th>Endereço</th>
+                            <th>Cidade</th>
+                            <th>UF</th>
+                            <th>CEP</th>
+                            <th>Dt Nasc</th>
+                            <th>Telefone</th>
+                            <th>Salário</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script	src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+</html>
