@@ -1,0 +1,249 @@
+1. Inclua a referência das bibliotecas do datatable dentro da sua página HTML:
+
+	<link rel="stylesheet"
+			href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+
+    <script	src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+
+2. Confira se a página está como abaixo:
+
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org">
+    <head>
+    <meta charset="utf-8" />
+    <title>Spring Boot + JPA + Datatables TESTE</title>
+    <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- As bibliotecas .css e .js abaixo servem para colocar as colunas da datatable que não cabem na linha,
+        ocasionando o scroll, deixando elas escondidas com a opção de consulta las através do botão mais que
+        aparece automaticamente ao utilizar essas bibliotecas. 
+    -->	
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.dataTables.min.css" />	
+    <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+    <script
+        src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="js/datatable.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.5/js/dataTables.responsive.min.js"></script>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-6 col-sm-6">
+                    <h1>Employees Table</h1>
+
+                    <!-- as classes display e nowrap server para deixar a datatable responsiva -->
+
+                    <table id="employeesTable" class="display nowrap">
+                        <!-- Header Table -->
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Active</th>
+                            </tr>
+                        </thead>
+                        <!-- Footer Table -->
+                        <tfoot>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Active</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+
+
+
+
+2. (Client) Nas configurações do datatable, no javascript do cliente deixe da seguinte forma:
+
+    $(document).ready( function () {
+
+        $('#employeesTable').DataTable({
+            processing : true,
+            serverSide : true,              // Importante para informar qq operação de paging, searching, etc será submitido ao servidor
+            responsive : true,
+            lengthMenu : [ 5, 10, 20 ],
+            ajax: { 
+                url : '/employees',         
+                data : 'data'               // Importante que o json criado pelo servidor venha dentro de uma estrutura, neste caso nomeado como "data"
+            },
+            "language" : {
+                "url" : "../docs/portuguese.json"
+            },
+            "contentType" : "application/json; charset=utf-8",
+            columns : [
+                    { "data": "id"},
+                    { "data": "name" },
+                    { "data": "lastName" },
+                    { "data": "email" },
+                    { "data": "phone" },
+                    { "data": "active" }
+            ]
+    /*        
+            ,colReorder: true,
+            "columnDefs": [{
+                "className": "small",
+                "targets": "_all"
+                }  ],
+    */	        
+        });
+        
+    });
+
+
+3. (Server) Crie a classe abaixo dentro do projeto:
+
+// Esta classe trata as requisições feitas pelo datatable
+package net.service;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+
+import net.model.Employee;
+import net.repository.EmployeeRepository;
+
+public class EmployeeDataTablesService {
+	private String[] cols = { "id", "name", "lastName", "email", "phone", "active" };
+	
+	public Map< String, Object> execute( EmployeeRepository repository, HttpServletRequest request ){
+		
+		int start = Integer.parseInt( request.getParameter("start") );
+		int length = Integer.parseInt( request.getParameter("length"));
+		int draw = Integer.parseInt( request.getParameter("draw"));
+		
+		int current = currentPage( start, length );
+		
+		String column = columnName(request);
+		
+		Sort.Direction direction = orderBy( request );
+		
+		String search = searchBy(request);
+		
+		Pageable pageable = PageRequest.of(current, length, direction, column);
+		
+		Page<Employee> page = queryBy( search, repository, pageable );
+		
+		
+		Map<String, Object> json = new LinkedHashMap<>();
+		
+		json.put("draw", draw);
+		json.put("recordsTotal",page.getTotalElements());
+		json.put("recordsFiltered", page.getTotalElements());
+		json.put("data", page.getContent());
+		
+		return json;
+	}
+	
+	private String searchBy( HttpServletRequest request) {
+		
+		return request.getParameter( "search[value]").isEmpty() ? "" : request.getParameter("search[value]" );
+	}
+	
+	private Page<Employee> queryBy(String search, EmployeeRepository repository, Pageable pageable) {
+
+		if (search.isEmpty()) {
+			return repository.findAll(pageable);
+		}
+		
+		return repository.findByNameOrLastNameOrEmailOrPhone(search,  pageable);
+	}
+
+
+	private Direction orderBy(HttpServletRequest request) {
+		String order = request.getParameter("order[0][dir]");
+		
+		Sort.Direction sort = Sort.Direction.ASC;
+		
+		if ( order.equalsIgnoreCase("desc")) {
+			sort = Sort.Direction.DESC;
+		}
+		
+		return sort;
+	}
+
+
+	private String columnName(HttpServletRequest request) {
+		int iCol = Integer.parseInt( request.getParameter("order[0][column]"));
+		
+		
+		return cols[iCol];
+	}
+
+
+	private int currentPage(int start, int length) {
+
+		return start/length;
+	}
+
+
+	public EmployeeDataTablesService() {
+		// TODO Auto-generated constructor stub
+	}
+
+}
+
+4. (Resource) Na classe Resource deixe da seguinte forma:
+
+    // Aqui que é feito a intersecção do javascript client datatable com o servidor
+/*
+
+    $(document).ready( function () {
+
+        $('#employeesTable').DataTable({
+            ...
+            ajax: { 
+                url : '/employees',   // é o mesmo pathname do "RequestMapping"
+                data : 'data'
+            },
+
+*/
+	@RequestMapping(path = "/employees", method = RequestMethod.GET)
+	public ResponseEntity<?> getAllEmployees( HttpServletRequest request ){
+		Map<String, Object> data = new EmployeeDataTablesService().execute(repository, request);
+
+		return ResponseEntity.ok(data);
+	}
+
+
+5. Deixando responsivo a página HTML:
+
+    . Coloque os links abaixo na página HTML:
+
+        <script src="https://cdn.datatables.net/responsive/2.2.5/js/dataTables.responsive.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.dataTables.min.css" />	
+
+    . Associe a classe "nowrap" na table da datatable dentro da página HTML:
+
+        <!-- nowrap faz com que o tamanho das colunas da datatable se ajuste ao tamanho do conteúdo da informação -->
+
+        <table id="employeesTable" class="display nowrap">
+
