@@ -247,3 +247,163 @@ public class EmployeeDataTablesService {
 
         <table id="employeesTable" class="display nowrap">
 
+    . Ao incluir o script cdn e o css já realiza o efeito de espansão (+) em cada linha para as colunas que não couberem
+        na tela.
+
+
+6. Insira na classe repository um método que sirva para localizar as infs através de todos os parâmetros eleitos para busca.
+    Qdo houver a digitação no campo de busca do datatable, o método selecionará através dos principais campos desejados para
+    realizar a busca:
+
+    @Repository("employeeRepository")
+    public interface EmployeeRepository extends JpaRepository<Employee, Long>{
+        
+        @Query("Select e from Employee e " +
+                "where e.name like %:search% " + 
+                "	or e.lastName like %:search% " +
+                "	or e.email like %:search% " +
+                " 	or e.phone like %:search%")
+                
+        Page<Employee> findByNameOrLastNameOrEmailOrPhone( @Param("search") String search, Pageable pageable );
+
+    }    
+
+    . Para o sistema sair da datatable e chegar nesse ponto do projeto fará os seguintes passos:
+    
+        . sempre que for digitado alguma coisa no campo de busca será chamado o método "/employees" visto anteriormente. 
+
+            $('#employeesTable').DataTable({
+                ...
+                ajax: { 
+                    url : '/employees',   // é o mesmo pathname do "RequestMapping"
+                    data : 'data'
+                },
+
+        . Passa o controle para o controller:
+            
+            @RequestMapping(path = "/employees", method = RequestMethod.GET)
+            public ResponseEntity<?> getAllEmployees( HttpServletRequest request ){
+                Map<String, Object> data = new EmployeeDataTablesService().execute(repository, request);
+
+                return ResponseEntity.ok(data);
+            }
+
+        . Que passa ao service:
+
+        	public Map< String, Object> execute( EmployeeRepository repository, HttpServletRequest request ){
+                ...
+        		Page<Employee> page = queryBy( search, repository, pageable );
+                ...
+            }
+
+            private Page<Employee> queryBy(String search, EmployeeRepository repository, Pageable pageable) {
+                if (search.isEmpty()) {
+                    return repository.findAll(pageable);
+                }
+                
+                return repository.findByNameOrLastNameOrEmailOrPhone(search,  pageable);
+            }
+
+        . Que passará para o método do repository:
+
+            @Repository("employeeRepository")
+            public interface EmployeeRepository extends JpaRepository<Employee, Long>{
+                
+                @Query("Select e from Employee e " +
+                        "where e.name like %:search% " + 
+                        "	or e.lastName like %:search% " +
+                        "	or e.email like %:search% " +
+                        " 	or e.phone like %:search%")
+                Page<Employee> findByNameOrLastNameOrEmailOrPhone( @Param("search") String search, Pageable pageable );
+                // O @Param encarrega-se de injetar o valor passado como parâmetro para dentro da String do @Query fazendo
+                // uma substituição do parâmetro :search
+
+            }    
+
+8. Caso houver necessidade de trabalhar com valores, ou números, no datatable assista a aula 61. Filtrando por preço. 
+    Encontreremos também como fazer para renderizar valores com máscara.
+
+9. Formatando valores datas no datatable:
+
+    . Acessar a página www.momentjs.com. Existem dois tipos de bibliotecas para ser baixado neste link:
+
+        . moment.min.js                 - Independente do local
+        . moment-with-locales.min.js    - Lib de um determinado local
+
+    . Ao invés de baixar a biblioteca do site momentjs podemos fazer uso do cdn:
+
+        . Acesse o site https://cdnjs.com, localize o cdn da biblioteca momentjs e copie para dentro da página do projeto:
+
+            https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.28.0/moment-with-locales.min.js
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.28.0/moment-with-locales.min.js"></script>
+
+    . Acesse a declaração do datatable, altere a renderização como feito no campo datNasc abaixo e informe o locale "moment.locale("pt-br")
+
+        $(document).ready(function() {
+            moment.locale("pt-br");         // Declaração do locale Brasil
+
+            ...
+            $('#pessoaTable').DataTable( {
+                "destroy" : true,
+                "scrollY" : "300px",
+                "scrollX" : true,
+                "select" : true,
+                "serverSide" : false,
+                "sAjaxDataProp" : "data",
+                "scrollCollapse" : true,
+                "info" : false,
+                "language" : {
+                    "decimal" : ",",
+                    "thousands" : "."
+                },
+                "pagingType" : "full_numbers",
+                "language" : {
+                    "url" : "../docs/portuguese.json"
+                },
+                "sPaginationType" : "bootstrap",
+                "contentType" : "application/json; charset=utf-8",
+                "aLengthMenu" : [ [ 5, 10, 20, 100, -1 ],
+                        [ 5, 10, 20, 100, "Todos" ] ],
+                "pageLength": 5,
+                "lengthChange" : true,
+                "processing" : true,
+                "serverSide" : false,
+                "ajax": {
+                        "url": "../pessoa/api",
+                        "type": "GET",
+                        "data": {
+                            'cpf': $('#cpf-busca').val(),
+                            'nome': $('#nome-busca').val()
+                        },
+                    "dataType": "json"                               
+                },
+                "columns": [
+                    {"defaultContent":"<div class='text-center'>"+
+                                        "<div class='btn-group'>"+
+                                            "<button class='btn btn-light btn-sm btnEditar'><i class='material-icons'>edit</i></button>&nbsp;"+
+                                            "<button class='btn btn-light btn-sm btnBorrar'><i class='material-icons'>delete</i></button>"+
+                                        "</div>"+
+                                    "</div>"}, 
+                    { "data" : "sequencial" }, 
+                    { "data" : "cpf" }, 
+                    { "data" : "nome" }, 
+                    { "data" : "endereco" }, 
+                    {"data" : "cidade" }, 
+                    { "data" : "estado" }, 
+                    { "data" : "cep" }, 
+                    {"data" : "datNasc", 
+                                render: function(datNasc){ 
+                                            return moment(datNasc).format("L");         // Renderização de campos datas
+                                        } 
+                    }, 
+                    {"data" : "foneRes"}, 
+                    {"data" : "salario", render: $.fn.dataTable.render.number( '.', ',', 2, 'R$' )} // Renderização de campos numéricos
+                ],
+            "columnDefs": [{
+                "className": "small",
+                "targets": "_all"
+                }  ],
+                select: true,
+                colReorder: true,
+            } );
