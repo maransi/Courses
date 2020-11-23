@@ -315,6 +315,42 @@ public class RestFulController {
 }
 
 
+. @ResponseBody e @RequestBody
+
+    Usando uma biblioteca JavaScript como o JQuery, você publicaria um objeto JSON como este:
+
+        { "firstName" : "Elmer", "lastName" : "Fudd" }
+
+    O método do seu controlador ficaria assim:
+
+        // controller
+        @ResponseBody @RequestMapping("/description")
+        public Description getDescription(@RequestBody UserStats stats){
+            return new Description(stats.getFirstName() + " " + stats.getLastname() + " hates wacky wabbits");
+        }
+
+        // domain / value objects
+        public class UserStats{
+            private String firstName;
+            private String lastName;
+            // + getters, setters
+        }
+
+        public class Description{
+            private String description;
+            // + getters, setters, constructor
+        }
+
+    Agora, se você tiver Jackson em seu caminho de classe (e tiver uma <mvc:annotation-driven>configuração), o Spring converterá o 
+    JSON recebido em um objeto UserStats do corpo da postagem (porque você adicionou a @RequestBodyanotação) e serializará o 
+    objeto retornado em JSON (porque você adicionou o @ResponseBodyanotação). Portanto, o Navegador / Cliente veria este 
+    resultado JSON:
+
+        { "description" : "Elmer Fudd hates wacky wabbits" }
+
+
+
+
 Read more: https://javarevisited.blogspot.com/2017/08/difference-between-restcontroller-and-controller-annotations-spring-mvc-rest.html#ixzz69doFiSVG.blogspot.com/2017/08/difference-between-restcontroller-and-controller-annotations-spring-mvc-rest.html#ixzz69doFiSVG
 
 
@@ -557,5 +593,87 @@ Metodo deleteStudentById
 . No Postman execute novamente o link abaixo, observe o desaparecimento do registro.
 
  	http://localhost:8080/api/v1/students
+
+
+. ResponseEntity
+
+    ResponseEntity representa toda a resposta HTTP: código de status, cabeçalhos e corpo . Por isso, podemos usá-lo 
+    para configurar totalmente a resposta HTTP.
+
+    ResponseEntity é um tipo genérico. Como resultado, podemos usar qualquer tipo como corpo de resposta:
+
+        @GetMapping("/hello")
+        ResponseEntity<String> hello() {
+            return new ResponseEntity<>("Hello World!", HttpStatus.OK);
+        }
+
+    Como especificamos o status da resposta programaticamente, podemos retornar com diferentes códigos de status para diferentes cenários:
+
+        @GetMapping("/age")
+        ResponseEntity<String> age(@RequestParam("yearOfBirth") int yearOfBirth) {
+
+            if (isInFuture(yearOfBirth)) {
+                return new ResponseEntity<>("Year of birth cannot be in the future", HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<>( "Your age is " + calculateAge(yearOfBirth),  HttpStatus.OK);
+        }
+
+    Além disso, podemos definir cabeçalhos HTTP:
+
+        @GetMapping("/customHeader")
+        ResponseEntity<String> customHeader() {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Custom-Header", "foo");
+
+            return new ResponseEntity<>("Custom header set", headers, HttpStatus.OK);
+        }
+
+    Além disso, ResponseEntity fornece duas interfaces de construtor aninhadas : HeadersBuilder e sua subinterface, BodyBuilder. Portanto, 
+    podemos acessar seus recursos através dos métodos estáticos de ResponseEntity.
+
+    O caso mais simples é uma resposta com um corpo e um código de resposta HTTP 200:
+
+        @GetMapping("/hello")
+        ResponseEntity<String> hello() {
+            return ResponseEntity.ok("Hello World!");
+        }
+
+    Para os códigos de status HTTP mais populares, obtemos métodos estáticos:
+
+        BodyBuilder accepted();
+        BodyBuilder badRequest();
+        BodyBuilder created(java.net.URI location);
+        HeadersBuilder<?> noContent();
+        HeadersBuilder<?> notFound();
+        BodyBuilder ok();
+
+    Além disso, podemos usar os métodos _BodyBuilder status (status HttpStatus) _ e _BodyBuilder status (status int) _ para definir qualquer status HTTP.
+
+    Finalmente, com _ResponseEntity <T> BodyBuilder.body (corpo T) _, podemos definir o corpo da resposta HTTP:
+
+        @GetMapping("/age")
+        ResponseEntity<String> age(@RequestParam("yearOfBirth") int yearOfBirth) {
+            if (isInFuture(yearOfBirth)) {
+                return ResponseEntity.badRequest().body("Year of birth cannot be in the future");
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body("Your age is " + calculateAge(yearOfBirth));
+        }
+
+    Também podemos definir cabeçalhos personalizados:
+
+        @GetMapping("/customHeader")
+        ResponseEntity<String> customHeader() {
+            return ResponseEntity.ok()
+                .header("Custom-Header", "foo")
+                .body("Custom header set");
+        }
+
+    Portanto, BodyBuilder.body () _ retorna um _ResponseEntity em vez de _BodyBuilder, _ deve ser a última chamada.
+
+    Observe que, com HeaderBuilder, não podemos definir nenhuma propriedade do corpo da resposta.
+
+    Ao retornar o objeto _ResponseEntity <T> _ do controlador, podemos obter alguma exceção ou erro ao processar a solicitação e gostaríamos de retornar informações relacionadas a erros para o usuário representado como outro tipo, digamos E .
 
 
