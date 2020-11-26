@@ -1,7 +1,15 @@
 Validação com BeanValidation
 ----------------------------
 
-1. Incluir as metatags nas classes model:
+1. Starting with Boot 2.3, we also need to explicitly add the 
+    spring-boot-starter-validation dependency:
+
+<dependency> 
+    <groupId>org.springframework.boot</groupId> 
+    <artifactId>spring-boot-starter-validation</artifactId> 
+</dependency>
+
+2. Incluir as metatags nas classes model:
 
     import javax.validation.*;  // Importante importar sempre as classes desse pacote
 
@@ -50,7 +58,7 @@ Validação com BeanValidation
 
     }
 
-2. Meta tags da classe BeanValidation:
+3. Meta tags da classe BeanValidation:
 
 Constraint              Description                                                     Example
 ----------              -----------                                                     -------
@@ -114,7 +122,7 @@ Constraint              Description                                             
 @Email                  validates that the annotated property is a valid email address.
 
 
-3. Validação no Controller ou no RestController
+4. Validação no Controller ou no RestController
 
 	@RequestMapping( method = RequestMethod.PUT,
 						headers = "Accept=*/*",
