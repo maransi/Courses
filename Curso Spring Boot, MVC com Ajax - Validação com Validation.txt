@@ -1,0 +1,168 @@
+Validação com BeanValidation
+----------------------------
+
+1. Incluir as metatags nas classes model:
+
+    import javax.validation.*;  // Importante importar sempre as classes desse pacote
+
+    public class Pessoa {
+
+        @Id
+        @GeneratedValue( strategy=GenerationType.IDENTITY)
+        private Long sequencial;
+        
+        @Column(nullable=false)
+        @NotNull(message="CPF não pode ser vazio")
+        @CpfCnpj
+        private String cpf;
+        
+        @Column( length=100, nullable=false)
+        @NotNull(message="Nome não pode ser vazio")
+        @Size(min=10, max=100, message="Nome deve conter tamanho minimo de 10 dígitos")
+        private String nome;
+        
+        @Column(name="datnasc", columnDefinition="DATE", nullable=false)
+    //	@NotNull(message="Data inválida")
+        @DateTimeFormat( iso = ISO.DATE)
+    //	@Past(message="Data inválida")
+        private LocalDate datNasc;
+        
+        @Column(length=150, nullable=false)
+        @NotNull(message="EndereÃ§o não pode ser vazio")
+        @Size(min=10, max=150, message="Nome deve conter tamanho minimo de 10 dígitos")
+        private String endereco;
+        
+        @Column(length=100, nullable=false)
+        @NotNull(message="Cidade não pode ser vazio")
+        @Size(min=10, max=100, message="Cidade deve conter tamanho minimo de 10 dígitos")
+        private String cidade;
+        
+        @Column(nullable=false, length=2, name="estado")
+        @NotNull(message="Estado não pode ser vazio")
+    //	@Enumerated(EnumType.STRING)	// Informa ao bd que o conteúdo deverão ser salvo como STRING
+        private String estado;
+        
+        @Column(length=10, nullable=false)
+        @NotNull(message="CEP não pode ser vazio")
+        private String cep;
+
+        ...
+
+    }
+
+2. Meta tags da classe BeanValidation:
+
+Constraint              Description                                                     Example
+----------              -----------                                                     -------
+@AssertFalse            The value of the field or property must be false.               @AssertFalse
+                                                                                        boolean isUnsupported;
+
+@AssertTrue             The value of the field or property must be true.                @AssertTrue
+                                                                                        boolean isActive;
+
+@DecimalMax             The value of the field or property must be a decimal value      @DecimalMax("30.00", message="...")
+                        lower than or equal to the number in the value element          BigDecimal discount;
+
+@DecimalMin             The value of the field or property must be a decimal value      @DecimalMin("5.00", message="...")
+                        greater than or equal to the number in the value element.       BigDecimal discount;
+
+@Digits                 The value of the field or property must be a number within a    @Digits(integer=6, fraction=2, message="...")
+                        specified range. The integer element specifies the maximum      BigDecimal price;
+                        integral digits for the number, and the fraction element 
+                        specifies the maximum fractional digits for the number.
+
+@Future                 The value of the field or property must be a date in the        @Future(message="...")
+                        future.                                                         Date eventDate;
+
+@Max	                The value of the field or property must be an integer value     @Max(10, message="...")
+                        lower than or equal to the number in the value element.	        int quantity;
+
+@Min	                The value of the field or property must be an integer value     @Min(5, message="...")
+                        greater than or equal to the number in the value element.	    int quantity;
+
+@NotNull	            The value of the field or property must not be null.	        @NotNull(message="...")
+                                                                                        String username;
+
+@Null	                The value of the field or property must be null.	            @Null
+                                                                                        String unusedString;
+
+@Past	                The value of the field or property must be a date in the past.	@Past(message="...")
+                                                                                        Date birthday;
+
+@Pattern	            The value of the field or property must match the regular 
+                        expression defined in the regexp element.	                    @Pattern(regexp="\\(\\d{3}\\)\\d{3}-\\d{4}", message="...")
+                                                                                        String phoneNumber;
+
+@Size	                The size of the field or property is evaluated and must match   @Size(min=2, max=240, message="...")
+                        the specified boundaries. If the field or property is a         String briefMessage;
+                        String, the size of the string is evaluated. If the field or 
+                        property is a Collection, the size of the Collection is 
+                        evaluated. If the field or property is a Map, the size of 
+                        the Map is evaluated. If the field or property is an array, 
+                        the size of the array is evaluated. Use one of the optional 
+                        max or min elements to specify the boundaries.	
+
+@Positive               The possible content always positive                            @Positive( message="Salário Inválido")
+                                                                                        private BigDecimal salary;
+
+@NotBlank               can be applied only to text values and validates that the 
+                        property is not null or whitespace.
+
+@NotEmpty               validates that the property is not null or empty; can be 
+                        applied to String, Collection, Map or Array values.
+
+@Email                  validates that the annotated property is a valid email address.
+
+
+3. Validação no Controller ou no RestController
+
+	@RequestMapping( method = RequestMethod.PUT,
+						headers = "Accept=*/*",
+						path = "{sequencial}")
+	public ResponseEntity<?> updatePessoa( @PathVariable Long sequencial, 
+												@Valid Pessoa pessoa,
+												BindingResult result){
+		try {
+            if ( result.hasErrors() ){
+                Map<String, String> errors = new HashMap<>();
+
+                for (FieldError error : result.getFieldErrors() ){
+                    errors.put( error.getField(), error.getDefaultMessage() );
+                }
+
+                return ResponseEntity.unprocessableEntity().body( errors );
+            
+            }
+
+			if (!pessoaService.findById(pessoa.getSequencial()).isPresent() ) {
+	//			ResponseEntity.badRequest().build();
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		
+			Pessoa pessoaUpdated = pessoaService.update(pessoa);
+
+			return new ResponseEntity<Pessoa>( HttpStatus.OK );
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		
+	}
+
+    . Na assinatura do metodo insira a annotation @Valid e o "BindingResult result"
+
+    . No corpo do método insira a verificação se houve erro de validação:
+        
+        if ( result.hasErrors() ){
+            Map<String, String> errors = new HashMap<>();
+
+            for (FieldError error : result.getFieldErrors() ){
+                errors.put( error.getField(), error.getDefaultMessage() );
+            }
+
+            return ResponseEntity.unprocessableEntity().body( errors );
+        
+        }
+
