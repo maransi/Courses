@@ -1,0 +1,224 @@
+Validação com BeanValidation
+----------------------------
+
+1. Starting with Boot 2.3, we also need to explicitly add the 
+    spring-boot-starter-validation dependency:
+
+<dependency> 
+    <groupId>org.springframework.boot</groupId> 
+    <artifactId>spring-boot-starter-validation</artifactId> 
+</dependency>
+
+2. Incluir as metatags nas classes model:
+
+    import javax.validation.*;  // Importante importar sempre as classes desse pacote
+
+    public class Pessoa {
+
+        @Id
+        @GeneratedValue( strategy=GenerationType.IDENTITY)
+        private Long sequencial;
+        
+        @Column(nullable=false)
+        @NotNull(message="CPF não pode ser vazio")
+        @CpfCnpj
+        private String cpf;
+        
+        @Column( length=100, nullable=false)
+        @NotNull(message="Nome não pode ser vazio")
+        @Size(min=10, max=100, message="Nome deve conter tamanho minimo de 10 dígitos")
+        private String nome;
+        
+        @Column(name="datnasc", columnDefinition="DATE", nullable=false)
+    //	@NotNull(message="Data inválida")
+        @DateTimeFormat( iso = ISO.DATE)
+    //	@Past(message="Data inválida")
+        private LocalDate datNasc;
+        
+        @Column(length=150, nullable=false)
+        @NotNull(message="EndereÃ§o não pode ser vazio")
+        @Size(min=10, max=150, message="Nome deve conter tamanho minimo de 10 dígitos")
+        private String endereco;
+        
+        @Column(length=100, nullable=false)
+        @NotNull(message="Cidade não pode ser vazio")
+        @Size(min=10, max=100, message="Cidade deve conter tamanho minimo de 10 dígitos")
+        private String cidade;
+        
+        @Column(nullable=false, length=2, name="estado")
+        @NotNull(message="Estado não pode ser vazio")
+    //	@Enumerated(EnumType.STRING)	// Informa ao bd que o conteúdo deverão ser salvo como STRING
+        private String estado;
+        
+        @Column(length=10, nullable=false)
+        @NotNull(message="CEP não pode ser vazio")
+        private String cep;
+
+        ...
+
+    }
+
+3. Meta tags da classe BeanValidation:
+
+    Constraint              Description                                                     Example
+    ----------              -----------                                                     -------
+    @AssertFalse            The value of the field or property must be false.               @AssertFalse
+                                                                                            boolean isUnsupported;
+
+    @AssertTrue             The value of the field or property must be true.                @AssertTrue
+                                                                                            boolean isActive;
+
+    @DecimalMax             The value of the field or property must be a decimal value      @DecimalMax("30.00", message="...")
+                            lower than or equal to the number in the value element          BigDecimal discount;
+
+    @DecimalMin             The value of the field or property must be a decimal value      @DecimalMin("5.00", message="...")
+                            greater than or equal to the number in the value element.       BigDecimal discount;
+
+    @Digits                 The value of the field or property must be a number within a    @Digits(integer=6, fraction=2, message="...")
+                            specified range. The integer element specifies the maximum      BigDecimal price;
+                            integral digits for the number, and the fraction element 
+                            specifies the maximum fractional digits for the number.
+
+    @Future                 The value of the field or property must be a date in the        @Future(message="...")
+                            future.                                                         Date eventDate;
+
+    @Max	                The value of the field or property must be an integer value     @Max(10, message="...")
+                            lower than or equal to the number in the value element.	        int quantity;
+
+    @Min	                The value of the field or property must be an integer value     @Min(5, message="...")
+                            greater than or equal to the number in the value element.	    int quantity;
+
+    @NotNull	            The value of the field or property must not be null.	        @NotNull(message="...")
+                                                                                            String username;
+
+    @Null	                The value of the field or property must be null.	            @Null
+                                                                                            String unusedString;
+
+    @Past	                The value of the field or property must be a date in the past.	@Past(message="...")
+                                                                                            Date birthday;
+
+    @Pattern	            The value of the field or property must match the regular 
+                            expression defined in the regexp element.	                    @Pattern(regexp="\\(\\d{3}\\)\\d{3}-\\d{4}", message="...")
+                                                                                            String phoneNumber;
+
+    @Size	                The size of the field or property is evaluated and must match   @Size(min=2, max=240, message="...")
+                            the specified boundaries. If the field or property is a         String briefMessage;
+                            String, the size of the string is evaluated. If the field or 
+                            property is a Collection, the size of the Collection is 
+                            evaluated. If the field or property is a Map, the size of 
+                            the Map is evaluated. If the field or property is an array, 
+                            the size of the array is evaluated. Use one of the optional 
+                            max or min elements to specify the boundaries.	
+
+    @Positive               The possible content always positive                            @Positive( message="Salário Inválido")
+                                                                                            private BigDecimal salary;
+
+    @NotBlank               can be applied only to text values and validates that the 
+                            property is not null or whitespace.
+
+    @NotEmpty               validates that the property is not null or empty; can be 
+                            applied to String, Collection, Map or Array values.
+
+    @Email                  validates that the annotated property is a valid email address.
+
+
+4. Validação no Controller ou no RestController
+
+	@RequestMapping( method = RequestMethod.PUT,
+						headers = "Accept=*/*",
+						produces = MediaType.APPLICATION_JSON_VALUE, 
+						path = "{sequencial}")
+	public ResponseEntity<?> updatePessoa(  @PathVariable Long sequencial, 
+												@Valid Pessoa pessoa,
+												BindingResult result){
+		if ( result.hasErrors() ){
+			Map<String, String> errors = new HashMap<>();
+			
+			for (FieldError error : result.getFieldErrors() ){
+				errors.put( error.getField(), error.getDefaultMessage() );
+			}
+			
+			return ResponseEntity.unprocessableEntity().body( errors );
+			
+		}
+		
+        ...
+	}
+
+    . Na assinatura do metodo insira a annotation @Valid e o "BindingResult result"
+
+    . No corpo do método insira a verificação se houve erro de validação:
+        
+        if ( result.hasErrors() ){
+            Map<String, String> errors = new HashMap<>();
+
+            for (FieldError error : result.getFieldErrors() ){
+                errors.put( error.getField(), error.getDefaultMessage() );
+            }
+
+            return ResponseEntity.unprocessableEntity().body( errors );
+        
+        }
+
+5. Atualização da página web
+
+    . Abaixo de cada tab <input> coloque a <div id="error-..." class=""></div>
+
+        <div class="form-row">
+            <div class="form-group col-lg-4 col-md-4">
+                <label for="" class="col-form-label">CPF</label>
+                <input type="text" class="form-control  form-control-sm" id="cpf" data-mask="000.000.000-00" autofocus>
+                <div id="error-cpf" class=""></div>
+            </div>
+            <div class="form-group col-lg-8 col-md-8">
+                <label for="" class="col-form-label">Nome</label>
+                <input type="text" class="form-control form-control-sm" id="nome">
+                <div id="error-nome" class=""></div>
+            </div>    
+        </div>
+
+6. Atualização do script js
+
+    $.ajax(	 { url : '../pessoa/api/' + $('#sequencial').val(),
+                type : 'PUT',
+                datatype : 'json',
+                data : pessoa,
+                beforeSend: function() {
+                    // removendo as mensagens
+                    $("span").closest('.error-span').remove();
+                    
+                    //remover as bordas vermelhas
+                    $('#cpf').removeClass("is-invalid");
+                    $('#nome').removeClass("is-invalid");
+                    $('#endereco').removeClass("is-invalid");
+                    $('#cidade').removeClass("is-invalid");
+                    $('#estado').removeClass("is-invalid");
+                    $('#cep').removeClass("is-invalid");
+                    $('#foneRes').removeClass("is-invalid");
+                    $('#datNasc').removeClass("is-invalid");
+                    $('#salario').removeClass("is-invalid");
+
+                },
+                success : function( data ){
+                            $('#modalCRUD').modal('hide');											     			
+                            $('#pessoaTable').DataTable().ajax.reload(null, false);
+                        },
+                statusCode: {
+                    422: function(xhr) {
+                        console.log('status error:', xhr.status);
+                        var errors = $.parseJSON(xhr.responseText);
+                        $.each(errors, function(key, val){
+                            $("#" + key).addClass("is-invalid");
+                            $("#error-" + key)
+                                .addClass("invalid-feedback")
+                                .append("<span class='error-span'>" + val + "</span>")
+                        });
+                    }
+                },
+                error : function( xhr ){
+                    console.log("> error: ", xhr.responseText);
+                    $("#alert").addClass("alert alert-danger").text("Não foi possível salvar a ocorrência.");
+                }
+            });
+
+
