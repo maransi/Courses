@@ -48,6 +48,122 @@ Aula 3 - Configurando as propriedades do projeto
 
 
 
+Aula 13 - Conhecendo o JQuery Ajax
+----------------------------------
+
+. Acesse o documento "Resumo JQuery.txt" para encontrar mais detalhes sobre o JQuery.
+
+. A página oficial do JQuery pode ser encontrada em https://api.jquery.com/category/ajax/
+
+. Exemplos:
+
+    // Exemplo 1
+    $.ajax({
+    method: "POST",
+    url: "cadastrar.php",
+    data: { nome: "Pedro", email: "pedro@email.com" }
+    });
+
+
+    // Exemplo 2
+    $.ajax({
+        url : "cadastrar.php",
+        type : 'post',
+        data : {
+            nome : "Maria Fernanda",
+            salario :'3500'
+        },
+        beforeSend : function(){
+            $("#resultado").html("ENVIANDO...");
+        }
+    })
+    .done(function(msg){
+        $("#resultado").html(msg);
+    })
+    .fail(function(jqXHR, textStatus, msg){
+        alert(msg);
+    });
+
+
+
+    // Exemplo 3 - Podemos usar os métodos .get, .put, ou .getJSON para fazer chamadas ajax
+    $.get("listar_dados.php", function(resultado){
+        $("#mensagem").html(resultado);
+    });
+
+
+    $.post("salvar_dados.php", {
+        nome : "Maria Fernanda", salario : "3000"
+    }, function(msg){
+        $("#resultado").html(msg);
+    });
+
+
+    $.getJSON({
+        url: "file.json"
+    }).done(function (result, status, xhr) {
+        alert(result)
+    }).fail(function (xhr, status, error) {
+        alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+    });
+
+
+    // Outra forma de usar o $.getJSON
+    <div id="jsonData"></div>
+    
+    $.getJSON({
+        url: "product.json",
+        success: function (result, status, xhr) {
+            var table = $("<table><tr><th>Product</th><th>Color</th><th>Price</th></tr>");
+            var tr;
+            for (var i = 0; i < result.length; i++) {
+                tr = $("<tr>");
+                tr.append("<td>" + result[i].Product + "</td>");
+                tr.append("<td>" + result[i].color + "</td>");
+                tr.append("<td>" + result[i].Price + "</td>");
+                tr.append("</tr>");
+                table.append(tr);
+            }
+            table.append("</table>");
+            $("#jsonData").html(table);
+        }
+    });
+
+
+    // Exemplo 4 - Junção do HTML com o JQuery Ajax
+    <html>
+    <head>
+        <title>The jQuery Example</title>
+        <script type = "text/javascript" 
+            src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+        </script>
+            
+        <script type = "text/javascript" language = "javascript">
+            $(document).ready(function() {
+                $("#driver").click(function(event){
+                $.ajax( {
+                    url:'result.html',
+                    success:function(data) {
+                        $('#stage').html(data);
+                    }
+                });
+                });
+            });
+        </script>
+    </head>
+        
+    <body>
+        <p>Click on the button to load result.html file:</p>
+            
+        <div id = "stage" style = "background-color:blue;">
+            STAGE
+        </div>
+            
+        <input type = "button" id = "driver" value = "Load Data" />
+    </body>
+    </html>
+
+
 
 
 

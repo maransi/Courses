@@ -707,34 +707,43 @@ Aulas 9 a 13 - Iniciando o desenvolvimento do projeto
         <version>1.14.15</version>
     </dependency>
 
+
 . Como definir o path das bibliotecas dentro das paginas (<script src="..." e <link rel="...")
     de acordo com as definições do webjars.
 
-    Na página HTML teremos as seguintes associações:
+    . É necessário que a dependência esteja definida no pom.xml, exemplo:
 
-    <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
-                ---------
-                    1    ----------
-                            2      -------------
-                                        3
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>jquery-maskmoney</artifactId>
+			<version>3.0.2</version>
+		</dependency>
 
-        1. A primeira parte é fixa "/webjars"
-        2. Ao acessar as informações da biblioteca no site do webjar, para isso basta localizar a 
-            biblioteca, acessar o seu interior clicando no link dela, vá na pasta 
-            "/src/main/resources/webjars-requirejs.js" e lá encontraremos a informação abaixo:
+    . Para encontrar a dependência correta para inserir no pom.xml acesse o site do webjar (https://www.webjars.org/), localize a 
+        biblioteca e copie a referência maven para dentro do pom.xml
 
-            requirejs.config({
-                paths: { 
-                    "bootstrap": webjars.path("bootstrap", "js/bootstrap"),
-                    "bootstrap-css": webjars.path("bootstrap", "css/bootstrap")  
-                },
-                shim: { "bootstrap": [ "jquery" ] }
-            });
+    . Na estrutura do projeto, acesse o nó "Maven Dependencies";
 
-            Nos parâmetros do webjars.path("bootstrap", "css/bootstrap") a primeira definição "bootstrap"
-            será a que irá no quadrante 2.
-        3. Já a segunda definição "css/bootstrap" será a que vai na terceira definição acrescido do nome da 
-            bibliotes ".min.js"
+    . Localize a biblioteca desejada;
+
+    . Dentro da dependencia vá até o nó {lib}/META-INF/resources/webjars/
+
+    . A partir deste nó gere o path para as tags <script...> e <link...>, por exemplo:
+
+        Maven Dependencies
+            +-- jquery-maskmoney-3.0.2.jar
+                    +-- META-INF
+                            +-- resources
+                                    +-- web-jars
+                                            +-- jquery-maskmoney    # --> o mapeamento começa aqui
+                                                    +-- 3.0.2
+                                                            +-- dist
+                                                                 +-- jquery-maskmoney.min.js
+
+        Exemplo:     <script th:src="@{/webjars/jquery-maskmoney/3.0.2/dist/jquery.maskMoney.min.js}"></script>
+
+    . Para mais informações, acesse o site https://www.springboottutorial.com/spring-boot-with-jquery-and-bootstrap-web-jars
+    
 
 
 Aulas 14 a 19 - Classes de Dominio
@@ -2104,7 +2113,7 @@ Aulas 29 a 35 - Thymeleaf para as Views
 
         <!DOCTYPE html>    
         <html xmlns:th="http://www.thymeleaf.org"
-            xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">    
+            xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">   
         <head>    
             <meta http-equiv="Content-Type" 
                 content="text/html; charset=UTF-8">    
