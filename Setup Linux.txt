@@ -225,10 +225,16 @@
 
 
 . Configuração das variaveis ambientais. Coloque as duas linhas abaixo num dos arquivos /etc/bash.bashrc, 
-	~/.bashrc ou /etc/environment
+	~/.bashrc, /etc/profile ou /etc/environment
 
-	export JAVA_HOME=/opt/jdk/jdk1.8.0_221/
-	export JRE_HOME=/opt/jdk/jdk1.8.0_221/
+	export JAVA_HOME=/opt/jdk/jdk15/
+	export JRE_HOME=/opt/jdk/jdk15/
+	export JAVA_OPTS="-Xms256M -Xmx1024M -XX:PermSize=32M"
+
+
+
+https://jdk.java.net/15/
+
 
 
 5. Instalação do Tomcat
@@ -328,26 +334,48 @@ Tecla de atalho                 Descrição
 Ctrl+Espaço                     Realiza o code completion, ou seja, sugere opções para qualquer
                                 coisa que você tenha digitado, com base em nomes de classes, mé-
                                 todos, propriedades etc.
+Ctrl+1							Import / Create class..
+Ctrl+D							Apaga linha
+Ctrl+F							Procura texto no arquivo atual
+Ctrl+I							Corrige identação da linha atual
+Ctrl+H							Procura texto nos outros arquivos
 Ctrl+K                          Localiza no arquivo aberto outras ocorrências do texto selecionado.
 Ctrl+L                          Localiza uma linha determinada.
+Ctrl+M							Maximiza o editor da aba posicionada
+Ctrl+N							New (Class, Project,...)
+Ctrl+W							Fecha o editor atual
+Ctrl+Shift+Space				Apresenta os argumentos de uma função
+Ctrl+Shfit+F					Formata texto
 Ctrl+Shift+T                    Localização rápida de classes Java, apenas digitando partes do nome.
 Ctrl+Shift+R                    Localização rápida de quaisquer arquivos, apenas digitando partes
                                 do nome.
 Ctrl+O                          Exibe a lista de propriedades e métodos da classe atual. Permite
                                 busca rápida pelo nome.
 Ctrl+Shift+O                    Organiza a lista dos imports da classe.
+Ctrl+shift+B					Adiciona Breakpoints de debug
 Ctrl+Shift+F                    Formata o código-fonte.
 Ctrl+/                          Adiciona um comentário de linha.
 Ctrl+Shift+/                    Adiciona um comentário de bloco.
-Alt+Shift+R                     Renomeia a propriedade ou o método selecionado, realizando o
+
+Shift+Alt+R                     Renomeia a propriedade ou o método selecionado, realizando o
                                 refactory de todo o código. Ou seja, será modificado o nome do
                                 elemento em todos os lugares nos quais ele era referenciado.
+Shift+Alt+S						Abre menu para geração de código (Getters/Setter; Constructor, ...)
+Shift+Alt+Z						Mostra os comandos que podem ser usado para abraçar um conjunto de linha 
+								de codigo. Para isso devemos fazer a seleção de um conjnto de linhas e 
+								acionar a shortkey e escolher o comando
 F2                              Mostra a documentação da classe, método ou propriedade que
                                 estiver com o foco.
 F3                              Abre a declaração da classe, método ou propriedade que estiver com
                                 o foco.
+F11								Aciona execução em modo debug
+Ctrl+F11						Aciona execução em modo runtime								
 Ctrl+Shift+L                    Lista todas as teclas de atalhos disponíveis na IDE.
+Alt+Seta Acima, ou Seta abaixo	Move o texto selecionado
 
+Bookmark						Va na barra vertical esquerda, click com o mouse direito e escolha 
+								"Add Bookmark". Depois vá no "Quick Access" digite "View Bookmarks" 
+								para encontrar o bookmark
 
 7. Instalação do VSCode:
 -----------------------
