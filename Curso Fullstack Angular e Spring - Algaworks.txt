@@ -1,0 +1,232 @@
+﻿Curso Fullstack Angular e Spring (Angular, REST e Spring Boot) - Algaworks
+--------------------------------------------------------------------------
+
+
+Aula 03.01. Criando o projeto da API
+------------------------------------
+
+. Crie um projeto spring boot com as seguintes configurações:
+
+    Name : Algamoney-api
+    Group : com.algaworks.algamoney-api
+    Artefact : algamoney-api
+    Package : com.example.algamoney-api
+
+. Nas dependências, adicione as seguintes bibliotecas:
+
+    Devtools
+    JPA
+    Web
+    MySQL / h2 / PostGres
+
+
+Aula 03.02. Conectando ao MySQL
+-------------------------------
+
+. Acesse o arquivo application.properties e insira o código abaixo dependendo do banco que for ser utilizado:
+
+    # ===============================
+    # = data.sql file will be executed?
+    # ===============================
+    spring.datasource.initialization-mode=always
+
+    # Far� somente os update das diferen�as entre as classes model com o BD
+    spring.jpa.hibernate.ddl-auto=update
+
+    spring.jpa.show-sql=true
+
+    # Conectando com o MySQL
+    ########################
+    spring.jpa.database=MYSQL
+    spring.datasource.url=jdbc:mysql://localhost/algamoneyapi?createDatabaseIfNotExist=true&useSSL=false
+    spring.database.username=root
+    spring.database.password=root
+
+
+    # Connection com o POSTGRES
+    ###########################
+    #spring.datasource.platform=postgres
+    #spring.datasource.url=jdbc:postgresql://localhost:5432/desenv
+    #spring.datasource.username=supervisor
+    #spring.datasource.password=brasil2
+
+
+
+
+    # Conexão com o H2
+    ##################
+    spring.datasource.driverClassName=org.h2.Driver
+    spring.datasource.username=sa
+    spring.datasource.password=
+    spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+    #Enabled H2 COnsole
+    spring.h2.console.enabled=true
+
+    # Custom H2 Console URL
+    spring.h2.console.path=/h2
+    # temporary data storage
+    spring.datasource.url = jdbc:h2:mem:testdb
+
+. Execute a aplicação para ver se ela levanta.
+
+. Acesse o link http://localhost:8080/h2 com user "sa" sem senha e veja se as tabelas foram criadas com sucesso
+
+
+Aula 03.03. Criando a estrutura das tabelas
+-------------------------------------------
+
+. Dentro da pasta resources crie o arquivo schema.sql com o conteúdo abaixo:
+
+    CREATE TABLE categoria( codigo SERIAL NOT NULL PRIMARY KEY,
+                            nome VARCHAR(50) NOT NULL );
+
+. Dentro da pasta resources crie o arquivo data.sql com o conteúdo abaixo:
+
+    INSERT INTO categoria( nome ) VALUES('Lazer');
+    INSERT INTO categoria( nome ) VALUES('Alimentação');
+    INSERT INTO categoria( nome ) VALUES('Supermercado');
+    INSERT INTO categoria( nome ) VALUES('Farmácia');
+    INSERT INTO categoria( nome ) VALUES('Cultura');
+    INSERT INTO categoria( nome ) VALUES('Outros');
+
+    
+
+Aula 03.04. Consultando primeiro recurso com GET
+------------------------------------------------
+
+. Crie a classe model abaixo:
+
+package com.example.algamoneyapi.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table
+public class Categoria implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue( strategy=GenerationType.IDENTITY)
+	private Long codigo;
+	
+	@Column
+	private String nome;
+
+	public Long getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(Long codigo) {
+		this.codigo = codigo;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	@Override
+	public String toString() {
+		return "Categoria [codigo=" + codigo + ", nome=" + nome + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Categoria other = (Categoria) obj;
+		if (codigo == null) {
+			if (other.codigo != null)
+				return false;
+		} else if (!codigo.equals(other.codigo))
+			return false;
+		return true;
+	}
+
+	public Categoria(String nome) {
+		super();
+		this.nome = nome;
+	}
+
+	public Categoria() {
+		super();
+	}
+}
+
+
+. Crie a interface Repository abaixo:
+
+    package com.example.algamoneyapi.repository;
+
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.stereotype.Repository;
+
+    import com.example.algamoneyapi.model.Categoria;
+
+    @Repository("pessoaRepository")
+    public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
+
+    }
+
+. Crie a classe Resource abaixo:
+
+    package com.example.algamoneyapi.resource;
+
+    import java.util.List;
+    import java.util.Optional;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.PathVariable;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import com.example.algamoneyapi.model.Categoria;
+    import com.example.algamoneyapi.repository.CategoriaRepository;
+
+    @RestController
+    @RequestMapping("categoria/api")
+    public class CategoriaResource {
+
+        @Autowired
+        private CategoriaRepository categoriaRepository;
+        
+        @GetMapping
+        public List<Categoria> findAll(){
+            
+            return categoriaRepository.findAll();
+        }
+        
+        @GetMapping(path= "{codigo}")
+        public Optional<Categoria> findById( @PathVariable Long codigo ) {
+            
+            return categoriaRepository.findById(codigo);
+            
+            
+        }
+    }
+
