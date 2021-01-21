@@ -283,3 +283,30 @@ Aula 3.6. Cadastrando nova categoria com POST
 
     . adicione o Method POST na Collection de URLs. 
 
+
+
+Aula 03.07. Desafio Retornar 404 caso não exista a categoria
+
+    . Atualize o metodo findById pelo abaixo:
+
+        @GetMapping(path = "{codigo}")
+        public ResponseEntity<?> findById(@PathVariable Long codigo, HttpServletResponse response) {
+
+            try {
+                Categoria categoria = categoriaRepository.findById(codigo).get();
+        
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("")
+                        .buildAndExpand(categoria.getCodigo()).toUri();
+
+                response.setHeader("Location", uri.toASCIIString());
+
+                return ResponseEntity.ok( categoria );
+            }catch( Exception e) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            
+        }
+
+    . Observe a tratativa dentro do try...catch. Mudamos o tipo do retorno do metodo para utilizar o retorno com ResponseEntity.
+        Aproveitamos para atualizar o header da resposta atraves do objeto response.
