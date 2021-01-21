@@ -230,3 +230,57 @@ public class Categoria implements Serializable {
         }
     }
 
+. Testar os metodos da API:
+
+    . Acesse o Postman;
+
+    . Crie e Teste as URLs abaixo:
+
+        Method : GET
+        URL : http://localhost:8080/categoria/api/
+
+        Method : GET
+        URL : http://localhost:8080/categoria/api/1
+
+    . Vá em Collection, crie uma coleção de urls e selecione as URLs acima para a Collection criada;
+    
+
+
+Aula 3.6. Cadastrando nova categoria com POST
+---------------------------------------------
+
+. Insira o método abaixo na classe CategoriaResource:
+
+        @PostMapping
+        // De forma simples podemos utilizar a annotation abaixo para retornar o código de Status
+        // para o Client que retornará 201 Created se tudo der certo. Caso contrário podemos retornar
+        // fazer de forma mais detalhada com ResponseEntity, informando detalhes para o Body.Pretty e
+        // Headers.Location
+        // @ResponseStatus( HttpStatus.CREATED)     
+        public ResponseEntity<Categoria> insert(@RequestBody Categoria categoria, 
+        					HttpServletResponse response) {
+        	Categoria categoriaSalva = categoriaRepository.save(categoria);
+        	
+        	URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+        				.buildAndExpand(categoriaSalva.getCodigo()).toUri();
+        	
+        	response.setHeader("Location", uri.toASCIIString());
+        	
+        	return ResponseEntity.created(uri).body(categoriaSalva);
+        }
+
+. Teste o metodo da API Post:
+
+    . Crie e Teste a URL abaixo:
+
+        Method : POST
+        URL : http://localhost:8080/categoria/api/
+        Body.raw : { "nome" : "Impostos" }
+        Body.JSON
+
+    . No method POST verifique o resultado Body.Pretty e Headers.Location
+
+
+    . adicione o Method POST na Collection de URLs.
+
+    
