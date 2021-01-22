@@ -249,43 +249,48 @@ public class Categoria implements Serializable {
 Aula 3.6. Cadastrando nova categoria com POST
 ---------------------------------------------
 
-. Insira o método abaixo na classe CategoriaResource:
+    . Insira o método abaixo na classe CategoriaResource:
 
-        @PostMapping
-        // De forma simples podemos utilizar a annotation abaixo para retornar o código de Status
-        // para o Client que retornará 201 Created se tudo der certo. Caso contrário podemos retornar
-        // fazer de forma mais detalhada com ResponseEntity, informando detalhes para o Body.Pretty e
-        // Headers.Location
-        // @ResponseStatus( HttpStatus.CREATED)     
-        public ResponseEntity<Categoria> insert(@RequestBody Categoria categoria, 
-        					HttpServletResponse response) {
-        	Categoria categoriaSalva = categoriaRepository.save(categoria);
-        	
-        	URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
-        				.buildAndExpand(categoriaSalva.getCodigo()).toUri();
-        	
-        	response.setHeader("Location", uri.toASCIIString());
-        	
-        	return ResponseEntity.created(uri).body(categoriaSalva);
-        }
+            @PostMapping
+            // De forma simples podemos utilizar a annotation abaixo para retornar o código de Status
+            // para o Client que retornará 201 Created se tudo der certo. Caso contrário podemos retornar
+            // fazer de forma mais detalhada com ResponseEntity, informando detalhes para o Body.Pretty e
+            // Headers.Location
+            // @ResponseStatus( HttpStatus.CREATED)     
+            public ResponseEntity<Categoria> insert(@RequestBody Categoria categoria, 
+                                HttpServletResponse response) {
+                Categoria categoriaSalva = categoriaRepository.save(categoria);
+                
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+                            .buildAndExpand(categoriaSalva.getCodigo()).toUri();
+                
+                response.setHeader("Location", uri.toASCIIString());
+                
+                return ResponseEntity.created(uri).body(categoriaSalva);
+            }
 
-. Teste o metodo da API Post:
+    . O @RequestBody, ou corpo da requisição, é onde geralmente enviamos dados que queremos gravar no servidor. 
+        Não é muito utilizado em requisições do tipo GET, mas sim nas do tipo POST e PUT. É no corpo da 
+        requisição onde você envia dados de um formulário de cadastro em seu site
 
-    . Crie e Teste a URL abaixo:
+    . Teste o metodo da API Post:
 
-        Method : POST
-        URL : http://localhost:8080/categoria/api/
-        Body.raw : { "nome" : "Impostos" }
-        Body.JSON
+        . Crie e Teste a URL abaixo:
 
-    . No method POST verifique o resultado Body.Pretty e Headers.Location
+            Method : POST
+            URL : http://localhost:8080/categoria/api/
+            Body.raw : { "nome" : "Impostos" }
+            Body.JSON
+
+        . No method POST verifique o resultado Body.Pretty e Headers.Location
 
 
-    . adicione o Method POST na Collection de URLs. 
+        . adicione o Method POST na Collection de URLs. 
 
 
 
 Aula 03.07. Desafio Retornar 404 caso não exista a categoria
+------------------------------------------------------------
 
     . Atualize o metodo findById pelo abaixo:
 
@@ -309,4 +314,40 @@ Aula 03.07. Desafio Retornar 404 caso não exista a categoria
         }
 
     . Observe a tratativa dentro do try...catch. Mudamos o tipo do retorno do metodo para utilizar o retorno com ResponseEntity.
-        Aproveitamos para atualizar o header da resposta atraves do objeto response.
+        Aproveitamos para atualizar o header da resposta atraves do objeto response. Na página web, nas infs da header, podemos
+        encontrar a URL restful para poder acessar a informação localizada, na "Location".
+
+
+
+Aula 03.08. Validando atributos desconhecidos
+---------------------------------------------
+
+    . Se quisermos obrigar que toda desserialização dos parâmetros seja obrigatoriamente igual ao que estamos recebendo nos método, 
+        utilizaremos a claúsula abaixo no arquivo application.properties. Se isto for usado, sempre que vier um propriedade/parâmetro
+        a mais, ou a menos, uma exceção será levantada.
+
+        spring.jackson.deserialization.fail-on-unknown-properties=true
+
+        Exemplo:
+
+            No Client
+
+                { "codigo" : 10,
+                    "nome" : "Imposto",
+                    "observacao" : "Imposto"
+                }
+
+            No Server
+
+                public ResponseEntity<Categoria> insert(@RequestBody Categoria categoria, 
+                                                HttpServletResponse response) {
+                    ...
+                }
+
+                // Uma exceção será levantada por conta da nova informação "observacao"
+
+    . StatusCode
+
+        2xx -> Sucesso
+        4xx -> Erro do cliente
+        5xx -> Erro no serviço/servidor
