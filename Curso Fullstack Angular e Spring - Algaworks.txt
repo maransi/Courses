@@ -420,3 +420,26 @@ Aula 03.09. Tratando erros com ExceptionHandler
                 "nome" : "Imposto",
                 "observacao" : "Imposto"
             }
+
+
+Aula 03.10. Validando valores inválidos com Bean Validation
+-----------------------------------------------------------
+
+    . Como estamos utilizando o Spring 2.x.x. é necessário colocar no pom.xml a dependência abaixo:
+
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<!-- <version>2.0.1.Final</version> -->
+		</dependency>
+
+    . Na classe model Categoria adicione as annotation de validação como abaixo:
+
+        @Column
+        @NotNull( message="Valor não pode ser nulo")
+        @Max(value=50, message="Valor máximo permitido 50 caracteres")
+        private String nome;
+
+    . Na classe resource CategoriaResource atualize pelo código abaixo:
+
+Ver no vídeo como foi feito na classe handleException
