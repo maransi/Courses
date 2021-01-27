@@ -295,22 +295,36 @@ Aula 03.07. Desafio Retornar 404 caso não exista a categoria
     . Atualize o metodo findById pelo abaixo:
 
         @GetMapping(path = "{codigo}")
-        public ResponseEntity<?> findById(@PathVariable Long codigo, HttpServletResponse response) {
-
+        public ResponseEntity<?> findById(@PathVariable Long codigo) {
             try {
-                Categoria categoria = categoriaRepository.findById(codigo).get();
-        
+                Optional<Categoria> categoria = categoriaRepository.findById(codigo);
+
                 URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("")
                         .buildAndExpand(categoria.getCodigo()).toUri();
 
                 response.setHeader("Location", uri.toASCIIString());
 
-                return ResponseEntity.ok( categoria );
-            }catch( Exception e) {
-                return ResponseEntity.notFound().build();
+                return categoria.isPresent() ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
             }
-            
-            
+        }
+
+    . Atualize o metodo findAll pelo abaixo:
+
+        @GetMapping
+        public  ResponseEntity<?> findAll() {
+
+            List<Categoria> categorias = null;
+
+            try {
+                categorias = categoriaRepository.findAll();
+
+                return ResponseEntity.ok(categorias);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+
         }
 
     . Observe a tratativa dentro do try...catch. Mudamos o tipo do retorno do metodo para utilizar o retorno com ResponseEntity.
@@ -352,6 +366,80 @@ Aula 03.08. Validando atributos desconhecidos
         4xx -> Erro do cliente
         5xx -> Erro no serviço/servidor
 
-Aula 3.9. Tratando erros com ExceptionHandler
----------------------------------------------
 
+Aula 03.09. Tratando erros com ExceptionHandler
+-----------------------------------------------
+
+    . Considerando que iremos recusar parâmetros que não se enquadram na estrutura da classe categoria, onde irá levantar exception caso a 
+        estrutura do parâmetro não coincida com a estrutura da classe. Trabalharemos com classe de exceção.
+
+    . Crie a classe abaixo:
+
+        package com.example.algamoneyapi.exceptionhandler;
+
+        import org.springframework.http.HttpHeaders;
+        import org.springframework.http.HttpStatus;
+        import org.springframework.http.ResponseEntity;
+        import org.springframework.http.converter.HttpMessageNotReadableException;
+        import org.springframework.web.bind.annotation.ControllerAdvice;
+        import org.springframework.web.context.request.WebRequest;
+        import org.springframework.web.servlet.NoHandlerFoundException;
+        import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+        @ControllerAdvice
+        public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
+
+            @Override
+            protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                    HttpHeaders headers, HttpStatus status, WebRequest request) {
+                // TODO Auto-generated method stub
+
+                return handleExceptionInternal(ex, "Mensagem Invalida", headers, HttpStatus.BAD_REQUEST, request);
+            }
+
+            
+            @Override
+            protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
+                    HttpStatus status, WebRequest request) {
+                // TODO Auto-generated method stub
+                return handleExceptionInternal(ex, "Informação não encontrada!!!", headers, HttpStatus.BAD_REQUEST, request);
+            }
+
+        }
+
+
+    . Faça o teste no Postman com os parâmetros abaixo:
+
+        Method : POST
+        URL : http://localhost:8080/categoria/api/
+
+        // Configure o tipo do parâmetro como JSON
+        Body.raw :
+
+            { "codigo" : 10,
+                "nome" : "Imposto",
+                "observacao" : "Imposto"
+            }
+
+
+Aula 03.10. Validando valores inválidos com Bean Validation
+-----------------------------------------------------------
+
+    . Como estamos utilizando o Spring 2.x.x. é necessário colocar no pom.xml a dependência abaixo:
+
+ 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+
+    . Na classe model Categoria adicione as annotation de validação como abaixo:
+
+        @Column
+        @NotNull( message="Valor não pode ser nulo")
+        @Max(value=50, message="Valor máximo permitido 50 caracteres")
+        private String nome;
+
+    . Na classe resource CategoriaResource atualize pelo código abaixo:
+
+Ver no vídeo como foi feito na classe handleException
