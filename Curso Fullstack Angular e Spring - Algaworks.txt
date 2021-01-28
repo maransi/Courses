@@ -433,13 +433,192 @@ Aula 03.10. Validando valores inválidos com Bean Validation
 		</dependency>
 
 
-    . Na classe model Categoria adicione as annotation de validação como abaixo:
+    Forma Simples de implementar o Bean Validation:
+    -----------------------------------------------
 
-        @Column
-        @NotNull( message="Valor não pode ser nulo")
-        @Max(value=50, message="Valor máximo permitido 50 caracteres")
-        private String nome;
+        . Na classe model Categoria adicione as annotation de validação como abaixo:
 
-    . Na classe resource CategoriaResource atualize pelo código abaixo:
+            @Column
+            @NotNull( message="Valor não pode ser nulo")
+            @Max(value=50, message="Valor máximo permitido 50 caracteres")
+            private String nome;
 
-Ver no vídeo como foi feito na classe handleException
+        . Na classe resource CategoriaResource atualize o metodo POST pelo código abaixo:
+
+            @PostMapping
+            public ResponseEntity<?> insert( @Valid @RequestBody Categoria categoria, BindingResult result ) {
+                
+                if ( result.hasErrors() ) { 
+                    Map<String, String> errors = new HashMap<>();
+                 
+                    for ( FieldError error : result.getFieldErrors()) { 
+                        errors.put( error.getField(), error.getDefaultMessage()); 
+                    }
+                
+                    return ResponseEntity.unprocessableEntity().body(errors); 
+                }
+
+                try {
+                    Categoria categoriaSalva = categoriaRepository.save(categoria);
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest().body(e.getMessage());
+                }
+            }
+
+        . Existe uma desvantagem nessa abordagem. Na assinatura do método não temos como utilizar como parâmetro
+            o objeto HttpServletResponse response, sem isso não conseguimos montar o cabeçalho de resposta para o 
+            cliente.
+
+        . A annotation @Valid força a validação diretamente na assinatura do método.
+
+    Forma mais completa de implementar o Bean Validation com ExceptionHandle:
+    -------------------------------------------------------------------------
+
+        . Na classe model Categoria adicione as annotation de validação como abaixo:
+
+            @Column
+            @NotNull
+            @Size(min=4, max=50, message="Valor deverá ter o tamanho entre 4 e 50 caracteres")
+            private String nome;
+
+        . Podemos configurar as mensagens de erro de duas formas. A primeira colocando a mensagem
+            como parâmetro da annotation @...(message="mensagem"); a segunda utilizando arquivos de 
+            propriedades "properties". Detalhe, elas podem trabalhar em conjunto.
+
+        . Altere o método POST da classe Resource como abaixo:
+
+            @PostMapping
+            public ResponseEntity<?> insert( @Valid @RequestBody Categoria categoria, HttpServletResponse response ) {
+                try {
+                    Categoria categoriaSalva = categoriaRepository.save(categoria);
+
+                    URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+                            .buildAndExpand(categoriaSalva.getCodigo()).toUri();
+
+                    response.setHeader("Location", uri.toASCIIString());
+
+                    return ResponseEntity.created(uri).body(categoriaSalva);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    return ResponseEntity.badRequest().body(e.getMessage());
+                }
+
+            }
+
+        . Só com a implementação acima podemos realizar testes de validação da API. Faça o teste no Postman com os 
+            parâmetros abaixo:
+
+            Method : POST
+            URL : http://localhost:8080/categoria/api/
+
+            // Configure o tipo do parâmetro como JSON
+            Body.raw :
+
+                { 
+                    "nome" : null
+                }
+
+        . Já dessa forma o StatusCode retorna para a aplicação será 400.
+
+        . Dentro do pacote resources crie o arquivo de propriedades abaixo com o nome message.properties:
+
+            mensagem.invalida=Mensagem inv\u00E1lida
+
+            categoria.nome=Nome        
+
+        . Implemente os métodos e a inner class abaixo na classe ExceptionHandle:
+
+            @ControllerAdvice
+            public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
+
+                // A annotation abaixo injeta a referência do arquivo message.properties
+                @Autowired
+                private MessageSource messageSource;
+
+                ...
+                
+                @Override
+                protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                        HttpHeaders headers, HttpStatus status, WebRequest request) {
+                    // TODO Auto-generated method stub
+                    List<Erro> erros = criarListaErro(ex.getBindingResult());
+                    
+                    return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
+                }
+                
+                
+                private List<Erro> criarListaErro( BindingResult bindingResult){
+                    
+                    List<Erro> erros = new ArrayList<>();
+                    
+                    for( FieldError fieldError : bindingResult.getFieldErrors() ) {
+                        String mensagemUsuario = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+                        String mensagemDesenvolvedor =  fieldError.toString();
+                        
+                        erros.add(new Erro(mensagemUsuario, mensagemDesenvolvedor));
+                    }
+                    
+                    return erros;
+                }
+
+                public static class Erro {
+                    
+                    private String mensagemUsuario;
+                    private String mensagemDesenvolvedor;
+                    
+                    public Erro( String mensagemUsuario, String mensagemDesenvolvedor ) {
+                        
+                        this.mensagemUsuario = mensagemUsuario;
+                        this.mensagemDesenvolvedor = mensagemDesenvolvedor;
+                    }
+
+                    public String getMensagemUsuario() {
+                        return mensagemUsuario;
+                    }
+
+                    public void setMensagemUsuario(String mensagemUsuario) {
+                        this.mensagemUsuario = mensagemUsuario;
+                    }
+
+                    public String getMensagemDesenvolvedor() {
+                        return mensagemDesenvolvedor;
+                    }
+
+                    public void setMensagemDesenvolvedor(String mensagemDesenvolvedor) {
+                        this.mensagemDesenvolvedor = mensagemDesenvolvedor;
+                    }
+                    
+                }
+            }
+
+        . Sempre que houver uma exceção de validação, o método handleMethodArgumentNotValid será executado. 
+            Observe no método criarListaErro 
+
+        . Para deixar as mensagens mais amigáveis crie o arquivo ValidationMessages.properties dentro da pasta resource.
+            Este arquivo tem que seguir esse padrão de nomenclatura para ser reconhecido automaticamente dentro da classe
+            ExceptionHandler.
+
+            javax.validation.constraints.NotNull.message={0} \u00e9 obrigat\u00f3rio(a)
+            #javax.validation.constraints.Size.message={0} deve ter o tamanho entre {min} e {max}
+
+        . Para encontrar as chaves desse arquivo basta clicar em cima da annotation de validação (@NotNull, @Size, ...) com
+            com Ctrl+Clique do mouse que será apresentado o fonte da annotation e lá dentro apresenta a chave, por exemplo:
+
+            String message() default "{javax.validation.constraints.NotNull.message}";  // Retirado da annotation @NotNull
+
+        . Esse recurso é vantanjoso porque acaba configurando uma mensagem padrão para todas as annotation feita dentro da classe
+            Model. 
+
+        . No arquivo ValidationMessages.properties foi configurado a chave e valor 
+            "javax.validation.constraints.NotNull.message={0} \u00e9 obrigat\u00f3rio(a)". O conteúdo {0} e o parâmetro que será o 
+            nome da propriedade que está levantando a exceção. Por exemplo: se a propriedade nome da categoria levantar exceção a 
+            mensagem que aparecerá será "nome é obrigatorio". 
+
+        . Veja que na mensagem produzida a mensagem ficou com nome em letra miniscula. Se quisermos deixar mais amigável ainda coloque o 
+            conteúdo abaixo no arquivo messages.properties:
+
+            categoria.nome=Nome
+
+        . Isto fará a mensagem sair "Nome é obrigatorio".
+
+        
