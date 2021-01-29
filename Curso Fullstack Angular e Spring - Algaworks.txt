@@ -622,3 +622,110 @@ Aula 03.10. Validando valores inválidos com Bean Validation
         . Isto fará a mensagem sair "Nome é obrigatorio".
 
         
+Aula 03.12. Usando eventos para adicionar header Location
+--------------------------------------------------------
+
+. Criar as classes de evento e de listener abaixo:
+
+    package com.example.algamoneyapi.event;
+
+    import javax.servlet.http.HttpServletResponse;
+
+    import org.springframework.context.ApplicationEvent;
+
+    public class RecursoCriadoEvent extends ApplicationEvent {
+
+        /**
+        * 
+        */
+        private static final long serialVersionUID = 1L;
+
+        private HttpServletResponse response;
+        private Long codigo;
+        
+        public RecursoCriadoEvent(Object source, HttpServletResponse response, Long codigo) {
+            super(source);
+
+            this.response = response;
+            this.codigo = codigo;
+        }
+
+        public HttpServletResponse getResponse() {
+            return response;
+        }
+
+        public Long getCodigo() {
+            return codigo;
+        }
+    }
+
+
+
+    package com.example.algamoneyapi.event.listener;
+
+    import java.net.URI;
+
+    import javax.servlet.http.HttpServletResponse;
+
+    import org.springframework.context.ApplicationListener;
+    import org.springframework.stereotype.Component;
+    import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+    import com.example.algamoneyapi.event.RecursoCriadoEvent;
+
+    @Component
+    public class RecursoCriadoListener implements ApplicationListener<RecursoCriadoEvent>{
+
+        @Override
+        public void onApplicationEvent(RecursoCriadoEvent event) {
+
+            HttpServletResponse response = event.getResponse();
+            Long codigo = event.getCodigo();
+            
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+                    .buildAndExpand(codigo).toUri();
+
+            response.setHeader("Location", uri.toASCIIString());		
+            
+        }
+
+    }
+
+
+. Alterar o metodo POST:
+
+    . De
+
+        @PostMapping
+        public ResponseEntity<?> insert( @Valid @RequestBody Pessoa pessoa, HttpServletResponse response ) {
+            try {
+                Pessoa pessoaSalva = pessoaRepository.save(pessoa);
+
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+                        .buildAndExpand(pessoaSalva.getCodigo()).toUri();
+
+                response.setHeader("Location", uri.toASCIIString());
+
+                return ResponseEntity.created(uri).body(pessoaSalva);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+
+        }
+
+    . Para
+
+        @PostMapping
+        public ResponseEntity<?> insert( @Valid @RequestBody Pessoa pessoa, HttpServletResponse response ) {
+            try {
+                Pessoa pessoaSalva = pessoaRepository.save(pessoa);
+
+                publisher.publishEvent( new RecursoCriadoEvent( this, response, pessoaSalva.getCodigo()));
+                
+                return ResponseEntity.status(HttpStatus.CREATED).body(pessoaSalva);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+        }
+
