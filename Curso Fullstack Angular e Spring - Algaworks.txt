@@ -633,7 +633,7 @@ Aula 03.12. Usando eventos para adicionar header Location
 
     import org.springframework.context.ApplicationEvent;
 
-    public class RecursoCriadoEvent extends ApplicationEvent {
+    public class RecursoCriadoEvent<T,K> extends ApplicationEvent {
 
         /**
         * 
@@ -641,9 +641,9 @@ Aula 03.12. Usando eventos para adicionar header Location
         private static final long serialVersionUID = 1L;
 
         private HttpServletResponse response;
-        private Long codigo;
+        private K codigo;
         
-        public RecursoCriadoEvent(Object source, HttpServletResponse response, Long codigo) {
+        public RecursoCriadoEvent(Object source, HttpServletResponse response, K codigo) {
             super(source);
 
             this.response = response;
@@ -654,11 +654,13 @@ Aula 03.12. Usando eventos para adicionar header Location
             return response;
         }
 
-        public Long getCodigo() {
+        public K getCodigo() {
             return codigo;
         }
-    }
 
+        
+        
+    }
 
 
     package com.example.algamoneyapi.event.listener;
@@ -680,7 +682,7 @@ Aula 03.12. Usando eventos para adicionar header Location
         public void onApplicationEvent(RecursoCriadoEvent event) {
 
             HttpServletResponse response = event.getResponse();
-            Long codigo = event.getCodigo();
+            Object codigo = event.getCodigo();
             
             URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
                     .buildAndExpand(codigo).toUri();
@@ -721,7 +723,7 @@ Aula 03.12. Usando eventos para adicionar header Location
             try {
                 Pessoa pessoaSalva = pessoaRepository.save(pessoa);
 
-                publisher.publishEvent( new RecursoCriadoEvent( this, response, pessoaSalva.getCodigo()));
+                publisher.publishEvent( new RecursoCriadoEvent<Pessoa, Long>( this, response, pessoaSalva.getCodigo()));
                 
                 return ResponseEntity.status(HttpStatus.CREATED).body(pessoaSalva);
             } catch (Exception e) {
