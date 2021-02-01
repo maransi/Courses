@@ -731,3 +731,32 @@ Aula 03.12. Usando eventos para adicionar header Location
             }
         }
 
+
+Aula 04.01. Removendo pessoa com DELETE
+---------------------------------------
+
+    . Inclua o método abaixo na classe PessoaResource
+
+        @DeleteMapping("{codigo}")
+        @ResponseStatus(HttpStatus.NO_CONTENT)
+        public void remove( @PathVariable Long codigo) {
+            pessoaRepository.deleteById(codigo);
+        }
+
+    . Inclua o método abaixo na classe AlgamoneyExceptionHandler:
+
+            @ExceptionHandler(EmptyResultDataAccessException.class)
+        //	@ResponseStatus(HttpStatus.NOT_FOUND)
+            public ResponseEntity<?> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request) {
+                List<Erro> erros = new ArrayList<>();
+                
+                String mensagemUsuario = ex.getMessage();
+                String mensagemDesenvolvedor =  ex.getMessage().toString();
+                
+                erros.add(new Erro(mensagemUsuario, mensagemDesenvolvedor));
+                
+                return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+            }
+
+    . O método acima não faz parte da implementação padrão da interface ResponseEntityExceptionHandler que a classe AlgamoneyExceptionHandler implementa.
+        Sempre que quisermos incluir um método próprio podemos faze-lo através da 
