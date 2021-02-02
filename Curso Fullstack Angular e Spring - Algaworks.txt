@@ -394,9 +394,16 @@ Aula 03.09. Tratando erros com ExceptionHandler
                     HttpHeaders headers, HttpStatus status, WebRequest request) {
                 // TODO Auto-generated method stub
 
-                return handleExceptionInternal(ex, "Mensagem Invalida", headers, HttpStatus.BAD_REQUEST, request);
+                String mensagemUsuario = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
+                // String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
+                String mensagemDesenvolvedor = Optional.ofNullable(ex.getCause()).orElse(ex).toString();
+                
+                List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor) );
+                
+                
+                
+                return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
             }
-
             
             @Override
             protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
@@ -759,4 +766,133 @@ Aula 04.01. Removendo pessoa com DELETE
             }
 
     . O método acima não faz parte da implementação padrão da interface ResponseEntityExceptionHandler que a classe AlgamoneyExceptionHandler implementa.
-        Sempre que quisermos incluir um método próprio podemos faze-lo através da 
+        Sempre que quisermos incluir um método próprio podemos faze-lo através da exceção a ser levantada pela API, neste caso utilizamos a annotation
+        @ExceptionHandler informando como parâmetro a classe de exception que deverá ser trabalhada.
+
+    . Se deixarmos o @ResponseStatus( HttpStatus.NOT_FOUND ) não precisaremos colocar mais nenhum código dentro do método. O código dentro do método é 
+        somente para enviar uma mensagem ao client.
+
+
+Aula 4.3. Atualizando pessoa com PUT
+------------------------------------
+
+    . Inclua o método abaixo na classe PessoaResource:
+
+        @PutMapping("{codigo}")
+        public ResponseEntity<?> update( @PathVariable Long codigo, @Valid @RequestBody Pessoa pessoa  ) {
+            Pessoa pessoaSalva = pessoaService.update(codigo, pessoa);
+            
+            return ResponseEntity.ok(pessoaSalva);
+        }
+
+    . Inclua a classe abaixo:
+
+        package com.example.algamoneyapi.service;
+
+        import org.springframework.beans.BeanUtils;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.dao.EmptyResultDataAccessException;
+        import org.springframework.stereotype.Service;
+
+        import com.example.algamoneyapi.model.Pessoa;
+        import com.example.algamoneyapi.repository.PessoaRepository;
+
+        @Service
+        public class PessoaService {
+
+            @Autowired
+            private PessoaRepository pessoaRepository;
+            
+            public Pessoa update(Long codigo, Pessoa pessoa) {
+                
+                Pessoa pessoaSalva = findById( codigo );
+                
+                // Função que copia as infs dos metodos de uma classe para outra. O último parâmetro são os atributos que 
+                //  serão desconsiderados para atualização.
+                BeanUtils.copyProperties(pessoa, pessoaSalva, "codigo" );
+                
+                pessoaRepository.save(pessoaSalva);
+                
+                return pessoaSalva;
+                
+                
+            }
+            
+            public Pessoa findById( Long codigo ) {
+                
+                try {
+                    Pessoa pessoaSalva = pessoaRepository.findById( codigo ).get();
+
+                    if (pessoaSalva == null) {
+                        throw new EmptyResultDataAccessException(1);
+                    }
+                    
+                    return pessoaSalva;
+                }catch ( Exception e ) {
+                    throw new EmptyResultDataAccessException(1);
+                }
+            }
+            
+            
+        }
+
+Aula 4.4. Implementando atualização parcial com PUT
+---------------------------------------------------
+
+    . Inclua o método abaixo na classe PessoaResource:
+
+        @PutMapping("{codigo}/ativo")
+        @ResponseStatus( HttpStatus.NO_CONTENT)
+        public void updateAtivo( @PathVariable Long codigo, @RequestBody Boolean ativo ){
+            
+            pessoaService.updateAtivo(codigo, ativo);
+            
+        }
+
+        . Foi criado o path "{codigo}/ativo"
+
+    . Inclua o método abaixo na classe PessoaService:
+
+        public void updateAtivo(Long codigo, Boolean ativo) {
+            Pessoa pessoaSalva = findById( codigo );
+            
+            pessoaSalva.setAtivo(ativo);
+            
+            pessoaRepository.save(pessoaSalva);
+        }
+        
+    . Para executar o teste do método updateAtivo utilize o teste do Postman com o nome de "UPDATE Parcial pessoa"
+
+
+Aula 5.1. Criando a migração e entidade de lançamento
+-----------------------------------------------------
+
+    . Dentro do arquivo schema.sql implemente os comandos abaixo:
+
+        CREATE TABLE lancamento (
+            codigo BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
+            descricao VARCHAR(50) NOT NULL,
+            data_vencimento DATE NOT NULL,
+            data_pagamento DATE,
+            valor DECIMAL(10,2) NOT NULL,
+            observacao VARCHAR(100),
+            tipo VARCHAR(20) NOT NULL,
+            codigo_categoria BIGINT(20) NOT NULL,
+            codigo_pessoa BIGINT(20) NOT NULL,
+            FOREIGN KEY (codigo_categoria) REFERENCES categoria(codigo),
+            FOREIGN KEY (codigo_pessoa) REFERENCES pessoa(codigo)
+        ) 
+
+    . Dentro do arquivo data.sql implemente os comandos abaixo:
+
+        INSERT INTO pessoa (nome, logradouro, numero, complemento, bairro, cep, cidade, estado, ativo) 
+        values ('João Silva', 'Rua do Abacaxi', '10', null, 'Brasil', '38.400-12', 'Uberlândia', 'MG', true),
+                ('Maria Rita', 'Rua do Sabiá', '110', 'Apto 101', 'Colina', '11.400-12', 'Ribeirão Preto', 'S,', true),
+                ('Pedro Santos', 'Rua da Bateria', '23', null, 'Morumbi', '54.212-12', 'Goiânia', 'GO', true),
+                ('Ricardo Pereira', 'Rua do Motorista', '123', 'Apto 302', 'Aparecida', '38.400-12', 'Salvad,r', 'BA', true),
+                ('Josué Mariano', 'Av Rio Branco', '321', null, 'Jardins', '56.400-12', 'Natal', 'RN', true),
+                ('Pedro Barbosa', 'Av Brasil', '100', null, 'Tubalina', '77.400-12', 'Porto Alegre', 'RS', true),
+                ('Henrique Medeiros', 'Rua do Sapo', '1120', 'Apto 201', 'Centro', '12.400-12', 'Rio de Janeiro', 'R,', true),
+                ('Carlos Santana', 'Rua da Manga', '433', null, 'Centro', '31.400-12', 'Belo Horizonte', 'MG', true),
+                ('Leonardo Oliveira', 'Rua do Músico', '566', null, 'Segismundo Pereira', '38.400-00', 'Uberlândia', 'MG', true),
+                ('Isabela Martins', 'Rua da Terra', '1233', 'Apto 10', 'Vigilato', '99.400-12', 'Manaus', 'AM', true);
