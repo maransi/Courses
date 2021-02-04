@@ -937,7 +937,7 @@ Aula 5.1. Criando a migração e entidade de lançamento
             
         }
 
-    . Crie a classe abaixo:    
+    . Crie as classes abaixo:    
 
         package com.example.algamoneyapi.model;
 
@@ -1126,3 +1126,190 @@ Aula 5.1. Criando a migração e entidade de lançamento
                         + tipo + ", categoria=" + categoria + ", pessoa=" + pessoa + "]";
             }
         }
+
+
+
+
+
+
+
+
+        package com.example.algamoneyapi.repository;
+
+        import org.springframework.data.jpa.repository.JpaRepository;
+        import org.springframework.stereotype.Repository;
+
+        import com.example.algamoneyapi.model.Lancamento;
+
+        @Repository
+        public interface LancamentoRepository extends JpaRepository<Lancamento, Long>{
+
+        }
+
+
+
+
+
+
+    package com.example.algamoneyapi.service;
+
+    import org.springframework.beans.BeanUtils;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.dao.EmptyResultDataAccessException;
+    import org.springframework.stereotype.Service;
+
+    import com.example.algamoneyapi.model.Lancamento;
+    import com.example.algamoneyapi.repository.LancamentoRepository;
+
+    @Service
+    public class LancamentoService {
+        @Autowired
+        private LancamentoRepository LancamentoRepository;
+        
+        public Lancamento update(Long codigo, Lancamento Lancamento) {
+            
+            Lancamento LancamentoSalva = findById( codigo );
+            
+            BeanUtils.copyProperties(Lancamento, LancamentoSalva, "codigo" );
+            
+            LancamentoRepository.save(LancamentoSalva);
+            
+            return LancamentoSalva;
+            
+            
+        }
+        
+        public Lancamento findById( Long codigo ) {
+            
+            try {
+                Lancamento LancamentoSalva = LancamentoRepository.findById( codigo ).get();
+
+                if (LancamentoSalva == null) {
+                    throw new EmptyResultDataAccessException(1);
+                }
+                
+                return LancamentoSalva;
+            }catch ( Exception e ) {
+                throw new EmptyResultDataAccessException(1);
+            }
+        }
+        
+        
+
+    }
+
+
+
+
+
+    package com.example.algamoneyapi.resource;
+
+    import java.util.List;
+    import java.util.Optional;
+
+    import javax.servlet.http.HttpServletResponse;
+    import javax.validation.Valid;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.ApplicationEventPublisher;
+    import org.springframework.dao.EmptyResultDataAccessException;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.web.bind.annotation.DeleteMapping;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.PathVariable;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.PutMapping;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.ResponseStatus;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import com.example.algamoneyapi.event.RecursoCriadoEvent;
+    import com.example.algamoneyapi.model.Lancamento;
+    import com.example.algamoneyapi.repository.LancamentoRepository;
+    import com.example.algamoneyapi.service.LancamentoService;
+
+    @RestController
+    @RequestMapping("lancamento/api")
+    public class LancamentoResource {
+
+        @Autowired
+        LancamentoRepository lancamentoRepository;
+        
+        @Autowired
+        LancamentoService lancamentoService;
+        
+        @Autowired
+        ApplicationEventPublisher publisher;
+        
+        
+        @GetMapping
+        public ResponseEntity<?> findAll(HttpServletResponse response){
+            
+            List<Lancamento> lancamentos = null;
+            
+            try {
+                lancamentos = lancamentoRepository.findAll();
+                
+                publisher.publishEvent( new RecursoCriadoEvent<Lancamento, Long>( this, response, null));
+
+                return ResponseEntity.ok(lancamentos); 
+                
+            }catch( Exception e ) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+            
+        }
+        
+
+        @GetMapping(path="/{codigo}")
+        public ResponseEntity<?> findById( @PathVariable Long codigo, HttpServletResponse response ){
+            
+            
+            Optional<Lancamento> lancamento = lancamentoRepository.findById(codigo);
+            
+            if (lancamento.isPresent()) {
+                throw new EmptyResultDataAccessException(1);
+            }
+            
+            publisher.publishEvent(new RecursoCriadoEvent<Lancamento, Long>(this, response,  null));
+            
+            return ResponseEntity.ok(lancamento);
+        }
+        
+        
+        @PostMapping
+        public ResponseEntity<?> insert( @Valid @RequestBody Lancamento lancamento, HttpServletResponse response) {
+            
+            try {
+                Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
+
+                publisher.publishEvent(new RecursoCriadoEvent<Lancamento, Long>(this, response,  null));
+                
+                return ResponseEntity.status( HttpStatus.CREATED ).body(lancamentoSalvo);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            
+            }
+            
+        }
+        
+        @PutMapping( path="/{codigo}")
+        public ResponseEntity<?> update( @PathVariable Long codigo, @Valid @RequestBody Lancamento lancamento){
+            
+            Lancamento lancamentoSalvo = lancamentoService.update(codigo, lancamento);
+            
+            return ResponseEntity.ok(lancamentoSalvo);	
+        }
+        
+        @DeleteMapping( path="/{codigo}")
+        @ResponseStatus( HttpStatus.NO_CONTENT)
+        public void remove( @PathVariable Long codigo ) {
+            lancamentoRepository.deleteById(codigo);
+        }
+        
+    }
+
+
+
