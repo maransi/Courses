@@ -937,6 +937,16 @@ Aula 5.1. Criando a migração e entidade de lançamento
             
         }
 
+    . Crie, ou atualize, o arquivo de propriedades messages.properties dentro do pacote src/main/resources
+
+        mensagem.invalida=Mensagem inv\u00E1lida
+
+        categoria.nome=Nome
+
+        recurso.nao-encontrado=Recurso nao encontrado
+
+        recurso.operacao-nao-permitido=Operacao nao permitida    
+
     . Crie as classes abaixo:    
 
         package com.example.algamoneyapi.model;
@@ -1282,17 +1292,11 @@ Aula 5.1. Criando a migração e entidade de lançamento
         @PostMapping
         public ResponseEntity<?> insert( @Valid @RequestBody Lancamento lancamento, HttpServletResponse response) {
             
-            try {
-                Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
+            Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
 
-                publisher.publishEvent(new RecursoCriadoEvent<Lancamento, Long>(this, response,  null));
-                
-                return ResponseEntity.status( HttpStatus.CREATED ).body(lancamentoSalvo);
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().body(e.getMessage());
+            publisher.publishEvent(new RecursoCriadoEvent<Lancamento, Long>(this, response,  null));
             
-            }
-            
+            return ResponseEntity.status( HttpStatus.CREATED ).body(lancamentoSalvo);
         }
         
         @PutMapping( path="/{codigo}")
@@ -1313,3 +1317,36 @@ Aula 5.1. Criando a migração e entidade de lançamento
 
 
 
+Aula 5.4. Validando inconsistências
+-----------------------------------
+
+    . Crie no pom.xml a dependencia abaixo:
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.11</version>
+		</dependency>
+
+    . Crie o método abaixo na classe AlgamoneyExceptionHandler:
+
+        @ExceptionHandler(  {DataIntegrityViolationException.class}  )
+        public ResponseEntity<Object> handleDataIntegrityViolationException( DataIntegrityViolationException ex, WebRequest request ){
+                String mensagemUsuario = messageSource.getMessage("recurso.operacao-nao-permitido", null, LocaleContextHolder.getLocale());
+            // String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
+            // String mensagemDesenvolvedor = Optional.ofNullable(ex.getCause()).orElse(ex).toString();
+            String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
+
+            List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor) );
+            
+            
+            return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+            
+        }
+
+    . Observe que a mensagemDesenvolvedor foi alterada, agora ela é construida através da classe ExceptionUtils. Esta classe é encontrada no
+        pacote commons-lang3, a responsabilidade deste pacote é detalhar melhor a mensagem de erro da exception.
+
+    . Observe também no trecho de código abaixo. "recurso.operacao-nao-permitido" é substituido pelo conteúdo do arquivo messages.properties
+
+        String mensagemUsuario = messageSource.getMessage("recurso.operacao-nao-permitido", null, LocaleContextHolder.getLocale());
