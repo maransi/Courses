@@ -979,11 +979,13 @@ Aula 5.1. Criando a migração e entidade de lançamento
             private Long codigo;
             
             @Column
+            @NotNull
             @Size( min=4, max=50, message="Conteúdo deve ser entre 4 a 50 dígitos")
             private String descricao;
             
             @DateTimeFormat( iso = ISO.DATE)
-            @Future(message="Data inválida")
+            @Future(message="Data inválida. Tem que ser uma data futura")
+            @NotNull
             @Column( columnDefinition="DATE", nullable=false)
             private LocalDate dataVencimento;
             
@@ -993,6 +995,7 @@ Aula 5.1. Criando a migração e entidade de lançamento
             
             
             @Column( nullable = false, columnDefinition = "DECIMAL(7,2) DEFAULT 0.00")
+            @NotNull
             @Positive
             private BigDecimal valor;
             
@@ -1005,11 +1008,11 @@ Aula 5.1. Criando a migração e entidade de lançamento
             @Enumerated( EnumType.STRING )
             private TipoLancamento tipo;
             
-            @ManyToOne(fetch=FetchType.LAZY)
+            @ManyToOne(fetch=FetchType.EAGER)
             @JoinColumn( name= "codigo_categoria", nullable=false)
             private Categoria categoria;
             
-            @ManyToOne(fetch=FetchType.LAZY)
+            @ManyToOne(fetch=FetchType.EAGER)
             @JoinColumn( name="codigo_pessoa", nullable=false)
             private Pessoa pessoa;
 
@@ -1085,8 +1088,8 @@ Aula 5.1. Criando a migração e entidade de lançamento
                 this.codigo = codigo;
             }
 
-            public Lancamento(@Size(min = 4, max = 50, message = "Conteúdo deve ser entre 4 a 50 dígitos") String descricao,
-                    @Future(message = "Data inválida") LocalDate dataVencimento, LocalDate dataPagamento,
+            public Lancamento(@Size(min = 4, max = 50, message = "Conte�do deve ser entre 4 a 50 d�gitos") String descricao,
+                    @Future(message = "Data inv�lida") LocalDate dataVencimento, LocalDate dataPagamento,
                     @Positive BigDecimal valor, @Size(max = 100) String observacao, TipoLancamento tipo, Categoria categoria,
                     Pessoa pessoa) {
                 super();
@@ -1135,10 +1138,10 @@ Aula 5.1. Criando a migração e entidade de lançamento
                         + ", dataPagamento=" + dataPagamento + ", valor=" + valor + ", observacao=" + observacao + ", tipo="
                         + tipo + ", categoria=" + categoria + ", pessoa=" + pessoa + "]";
             }
+            
+            
+            
         }
-
-
-
 
 
 
@@ -1328,6 +1331,10 @@ Aula 5.4. Validando inconsistências
 			<version>3.11</version>
 		</dependency>
 
+    . Acrescente no arquivo messages.properties a linha abaixo:
+
+        recurso.operacao-nao-permitido=Problema de integridade entre as informacoes
+
     . Crie o método abaixo na classe AlgamoneyExceptionHandler:
 
         @ExceptionHandler(  {DataIntegrityViolationException.class}  )
@@ -1350,3 +1357,143 @@ Aula 5.4. Validando inconsistências
     . Observe também no trecho de código abaixo. "recurso.operacao-nao-permitido" é substituido pelo conteúdo do arquivo messages.properties
 
         String mensagemUsuario = messageSource.getMessage("recurso.operacao-nao-permitido", null, LocaleContextHolder.getLocale());
+
+
+Aula 05.06. Regra para não salvar pessoa inativa
+------------------------------------------------
+
+    . Crie a classe service abaixo:
+
+        package com.example.algamoneyapi.service;
+
+        import org.springframework.beans.BeanUtils;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.dao.EmptyResultDataAccessException;
+        import org.springframework.stereotype.Service;
+
+        import com.example.algamoneyapi.model.Lancamento;
+        import com.example.algamoneyapi.model.Pessoa;
+        import com.example.algamoneyapi.repository.LancamentoRepository;
+        import com.example.algamoneyapi.repository.PessoaRepository;
+        import com.example.algamoneyapi.service.exception.PessoaInexistenteOuInativaException;
+
+        @Service
+        public class LancamentoService {
+            @Autowired
+            private LancamentoRepository lancamentoRepository;
+            
+            @Autowired
+            private PessoaRepository pessoaRepository; 
+            
+            
+            
+            public Lancamento update(Long codigo, Lancamento Lancamento) {
+                
+                Lancamento LancamentoSalva = findById( codigo );
+                
+                BeanUtils.copyProperties(Lancamento, LancamentoSalva, "codigo" );
+                
+                lancamentoRepository.save(LancamentoSalva);
+                
+                return LancamentoSalva;
+                
+                
+            }
+            
+            public Lancamento findById( Long codigo ) {
+                
+                try {
+                    Lancamento LancamentoSalva = lancamentoRepository.findById( codigo ).get();
+
+                    if (LancamentoSalva == null) {
+                        throw new EmptyResultDataAccessException(1);
+                    }
+                    
+                    return LancamentoSalva;
+                }catch ( Exception e ) {
+                    throw new EmptyResultDataAccessException(1);
+                }
+            }
+            
+            
+            public Lancamento save( Lancamento lancamento ) {
+                
+                Pessoa pessoa = pessoaRepository.findById( lancamento.getPessoa().getCodigo() ).get();
+                
+                if (pessoa == null || pessoa.isInativo() ) {
+                    throw new PessoaInexistenteOuInativaException();
+                }
+                return lancamentoRepository.save(lancamento);
+            }
+        }
+
+    . Implemente a Exception abaixo:
+
+        package com.example.algamoneyapi.service.exception;
+
+        public class PessoaInexistenteOuInativaException extends RuntimeException {
+
+            private static final long serialVersionUID = 1L;
+        }
+
+
+    . Implemente o código abaixo na classe Model Pessoa:
+
+        @JsonIgnore
+        @Transient
+        public Boolean isInativo() {
+            return !this.ativo;
+        }
+        
+        . A annotation @JsonIgnore servirá para não criar no resultado JSon a informação do método isInativo
+        . A annotation @Transient servirá para não persistir a informação
+
+    . Na classe LancamentoResource inclua a declaração abaixo:
+
+        @Autowired
+        LancamentoService lancamentoService;
+
+    . Altere o método abaixo da classe LancamentoResource:
+
+        @PostMapping
+        public ResponseEntity<?> insert( @Valid @RequestBody Lancamento lancamento, HttpServletResponse response) {
+
+            // Foi alterado de lancamentoRepository.insert para lancamentoService.save para implementar a regra que restringe a inclusão
+            // de lançamento de pessoas inativas
+            Lancamento lancamentoSalvo = lancamentoService.save(lancamento);
+
+            publisher.publishEvent(new RecursoCriadoEvent<Lancamento, Long>(this, response,  lancamentoSalvo.getCodigo()));
+            
+            return ResponseEntity.status( HttpStatus.CREATED ).body(lancamentoSalvo);
+        }
+
+    . Implemente o método abaixo na classe LancamentoResource:
+
+        @ExceptionHandler( PessoaInexistenteOuInativaException.class )
+        public ResponseEntity<?> handlePessoaInexistenteOuInativaException( PessoaInexistenteOuInativaException ex){
+            String mensagemUsuario = messageSource.getMessage("pessoa.inexistente-ou-inativa", null, LocaleContextHolder.getLocale());
+            // String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
+            String mensagemDesenvolvedor = Optional.ofNullable(ex.getCause()).orElse(ex).toString();
+            
+            List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor) );
+            
+            
+            return ResponseEntity.badRequest().body(erros);
+            
+        }
+
+        . Este método servirá para pegar a Exception levantada pela classe LancamentoService
+
+    . Implemente a linha abaixo no arquivo messages.properties:
+
+        pessoa.inexistente-ou-inativa=Pessoa inexistente ou inativa
+
+    . Faça a inativação de uma das pessoas:
+
+        http://localhost:8080/pessoa/2/ativo 
+
+        . Coloque o parâmetro como false
+
+    . Faça o teste colocando um lançamento com a pessoa 2 que foi inativado.
+
+    
