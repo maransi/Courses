@@ -1643,3 +1643,79 @@ Aula 5.7. Implementando pesquisa de lançamento com Metamodel
         http://localhost:8080/lancamento/api/filter?descricao=mensal 
 
 
+Aula 05.09. Implementando a paginação de lançamentos
+----------------------------------------------------
+
+. Dentro da classe LancamentoResource coloque o método abaixo:
+
+	@GetMapping(path="/filterAndPageable")
+	public Page<Lancamento> findByFilterAndPageable(LancamentoFilter lancamentoFilter, Pageable pageable){
+		
+		Page<Lancamento> lancamentos = lancamentoRepository.filtrar( lancamentoFilter, pageable );
+		
+		return lancamentos;
+		
+	}
+
+    . Observe que:
+        
+        O retorno do método é a classe Page<Lancamento>
+        Na assinatura do método foi colocado o parâmetro Pageable pageable. No cliente é colocado os valores 
+            "page=[No. da página iniciando com a pág 0]" e "size=[No. de regs por pag]"
+
+. Dentro da interface LancamentoFilterQuery coloque o método abaixo:
+
+	public Page<Lancamento> filtrar(LancamentoFilter lancamentoFilter, Pageable pageable);
+
+. Dentro da classe LancamentoFilterQueryImpl coloque os métodos abaixo:
+
+	@Override
+	public Page<Lancamento> filtrar(LancamentoFilter lancamentoFilter, Pageable pageable) {
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		CriteriaQuery<Lancamento> criteria = builder.createQuery(Lancamento.class);
+		Root<Lancamento> root = criteria.from(Lancamento.class);
+		
+		Predicate[] predicates = criarRestricoes(lancamentoFilter, builder, root);
+		criteria.where(predicates);
+		
+		TypedQuery<Lancamento> query = manager.createQuery(criteria);
+		
+		adicionarRestricaoDePaginacao(query, pageable);
+		
+		Long totalReg = total(lancamentoFilter);
+		
+		return new PageImpl<>(query.getResultList(), pageable, total(lancamentoFilter));
+	}
+
+	private void adicionarRestricaoDePaginacao(TypedQuery<Lancamento> query, Pageable pageable) {
+		int paginaAtual = pageable.getPageNumber();
+		int totalRegistroPorPagina = pageable.getPageSize();
+		int primeiroRegistroDaPagina = paginaAtual * totalRegistroPorPagina;
+		
+		query.setFirstResult(primeiroRegistroDaPagina);
+		query.setMaxResults(totalRegistroPorPagina);
+		
+		
+	}
+
+	private Long total(LancamentoFilter lancamentoFilter) {
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		
+		CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+		
+		Root<Lancamento> root = criteria.from(Lancamento.class);
+		
+		Predicate[] predicates = criarRestricoes(lancamentoFilter, builder, root);
+		
+		criteria.where(predicates);
+		
+		criteria.select(builder.count(root));
+		
+		return manager.createQuery(criteria).getSingleResult();
+	}
+
+. Teste a página no Postman com a URL abaixo:
+
+    Method : GET
+    URL : http://localhost:8080/lancamento/api/filterAndPageable?page=0&size=5&dataVencimentoAte=2017-06-01
+
