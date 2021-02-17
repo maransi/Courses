@@ -1719,3 +1719,87 @@ Aula 05.09. Implementando a paginação de lançamentos
     Method : GET
     URL : http://localhost:8080/lancamento/api/filterAndPageable?page=0&size=5&dataVencimentoAte=2017-06-01
 
+
+
+Aula 6.1. Implementando autenticação Basic
+------------------------------------------
+
+. Acrescente a dependencia abaixo no pom.xml
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+
+. Crie a classe abaixo no projeto:
+
+    package com.example.algamoney.api.config;
+
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+    import org.springframework.security.config.http.SessionCreationPolicy;
+
+    @Configuration
+    @EnableWebSecurity
+    public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.inMemoryAuthentication()
+                .withUser("admin").password("admin").roles("ROLE");
+        }
+        
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.authorizeRequests()
+                    .antMatchers("/categoria").permitAll()
+                    .anyRequest().authenticated()
+                    .and()
+                .httpBasic().and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .csrf().disable();
+        }
+        
+    }
+
+. Retorne ao Postman e execute os links novamente para ver se a consulta ainda funciona:
+
+    Method : GET
+    URL : http://localhost:8080/lancamento/api/filterAndPageable?page=0&size=5&dataVencimentoAte=2017-06-01
+
+    . O objetivo é não funcionar, pois agora existe o controle de autenticação.
+
+. Execute o link das categorias:
+
+    Method : GET
+    URL : http://localhost:8080/categoria/api/
+
+    Method : GET
+    URL : http://localhost:8080/categoria/api/1
+
+    . Os links da categoria tem que funcionar pois tem a permissão para isso na configuração:
+
+        http.authorizeRequests()
+                .antMatchers("/categorias").permitAll()
+                .anyRequest().authenticated()
+                .and()
+            .httpBasic().and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+            .csrf().disable();
+
+. Retorne ao Postman, no link do lancamento. Acesse as configurações Authentication; escolha o type "Basic Auth";
+    coloque no Username : admin e Password : aa; e acione o botão "Update Request".
+
+    . Na aba Headers observe que foi colocado um parâmetro com o nome de Authorization com um valor
+
+    . Ao enviar o link ainda não conseguiremos retornar o conteúdo porque a senha está errada.
+
+. Altere o usuário e senha para "admin" "admin" e execute novamente o link. Dessa vez haverá retorno das informações.
+
+
+
+https://www.baeldung.com/spring-security-basic-authentication
+https://howtodoinjava.com/spring-boot2/security-rest-basic-auth-example/
