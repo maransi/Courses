@@ -1745,17 +1745,16 @@ Aula 6.1. Implementando autenticação Basic
     @Configuration
     @EnableWebSecurity
     public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
             auth.inMemoryAuthentication()
-                .withUser("admin").password("admin").roles("ROLE");
+                .withUser("admin").password("{noop}admin").roles("ROLE");
         }
         
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.authorizeRequests()
-                    .antMatchers("/categoria").permitAll()
+                    .antMatchers("/categoria/api").permitAll()
                     .anyRequest().authenticated()
                     .and()
                 .httpBasic().and()
@@ -1801,5 +1800,110 @@ Aula 6.1. Implementando autenticação Basic
 
 
 
-https://www.baeldung.com/spring-security-basic-authentication
 https://howtodoinjava.com/spring-boot2/security-rest-basic-auth-example/
+http://websystique.com/spring-security/secure-spring-rest-api-using-basic-authentication/
+
+
+
+. Outra forma mais complexa de definir os acessos seria como abaixo:
+
+    . Altere a classe SecurityConfig como abaixo:
+
+
+        package com.example.algamoneyapi.config;
+
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.context.annotation.Bean;
+        import org.springframework.context.annotation.Configuration;
+        import org.springframework.http.HttpMethod;
+        import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+        import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+        import org.springframework.security.config.annotation.web.builders.WebSecurity;
+        import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+        import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+        import org.springframework.security.config.http.SessionCreationPolicy;
+        import org.springframework.security.web.AuthenticationEntryPoint;
+
+        @Configuration
+        @EnableWebSecurity
+        public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+            private static String REALM = "basic_maransi";
+
+            @Autowired
+            public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
+                auth.inMemoryAuthentication().withUser("bill").password("{noop}abc123").roles("ADMIN");
+                auth.inMemoryAuthentication().withUser("tom").password("{noop}abc123").roles("USER");
+                auth.inMemoryAuthentication().withUser("admin").password("{noop}admin").roles("ROLE");
+            }
+
+            @Override
+            protected void configure(HttpSecurity http) throws Exception {
+                
+                http.csrf().disable()
+                    .authorizeRequests()
+                    .antMatchers("/categoria/api").permitAll()          // Qq um poderá acessar esse contexto 
+                    .antMatchers("/lancamento/**").hasRole("ROLE")      // Somente usuários com esta role poderá acessar esse contexto
+                    .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
+                    .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);		 
+            }
+
+            @Bean
+            public CustomBasicAuthenticationEntryPoint getBasicAuthEntryPoint() {
+                return new CustomBasicAuthenticationEntryPoint();
+            }
+
+            /* To allow Pre-flight [OPTIONS] request from browser */
+            @Override
+            public void configure(WebSecurity web) throws Exception {
+                web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+            }
+        }
+
+
+    . Crie a classe CustomBasicAuthenticationEntryPoint que será disparada caso a autenticação falhe
+        para completar as informações de resposta ao cliente.
+
+        package com.example.algamoneyapi.config;
+
+        import java.io.IOException;
+        import java.io.PrintWriter;
+
+        import javax.servlet.ServletException;
+        import javax.servlet.http.HttpServletRequest;
+        import javax.servlet.http.HttpServletResponse;
+
+        import org.springframework.security.core.AuthenticationException;
+        import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+        
+        public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
+        
+            @Override
+            public void commence(final HttpServletRequest request, 
+                    final HttpServletResponse response, 
+                    final AuthenticationException authException) throws IOException {
+                //Authentication failed, send error response.
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.addHeader("WWW-Authenticate", "Basic realm=" + getRealmName() + "");
+                
+                PrintWriter writer = response.getWriter();
+                writer.println("HTTP Status 401 : " + authException.getMessage());
+            }
+            
+            @Override
+            public void afterPropertiesSet() {
+                setRealmName("basic_maransi");
+                super.afterPropertiesSet();
+            }
+        }    
+
+    . Retorne ao Postman, acesse as configurações Authentication; escolha o type "Basic Auth";
+        coloque no Username : tom e Password : abc123; utilize o link abaixo; e acione o botão "Send"
+
+        Method : GET
+        URL : http://localhost:8080/lancamento/api/
+
+        . Dará erro, pois esse link só está configurado a liberação para os usuários com a role "ROLE"
+
+    . Execute o mesmo link acima com o usuário admin : admin
+
