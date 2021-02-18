@@ -1917,6 +1917,145 @@ Aula 6.3. Implementando segurança com OAuth 2 e Password Flow
     <dependency>
         <groupId>org.springframework.oauth</groupId>
         <artifactId>spring-security-oauth2</artifactId>
-        <version>2.3.5.RELEASE</version>
+        <!-- <version>2.3.5.RELEASE</version> -->
     </dependency>
 
+. Inclua a classe abaixo no projeto:
+
+    package com.example.algamoneyapi.config;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.http.SessionCreationPolicy;
+    import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+    import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+    import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+
+    @Configuration
+    @EnableWebSecurity
+    @EnableResourceServer
+    public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+
+        @Autowired
+        public void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.inMemoryAuthentication()
+                .withUser("admin").password("admin").roles("ROLE");
+        }
+        
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            http.authorizeRequests()
+                    .antMatchers("/categorias").permitAll()
+                    .anyRequest().authenticated()
+                    .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .csrf().disable();
+        }
+        
+        @Override
+        public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+            resources.stateless(true);
+        }
+        
+    }
+
+
+. Inclua a classe abaixo no projeto:
+
+    package com.example.algamoneyapi.config;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
+    import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+    import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+    import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+    import org.springframework.security.oauth2.provider.token.TokenStore;
+    import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+
+    @Configuration
+    @EnableAuthorizationServer
+    public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+        @Autowired
+        private AuthenticationManager authenticationManager;
+        
+        @Override
+        public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+            clients.inMemory()
+                .withClient("angular")
+                .secret("@ngul@r0")
+                .scopes("read", "write")
+                .authorizedGrantTypes("password")
+                .accessTokenValiditySeconds(1800);
+        }
+        
+        @Override
+        public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+            endpoints
+                .tokenStore(tokenStore())
+                .authenticationManager(authenticationManager);
+        }
+        
+        @Bean
+        public TokenStore tokenStore() {
+            return new InMemoryTokenStore();
+        }
+        
+    }
+
+
+. Crie uma chamada no Postman como abaixo:
+
+    Method : POST
+    url : localhost:8080/oauth/token
+
+    . Em Authoritation coloque os parâmetros abaixo:
+
+        Type : Basic Auth
+        User : angular
+        Password : @ngul@r0
+
+        // De Update Request
+
+    . em Body  coloque os parâmetros abaixo:
+
+        x-www-form-urlencoded : true
+
+        key                             value
+        ----                            -----
+        client                          angular
+        username                        admin
+        Password                        admin
+        grant_type                      password
+
+    . Acione o send e pegue o valor do "access_token"
+
+
+. Acesse no Postman a URL abaixo:
+
+
+    Method : GET
+    URL : http://localhost:8080/categoria/api/
+
+    Method : GET
+    URL : http://localhost:8080/categoria/api/1
+
+    . Deixe em Authoritation no Type como "No Auth"
+
+    . Acesse a aba Headers e coloque os parâmetros abaixo:
+
+        key                             value
+        ----                            -----
+        Authoritation                   Bearer + [Access Token]
+
+
+        . Acione o Send
+
+
+        
