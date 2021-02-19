@@ -1914,11 +1914,11 @@ Aula 6.3. Implementando segurança com OAuth 2 e Password Flow
 
 . Inclua a dependência abaixo no pom.xml:
 
-    <dependency>
-        <groupId>org.springframework.oauth</groupId>
-        <artifactId>spring-security-oauth2</artifactId>
-        <!-- <version>2.3.5.RELEASE</version> -->
-    </dependency>
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth2</artifactId>
+			<version>2.3.4.RELEASE</version>
+		</dependency>
 
 . Inclua a classe abaixo no projeto:
 
@@ -2010,6 +2010,35 @@ Aula 6.3. Implementando segurança com OAuth 2 e Password Flow
     }
 
 
+. Inclua a classe abaixo no projeto, ela ajudará na Injeção de Dependência da classe AuthenticationManager
+
+    package com.example.algamoneyapi.config;
+
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+    import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+
+    @Configuration
+    @EnableWebSecurity
+    public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        @Bean
+        @Override
+        public AuthenticationManager authenticationManager() throws Exception {
+            return super.authenticationManager();
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return NoOpPasswordEncoder.getInstance();
+        }
+    }
+
+
 . Crie uma chamada no Postman como abaixo:
 
     Method : POST
@@ -2046,7 +2075,8 @@ Aula 6.3. Implementando segurança com OAuth 2 e Password Flow
     Method : GET
     URL : http://localhost:8080/categoria/api/1
 
-    . Deixe em Authoritation no Type como "No Auth"
+    . Deixe em Authoritation no Type como "No Auth". Isso permitirá colocar o parâmetro Authentication
+        no Headers como abaixo.
 
     . Acesse a aba Headers e coloque os parâmetros abaixo:
 
