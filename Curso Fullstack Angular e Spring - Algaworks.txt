@@ -1950,11 +1950,14 @@ Aula 6.3. Implementando segurança com OAuth 2 e Password Flow
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http.authorizeRequests()
-                    .antMatchers("/categorias").permitAll()
-                    .anyRequest().authenticated()
-                    .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .csrf().disable();
+                    .antMatchers("/categoria/**").permitAll()
+                    .antMatchers("/h2/**").permitAll()
+                    .antMatchers("/h2-console/**").permitAll()
+                    .anyRequest().authenticated().and()
+                    .headers().frameOptions().sameOrigin().and()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                    .csrf().ignoringAntMatchers("/h2-console/**").and()
+                    .csrf().disable();
         }
         
         @Override
@@ -1964,6 +1967,13 @@ Aula 6.3. Implementando segurança com OAuth 2 e Password Flow
         
     }
 
+    . Para permitir a utilização do localhost:8080/h2 é necessário utilizar os métodos abaixo no método "configure"
+
+        http.authorizeRequests()
+            .antMatchers("/h2/**").permitAll()
+            .antMatchers("/h2-console/**").permitAll()
+            .and().csrf().ignoringAntMatchers("/h2-console/**")
+            .and().headers().frameOptions().sameOrigin();
 
 . Inclua a classe abaixo no projeto:
 
@@ -2090,7 +2100,15 @@ Aula 6.3. Implementando segurança com OAuth 2 e Password Flow
         . Acione o Send
 
 
-
-
-
 https://www.devglan.com/spring-security/spring-boot-security-oauth2-example
+
+
+
+
+Aula 6.4. JSON Web Tokens - JWT
+-------------------------------
+
+. Consultar o site https://jwt.io
+
+
+
