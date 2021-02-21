@@ -2185,7 +2185,50 @@ Aula 6.5. Configurando JWT no projeto
 
     . Selecione o token gerado é submeta ele no site https://jwt.io e valide ele.
 
+    . Em Authoritation coloque os parâmetros abaixo:
+
+        Type : Basic Auth
+        User : angular
+        Password : @ngul@r0
+
+        // De Update Request
+
+    . em Body  coloque os parâmetros abaixo:
+
+        x-www-form-urlencoded : true
+
+        key                             value
+        ----                            -----
+        client                          angular
+        username                        admin
+        Password                        admin
+        grant_type                      password
+
+    . Acione o send e pegue o valor do "access_token"
+
+
     . No Verify Signature altere o valor da chave de "secret" para "algaworks" conforme colocado no método
         accessTokenConverter.
+
+. Acesse no Postman a URL abaixo:
+
+
+    Method : GET
+    URL : http://localhost:8080/categoria/api/
+
+    Method : GET
+    URL : http://localhost:8080/categoria/api/1
+
+    . Deixe em Authoritation no Type como "No Auth". Isso permitirá colocar o parâmetro Authentication
+        no Headers como abaixo.
+
+    . Acesse a aba Headers e coloque os parâmetros abaixo:
+
+        key                             value
+        ----                            -----
+        Authoritation                   Bearer + [Access Token]
+
+
+        . Acione o Send
 
     
