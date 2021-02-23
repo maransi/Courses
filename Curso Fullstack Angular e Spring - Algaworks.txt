@@ -2161,7 +2161,7 @@ Aula 6.5. Configurando JWT no projeto
                 .tokenStore(tokenStore())
                 .accessTokenConverter(accessTokenConverter())       // Linha alterada para adequar JWT
                 .authenticationManager(authenticationManager);
-        }
+        }   
         
         // Método criado para JWT
         @Bean
@@ -2231,4 +2231,201 @@ Aula 6.5. Configurando JWT no projeto
 
         . Acione o Send
 
+
+Aula 6.6. Renovando o access token com o refresh token
+------------------------------------------------------
+
+. Altere o parâmetro .accessTokenValiditySeconds para 20 segundos:
+
+    ...
+    @Configuration
+    @EnableAuthorizationServer
+    public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+        @Autowired
+        private AuthenticationManager authenticationManager;
+        
+        @Override
+        public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+            clients.inMemory()
+                .withClient("angular")
+                .secret("@ngul@r0")
+                .scopes("read", "write")
+                .authorizedGrantTypes("password")
+                .accessTokenValiditySeconds(20);    // Altere para 20 seg
+        }
+        
+        ...
+    }
+
+. Com essa alteração o token terá um tempo curto de existência. Acesse o Postman, faça a criação de um
+    token como nos exemplos anteriores e execute uma url com ele durante 20 seg, ou mais para verificar
+    a expiração do token.
     
+    # Para obter o token
+    Method : POST
+    url : localhost:8080/oauth/token
+
+    # Utilize o token no Authorization da url abaixo
+    Method : GET
+    URL : http://localhost:8080/categoria/api/
+
+. Faça as alterações abaixo nos parâmetros do token:
+
+        ...
+        @Override
+        public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+            clients.inMemory()
+                .withClient("angular")
+                .secret("@ngul@r0")
+                .scopes("read", "write")
+                .authorizedGrantTypes("password", "refresh_token")          // Inclua o param "refresh_token"
+                .accessTokenValiditySeconds(20);                            // Altere para 20 seg
+                .refreshTokenValiditySeconds( 3600 * 24 )                   // Tempo para expirar o refreshToken de 1 dia
+        }
+        
+        @Override
+        public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+            endpoints
+                .tokenStore(tokenStore())
+                .accessTokenConverter(accessTokenConverter()) 
+                .reuseRefreshTokens(false)                                  // Um novo refreshToken será criado a cada solicitação
+                .authenticationManager(authenticationManager);
+                
+        }   
+        ...
+
+. Faça a solicitação novamente do token e observe que veio o refresh_token:
+
+    # Para obter o token
+    Method : POST
+    url : localhost:8080/oauth/token
+
+. Espere a expiração do token e solicite um novo token com o refresh_token. Para isso será necessário 
+    chamar a url acima. Porém sem o usuário e senha, somente com o refresh_token. Crie uma nova requisição de token
+    como abaixo:
+
+    # Para obter o token
+    Method : POST
+    url : localhost:8080/oauth/token
+
+    . Em Authoritation coloque os parâmetros abaixo:
+
+        Type : Basic Auth
+        User : angular
+        Password : @ngul@r0
+
+    . No "body" em x-wwww-form-urlencoded = true
+
+        key                             value
+        ----                            -----
+        grant_type                      refresh_token
+        refresh_token                   [ access_token adquirido no passo anterior de obtenção do refresh_token ]
+
+    . Dê um send, copie o novo token obtido com a requisição acima e utilize para executar a requisição abaixo:
+
+        # Utilize o token no Authorization da url abaixo
+        Method : GET
+        URL : http://localhost:8080/categoria/api/
+
+
+
+Aula 6.7. Movendo o refresh token para o cookie
+-----------------------------------------------
+
+. Para deixar mais seguro nossos tokens iremos retirar o refresh_token do corpo da resposta da nossa requisição e colocá-lo
+    num cookie http e assim deixar mais segura a nossa aplicação.
+
+. Crie a classe abaixo no projeto:
+
+    package com.example.algamoneyapi.token;
+
+    import javax.servlet.http.Cookie;
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+
+    import org.springframework.core.MethodParameter;
+    import org.springframework.http.MediaType;
+    import org.springframework.http.converter.HttpMessageConverter;
+    import org.springframework.http.server.ServerHttpRequest;
+    import org.springframework.http.server.ServerHttpResponse;
+    import org.springframework.http.server.ServletServerHttpRequest;
+    import org.springframework.http.server.ServletServerHttpResponse;
+    import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+    import org.springframework.security.oauth2.common.OAuth2AccessToken;
+    import org.springframework.web.bind.annotation.ControllerAdvice;
+    import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+    @ControllerAdvice
+    public class RefreshTokenPostProcessor implements ResponseBodyAdvice<OAuth2AccessToken> {
+
+        @Override
+        public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+            return returnType.getMethod().getName().equals("postAccessToken");
+        }
+
+        @Override
+        public OAuth2AccessToken beforeBodyWrite(OAuth2AccessToken body, MethodParameter returnType,
+                MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                ServerHttpRequest request, ServerHttpResponse response) {
+            
+            HttpServletRequest req = ((ServletServerHttpRequest) request).getServletRequest();
+            HttpServletResponse resp = ((ServletServerHttpResponse) response).getServletResponse();
+            
+            DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) body;
+            
+            String refreshToken = body.getRefreshToken().getValue();
+            adicionarRefreshTokenNoCookie(refreshToken, req, resp);
+            removerRefreshTokenDoBody(token);
+            
+            return body;
+        }
+
+        private void removerRefreshTokenDoBody(DefaultOAuth2AccessToken token) {
+            token.setRefreshToken(null);
+        }
+
+        private void adicionarRefreshTokenNoCookie(String refreshToken, HttpServletRequest req, HttpServletResponse resp) {
+            Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+            refreshTokenCookie.setHttpOnly(true);
+            refreshTokenCookie.setSecure(false); // TODO: Mudar para true em producao
+            refreshTokenCookie.setPath(req.getContextPath() + "/oauth/token");
+            refreshTokenCookie.setMaxAge(2592000);
+            resp.addCookie(refreshTokenCookie);
+        }
+
+    }
+
+
+    . No parâmetro abaixo estamos informando que o refresh_token poderá ser colocado num cookie http. Se fosse true, ele só
+        viria num cookie https
+
+. Execute o projeto, acesse o postman e solicite o token como abaixo. 
+
+    # Para obter o token
+    Method : POST
+    url : localhost:8080/oauth/token
+
+    . Verifique que agora o refres_token não veio, ele está 
+        disponivel no cookie.
+
+    . Em Authoritation coloque os parâmetros abaixo:
+
+        Type : Basic Auth
+        User : angular
+        Password : @ngul@r0
+
+    . No "body" em x-wwww-form-urlencoded = true
+
+        key                             value
+        ----                            -----
+        grant_type                      refresh_token
+        refresh_token                   [ access_token adquirido no passo anterior que está no cookie de obtenção do refresh_token ]
+
+    . Dê um send, copie o novo token obtido e utilize para executar a requisição abaixo:
+
+        # Utilize o token no Authorization da url abaixo
+        Method : GET
+        URL : http://localhost:8080/categoria/api/
+
+    . 
