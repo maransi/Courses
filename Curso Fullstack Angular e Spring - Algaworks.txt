@@ -2183,7 +2183,6 @@ Aula 6.5. Configurando JWT no projeto
     Method : POST
     url : localhost:8080/oauth/token
 
-    . Selecione o token gerado é submeta ele no site https://jwt.io e valide ele.
 
     . Em Authoritation coloque os parâmetros abaixo:
 
@@ -2206,6 +2205,7 @@ Aula 6.5. Configurando JWT no projeto
 
     . Acione o send e pegue o valor do "access_token"
 
+    . Selecione o access_token gerado é submeta ele no site https://jwt.io e valide ele.
 
     . No Verify Signature altere o valor da chave de "secret" para "algaworks" conforme colocado no método
         accessTokenConverter.
@@ -2280,8 +2280,8 @@ Aula 6.6. Renovando o access token com o refresh token
                 .secret("@ngul@r0")
                 .scopes("read", "write")
                 .authorizedGrantTypes("password", "refresh_token")          // Inclua o param "refresh_token"
-                .accessTokenValiditySeconds(20);                            // Altere para 20 seg
-                .refreshTokenValiditySeconds( 3600 * 24 )                   // Tempo para expirar o refreshToken de 1 dia
+                .accessTokenValiditySeconds(20)                            // Altere para 20 seg
+                .refreshTokenValiditySeconds( 3600 * 24 );                   // Tempo para expirar o refreshToken de 1 dia
         }
         
         @Override
@@ -2302,7 +2302,7 @@ Aula 6.6. Renovando o access token com o refresh token
     url : localhost:8080/oauth/token
 
 . Espere a expiração do token e solicite um novo token com o refresh_token. Para isso será necessário 
-    chamar a url acima. Porém sem o usuário e senha, somente com o refresh_token. Crie uma nova requisição de token
+    chamar a url acima. Porém sem o usuário e senha, somente com o grant_type igual a refresh_token. Crie uma nova requisição de token
     como abaixo:
 
     # Para obter o token
@@ -2322,7 +2322,7 @@ Aula 6.6. Renovando o access token com o refresh token
         grant_type                      refresh_token
         refresh_token                   [ access_token adquirido no passo anterior de obtenção do refresh_token ]
 
-    . Dê um send, copie o novo token obtido com a requisição acima e utilize para executar a requisição abaixo:
+    . Dê um send, copie o novo access_token obtido com a requisição acima e utilize para executar a requisição abaixo:
 
         # Utilize o token no Authorization da url abaixo
         Method : GET
