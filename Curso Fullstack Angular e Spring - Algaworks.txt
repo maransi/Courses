@@ -2403,7 +2403,9 @@ Aula 6.7. Movendo o refresh token para o cookie
 
 
     . No parâmetro abaixo estamos informando que o refresh_token poderá ser colocado num cookie http. Se fosse true, ele só
-        viria num cookie https
+        viria num cookie https:
+
+        refreshTokenCookie.setHttpOnly(true);
 
 . Execute o projeto, acesse o postman e solicite o token como abaixo. 
 
@@ -2535,12 +2537,23 @@ Aula 6.8. Movendo o refresh token do cookie para a requisição
         grant_type                      refresh_token
         refresh_token                   [ access_token adquirido no passo anterior que está no cookie de obtenção do refresh_token ]
 
-    . Desmarque o parâmetro refresh_token e submeta novamente a requisição e verifique se o access_token veio.
+    . Desmarque o parâmetro refresh_token, submeta novamente a requisição e verifique se o access_token veio.
 
-    . Dê um send, copie o access_token obtido e utilize  no lugar do token para executar a requisição abaixo:
+
+        . O objetivo é passar nos parâmetros do Body somente o grant_type, sem ter que passar o refresh_token e expo-lo na requisição. 
+        . Como o cookie fica armazenado no client, o server através da classe Filter acima recupera o conteúdo do Cookie e adiciona aos
+            parâmetros automaticamente, sem a necessidade de enviá-lo nos parâmetros do Body
+
+    . Dê um send, acesse a aba Cookie, copie o access_token obtido no Cookie e utilize  no lugar do token para executar a requisição abaixo:
 
         # Utilize o token no Authorization da url abaixo
         Method : GET
         URL : http://localhost:8080/categoria/api/
 
 
+
+Aula 6.9
+
+https://howtodoinjava.com/spring5/webmvc/spring-mvc-cors-configuration/
+https://www.baeldung.com/spring-cors
+https://helpdev.com.br/2019/01/03/java-configurando-cors-no-spring-boot-e-security/
