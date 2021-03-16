@@ -66,7 +66,7 @@ Aula 03.02. Conectando ao MySQL
     # Custom H2 Console URL
     spring.h2.console.path=/h2
     # temporary data storage
-    spring.datasource.url = jdbc:h2:mem:testdb
+    spring.datasource.url = jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
 
 . Execute a aplicação para ver se ela levanta.
 
@@ -2552,8 +2552,446 @@ Aula 6.8. Movendo o refresh token do cookie para a requisição
 
 
 
-Aula 6.9
+Aula 06.09. O que é CORS
+-----------------------
 
+    CORS (Cross-Origin Resource Sharing) é uma especificação do W3C que, quando implementado pelo navegador, permite que um site acesse 
+    recursos de outro site mesmo estando em domínios diferentes.
+
+    Explicando um pouco melhor: os navegadores fazem uso de uma funcionalidade de segurança chamada Same-Origin Policy: um recurso 
+    de um site só pode ser chamado por outro site se os 2 sites estiverem sob o mesmo domínio (mesmo endereço, 
+    por ex.: meudominio.com.br). Isso limita a chamada de APIs REST por aplicações JS, por exemplo, hospedadas em 
+    servidores diferentes (front-end e back-end em camadas distintas). Isso porque o navegador considera recursos do mesmo 
+    domínio somente aqueles que usam o mesmo protocolo (http ou https), a mesma porta e o mesmo endereço (mesmo subdomínios, 
+    subdominio.meudominio.com.br, por exemplo, não são considerados seguros e não funcionam).
+
+    Antes do CORS, era possível contornar essa restrição criando algum tipo de componente que servisse de proxy para as chamadas externas. 
+    O uso do JSONP (JSON with padding) para APIs que dão suporte (pouco comum) também era uma saída. Contudo o JSONP é limitado 
+    somente a chamadas do tipo GET o que causa bastante transtorno para APIs baseadas em REST (que faz uso dos outros 
+    verbos POST, PUT e DELETE).
+
+    Com a implementação do CORS um domínio permite comunicação com outro de forma livre, independente do método da chamada 
+    (GET, POST, PUT ou DELETE) contanto que o domínio de destino tenha especificado esse tipo de comunicação.
+
+    Geralmente essa configuração é feita no lado da API e cada framework tem sua forma de configuração. A parte importante 
+    é a inclusão do Access-Control-Allow-Origin no header da reposta da API.
+
+    Então, em um cenário bem simples, sua aplicação JS cliente em dev.meudominio.com.br faz um request para a 
+    API (normalmente numa chamada AJAX) para o servidor api.meudominio.com.br. A resposta da API deve incluir no 
+    header da resposta o Access-Control-Allow-Origin: http://dev.meudominio.com.br deixando claro para o navegador 
+    que ele aceita requests originados somente desse domínio.
+
+    Então em um exemplo de chamada de dev.meudominio.com.br para api.meudominio.com.br/recurso.php, gera esse request header:
+
+
+        GET /recurso.php HTTP/1.1
+        User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/536.30.1 (KHTML, like Gecko) Version/6.0.5 Safari/536.30.1
+        Accept: application/json, text/plain, */*
+        Referer: http://dev.meudominio.com.br/
+        Origin: http://dev.meudominio.com.br/
+
+
+    E a API deve gerar a resposta com o response header abaixo:
+
+        HTTP/1.1 200 OK
+        Content-Type: application/json;charset=UTF-8
+        Date: Wed, 20 Nov 2013 19:36:00 GMT
+        Server: Apache-Coyote/1.1
+        Content-Length: 35
+        Connection: keep-alive
+        Access-Control-Allow-Origin: http://dev.meudominio.com.br
+
+    Se o conteúdo de Origin for idêntico ao de Access-Control-Allow-Origin a comunicação é permitida pelo navegador.
+
+    Em um cenário mais complexo, existem outros headers que precisam ser configurados na resposta. De novo, isso varia com os 
+    frameworks que estão sendo utilizados (cliente e servidor).
+
+
+https://www.youtube.com/watch?v=GZV-FUdeVwE
 https://howtodoinjava.com/spring5/webmvc/spring-mvc-cors-configuration/
 https://www.baeldung.com/spring-cors
 https://helpdev.com.br/2019/01/03/java-configurando-cors-no-spring-boot-e-security/
+
+
+Aula 06.10. Criando filtro para CORS
+------------------------------------
+
+    . Implemente a classe abaixo no projeto:
+
+        package com.example.algamoneyapi.cors;
+
+        import java.io.IOException;
+
+        import javax.servlet.Filter;
+        import javax.servlet.FilterChain;
+        import javax.servlet.FilterConfig;
+        import javax.servlet.ServletException;
+        import javax.servlet.ServletRequest;
+        import javax.servlet.ServletResponse;
+        import javax.servlet.http.HttpServletRequest;
+        import javax.servlet.http.HttpServletResponse;
+
+        import org.springframework.core.Ordered;
+        import org.springframework.core.annotation.Order;
+        import org.springframework.stereotype.Component;
+
+        @Component
+        @Order(Ordered.HIGHEST_PRECEDENCE)
+        public class CorsFilter implements Filter {
+
+            private String originPermitida = "http://localhost:8000"; // TODO: Configurar para diferentes ambientes
+            
+            @Override
+            public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+                    throws IOException, ServletException {
+                
+                HttpServletRequest request = (HttpServletRequest) req;
+                HttpServletResponse response = (HttpServletResponse) resp;
+                
+                response.setHeader("Access-Control-Allow-Origin", originPermitida);
+                response.setHeader("Access-Control-Allow-Credentials", "true"); // Para permitir trabalhar com os cookies
+                
+                if ("OPTIONS".equals(request.getMethod()) && originPermitida.equals(request.getHeader("Origin"))) {
+                    response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
+                    response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
+                    response.setHeader("Access-Control-Max-Age", "3600");
+                    
+                    response.setStatus(HttpServletResponse.SC_OK);  // Serve para parar a chamada do prox filter
+                } else {
+                    chain.doFilter(req, resp);
+                }
+                
+            }
+            
+            @Override
+            public void destroy() {
+            }
+
+            @Override
+            public void init(FilterConfig arg0) throws ServletException {
+            }
+
+        }
+
+
+Aula 06.11. Movendo o usuário para o banco de dados
+---------------------------------------------------
+
+    . Implemente no arquivo schema.sql as DDLs abaixo:
+
+        CREATE TABLE usuario (
+            codigo BIGINT(20) PRIMARY KEY,
+            nome VARCHAR(50) NOT NULL,
+            email VARCHAR(50) NOT NULL,
+            senha VARCHAR(150) NOT NULL
+        );
+
+        CREATE TABLE permissao (
+            codigo BIGINT(20) PRIMARY KEY,
+            descricao VARCHAR(50) NOT NULL
+        );
+
+        CREATE TABLE usuario_permissao (
+            codigo_usuario BIGINT(20) NOT NULL,
+            codigo_permissao BIGINT(20) NOT NULL,
+            PRIMARY KEY (codigo_usuario, codigo_permissao),
+            FOREIGN KEY (codigo_usuario) REFERENCES usuario(codigo),
+            FOREIGN KEY (codigo_permissao) REFERENCES permissao(codigo)
+        );
+
+    . Implemente no arquivo data.sql as DMLs abaixo:
+
+        INSERT INTO usuario (codigo, nome, email, senha) values (1, 'Administrador', 'admin@algamoney.com', '$2a$10$X607ZPhQ4EgGNaYKt3n4SONjIv9zc.VMWdEuhCuba7oLAL5IvcL5.');
+        INSERT INTO usuario (codigo, nome, email, senha) values (2, 'Maria Silva', 'maria@algamoney.com', '$2a$10$Zc3w6HyuPOPXamaMhh.PQOXvDnEsadztbfi6/RyZWJDzimE8WQjaq');
+
+        INSERT INTO permissao (codigo, descricao) values (1, 'ROLE_CADASTRAR_CATEGORIA');
+        INSERT INTO permissao (codigo, descricao) values (2, 'ROLE_PESQUISAR_CATEGORIA');
+
+        INSERT INTO permissao (codigo, descricao) values (3, 'ROLE_CADASTRAR_PESSOA');
+        INSERT INTO permissao (codigo, descricao) values (4, 'ROLE_REMOVER_PESSOA');
+        INSERT INTO permissao (codigo, descricao) values (5, 'ROLE_PESQUISAR_PESSOA');
+
+        INSERT INTO permissao (codigo, descricao) values (6, 'ROLE_CADASTRAR_LANCAMENTO');
+        INSERT INTO permissao (codigo, descricao) values (7, 'ROLE_REMOVER_LANCAMENTO');
+        INSERT INTO permissao (codigo, descricao) values (8, 'ROLE_PESQUISAR_LANCAMENTO');
+
+        -- admin
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 1);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 2);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 3);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 4);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 5);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 6);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 7);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 8);
+
+        -- maria
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (2, 2);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (2, 5);
+        INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (2, 8);
+
+
+    . Crie as classes model abaixo:
+
+        /*
+         *  Usuario
+         */
+
+        package com.example.algamoneyapi.model;
+
+        import java.util.List;
+
+        import javax.persistence.Entity;
+        import javax.persistence.FetchType;
+        import javax.persistence.Id;
+        import javax.persistence.JoinColumn;
+        import javax.persistence.JoinTable;
+        import javax.persistence.ManyToMany;
+        import javax.persistence.Table;
+
+        @Entity
+        @Table(name = "usuario")
+        public class Usuario {
+
+            @Id
+            private Long codigo;
+
+            private String nome;
+            private String email;
+            private String senha;
+
+            @ManyToMany(fetch = FetchType.EAGER)
+            @JoinTable(name = "usuario_permissao", joinColumns = @JoinColumn(name = "codigo_usuario")
+                , inverseJoinColumns = @JoinColumn(name = "codigo_permissao"))
+            private List<Permissao> permissoes;
+
+            public Long getCodigo() {
+                return codigo;
+            }
+
+            public void setCodigo(Long codigo) {
+                this.codigo = codigo;
+            }
+
+            public String getNome() {
+                return nome;
+            }
+
+            public void setNome(String nome) {
+                this.nome = nome;
+            }
+
+            public String getEmail() {
+                return email;
+            }
+
+            public void setEmail(String email) {
+                this.email = email;
+            }
+
+            public String getSenha() {
+                return senha;
+            }
+
+            public void setSenha(String senha) {
+                this.senha = senha;
+            }
+
+            public List<Permissao> getPermissoes() {
+                return permissoes;
+            }
+
+            public void setPermissoes(List<Permissao> permissoes) {
+                this.permissoes = permissoes;
+            }
+
+            @Override
+            public int hashCode() {
+                final int prime = 31;
+                int result = 1;
+                result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
+                return result;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj)
+                    return true;
+                if (obj == null)
+                    return false;
+                if (getClass() != obj.getClass())
+                    return false;
+                Usuario other = (Usuario) obj;
+                if (codigo == null) {
+                    if (other.codigo != null)
+                        return false;
+                } else if (!codigo.equals(other.codigo))
+                    return false;
+                return true;
+            }
+
+        }
+
+
+
+
+
+        /*
+         *  Permissao
+         */
+
+
+        package com.example.algamoney.api.model;
+
+        import javax.persistence.Entity;
+        import javax.persistence.Id;
+        import javax.persistence.Table;
+
+        @Entity
+        @Table(name = "permissao")
+        public class Permissao {
+
+            @Id
+            private Long codigo;
+            private String descricao;
+
+            public Long getCodigo() {
+                return codigo;
+            }
+
+            public void setCodigo(Long codigo) {
+                this.codigo = codigo;
+            }
+
+            public String getDescricao() {
+                return descricao;
+            }
+
+            public void setDescricao(String descricao) {
+                this.descricao = descricao;
+            }
+
+            @Override
+            public int hashCode() {
+                final int prime = 31;
+                int result = 1;
+                result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
+                return result;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj)
+                    return true;
+                if (obj == null)
+                    return false;
+                if (getClass() != obj.getClass())
+                    return false;
+                Permissao other = (Permissao) obj;
+                if (codigo == null) {
+                    if (other.codigo != null)
+                        return false;
+                } else if (!codigo.equals(other.codigo))
+                    return false;
+                return true;
+            }
+
+        }
+
+
+    . Crie a classe repository abaixo no projeto:
+
+        package com.example.algamoneyapi.repository;
+
+        import java.util.Optional;
+
+        import org.springframework.data.jpa.repository.JpaRepository;
+
+        import com.example.algamoney.api.model.Usuario;
+
+        public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+            public Optional<Usuario> findByEmail(String email);
+            
+        }
+
+
+    . Altere na classe ResourceServerConfig o método configure como abaixo :
+
+        // De
+
+        @Autowired
+        public void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.inMemoryAuthentication()
+                    .withUser("admin").password("admin").roles("ROLE");
+        }
+
+
+        // Para
+
+        @Autowired
+        private UserDetailsService userDetailsService
+
+        @Autowired
+        public void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        }    
+
+
+    . Ainda no arquivo ResourceServerConfig implemente o método abaixo:
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+
+    . Crie a classe abaixo no projeto:
+
+        package com.example.algamoneyapi.security;
+
+        import java.util.Collection;
+        import java.util.HashSet;
+        import java.util.Optional;
+        import java.util.Set;
+
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.security.core.GrantedAuthority;
+        import org.springframework.security.core.authority.SimpleGrantedAuthority;
+        import org.springframework.security.core.userdetails.User;
+        import org.springframework.security.core.userdetails.UserDetails;
+        import org.springframework.security.core.userdetails.UserDetailsService;
+        import org.springframework.security.core.userdetails.UsernameNotFoundException;
+        import org.springframework.stereotype.Service;
+
+        import com.example.algamoney.api.model.Usuario;
+        import com.example.algamoney.api.repository.UsuarioRepository;
+
+        @Service
+        public class AppUserDetailsService implements UserDetailsService {
+
+            @Autowired
+            private UsuarioRepository usuarioRepository;
+            
+            @Override
+            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(email);
+                Usuario usuario = usuarioOptional.orElseThrow(() -> new UsernameNotFoundException("Usuário e/ou senha incorretos"));
+                return new User(email, usuario.getSenha(), getPermissoes(usuario));
+            }
+
+            private Collection<? extends GrantedAuthority> getPermissoes(Usuario usuario) {
+                Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+                usuario.getPermissoes().forEach(p -> authorities.add(new SimpleGrantedAuthority(p.getDescricao().toUpperCase())));
+                return authorities;
+            }
+
+        }
+
+    . As configurações abaixo estão no Postman -> Body -> x-www-form-urlencoded
+
+    . Subir a aplicação testando, executar localhost:8080/oauth/token com o usuário admin@algamoney.com e password admin para 
+        recuperar o access_token
+
+    . execute novamente localhost:808/oauth/token com usuário e senha maria@algamoney.com maria respectivamente para recuperar
+        o access_token.
