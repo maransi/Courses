@@ -2995,3 +2995,424 @@ Aula 06.11. Movendo o usuário para o banco de dados
 
     . execute novamente localhost:808/oauth/token com usuário e senha maria@algamoney.com maria respectivamente para recuperar
         o access_token.
+
+
+https://www.javadevjournal.com/spring/spring-security-userdetailsservice/
+        
+
+
+
+Aula 06.12. Adicionando permissões de acesso
+--------------------------------------------
+
+    . Incluir a anotação  @EnableGlobalMethodSecurity(prePostEnabled=true) na classe ResourceServerConfig. Isto habilita o controle
+        de segurança nos métodos das API (classes resource):
+
+        @Configuration
+        @EnableWebSecurity
+        @EnableResourceServer
+        @EnableGlobalMethodSecurity(prePostEnabled=true)
+        public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+
+            ...
+
+        }
+
+    . Inclua o método abaixo na classe ResourceServerConfig:
+
+        ...
+        @Bean
+        public MethodSecurityExpressionHandler createExpressionHandler(){
+            return new OAuth2MethodSecurityExpressionHandler();
+        }
+        ...
+
+    . Acessar os métodos das classes resources e incluir a anotação @PreAuthorize:
+
+        @GetMapping
+        @PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
+        public  ResponseEntity<?> findAll() {
+
+            List<Categoria> categorias = null;
+
+            try {
+                categorias = categoriaRepository.findAll();
+
+                return ResponseEntity.ok(categorias);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+
+        }
+
+        @GetMapping(path = "{codigo}")
+        @PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
+        public ResponseEntity<?> findById(@PathVariable Long codigo, HttpServletResponse response) {
+
+            try {
+                Categoria categoria = categoriaRepository.findById(codigo).get();
+        
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("")
+                        .buildAndExpand(categoria.getCodigo()).toUri();
+
+                response.setHeader("Location", uri.toASCIIString());
+
+                return ResponseEntity.ok( categoria );
+            }catch( Exception e) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            
+        }
+
+        @PostMapping
+        @PreAuthorize("hasAuthority('ROLE_CADASTRAR_CATEGORIA') and #oauth2.hasScope('write')")
+        // @ResponseStatus( HttpStatus.CREATED)
+        public ResponseEntity<?> insert( @Valid @RequestBody Categoria categoria, HttpServletResponse response ) {
+            /*
+            * if ( result.hasErrors() ) { Map<String, String> errors = new HashMap<>();
+            * 
+            * for ( FieldError error : result.getFieldErrors()) { errors.put(
+            * error.getField(), error.getDefaultMessage()); }
+            * 
+            * return ResponseEntity.unprocessableEntity().body(errors); }
+            */		
+            try {
+                Categoria categoriaSalva = categoriaRepository.save(categoria);
+
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+                        .buildAndExpand(categoriaSalva.getCodigo()).toUri();
+
+                response.setHeader("Location", uri.toASCIIString());
+
+                return ResponseEntity.created(uri).body(categoriaSalva);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+
+        }
+
+        . Com a inclusão das permissões através das roles cadastrada nas permissões de cada cliente, não será mais 
+            necessário a configuração feita no método ResourceServerConfig.configure( HttpSecurity http ) que realiza
+            a autorização de acesso para todos ao contexto ("/categoria/**) neste caso podemos eliminar essa linha.
+
+            http.authorizeRequests()
+                    .antMatchers("/categoria/**").permitAll()
+
+        . Deixe esse método como abaixo:
+
+            http.authorizeRequests()
+                    .antMatchers("/h2/**").permitAll()
+                    .antMatchers("/h2-console/**").permitAll()
+                    .anyRequest().authenticated().and()
+                    .headers().frameOptions().sameOrigin().and()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                    .csrf().ignoringAntMatchers("/h2-console/**").and()
+                    .csrf().disable();
+
+        . Levante a aplicação; acesso o Postman; altere as configurações do  localhost:8080/oauth/token no body deixando como abaixo:
+
+            username : maria@algamoney.com
+            password : maria
+
+        . Transporte o token obtido para a consulta de categoria e execute a query.
+
+        . Para trabalhar com os escopos "read" e "write" temos que alterar na classe AuthorizationServerConfig no metodo
+            configure( ClienteDetailsServiceConfigurer clients) o objeto clients.
+
+
+            ...
+
+            @Override
+            public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+                clients.inMemory()
+                        .withClient("angular")
+                        .secret("@ngul@r0")
+                        .scopes("read", "write")
+                        .authorizedGrantTypes("password", "refresh_token")
+                        .accessTokenValiditySeconds(1800)
+                        .refreshTokenValiditySeconds(3600 * 24)
+                    .and()
+                        .withClient("mobile")
+                        .secret("m0b1l30")
+                        .scopes("read")
+                        .authorizedGrantTypes("password", "refresh_token")
+                        .accessTokenValiditySeconds(1800)
+                        .refreshTokenValiditySeconds(3600 * 24);
+            }
+
+            ...
+
+
+            . Observe que foi incluído mais um and() para o cliente mobile e ele só tem o escopo "read" que serão utilizados
+                nos métodos das classes resources na anotação @PreAuthorize:
+
+                ...
+
+                @GetMapping
+                @PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
+                public  ResponseEntity<?> findAll() {
+
+                    List<Categoria> categorias = null;
+
+                    try {
+                        categorias = categoriaRepository.findAll();
+
+                        return ResponseEntity.ok(categorias);
+                    } catch (Exception e) {
+                        return ResponseEntity.badRequest().body(e.getMessage());
+                    }
+
+                }
+
+                @GetMapping(path = "{codigo}")
+                @PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
+                public ResponseEntity<?> findById(@PathVariable Long codigo, HttpServletResponse response) {
+
+                    try {
+                        Categoria categoria = categoriaRepository.findById(codigo).get();
+                
+                        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("")
+                                .buildAndExpand(categoria.getCodigo()).toUri();
+
+                        response.setHeader("Location", uri.toASCIIString());
+
+                        return ResponseEntity.ok( categoria );
+                    }catch( Exception e) {
+                        return ResponseEntity.notFound().build();
+                    }
+                    
+                    
+                }
+
+                @PostMapping
+                @PreAuthorize("hasAuthority('ROLE_CADASTRAR_CATEGORIA') and #oauth2.hasScope('write')")
+                // @ResponseStatus( HttpStatus.CREATED)
+                public ResponseEntity<?> insert( @Valid @RequestBody Categoria categoria, HttpServletResponse response ) {
+                    /*
+                    * if ( result.hasErrors() ) { Map<String, String> errors = new HashMap<>();
+                    * 
+                    * for ( FieldError error : result.getFieldErrors()) { errors.put(
+                    * error.getField(), error.getDefaultMessage()); }
+                    * 
+                    * return ResponseEntity.unprocessableEntity().body(errors); }
+                    */		
+                    try {
+                        Categoria categoriaSalva = categoriaRepository.save(categoria);
+
+                        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+                                .buildAndExpand(categoriaSalva.getCodigo()).toUri();
+
+                        response.setHeader("Location", uri.toASCIIString());
+
+                        return ResponseEntity.created(uri).body(categoriaSalva);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        return ResponseEntity.badRequest().body(e.getMessage());
+                    }
+
+                }
+
+                ...
+
+        . Acesse no Postman a URL localhost:8080/oauth/token:
+            
+            Authorization; altere o username para mobile e password para m0b1l30
+
+            Body altere o client para mobile, username para admin@algamoney.com e password para admin
+
+        . Execute a URL e transporte o token obtido para a consulta com método POST de categoria e execute a query. Dará erro de 
+            insuficiencia de acesso.
+
+        . Retorne ao Postman na URL localhost:8080/oauth/token altere o valor de Authorization para o angular:
+
+            Authorization; altere o username para angular e password para @ngul@r0
+
+        . Execute a URL e transporte o token obtido para a consulta  com método POST de categoria e execute a query. Dessa vez não dará
+            mais erro pois agora o client angular possui o escopo write.
+
+
+
+Auala 06.14. Implementando o logout
+-----------------------------------
+
+    . Insira a classe abaixo no projeto:
+
+        package com.example.algamoneyapi.resource;
+
+        import javax.servlet.http.Cookie;
+        import javax.servlet.http.HttpServletRequest;
+        import javax.servlet.http.HttpServletResponse;
+
+        import org.springframework.http.HttpStatus;
+        import org.springframework.web.bind.annotation.DeleteMapping;
+        import org.springframework.web.bind.annotation.RequestMapping;
+        import org.springframework.web.bind.annotation.RestController;
+
+        @RestController
+        @RequestMapping("/tokens")
+        public class TokenResource {
+
+            @DeleteMapping("/revoke")
+            public void revoke(HttpServletRequest req, HttpServletResponse resp) {
+                Cookie cookie = new Cookie("refreshToken", null);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(false); // TODO: Em producao sera true
+                cookie.setPath(req.getContextPath() + "/oauth/token");
+                cookie.setMaxAge(0);
+                
+                resp.addCookie(cookie);
+                resp.setStatus(HttpStatus.NO_CONTENT.value());
+            }
+            
+        }
+
+    . Faça a solicitação de um access token com a url abaixo:
+
+        localhost:8080/oauth/token
+
+        client : angular
+        username : admin@algamoney.com
+        password : admin
+        grant_type : password
+
+    . Observe que veio o Cookie logo ao lado da resposta
+
+    . Crie no Postman uma nova solicitação com método DELETE:
+
+        localhost:8080/tokens/revoke
+
+        . Adicione o access_token obtido do passo anterior na aba Headers com o parâmetro abaixo: 
+
+            Authorization     : Bearer [access_token]
+
+        . Execute a url e observe que não veio o Cookie logo ao lado da resposta
+
+
+
+
+Aula 07.01. Implementando projeção de lançamento        
+------------------------------------------------
+
+    . Implemente a classe model abaixo:
+
+
+        package com.example.algamoneyapi.model;
+
+        import java.math.BigDecimal;
+        import java.time.LocalDate;
+        import java.util.Objects;
+
+        public class ResumoLancamento {
+
+            private Long codigo;
+            private String descricao;
+            private LocalDate dataVencimento;
+            private LocalDate dataPagamento;
+            private BigDecimal valor;
+            private String categoria;
+            private String pessoa;
+
+            public ResumoLancamento() {
+                super();
+            }
+
+            public ResumoLancamento(Long codigo, String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor, String categoria, String pessoa) {
+                this.codigo = codigo;
+                this.descricao = descricao;
+                this.dataVencimento = dataVencimento;
+                this.dataPagamento = dataPagamento;
+                this.valor = valor;
+                this.categoria = categoria;
+                this.pessoa = pessoa;
+            }
+
+            public Long getCodigo() {
+                return codigo;
+            }
+
+            public void setCodigo(Long codigo) {
+                this.codigo = codigo;
+            }
+
+            public String getDescricao() {
+                return descricao;
+            }
+
+            public void setDescricao(String descricao) {
+                this.descricao = descricao;
+            }
+
+            public LocalDate getDataVencimento() {
+                return dataVencimento;
+            }
+
+            public void setDataVencimento(LocalDate dataVencimento) {
+                this.dataVencimento = dataVencimento;
+            }
+
+            public LocalDate getDataPagamento() {
+                return dataPagamento;
+            }
+
+            public void setDataPagamento(LocalDate dataPagamento) {
+                this.dataPagamento = dataPagamento;
+            }
+
+            public BigDecimal getValor() {
+                return valor;
+            }
+
+            public void setValor(BigDecimal valor) {
+                this.valor = valor;
+            }
+
+            public String getCategoria() {
+                return categoria;
+            }
+
+            public void setCategoria(String categoria) {
+                this.categoria = categoria;
+            }
+
+            public String getPessoa() {
+                return pessoa;
+            }
+
+            public void setPessoa(String pessoa) {
+                this.pessoa = pessoa;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ResumoLancamento that = (ResumoLancamento) o;
+                return Objects.equals(codigo, that.codigo);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(codigo);
+            }
+
+
+        }
+
+    . Adicione na interface LancamentoRepositoryQuery o método resumir abaixo:
+
+        ...
+        public interface LancamentoRepositoryQuery {
+
+            ...
+            public Page<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable);
+
+        }    
+
+    . Inserir o método abaixo na classe LancamentoRepositoryImpl
+
+        @Override
+        public Page<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable) {
+            return null;
+        }
