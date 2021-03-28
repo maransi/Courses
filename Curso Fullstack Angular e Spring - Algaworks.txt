@@ -3479,3 +3479,165 @@ https://github.com/steppat/modelmapper
 http://modelmapper.org/getting-started/#setting-up
 
 
+
+
+Complemento da Aula 07.01. Implementando projeção de lançamento ( com biblioteca ModelMapper )
+---------------------------------------------------------------
+
+    . Inclua a dependência abaixo no pom.xml
+
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>2.3.9</version>
+		</dependency>
+
+    . Inclua o objeto DTO abaixo no projeto:
+
+        package com.example.algamoneyapi.model;
+
+        import java.math.BigDecimal;
+        import java.time.LocalDate;
+
+        public class LancamentoDTO {
+
+            private Long codigo;
+            private String descricao;
+            private LocalDate dataVencimento;
+            private LocalDate dataPagamento;
+            private BigDecimal valor;
+            private String categoriaNome;
+            private String pessoaNome;
+
+            public Long getCodigo() {
+                return codigo;
+            }
+
+            public void setCodigo(Long codigo) {
+                this.codigo = codigo;
+            }
+
+            public String getDescricao() {
+                return descricao;
+            }
+
+            public void setDescricao(String descricao) {
+                this.descricao = descricao;
+            }
+
+            public LocalDate getDataVencimento() {
+                return dataVencimento;
+            }
+
+            public void setDataVencimento(LocalDate dataVencimento) {
+                this.dataVencimento = dataVencimento;
+            }
+
+            public LocalDate getDataPagamento() {
+                return dataPagamento;
+            }
+
+            public void setDataPagamento(LocalDate dataPagamento) {
+                this.dataPagamento = dataPagamento;
+            }
+
+            public BigDecimal getValor() {
+                return valor;
+            }
+
+            public void setValor(BigDecimal valor) {
+                this.valor = valor;
+            }
+
+            public String getCategoriaNome() {
+                return categoriaNome;
+            }
+
+            public void setCategoriaNome(String categoriaNome) {
+                this.categoriaNome = categoriaNome;
+            }
+
+            public String getPessoaNome() {
+                return pessoaNome;
+            }
+
+            public void setPessoaNome(String pessoaNome) {
+                this.pessoaNome = pessoaNome;
+            }
+
+            public LancamentoDTO() {
+                super();
+            }
+
+            public LancamentoDTO(Long codigo, String descricao,
+                                LocalDate dataVencimento, LocalDate dataPagamento,
+                                BigDecimal valor, String categoriaNome,
+                                String pessoaNome) {
+                this.codigo = codigo;
+                this.descricao = descricao;
+                this.dataVencimento = dataVencimento;
+                this.dataPagamento = dataPagamento;
+                this.valor = valor;
+                this.categoriaNome = categoriaNome;
+                this.pessoaNome = pessoaNome;
+            }
+
+            @Override
+            public String toString() {
+                return "LancamentoDTO{" +
+                        "codigo=" + codigo +
+                        ", descricao='" + descricao + '\'' +
+                        ", dataVencimento=" + dataVencimento +
+                        ", dataPagamento=" + dataPagamento +
+                        ", valor=" + valor +
+                        ", categoriaNome='" + categoriaNome + '\'' +
+                        ", pessoaNome='" + pessoaNome + '\'' +
+                        '}';
+            }
+        }
+
+    . Importante: Existe um padrão na nomenclatura das propriedades que deve ser seguindo.
+                    O nome da propriedade categoriaNome e pessoaNome foram colocados dessa
+                    forma para atender a padronização pessoa.nome e categoria.nome que é utilizado
+                    na classe pai Lancamento, que contêm as propriedade:
+
+                    private Categoria categoria
+                    private Pessoa pessoa
+
+                    O ModelMapper utiliza esse padrão para fazer o mapper de uma classe para outra.
+                    Mais detalhes acesse o link: http://modelmapper.org/getting-started/#setting-up
+
+    . Crie o método abaixo na classe LancamentoResource:
+
+        @GetMapping(params="resumo")
+        public ResponseEntity<?> resumo(){
+            List<Lancamento> lancamentos = lancamentoRepository.findAll();
+
+            List<LancamentoDTO> lancamentosDTO = new ArrayList<>();
+
+            ModelMapper modelMapper = new ModelMapper();
+
+            lancamentos.forEach(lancamento -> lancamentosDTO.add( modelMapper.map( lancamento, LancamentoDTO.class) ) );
+
+            return ResponseEntity.ok(lancamentosDTO);
+        }
+
+
+    . Levante a aplicação e solicite um access token com a url abaixo:
+
+        localhost:8080/oauth/token
+
+        client : angular
+        username : admin@algamoney.com
+        password : admin
+        grant_type : password    
+
+    . Crie uma nova URL no Postman 
+
+        localhost:8080/lancamentos?resumo
+
+        Header.Authorization : Bearer [Token obtido no item anterior]
+
+
+
+TODO: ver como funcionaria a páginação e o filtro para esse método
