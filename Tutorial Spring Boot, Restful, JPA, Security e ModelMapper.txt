@@ -1998,4 +1998,492 @@
         }
     }
 
-25. 
+25. Incluir a classe AppUserDetailsService abaixo:
+
+    package com.maransi.monaco.security;
+
+    import java.util.Collection;
+    import java.util.HashSet;
+    import java.util.Optional;
+    import java.util.Set;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.security.core.GrantedAuthority;
+    import org.springframework.security.core.authority.SimpleGrantedAuthority;
+    import org.springframework.security.core.userdetails.User;
+    import org.springframework.security.core.userdetails.UserDetails;
+    import org.springframework.security.core.userdetails.UserDetailsService;
+    import org.springframework.security.core.userdetails.UsernameNotFoundException;
+    import org.springframework.stereotype.Service;
+
+    import com.maransi.monaco.model.Usuario;
+    import com.maransi.monaco.repository.UsuarioRepository;
+
+    @Service
+    public class AppUserDetailsService implements UserDetailsService {
+
+        @Autowired
+        private UsuarioRepository usuarioRepository;
+        
+        @Override
+        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+            Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(email);
+            Usuario usuario = usuarioOptional.orElseThrow(() -> new UsernameNotFoundException("Usuário e/ou senha incorretos"));
+            return new User(email, usuario.getSenha(), getPermissoes(usuario));
+        }
+
+        private Collection<? extends GrantedAuthority> getPermissoes(Usuario usuario) {
+            Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+            usuario.getPermissoes().forEach(p -> authorities.add(new SimpleGrantedAuthority(p.getDescricao().toUpperCase())));
+            return authorities;
+        }
+
+    }
+
+
+26. Inclua a classe RefreshTokenPostProcessor no projeto:
+
+    package com.maransi.monaco.token;
+
+    import javax.servlet.http.Cookie;
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+
+    import org.springframework.core.MethodParameter;
+    import org.springframework.http.MediaType;
+    import org.springframework.http.converter.HttpMessageConverter;
+    import org.springframework.http.server.ServerHttpRequest;
+    import org.springframework.http.server.ServerHttpResponse;
+    import org.springframework.http.server.ServletServerHttpRequest;
+    import org.springframework.http.server.ServletServerHttpResponse;
+    import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+    import org.springframework.security.oauth2.common.OAuth2AccessToken;
+    import org.springframework.web.bind.annotation.ControllerAdvice;
+    import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+    @ControllerAdvice
+    public class RefreshTokenPostProcessor implements ResponseBodyAdvice<OAuth2AccessToken> {
+
+        @Override
+        public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+            return returnType.getMethod().getName().equals("postAccessToken");
+        }
+
+        @Override
+        public OAuth2AccessToken beforeBodyWrite(OAuth2AccessToken body, MethodParameter returnType,
+                                                MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                                ServerHttpRequest request, ServerHttpResponse response) {
+
+            HttpServletRequest req = ((ServletServerHttpRequest) request).getServletRequest();
+            HttpServletResponse resp = ((ServletServerHttpResponse) response).getServletResponse();
+
+            DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) body;
+
+            String refreshToken = body.getRefreshToken().getValue();
+            adicionarRefreshTokenNoCookie(refreshToken, req, resp);
+            removerRefreshTokenDoBody(token);
+
+            return body;
+        }
+
+        private void removerRefreshTokenDoBody(DefaultOAuth2AccessToken token) {
+            token.setRefreshToken(null);
+        }
+
+        private void adicionarRefreshTokenNoCookie(String refreshToken, HttpServletRequest req, HttpServletResponse resp) {
+            Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+            refreshTokenCookie.setHttpOnly(true);
+            refreshTokenCookie.setSecure(false); // TODO: Mudar para true em producao
+            refreshTokenCookie.setPath(req.getContextPath() + "/oauth/token");
+            refreshTokenCookie.setMaxAge(2592000);
+            resp.addCookie(refreshTokenCookie);
+        }
+
+    }
+
+27. Inclua a classe RefreshTokenCookiePreProcessorFilter no projeto:
+
+    package com.maransi.monaco.token;
+
+    import java.io.IOException;
+    import java.util.Map;
+
+    import javax.servlet.Filter;
+    import javax.servlet.FilterChain;
+    import javax.servlet.FilterConfig;
+    import javax.servlet.ServletException;
+    import javax.servlet.ServletRequest;
+    import javax.servlet.ServletResponse;
+    import javax.servlet.http.Cookie;
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletRequestWrapper;
+
+    import org.apache.catalina.util.ParameterMap;
+    import org.springframework.core.Ordered;
+    import org.springframework.core.annotation.Order;
+    import org.springframework.stereotype.Component;
+
+    @Component
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public class RefreshTokenCookiePreProcessorFilter implements Filter {
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+                throws IOException, ServletException {
+            
+            HttpServletRequest req = (HttpServletRequest) request;
+            
+            if ("/oauth/token".equalsIgnoreCase(req.getRequestURI()) 
+                    && "refresh_token".equals(req.getParameter("grant_type"))
+                    && req.getCookies() != null) {
+                for (Cookie cookie : req.getCookies()) {
+                    if (cookie.getName().equals("refreshToken")) {
+                        String refreshToken = cookie.getValue();
+                        req = new MyServletRequestWrapper(req, refreshToken);
+                    }
+                }
+            }
+            
+            chain.doFilter(req, response);
+        }
+        
+        @Override
+        public void destroy() {
+            
+        }
+
+        @Override
+        public void init(FilterConfig arg0) throws ServletException {
+            
+        }
+        
+        static class MyServletRequestWrapper extends HttpServletRequestWrapper {
+
+            private String refreshToken;
+            
+            public MyServletRequestWrapper(HttpServletRequest request, String refreshToken) {
+                super(request);
+                this.refreshToken = refreshToken;
+            }
+            
+            @Override
+            public Map<String, String[]> getParameterMap() {
+                ParameterMap<String, String[]> map = new ParameterMap<>(getRequest().getParameterMap());
+                map.put("refresh_token", new String[] { refreshToken });
+                map.setLocked(true);
+                return map;
+            }
+            
+        }
+
+    }
+
+28. Inclua a classe TokenResource no projeto
+
+    package com.maransi.monaco.resource;
+
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.DeleteMapping;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import javax.servlet.http.Cookie;
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+
+    @RestController
+    @RequestMapping("/tokens")
+    public class TokenResource {
+
+        @DeleteMapping("/revoke")
+        public void revoke(HttpServletRequest req, HttpServletResponse resp){
+            Cookie cookie = new Cookie("refreshToke", null);
+
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath(req.getContextPath());
+            cookie.setMaxAge(0);
+
+            resp.addCookie(cookie);
+            resp.setStatus(HttpStatus.NO_CONTENT.value());
+        }
+    }
+
+29. Inclua a classe CorsFilter no projeto:
+
+    package com.maransi.monaco.cors;
+
+    import java.io.IOException;
+
+    import javax.servlet.Filter;
+    import javax.servlet.FilterChain;
+    import javax.servlet.FilterConfig;
+    import javax.servlet.ServletException;
+    import javax.servlet.ServletRequest;
+    import javax.servlet.ServletResponse;
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+
+    import org.springframework.core.Ordered;
+    import org.springframework.core.annotation.Order;
+    import org.springframework.stereotype.Component;
+
+    @Component
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public class CorsFilter implements Filter {
+
+        private String originPermitida = "http://localhost:8000"; // TODO: Configurar para diferentes ambientes
+
+        @Override
+        public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+                throws IOException, ServletException {
+
+            HttpServletRequest request = (HttpServletRequest) req;
+            HttpServletResponse response = (HttpServletResponse) resp;
+
+            response.setHeader("Access-Control-Allow-Origin", originPermitida);
+            response.setHeader("Access-Control-Allow-Credentials", "true"); // Para permitir trabalhar com os cookies
+
+            if ("OPTIONS".equals(request.getMethod()) && originPermitida.equals(request.getHeader("Origin"))) {
+                response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
+                response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
+                response.setHeader("Access-Control-Max-Age", "3600");
+
+                response.setStatus(HttpServletResponse.SC_OK); // Serve para parar a chamada do prox filter
+            } else {
+                chain.doFilter(req, resp);
+            }
+
+        }
+
+        @Override
+        public void destroy() {
+        }
+
+        @Override
+        public void init(FilterConfig arg0) throws ServletException {
+        }
+
+    }
+
+30. Inclua a classe RecursoCriadoListener no projeto:
+
+    package com.maransi.monaco.event.listener;
+
+    import java.net.URI;
+
+    import javax.servlet.http.HttpServletResponse;
+
+    import org.springframework.context.ApplicationListener;
+    import org.springframework.stereotype.Component;
+    import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+    import com.example.algamoneyapi.event.RecursoCriadoEvent;
+
+    @Component
+    public class RecursoCriadoListener implements ApplicationListener<RecursoCriadoEvent>{
+
+        @Override
+        public void onApplicationEvent(RecursoCriadoEvent event) {
+
+            HttpServletResponse response = event.getResponse();
+            Object codigo = event.getCodigo();
+            
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+                    .buildAndExpand(codigo).toUri();
+
+            response.setHeader("Location", uri.toASCIIString());		
+            
+        }
+
+    }
+
+31. Inclua classe RecursoCriadoEvent no projeto:
+
+    package com.maransi.monaco.event;
+
+    import javax.servlet.http.HttpServletResponse;
+
+    import org.springframework.context.ApplicationEvent;
+
+    public class RecursoCriadoEvent<T,K> extends ApplicationEvent {
+
+        /**
+        * 
+        */
+        private static final long serialVersionUID = 1L;
+
+        private HttpServletResponse response;
+        private K codigo;
+        
+        public RecursoCriadoEvent(Object source, HttpServletResponse response, K codigo) {
+            super(source);
+
+            this.response = response;
+            this.codigo = codigo;
+        }
+
+        public HttpServletResponse getResponse() {
+            return response;
+        }
+
+        public K getCodigo() {
+            return codigo;
+        }
+
+        
+        
+    }
+
+32. Inclua a classe AlgamoneyExceptionHandler no projeto:
+
+    package com.maransi.monaco.exceptionhandler;
+
+    import java.util.ArrayList;
+    import java.util.Arrays;
+    import java.util.List;
+    import java.util.Optional;
+
+    import org.apache.commons.lang3.exception.ExceptionUtils;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.MessageSource;
+    import org.springframework.context.i18n.LocaleContextHolder;
+    import org.springframework.dao.DataIntegrityViolationException;
+    import org.springframework.dao.EmptyResultDataAccessException;
+    import org.springframework.http.HttpHeaders;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.http.converter.HttpMessageNotReadableException;
+    import org.springframework.validation.BindingResult;
+    import org.springframework.validation.FieldError;
+    import org.springframework.web.bind.MethodArgumentNotValidException;
+    import org.springframework.web.bind.annotation.ControllerAdvice;
+    import org.springframework.web.bind.annotation.ExceptionHandler;
+    import org.springframework.web.context.request.WebRequest;
+    import org.springframework.web.servlet.NoHandlerFoundException;
+    import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+    // 12:21
+
+    @ControllerAdvice
+    public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
+        @Autowired
+        private MessageSource messageSource;
+        
+    //    @ExceptionHandler(MyException.class)
+    //   protected ResponseEntity<Object> exception(MyException exception) {
+    //       String errorMsg = "Example error message";
+    //       return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
+    //   }
+
+        @Override
+        protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                HttpHeaders headers, HttpStatus status, WebRequest request) {
+            // TODO Auto-generated method stub
+
+            String mensagemUsuario = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
+            // String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
+            String mensagemDesenvolvedor = Optional.ofNullable(ex.getCause()).orElse(ex).toString();
+            
+            List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor) );
+            
+            
+            
+            return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
+        }
+
+        @ExceptionHandler(  {DataIntegrityViolationException.class}  )
+        public ResponseEntity<Object> handleDataIntegrityViolationException( DataIntegrityViolationException ex, WebRequest request ){
+                String mensagemUsuario = messageSource.getMessage("recurso.operacao-nao-permitido", null, LocaleContextHolder.getLocale());
+            // String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
+    //		String mensagemDesenvolvedor = Optional.ofNullable(ex.getCause()).orElse(ex).toString();
+            String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
+
+            List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor) );
+            
+            
+            return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+            
+        }
+        
+        @Override
+        protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
+                HttpStatus status, WebRequest request) {
+            // TODO Auto-generated method stub
+            return handleExceptionInternal(ex, "Informação não encontrada!!!", headers, HttpStatus.BAD_REQUEST, request);
+        }
+
+        
+        @ExceptionHandler(EmptyResultDataAccessException.class)
+    //	@ResponseStatus(HttpStatus.NOT_FOUND)
+        public ResponseEntity<?> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request) {
+            List<Erro> erros = new ArrayList<>();
+            
+            String mensagemUsuario = ex.getMessage();
+            String mensagemDesenvolvedor =  ex.getMessage().toString();
+            
+            erros.add(new Erro(mensagemUsuario, mensagemDesenvolvedor));
+            
+            return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+        }
+        
+        
+        @Override
+        protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                HttpHeaders headers, HttpStatus status, WebRequest request) {
+            // TODO Auto-generated method stub
+            List<Erro> erros = criarListaErro(ex.getBindingResult());
+            
+            return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
+        }
+        
+        
+        private List<Erro> criarListaErro( BindingResult bindingResult){
+            
+            List<Erro> erros = new ArrayList<>();
+            
+            for( FieldError fieldError : bindingResult.getFieldErrors() ) {
+                String mensagemUsuario = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+                String mensagemDesenvolvedor =  fieldError.toString();
+                
+                erros.add(new Erro(mensagemUsuario, mensagemDesenvolvedor));
+                
+                
+                
+            }
+            
+            return erros;
+        }
+        
+        public static class Erro {
+            
+            private String mensagemUsuario;
+            private String mensagemDesenvolvedor;
+            
+            public Erro( String mensagemUsuario, String mensagemDesenvolvedor ) {
+                
+                this.mensagemUsuario = mensagemUsuario;
+                this.mensagemDesenvolvedor = mensagemDesenvolvedor;
+            }
+
+            public String getMensagemUsuario() {
+                return mensagemUsuario;
+            }
+
+            public void setMensagemUsuario(String mensagemUsuario) {
+                this.mensagemUsuario = mensagemUsuario;
+            }
+
+            public String getMensagemDesenvolvedor() {
+                return mensagemDesenvolvedor;
+            }
+
+            public void setMensagemDesenvolvedor(String mensagemDesenvolvedor) {
+                this.mensagemDesenvolvedor = mensagemDesenvolvedor;
+            }
+            
+        }
+    }
+
+33. Levante o projeto, va no Postman, importe o JSON do item 4 e execute os links importados.
+
