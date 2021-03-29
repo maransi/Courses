@@ -1,0 +1,2001 @@
+1. Crie um projeto com o pom.xml abaixo:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+        <parent>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-parent</artifactId>
+            <version>2.3.9.RELEASE</version>
+            <relativePath/> <!-- lookup parent from repository -->
+        </parent>
+        <groupId>com.maransi</groupId>
+        <artifactId>monaco</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <name>monaco</name>
+        <description>Demo project for Spring Boot</description>
+        <properties>
+            <java.version>11</java.version>
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-jpa</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-devtools</artifactId>
+                <scope>runtime</scope>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-validation</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.modelmapper</groupId>
+                <artifactId>modelmapper</artifactId>
+                <version>2.3.9</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>2.3.4.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-jwt</artifactId>
+                <version>1.1.1.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.junit.vintage</groupId>
+                        <artifactId>junit-vintage-engine</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </build>
+
+    </project>
+
+2. Altere o src/main/resource/application.properties como abaixo:
+
+    # ===============================
+    # = data.sql file will be executed?
+    # ===============================
+    spring.datasource.initialization-mode=always
+
+    # Fará somente os update das diferen�as entre as classes model com o BD
+    spring.jpa.hibernate.ddl-auto=update
+
+    spring.jpa.show-sql=true
+
+    # Conexão com o H2
+    ##################
+    spring.datasource.driverClassName=org.h2.Driver
+    spring.datasource.username=sa
+    spring.datasource.password=
+    spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+    #Enabled H2 COnsole
+    spring.h2.console.enabled=true
+
+    # Custom H2 Console URL
+    spring.h2.console.path=/h2
+
+    # temporary data storage
+    spring.datasource.url = jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
+
+    spring.jackson.deserialization.fail-on-unknown-properties=true
+
+    #spring.main.web-application-type=NONE
+
+3. Crie o arquivo src/main/resource/schema.sql como abaixo:
+
+    CREATE TABLE usuario (      codigo LONG PRIMARY KEY,
+                                nome VARCHAR(50) NOT NULL,
+                                email VARCHAR(50) NOT NULL,
+                                senha VARCHAR(150) NOT NULL );
+
+    CREATE TABLE permissao (
+        codigo LONG PRIMARY KEY,
+        descricao VARCHAR(50) NOT NULL
+    );
+
+    CREATE TABLE usuario_permissao (
+        codigo_usuario LONG NOT NULL,
+        codigo_permissao LONG NOT NULL,
+        PRIMARY KEY (codigo_usuario, codigo_permissao),
+        FOREIGN KEY (codigo_usuario) REFERENCES usuario(codigo),
+        FOREIGN KEY (codigo_permissao) REFERENCES permissao(codigo)
+    );
+
+    CREATE TABLE produto(   codigoProduto   LONG NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                            descricao       VARCHAR(100) NOT NULL,
+                            observacao      VARCHAR(100) NOT NULL,
+                            unidade         VARCHAR(5),
+                            dataInclusao    DATE DEFAULT CURRENT_DATE);
+
+
+    create table cliente( codigoCliente   LONG NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                        cpf  VARCHAR(15),
+                        nome VARCHAR(100),
+                        datNasc DATE,
+                        logradouro VARCHAR(150),
+                        cidade VARCHAR(100),
+                        estado VARCHAR(5),
+                        cep VARCHAR(10),
+                        foneRes VARCHAR(30),
+                        salario DECIMAL(11,2),
+                        dataInclusao    DATE DEFAULT CURRENT_DATE);
+
+    CREATE TABLE vendedor( codigoVendedor   LONG NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                            nome            VARCHAR(50) NOT NULL,
+                            codigoUsuario   LONG NOT NULL,
+                                FOREIGN KEY( codigoUsuario )
+                                REFERENCES usuario(codigo));
+
+    CREATE TABLE pedido(    codigoPedido    LONG NOT NULL  PRIMARY KEY AUTO_INCREMENT,
+                            codigoCliente   LONG NOT NULL,
+                            codigoVendedor  LONG NOT NULL,
+                            dataPedido      DATE NOT NULL,
+                            logradouro VARCHAR(150),
+                            cidade VARCHAR(100),
+                            estado VARCHAR(5),
+                            cep VARCHAR(10),
+                            foneRes VARCHAR(30),
+                            valorPedido      DECIMAL(11,2) DEFAULT 0,
+                            dataInclusao    DATE DEFAULT CURRENT_DATE,
+                                FOREIGN KEY( codigoCliente )
+                                    REFERENCES cliente(codigoCliente),
+                                FOREIGN KEY( codigoVendedor )
+                                    REFERENCES vendedor( codigoVendedor ));
+
+
+    CREATE TABLE pedidoItem( codigoPedido   LONG NOT NULL,
+                            numeroItem      INT NOT NULL,
+                            codigoProduto  LONG NOT NULL,
+                            quantidade     INT NOT NULL DEFAULT 0,
+                            valorItem      DECIMAL(11,2) DEFAULT 0,
+                                PRIMARY KEY( codigoPedido, numeroItem ),
+                                FOREIGN KEY( codigoPedido )
+                                    REFERENCES pedido( codigoPedido ),
+                                FOREIGN KEY( codigoProduto )
+                                    REFERENCES produto( codigoProduto ));
+
+3. Crie o arquivo src/main/resources/data.sql como abaixo:
+
+    INSERT INTO usuario (codigo, nome, email, senha) values (1, 'Administrador', 'admin@algamoney.com', '$2a$10$X607ZPhQ4EgGNaYKt3n4SONjIv9zc.VMWdEuhCuba7oLAL5IvcL5.');
+    INSERT INTO usuario (codigo, nome, email, senha) values (2, 'Jose Silva', 'jose@algamoney.com', '$2a$10$Zc3w6HyuPOPXamaMhh.PQOXvDnEsadztbfi6/RyZWJDzimE8WQjaq');
+    INSERT INTO usuario (codigo, nome, email, senha) values (3, 'Maria Silva', 'maria@algamoney.com', '$2a$10$Zc3w6HyuPOPXamaMhh.PQOXvDnEsadztbfi6/RyZWJDzimE8WQjaq');
+    INSERT INTO usuario (codigo, nome, email, senha) values (4, 'Joao Silva', 'joao@algamoney.com', '$2a$10$Zc3w6HyuPOPXamaMhh.PQOXvDnEsadztbfi6/RyZWJDzimE8WQjaq');
+
+    INSERT INTO permissao (codigo, descricao) values (1, 'ROLE_CADASTRAR_CATEGORIA');
+    INSERT INTO permissao (codigo, descricao) values (2, 'ROLE_PESQUISAR_CATEGORIA');
+
+    INSERT INTO permissao (codigo, descricao) values (3, 'ROLE_CADASTRAR_PESSOA');
+    INSERT INTO permissao (codigo, descricao) values (4, 'ROLE_REMOVER_PESSOA');
+    INSERT INTO permissao (codigo, descricao) values (5, 'ROLE_PESQUISAR_PESSOA');
+
+    INSERT INTO permissao (codigo, descricao) values (6, 'ROLE_CADASTRAR_LANCAMENTO');
+    INSERT INTO permissao (codigo, descricao) values (7, 'ROLE_REMOVER_LANCAMENTO');
+    INSERT INTO permissao (codigo, descricao) values (8, 'ROLE_PESQUISAR_LANCAMENTO');
+
+    -- admin
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 1);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 2);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 3);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 4);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 5);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 6);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 7);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (1, 8);
+
+    -- maria
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (2, 2);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (2, 5);
+    INSERT INTO usuario_permissao (codigo_usuario, codigo_permissao) values (2, 8);
+
+
+    INSERT INTO produto( descricao, observacao, unidade )
+    VALUES('PROCESSADOR CORE I5 3560', 'LGA 1155', 'PC'),
+            ('PROCESSADOR CORE I7 3770', 'LGA 1155', 'PC'),
+            ('PROCESSADOR CORE I5 3770', 'LGA 1151','PC'),
+            ('MEMORIA DDR3', '8 Gb 1333 Mz','PC'),
+            ('MEMORIA DDR4', '16 Gb 2200 Mz', 'PC'),
+            ('MOTHERBOARD ASUS', 'LGA 1155', 'PC'),
+            ('MOTHERBOARD GIGABYTE','LGA 1150', 'PC'),
+            ('GABINETE GAMER','ATX','PC');
+
+    INSERT INTO cliente (cpf, nome, datNasc, logradouro, cidade, estado, cep, foneRes, salario) VALUES
+    ('106.523.608-58','MARCO ANTONIO DA SILVA','1966-10-17', 'R CARIOBA 360', 'SAO PAULO', 'SP','02423100','11 98336-1336',1000),
+    ('000.000.611-40', 'ELISANGELA APARECIDA DE ALMEIDA', '1983-03-10', 'RUA CINQUENTA , QD 12 ', 'VARZEA GRANDE', 'MT', '78145000', '84148158', 1119),
+    ('000.004.632-99', 'TARCIA TAMIRES REIS DE MELO', '1989-12-16', 'RUA GLOXINIA ', 'MANAUS', 'AM', '69023235', '', 1084.92),
+    ('000.006.713-04', 'FRANCISCO BRISAMAR DE AGUIAR ROCHA FILHO ', '1947-03-18', 'RUA VIS DE CAIRU ', 'FORTALEZA', 'CE', '60182130', '9677-8549', NULL),
+    ('000.012.242-47', 'ELKILENE  DE SOUSA DIAS', '1987-08-22', 'ET CURUCAMBA OESTE', 'ANANINDEUA', 'PA', '67145034', '', NULL),
+    ('000.012.398-64', 'HELIO RODRIGUES DE MOURA', '1958-02-02', 'R HERMES FONTES ', 'MOGI DAS CRUZES', 'SP', '08810360', '23120312', NULL),
+    ('000.012.467-20', 'MARTHA LUCIENE OLIVEIRA DOS SANTOS', '1967-11-12', 'TV BELIZARIO ', 'SAO GONCALO', 'RJ', '24410030', '26389040', NULL),
+    ('000.015.202-10', 'CRISTINA IVONE NAKANO TAVARES', '1935-03-14', 'AV ENGENHEIRO FERNANDO GUILHON  , 1591', 'BELEM', 'PA', '66033310', '32410493', NULL),
+    ('000.015.302-83', 'RAFAEL GUIMARAES FERREIRA', '1987-06-17', 'AV 7 DE SETEMBRO', 'PORTO VELHO', 'RO', '76824412', '', 1056),
+    ('000.018.662-73', 'FRANCISCO ADRIANO FERREIRA DE ARAUJO', '1981-03-26', 'TV-WE-69 CJ GUAJARA I', 'ANANINDEUA', 'PA', '67143450', '99646353', 1291),
+    ('000.020.313-02', 'MARIVALDO MOURA SILVA ', '1982-06-04', 'RUA PEDRO NEIVA DE SANTANA ', 'SÃO LUIS', 'MA', '65076240', '', NULL),
+    ('000.021.498-18', 'DEMERVAL BALBINO DOS SANTOS', '1952-05-03', 'R ALFREDO BERNARDO LEITE 986', 'S.BERNARDO CAMPO', 'SP', '09670000', '43631529', NULL),
+    ('000.021.832-42', 'ADENILTON DO SANTOS CARVALHO', '1986-02-14', 'AV SAO JORGE 650', 'MANAUS', 'AM', '69033300', '32283134', 0),
+    ('000.022.708-03', 'IVO MARQUES DE SOUSA FILHO', '1955-07-12', 'R SILVA JARDIM ', 'ARACATUBA', 'SP', '16015240', '36258560', 3485),
+    ('000.022.885-08', 'RENIVALDO SILVA SANTOS', '1980-09-04', 'CJ LOTEAMENTO VIDA NOVA', 'LAURO DE FREITAS', 'BA', '42700000', '', 1306),
+    ('000.023.073-16', 'FRANCISCO PEREIRA LUZ ', '1970-08-14', 'SITIO RIACHO VERDE  22', 'SENADOR POMPEU ', 'CE', '63600000', '', 545),
+    ('000.023.988-77', 'MARIA JOSE DA SILVA', '1955-03-19', 'RUA JOSE BEGOSSO', 'CANDIDO MOTA', 'SP', '19880000', '', 1809),
+    ('000.025.781-82', 'JOEL SANTANA', '1932-04-01', 'R HERMANN TELES RIBEIRO ', 'SAO PAULO', 'SP', '03348010', '24251132', NULL),
+    ('000.026.402-44', 'EVANDRO DOUGLAS DA SILVA', '1934-08-13', 'TV ANGUSTURA 287 CASA A', 'BELEM', 'PA', '66120230', '30853043', 2167.27),
+    ('000.026.808-90', 'MOACIR BRANDAO', '1949-12-16', 'R FERNANDO DE MELLO VIANA ', 'SOROCABA', 'SP', '18066130', '30166369', NULL),
+    ('000.027.261-22', 'MARIA DE FATIMA LIRA RODRIGUES', '1980-05-13', 'Q QNN 19 CONJUNTO L LOTE 47 AP', 'CEILÂNDIA', 'DF', '72225202', '02423-100', NULL),
+    ('000.028.042-98', 'IURE ANTONIO LOPES SILVA', '1993-10-13', 'Q VINTE E NOVE ', 'MARABA', 'PA', '68512630', '9125-2967', NULL),
+    ('000.031.978-32', 'JOSE BENEDITO FARIA', '1948-09-15', 'R. MARIO GONÇALVES DOS CAMPOS, 65', 'JACAREÍ', 'SP', '12312195', '39523818', 773.77),
+    ('000.032.406-06', 'NELSON DOUGLAS MARCOS OLIVEIRA', '1974-09-08', 'RUA DOIS DE OUTUBRO', 'MARIANA', 'MG', '35420000', '', 504),
+    ('000.033.178-38', 'SEBASTIAO LOPES', '1951-07-27', 'R PEDRO PEREIRA DOS SANTOS  ', 'HORTOLÂNDIA', 'SP', '13186130', '32190744', 1355),
+    ('000.034.910-05', 'MAURICIO MACIEL', '1971-03-20', 'RUA D ', 'GRAVATAI', 'RS', '94010970', '86143689', 531),
+    ('000.034.978-01', 'SEBASTIANA BENEDITA FLORENTINO', '1948-09-07', 'JOAO VAZ DE LIMA', 'LINS', 'SP', '16400000', '35321095', NULL),
+    ('000.035.327-20', 'LUIZ CARLOS DE ANDRADE', '1966-05-04', 'Rua Envira', 'Rio de Janeiro', 'RJ', '21775120', '33093875', 1318),
+    ('000.036.184-47', 'MAURICIO ALVES DA SILVA', '1975-06-25', 'RUA JOSE MARCONE RAMOS SILVA', 'JOÃO PESSOA', 'PB', '58000000', '', 839),
+    ('000.036.880-62', 'PRISCILLA VISMARA SCHMIDT BELLOLI', '1982-03-21', 'R CONCEICAO ', 'VIAMAO', 'RS', '94475590', '34928975', 806.33),
+    ('000.037.859-39', 'CLAUDETE LUIZ COSTA', '1960-11-21', 'R LAURINDO JANUARIO DA SILVEIRA ', 'FLORIANOPOLIS', 'SC', '88062200', '32344940', 2067),
+    ('000.038.306-67', 'ANDREA ALVES VILACA', '1974-04-03', 'RUA DIANA Nº 60', 'SABARÁ', 'MG', '34500000', '34851290', 0),
+    ('000.038.479-85', 'LEONOR MELO CARSOSO', '1918-11-30', 'R. JOSE FIRMINO DE NOVAIS , 917  / 204', 'SÃO JOSÉ', 'SE', '88100000', '2592213', 0),
+    ('000.039.698-27', 'SHUKITE ORLANDO IZU ', '1952-06-06', 'R GENERAL HUMBERTO DE SOUZA MELLO ', 'PRAIA GRANDE', 'SP', '11700440', '34731005', 5381),
+    ('000.039.781-41', 'RAFAEL ANTONIO RIBEIRO BORTHOLACCI', '1984-05-07', 'R ALBERTO VELHO MOREIRA ', 'CUIABÁ ', 'MT', '78010180', '', 1887.07),
+    ('000.041.955-90', 'NELSUITA DE MORAIS SOUZA SANTANA ', '1979-09-06', 'R FORTALEZA ', 'SANTO ANTONIO DE JESUS ', 'BA', '44570410', '8296-5941', NULL),
+    ('000.042.556-74', 'CARLA BATISTA DA SILVA', '1975-10-01', 'R CELSO BAETA NEVES ', 'BELO HORIZONTE', 'MG', '31370500', '', 675),
+    ('000.045.328-56', 'VERA LUCIA DE FREITAS SANTOS', '1950-06-30', 'AV. PEDRO LESSA,  616       APTO. 22', 'SANTOS', 'SP', '11025000', '32369908', 0),
+    ('000.046.959-92', 'ROSA MARIA SILVA SANTOS', '1969-10-09', 'R CAMPOS NOVOS ', 'PALHOCA', 'SC', '88134245', '', 798.42),
+    ('000.047.558-04', 'VALDENICE FORTUNATO GOMES', '1950-10-06', 'R DOS PINHEIROS 120', 'FRANCISCO MORATO', 'SP', '07929040', '44888555', NULL),
+    ('000.048.196-32', 'JUDITH LOUREDO FERNANDES', '1926-07-19', 'R. FLORESTAL , 40', 'BELO HORIZONTE', 'MG', '31035210', '34848585', 0),
+    ('000.050.825-01', 'ANAILTON PEREIRA DE LIMA', '1964-08-09', 'LOT CHACARA DO ALECRIM ', 'EUNAPOLIS', 'BA', '45826485', '', NULL),
+    ('000.051.126-99', 'ADRIANA MITRE FERNANDES LEMOS ', '1974-03-17', 'RUA DES. DARIO LINS', 'BELO HORIZONTE ', 'MG', '30460260', '7112 6910', NULL),
+    ('000.051.560-41', 'ADRIANA SILVEIRA PEREIRA', '1981-10-13', 'RUA ASSOCIACAO ATLETICA TRIENON', 'PORTO ALEGRE', 'RS', '91780180', '85768956', NULL),
+    ('000.052.152-34', 'ROSIRIS DA FONSECA SANTOS', '1937-09-22', 'AV. ALMIRANTE WALDENKOLK 350', 'BELEM-PA', 'PA', '66055030', '32226250', 0),
+    ('000.052.327-59', 'COSME DA SILVA SOUZA', '1964-09-27', 'RUA DALVA RAPOSA', 'SÃO GONÇALO', 'RJ', '24754190', '2603-8212', NULL),
+    ('000.053.996-10', 'MARCIO PAULINO DA SILVA', '1974-01-03', 'R. CHILE , 394', 'CONTAGEM', 'MG', '32145240', '33944539', 0),
+    ('000.054.429-90', 'MARIVANIA FREITAS', '1977-02-10', 'Rua José Luiz Vieira', 'Florianópolis', 'SC', '88095380', '32408887', 636.47),
+    ('000.055.336-00', 'THERESINO CALDEIRA BRANT', '1917-12-17', 'R. MONTE ALEGRE , 270  APTO- 201', 'BELO HORIZONTE', 'MG', '30240230', '32218754', 0),
+    ('000.055.399-94', 'DENICE DAS GRACAS MELO DOS PRAZERES', '1951-05-10', 'AVENIDA SETE DE SETEMBRO', 'ARARANGUA', 'SC', '88900970', '', 3305.24),
+    ('000.057.138-54', 'JURACI DE LIMA', '1951-12-05', 'R. PASSEIO IMPERATRIZ , 417', 'I. SOLTEIRA', 'SP', '15385000', '37432692', 0);
+
+    UPDATE cliente
+    SET salario = 0
+    WHERE salario IS NULL;
+
+    INSERT INTO vendedor( nome, codigoUsuario )
+    VALUES('JOSE DA SILVA',2),
+            ('MARIA DA SILVA',3),
+            ('JOAO GONÇALVES SILVA',4);
+
+    INSERT INTO pedido( codigoCliente, codigoVendedor, dataPedido )
+    VALUES(1, 1, '2021-03-01'),
+            (2, 3, '2021-02-15'),
+            (3, 2, '2021-01-20'),
+            (6, 1, '2021-02-28');
+
+    UPDATE pedido AS a
+    SET a.logradouro  = ( SELECT logradouro FROM cliente a1 WHERE a1.codigoCliente = a.codigoCliente),
+        a.cidade      = ( SELECT cidade FROM cliente a1 WHERE a1.codigoCliente = a.codigoCliente),
+        a.estado      = ( SELECT estado FROM cliente a1 WHERE a1.codigoCliente = a.codigoCliente),
+        a.cep         = ( SELECT cep FROM cliente a1 WHERE a1.codigoCliente = a.codigoCliente),
+        a.foneRes     = ( SELECT foneRes FROM cliente a1 WHERE a1.codigoCliente = a.codigoCliente);
+
+    INSERT INTO pedidoItem( codigoPedido, numeroItem, codigoProduto, quantidade, valorItem )
+    VALUES( 1, 1, 1, 10, 500 ),
+            (1, 2, 2, 5, 400 ),
+            (2, 1, 3, 1, 5),
+            (3, 1, 1, 50, 5000);
+
+    UPDATE pedido a
+    SET valorPedido = ( SELECT IFNULL( SUM( valorItem ), 0 )
+                    FROM pedidoItem a1
+                    WHERE a1.codigoPedido = a.codigoPedido );
+
+4. Crie o arquivo json abaixo para testar as APIs no Postman:
+
+    {
+        "info": {
+            "_postman_id": "d71266ea-6311-47e3-9475-722128dd3e16",
+            "name": "Projeto Monaco",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        "item": [
+            {
+                "name": "Produto findAll ",
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "http://localhost:8080/produto/api",
+                        "protocol": "http",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "8080",
+                        "path": [
+                            "produto",
+                            "api"
+                        ]
+                    }
+                },
+                "response": []
+            },
+            {
+                "name": "Produto FindById",
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "http://localhost:8080/produto/api/1",
+                        "protocol": "http",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "8080",
+                        "path": [
+                            "produto",
+                            "api",
+                            "1"
+                        ]
+                    }
+                },
+                "response": []
+            },
+            {
+                "name": "Cliente FindAll",
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "localhost:8080/cliente/api",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "8080",
+                        "path": [
+                            "cliente",
+                            "api"
+                        ]
+                    }
+                },
+                "response": []
+            },
+            {
+                "name": "Produto insert",
+                "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"codigoProduto\": null,\n    \"descricao\": \"COOLER CPU 775, 1156, 1155, 1366\",\n    \"observacao\": \"MARCA DEX\",\n    \"unidade\": \"PC\"\n}",
+                        "options": {
+                            "raw": {
+                                "language": "json"
+                            }
+                        }
+                    },
+                    "url": {
+                        "raw": "http://localhost:8080/produto/api",
+                        "protocol": "http",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "8080",
+                        "path": [
+                            "produto",
+                            "api"
+                        ]
+                    }
+                },
+                "response": []
+            },
+            {
+                "name": "Pedido findAll",
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "http://localhost:8080/pedido/api/",
+                        "protocol": "http",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "8080",
+                        "path": [
+                            "pedido",
+                            "api",
+                            ""
+                        ]
+                    }
+                },
+                "response": []
+            },
+            {
+                "name": "GetToken com refresh_token (Monaco)",
+                "request": {
+                    "auth": {
+                        "type": "basic",
+                        "basic": [
+                            {
+                                "key": "username",
+                                "value": "angular",
+                                "type": "string"
+                            },
+                            {
+                                "key": "password",
+                                "value": "@ngul@r0",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                        "mode": "urlencoded",
+                        "urlencoded": [
+                            {
+                                "key": "client",
+                                "value": "angular",
+                                "type": "text"
+                            },
+                            {
+                                "key": "username",
+                                "value": "admin",
+                                "type": "text"
+                            },
+                            {
+                                "key": "password",
+                                "value": "admin",
+                                "type": "text"
+                            },
+                            {
+                                "key": "grant_type",
+                                "value": "password",
+                                "type": "text"
+                            }
+                        ]
+                    },
+                    "url": {
+                        "raw": "localhost:8080/oauth/token",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "8080",
+                        "path": [
+                            "oauth",
+                            "token"
+                        ]
+                    }
+                },
+                "response": []
+            },
+            {
+                "name": "GetToken com refresh_token (Monaco)",
+                "request": {
+                    "auth": {
+                        "type": "basic",
+                        "basic": [
+                            {
+                                "key": "username",
+                                "value": "angular",
+                                "type": "string"
+                            },
+                            {
+                                "key": "password",
+                                "value": "@ngul@r0",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                        "mode": "urlencoded",
+                        "urlencoded": [
+                            {
+                                "key": "client",
+                                "value": "angular",
+                                "type": "text"
+                            },
+                            {
+                                "key": "username",
+                                "value": "admin@algamoney.com",
+                                "type": "text"
+                            },
+                            {
+                                "key": "password",
+                                "value": "admin",
+                                "type": "text"
+                            },
+                            {
+                                "key": "grant_type",
+                                "value": "password",
+                                "type": "text"
+                            }
+                        ]
+                    },
+                    "url": {
+                        "raw": "localhost:8080/oauth/token",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "8080",
+                        "path": [
+                            "oauth",
+                            "token"
+                        ]
+                    }
+                },
+                "response": []
+            },
+            {
+                "name": "Produto update",
+                "request": {
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"codigoProduto\": 9,\n    \"descricao\": \"COOLER CPU 775, 1156, 1155, 1366, 1356\",\n    \"observacao\": \"MARCA\",\n    \"unidade\": \"UN\"\n}",
+                        "options": {
+                            "raw": {
+                                "language": "json"
+                            }
+                        }
+                    },
+                    "url": {
+                        "raw": "http://localhost:8080/produto/api",
+                        "protocol": "http",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "8080",
+                        "path": [
+                            "produto",
+                            "api"
+                        ]
+                    }
+                },
+                "response": []
+            }
+        ]
+    }
+
+6. Verifique se a classe lançadora do projeto src/main/java/[projeto]Application.java está como abaixo:
+
+    package com.maransi.monaco;
+
+    import org.springframework.boot.SpringApplication;
+    import org.springframework.boot.autoconfigure.SpringBootApplication;
+    import org.springframework.context.annotation.ComponentScan;
+
+    @SpringBootApplication
+    public class MonacoApplication {
+
+        public static void main(String[] args) {
+            SpringApplication.run(MonacoApplication.class, args);
+        }
+
+    }
+
+6. Crie a classe Usuario como abaixo:
+
+    package com.maransi.monaco.model;
+
+    import java.util.List;
+
+    import javax.persistence.Entity;
+    import javax.persistence.FetchType;
+    import javax.persistence.Id;
+    import javax.persistence.JoinColumn;
+    import javax.persistence.JoinTable;
+    import javax.persistence.ManyToMany;
+
+    @Entity
+    public class Usuario {
+
+        @Id
+        private Long codigo;
+
+        private String nome;
+        private String email;
+        private String senha;
+
+        @ManyToMany(fetch = FetchType.EAGER )
+        @JoinTable( name="usuario_permissao",
+                joinColumns = @JoinColumn(name="codigo_usuario"),
+                inverseJoinColumns = @JoinColumn(name="codigo_permissao"))
+        private List<Permissao> permissoes;
+
+        public Usuario() {
+            // TODO Auto-generated constructor stub
+        }
+
+        public Long getCodigo() {
+            return codigo;
+        }
+
+        public void setCodigo(Long codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getSenha() {
+            return senha;
+        }
+
+        public void setSenha(String senha) {
+            this.senha = senha;
+        }
+
+
+        public List<Permissao> getPermissoes() {
+            return permissoes;
+        }
+
+        public void setPermissoes(List<Permissao> permissoes) {
+            this.permissoes = permissoes;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Usuario other = (Usuario) obj;
+            if (codigo == null) {
+                if (other.codigo != null)
+                    return false;
+            } else if (!codigo.equals(other.codigo))
+                return false;
+            return true;
+        }
+
+
+
+    }
+
+7. Crie a classe Permissao como abaixo:
+
+    package com.maransi.monaco.model;
+
+    import javax.persistence.Entity;
+    import javax.persistence.Id;
+
+    @Entity
+    public class Permissao {
+
+        @Id
+        private Long codigo;
+
+        private String descricao;
+
+        public Permissao() {
+            // TODO Auto-generated constructor stub
+        }
+
+        public Permissao(Long codigo, String descricao) {
+            this.codigo = codigo;
+            this.descricao = descricao;
+        }
+
+        public Long getCodigo() {
+            return codigo;
+        }
+
+        public void setCodigo(Long codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getDescricao() {
+            return descricao;
+        }
+
+        public void setDescricao(String descricao) {
+            this.descricao = descricao;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Permissao other = (Permissao) obj;
+            if (codigo == null) {
+                if (other.codigo != null)
+                    return false;
+            } else if (!codigo.equals(other.codigo))
+                return false;
+            return true;
+        }
+
+
+
+    }
+
+8. Crie a classe Produto como abaixo:
+
+    package com.maransi.monaco.model;
+
+    import javax.persistence.*;
+    import javax.validation.constraints.NotNull;
+    import javax.validation.constraints.Size;
+    import java.util.Objects;
+
+    @Entity
+    public class Produto {
+
+        // Importante: The default strategy for @Column(name="codigoProduto") will be codigo_produto,
+        //              this is correct behavior!
+        //
+        //If you have a column named codigoProduto in your database you should change Column
+        // annotation to @Column(name="codigoproduto").
+        //
+        //This works because database does not care if you name your column codigoProduto or
+        // codigoproduto (column names are case insensitive!!).
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name="codigoproduto", updatable = false)
+        private Long codigoProduto;
+
+        @Column(name="descricao")
+        @NotNull(message="Descrição não pode ser vazia")
+        @Size(min=5, max=100, message="Tamanho da descrição deve ser entre 5 e 100 caracteres")
+        private String descricao;
+
+        @Column
+        @NotNull(message="Observação não pode ser vazia")
+        @Size(min=5, max=100, message="Tamanho da observação deve ser 5 e 100 caracteres")
+        private String observacao;
+
+        @Column
+        @Size(max=5, message="Tamanho da unidade deve ser inferior a 5 caracteres")
+        private String unidade;
+
+        public Long getCodigoProduto() {
+            return codigoProduto;
+        }
+
+        public void setCodigoProduto(Long codigoProduto) {
+            this.codigoProduto = codigoProduto;
+        }
+
+        public String getDescricao() {
+            return descricao;
+        }
+
+        public void setDescricao(String descricao) {
+            this.descricao = descricao;
+        }
+
+        public String getObservacao() {
+            return observacao;
+        }
+
+        public void setObservacao(String observacao) {
+            this.observacao = observacao;
+        }
+
+        public String getUnidade() {
+            return unidade;
+        }
+
+        public void setUnidade(String unidade) {
+            this.unidade = unidade;
+        }
+
+        public Produto( String descricao, String observacao, String unidade) {
+            this.descricao = descricao;
+            this.observacao = observacao;
+            this.unidade = unidade;
+        }
+
+        public Produto() {
+            super();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Produto produto = (Produto) o;
+            return Objects.equals(codigoProduto, produto.codigoProduto);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(codigoProduto);
+        }
+
+        @Override
+        public String toString() {
+            return "Produto{" +
+                    "codigoProduto=" + codigoProduto +
+                    ", descricao='" + descricao + '\'' +
+                    ", observacao='" + observacao + '\'' +
+                    ", unidade='" + unidade + '\'' +
+                    '}';
+        }
+    }
+
+9. Crie a classe Vendedor como abaixo:
+
+    package com.maransi.monaco.model;
+
+    import javax.persistence.*;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.NotNull;
+    import javax.validation.constraints.Size;
+    import java.util.Objects;
+
+    @Entity
+    public class Vendedor {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name="codigovendedor")
+        private Long codigoVendedor;
+
+        @Column
+        @NotNull(message="Nome não pode ser vázio")
+        @NotBlank(message="Nome não pode ser sem conteúdo")
+        @Size(min=5, max=50, message="Nome deve ter tamanho entre 5 e 50 caracteres")
+        private String nome;
+
+        public Long getCodigoVendedor() {
+            return codigoVendedor;
+        }
+
+        public void setCodigoVendedor(Long codigoVendedor) {
+            this.codigoVendedor = codigoVendedor;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public Vendedor(String nome) {
+            this.nome = nome;
+        }
+
+        public Vendedor() {
+            super();
+        }
+
+        @Override
+        public String toString() {
+            return "Vendedor{" +
+                    "codigoVendedor=" + codigoVendedor +
+                    ", nome='" + nome + '\'' +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Vendedor vendedor = (Vendedor) o;
+            return Objects.equals(codigoVendedor, vendedor.codigoVendedor);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(codigoVendedor);
+        }
+
+
+    }
+
+10. Crie a classe Cliente como abaixo:
+
+    package com.maransi.monaco.model;
+
+    import org.springframework.format.annotation.DateTimeFormat;
+
+    import javax.persistence.*;
+    import javax.validation.constraints.*;
+    import java.math.BigDecimal;
+    import java.time.LocalDate;
+    import java.util.Objects;
+
+    @Entity
+    public class Cliente {
+
+        @Id
+        @GeneratedValue( strategy = GenerationType.IDENTITY)
+        @Column(name="codigocliente", updatable = false)
+        private Long codigoCliente;
+
+        @Column
+        @Size(min=11, max=14, message="Tamanho do CPF inválido")
+        @NotNull(message="CPF não pode ser vazio")
+        private String cpf;
+
+        @Column
+        @Size(min=5, max=100, message="Tamanho do nome deve ser entre 5 e 100 caracteres")
+        @NotNull(message="Nome não pode ser vazio")
+        private String nome;
+
+        @Column(name="datnasc", columnDefinition = "DATE")
+        @Past(message="Data de Nascimento inválida, deve ser data anterior a atual")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        private LocalDate datNasc;
+
+        @Column(length=150, nullable=false)
+        @NotBlank(message="Endereço não pode ser vazio")
+        @Size(min=10, message="Endereço deve conter ao menos 10 dígitos")
+        private String logradouro;
+
+        @Column(length=100, nullable=false)
+        @NotNull(message="Cidade não pode ser vazio")
+        @NotBlank(message="Selecione uma cidade")
+        private String cidade;
+
+        @NotNull(message="Estado não pode ser vazio")
+        @Pattern(regexp="[A-Z][A-Z]", message="Estado inválido")
+        @Column(nullable=false, length=2, name="estado")
+        private String estado;
+
+        @NotBlank(message="CEP não pode ser vazio")
+        @Column(length=10, nullable=false)
+        private String cep;
+
+        @NotBlank(message="Telefone não pode ser vazio")
+        @Column(name = "foneres", length=30)
+        private String foneRes;
+
+        @Positive( message="Salário tem que ser maior que zero")
+    //	@NumberFormat(style=Style.CURRENCY, pattern = "###,###,##0.00" )
+    //	@NumberFormat(style = NumberFormat.Style.CURRENCY, pattern = "#,##0.00")
+        @Digits( integer = 11, fraction = 2)
+        @Column( nullable = false, columnDefinition = "DECIMAL(11,2) DEFAULT 0.00")
+        private BigDecimal salario;
+
+        public Long getCodigoCliente() {
+            return codigoCliente;
+        }
+
+        public void setCodigoCliente(Long codigoCliente) {
+            this.codigoCliente = codigoCliente;
+        }
+
+        public String getCpf() {
+            return cpf;
+        }
+
+        public void setCpf(String cpf) {
+            this.cpf = cpf;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public LocalDate getDatNasc() {
+            return datNasc;
+        }
+
+        public void setDatNasc(LocalDate datNasc) {
+            this.datNasc = datNasc;
+        }
+
+        public String getLogradouro() {
+            return logradouro;
+        }
+
+        public void setLogradouro(String logradouro) {
+            this.logradouro = logradouro;
+        }
+
+        public String getCidade() {
+            return cidade;
+        }
+
+        public void setCidade(String cidade) {
+            this.cidade = cidade;
+        }
+
+        public String getEstado() {
+            return estado;
+        }
+
+        public void setEstado(String estado) {
+            this.estado = estado;
+        }
+
+        public String getCep() {
+            return cep;
+        }
+
+        public void setCep(String cep) {
+            this.cep = cep;
+        }
+
+        public String getFoneRes() {
+            return foneRes;
+        }
+
+        public void setFoneRes(String foneRes) {
+            this.foneRes = foneRes;
+        }
+
+        public BigDecimal getSalario() {
+            return salario;
+        }
+
+        public void setSalario(BigDecimal salario) {
+            this.salario = salario;
+        }
+
+        public Cliente(String cpf,
+                    String nome,
+                    LocalDate datNasc,
+                    String logradouro,
+                    String cidade,
+                    String estado,
+                    String cep,
+                    String foneRes,
+                    BigDecimal salario) {
+            this.cpf = cpf;
+            this.nome = nome;
+            this.datNasc = datNasc;
+            this.logradouro = logradouro;
+            this.cidade = cidade;
+            this.estado = estado;
+            this.cep = cep;
+            this.foneRes = foneRes;
+            this.salario = salario;
+        }
+
+        public Cliente() {
+            super();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Cliente cliente = (Cliente) o;
+            return Objects.equals(codigoCliente, cliente.codigoCliente);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(codigoCliente);
+        }
+
+        @Override
+        public String toString() {
+            return "Cliente{" +
+                    "codigoCliente=" + codigoCliente +
+                    ", cpf='" + cpf + '\'' +
+                    ", nome='" + nome + '\'' +
+                    ", dataNasc=" + datNasc +
+                    ", logradouro='" + logradouro + '\'' +
+                    ", cidade='" + cidade + '\'' +
+                    ", estado='" + estado + '\'' +
+                    ", cep='" + cep + '\'' +
+                    ", foneRes='" + foneRes + '\'' +
+                    ", salario=" + salario +
+                    '}';
+        }
+    }
+
+11. Crie a classe Pedido como abaixo:
+
+    package com.maransi.monaco.model;
+
+    import org.springframework.format.annotation.DateTimeFormat;
+
+    import javax.persistence.*;
+    import javax.validation.constraints.*;
+    import java.math.BigDecimal;
+    import java.time.LocalDate;
+    import java.util.Objects;
+
+    @Entity
+    public class Pedido {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name="codigopedido", updatable = false)
+        private Long codigoPedido;
+
+        @ManyToOne( fetch = FetchType.EAGER)
+        @JoinColumn( name = "codigocliente")
+        private Cliente cliente;
+
+        @ManyToOne( fetch=FetchType.EAGER)
+        @JoinColumn(name="codigovendedor")
+        private Vendedor vendedor;
+
+        @Column(name="datapedido", columnDefinition = "DATE")
+        @DateTimeFormat( iso = DateTimeFormat.ISO.DATE )
+        @NotNull(message="Data inválida")
+        private LocalDate dataPedido;
+
+        @Column(length=150, nullable=false)
+        @NotBlank(message="Endereço não pode ser vazio")
+        @Size(min=10, message="Endereço deve conter ao menos 10 dígitos")
+        private String logradouro;
+
+        @Column(length=100, nullable=false)
+        @NotNull(message="Cidade não pode ser vazio")
+        @NotBlank(message="Selecione uma cidade")
+        private String cidade;
+
+        @NotNull(message="Estado não pode ser vazio")
+        @Pattern(regexp="[A-Z][A-Z]", message="Estado inválido")
+        @Column(nullable=false, length=2, name="estado")
+        private String estado;
+
+        @NotBlank(message="CEP não pode ser vazio")
+        @Column(length=10, nullable=false)
+        private String cep;
+
+        @NotBlank(message="Telefone não pode ser vazio")
+        @Column(name = "foneres", length=30)
+        private String foneRes;
+
+        @Positive( message="Salário tem que ser maior que zero")
+        @Digits( integer = 11, fraction = 2)
+        @Column( name="valorpedido", nullable = false, columnDefinition = "DECIMAL(11,2) DEFAULT 0.00")
+        private BigDecimal valorPedido;
+
+        public Long getCodigoPedido() {
+            return codigoPedido;
+        }
+
+        public void setCodigoPedido(Long codigoPedido) {
+            this.codigoPedido = codigoPedido;
+        }
+
+        public Cliente getCliente() {
+            return cliente;
+        }
+
+        public void setCliente(Cliente cliente) {
+            this.cliente = cliente;
+        }
+
+        public Vendedor getVendedor() {
+            return vendedor;
+        }
+
+        public void setVendedor(Vendedor vendedor) {
+            this.vendedor = vendedor;
+        }
+
+        public LocalDate getDataPedido() {
+            return dataPedido;
+        }
+
+        public void setDataPedido(LocalDate dataPedido) {
+            this.dataPedido = dataPedido;
+        }
+
+        public String getLogradouro() {
+            return logradouro;
+        }
+
+        public void setLogradouro(String logradouro) {
+            this.logradouro = logradouro;
+        }
+
+        public String getCidade() {
+            return cidade;
+        }
+
+        public void setCidade(String cidade) {
+            this.cidade = cidade;
+        }
+
+        public String getEstado() {
+            return estado;
+        }
+
+        public void setEstado(String estado) {
+            this.estado = estado;
+        }
+
+        public String getCep() {
+            return cep;
+        }
+
+        public void setCep(String cep) {
+            this.cep = cep;
+        }
+
+        public String getFoneRes() {
+            return foneRes;
+        }
+
+        public void setFoneRes(String foneRes) {
+            this.foneRes = foneRes;
+        }
+
+        public BigDecimal getValorPedido() {
+            return valorPedido;
+        }
+
+        public void setValorPedido(BigDecimal valorPedido) {
+            this.valorPedido = valorPedido;
+        }
+
+        public Pedido(Cliente cliente,
+                    Vendedor vendedor,
+                    LocalDate dataPedido,
+                    String logradouro,
+                    String cidade,
+                    String estado,
+                    String foneRes,
+                    BigDecimal valorPedido) {
+            this.cliente = cliente;
+            this.vendedor = vendedor;
+            this.dataPedido = dataPedido;
+            this.logradouro = logradouro;
+            this.cidade = cidade;
+            this.estado = estado;
+            this.cep = cep;
+            this.foneRes = foneRes;
+            this.valorPedido = valorPedido;
+        }
+
+        public Pedido() {
+            super();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pedido pedido = (Pedido) o;
+            return codigoPedido.equals(pedido.codigoPedido);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(codigoPedido);
+        }
+
+        @Override
+        public String toString() {
+            return "Pedido{" +
+                    "codigoPedido=" + codigoPedido +
+                    ", cliente=" + cliente +
+                    ", vendedor=" + vendedor +
+                    ", dataPedido=" + dataPedido +
+                    ", logradouro='" + logradouro + '\'' +
+                    ", cidade='" + cidade + '\'' +
+                    ", estado='" + estado + '\'' +
+                    ", cep='" + cep + '\'' +
+                    ", foneRes='" + foneRes + '\'' +
+                    ", valorPedido=" + valorPedido +
+                    '}';
+        }
+    }
+
+13. Crie a classe PedidoDTO como abaixo:
+
+    package com.maransi.monaco.model;
+
+    import org.springframework.format.annotation.DateTimeFormat;
+
+    import javax.persistence.*;
+    import javax.validation.constraints.*;
+    import java.math.BigDecimal;
+    import java.time.LocalDate;
+
+    public class PedidoDTO {
+        private Long codigoPedido;
+
+        private String clienteNome;
+
+        private String vendedorNome;
+
+        private LocalDate dataPedido;
+
+        private String logradouro;
+
+        private String cidade;
+
+        private String estado;
+
+        private String cep;
+
+        private String foneRes;
+
+        private BigDecimal valorPedido;
+
+        public Long getCodigoPedido() {
+            return codigoPedido;
+        }
+
+        public void setCodigoPedido(Long codigoPedido) {
+            this.codigoPedido = codigoPedido;
+        }
+
+        public String getClienteNome() {
+            return clienteNome;
+        }
+
+        public void setClienteNome(String clienteNome) {
+            this.clienteNome = clienteNome;
+        }
+
+        public String getVendedorNome() {
+            return vendedorNome;
+        }
+
+        public void setVendedorNome(String vendedorNome) {
+            this.vendedorNome = vendedorNome;
+        }
+
+        public LocalDate getDataPedido() {
+            return dataPedido;
+        }
+
+        public void setDataPedido(LocalDate dataPedido) {
+            this.dataPedido = dataPedido;
+        }
+
+        public String getLogradouro() {
+            return logradouro;
+        }
+
+        public void setLogradouro(String logradouro) {
+            this.logradouro = logradouro;
+        }
+
+        public String getCidade() {
+            return cidade;
+        }
+
+        public void setCidade(String cidade) {
+            this.cidade = cidade;
+        }
+
+        public String getEstado() {
+            return estado;
+        }
+
+        public void setEstado(String estado) {
+            this.estado = estado;
+        }
+
+        public String getCep() {
+            return cep;
+        }
+
+        public void setCep(String cep) {
+            this.cep = cep;
+        }
+
+        public String getFoneRes() {
+            return foneRes;
+        }
+
+        public void setFoneRes(String foneRes) {
+            this.foneRes = foneRes;
+        }
+
+        public BigDecimal getValorPedido() {
+            return valorPedido;
+        }
+
+        public void setValorPedido(BigDecimal valorPedido) {
+            this.valorPedido = valorPedido;
+        }
+
+        public PedidoDTO() {
+            super();
+        }
+
+        public PedidoDTO(Long codigoPedido, String clienteNome, String vendedorNome, LocalDate dataPedido,
+                        String logradouro, String cidade, String estado, String cep, String foneRes,
+                        BigDecimal valorPedido) {
+            this.codigoPedido = codigoPedido;
+            this.clienteNome = clienteNome;
+            this.vendedorNome = vendedorNome;
+            this.dataPedido = dataPedido;
+            this.logradouro = logradouro;
+            this.cidade = cidade;
+            this.estado = estado;
+            this.cep = cep;
+            this.foneRes = foneRes;
+            this.valorPedido = valorPedido;
+        }
+
+
+    }
+
+14. Crie a classe UsuarioRepository como abaixo:
+
+    package com.maransi.monaco.repository;
+
+    import java.util.Optional;
+
+    import com.maransi.monaco.model.Usuario;
+    import org.springframework.data.jpa.repository.JpaRepository;
+
+
+    public interface UsuarioRepository extends JpaRepository<Usuario, Long >{
+
+        public Optional<Usuario> findByEmail(String email);
+
+    }
+
+15. Crie a classe ProdutoRepository como abaixo:
+
+    package com.maransi.monaco.repository;
+
+    import com.maransi.monaco.model.Produto;
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.stereotype.Repository;
+
+    @Repository
+    public interface ProdutoRepository extends JpaRepository<Produto, Long > {
+
+    }
+
+16. Crie a classe ClienteRepository como abaixo:
+
+    package com.maransi.monaco.repository;
+
+    import com.maransi.monaco.model.Produto;
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.stereotype.Repository;
+
+    @Repository
+    public interface ProdutoRepository extends JpaRepository<Produto, Long > {
+
+    }
+
+17. Crie a classe PedidoRepository como abaixo:
+
+    package com.maransi.monaco.repository;
+
+    import com.maransi.monaco.model.Pedido;
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.stereotype.Repository;
+
+    @Repository
+    public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+
+    }
+
+18. Crie a classe ProdutoResource como abaixo:
+
+    package com.maransi.monaco.resource;
+
+    import com.maransi.monaco.model.Produto;
+    import com.maransi.monaco.repository.ProdutoRepository;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.web.bind.annotation.*;
+
+    import javax.validation.Valid;
+
+    @RestController
+    @RequestMapping("/produto/api")
+    public class ProdutoResource {
+
+        @Autowired
+        private ProdutoRepository produtoRepository;
+
+        @GetMapping
+        public ResponseEntity<?> findAll(){
+
+            return ResponseEntity.ok( produtoRepository.findAll() );
+
+        }
+
+        @GetMapping(path="{codigoProduto}")
+        public ResponseEntity<?> findById(@PathVariable Long codigoProduto){
+
+            return ResponseEntity.ok( produtoRepository.findById(codigoProduto));
+
+        }
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        public ResponseEntity<?> insert(@RequestBody @Valid Produto produto){
+
+            return ResponseEntity.ok( produtoRepository.save(produto));
+        }
+
+        @PutMapping
+        @ResponseStatus( HttpStatus.OK )
+        public ResponseEntity<?> update( @RequestBody @Valid Produto produto ){
+
+            return ResponseEntity.ok( produtoRepository.save(produto) );
+        }
+
+        @DeleteMapping(path="{codigoProduto}")
+        @ResponseStatus( HttpStatus.NO_CONTENT)
+        public void delete( @PathVariable Long codigoProduto ){
+            produtoRepository.deleteById(codigoProduto);
+        }
+
+    }
+
+19. Crie a classe ClienteResource como abaixo:
+
+    package com.maransi.monaco.resource;
+
+    import com.maransi.monaco.model.Cliente;
+    import com.maransi.monaco.model.Cliente;
+    import com.maransi.monaco.repository.ClienteRepository;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.web.bind.annotation.*;
+
+    import javax.servlet.http.HttpServletResponse;
+    import javax.validation.Valid;
+    import java.util.List;
+
+    @RestController
+    @RequestMapping("/cliente/api")
+    public class ClienteResource {
+
+        @Autowired
+        private ClienteRepository clienteRepository;
+
+        @GetMapping
+        public ResponseEntity<?> findAll(HttpServletResponse resp){
+
+            List<Cliente> clientes = clienteRepository.findAll();
+
+            return ResponseEntity.ok(clientes);
+        }
+
+        @GetMapping(path="{codigoCliente}")
+        public ResponseEntity<?> findById(@PathVariable Long codigoCliente){
+
+            return ResponseEntity.ok( clienteRepository.findById(codigoCliente));
+
+        }
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        public ResponseEntity<?> insert(@RequestBody @Valid Cliente cliente){
+
+            return ResponseEntity.ok( clienteRepository.save(cliente));
+        }
+
+        @PutMapping
+        @ResponseStatus( HttpStatus.OK )
+        public ResponseEntity<?> update( @RequestBody @Valid Cliente cliente ){
+
+            return ResponseEntity.ok( clienteRepository.save(cliente) );
+        }
+
+        @DeleteMapping(path="{codigoCliente}")
+        @ResponseStatus( HttpStatus.NO_CONTENT)
+        public void delete( @PathVariable Long codigoCliente ){
+            clienteRepository.deleteById(codigoCliente);
+        }
+
+
+
+    }
+
+20. Crie a classe PedidoResource como abaixo:
+
+    package com.maransi.monaco.resource;
+
+    import com.maransi.monaco.model.Pedido;
+    import com.maransi.monaco.model.Pedido;
+    import com.maransi.monaco.model.PedidoDTO;
+    import com.maransi.monaco.repository.PedidoRepository;
+    import org.modelmapper.ModelMapper;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.web.bind.annotation.*;
+
+    import javax.servlet.http.HttpServletResponse;
+    import javax.validation.Valid;
+    import java.util.ArrayList;
+    import java.util.List;
+
+    @RestController
+    @RequestMapping("/pedido/api")
+    public class PedidoResource {
+
+        @Autowired
+        private PedidoRepository PedidoRepository;
+
+        @GetMapping
+        @ResponseStatus( HttpStatus.OK)
+        public ResponseEntity<?> findAll(HttpServletResponse resp){
+
+            List<Pedido> Pedidos = PedidoRepository.findAll();
+
+            return ResponseEntity.ok(Pedidos);
+        }
+
+
+        @GetMapping(params="resumo")
+        @ResponseStatus( HttpStatus.OK)
+        public ResponseEntity<?> findAllResumo(){
+
+            ModelMapper modelMapper = new ModelMapper();
+
+            List<Pedido> pedidos = PedidoRepository.findAll();
+
+            List<PedidoDTO> pedidosDTO = new ArrayList<>();
+
+            pedidos.forEach( pedido -> pedidosDTO.add( modelMapper.map(pedido, PedidoDTO.class) ) );
+
+            return ResponseEntity.ok(pedidosDTO);
+        }
+
+        @GetMapping(path="{codigoPedido}")
+        @ResponseStatus( HttpStatus.OK)
+        public ResponseEntity<?> findById(@PathVariable Long codigoPedido){
+
+            return ResponseEntity.ok( PedidoRepository.findById(codigoPedido));
+
+        }
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        public ResponseEntity<?> insert(@RequestBody @Valid Pedido Pedido){
+
+            return ResponseEntity.ok( PedidoRepository.save(Pedido));
+        }
+
+        @PutMapping
+        @ResponseStatus( HttpStatus.OK )
+        public ResponseEntity<?> update( @RequestBody @Valid Pedido Pedido ){
+
+            return ResponseEntity.ok( PedidoRepository.save(Pedido) );
+        }
+
+        @DeleteMapping(path="{codigoPedido}")
+        @ResponseStatus( HttpStatus.NO_CONTENT)
+        public void delete( @PathVariable Long codigoPedido ){
+            PedidoRepository.deleteById(codigoPedido);
+        }
+
+
+
+    }
+
+21. Altere a classe de teste src/main/test como abaixo:
+
+    package com.maransi.monaco;
+
+    import com.maransi.monaco.model.Produto;
+    import com.maransi.monaco.repository.ProdutoRepository;
+    import org.junit.jupiter.api.MethodOrderer;
+    import org.junit.jupiter.api.Order;
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.TestMethodOrder;
+    import org.junit.runner.RunWith;
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.test.context.SpringBootTest;
+    import org.springframework.test.context.junit4.SpringRunner;
+    import org.springframework.transaction.annotation.Transactional;
+
+    import java.util.List;
+    import java.util.Optional;
+
+    import static org.junit.jupiter.api.Assertions.*;
+
+
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    @RunWith(SpringRunner.class)
+    @SpringBootTest(classes=MonacoApplication.class)
+    @Transactional
+    class MonacoApplicationTests {
+        private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
+
+        @Autowired
+        private ProdutoRepository produtoRepository;
+
+        @Test
+        void contextLoads() {
+
+        }
+
+        @Test
+        @Order(1)
+        void produtoTest() {
+            logger.info("TESTANDO produtoRepository.findAll()");
+
+            List<Produto> produtos = produtoRepository.findAll();
+
+            assertNotNull( produtos );
+
+            logger.info("TESTANDO produtoRepository.findById(1L)");
+
+            Optional<Produto> produto = produtoRepository.findById(1L);
+
+            assertNotNull( produto );
+
+            logger.info("TESTANDO produtoRepository.delete");
+
+            produtoRepository.deleteById(1L);
+
+            produto = produtoRepository.findById(1L);
+
+            assertTrue( produto.isEmpty() );
+
+            logger.info("TESTANDO produtoRepository.insert");
+
+            Produto produtoNovo = new Produto( "TESTE DE DESCRICAO", "TESTE DE OBSERVACAO","TESTE"  );
+
+            produtoNovo = produtoRepository.save( produtoNovo );
+
+            assertTrue( produtoNovo.getCodigoProduto() > 0 );
+
+            logger.info("TESTANDO produtoRepository.update");
+
+            produtoNovo.setDescricao("ALTERACAO DO TESTE");
+
+            Produto produtoAlterado = produtoRepository.save( produtoNovo );
+
+            assertEquals(produtoAlterado.getDescricao(), "ALTERACAO DO TESTE");
+        }
+    }
+
+
+22. Crie a classe AuthorizationServerConfig como abaixo:
+
+    package com.maransi.monaco.config;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
+    import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+    import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+    import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+    import org.springframework.security.oauth2.provider.token.TokenStore;
+    import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+    import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+
+    @Configuration
+    @EnableAuthorizationServer
+    public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+        @Autowired
+        private AuthenticationManager authenticationManager;
+
+        @Override
+        public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+            clients.inMemory()
+                    .withClient("angular")
+                    .secret("@ngul@r0")
+                    .scopes("read", "write")
+    //				.authorizedGrantTypes("password")
+                    .authorizedGrantTypes("password", "refresh_token")          // Inclua o param "refresh_token"
+                    .accessTokenValiditySeconds(60*60*24)                            // Altere para 20 seg
+                    .refreshTokenValiditySeconds( 3600 * 24 )                   // Tempo para expirar o refreshToken de 1 dia
+                    .and()
+                    .withClient("mobile")
+                    .secret("m0b1l30")
+                    .scopes("read")
+                    .authorizedGrantTypes("password", "refresh_token")
+                    .accessTokenValiditySeconds(1800)
+                    .refreshTokenValiditySeconds(3600 * 24);                
+        }
+
+        @Override
+        public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+            endpoints
+                    .tokenStore(tokenStore())
+                    .accessTokenConverter(accessTokenConverter())       // Linha alterada para adequar JWT
+                    .reuseRefreshTokens(false)
+                    .authenticationManager(authenticationManager);
+        }
+
+        // Método criado para JWT
+        @Bean
+        public JwtAccessTokenConverter accessTokenConverter() {
+            JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
+            accessTokenConverter.setSigningKey("algaworks");
+            return accessTokenConverter;
+        }
+
+        @Bean
+        public TokenStore tokenStore() {
+            return new JwtTokenStore(accessTokenConverter());   // Linha alterada para adequar ao JWT
+        }
+
+    }
+
+23. Crie a classe OAuthSecurityConfig como abaixo:
+
+    package com.maransi.monaco.config;
+
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+    import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+
+    @Configuration
+    @EnableWebSecurity
+    public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        @Bean
+        @Override
+        public AuthenticationManager authenticationManager() throws Exception {
+            return super.authenticationManager();
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return NoOpPasswordEncoder.getInstance();
+        }
+    }
+
+24 . Crie a classe ResourceServerConfig como abaixo:
+
+    package com.maransi.monaco.config;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+    import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+    import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.http.SessionCreationPolicy;
+    import org.springframework.security.core.userdetails.UserDetailsService;
+    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+    import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+    import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+    import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
+
+    @Configuration
+    @EnableWebSecurity
+    @EnableResourceServer
+    @EnableGlobalMethodSecurity( prePostEnabled=true)
+    public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+
+        @Autowired
+        private UserDetailsService userDetailsService;
+        
+        @Autowired
+        public void configure(AuthenticationManagerBuilder auth) throws Exception {
+            
+    //        auth.inMemoryAuthentication()
+    //                .withUser("admin").password("admin").roles("ROLE");
+            auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        }
+
+        private PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            http.authorizeRequests()
+                    .antMatchers("/produto/**").permitAll()
+                    .antMatchers("/h2/**").permitAll()
+                    .antMatchers("/h2-console/**").permitAll()
+                    .anyRequest().authenticated().and()
+                    .headers().frameOptions().sameOrigin().and()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                    .csrf().ignoringAntMatchers("/h2-console/**").and()
+                    .csrf().disable();
+        }
+
+        @Override
+        public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+            resources.stateless(true);
+        }
+        
+        @Bean
+        public MethodSecurityExpressionHandler createExpressionHandler(){
+            return new OAuth2MethodSecurityExpressionHandler();
+        }
+    }
+
+25. 
