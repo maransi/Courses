@@ -3641,3 +3641,303 @@ Complemento da Aula 07.01. Implementando projeção de lançamento ( com bibliot
 
 
 TODO: ver como funcionaria a páginação e o filtro para esse método
+
+
+
+Aula 07.02. Profiles do Spring
+------------------------------
+
+    . Alterar algumas propriedades das classes que estão "hardcode". A primeira seria na classe TokenResource:
+
+
+        @RestController
+        @RequestMapping("/tokens")
+        public class TokenResource {
+
+            @DeleteMapping("/revoke")
+            public void revoke(HttpServletRequest req, HttpServletResponse resp){
+                Cookie cookie = new Cookie("refreshToke", null);
+
+                cookie.setHttpOnly(true);
+                cookie.setSecure(false);                // TODO: Colocar essa propriedade como configurável para produção e no desenv
+                cookie.setPath(req.getContextPath());
+                cookie.setMaxAge(0);
+
+                resp.addCookie(cookie);
+                resp.setStatus(HttpStatus.NO_CONTENT.value());
+            }
+        }
+
+        . Iremos alterar a propriedade cookie.setSecure(false). Colocar ela como configurável para produção e no desenv
+
+
+    . Inserir a classe abaixo no projeto:
+
+        package com.example.algamoneyapi.config.property;
+
+        import org.springframework.boot.context.properties.ConfigurationProperties;
+
+        @ConfigurationProperties("algamoney")  
+        public class AlgamoneyApiProperty {
+
+            private String originPermitida = "http://localhost:8000";
+
+            private final Seguranca seguranca = new Seguranca();
+
+            public Seguranca getSeguranca() {
+                return seguranca;
+            }
+
+            public String getOriginPermitida() {
+                return originPermitida;
+            }
+
+            public void setOriginPermitida(String originPermitida) {
+                this.originPermitida = originPermitida;
+            }
+
+            public static class Seguranca {
+
+                private boolean enableHttps;        // O default é false, por isso não é colocado nenhum valor
+
+                public boolean isEnableHttps() {
+                    return enableHttps;
+                }
+
+                public void setEnableHttps(boolean enableHttps) {
+                    this.enableHttps = enableHttps;
+                }
+
+            }
+
+        }
+
+    . Para utilizar a anotation @ConfigurationProperties é necessário inserir a dependência abaixo no pom.xml:
+
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>    
+
+    . Inclua a annotation @EnableConfigurationProperties na classe AlgamoneyApiApplication como abaixo:
+
+        @SpringBootApplication
+        @EnableConfigurationProperties(AlgamoneyApiProperty.class)
+        public class AlgamoneyApiApplication {
+
+            public static void main(String[] args) {
+                SpringApplication.run(AlgamoneyApiApplication.class, args);
+            }
+            
+        }
+
+    . A partir daqui é possível utilizar as propriedades da classe AlgamoneyApiProperty e da inner class Seguranca
+        dentro do arquivo application.properties. Vá nesse último arquivo e tente colocar a propriedade abaixo para
+        verificar:
+
+        algamoney.seguranca.enable-htpps=false
+
+    . Não vamos deixar essa propriedade no arquivo application.properties, ao invés disso iremos criar um novo arquivo
+        application-prod.properties e colocar essa propriedade e outras destinadas para a produção:
+
+        algamoney.seguranca.enable-htpps=false
+
+    . Retorne a classe TokenResource e deixe-a como abaixo:
+
+        @RestController
+        @RequestMapping("/tokens")
+        public class TokenResource {
+            
+            @Autowired
+            private AlgamoneyApiProperty algamoneyApiProperty;
+
+            @DeleteMapping("/revoke")
+            public void revoke(HttpServletRequest req, HttpServletResponse resp) {
+                Cookie cookie = new Cookie("refreshToken", null);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(algamoneyApiProperty.getSeguranca().isEnableHttps());
+                cookie.setPath(req.getContextPath() + "/oauth/token");
+                cookie.setMaxAge(0);
+                
+                resp.addCookie(cookie);
+                resp.setStatus(HttpStatus.NO_CONTENT.value());
+            }
+            
+        }
+
+        . Inclua a propriedade algamoneyApiProperty:
+
+            @Autowired
+            private AlgamoneyApiProperty algamoneyApiProperty;
+
+        . Altere a linha do cookie.setSecure como abaixo:
+
+            De
+
+                cookie.setSecure(false);                // TODO: Colocar essa propriedade como configurável para produção e no desenv
+
+            Para
+
+                cookie.setSecure(algamoneyApiProperty.getSeguranca().isEnableHttps());
+
+    . Acesse a classe RefreshTokenPostProcessor e deixe-a como abaixo:
+    
+        @ControllerAdvice
+        public class RefreshTokenPostProcessor implements ResponseBodyAdvice<OAuth2AccessToken> {
+
+            @Autowired
+            private AlgamoneyApiProperty algamoneyApiProperty;
+            
+            @Override
+            public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+                return returnType.getMethod().getName().equals("postAccessToken");
+            }
+
+            @Override
+            public OAuth2AccessToken beforeBodyWrite(OAuth2AccessToken body, MethodParameter returnType,
+                    MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                    ServerHttpRequest request, ServerHttpResponse response) {
+                
+                HttpServletRequest req = ((ServletServerHttpRequest) request).getServletRequest();
+                HttpServletResponse resp = ((ServletServerHttpResponse) response).getServletResponse();
+                
+                DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) body;
+                
+                String refreshToken = body.getRefreshToken().getValue();
+                adicionarRefreshTokenNoCookie(refreshToken, req, resp);
+                removerRefreshTokenDoBody(token);
+                
+                return body;
+            }
+
+            private void removerRefreshTokenDoBody(DefaultOAuth2AccessToken token) {
+                token.setRefreshToken(null);
+            }
+
+            private void adicionarRefreshTokenNoCookie(String refreshToken, HttpServletRequest req, HttpServletResponse resp) {
+                Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+                refreshTokenCookie.setHttpOnly(true);
+                refreshTokenCookie.setSecure(algamoneyApiProperty.getSeguranca().isEnableHttps());
+                refreshTokenCookie.setPath(req.getContextPath() + "/oauth/token");
+                refreshTokenCookie.setMaxAge(2592000);
+                resp.addCookie(refreshTokenCookie);
+            }
+
+        }
+
+
+        . Inclua a propriedade abaixo na classe acima:
+
+            @Autowired
+            private AlgamoneyApiProperty algamoneyApiProperty;
+
+        . Altere a linha abaixo:
+
+            De
+
+                refreshTokenCookie.setSecure(false); // TODO: Mudar para true em producao
+
+            Para
+
+                refreshTokenCookie.setSecure(algamoneyApiProperty.getSeguranca().isEnableHttps());
+
+    . Levante a aplicação e solicite um access token com a url abaixo:
+
+        localhost:8080/oauth/token
+
+        client : angular
+        username : admin@algamoney.com
+        password : admin
+        grant_type : password    
+
+    . Acesse as propriedades da resposta e verifique o conteúdo da propriedade Secure, ela estará como false.
+
+    . Altere a propriedade abaixo do arquivo application-prod.properties para:
+    
+        algamoney.seguranca.enable-htpps=true
+
+    . Levante novamente a aplicação e execute a url abaixo:
+
+        localhost:8080/oauth/token
+
+    . Acesse as propriedades da resposta e verifique o conteúdo da propriedade Secure, ela estará como true.
+
+    . Acesse as propriedades do arquivo application-prod.properties e inclua a propriedade abaixo:
+
+        algamoney.seguranca.enable-https=true
+
+    . Acesse a classe CorsFilter e altere como abaixo:
+
+        @Component
+        @Order(Ordered.HIGHEST_PRECEDENCE)
+        public class CorsFilter implements Filter {
+
+            @Autowired
+            private AlgamoneyApiProperty algamoneyApiProperty;
+            
+            @Override
+            public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+                    throws IOException, ServletException {
+                
+                HttpServletRequest request = (HttpServletRequest) req;
+                HttpServletResponse response = (HttpServletResponse) resp;
+                
+                response.setHeader("Access-Control-Allow-Origin", algamoneyApiProperty.getOriginPermitida());
+                response.setHeader("Access-Control-Allow-Credentials", "true");
+                
+                if ("OPTIONS".equals(request.getMethod()) && algamoneyApiProperty.getOriginPermitida().equals(request.getHeader("Origin"))) {
+                    response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
+                    response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
+                    response.setHeader("Access-Control-Max-Age", "3600");
+                    
+                    response.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    chain.doFilter(req, resp);
+                }
+                
+            }
+            
+            @Override
+            public void destroy() {
+            }
+
+            @Override
+            public void init(FilterConfig arg0) throws ServletException {
+            }
+
+        }
+
+
+        . Altere a linha abaixo:
+
+            De
+
+                private String originPermitida = "http://localhost:8000"; // TODO: Configurar para diferentes ambientes
+
+            Para 
+
+                @Autowired
+                private AlgamoneyApiProperty algamoneyApiProperty;
+
+        . Altere as linhas abaixo:
+
+            De
+
+        		response.setHeader("Access-Control-Allow-Origin", originPermitida);
+
+            Para
+
+                response.setHeader("Access-Control-Allow-Origin", algamoneyApiProperty.getOriginPermitida());            
+
+
+            De
+
+                if ("OPTIONS".equals(request.getMethod()) && originPermitida.equals(request.getHeader("Origin"))) {...
+            
+            Para
+
+                if ("OPTIONS".equals(request.getMethod()) && algamoneyApiProperty.getOriginPermitida().equals(request.getHeader("Origin"))) {
+
+    
+    . Importante: As alterações feitas na classe CorsFilter só serão possíveis de testar quando o projeto for para num ambiente de produção:
