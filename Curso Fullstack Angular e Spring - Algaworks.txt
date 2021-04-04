@@ -3942,3 +3942,246 @@ Aula 07.02. Profiles do Spring
     
     . Importante: As alterações feitas na classe CorsFilter só serão possíveis de testar quando o projeto for para num ambiente de produção:
     
+
+Aula 07.05. Nome do usuário no token JWT
+----------------------------------------
+
+    . Caso ocorra necessidade de colocar mais informações no Token, podemos usar a técnica dos passos abaixo.
+
+    . Acesse a classe AuthorizationServerConfig e faça as alterações no método config:
+
+        De
+
+            @Override
+            public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+                endpoints
+                        .tokenStore(tokenStore())
+                        .accessTokenConverter(accessTokenConverter())       // Linha excluída
+                        .reuseRefreshTokens(false)
+                        .authenticationManager(authenticationManager);
+            }
+
+
+        Para
+
+            @Override
+            public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+                TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();                               // Linha incluída
+                tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));   // Linha incluída
+                
+                endpoints
+                    .tokenStore(tokenStore())
+                    .tokenEnhancer(tokenEnhancerChain)                  // Linha alterada
+                    .reuseRefreshTokens(false)
+                    .authenticationManager(authenticationManager);
+            }        
+
+        . Foram incluídos as linhas:
+
+            TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+            tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
+
+                endpoints
+                    ...
+                    .tokenEnhancer(tokenEnhancerChain)                  // Linha alterada
+                    ...
+
+
+    . Acrescente o método abaixo na classe AuthorizationServerConfig:
+
+        @Bean
+        public TokenEnhancer tokenEnhancer() {
+            return new CustomTokenEnhancer();
+        }
+	    
+    . Crie a classe abaixo no projeto, responsável por incrementar a informação no token:
+
+        package com.example.algamoneyapi.config.token;
+
+        import java.util.HashMap;
+        import java.util.Map;
+
+        import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+        import org.springframework.security.oauth2.common.OAuth2AccessToken;
+        import org.springframework.security.oauth2.provider.OAuth2Authentication;
+        import org.springframework.security.oauth2.provider.token.TokenEnhancer;
+
+        import com.example.algamoney.api.security.UsuarioSistema;
+
+        public class CustomTokenEnhancer implements TokenEnhancer {
+
+            @Override
+            public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+                UsuarioSistema usuarioSistema = (UsuarioSistema) authentication.getPrincipal();
+                
+                Map<String, Object> addInfo = new HashMap<>();
+                addInfo.put("nome", usuarioSistema.getUsuario().getNome());
+                
+                ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(addInfo);
+                return accessToken;
+            }
+
+        }
+
+    . Altere o retorno do métoto AppUserDetailsService.loadUserByUsername como abaixo:
+
+        De
+
+            @Override
+            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(email);
+                Usuario usuario = usuarioOptional.orElseThrow(() -> new UsernameNotFoundException("Usuário e/ou senha incorretos"));
+                return new User(email, usuario.getSenha(), getPermissoes(usuario));                                                     // Linha alterada
+            }
+
+        Para
+
+            @Override
+            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(email);
+                Usuario usuario = usuarioOptional.orElseThrow(() -> new UsernameNotFoundException("Usuário e/ou senha incorretos"));
+                return new UsuarioSistema(usuario, getPermissoes(usuario));                                                             // Linha alterada
+            }
+
+    . Inclua a classe abaixo no sistema:
+
+    
+        package com.example.algamoneyapi.security;
+
+        import java.util.Collection;
+
+        import org.springframework.security.core.GrantedAuthority;
+        import org.springframework.security.core.userdetails.User;
+
+        import com.example.algamoney.api.model.Usuario;
+
+        public class UsuarioSistema extends User {
+
+            private static final long serialVersionUID = 1L;
+
+            private Usuario usuario;
+
+            public UsuarioSistema(Usuario usuario, Collection<? extends GrantedAuthority> authorities) {
+                super(usuario.getEmail(), usuario.getSenha(), authorities);
+                this.usuario = usuario;
+            }
+
+            public Usuario getUsuario() {
+                return usuario;
+            }
+
+        }
+
+    . Levante a aplicação e solicite um access token com a url abaixo:
+
+        localhost:8080/oauth/token
+
+        client : angular
+        username : admin@algamoney.com
+        password : admin
+        grant_type : password    
+
+    . Transporte o token gerado, acesse o site https://jwt.io, cole o conteúdo no campo "Encoded" e verifique se 
+        o valor "nome" aparece nos itens do Payload do token no campo ao lado do "Encoded".
+
+
+Aula 07.06. Alternando OAuth 2 e Basic Security com profiles
+------------------------------------------------------------
+
+    . Se precisar agilizar a troca do tipo de segurança de OAuth2 para Basic faça as alterações abaixo.
+
+    . Inclua a classe abaixo no projeto:
+
+        package com.example.algamoneyapi.config;
+
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.context.annotation.Bean;
+        import org.springframework.context.annotation.Profile;
+        import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+        import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+        import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+        import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+        import org.springframework.security.config.http.SessionCreationPolicy;
+        import org.springframework.security.core.userdetails.UserDetailsService;
+        import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+        import org.springframework.security.crypto.password.PasswordEncoder;
+
+        @Profile("basic-security")
+        @EnableWebSecurity
+        public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
+
+            @Autowired
+            private UserDetailsService userDetailsService;
+            
+            @Override
+            protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+                auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+            }
+            
+            @Bean
+            public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+            }
+            
+            @Override
+            protected void configure(HttpSecurity http) throws Exception {
+                http.authorizeRequests()
+                    .anyRequest().authenticated()
+                    .and()
+                    .httpBasic()
+                    .and()
+                    .sessionManagement()
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .csrf().disable();
+            }
+            
+        }
+
+    . Através do @Profile é possível fazer essa mudança.
+
+    . Na classe AuthorizationServerConfig coloque a annotation @Profile como abaixo:
+
+        ...
+        @Profile("oauth-security")      // Linha incluida
+        @Configuration
+        @EnableAuthorizationServer
+        public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+        ...
+
+    . Para configurar qual tipo de token queremos basta configurar no application.properties
+
+        spring.profiles.active=oauth-security
+
+    . Levante a aplicação e solicite um access token com a url abaixo no Postman:
+
+        localhost:8080/oauth/token
+
+        client : angular
+        username : admin@algamoney.com
+        password : admin
+        grant_type : password    
+
+    . Crie uma nova URL no Postman 
+
+        localhost:8080/lancamentos?resumo
+
+        Header.Authorization : Bearer [Token obtido no item anterior]
+
+    . Pare a aplicação.
+
+    . Altere o tipo do token no application.properties como abaixo:
+
+        spring.profiles.active=basic-security
+
+    . Levante a aplicação e no Postman crie uma nova URL como abaixo:
+
+        Method : GET
+        URL : http://localhost:8080/categoria
+        Authoritation.Type : Basic Auth
+        Authorization.Username : admin@algamoney.com
+        Authorization.Password : admin
+
+    . Execute a URL e veja se a resposta veio com sucesso:
+
+    
