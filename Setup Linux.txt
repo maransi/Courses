@@ -151,7 +151,12 @@
 		# Passo opcional caso queira melhorar o nivel de segurança do banco
 		# sudo mysql_secure_installation
 
-		mysql -u root -p
+		create user 'marco'@'localhost' identified by 'brasil2';
+
+		GRANT ALL PRIVILEGES ON *.* to 'marco'@'localhost' WITH GRANT OPTION;
+
+
+		mysql -u marco -p
 
 
 4. Instalação do Java

@@ -1,0 +1,115 @@
+Curso .NETCore 3.1 ou NET5.0 - CSharp API Arquitetura DDD na Prática - UDEMY
+----------------------------------------------------------------------------
+
+Aula 6 - Download linux Peppermint OS 9
+---------------------------------------
+
+    . Acessar a URL https://www.osboxes.org/virtualbox-images/ para baixar a imagem pronta da 
+        distribuição Peppermint
+
+    . Acesse o Virtualbox, crie uma vm com o nome Peppermint.
+
+    . Após download descompacte a vm em ~/Virtualbox VMs/Peppermint
+
+    . Importe a VM baixada.
+
+
+Aula 8. Alterar Algumas Configurações do Linux Peppermint OS 9    
+--------------------------------------------------------------
+
+    . Inicie e acesse a VM. O usuário e senha são osboxes.org / osboxes.org
+
+    . Altere o layout do teclado para Português Brasil
+
+    . Altere o fuso horário
+
+    . Acesse o terminal e execute os comandos abaixo:
+
+        sudo apt-get update && sudo apt-get upgrade
+
+        sudo apt-get install virtualbox-guest-utils virtualbox-guest-x11 virtualbox-guest-dkms -y
+
+
+Aula 9. Alterar Senha OsBoxes.org
+---------------------------------
+
+    passwd 
+
+
+Aula 11. Instalar AspNetCore 3.1
+--------------------------------
+
+    . Acesse o link abaixo para baixar o .NET Core 3.1
+
+        https://dotnet.microsoft.com/download
+
+    . Acesse o download "All .NET Core downloads" e baixe a versão 3.1
+
+    . Acesse o link "Package manager instructions" 
+
+    . Localize a versão do Ubuntu que está sendo utilizado, copie e execute os comandos no 
+        terminal:
+
+        wget https://packages.microsoft.com/config/ubuntu/20.10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        sudo apt-get update;   sudo apt-get install -y apt-transport-https &&   sudo apt-get update &&   sudo apt-get install -y dotnet-sdk-5.0
+        sudo apt-get update;   sudo apt-get install -y apt-transport-https &&   sudo apt-get update &&   sudo apt-get install -y aspnetcore-runtime-5.0
+
+    . Para testar a instalação execute os comandos abaixo:
+
+        dotnet --version
+        dotnet --help
+        dotnet --list
+        dotnet --list-runtimes
+        dotnet --list-sdks
+
+Aula 12. Instalar MySQL e WorkBench
+------------------------------
+
+    . Abra o terminal e execute os comandos abaixo:
+
+            sudo apt update 
+            sudo apt upgrade
+
+            # No passo abaixo use <Tab> para mover entre as opções e dê <OK> para finalizar a escolha
+            wget http://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
+
+            sudo dpkg -i mysql-apt-config_0.8.13-1_all.deb
+            sudo apt update 
+            sudo apt install mysql-server
+            sudo systemctl restart mysql
+
+            # Passo opcional caso queira melhorar o nivel de segurança do banco
+            # sudo mysql_secure_installation
+
+            create user 'marco'@'localhost' identified by 'brasil2';
+
+            GRANT ALL PRIVILEGES ON *.* to 'marco'@'localhost' WITH GRANT OPTION;
+
+
+            mysql -u marco -p
+
+    . Acesse o site https://dev.mysql.com/downloads/workbench/ e realize o download do mysql-workdbenck
+
+    . Acesse o local do download e execute os comandos abaixo:
+
+        sudo dpkg -i mysql-workbench-community_8.0.23-1ubuntu20.10_amd64.deb 
+        sudo apt-get install -f
+        sudo dpkg -i mysql-workbench-community_8.0.23-1ubuntu20.10_amd64.deb 
+
+    . Acesse o mysql-workbench e altere a conexão que está com o usuário root pelo marco.
+
+
+Aula 13. Instalar Visual Studio Code
+------------------------------------
+
+    . Acesse o site do Visual Studio, faça o download e a instalação
+
+    . Instale as extensions abaixo:
+
+        C#
+        C# Extensions
+        C# XML Documentation Comments
+        vscode-icons (Opcional)
+        
+
