@@ -113,3 +113,68 @@ Aula 13. Instalar Visual Studio Code
         vscode-icons (Opcional)
         
 
+Aula 19. Documentação do C# e o que eu posso fazer com C#
+---------------------------------------------------------
+
+    . A documentação da Microsoft encontra-se no link abaixo:
+
+        https://docs.microsoft.com/pt-br/dotnet/csharp
+
+
+Aula 20. Criar uma Solution
+---------------------------
+
+    . Crie uma pasta com o nome CSharpBasico
+
+    . Digite o comando abaixo para verificar as opções do compilador dotnet:
+
+        dotnet new
+
+    . Dentro da pasta CSharpBasico digite o comando abaixo:
+
+        dotnet new sln --name CSharpBasico
+
+    . Para acessar a solução com o VisualStudio Code digite o comando abaixo:
+
+        code .
+
+    . Dentro da "Solution" criaremos um projeto, do tipo console:
+
+        dotnet new console -n HelloWorld -o helloWorld
+        
+        -n : name da aplicação (Nome do projeto HelloWorld.csproj )
+        -o : output (nome da pasta que será criado para criar as classes)
+
+    . A estrutura de pastas ficará:
+
+        CSharpBasico
+            |
+            +----------- obj
+            |
+            +----------- helloWorld
+            |               +----   HelloWorld.csproj
+            |               +----   Program.cs
+            CSharpBasico.sln
+
+    . Agora precisamos associar o projeto a solution
+
+        dotnet sln add helloWorld/
+
+    . Digite o comando abaixo para verificar os projetos que compoem a solution:
+
+        dotnet sln list
+
+    . O arquivo Program.cs possui um método main. Para executarmos a classe Program.cs digite os
+        comandos abaixo:
+
+        cd CSharpBasico/helloWorld
+
+        dotnet run
+
+
+Aula 21. O que é uma Namespace
+------------------------------
+
+    . Namespace tem a mesma lógica de packages do java. Obedecendo critérios de imports das classes.
+
+    
