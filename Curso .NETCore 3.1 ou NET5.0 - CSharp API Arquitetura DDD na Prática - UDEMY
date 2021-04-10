@@ -177,4 +177,396 @@ Aula 21. O que é uma Namespace
 
     . Namespace tem a mesma lógica de packages do java. Obedecendo critérios de imports das classes.
 
+
+Aula 24. Tipos Primitivos
+-------------------------
+
+    . As variáveis value type contém dentro delas um valor, enquanto as reference type contém uma referência. Isso significa 
+        que se copiar uma variável do tipo value type para dentro de outra o valor é copiado e, se o mesmo for feito com uma 
+        do tipo reference type será copiado apenas a referência do objeto.
+
+    . Value Type existem duas categorias: struct e enum.
+
+        . Struct: é dividida em tipos numéricos, bool e estruturas personalizadas pelo usuário.
     
+            Os tipos numéricos:
+
+                Tipo de dados	Intervalo
+                -------------   ---------
+                byte	        0 ..255
+                sbyte	        -128 ..127
+                short	        -32,768 ..32,767
+                ushort	        0 ..65,535
+                int	            -2,147,483,648 ..2,147,483,647
+                uint	        0 ..4,294,967,295
+                long	        -9,223,372,036,854,775,808..9,223,372,036,854,775,807
+                ulong	        0 ..18,446,744,073,709,551,615
+                float	        -3.402823e38 ..3.402823e38
+                double	        -1.79769313486232e308 ..1.79769313486232e308
+                decimal	        -79228162514264337593543950335..79228162514264337593543950335
+                char	        U+0000 .. U+ffff
+
+        . Enum:  permite criar um tipo que é formado por várias constante
+
+            . Exemplo 1:
+
+                class Pedido
+                {
+                    enum Situacao
+                    {
+                        Aberto,
+                        Faturado,
+                        Cancelado
+                    }
+
+                    public int numero;
+                    public DateTime dataHora;
+                    public int situacao;
+
+                }            
+
+                class Program
+                {
+                    static void Main(string[] args)
+                    {
+                        Pedido pedido = new Pedido();
+
+                        pedido.numero = 1;
+                        pedido.dataHora = DateTime.Now;
+
+                        // A propriedade situacao recebe o valor via cast 
+                        // porque o tipo dela é int
+                        pedido.situacao = (int) Situacao.Faturado;
+
+                        Console.WriteLine("Número do pedido: "
+                        + pedido.numero.ToString());
+                        Console.WriteLine("Número do pedido: "
+                        + pedido.dataHora.ToString());
+                        Console.WriteLine("Número do pedido: "
+                        + pedido.situacao.ToString());
+
+                    }
+                }
+
+
+            . Exemplo 2: Mudando o enum para public e colocando o valor da propriedade
+                            Pedido.situacao diretamento o conteúdo do enum
+                            Situacao.Faturado
+
+                class Pedido
+                {
+                    public enum Situacao
+                    {
+                        Aberto,
+                        Faturado,
+                        Cancelado
+                    }
+
+                    public int numero;
+                    public DateTime dataHora;
+                    public int situacao;
+
+                }            
+
+                class Program
+                {
+                    static void Main(string[] args)
+                    {
+                        Pedido pedido = new Pedido();
+
+                        pedido.numero = 1;
+                        pedido.dataHora = DateTime.Now;
+
+                        pedido.situacao = Situacao.Faturado;
+
+                        Console.WriteLine("Número do pedido: " + pedido.numero.ToString());
+                        Console.WriteLine("Número do pedido: " + pedido.dataHora.ToString());
+                        Console.WriteLine("Número do pedido: " + pedido.situacao );
+
+                    }
+                }
+
+    . Reference Types - armazenam apenas a referência do objeto. 
+        Os tipos de referência são: class, interface, delegate, object, string e Array.
+
+        . Tipo object: todos os tipos são derivados da classe Object, sendo assim é possível 
+            converter qualquer tipo para object.
+
+        . Tipo string: é utilizado para se armazenar caracteres e uma string deve estar entre aspas
+
+        Exemplos:
+
+            string nome = "DevMedia";
+            tipo[] nomeDoArray = {item, item, item};
+
+            string[] array = {"Quadrado", "Círculo", "Triângulo", "Retângulo"};
+            string forma =  array[2];
+
+    . Constantes:
+
+        Exemplo: const double medida = 10.5;
+
+    . Ao invés de declarar o tipo da variável é possivel declarar com o tipo "var", onde o tipo da variável
+        será determinado pelo seu conteúdo:
+
+        var nome = "Marco";
+        var idade = 54;
+        var casado = true;
+
+    . Quando for utilizar variáveis em classes deve obedecer os modificadores de acesso como abaixo:
+
+        Modificador	            Funcionamento
+        -----------             -------------
+        public	                O acesso não é restrito.
+        protected	            O acesso é limitado às classes ou tipos derivados daclasse que a variável está.
+        Internal	            O acesso é limitado ao conjunto de módulos(assembly) corrente.
+        protected internal	    O acesso é limitado ao conjunto corrente ou tipos derivados da classe recipiente.
+        private	                O acesso é limitado à classe que a variável está.
+
+
+Aula 26. Operadores Aritméticos
+-------------------------------
+
+    Operador Aritmético	    Descrição
+    -------------------     ---------
+        +	                Adição
+        -	                Subtração
+        *	                Multiplicação
+        /	                Divisão
+        %	                Módulo (resto da divisão)
+
+    Exemplos:
+
+        int a = 5, b = 10, c = 15, d = 20; // declaramos quatro variáveis do tipo int
+        Console.WriteLine(a + d); // operação de soma
+        Console.WriteLine(c - a); // operação de subtração
+        Console.WriteLine(b * c); // operação de multiplicação
+        Console.WriteLine(d / b); // operação de divisão
+        Console.WriteLine(c % b); // operação de módulo (resto de divisão)
+        Console.ReadKey();
+
+    . Operadores Aritméticos de Atribuição Reduzida
+
+        Operador Aritmético	    Descrição
+        -------------------     ---------
+            + =	                mais igual
+            - =	                menos igual
+            * =	                vezes igual
+            / =	                dividido igual
+            % =	                módulo igual
+
+        Exemplos:
+
+            int x = 5;
+            x += 5; // é a mesma coisa que x = x + 5
+            Console.WriteLine("Valor do x = " + x);
+            Console.ReadKey();
+
+    . Operadores incrementais e decrementais
+
+        (++)    Incremento
+        (--)    Decremento
+
+        Exemplo:
+
+            Console.WriteLine("Pré-Incremento:\n");
+
+            int x = 0;
+            Console.WriteLine("x = " + x);
+
+            Console.WriteLine("\n++x +20 = \n");
+            Console.WriteLine(++x +20 + "\n");
+
+            Console.WriteLine("\nPós-Incremento:\n");
+            x = 0;
+
+            Console.WriteLine("\nx++ +20 = \n");
+            Console.WriteLine(x++ + 20 + "\n");
+
+            Console.WriteLine("\nPré-Decremento:\n");
+            x = 0;
+
+            Console.WriteLine("x = " + x);
+
+            Console.WriteLine("\n--x +20 = \n");
+            Console.WriteLine(--x + 20 + "\n");
+
+            Console.WriteLine("\nPós-Decremento:\n");
+            x = 0;
+
+            Console.WriteLine("\nx-- +20 = \n");
+            Console.WriteLine(x-- + 20 + "\n");
+
+            Console.ReadKey();
+
+    . Operadores Relacionais
+
+        Operador Relacional	        Descrição
+        -------------------         ---------
+                ==	                Igual a
+                !=	                Diferente de
+                >	                Maior que
+                <	                Menor que
+                >=	                Maior do que ou igual a
+                <=	                Menor do que ou igual a
+
+        Exemplo:
+
+            int a = 10, b = 25, c = 50, d = 100; // declaramos quatro variáveis de tipo int
+
+            Console.WriteLine(a == d); // avaliamos a igualdade entre a e d
+            Console.WriteLine(b != c);  // avaliamos a desigualdade entre b e c
+            Console.WriteLine(a > b); // avaliamos se a é maior que b
+            Console.WriteLine(c < d);  // avaliamos se c é menor que d
+            Console.WriteLine(c >= a); // avaliamos se c é maior ou igual que a
+            Console.WriteLine(d <= b); // avaliamos se d é menor ou igual que b
+
+            Console.ReadKey();
+
+
+    . Operadores Lógicos
+
+        Operador Lógico	        Descrição
+        ---------------         ---------
+        &&	                    AND = E
+        ||	                    OR = Ou
+        !	                    NOT = Não
+
+        Exemplo:
+
+            int a = 5, b = 10, c = 15, d = 20; // declaramos quatro variáveis do tipo int
+
+            Console.WriteLine(a == 5 && d == 10); // avaliamos se a é igual a 5 e se d é igual a 10
+            Console.WriteLine(c < b || d == 20); // avaliamos se c é menor que b ou se d é igual a 20
+            Console.WriteLine(! (b > a)); // negamos que b é maior que a
+
+            Console.ReadKey();
+
+    . Operadores Ternários
+
+        . O operador ternário é composto por três operandos separados pelos sinais ? e : e tem o 
+            objetivo de atribuir o valor a uma variável de acordo com o resultado de um teste lógico. 
+            A sintaxe dele é: teste lógico ? valor se verdadeiro : valor se falso;
+
+        . Exemplo
+
+            int x = 5, y = 10; // declaradas duas variáveis de tipo int
+
+            Console.WriteLine(x < y ? "sim" : "não"); // expressão x < y é avaliada
+            // se for verdadeira exibe "sim"
+            // se não for verdadeira exibe "não"
+            Console.ReadKey();
+
+
+Aula 30. If/Else (Se/Senão)
+---------------------------
+
+    Exemplo 1
+
+        double media = 8;
+        if (media >= 7)
+        {
+            Console.WriteLine("Aluno aprovado!");
+        }
+        else if (media < 7 && media >=5)
+        {
+            Console.WriteLine("Aluno em recuperação!");
+        }
+        else
+        {
+            Console.WriteLine("Aluno reprovado!");
+        }
+
+    Exemplo 2
+
+        double media = 8;
+        string resultado = "Olá aluno, você foi ";
+        resultado += media >= 7 ? "aprovado." : "reprovado.";
+        Console.WriteLine(resultado);
+
+
+Aula 31. For (Para Cada)
+------------------------
+
+    Exemplo 1
+
+        for (int contador = 0; contador < 5; contador++)
+        {
+            Console.WriteLine(contador);
+        }
+
+    Exemplo 2
+
+        string[] nomes = { “André”, “Bruna”, “Carla”, “Daniel” };
+
+        foreach (string nome in nomes)
+        {
+            Console.WriteLine(nome);
+        }
+
+
+Aula 32. While...Continue...Break (Enquanto)
+--------------------------------------------
+
+    Exemplo 1
+
+       int a = 10;
+         
+         /* do loop execution */
+         do {
+            Console.WriteLine("value of a: {0}", a);
+            a = a + 1;
+         } 
+         while (a < 20);
+
+         Console.ReadLine();
+
+    Exemplo 2: while / break
+
+        int i = 1;
+        while (i < 10)
+        {
+            if(i == 5)
+                break;
+                
+            Console.WriteLine(i);
+            i++;
+        }
+
+    Exemplo 3: while / continue
+
+        int i = 0;
+        while(i < 10){
+            i++;
+            
+            if(i %2 == 0)
+                continue;
+            
+            Console.WriteLine(i);
+        }
+
+
+Aula 33. Switch...Case (Caso)
+-----------------------------
+
+    Exemplo
+
+        switch (mes)
+        {
+            case "Janeiro":
+            case "Março":
+            case "Maio":
+            case "Julho":
+            case "Agosto":
+            case "Outubro":
+            case "Dezembro":
+                                Console.WriteLine("Este mês tem 31 dias");
+                                break;
+            case "Fevereiro":
+                                Console.WriteLine("Este mês tem 28 ou 29 dias");
+                                break;
+            default:
+                                Console.WriteLine("Este mês tem 30 dias");
+                                break;
+        }
+
