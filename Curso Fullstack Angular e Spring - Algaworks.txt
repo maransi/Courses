@@ -2320,7 +2320,7 @@ Aula 6.6. Renovando o access token com o refresh token
         key                             value
         ----                            -----
         grant_type                      refresh_token
-        refresh_token                   [ access_token adquirido no passo anterior de obtenção do refresh_token ]
+        refresh_token                   [ access_token adquirido no passo anterior de obtenção do refresh_token que veio no cookie]
 
     . Dê um send, copie o novo access_token obtido com a requisição acima e utilize para executar a requisição abaixo:
 
@@ -3853,6 +3853,14 @@ Aula 07.02. Profiles do Spring
 
     . Acesse as propriedades da resposta e verifique o conteúdo da propriedade Secure, ela estará como false.
 
+    . Inclua temporariamente a propriedade abaixo no arquivo application.properties, levante novamente a aplicação, solicite um novo access e verifique as 
+        propriedades da resposta. Observe que não veio nenhum cookie, algo que deve ocorrer na produção, deixando o 
+        cookie invisivel.
+
+        algamoney.seguranca.enable-htpps=true
+
+    . Apague a propriedade acima do arquivo application.properties
+
     . Altere a propriedade abaixo do arquivo application-prod.properties para:
     
         algamoney.seguranca.enable-htpps=true
@@ -4006,7 +4014,7 @@ Aula 07.05. Nome do usuário no token JWT
         import org.springframework.security.oauth2.provider.OAuth2Authentication;
         import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 
-        import com.example.algamoney.api.security.UsuarioSistema;
+        import com.example.algamoneyapi.security.UsuarioSistema;
 
         public class CustomTokenEnhancer implements TokenEnhancer {
 
@@ -4053,7 +4061,7 @@ Aula 07.05. Nome do usuário no token JWT
         import org.springframework.security.core.GrantedAuthority;
         import org.springframework.security.core.userdetails.User;
 
-        import com.example.algamoney.api.model.Usuario;
+        import com.example.algamoneyapi.model.Usuario;
 
         public class UsuarioSistema extends User {
 
@@ -4185,3 +4193,9 @@ Aula 07.06. Alternando OAuth 2 e Basic Security com profiles
     . Execute a URL e veja se a resposta veio com sucesso:
 
     
+    * Rever a aula e tentar descobrir porque não estou conseguindo acessar pelo Basic Auth como no passo anterior
+    * A classe OAuthSecurityConfig não está presente no projeto da Algaworks, para retirar ela do meu projeto
+        será preciso copiar o método "authenticationManager" para outra classe
+        * Rever a aula para encontrar onde foi colocada e onde foi retirada.
+    * No projeto da Algaworks a classe ResourceServerConfig está anotada com @Profile("oauth-security") 
+        rever a aula e tentar descobrir se isto foi realmente inserido 

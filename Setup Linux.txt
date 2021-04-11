@@ -878,7 +878,8 @@ sudo apt install net-tools
 		Tecla de atalho                 Descrição
 		--------------					----------
 		Ctrl + Y					Apagar linha
-		Ctrl + N					Realiza busca de arquivo
+		Ctrl + N					Busca de classes no projeto
+		Ctrl + Shift + N			Busca de arquivos no projeto
 		Shift + Esc					Maximiza o editor em focu
 		Alt + Insert				Generate ( Getter, Setter, Constructor, etc )
 		Shift + F6					Selecione uma expressão (variavel, metodo, etc) para fazer o refactoring no código
@@ -912,6 +913,25 @@ sudo apt install net-tools
 
 		. If the SDK is installed on your computer, but not defined in the IDE, select Add SDK | 'SDK name', 
 			and specify the path to the SDK home directory.
+
+	. Configuração do Devtools:
+
+		. Coloque a depedência abaixo no pom.xlm do projeto
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-devtools</artifactId>
+				<scope>runtime</scope>
+			</dependency>
+
+	. Acesse File / Settings / build,execution,deployment. / Compiler. e habilite a propriedade "build project automatically"
+
+	. Acione Ctrl + Shift + A e digite Registry
+
+	. Localize compiler.automaker.allow.when.app.running e habilite.
+
+	. Levante a aplicação, faça qualquer alteração e verifique depois de 7 seg se a aplicação recompilou sozinha.
+
 
 
 
