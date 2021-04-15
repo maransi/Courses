@@ -2940,7 +2940,8 @@ Aula 06.11. Movendo o usuário para o banco de dados
 
     . Ainda no arquivo ResourceServerConfig implemente o método abaixo:
 
-        @Bean
+        // @Bean            // O @Bean foi comentado devido a problemas mais a frente com as aulas o @Profile. Devido ao metodo ser declarado em mais de um
+        //                      lugar, o projeto não levanta. Até este ponto pode ser usado, mas qdo for criado a classe BasicSecurityConfig vai parar
         public PasswordEncoder passwordEncoder() {
             return new BCryptPasswordEncoder();
         }
@@ -4134,14 +4135,18 @@ Aula 07.06. Alternando OAuth 2 e Basic Security com profiles
             @Override
             protected void configure(HttpSecurity http) throws Exception {
                 http.authorizeRequests()
-                    .anyRequest().authenticated()
-                    .and()
-                    .httpBasic()
-                    .and()
-                    .sessionManagement()
+                        .antMatchers("/h2/**").permitAll()
+                        .antMatchers("/h2-console/**").permitAll()
+                        .anyRequest().authenticated().and()
+                        .headers().frameOptions().sameOrigin().and()
+                        .httpBasic()
+                        .and()
+                        .sessionManagement()
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
-                    .csrf().disable();
+                        .and()
+                        .csrf().ignoringAntMatchers("/h2-console/**").and()
+                        .csrf().ignoringAntMatchers("/h2/**").and()
+                        .csrf().disable();
             }
             
         }
@@ -4155,6 +4160,24 @@ Aula 07.06. Alternando OAuth 2 e Basic Security com profiles
         @Configuration
         @EnableAuthorizationServer
         public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+        ...
+
+    . Na classe ResourceServerConfig coloque a annotation @Profile como abaixo:
+
+        @Profile("oauth-security")
+        @Configuration
+        @EnableWebSecurity
+        @EnableResourceServer
+        @EnableGlobalMethodSecurity( prePostEnabled=true)
+        public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+        ...
+
+    . Na classe OAuthSecurityConfig coloque a annotation @Profile como abaixo:
+    
+        @Profile("oauth-security")      // Linha incluida
+        @Configuration
+        @EnableWebSecurity
+        public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
         ...
 
     . Para configurar qual tipo de token queremos basta configurar no application.properties
