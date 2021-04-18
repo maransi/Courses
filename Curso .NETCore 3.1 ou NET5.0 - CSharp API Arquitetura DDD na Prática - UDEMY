@@ -205,6 +205,18 @@ Aula 24. Tipos Primitivos
                 double	        -1.79769313486232e308 ..1.79769313486232e308
                 decimal	        -79228162514264337593543950335..79228162514264337593543950335
                 char	        U+0000 .. U+ffff
+                string
+                bool
+
+            Exemplos:
+
+                int myNum = 5;
+                long myNum = 15000000000L;
+                double myDoubleNum = 5.99D;
+                float myNum = 5.75F;
+                char myLetter = 'D';
+                bool myBool = true;
+                string myText = "Hello";            
 
         . Enum:  permite criar um tipo que é formado por várias constante
 
@@ -569,4 +581,140 @@ Aula 33. Switch...Case (Caso)
                                 Console.WriteLine("Este mês tem 30 dias");
                                 break;
         }
+
+
+Aula 35. Configurar Visual Studio Code para .NETCore
+----------------------------------------------------
+
+    . Acesse File / Preferences / Settings
+
+    . Digite C#
+
+    . Acesse "C# Configuration / CSharp Format Enabled" e habilite a configuração
+
+    . Digite "Format on save" e habilite a configuração
+
+    . Digite "Final" e habilite a configuração "Files: Insert final newline" e habilite a configuração
+
+
+Aula 36. .NET Core Command-Line Interface (CLI)    
+-----------------------------------------------
+
+    . Digite no terminal "dotnet --info" para apresentar informações variadas da instação do dotnet
+
+    . Digite no terminal "dotnet new" irá apresentar as várias possibilidades de criar diversos projetos, exemplo:
+
+        dotnet new mvc
+
+        dotnet run
+
+        #Acesse o navegador e digite a URL: https://localhost:5001/ para ver o resultado do projeto criado.
+
+    . Ctrl + C no terminal acaba com a execução do projeto:
+
+https://www.infoq.com/br/articles/netcore-cli/    
+
+
+
+Aula 37. Instalar pacotes através do Nuget.org
+----------------------------------------------
+
+    . Ao ser compilada, uma biblioteca gera um arquivo DLL. Será esta DLL que os outros projetos irão utilizar. 
+        O NuGet aproveita desta característica da plataforma para definir seus pacotes.
+
+    . Na prática, um pacote NuGet é um arquivo compactado com a extensão .nupkg que contém um código compilado (DLL), 
+        outros arquivos relacionados a este código (como imagens, etc.) e um arquivo de configuração que contém 
+        informações sobre o pacote, como: número de versão, criador, etc.
+
+    . Estes pacotes .nupkg podem ser publicados em repositórios públicos ou privados, onde os desenvolvedores podem 
+        consumi-los, adicionando-os em seus projetos e utilizando no código as funcionalidades que fornecerem.
+
+    . Em se tratando de projeto, como se fosse as dependências de bibliotecas.
+
+    . Acesse o site nuget.org, digite "Microsoft Entity Framework Core" e faça a pesquisa.
+
+    . Acesse o item Microsoft.EntityFrameworkCore.
+
+    . Acesse uma das versões, atualmente 5.0.5.
+    
+    . Acesse a aba .NetCli.
+
+    . Copie o comando sugerido por esse caminho:
+
+        dotnet add package Microsoft.EntityFrameworkCore --version 5.0.5
+
+    . Acesse o terminal, vá na pasta do projeto e execute o comando acima. Cuidado é necessário acessar a pasta do projeto
+        e não da solução, exemplo: ~/workspace-two/CSharpBasico/helloWorld.
+
+
+    . Após a execução, no terminal, execute um dos comandos abaixo:
+
+        dotnet restore
+
+        ou
+
+        dotnet build
+
+    . Acesse o Visual Studio Code "code ." para entrar no projeto e acesse o arquivo com extensão "*.csproj". Podemos verificar 
+        que agora temos o pacote dentro da aplicação:
+
+        <ItemGroup>
+            <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+        </ItemGroup>
+
+    . Retorne ao Home do site nuget.org e digite "Pomelo Entity Framework core" e acesse o link do MySQL.
+
+    . Acesse a aba "PackageReference" e copie o comando sugerido:
+
+    . Acesse novamente o arquivo com a extensão *.csproj e insira a dependência copiada dentro do nó "ItemGroup":
+
+        <ItemGroup>
+            <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+            <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />    
+        </ItemGroup>
+
+    . Salve o conteúdo do arquivo, o VsCode irá pedir para dar o "Restore", confirme o restore.
+
+    . Se quiser podemos dar o "dotnet restore", ou o "dotnet build", no terminal.
+
+    . Caso haja a necessidade de retirar alguma dependência do nó "ItemGroup", acesse o terminal, e execute os comandos abaixo:
+
+        dotnet clean
+        dotnet restore
+
+
+Aula 39. Entity Framework Core
+------------------------------
+
+    . Entity Framework Core - EF é um ORM (Mapeador de Objeto Relacional), permite que os desenvolvedores trabalhem com um banco 
+        de dados usando objetos em .Net, eliminando uma grande parte de código de acesso aos dados, como:
+
+        SELECT, INSERT, UPDATE e DELETE
+        WHERE 
+        ORDER BY
+
+Aula 40. API e Micro Service
+---------------------------
+
+    . API - Quando você desenvolve um sistema completo utilizando o mesmo banco de dados. Exemplo: Faturamento, estoque, vendas, etc.
+        tudo no mesmo projeto. Você irá subir esta aplicação em uma instância e consegue escalar aumentando recursos. 
+
+        . De uma perspectiva técnica, as APIs geralmente enviam dados por meio de solicitações HTTP. Estas retornam um arquivo de texto, 
+            normalmente no formato JSON, que os desenvolvedores podem usar como quiserem. Os tipos de estilos de design da API incluem REST, 
+            SOAP, GraphQL, gRPC e outros. Muitos usam formatos de especificação como OpenAPI, RAML ou AsyncAPI para definir interações de 
+            API amigáveis para máquinas e humanos.
+
+    . Micro Service - Quando você desenvolve um sistema distribuido utilizando vários banco de dados. Exemplo: 
+
+        Faturamento, podemos criar um microservice e um banco de dados.
+        Estoque, idem
+
+        Neste caso conseguimos colocar cada microservice em instâncias difrentes e até mesmo escrever em linguagens diferentes e bancos
+        diferentes.
+
+        Caso precisemos que as aplicações se comuniquem, criaremos um orquestrador.
+
+    
+
+
 
