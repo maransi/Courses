@@ -825,10 +825,249 @@ Aula 44. Dica de como alterar a versão do AspNetCore em um novo Projeto
     . Veja que o <TargetFramework> está configurado automaticamente para o SDK 3.1
 
     
+Aula 45. Criar a Solution
+-------------------------
+
+    . Solução Asp.NET Core
+
+        . SLN (Solution File)
+
+        . A solução é apenas um container de um ou mais projetos relacionados, juntamente com informações
+            de build.
+
+            dotnet new --name <<nome>>
+
+Aula 46. Aplicação (Application) - Criar e Adicionar uma Aplicação Web API
+--------------------------------------------------------------------------
+
+    . Acesse nosso diretório de projetos e crie as pastas abaixo:
+
+        mkdir curso_api_netcore
+        mkdir curso_api_netcore/src
+        cd curso_api_netcore/src
+
+    . Dentro da pasta curso_api_netcore/src crie a solução como abaixo:
+
+        dotnet new sln --name API
 
 
+    . Acesse o code e dentro da pasta curso_api_netcore/src crie o arquivo global.json
+
+    . Coloque o conteúdo abaixo no arquivo global.json:
+
+        {
+            "sdk" : {
+                "version" : "3.1.408"
+            }     
+
+        }
+
+
+    . Dentro da pasta curso_api_netcore/src crie a solution:
+
+        dotnet new webapi -n application -o Api.Application --no-https
+
+    . Adicinar o projeto criado no passo anterior a solution:
+
+        . Acesse a pasta curso_api_netcore/src
+
+        . Digite o comando abaixo para realizar a associação:
+
+            dotnet sln add Api.Application
+
+    . Na pasta curso_api_netcore/src faça um build:
+
+        dotnet build
+
+    . Dentro da pasta src acesse o VSCode, ao entrar ele irá fazer uma pergunta para colocar o build e o debug no projeto,
+        responda "Yes"
+
+        code .
+
+        . Ao responder "Yes", o VSCode ira criar uma pasta do projeto .vscode. Dentro desta pasta teremos dois arquivos
+            ( launch.json e tasks.json). Esses arquivos criados automaticamente tem as configurações para depuração.
+
+        . Podemos acessar a execução do projeto do icone com triângulo na barra vertical do VSCode, que surgira a "Side Bar".
+            Neste ponto surgirá os botões de execução do projeto. 
+
+        . Execute o projeto e no navegador execute a URL abaixo:
+
+            http://localhost:5000/WeatherForecast
 
     
+    . Pare a aplicação, e elimine os arquivos abaixo do projeto:
+
+        /WeatherForecast.cs
+        Controllers/WeatherForecastController.cs
+        
+    . No VSCode acesse a opção Terminal / Run Task... e escolha a opção "build"
+
+
+
+Aula 47. Domínio (Domain) - Criar e Adicionar na Solution
+---------------------------------------------------------
+
+    . Acesse a pasta /src do seu projeto
+
+    . Digite o comanda abaixo para verificar as opções do comando "classlib":
+
+        dotnet new classlib --help
+
+    . Digite o comando abaixo para criar a classlib:
+
+        dotnet new classlib -n Domain -o Api.Domain -f netcoreapp3.1
+
+    . Dentro da pasta "src" digite o comando abaixo para adicionar a pasta "Api.Domain" a solution:
+
+        dotnet sln add ./Api.Domain/
+
+        dotnet restore
+
+    . Acesse a pasta Api.Domain e apague a classe Classe1.cs
+
+    . Digite o comando abaixo:
+
+        dotnet build
+
+    . Opções para o comando abaixo "Ctrl+Shift+B", ou acesse a opção "Terminal / Run Build Task"
+
+
+
+Aula 48. Infra Estrutura (Cross Cutting) - Criar e Adicionar na Solution     
+------------------------------------------------------------------------
+
+    . Cross Cutting é uma parte do projeto para conter bibliotecas de classes utilitárias 
+        comum ao projeto para que possam ser reutilizadas em todo o projeto, exemplo: segurança,
+        logging, caching, Authorization, Error handling and Auditing.
+
+    . Acesse a pasta source e digite o comando abaixo:
+
+        dotnet new classlib -n CrossCutting -f netcoreapp3.1 -o Api.CrossCutting
+
+    . Dentro da pasta "src" adicone a pasta CrossCutting a solution:
+
+        dotnet sln add ./Api.CrossCutting/
+
+        dotnet build
+
+    . Acesse a pasta Api.CrossCutting e apague a classe Classe1
+
+    
+Aula 49. Infra Estrutura (Data) - Criar e Adicionar na Solution
+----------------------------------------------------------------
+
+    . Acessar a pasta src e digitar o comando abaixo:
+
+        dotnet new classlib -n Data -f netcoreapp3.1 -o Api.Data
+
+    . Dentro da pasta "src" adicone a pasta CrossCutting a solution:
+
+        dotnet sln add ./Api.Data/
+
+    . Acesse a pasta Api.Data e apague a classe Classe1
+
+    . Digite o comando abaixo:
+
+        dotnet build
+
+
+Aula 50. Serviço (Service) - Criar e Adicionar na Solution
+----------------------------------------------------------
+
+    . Acessar a pasta src e digitar o comando abaixo:
+
+        dotnet new classlib -n Service -f netcoreapp3.1 -o Api.Service
+
+    . Dentro da pasta "src" adicone a pasta CrossCutting a solution:
+
+        dotnet sln add ./Api.Service/
+
+    . Acesse a pasta Api.Service e apague a classe Classe1
+
+    . Digite o comando abaixo:
+
+        dotnet build
+
+
+Aula 51. Overview da Arquitetura
+--------------------------------
+
+    . Através da classe Startup.cs do projeto Api.Application que a execução do projeto 
+        começa.
+
+    . Todos os projetos estão associados a solution, no arquivo API.sln
+
+
+
+Aula 52. Api.Domain - Implementação BaseEntity
+----------------------------------------------
+
+    . No VSCode, clique com o botão direito sobre a pasta Api.Domain e crie as folder abaixo:
+
+        Entities
+        Interfaces
+
+    . No VSCode, clique com o botão direito sobre a pasta Api.Domain.Entities e crie uma nova classe
+        com o nome de "BaseEntity".
+
+    . Dentro das chave da classe "BaseEntity" digite "prop" e tecle tab para criar uma propriedade.
+
+        public Guid id { get; set; }
+
+    . ABaixo da propriedade criada acima digite "propfull" e crie a propriedade abaixo:
+
+        private DateTime? _createAt;
+        public DateTime? CreateAt
+        {       
+            get { return _createAt;_} 
+            set { _createAt  =  (value == null? DateTime.Utc : value); }
+        }
+
+        // O símbolo de interrogação é para dizer que a propriedade pode aceite null
+
+    . ABaixo da propriedade criada acima digite "prop" e crie a propriedade abaixo:
+
+        public DateTime? UpdateAt { get; set; }
+
+    . Na propriedade Id coloque a annotation [Key]:
+
+        [Key]
+        public Guid id { get; set; }
+
+    . Deixe a classe BaseEntity como abstract:
+
+        public abstract class BaseEntity
+        {
+
+    . No final a classe deverá ficar como abaixo:
+
+        using System;
+        using System.ComponentModel.DataAnnotations;
+
+        namespace Api.Domain.Entities
+        {
+            public abstract class BaseEntity
+            {
+                [Key]
+                public Guid id { get; set; }
+
+                private DateTime? _createAt;
+                public DateTime? CreateAt
+                {       
+                    get { return _createAt; } 
+                    set { _createAt  =  (value == null? DateTime.UtcNow : value); }
+                }
+                
+                public DateTime? UpdateAt { get; set; }
+
+            }
+        }
+
+
+
+
+
+
 
 
 
