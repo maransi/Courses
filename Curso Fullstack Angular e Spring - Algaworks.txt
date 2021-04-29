@@ -3648,6 +3648,12 @@ TODO: ver como funcionaria a páginação e o filtro para esse método
 Aula 07.02. Profiles do Spring
 ------------------------------
 
+    . Atenção: Foi verificado que o método da classe "AlgamoneyApiProperty.Seguranca.isEnableHttps" que consta no curso, 
+        não funciona. Este método deve ser alterado para "AlgamoneyApiProperty.Seguranca.getEnableHttps", caso contrário
+        as configurações nos arquivos *.properties não funcionará. É obrigatório que qq parâmetro incluido no 
+        application*.properties deverá ter um correspondente com getter/setter na classe de propriedade, sem isso o conteúdo
+        não é atribuido ao objeto injetado.
+
     . Alterar algumas propriedades das classes que estão "hardcode". A primeira seria na classe TokenResource:
 
 
@@ -3677,11 +3683,14 @@ Aula 07.02. Profiles do Spring
         package com.example.algamoneyapi.config.property;
 
         import org.springframework.boot.context.properties.ConfigurationProperties;
+        import org.springframework.context.annotation.Profile;
+        import org.springframework.context.annotation.PropertySource;
+        import org.springframework.stereotype.Component;
 
-        @ConfigurationProperties("algamoney")  
+        @ConfigurationProperties("algamoney")
         public class AlgamoneyApiProperty {
 
-            private String originPermitida = "http://localhost:8000";
+            private String originPermitida; // = "http://localhost:8000";
 
             private final Seguranca seguranca = new Seguranca();
 
@@ -3701,7 +3710,7 @@ Aula 07.02. Profiles do Spring
 
                 private boolean enableHttps;        // O default é false, por isso não é colocado nenhum valor
 
-                public boolean isEnableHttps() {
+                public boolean getEnableHttps() {
                     return enableHttps;
                 }
 
@@ -3712,6 +3721,7 @@ Aula 07.02. Profiles do Spring
             }
 
         }
+
 
     . Para utilizar a anotation @ConfigurationProperties é necessário inserir a dependência abaixo no pom.xml:
 
@@ -3757,7 +3767,7 @@ Aula 07.02. Profiles do Spring
             public void revoke(HttpServletRequest req, HttpServletResponse resp) {
                 Cookie cookie = new Cookie("refreshToken", null);
                 cookie.setHttpOnly(true);
-                cookie.setSecure(algamoneyApiProperty.getSeguranca().isEnableHttps());
+                cookie.setSecure(algamoneyApiProperty.getSeguranca().getEnableHttps());
                 cookie.setPath(req.getContextPath() + "/oauth/token");
                 cookie.setMaxAge(0);
                 
@@ -3854,11 +3864,16 @@ Aula 07.02. Profiles do Spring
 
     . Acesse as propriedades da resposta e verifique o conteúdo da propriedade Secure, ela estará como false.
 
-    . Inclua temporariamente a propriedade abaixo no arquivo application.properties, levante novamente a aplicação, solicite um novo access e verifique as 
-        propriedades da resposta. Observe que não veio nenhum cookie, algo que deve ocorrer na produção, deixando o 
-        cookie invisivel.
+    . Inclua temporariamente a propriedade abaixo no arquivo application.properties, levante novamente a aplicação, 
+        solicite um novo access e verifique as propriedades da resposta. Observe que *** NÃO VIRÁ NENHUM COOKIE ***, 
+        algo que deverá ocorrer na produção, deixando o cookie invisivel.
 
         algamoney.seguranca.enable-htpps=true
+
+        ou
+
+        algamoney.seguranca.enableHtpps=true
+
 
     . Apague a propriedade acima do arquivo application.properties
 
@@ -4196,6 +4211,8 @@ Aula 07.06. Alternando OAuth 2 e Basic Security com profiles
     . Crie uma nova URL no Postman 
 
         localhost:8080/lancamentos?resumo
+
+        Authoritation.Type : No Auth
 
         Header.Authorization : Bearer [Token obtido no item anterior]
 

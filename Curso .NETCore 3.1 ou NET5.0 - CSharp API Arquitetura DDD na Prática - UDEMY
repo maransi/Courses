@@ -1064,10 +1064,82 @@ Aula 52. Api.Domain - Implementação BaseEntity
         }
 
 
+Aula 53. Api.Domain - Implementação UserEntity
+----------------------------------------------
+
+    . Acesse a pasta Api.Domain.Entities e crie a classe UserEntity.cs como abaixo:
+
+        namespace Api.Domain.Entities
+        {
+            public class UserEntity : BaseEntity
+            {
+
+                public string Nome { get; set; }
+
+                public string email { get; set; }
+                
+            }
+        }
 
 
 
+Aula 54. Api.Data - Instalação dos Pacotes (NuGet) para o Entity FrameWorkCore
+------------------------------------------------------------------------------
 
+    . Acesse a página https://www.nuget.org 
 
+    . Pesquise as libraries abaixo e acesse o link de cada pesquisa. Para cada pesquisa, acesse a 
+        aba PackageReference, copie a instrução de referência e cole-a dentro do arquivo Api.Data.Data.csproj
+        
+        . Importante selecione sempre a última versão da 3.x
 
+        . Importante, adicione dentro do arquivo Data.csproj a tag abaixo para inserir as referências.
 
+            <ItemGroup>
+                ...
+            </ItemGroup>
+
+        . Pesquisa das libraries:
+
+            Pesquisa : EntityFrameworkCore.SqlServer
+            link : Microsoft.EntityFrameworkCore.SqlServer 
+            reference : <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.14" />
+
+            Pesquisa : Pomelo.EntityFrameworkCore.MySql
+            link : Pomelo.EntityFrameworkCore.MySql 
+            reference : <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.2" />
+
+            Pesquisa : Microsoft.EntityFrameworkCore.Tools
+            link : Microsoft.EntityFrameworkCore.Tools
+            reference : 
+                        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.14">
+                            <PrivateAssets>all</PrivateAssets>
+                            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+                        </PackageReference>
+            observacao : SELECIONE DE PREFERENCIA SEMPRE A MESMA VERSION DA REFERENCIA SQLSERVER
+
+            Pesquisa : Microsoft.EntityFrameworkCore.Design
+            link : Microsoft.EntityFrameworkCore.Design
+            reference : 
+                        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.14">
+                            <PrivateAssets>all</PrivateAssets>
+                            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+                        </PackageReference>
+    
+    . Acesse a pasta /src/Api.Data e execute os comandos abaixo:
+
+        dotnet restore
+
+        dotnet tool install --global dotnet-ef
+
+        dotnet ef  # Verificação se a ferramenta foi instalada com sucesso
+
+    . Digite os comandos abaixo:
+
+        dotnet restore
+
+        dotnet build
+
+    . Verifique se depois do "build" a aplicação compilou com zero erro.
+
+    
