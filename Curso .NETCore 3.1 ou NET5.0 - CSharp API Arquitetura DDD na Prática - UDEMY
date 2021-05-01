@@ -1142,4 +1142,40 @@ Aula 54. Api.Data - Instalação dos Pacotes (NuGet) para o Entity FrameWorkCore
 
     . Verifique se depois do "build" a aplicação compilou com zero erro.
 
-    
+
+
+Aula 55. Api.Data - Criar MyContext e Referenciar Api.Data com Api.Domain
+-------------------------------------------------------------------------
+
+    . Dentro da pasta Api.Data crie as pastas abaixo:
+
+        Content
+        Mapping
+        Repository
+
+    . No terminal e na pasta src faça a referência da pasta Api.Domain para a pasta Api.Data.
+
+        dotnet add ./Api.Data/ reference ./Api.Domain/
+
+        . Verifique no arquivo ./Api.Data/Data.csproj se existe uma referência ao projeto Api.Domain
+
+    . Crie a classe MyContext.cs dentro da pasta ./Api.Data/Context como abaixo. O contexto que fará a conexão
+        com o banco de dados.
+
+        using Api.Domain.Entities;
+        using Microsoft.EntityFrameworkCore;
+
+        namespace Api.Data.Content
+        {
+            public class MyContext : DbContext
+            {
+
+            public DbSet<UserEntity> Users { get; set; }
+
+                public MyContext(DbContext<MyContext> options) : base(options){  }
+
+                protected override void OnModelCreating(ModelBuilder modelBuilder){
+                    base.OnModelCreating(modelBuilder);
+                }
+            }
+        }

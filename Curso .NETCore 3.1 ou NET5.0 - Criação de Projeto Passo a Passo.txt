@@ -1,0 +1,243 @@
+
+. Crie as pastas abaixo:
+
+        mkdir cursoApiNetcore
+        mkdir cursoApiNetcore/src
+        cd cursoApiNetcore
+
+. Dentro da pasta src execute o comando abaixo:
+
+        cd src
+        
+        dotnet new sln --name API
+
+. Acesse o VSCode na pasta raiz do projeto:
+
+        cd cursoApiNetcore/src
+
+        code .
+
+. Crie o arquivo global.json na pasta src com o conteúdo abaixo:
+
+        {
+                "sdk" : {
+                "version" : "3.1.408"
+                }     
+
+        }
+
+
+. Dentro da pasta src execute o comando abaixo:
+
+        cd cursoApiNetcore/src
+
+        dotnet new webapi -n application -o Api.Application --no-https
+
+        dotnet sln add Api.Application
+
+        dotnet build
+
+. Dentro da pasta src acesse o VSCode, ao entrar ele irá fazer uma pergunta para colocar o build e o debug no projeto,
+        responda "Yes"
+
+        code .
+
+. Ao responder "Yes", o VSCode ira criar uma pasta do projeto .vscode. Dentro desta pasta teremos dois arquivos
+        ( launch.json e tasks.json). Esses arquivos criados automaticamente tem as configurações para depuração.
+
+. Podemos acessar a execução do projeto do icone com triângulo na barra vertical do VSCode, que surgira a "Side Bar".
+            Neste ponto surgirá os botões de execução do projeto. 
+
+        . Execute o projeto e no navegador execute a URL abaixo:
+
+            http://localhost:5000/WeatherForecast
+
+. Acesse a pasta /src do seu projeto
+
+. Digite o comando abaixo para criar a classlib:
+
+        dotnet new classlib -n Domain -o Api.Domain -f netcoreapp3.1
+
+. Dentro da pasta "src" digite o comando abaixo para adicionar a pasta "Api.Domain" a solution:
+
+        dotnet sln add ./Api.Domain/
+
+        dotnet restore
+
+. Acesse a pasta Api.Domain e apague a classe Classe1.cs
+
+. Digite o comando abaixo:
+
+        dotnet build
+
+. Opções para o comando abaixo "Ctrl+Shift+B", ou acesse a opção "Terminal / Run Build Task"
+
+
+
+
+. Acesse a pasta source e digite o comando abaixo:
+
+        cd src
+
+        dotnet new classlib -n CrossCutting -f netcoreapp3.1 -o Api.CrossCutting
+
+. Dentro da pasta "src" adicone a pasta CrossCutting a solution:
+
+        dotnet sln add ./Api.CrossCutting/
+
+
+. Acesse a pasta Api.CrossCutting e apague a classe Classe1
+
+        dotnet build
+
+
+
+
+. Acessar a pasta src e digitar o comando abaixo:
+
+        cd src
+
+        dotnet new classlib -n Data -f netcoreapp3.1 -o Api.Data
+
+. Dentro da pasta "src" adicone a pasta CrossCutting a solution:
+
+        dotnet sln add ./Api.Data/
+
+. Acesse a pasta Api.Data e apague a classe Classe1
+
+. Digite o comando abaixo:
+
+        dotnet build
+
+
+
+. Acessar a pasta src e digitar o comando abaixo:
+
+        dotnet new classlib -n Service -f netcoreapp3.1 -o Api.Service
+
+. Dentro da pasta "src" adicone a pasta CrossCutting a solution:
+
+        dotnet sln add ./Api.Service/
+
+. Acesse a pasta Api.Service e apague a classe Classe1
+
+. Digite o comando abaixo:
+
+        dotnet build
+
+
+
+
+. No VSCode, clique com o botão direito sobre a pasta Api.Domain e crie as folder abaixo:
+
+        Entities
+        Interfaces
+
+. No VSCode, clique com o botão direito sobre a pasta Api.Domain.Entities e crie uma nova classe
+        com o nome de "BaseEntity" e com o conteúdo abaixo:
+
+        using System;
+        using System.ComponentModel.DataAnnotations;
+
+        namespace Api.Domain.Entities
+        {
+            public abstract class BaseEntity
+            {
+                [Key]
+                public Guid id { get; set; }
+
+                private DateTime? _createAt;
+                public DateTime? CreateAt
+                {       
+                    get { return _createAt; } 
+                    set { _createAt  =  (value == null? DateTime.UtcNow : value); }
+                }
+                
+                public DateTime? UpdateAt { get; set; }
+
+            }
+        }
+
+
+
+. Acesse a pasta Api.Domain.Entities e crie a classe UserEntity.cs como abaixo:
+
+        namespace Api.Domain.Entities
+        {
+            public class UserEntity : BaseEntity
+            {
+
+                public string Nome { get; set; }
+
+                public string email { get; set; }
+                
+            }
+        }
+
+. Inclua a tag abaixo no arquivo Api.Data.Data.csproj:
+
+        <ItemGroup>
+                <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.14" />
+
+                <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.2" />
+
+                <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.14">
+                        <PrivateAssets>all</PrivateAssets>
+                        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+                </PackageReference>
+        
+                <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.14">
+                        <PrivateAssets>all</PrivateAssets>
+                        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+                </PackageReference>
+
+        </ItemGroup>
+
+
+
+. Acesse a pasta /src/Api.Data e execute os comandos abaixo:
+
+        dotnet restore
+
+        dotnet tool install --global dotnet-ef
+
+        dotnet ef  # Verificação se a ferramenta foi instalada com sucesso
+
+        dotnet build
+
+. Verifique se depois do "build" a aplicação compilou com zero erro.
+
+
+
+. Dentro da pasta Api.Data crie as pastas abaixo:
+
+        Content
+        Mapping
+        Repository
+
+. No terminal e na pasta src faça a referência da pasta Api.Domain para a pasta Api.Data.
+
+        dotnet add ./Api.Data/ reference ./Api.Domain/
+
+        . Verifique no arquivo ./Api.Data/Data.csproj se existe uma referência ao projeto Api.Domain
+
+. Crie a classe MyContext.cs dentro da pasta ./Api.Data/Context como abaixo. O contexto que fará a conexão
+        com o banco de dados.
+
+        using Api.Domain.Entities;
+        using Microsoft.EntityFrameworkCore;
+
+        namespace Api.Data.Content
+        {
+            public class MyContext : DbContext
+            {
+
+            public DbSet<UserEntity> Users { get; set; }
+
+                public MyContext(DbContext<MyContext> options) : base(options){  }
+
+                protected override void OnModelCreating(ModelBuilder modelBuilder){
+                    base.OnModelCreating(modelBuilder);
+                }
+            }
+        }
