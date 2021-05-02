@@ -1179,3 +1179,31 @@ Aula 55. Api.Data - Criar MyContext e Referenciar Api.Data com Api.Domain
                 }
             }
         }
+
+Aula 56. Api.Data - Criar ContextFactory
+----------------------------------------
+
+
+. Criar a classe ContextFactory como abaixo:
+
+    using Microsoft.EntityFrameworkCore.Design;
+    using Microsoft.EntityFrameworkCore;
+
+    namespace Api.Data.Content
+    {
+        public class ContextFactory : IDesignTimeDbContextFactory<MyContext>
+        {
+            
+            public MyContext CreateDbContext( string[] args ){
+                var connectionString = "Server=localhost;Port=3306;Database=desenv;Uid=marco;Pwd=brasil2";
+                var optionBuilder = new DbContextOptionsBuilder<MyContext>();
+
+                optionBuilder.UseMySql( connectionString );
+
+
+                throw new System.NotImplementedException();
+            }
+
+
+        }
+    }
