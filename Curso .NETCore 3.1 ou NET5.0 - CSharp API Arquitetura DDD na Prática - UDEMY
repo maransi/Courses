@@ -1032,7 +1032,7 @@ Aula 52. Api.Domain - Implementação BaseEntity
     . Na propriedade Id coloque a annotation [Key]:
 
         [Key]
-        public Guid id { get; set; }
+        public Guid Id { get; set; }
 
     . Deixe a classe BaseEntity como abstract:
 
@@ -1049,7 +1049,7 @@ Aula 52. Api.Domain - Implementação BaseEntity
             public abstract class BaseEntity
             {
                 [Key]
-                public Guid id { get; set; }
+                public Guid Id { get; set; }
 
                 private DateTime? _createAt;
                 public DateTime? CreateAt
@@ -1076,7 +1076,7 @@ Aula 53. Api.Domain - Implementação UserEntity
 
                 public string Nome { get; set; }
 
-                public string email { get; set; }
+                public string Email { get; set; }
                 
             }
         }
@@ -1201,9 +1201,244 @@ Aula 56. Api.Data - Criar ContextFactory
                 optionBuilder.UseMySql( connectionString );
 
 
-                throw new System.NotImplementedException();
+                return new MyContext(optionBuilder.Options);
             }
 
 
         }
     }
+
+
+
+Aula 57. Api.Data - Criar UserMap
+---------------------------------
+
+     Crie na pasta "mapping" a classe "UserMap" como abaixo:
+
+        using Api.Domain.Entities;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+        namespace Api.Data.Mapping
+        {
+            public class UserMap : IEntityTypeConfiguration<UserEntity>
+            {
+                public void Configure(EntityTypeBuilder<UserEntity> builder)
+                {
+
+                    builder.ToTable("User");
+
+                    builder.HasKey( u => u.Id );
+
+                    builder.HasIndex( u => u.Email )
+                        .IsUnique();
+
+                    builder.Property( u => u.Name )
+                            .IsRequered()
+                            .HasMaxLength(60);
+
+                    builder.Property( u => u.Email )
+                            .HasMaxLength(100);
+
+
+
+
+                }
+            }
+        }
+
+
+    . Acesse a classe Api.Data.Content.MyContext.cs e altere o método "OnModelCreating" como abaixo:
+
+        . Inclua a criação da tabela com o comando abaixo:
+
+            modelBuilder.Entity<UserEntity>( new UserMap().Configure );
+
+        . O método ficará da seguinte forma:
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder){
+                base.OnModelCreating(modelBuilder);
+
+                modelBuilder.Entity<UserEntity>( new UserMap().Configure );
+            }
+
+
+
+Aula 58. Api.Data - Criar Migrações e Atualização no Banco de Dados
+-------------------------------------------------------------------
+
+
+    . Resumo do funcionamento do Entity Framework:
+
+        . O plugin "EF" responsável pelo ORM do .NET Core está registrado dentro do projeto Api.Data. 
+        
+        . Para saber a versão do "EF" do projeto digito o comando abaixo:
+
+            dotnet ef --version
+
+            # Para saber mais detalhes do comando dotnet ef digite o comando abaixo
+            dotnet ef --help
+
+        . Sequência de execução do ORM .NET Core:
+
+            1. Criamos a classe Entity "UserEntity" que extende a classe BaseEntity. Quando formos criar a 
+                tabela no banco de dados ela será criada com os mesmos campos das propriedades dessas classes.
+
+                namespace Api.Domain.Entities
+                {
+                    public class UserEntity : BaseEntity
+                    {
+
+                        public string Nome { get; set; }
+
+                        public string Email { get; set; }
+                        
+                    }
+                }
+
+                ....
+
+                using System;
+                using System.ComponentModel.DataAnnotations;
+
+                namespace Api.Domain.Entities
+                {
+                    public abstract class BaseEntity
+                    {
+                        [Key]
+                        public Guid Id { get; set; }
+
+                        private DateTime? _createAt;
+                        public DateTime? CreateAt
+                        {
+                            get { return _createAt; }
+                            set { _createAt = (value == null ? DateTime.UtcNow : value); }
+                        }
+
+                        public DateTime? UpdateAt { get; set; }
+
+                    }
+                }
+
+            2. Dentro da classe MyContext.cs adicionamos a propriedade abaixo fazendo referência a classe Entity
+
+                public class MyContext : DbContext{
+
+                    public DbSet<UserEntity> Users{ get; set }
+
+                    ...
+                }
+
+            3. Dentro da mesma classe é feito a criação da tabela pela classe através do modelBuilder:
+
+                public class MyContext : DbContext{
+
+                    ...
+
+                    protected override void OnModelCreating( ModelBuilder modelBuilder){
+
+                        base.OnModelCreating(modelBuilder);
+
+                        modelBuilder.Entity<UserEntity>(new UserMap().Configure);
+
+                    }
+                }
+
+            4. A classe map auxilia ainda mais a configuração da classe Entity definindo tamanho do campo, obrigatoriedade, 
+                indice, etc.
+
+                using Api.Domain.Entities;
+                using Microsoft.EntityFrameworkCore;
+                using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+                namespace Api.Data.Mapping
+                {
+                    public class UserMap : IEntityTypeConfiguration<UserEntity>
+                    {
+                        public void Configure(EntityTypeBuilder<UserEntity> builder)
+                        {
+
+                            builder.ToTable("User");
+
+                            builder.HasKey(u => u.Id);
+
+                            builder.HasIndex(u => u.Email)
+                                    .IsUnique();
+
+                            builder.Property(u => u.Nome)
+                                    .IsRequired()
+                                    .HasMaxLength(60);
+
+                            builder.Property(u => u.Email)
+                                    .HasMaxLength(100);
+                        }
+                    }
+                }
+
+            5. A classe ContextFactory faz a conexão com o banco:
+
+                using Microsoft.EntityFrameworkCore.Design;
+                using Microsoft.EntityFrameworkCore;
+
+                namespace Api.Data.Content
+                {
+                    public class ContextFactory : IDesignTimeDbContextFactory<MyContext>
+                    {
+                        
+                        public MyContext CreateDbContext( string[] args ){
+                            var connectionString = "Server=localhost;Port=3306;Database=desenv;Uid=marco;Pwd=brasil2";
+                            var optionBuilder = new DbContextOptionsBuilder<MyContext>();
+
+                            optionBuilder.UseMySql( connectionString );
+
+
+                            throw new System.NotImplementedException();
+                        }
+
+
+                    }
+                }
+
+    . Para que todas essas classes funcionem em conjunto e crie a tabela no banco temos que criar as classes "migration" com o
+        comando abaixo. Isto na pasta raiz Api.Data:
+
+        # UserMigrations é o nome que é data para a migração
+        dotnet ef migrations add UserMigration
+
+    . Para criar as novas tabelas no banco utilizaremos o comando abaixo, que usará as classes migrations para isso:
+
+        donet ef database update
+
+
+
+Aula 59. Api.Domain - Criar a Interface de Repository (IRepository)    
+-------------------------------------------------------------------
+
+    . Crie a interface abaixo em Api.Domain.Interfaces
+
+        using System;
+        using System.Collections.Generic;
+        using System.Threading.Tasks;
+        using Api.Domain.Entities;
+
+        namespace Api.Domain.Interfaces
+        {
+            public interface IRepository<T> where T : BaseEntity
+            {
+                Task<T> InsertAsync( T item);
+
+                Task<T> UpdateAsync( T item);
+
+                Task<T> DeletAsync(Guid id);
+
+                Task<T> SelectAsync( Guid id);
+
+                Task<IEnumerable<T>> SelectAsync();
+                    
+            }
+        }
+
+
+Aula 60. Api.Data - Repositório Genérico Método InsertAsync
+-----------------------------------------------------------
+

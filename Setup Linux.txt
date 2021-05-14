@@ -313,6 +313,29 @@ https://jdk.java.net/15/
 	. No "Location" insira "http://download.emmet.io/eclipse/updates/"
 
 
+. Instalação do Lombok
+
+	. Acesse a página do Lombok e faça download do arquivo lombok.jar
+
+	. Acesse o terminal e o local onde foi descarregado o jar e execute o comando abaixo:
+
+		java -jar lombok.jar	
+
+	. Informe o local onde o Eclipse está instalado e pressione o botão "Install/Update"
+
+	. Nos projetos Maven adicione a dependência abaixo:
+
+		<dependencies>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.10</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+
+
+
 . Acesse Windows -> Preferences -> Java -> Installed JREs -> Edit
 
     Escolha a pasta onde encontra-se a instação do JRE
@@ -847,8 +870,7 @@ sudo apt install net-tools
 
 	For example, to extract it to the recommended /opt directory, run the following command:
 
-	$
-	sudo tar -xzf ideaIU.tar.gz -C /opt
+	$ sudo tar -xzf ideaIU.tar.gz -C /opt
 	Copied!
 	Do not extract the tarball over an existing installation to avoid conflicts. Always extract it to a clean directory.
 
@@ -934,7 +956,21 @@ sudo apt install net-tools
 
 	. Levante a aplicação, faça qualquer alteração e verifique depois de 7 seg se a aplicação recompilou sozinha.
 
+	. Configuração do Lombok:
 
+		. Acesse a opção Files | Settings | Build, Execution, Deployment | Compiler | Annotation Processors 
+
+		. Marque as opções abaixo:
+
+			. Enable annotation processing box is checked
+			. Obtain processors from project classpath option is selected		
+
+		. Acesse a opção Files | Settings | Plugins, localize o plugin Lombok e faça a instalação.
+
+		. Confira se o plugins foi instalado com sucesso na opção "Installed".
+
+		. Faça o restart do IDE.
+		
 
 
 29. Instalação do Tweak

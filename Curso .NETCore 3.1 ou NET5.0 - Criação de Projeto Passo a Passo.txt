@@ -144,7 +144,7 @@
             public abstract class BaseEntity
             {
                 [Key]
-                public Guid id { get; set; }
+                public Guid Id { get; set; }
 
                 private DateTime? _createAt;
                 public DateTime? CreateAt
@@ -169,7 +169,7 @@
 
                 public string Nome { get; set; }
 
-                public string email { get; set; }
+                public string Email { get; set; }
                 
             }
         }
@@ -259,7 +259,7 @@
                 optionBuilder.UseMySql( connectionString );
 
 
-                throw new System.NotImplementedException();
+                return new MyContext(optionBuilder.Options);
             }
 
 
@@ -267,7 +267,89 @@
     }
 
 
+. Crie na pasta "mapping" a classe "UserMap" como abaixo:
 
--- Parei na aula 57
+        using Api.Domain.Entities;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+        namespace Api.Data.Mapping
+        {
+                public class UserMap : IEntityTypeConfiguration<UserEntity>
+                {
+                        public void Configure(EntityTypeBuilder<UserEntity> builder)
+                        {
+
+                                builder.ToTable("User");
+
+                                builder.HasKey( u => u.Id );
+
+                                builder.HasIndex( u => u.Email )
+                                .IsUnique();
+
+                                builder.Property( u => u.Name )
+                                        .IsRequered()
+                                        .HasMaxLength(60);
+
+                                builder.Property( u => u.Email )
+                                        .HasMaxLength(100);
+                        }
+                }
+        }
+
+
+. Acesse a classe Api.Data.Content.MyContext.cs e altere o método "OnModelCreating" como abaixo:
+
+        using Api.Data.Mapping;
+        using Api.Domain.Entities;
+        using Microsoft.EntityFrameworkCore;
+
+        namespace Api.Data.Content  {
+                public class MyContext : DbContext
+                {
+
+                        public DbSet<UserEntity> Users { get; set; }
+
+                        public MyContext(DbContextOptions<MyContext> options) : base(options){  }
+
+                        protected override void OnModelCreating(ModelBuilder modelBuilder){
+                                base.OnModelCreating(modelBuilder);
+
+                                modelBuilder.Entity<UserEntity>( new UserMap().Configure );     // Linha incluída
+                        
+                        }
+                }
+        }
+
+. Na pasta raiz Api.Data digite os comandos abaixo para criação das tabelas no banco de dados:
+
+        # UserMigrations é o nome que é data para a migração
+        dotnet ef migrations add UserMigration
+
+        donet ef database update
+
+. Crie a interface abaixo em Api.Domain.Interfaces
+
+        using System;
+        using System.Collections.Generic;
+        using System.Threading.Tasks;
+        using Api.Domain.Entities;
+
+        namespace Api.Domain.Interfaces
+        {
+        public interface IRepository<T> where T : BaseEntity
+        {
+                Task<T> InsertAsync( T item);
+
+                Task<T> UpdateAsync( T item);
+
+                Task<T> DeletAsync(Guid id);
+
+                Task<T> SelectAsync( Guid id);
+
+                Task<IEnumerable<T>> SelectAsync();
+                
+        }
+        }
+        
 
