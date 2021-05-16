@@ -337,19 +337,95 @@
 
         namespace Api.Domain.Interfaces
         {
-        public interface IRepository<T> where T : BaseEntity
+                public interface IRepository<T> where T : BaseEntity
+                {
+                        Task<T> InsertAsync( T item);
+
+                        Task<T> UpdateAsync( T item);
+
+                        Task<bool> DeleteAsync(Guid id);
+
+                        Task<T> SelectAsync( Guid id);
+
+                        Task<IEnumerable<T>> SelectAsync();
+                        
+                }
+        }
+
+. Crie dentro da pasta Api.Data.Repository a classe BaseRepository como abaixo:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Threading.Tasks;
+        using Api.Data.Content;
+        using Api.Domain.Entities;
+        using Api.Domain.Interfaces;
+        using Microsoft.EntityFrameworkCore;
+
+        namespace Api.Data.Repository
         {
-                Task<T> InsertAsync( T item);
+            public class BaseRepository<T> : IRepository<T> where T : BaseEntity
+            {
+                protected readonly MyContext _context;
 
-                Task<T> UpdateAsync( T item);
+                private DbSet<T> _dataSet;
 
-                Task<T> DeletAsync(Guid id);
+                public BaseRepository(MyContext context)
+                {
+                    _context = context;
+                    _dataSet = _context.Set<T>();
 
-                Task<T> SelectAsync( Guid id);
+                }
 
-                Task<IEnumerable<T>> SelectAsync();
-                
+
+
+                public Task<bool> DeleteAsync(Guid id)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public async Task<T> InsertAsync(T item)
+                {
+                    try
+                    {
+                        if (item.Id == Guid.Empty)
+                        {
+                            item.Id = Guid.NewGuid();
+                        }
+
+                        item.CreateAt = DateTime.UtcNow;
+
+                        _dataSet.Add( item );
+
+                        await _context.SaveChangesAsync();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        
+                        throw ex;
+                    }
+
+                    return item;
+
+                }
+
+                public Task<T> SelectAsync(Guid id)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public Task<IEnumerable<T>> SelectAsync()
+                {
+                    throw new NotImplementedException();
+                }
+
+                public Task<T> UpdateAsync(T item)
+                {
+                    throw new NotImplementedException();
+                }
+            }
         }
-        }
-        
+
+
 
