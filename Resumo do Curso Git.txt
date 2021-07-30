@@ -231,6 +231,40 @@ Github em linha de comando:
 
             $ git pull
 
+        . Outra forma de atualizar o repositorio:
+
+            . Tenha um repositório próprio em dois diretórios diferentes.
+
+            . Faça uma alteração e um commit em um dos diretórios e em seguida dê git push.
+
+            . No outro repositório faça um fetch seguido de um diff:
+
+                $ git fetch
+                $ git diff origin/master
+
+            . Você vai ver as diferenças entre o seu código local e o código remoto (que na verdade 
+                agora está em sua máquina graças ao fetch), com a alteração que acabou de ser feita, 
+                sem que o código local seja alterado.
+
+            . Esta é uma forma segura de atualizar o espelho do repositório remoto em seu repositório 
+                local sem fazer merge.
+
+            . Para ter a versão remota em sua "área de trabalho", você ainda precisará fazer "merge" deste commit. 
+                E isso é feito automaticamente no caso do git pull:
+
+                $ git pull
+
+            . O comando git pull existe por ser uma forma mais semântica e simples de "puxar" o código, mas na 
+                realidade ele simplesmente acaba executando fetch e em seguida merge. Ex:
+
+                $ git fetch
+                $ git merge origin/master
+
+            . No código acima temos a referência de "origin/master" que nada mais é do que a uma referência à cópia da branch 
+                "master" obtida através de git fetch em "origin", que é um atalho ao repositório remoto.
+
+
+
     . Atualizar os arquivos no repositorio do github:
 
         # Se o arquivo for novo, ou seja, é a primeira vez que ele irá para o git
