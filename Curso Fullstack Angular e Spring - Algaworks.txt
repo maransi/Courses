@@ -261,9 +261,15 @@ Aula 3.6. Cadastrando nova categoria com POST
                                 HttpServletResponse response) {
                 Categoria categoriaSalva = categoriaRepository.save(categoria);
                 
+                // Para montar a URL da categoria criada
+                //
+                // ServletUriComponentsBuilder.fromCurrentRequestUri() -> Retorna a requisição atual
+                // .path("/{codigo}").buildAndExpand(categoriaSalva.getCodigo()).toUri() -> Adiciona o código 
                 URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
                             .buildAndExpand(categoriaSalva.getCodigo()).toUri();
-                
+
+
+                // Adiciona a URL no header na resposta da requisição
                 response.setHeader("Location", uri.toASCIIString());
                 
                 return ResponseEntity.created(uri).body(categoriaSalva);
@@ -282,7 +288,7 @@ Aula 3.6. Cadastrando nova categoria com POST
             Body.raw : { "nome" : "Impostos" }
             Body.JSON
 
-        . No method POST verifique o resultado Body.Pretty e Headers.Location
+        . Na resposta do method POST, no Postman, verifique o resultado Body.Pretty e Headers.Location
 
 
         . adicione o Method POST na Collection de URLs. 
@@ -295,16 +301,16 @@ Aula 03.07. Desafio Retornar 404 caso não exista a categoria
     . Atualize o metodo findById pelo abaixo:
 
         @GetMapping(path = "{codigo}")
-        public ResponseEntity<?> findById(@PathVariable Long codigo) {
+        public ResponseEntity<?> findById(@PathVariable Long codigo, HttpServletResponse response) {
             try {
-                Optional<Categoria> categoria = categoriaRepository.findById(codigo);
+                Categoria categoria = categoriaRepository.findById(codigo).orElseThrow( () -> new Exception("Categoria Inexistente")  );
 
                 URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("")
                         .buildAndExpand(categoria.getCodigo()).toUri();
 
                 response.setHeader("Location", uri.toASCIIString());
 
-                return categoria.isPresent() ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
+                return ResponseEntity.ok(categoria);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().body(e.getMessage());
             }
