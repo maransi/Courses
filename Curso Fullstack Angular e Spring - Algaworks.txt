@@ -745,6 +745,10 @@ Aula 03.12. Usando eventos para adicionar header Location
 
     }
 
+. Implemente a propriedade abaixo na classe PessoaResource:
+
+	@Autowired
+	private ApplicationEventPublisher publisher;
 
 . Alterar o metodo POST:
 
@@ -820,6 +824,11 @@ Aula 04.01. Removendo pessoa com DELETE
 
 Aula 4.3. Atualizando pessoa com PUT
 ------------------------------------
+
+    . Inclua a propriedade abaixo na classe PessoaResource:
+
+        @Autowired
+        private CategoriaService categoriaService;
 
     . Inclua o método abaixo na classe PessoaResource:
 
