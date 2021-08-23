@@ -1808,12 +1808,15 @@ Aula 6.1. Implementando autenticação Basic
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.authorizeRequests()
-                    .antMatchers("/categoria/api").permitAll()
-                    .anyRequest().authenticated()
-                    .and()
-                .httpBasic().and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .csrf().disable();
+                    .antMatchers("/categoria/api/**").permitAll()
+                    .antMatchers("/h2/**").permitAll()
+                    .antMatchers("/h2-console/**").permitAll()
+                    .anyRequest().authenticated().and()
+                    .headers().frameOptions().sameOrigin().and()
+                    .httpBasic().and()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                    .csrf().ignoringAntMatchers("/h2-console/**").and()
+                    .csrf().disable();
         }
         
     }
@@ -1828,7 +1831,7 @@ Aula 6.1. Implementando autenticação Basic
 . Execute o link das categorias:
 
     Method : GET
-    URL : http://localhost:8080/categoria/api/
+    URL : http://localhost:8080/categoria/api
 
     Method : GET
     URL : http://localhost:8080/categoria/api/1
@@ -1836,7 +1839,7 @@ Aula 6.1. Implementando autenticação Basic
     . Os links da categoria tem que funcionar pois tem a permissão para isso na configuração:
 
         http.authorizeRequests()
-                .antMatchers("/categorias").permitAll()
+                .antMatchers("/categoria/api/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .httpBasic().and()
@@ -1844,7 +1847,7 @@ Aula 6.1. Implementando autenticação Basic
             .csrf().disable();
 
 . Retorne ao Postman, no link do lancamento. Acesse as configurações Authentication; escolha o type "Basic Auth";
-    coloque no Username : admin e Password : aa; e acione o botão "Update Request".
+    coloque no Username : admin e Password : admin; e acione o botão "Update Request".
 
     . Na aba Headers observe que foi colocado um parâmetro com o nome de Authorization com um valor
 
@@ -1896,10 +1899,16 @@ http://websystique.com/spring-security/secure-spring-rest-api-using-basic-authen
                 
                 http.csrf().disable()
                     .authorizeRequests()
-                    .antMatchers("/categoria/api").permitAll()          // Qq um poderá acessar esse contexto 
+                    .antMatchers("/categoria/api/**").permitAll()          // Qq um poderá acessar esse contexto 
                     .antMatchers("/lancamento/**").hasRole("ROLE")      // Somente usuários com esta role poderá acessar esse contexto
-                    .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
-                    .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);		 
+                    .antMatchers("/h2/**").permitAll()
+                    .antMatchers("/h2-console/**").permitAll()
+                    .anyRequest().authenticated().and()
+                    .headers().frameOptions().sameOrigin().and()
+                    .httpBasic().and()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                    .csrf().ignoringAntMatchers("/h2-console/**").and()
+                    .csrf().disable();
             }
 
             @Bean
