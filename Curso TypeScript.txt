@@ -51,3 +51,215 @@ Aula 1 a 5
     . Execute conforme abaixo:
 
         nodejs HelloWorld
+
+
+Aula 2.1. Declaração de variáveis (var, let e const)
+----------------------------------------------------
+
+    . Configurações no VSCode:
+
+        . Crie uma pasta e crie o arquivo  tsconfig.json com o conteúdo abaixo:
+
+            {
+                "compileOptions" : {
+                    target := "es5"
+                }
+            }
+
+        . Esse arquivo especifica os arquivos raiz e as configurações de compilação necessárias para o projeto.
+            No caso acima declarou a compatibilidade com a versão 5 do javascript
+
+        . Dentro do VSCode acione Ctrl + Shift + P (Command Pallete...)
+
+        . Localize "Configure Task Runner"
+
+        . Escolha a opção "TypeScript - Watch Mode". Opção que fica observando se houve alguma alteração no fonte e
+            caso ocorra, é feito a compilação automaticamente.
+
+        . Digite F1 e escolha a opção "Run Build Task". Ao termino desses procedimentos a transcompilação ficará automática.
+            Basta irmos no terminal, ou no output para ver o resultado da transcompilação.
+
+    . Programa exemplo:
+
+        function iniciarTime( iniciaJogo : Boolean ){
+            var nome = 'Messi e amigos';
+
+            // Qdo utilizamos "var" p/declarar uma variável, na transcompilação
+            // o Typescript gera o arquivo js com a declaração da variável no topo do bloco
+            // e deixa no lugar inicialmente declarado, abaixo, somente a inserção do conteúdo
+            //
+            // var nome = 'Messi...';
+            // var cidade;
+            // ...
+            // if...{
+            //      cidade = 'Em Uberlândia';
+            // }
+            //  
+            if (iniciaJogo){
+                var cidade = 'Em Uberlândia';   
+            }
+
+            console.log('${nome} vão jogar ${cidade});
+        }
+
+        iniciarTime(true);
+    
+    . Caso utilizemos o "let" para declarar as variáveis no lugar do "var" o código acima
+        não irá compilar. O "let" não consegui levar a declaração das variáveis para o inicio
+        do bloco como é o caso do "var". Nesse caso devemos fazer a declaração com o "let"
+        no inicio do bloco e depois armazenar o valor que queremos na variável:
+
+        function iniciaJogo( iniciaJogo : Boolean ){
+            let nome = 'Mess...';
+            let cidade;
+
+            if (iniciaJogo){
+                cidade = 'Em Uberlândia';
+            }
+
+            ...
+        }
+
+    . No caso do "const" seria a declaração de uma variável constante, imutável.
+
+Aula 2.2 - Tipos básicos
+------------------------
+
+    Data        type	    Keyword	Description
+    ----        ----        -------------------
+    Number	    number	    Double precision 64-bit floating point values. It can be 
+                            used to represent both, integers and fractions.
+    String	    string	    Represents a sequence of Unicode characters
+    Boolean	    boolean	    Represents logical values, true and false
+    Void	    void	    Used on function return types to represent non-returning 
+                            functions
+    Null	    null	    Represents an intentional absence of an object value.
+    Undefined	undefined   Denotes value given to all uninitialized variables
+
+    Exemplos:
+
+        // number
+        let idade : number = 20;
+        let valor : number = 29.99;
+
+        // string
+        let empresa : string = 'Algaworks';
+        let nome : string = 'Marco';
+
+        console.log('Olá, meu nome é ${nome} e tenho ${idade} anos');
+
+        // arrays
+        let notas : number[] = [0,1,2,3,4,5];
+
+        console.log(notas[0]);
+
+        //
+        let nums:number[] = [1,2,3,3] 
+
+        console.log(nums[0]); 
+        console.log(nums[1]); 
+        console.log(nums[2]); 
+        console.log(nums[3]);
+
+        //
+        let pontos : number[] = new Array(4)  
+
+        for(var i = 0;i<pontos.length;i++) { 
+            pontos[i] = i * 2; 
+            console.log(pontos[i]) ;
+        }
+
+        //
+        let names:string[] = new Array("Mary","Tom","Jack","Jill") 
+
+        for(var i = 0;i<names.length;i++) { 
+            console.log(names[i]) 
+        }
+
+        // tuple
+        let alunos : [string, number, string] = ['Marco', 55, 'Matemática'];
+        console.log(alunos[0]); // 'Marco'
+        console.log(alunos[1])  // 55
+
+
+        // Enum
+        enum Cor {Verde, Amarelo, Azul, Branco};
+
+        let corFundo : Cor = Cor.Verde;
+
+        // Any
+        let algumValor : any = 4;
+        algumValor = 'Agora é uma string';
+        algumValor = true;
+
+        //
+        var j:any; 
+        var nums:number[] = [1001,1002,1003,1004] 
+
+        for(j in nums) { 
+            console.log(nums[j]) 
+        } 
+
+        // void
+        function alerta() : void {
+            ...
+        }
+
+        // null e undefined
+        let u : undefined = undefined;
+        let n : null = null;
+
+Aula 2.3. Inferência de Tipos
+-----------------------------
+
+    . Mesmo que cada local de armazenamento tenha um tipo estático no TypeScript, 
+        nem sempre é necessário especificá-lo explicitamente. O TypeScript geralmente 
+        pode inferir isso. Por exemplo, se você escrever:
+
+        // O TypeScript infere que x tem o tipo estático number.        
+        let x = 123;
+
+Aula 2.4. Arrays e Iterações
+----------------------------
+
+    let notasAlunos : number[] = [10,8,8.5,7];
+
+    // Com "in"
+    for ( let i in notasAlunos){
+        console.log(i);
+    }
+
+    // Com "of"
+    for ( let notaAluno of notasAlunos){
+        console.log(notaAluno);
+    }
+
+Aula 3.1. Classe e objetos
+--------------------------
+
+    . Um objeto padrão
+
+        var person = { 
+            FirstName:"Tom", 
+            LastName:"Hanks", 
+            sayHi: ()=>{ return "Hi"} 
+        };
+
+    . Trabalhando com interface:
+
+        interface IPerson { 
+            firstName:string, 
+            lastName:string, 
+            sayHi: ()=>string 
+        } ;
+
+        var customer:IPerson = { 
+            firstName:"Tom",
+            lastName:"Hanks", 
+            sayHi: ():string =>{return "Hi there"} 
+        };
+
+        console.log("Customer Object "); 
+        console.log(customer.firstName); 
+        console.log(customer.lastName); 
+        console.log(customer.sayHi());  
