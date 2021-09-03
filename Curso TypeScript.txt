@@ -263,3 +263,135 @@ Aula 3.1. Classe e objetos
         console.log(customer.firstName); 
         console.log(customer.lastName); 
         console.log(customer.sayHi());  
+
+
+Aula 3.3. Construindo a primeira Classe
+---------------------------------------
+
+    . Estrutura de uma classe:
+
+        class Cliente{
+            // Propriedades
+            nome : String;
+            idade : Number;
+
+            constructor( nome : String, idade : Number){
+                this.nome = nome;
+                this.idade = idade;
+            }
+
+            apresentar():String{
+                return 'Olá, eu sou ${this.nome} e tenho {$this.idade} anos';
+            }
+        }
+
+        let joao : Cliente = new Cliente('João', 18);
+
+        let apresentacao : String = joao.apresentar();
+
+        console.log(apresentacao);
+
+    . Algumas variações:
+
+        // Exemplo 1 - Extendendo classe
+        class Shape { 
+            Area:number 
+            
+            constructor(a:number) { 
+                this.Area = a 
+            } 
+        } 
+
+        class Circle extends Shape { 
+            disp():void { 
+                console.log("Area of the circle:  "+this.Area) 
+            } 
+        }
+        
+        var obj = new Circle(223); 
+        obj.disp()
+
+
+
+        // Exemplo 2 - Extendendo classes
+        class Root { 
+            str:string; 
+        } 
+
+        class Child extends Root {} 
+        class Leaf extends Child {} //indirectly inherits from Root by virtue of inheritance  
+
+        var obj = new Leaf(); 
+        obj.str ="hello";
+        console.log(obj.str);
+
+
+
+        // Exemplo 3 - Sobescrevendo método
+        class PrinterClass { 
+            doPrint():void {
+                console.log("doPrint() from Parent called…") 
+            } 
+        } 
+
+        class StringPrinter extends PrinterClass { 
+            doPrint():void { 
+                super.doPrint() 
+                console.log("doPrint() is printing a string…")
+            } 
+        } 
+
+        var obj = new StringPrinter() ;
+        obj.doPrint();
+
+
+
+
+        // Exemplo 4 - Propriedade e métodos estáticos
+        class StaticMem {  
+            static num:number; 
+            
+            static disp():void { 
+                console.log("The value of num is"+ StaticMem.num) 
+            } 
+        } 
+
+        StaticMem.num = 12;     // initialize the static variable 
+        StaticMem.disp();
+
+
+
+        // Exemplo 5 - Trabalhando com operador instanceOf
+        class Person{ } 
+
+        var obj = new Person();
+        
+        var isPerson = obj instanceof Person; 
+        
+        console.log(" obj is an instance of Person " + isPerson);
+
+
+    . Atributos de visibilidade das propriedades e métodos:
+
+        private
+        public
+        protected
+
+    . Implementação de interfaces:
+
+        interface ILoan { 
+            interest:number;
+        } 
+
+        class AgriLoan implements ILoan { 
+            interest:number ;
+            rebate:number;
+            
+            constructor(interest:number,rebate:number) { 
+                this.interest = interest;
+                this.rebate = rebate;
+            } 
+        } 
+
+        var obj = new AgriLoan(10,1) ;
+        console.log("Interest is : "+obj.interest+" Rebate is : "+obj.rebate );
