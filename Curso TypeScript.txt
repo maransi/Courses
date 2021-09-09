@@ -379,6 +379,8 @@ Aula 3.3. Construindo a primeira Classe
 
     . Implementação de interfaces:
 
+        // Exemplo 1
+
         interface ILoan { 
             interest:number;
         } 
@@ -395,3 +397,64 @@ Aula 3.3. Construindo a primeira Classe
 
         var obj = new AgriLoan(10,1) ;
         console.log("Interest is : "+obj.interest+" Rebate is : "+obj.rebate );
+
+
+
+        // Exemplo 2
+
+        interface IPerson { 
+        firstName:string, 
+        lastName:string, 
+        sayHi: ()=>string 
+        } 
+
+        var customer:IPerson = { 
+        firstName:"Tom",
+        lastName:"Hanks", 
+        sayHi: ():string =>{return "Hi there"} 
+        } 
+
+        console.log("Customer Object "); 
+        console.log(customer.firstName); 
+        console.log(customer.lastName); 
+        console.log(customer.sayHi());
+
+Aula 3.5 - Herança
+------------------
+
+    // Exemplo 1
+    class Funcionario{
+        nome : String;
+        salario : Number;
+
+        constructor( nome : String; salario : Number ){
+            this.nome = nome;
+            this.salario = salario;
+        }
+
+        pagarImposto( taxa : Number = 7.5 ){
+            console.log('Pagando ${this.salario * taxa / 100 } de imposto');
+        }
+
+    }
+
+    class Secretario extends Funcionario{
+
+    }
+
+    class Executivo extends Funcionario{
+        
+        pagarImposto( taxa : number = 27.5 ){
+            console.log('Executivo paga mais imposto!');
+
+            super.pagarImposto( taxa );
+        }
+    }
+
+    let sarah = new Secretario('Sarah', 5000 );
+    sarah.pagarImposto();
+
+    let jorge = new Executivo('Jorge', 30000 );
+    jorge.pagarImposto();
+
+    
