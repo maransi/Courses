@@ -377,47 +377,6 @@ Aula 3.3. Construindo a primeira Classe
         public
         protected
 
-    . Implementação de interfaces:
-
-        // Exemplo 1
-
-        interface ILoan { 
-            interest:number;
-        } 
-
-        class AgriLoan implements ILoan { 
-            interest:number ;
-            rebate:number;
-            
-            constructor(interest:number,rebate:number) { 
-                this.interest = interest;
-                this.rebate = rebate;
-            } 
-        } 
-
-        var obj = new AgriLoan(10,1) ;
-        console.log("Interest is : "+obj.interest+" Rebate is : "+obj.rebate );
-
-
-
-        // Exemplo 2
-
-        interface IPerson { 
-        firstName:string, 
-        lastName:string, 
-        sayHi: ()=>string 
-        } 
-
-        var customer:IPerson = { 
-        firstName:"Tom",
-        lastName:"Hanks", 
-        sayHi: ():string =>{return "Hi there"} 
-        } 
-
-        console.log("Customer Object "); 
-        console.log(customer.firstName); 
-        console.log(customer.lastName); 
-        console.log(customer.sayHi());
 
 Aula 3.5 - Herança
 ------------------
@@ -457,4 +416,117 @@ Aula 3.5 - Herança
     let jorge = new Executivo('Jorge', 30000 );
     jorge.pagarImposto();
 
-    
+
+Aulas 3.6 - Type vs Interfaces
+------------------------------    
+
+    . Implementação de interfaces:
+
+        // Exemplo 1
+
+        interface ILoan { 
+            interest:number;
+        } 
+
+        class AgriLoan implements ILoan { 
+            interest:number ;
+            rebate:number;
+            
+            constructor(interest:number,rebate:number) { 
+                this.interest = interest;
+                this.rebate = rebate;
+            } 
+        } 
+
+        var obj = new AgriLoan(10,1) ;
+        console.log("Interest is : "+obj.interest+" Rebate is : "+obj.rebate );
+
+
+
+        // Exemplo 2
+        interface Animal{
+            sex : 'male' | 'female';
+            hungry : boolean;
+        }
+
+        interface Mammal implements Animal{
+
+            weaned : boolean;
+
+        }
+
+        const animal : Mammal = {
+            hungry : false;
+            weaned : false;
+            sex : 'male';
+        }
+
+
+
+        // Exemplo 3
+
+        interface IPerson { 
+            firstName:string, 
+            lastName:string, 
+            sayHi: ()=>string 
+        } 
+
+        var customer:IPerson = { 
+            firstName:"Tom",
+            lastName:"Hanks", 
+            sayHi: ():string =>{return "Hi there"} 
+        } 
+
+        console.log("Customer Object "); 
+        console.log(customer.firstName); 
+        console.log(customer.lastName); 
+        console.log(customer.sayHi());
+
+    . Implementando Types:
+
+        type Height = number
+
+        type Width = number
+
+        // Type Aliases
+        type Size = {
+            width: Width
+            height: Height
+        };
+
+        type Color = "Black" | "White" | "Brown"
+
+        // Type Aliases
+        type Table = {
+            size: Size
+            color: Color
+            numberOfDrawers: 4 | 6
+        }
+
+    . Usando Type Aliases em objetos
+
+        type Product = { name: string, price: number };
+
+        let p: Product = {price: 100, name: 'Monitor'};
+
+        console.log(p);    
+
+    . Usando Type Aliases como function
+
+        // Exemplo 1
+        type StringRemover = (input: string, index: number) => string;
+
+        let remover: StringRemover = function (str: string, i: number): string {
+            return str.substring(i);
+        }
+
+        // Exemplo 2
+        type GreetMethod = (name : string) => string;
+
+        const greet = (name : string) => 'Hello ' + name;
+
+        ou 
+
+        type GreetMethod = (name : string) => string;
+
+        const greet : GreetMethod = function( name : string ) => 'Hello ' + name;
