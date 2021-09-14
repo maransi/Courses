@@ -4356,3 +4356,112 @@ Aula 8.7. Instalando e Criando um projeto angular CLI
         Angular Extension Pack 
         Material Icon
         
+
+Aula 8.8. Abrindo o projeto no VSCode
+-------------------------------------
+
+// Estrutura de pastas
+https://imasters.com.br/desenvolvimento/angular-cli-scaffold
+
+https://www.devmedia.com.br/angular-cli-como-criar-e-executar-um-projeto-angular/38246
+
+
+    . Estrutura de pastas dos projetos Angular:
+
+        Pasta	            Uso
+        -----               ---
+
+        e2e	                Testes end-to-end usando o Protractor.
+        node_modules	    Dependências do Node.JS necessárias no projeto.
+        src/app             Encontram-se todos os arquivos do projeto, como arquivos referentes aos 
+                            componentes, diretivas, filtros e módulos da aplicação
+        src/assets	        Recursos externos do projeto, como CSS, imagens, bibliotecas JavaScript, etc.
+        src/environments    Configuração dos ambientes da aplicação (desenvolvimento, produção, etc).
+
+
+    . Arquivos da pasta src/app:
+
+        . app.component.css: Arquivo responsável pelo estilo do nosso módulo. Com o Angular nós trabalhamos 
+          com os estilos separados para cada componente, assim conseguimos ter um desacoplamento de estilos. 
+          Nesse exemplo nós criamos um projeto com a extensão .css, mas também temos a possibilidade de 
+          trabalhar com arquivos Sass. Para que possamos alterar, basta executar o comando ng set 
+          defaults.styleExt scss, ele irá configurar para que os próximos componentes sejam criados 
+          com a extensão do .scss.
+
+        . app.component.html: Arquivo HTML do nosso componente App, segue o mesmo pensamento que os arquivos de 
+          estilo.
+
+        . app.component.spec.ts: Arquivo de teste do nosso componente.
+
+        . app.component.ts: Pensando em uma arquitetura MVC, esse arquivo teria as mesmas responsabilidades das 
+          nossas Controllers.
+
+        . app.module.ts: O Angular é um framework modular, ele precisa de um ou mais módulos para que possamos 
+          gerenciar os nossos componentes, esse módulo acaba sendo um default, mas podemos criar outros modules e 
+          chamar eles dentro dele.
+
+    . Arquivos da pasta src:
+
+        . index.html: Esse seria o nosso arquivo root, dentro dele rodamos a nossa SPA (Single Page Application).
+
+        . main.ts: Esse é o arquivo principal da nossa Solution. Ele vem definido dentro do nosso arquivo angular-cli.json,
+          esse seria o bootstrap da nossa aplicação.
+
+        . polyfills.ts: Esse arquivo funciona como um tradutor. Ex.: Nós precisamos utilizar algo novo do ES6, 
+          mas os nossos navegadores só conseguem entender o ES5, ele irá interpretar e passar o código corretamente 
+          para os nossos navegadores.
+
+        . styles.css: Como todos os nossos componentes tem o seu próprio arquivo .css ou .scss, nós podemos 
+          utilizar esse arquivo para criar algo global como variáveis para nossa aplicação.
+
+        . tsconfig.app.json e tsconfig.spec.json: são os nossos arquivos de configuração do TypeScript.
+
+        . typings.d.ts: Nesse arquivo nós podemos definir tipos para o typescript. Ex.: A utilização de um require.
+
+    . Pasta raiz do projeto:
+
+        . .gitignore: Arquivo do git que utilizamos para o gerenciamento dos arquivos que serão ignorados no momento do 
+          nosso commit.
+
+        . karma.config.js: O Karma é uma biblioteca utilizada para criação de testes unitários desenvolvida pela própria 
+          equipe do Angular.
+
+        . package.json: Esse arquivo é o responsável por gerenciar as dependências do nosso projeto, quando nós 
+          executamos o comando npm install, ele verifica os pacotes que estão dentro desse arquivo e baixa para o nosso 
+          diretório node_modules conforme foi visto no passo anterior.
+
+        . protractor.conf.js: Responsável pela execução dos nossos testes unitários que estão dentro do nosso diretório e2e.
+
+        . README.md: Arquivo Markdown para documentação da nossa aplicação.
+
+        . tsconfig.json: Arquivo de configuração do TypeScript.
+
+        . tslint.json: O tslint fica verificando se estamos escrevendo o nosso código corretamente, ele verifica a 
+          sintaxe do nosso projeto em tempo de execução e em caso de algum erro ou warning ele lança uma exception no console.    
+
+    . Acesse o arquivo src/app/app.component.ts e insira a propriedade "nome" como abaixo:
+
+        import { Component } from '@angular/core';
+
+        @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.css']
+        })
+        export class AppComponent {
+            title = 'app';
+            nome = 'Marco'
+        }
+
+
+    . Acesse o arquivo src/app/app.component.html e deixe o código como abaixo:
+
+        <h1>
+            Olá {{nome}}
+        </h1>
+
+    . Abra o terminal e execute o comando:
+
+        ng serve --open
+
+    
