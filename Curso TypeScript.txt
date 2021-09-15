@@ -58,23 +58,28 @@ Aula 2.1. Declaração de variáveis (var, let e const)
 
     . Configurações no VSCode:
 
-        . Crie uma pasta e crie o arquivo  tsconfig.json com o conteúdo abaixo:
+        . Crie uma pasta para o projeto e dentro do VSCode abra a pasta recém criada.
+
+        . Crie o arquivo  tsconfig.json com o conteúdo abaixo:
 
             {
-                "compileOptions" : {
-                    target := "es5"
+                "compilerOptions": {
+                "target": "es5",
+                "module": "commonjs",
+                "sourceMap": true
                 }
             }
+
 
         . Esse arquivo especifica os arquivos raiz e as configurações de compilação necessárias para o projeto.
             No caso acima declarou a compatibilidade com a versão 5 do javascript
 
-        . Dentro do VSCode acione Ctrl + Shift + P (Command Pallete...)
+        . Dentro do VSCode acione Ctrl + Shift + B
 
-        . Localize "Configure Task Runner"
-
-        . Escolha a opção "TypeScript - Watch Mode". Opção que fica observando se houve alguma alteração no fonte e
+        . Localize "tsc:watch". Essa opção fica observando se houve alguma alteração no fonte e
             caso ocorra, é feito a compilação automaticamente.
+
+            . Ao termino ele criará um arquivo dentro do projeto ".vscode/task.json"
 
         . Digite F1 e escolha a opção "Run Build Task". Ao termino desses procedimentos a transcompilação ficará automática.
             Basta irmos no terminal, ou no output para ver o resultado da transcompilação.
@@ -121,6 +126,8 @@ Aula 2.1. Declaração de variáveis (var, let e const)
         }
 
     . No caso do "const" seria a declaração de uma variável constante, imutável.
+
+// PAREI AQUI
 
 Aula 2.2 - Tipos básicos
 ------------------------
