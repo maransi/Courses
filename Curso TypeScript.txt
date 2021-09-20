@@ -525,11 +525,39 @@ Aulas 3.6 - Type vs Interfaces
 
     . Usando Type Aliases em objetos
 
+        // Exemplo 1
         type Product = { name: string, price: number };
 
         let p: Product = {price: 100, name: 'Monitor'};
 
         console.log(p);    
+
+
+        // Exemplo 2
+        var customer = { 
+            firstName:"Tom",
+            lastName:"Hanks", 
+            sayHi: ():string =>{return "Hi there"} 
+        } 
+
+        console.log("Customer Object "); 
+        console.log(customer.firstName); 
+        console.log(customer.lastName); 
+        console.log(customer.sayHi());
+
+        // Exemplo 3
+        var customer = {
+            firstName : "Marco",
+            lastName : "Silva",
+            sayHi : function(){
+                return "Hi there";
+            }
+        }
+
+        console.log("Customer Object "); 
+        console.log(customer.firstName); 
+        console.log(customer.lastName); 
+        console.log(customer.sayHi());
 
     . Usando Type Aliases como function
 
