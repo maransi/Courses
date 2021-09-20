@@ -4468,3 +4468,171 @@ https://www.devmedia.com.br/angular-cli-como-criar-e-executar-um-projeto-angular
 Aula 9.1. Bootstrapping e AppModule
 -----------------------------------
  
+    . Acesse a pasta do projeto e execute o comando abaixo no prompt do sistema operacional:
+
+        ng serve --open
+
+    . Acesse o código fonte da página web que foi aberta:
+
+        <!doctype html>
+        <html lang="en">
+
+        <head>
+            <meta charset="utf-8">
+            <title>Helloworld</title>
+            <base href="/">
+
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="icon" type="image/x-icon" href="favicon.ico">
+        </head>
+
+        <body>
+            <app-root></app-root>
+            <script type="text/javascript" src="inline.bundle.js"></script>
+            <script type="text/javascript" src="polyfills.bundle.js"></script>
+            <script type="text/javascript" src="styles.bundle.js"></script>
+            <script type="text/javascript" src="vendor.bundle.js"></script>
+            <script type="text/javascript" src="main.bundle.js"></script>
+        </body>
+
+        </html>
+
+    . Se compararmos o conteúdo apresentado pela página aberta no navegador, com o arquivo index.html 
+        da pasta /src observaremos que o framework do angular inseriu automaticamente algumas linhas dentro da tag
+        <body> através da tab <app-root></app-root>
+
+        <!doctype html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8">
+                <title>Helloworld</title>
+                <base href="/">
+
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <link rel="icon" type="image/x-icon" href="favicon.ico">
+            </head>
+            <body>
+                <app-root></app-root>
+            </body>
+        </html>
+
+    . A substituição da tag <app-root> será feito pelo conteúdo do arquivo src/app/app.component.html que tem o conteúdo:
+
+        <h1>
+            Olá {{nome}}!!
+        </h1>
+
+    . O "Data Binding" {{nome}} será substuido pelo conteúdo que estiver no arquivo src/app/app.component.ts:
+
+
+        @Component({
+            selector: 'app-root',                   // Associação com a tag <app-root>
+            templateUrl: './app.component.html',    // Associação com a página html
+            styleUrls: ['./app.component.css']
+        })
+        export class AppComponent {
+            title = 'app';
+            nome = 'Marco'      // Conteúdo que será utilizado no data binding {{nome}}
+        }
+
+    Sequência de execução do Angular:
+    ---------------------------------
+
+    . O inicio do projeto ocorrerá pelo componente src/main.ts:
+
+        import { enableProdMode } from '@angular/core';
+        import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+        import { AppModule } from './app/app.module';               // Importação do modulo para iniciar a aplicação
+        import { environment } from './environments/environment';
+
+        if (environment.production) {
+            enableProdMode();
+        }
+
+        platformBrowserDynamic().bootstrapModule(AppModule);    // Aponta e inicia o arquivo src/app/app.module.ts
+
+        . Identificará o arquivo src/app/app.module.ts para iniciar a construção da página principal.
+
+    . O arquivo src/app/app.module.ts faz a associação com os componentes principais da página principal:
+
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+
+        import { AppComponent } from './app.component';     // abrirá o arquivo src/app/app.component.ts
+
+        @NgModule({
+            declarations: [
+                AppComponent                    
+            ],
+            imports: [
+                BrowserModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]       // Componente principal que iniciará a aplicação 
+        })
+
+        export class AppModule { }
+
+        . Observe que é feito a importação do arquivo "./app.component" que iniciará a construção da página inicial:
+
+        . Propriedades do arquivo app.module.ts
+
+            . declarations: The components, directives, and pipes that belong to this NgModule.
+
+            . exports: The subset of declarations that should be visible and usable in the component 
+                        templates of other NgModules.
+
+            . imports: Other modules whose exported classes are needed by component templates declared in this NgModule.
+
+            . providers: Creators of services that this NgModule contributes to the global collection of services;
+                         they become accessible in all parts of the application. (You can also specify providers at the component level.)
+
+            . bootstrap: The main application view, called the root component, which hosts all other application views.
+                         Only the root NgModule should set the bootstrap property.
+
+    . A partir da definição do componente principal o framework do angular abrirá o arquivo src/app/app.component.ts
+
+    . O app.component.ts irá vincular com o template src/app/app.component.html
+
+    . Onde criará a página index.html fazendo a substituição da tag <app-root>
+
+
+Aula 09.02. O que são componentes
+---------------------------------
+
+    . Podemos subdivir nossos formulários em componentes e aproveitar a reutilização deles em vários outros
+        formulários:
+
+        +-----------------------------------------------------------+ ->  1. CadastroPessoaComponent
+        |                                                           |
+        |   +---------------------------------------------------+ --|--> 2. NavbarComponent
+        |   |                                                   |   |
+        |   |   +--------+          +---------+     +---------+ |   |
+        |   |   | Salvar |          | Alterar |     | Excluir | |   |
+        |   |   +--------+          +---------+     +---------+ |   |
+        |   +---------------------------------------------------+   |
+        |                                                           |
+        |   +---------------------------------------------------+ --|--> 3. PessoaFormComponent
+        |   |                                                   |   |
+        |   |   Nome :      _________________________________   |   |
+        |   |   Telefone:   _________________________________   |   |
+        |   |                                                   |   |
+        |   +---------------------------------------------------+   |
+        |                                                           |
+        |   +---------------------------------------------------+ --|--> 4.DataTableComponent
+        |   |       |   Nome                    |   Telefone    |   |
+        |   +---------------------------------------------------+   |
+        |   |   X   |   Jose da Silva           |   999999999   |   |
+        |   +---------------------------------------------------+   |
+        |   |       |   Maria da Silva          |   888888888   |   |
+        |   +---------------------------------------------------+   |
+        |   |       |   João da Silva           |   777777777   |   |
+        |   +---------------------------------------------------+   |
+        |                                                           |
+        +-----------------------------------------------------------+
+
+
+Aula 09.03. Criando um componente
+---------------------------------
+
