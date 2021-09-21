@@ -4368,6 +4368,22 @@ https://www.devmedia.com.br/angular-cli-como-criar-e-executar-um-projeto-angular
 
     . Estrutura de pastas dos projetos Angular:
 
+        +----e2e
+        +----node_modules
+        +----src
+            +----app
+                +----app.component.css
+                +----app.component.html
+                +----app.component.spec.ts
+                +----app.component.ts
+                +----app.module.ts
+            +----assets
+            +----environments
+            +----index.html
+            +----main.ts
+        +----.angular-cli.json
+
+
         Pasta	            Uso
         -----               ---
 
@@ -4636,3 +4652,101 @@ Aula 09.02. O que são componentes
 Aula 09.03. Criando um componente
 ---------------------------------
 
+    Criando um componente manualmente
+    ---------------------------------
+
+    . Dentro da pasta "app" do projeto crie outra pasta com o nome "hello".
+
+    . Dentro da pasta "hello" crie o arquivo "hello.component.ts" com o código abaixo:
+
+        import { Component } from '@angular/core';
+
+        @Component({
+            selector : 'hello',  
+            template : `<h1>Hello {{nome}}</h1>`
+
+
+        })
+
+        export class HelloComponent{
+            nome : 'Marco';
+        }
+
+
+        . O nome da classe "HelloComponent" utiliza a convenção no nome de terminar com a palavra "Component".
+
+        . @Component é um decorador que precisa ser inserido no componente para caracterizá-la como um componente.
+
+        . Para que o framework reconheça a annotation @Component é necessário efetuar a importação da biblioteca 
+            do Angular:
+
+            import { Component } from '@angular/core';            
+
+        . Detalhes das demais propriedades do componente:
+            
+            @Component({
+                selector : 'hello',     // Nome da tag/elemento que será usado na página <hello></hello>
+                
+                templateUrl : './app.component.html'    // Nome do arquivo que será usado para substituir no lugar da tag <hello>
+                template : `<h1>Hello {{nome}}</h1>`    // ou, trecho de código para isso. Observe a utilização do acento craseado.
+
+            })
+
+            export class HelloComponent{
+                nome : 'Marco';                         // Para ser utilizado no meta dado "template" da annotation @Component
+            }
+
+        . Acesse o arquivo src/app/app.component.html e implemente as linhas abaixo:
+
+            <hello></hello>
+
+        . Acesse o arquivo src/app/app.module.ts e implemente a declaração do nosso componente na propriedade "delarations":
+
+            ...
+            import { HelloComponent } from './hello/hello.component';
+
+            @NgModule({
+                declarations : [
+                    AppComponent,
+                    HelloComponent
+                ]
+            })
+            ...
+
+        . Carregue a tela principal do projeto e verifique se o nosso componente está funcionando.
+
+
+    Criando um componente com o AngularCli
+    --------------------------------------
+
+    . Abra o terminal, acesse a pasta raiz do projeto e digite o comando abaixo:
+
+        $ ng generate component bem-vindo --spec=false
+
+        # ou
+
+        $ ng g c bem-vindo --spec=false
+
+    . Após a execução do comando acima será criado os arquivos dos componentes na pasta "bem-vindo"
+
+    . Acesse o arquivo src/bem-vindo/bem-vindo.component.ts e deixe o código como abaixo:
+
+        import { Component } from '@angular/core'
+
+        @Component({
+            selector : 'app-bem-vindo',
+            templateUrl : './bem-vindo.component.html',
+            styleUrls : ['./bem-vindo.component.css']
+        })
+
+        export class BemVindoComponent{
+
+        }
+    
+        . Acesse o arquivo src/app/app.component.html e implemente as linhas abaixo:
+
+            <app-bem-vindo></app-bem-vindo>
+
+        . Carregue a tela principal do projeto e verifique se o nosso componente está funcionando.
+        
+        . Todo trabalho repetitivo de registro já foi feito automaticamente no projeto.
