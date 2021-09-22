@@ -4669,7 +4669,7 @@ Aula 09.03. Criando um componente
         })
 
         export class HelloComponent{
-            nome : 'Marco';
+            nome = 'Marco';
         }
 
 
@@ -4693,7 +4693,7 @@ Aula 09.03. Criando um componente
             })
 
             export class HelloComponent{
-                nome : 'Marco';                         // Para ser utilizado no meta dado "template" da annotation @Component
+                nome = 'Marco';                         // Para ser utilizado no meta dado "template" da annotation @Component
             }
 
         . Acesse o arquivo src/app/app.component.html e implemente as linhas abaixo:
@@ -4750,3 +4750,39 @@ Aula 09.03. Criando um componente
         . Carregue a tela principal do projeto e verifique se o nosso componente está funcionando.
         
         . Todo trabalho repetitivo de registro já foi feito automaticamente no projeto.
+
+
+Aula 09.04. Instalando a biblioteca CSS do Bootstrap
+----------------------------------------------------
+
+    . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
+
+        $ npm install bootstrap@4.5.3 --save
+
+    . Acesse o arquivo angular-cli.json da pasta raiz do projeto, localize o atributo "styles" e inclua a configuração do 
+        bootstrap como abaixo:
+
+        ...
+        "styles": [
+            "styles.css",
+            "../node_modules/bootstrap/dist/css/bootstrap.css"
+        ],
+        ...
+
+    . Acesse o arquivo app.component.html da pasta raiz e substitua pelo código abaixo:
+
+        <div class="container">
+            <div class="jumbotron">
+                <h1 class="display-4">Hello, world!</h1>
+                <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+                <hr class="my-4">
+                <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+                <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+            </div>
+        </div>
+
+
+
+Aula 09.05. Introdução a data binding
+-------------------------------------
+
