@@ -4911,5 +4911,53 @@ https://www.tutorialspoint.com/angular8/angular8_data_binding.htm
             <p [style.color]="myColor">Text color is styled using style binding</p>            
 
         
+Aula 09.06. Usando interpolação
+-------------------------------
 
+    . Acesse a pasta raiz do projeto no terminal e execute o comando abaixo:
+
+        $ ng g c cliente --spec=false
+
+    . Acesse o componente src/app/cliente/cliente.component.ts e deixe com o código abaixo:
+
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-cliente',
+            templateUrl: './cliente.component.html',
+            styleUrls: ['./cliente.component.css']
+        })
+        export class ClienteComponent implements OnInit {
+
+            cpf : String;
+            nome : String;
+            idade : Number;
+
+            constructor() { }
+
+            ngOnInit() {
+                this.cpf = '106.523.608-58';
+                this.idade = 55;
+                this.nome = 'MARCO ANTONIO SILVA';
+
+            }
+
+            getIdade() : Number{
+                return this.idade;
+            }
+
+        }
+
+    . Acesse o componente src/app/cliente/cliente.component.html e deixe com o código abaixo:
                     
+        <p>
+            Nome : {{nome}}
+            CPF : {{cpf}}
+            Idade Atual : {{idade}}
+            Idade daqui a 20 anos : {{ getIdade() + 20 }}
+        </p>
+                
+    . Acesse o componente src/app/app.component.html e acrescente a tag abaixo:
+
+        <app-cliente></app-cliente>    
+
