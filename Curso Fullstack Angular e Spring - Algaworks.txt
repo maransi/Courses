@@ -4786,3 +4786,130 @@ Aula 09.04. Instalando a biblioteca CSS do Bootstrap
 Aula 09.05. Introdução a data binding
 -------------------------------------
 
+https://www.tutorialspoint.com/angular8/angular8_data_binding.htm
+
+    . Data binding é uma técnica, onde o dado fica sincronizado entre o componente e a visão.
+
+    . Essa técnica é dividida em 5 grupos:
+
+        . String interpolação, representado pelo {{ }}:
+
+            // *.component.ts
+            export class TestComponent implements OnInit { 
+                appName = "My first app in Angular 4"; 
+            }
+
+            // *.component.html 
+            <h1>{{appName}}</h1>            
+
+            // app.component.html
+            <app-test></app-test>
+
+        . Event binding, eventos do tipo: click(), hover(), doubleClick(), etc:
+
+            // *.component.ts
+            export class TestComponent { 
+                showData($event: any){ 
+                    console.log("button is clicked!"); if($event) { 
+                        console.log($event.target); 
+                        console.log($event.target.value); 
+                    } 
+                } 
+            }
+
+            // *.component.html
+            <h2>Event Binding</h2> 
+            <button (click)="showData($event)">Click here</button>
+
+            ou
+
+            <button on-click = "showData()">Click here</button>
+
+
+        . Property binding, utilizado para ligar o dado de uma propriedade de um componente para 
+            o elemento DOM:
+
+            // *.component.ts
+            export class TestComponent { 
+                userName:string = "Peter"; 
+            }
+
+            // *.component.html
+            // userName property is bind to an attribute of a DOM element <input> tag
+            <input type="text" [value]="userName">
+
+        . Attribute binding é usado para ligar o dado de um componente para o atributo HTML:
+
+            // *.component.ts
+            // Observe 
+            import { Component, OnInit } from '@angular/core';  
+            
+            @Component({  
+                selector: 'app-example',  
+                templateUrl: './example.component.html',  
+                styleUrls: ['./example.component.css']  
+            })  
+
+            export class ExampleComponent ({  
+                id:number=1;  
+                name:string="Farhan Ahmed";  
+                gender:string="Male";  
+                designation:string="Software Developer";  
+                location:string="Bangalore";  
+                salary:number=70000;  
+                imageHeight:number=100;  
+                imageWidth:number=100;  
+                imagePath:string="assets/Images/farhan.png";  
+                columnSpan:number=4;  
+            });
+
+            // *.component.html
+            // Observe o contéudo entre colchetes '<th [attr.colspan]="columnSpan">'
+            // O atributo attr.colspan utilizará o que foi configurado na propriedade do componente columnSpan, que será 4.
+            <div class="container">  
+                <table class="table table-bordered">  
+                    <thead class="bg-primary text-white">  
+                        <tr>  
+                            <th [attr.colspan]="columnSpan">  
+                                <h4 class="text-center text-uppercase">Employee Information</h4>  
+                            </th>  
+                        </tr>  
+                    </thead>  
+                    <tbody>  
+                        <tr>  
+                            <td>Employee ID:</td>  
+                            <td>{{id}}</td>  
+                        </tr>  
+                        <tr>  
+                            <td>Employee Name:</td>  
+                            <td>{{name}}</td>  
+                        </tr>  
+                    </tbody>  
+                </table>  
+            </div>  
+
+        . Class binding é usado para ligar o dado do componente para a propriedade class do HTML:
+
+            // *.component.ts
+            export class TestComponent { 
+                myCSSClass = "red"; 
+                applyCSSClass = false; 
+            }
+
+            // *.component.html
+            <p [class]="myCSSClass">This paragraph class comes from *myClass* property </p> 
+            <p [class.blue]="applyCSSClass">This paragraph class does not apply</p>
+
+        . Style binding  é usado para ligar o dado do componente para a propriedade de estilo do HTML:
+
+            // *.component.ts
+            export class TestComponent { 
+                myColor = 'brown';
+            }
+
+            // *.component.html
+            <p [style.color]="myColor">Text color is styled using style binding</p>            
+
+        
+
+                    
