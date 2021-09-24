@@ -4961,3 +4961,67 @@ Aula 09.06. Usando interpolação
 
         <app-cliente></app-cliente>    
 
+
+
+Aula 09.07. Usando event binding
+--------------------------------
+
+    . Acesse o componente src/app/cliente/cliente.component.ts e deixe com o código abaixo:
+
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-cliente',
+            templateUrl: './cliente.component.html',
+            styleUrls: ['./cliente.component.css']
+        })
+        export class ClienteComponent implements OnInit {
+
+            cpf : String;
+            nome : String;
+            idade : Number;
+
+            constructor() { }
+
+            ngOnInit() {
+                this.cpf = '106.523.608-58';
+                this.idade = 55;
+                this.nome = 'MARCO ANTONIO SILVA';
+
+            }
+
+            salvar(){
+                console.log(`Cliente ${nome} salvo!!!`)
+            }
+
+            alterarNome( event : any ){
+                console.log(event);
+
+                this.nome = event.target.value;
+            }
+
+        }
+
+    . Acesse o componente src/app/cliente/cliente.component.html e deixe com o código abaixo:
+
+        <div class="container">
+            <div class="alert alert-success" role="alert">
+                Nome do Cliente : <strong> {{nome}} </strong>
+            </div>
+
+            <div class="form-group">
+                <label for="clienteNome">Nome do Cliente</label>
+                <input type="text" class="form-control" id="nomeCliente" value="{{nome}} (input)="alterarNome($event)" >
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>     
+
+            <button type="button" class="btn btn-primary" (click)="salvar()">Salvar</button>                   
+        </div>
+
+        . Na tag HTML <input> existe a declaração (input)="alterarNome($event). O $event contém informações do evento, o método  
+            do componente cliente.component.ts a ser chamado deverá ter também na sua assinatura a recepção do objeto "event" 
+            alterarNome( event : any ). Se quiser verificar o contéudo do objeto evento, coloque no método alterarNome o 
+            console.log( event ); acesse a console do navegador; localize o item "target.value" para encontrar o valor 
+            do campo digitado "nomeCliente".
+
+    . Execute a página, abra o console do navegador, digite um nome e acione o botão salvar
