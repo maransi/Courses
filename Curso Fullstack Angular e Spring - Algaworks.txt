@@ -4991,7 +4991,7 @@ Aula 09.07. Usando event binding
             }
 
             salvar(){
-                console.log(`Cliente ${nome} salvo!!!`)
+                console.log("Cliente ${nome} salvo!!!")
             }
 
             alterarNome( event : any ){
@@ -5011,8 +5011,8 @@ Aula 09.07. Usando event binding
 
             <div class="form-group">
                 <label for="clienteNome">Nome do Cliente</label>
-                <input type="text" class="form-control" id="nomeCliente" value="{{nome}} (input)="alterarNome($event)" >
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                <input type="text" class="form-control" id="nomeCliente" value="{{nome}}" (input)="alterarNome($event)" >
+                <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
             </div>     
 
             <button type="button" class="btn btn-primary" (click)="salvar()">Salvar</button>                   
@@ -5025,3 +5025,6 @@ Aula 09.07. Usando event binding
             do campo digitado "nomeCliente".
 
     . Execute a página, abra o console do navegador, digite um nome e acione o botão salvar
+
+
+// https://www.youtube.com/watch?v=Lczqac3paNM    
