@@ -4330,6 +4330,33 @@ Aula 8.1 a 8.6
         sudo apt-get install npm
 
 
+    . Instalação do Plugin de debug no VSCode:
+
+        . Pré requisito que o navegador Chrome esteja instalado no sistema operacional.
+
+        . Acesse o projeto, vá para a área de Debug, acione a criação do "launch.json" e informe o ambiente "Chrome".
+
+        . Acesse o arquivo launch.json e altere o conteúdo pelo abaixo:
+
+            {
+                // Use o IntelliSense para saber mais sobre os atributos possíveis.
+                // Focalizar para exibir as descrições dos atributos existentes.
+                // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+                "version": "0.2.0",
+                "configurations": [
+                    {
+                        "name": "Debug Angular",
+                        "url": "http://localhost:4200",
+                        "webRoot": "${workspaceFolder}"
+                    }
+
+                ]
+            }
+
+        . Acesse o terminal para levantar o projeto (ng serve), no VSCode acesse a página principal e na área de debug de o "play" no debug.
+
+        . No navegador vá até a página onde você que depurar e faça as ações para isso.
+
 Aula 8.7. Instalando e Criando um projeto angular CLI
 -----------------------------------------------------
 
@@ -4551,6 +4578,7 @@ Aula 9.1. Bootstrapping e AppModule
             nome = 'Marco'      // Conteúdo que será utilizado no data binding {{nome}}
         }
 
+
     Sequência de execução do Angular:
     ---------------------------------
 
@@ -4715,6 +4743,180 @@ Aula 09.03. Criando um componente
 
         . Carregue a tela principal do projeto e verifique se o nosso componente está funcionando.
 
+
+    Modularizando os componentes (Conteúdo Extra)
+    ---------------------------------------------
+
+        . Fonte : https://www.youtube.com/watch?v=36kd3uR-hG8&list=PLGxZ4Rq3BOBoSRcKWEdQACbUCNWLczg2G&index=6
+
+        . A classe de modulos central é o arquivo src/app/app.modules.ts. Uma classe normal como qualquer outra, porém 
+            decorada/anotada com o @NgModule.
+
+        . A estrutura da classe app.modules.ts:
+
+            import { BrowserModule } from '@angular/platform-browser';
+            import { NgModule } from '@angular/core';
+
+            import { AppComponent } from './app.component';
+
+            @NgModule({
+            declarations: [
+                AppComponent
+            ],
+            imports: [
+                BrowserModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+            })
+
+            export class AppModule { }
+
+        . Seções do AppModule:
+
+            . Os imports são:
+
+                // Suporte a navegação pelo Browser
+                import { BrowserModule } from '@angular/platform-browser';
+
+                // Utilizado devido ao decorate @NgModule
+                import { NgModule } from '@angular/core';
+
+                import { AppComponent } from './app.component';
+
+            . O decorate/annotation @NgModule:
+
+                @NgModule({
+                declarations: [
+                    AppComponent
+                ],
+                imports: [
+                    BrowserModule
+                ],
+                providers: [],
+                bootstrap: [AppComponent]
+                })
+
+                . Dentro do decorate existe os metadados:
+
+                    declarations :[ ... ] - Local para realizar a declaração dos componentes do nosso projeto.
+                                            Cada componente incluido neste metadado deverá ser feito o "import",
+                                            Exemplo: Observe o componente HelloWorld
+
+                        ...
+                        import { AppComponent } from './app.component';
+                        import { HelloComponent } from './hello/hello.component';
+
+                        @NgModule({
+                            declarations: [
+                                AppComponent,
+                                HelloComponent
+                            ],
+                            ...
+                        })
+                        export class AppModule { }
+
+                    imports: [...] - Importação das biblitecas que iremos utilizar no projeto. Cada componente declarado
+                                     neste metadado deverá ser feito o "import".
+                                     Exemplo: Observe o BrowserModule
+
+                        import { BrowserModule } from '@angular/platform-browser';
+                        ...
+
+                        @NgModule({
+                            ...
+                            imports: [
+                                BrowserModule
+                            ],
+                            ...
+                        })
+
+                    providers : [...] - Local para configurar os serviços que serão utilizados no projeto, como:
+                                        Autenticação, rotas, etc.
+
+                    bootstrap : [AppComponent] - O objeto principal do projeto, que fará a inicialização da aplicação.
+
+            . Declaração da classe:
+
+                export class AppModule { }
+
+        . Modularizando a aplicação - A medida que a aplicação for crescendo, o AppModule ficará muito grande. Neste
+                                        caso seria interessante criar "features modules", ou modulos de funcionalidades
+                                        para organizar melhor o nosso projeto.
+
+            . Para criar um módulo de funcionalidade: acesse o terminal, acesse a pasta raiz do projeto e digite o comando abaixo:
+
+                ng g m [Nome do Módulo]
+
+                Exemplo:
+
+                ng g m curso
+
+                . Este comando criará uma pasta com o nome do módulo e um arquivo dentro dela com o nome [nome modulo].module.ts:
+
+                    import { NgModule } from '@angular/core';
+                    import { CommonModule } from '@angular/common';
+
+                    @NgModule({
+                        imports: [
+                            CommonModule
+                        ],
+                        declarations: []
+                    })
+                    export class CursoModule { }
+
+                    . A diferença entre o módulo de funcionalidade e o de raiz seria que: o de funcionalidade é bem reduzido e somente
+                        importa o "CommonModule".
+
+                . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+                    ng g c curso
+
+                . Acesse o src/app/app.module.ts e retire qualquer referência do componente criado no passo anterior, caso houver.
+
+                . Acesse o src/app/curso/curso.module.ts e faça a declaração do componente curso:
+
+                    import { NgModule } from '@angular/core';
+                    import { CommonModule } from '@angular/common';
+                    import { CursoComponent } from './curso.component';
+
+                    @NgModule({
+                        imports: [
+                            CommonModule
+                        ],
+                        declarations: [CursoComponent]
+                    })
+                    export class CursoModule { }
+
+                . Acesse a classe src/app/curso/curso.module.ts e inclua o metadado abaixo no decorate @NgModule:
+
+                    exports : [ 
+                                CursoComponent
+                              ]
+
+                . Acesse a classe src/app/app.module.ts, insira dentro do metadado "imports" o "CursoModule" e faça o import.
+
+                    ...
+                    import { CursoModule } from './curso/curso.module';
+
+                    @NgModule({
+                        ...
+                        imports: [
+                            BrowserModule,
+                            CursoModule
+                        ],
+                        ...
+                    })
+                    export class AppModule { }
+
+                . Acesse o arquivo src/app/app.component.html e inclua a tag abaixo:
+
+                    <app-curso></app-curso>
+
+                . Execute o projeto e verifique se a modularização deu certo:
+
+                    ng serve --open
+                    
 
     Criando um componente com o AngularCli
     --------------------------------------
