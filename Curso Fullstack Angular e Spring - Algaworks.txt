@@ -4744,102 +4744,6 @@ Aula 09.03. Criando um componente
         . Carregue a tela principal do projeto e verifique se o nosso componente está funcionando.
 
 
-    Modularizando os componentes (Conteúdo Extra)
-    ---------------------------------------------
-
-        . Fonte : https://www.youtube.com/watch?v=36kd3uR-hG8&list=PLGxZ4Rq3BOBoSRcKWEdQACbUCNWLczg2G&index=6
-
-        . A classe de modulos central é o arquivo src/app/app.modules.ts. Uma classe normal como qualquer outra, porém 
-            decorada/anotada com o @NgModule.
-
-        . A estrutura da classe app.modules.ts:
-
-            import { BrowserModule } from '@angular/platform-browser';
-            import { NgModule } from '@angular/core';
-
-            import { AppComponent } from './app.component';
-
-            @NgModule({
-            declarations: [
-                AppComponent
-            ],
-            imports: [
-                BrowserModule
-            ],
-            providers: [],
-            bootstrap: [AppComponent]
-            })
-
-            export class AppModule { }
-
-        . Seções do AppModule:
-
-            . Os imports são:
-
-                // Suporte a navegação pelo Browser
-                import { BrowserModule } from '@angular/platform-browser';
-
-                // Utilizado devido ao decorate @NgModule
-                import { NgModule } from '@angular/core';
-
-                import { AppComponent } from './app.component';
-
-            . O decorate/annotation @NgModule:
-
-                @NgModule({
-                declarations: [
-                    AppComponent
-                ],
-                imports: [
-                    BrowserModule
-                ],
-                providers: [],
-                bootstrap: [AppComponent]
-                })
-
-                . Dentro do decorate existe os metadados:
-
-                    declarations :[ ... ] - Local para realizar a declaração dos componentes do nosso projeto.
-                                            Cada componente incluido neste metadado deverá ser feito o "import",
-                                            Exemplo: Observe o componente HelloWorld
-
-                        ...
-                        import { AppComponent } from './app.component';
-                        import { HelloComponent } from './hello/hello.component';
-
-                        @NgModule({
-                            declarations: [
-                                AppComponent,
-                                HelloComponent
-                            ],
-                            ...
-                        })
-                        export class AppModule { }
-
-                    imports: [...] - Importação das biblitecas que iremos utilizar no projeto. Cada componente declarado
-                                     neste metadado deverá ser feito o "import".
-                                     Exemplo: Observe o BrowserModule
-
-                        import { BrowserModule } from '@angular/platform-browser';
-                        ...
-
-                        @NgModule({
-                            ...
-                            imports: [
-                                BrowserModule
-                            ],
-                            ...
-                        })
-
-                    providers : [...] - Local para configurar os serviços que serão utilizados no projeto, como:
-                                        Autenticação, rotas, etc.
-
-                    bootstrap : [AppComponent] - O objeto principal do projeto, que fará a inicialização da aplicação.
-
-            . Declaração da classe:
-
-                export class AppModule { }
-
     Criando um componente com o AngularCli
     --------------------------------------
 
@@ -4876,8 +4780,102 @@ Aula 09.03. Criando um componente
         . Todo trabalho repetitivo de registro já foi feito automaticamente no projeto.
 
 
-    Modularizando a Aplicação
-    -------------------------
+
+    Modularizando os componentes (Conteúdo Extra)
+    ---------------------------------------------
+
+        . Fonte : https://www.youtube.com/watch?v=36kd3uR-hG8&list=PLGxZ4Rq3BOBoSRcKWEdQACbUCNWLczg2G&index=6
+
+        . A classe de modulos central é o arquivo src/app/app.modules.ts. Uma classe normal como qualquer outra, porém 
+            decorada/anotada com o @NgModule.
+
+        . A estrutura da classe app.modules.ts:
+
+                    import { BrowserModule } from '@angular/platform-browser';
+                    import { NgModule } from '@angular/core';
+
+                    import { AppComponent } from './app.component';
+
+                    @NgModule({
+                    declarations: [
+                        AppComponent
+                    ],
+                    imports: [
+                        BrowserModule
+                    ],
+                    providers: [],
+                    bootstrap: [AppComponent]
+                    })
+
+                    export class AppModule { }
+
+            . Seções do AppModule:
+
+                . Os imports são:
+
+                    // Suporte a navegação pelo Browser
+                    import { BrowserModule } from '@angular/platform-browser';
+
+                    // Utilizado devido ao decorate @NgModule
+                    import { NgModule } from '@angular/core';
+
+                    import { AppComponent } from './app.component';
+
+                . O decorate/annotation @NgModule:
+
+                    @NgModule({
+                    declarations: [
+                        AppComponent
+                    ],
+                    imports: [
+                        BrowserModule
+                    ],
+                    providers: [],
+                    bootstrap: [AppComponent]
+                    })
+
+                    . Dentro do decorate existe os metadados:
+
+                        declarations :[ ... ] - Local para realizar a declaração dos componentes do nosso projeto.
+                                                Cada componente incluido neste metadado deverá ser feito o "import",
+                                                Exemplo: Observe o componente HelloWorld
+
+                            ...
+                            import { AppComponent } from './app.component';
+                            import { HelloComponent } from './hello/hello.component';
+
+                            @NgModule({
+                                declarations: [
+                                    AppComponent,
+                                    HelloComponent
+                                ],
+                                ...
+                            })
+                            export class AppModule { }
+
+                        imports: [...] - Importação das biblitecas que iremos utilizar no projeto. Cada componente declarado
+                                        neste metadado deverá ser feito o "import".
+                                        Exemplo: Observe o BrowserModule
+
+                            import { BrowserModule } from '@angular/platform-browser';
+                            ...
+
+                            @NgModule({
+                                ...
+                                imports: [
+                                    BrowserModule
+                                ],
+                                ...
+                            })
+
+                        providers : [...] - Local para configurar os serviços que serão utilizados no projeto, como:
+                                            Autenticação, rotas, etc.
+
+                        bootstrap : [AppComponent] - O objeto principal do projeto, que fará a inicialização da aplicação.
+
+                . Declaração da classe:
+
+                    export class AppModule { }
 
         . A medida que a aplicação for crescendo, o AppModule ficará muito grande. Neste
             caso seria interessante criar "features modules", ou modulos de funcionalidades
