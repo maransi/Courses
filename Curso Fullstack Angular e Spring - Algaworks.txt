@@ -4840,11 +4840,51 @@ Aula 09.03. Criando um componente
 
                 export class AppModule { }
 
-        . Modularizando a aplicação - A medida que a aplicação for crescendo, o AppModule ficará muito grande. Neste
-                                        caso seria interessante criar "features modules", ou modulos de funcionalidades
-                                        para organizar melhor o nosso projeto.
+    Criando um componente com o AngularCli
+    --------------------------------------
 
-            . Para criar um módulo de funcionalidade: acesse o terminal, acesse a pasta raiz do projeto e digite o comando abaixo:
+    . Abra o terminal, acesse a pasta raiz do projeto e digite o comando abaixo:
+
+        $ ng generate component bem-vindo --spec=false
+
+        # ou
+
+        $ ng g c bem-vindo --spec=false
+
+    . Após a execução do comando acima será criado os arquivos dos componentes na pasta "bem-vindo"
+
+    . Acesse o arquivo src/bem-vindo/bem-vindo.component.ts e deixe o código como abaixo:
+
+        import { Component } from '@angular/core'
+
+        @Component({
+            selector : 'app-bem-vindo',
+            templateUrl : './bem-vindo.component.html',
+            styleUrls : ['./bem-vindo.component.css']
+        })
+
+        export class BemVindoComponent{
+
+        }
+    
+        . Acesse o arquivo src/app/app.component.html e implemente as linhas abaixo:
+
+            <app-bem-vindo></app-bem-vindo>
+
+        . Carregue a tela principal do projeto e verifique se o nosso componente está funcionando.
+        
+        . Todo trabalho repetitivo de registro já foi feito automaticamente no projeto.
+
+
+    Modularizando a Aplicação
+    -------------------------
+
+        . A medida que a aplicação for crescendo, o AppModule ficará muito grande. Neste
+            caso seria interessante criar "features modules", ou modulos de funcionalidades
+            para organizar melhor o nosso projeto.
+
+            . Para criar um módulo de funcionalidade: acesse o terminal, acesse a pasta raiz do projeto e 
+                digite o comando abaixo:
 
                 ng g m [Nome do Módulo]
 
@@ -4916,42 +4956,7 @@ Aula 09.03. Criando um componente
                 . Execute o projeto e verifique se a modularização deu certo:
 
                     ng serve --open
-                    
 
-    Criando um componente com o AngularCli
-    --------------------------------------
-
-    . Abra o terminal, acesse a pasta raiz do projeto e digite o comando abaixo:
-
-        $ ng generate component bem-vindo --spec=false
-
-        # ou
-
-        $ ng g c bem-vindo --spec=false
-
-    . Após a execução do comando acima será criado os arquivos dos componentes na pasta "bem-vindo"
-
-    . Acesse o arquivo src/bem-vindo/bem-vindo.component.ts e deixe o código como abaixo:
-
-        import { Component } from '@angular/core'
-
-        @Component({
-            selector : 'app-bem-vindo',
-            templateUrl : './bem-vindo.component.html',
-            styleUrls : ['./bem-vindo.component.css']
-        })
-
-        export class BemVindoComponent{
-
-        }
-    
-        . Acesse o arquivo src/app/app.component.html e implemente as linhas abaixo:
-
-            <app-bem-vindo></app-bem-vindo>
-
-        . Carregue a tela principal do projeto e verifique se o nosso componente está funcionando.
-        
-        . Todo trabalho repetitivo de registro já foi feito automaticamente no projeto.
 
 
 Aula 09.04. Instalando a biblioteca CSS do Bootstrap
