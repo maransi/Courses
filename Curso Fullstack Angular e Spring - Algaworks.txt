@@ -4332,30 +4332,38 @@ Aula 8.1 a 8.6
 
     . Instalação do Plugin de debug no VSCode:
 
-        . Pré requisito que o navegador Chrome esteja instalado no sistema operacional.
+        . Chrome:
 
-        . Acesse o projeto, vá para a área de Debug, acione a criação do "launch.json" e informe o ambiente "Chrome".
+            // https://www.youtube.com/watch?v=Lczqac3paNM    
 
-        . Acesse o arquivo launch.json e altere o conteúdo pelo abaixo:
+            . Pré requisito que o navegador Chrome esteja instalado no sistema operacional.
 
-            {
-                // Use o IntelliSense para saber mais sobre os atributos possíveis.
-                // Focalizar para exibir as descrições dos atributos existentes.
-                // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
-                "version": "0.2.0",
-                "configurations": [
-                    {
-                        "name": "Debug Angular",
-                        "url": "http://localhost:4200",
-                        "webRoot": "${workspaceFolder}"
-                    }
+            . Acesse o projeto, vá para a área de Debug, acione a criação do "launch.json" e informe o ambiente "Chrome".
 
-                ]
-            }
+            . Acesse o arquivo launch.json e altere o conteúdo pelo abaixo:
 
-        . Acesse o terminal para levantar o projeto (ng serve), no VSCode acesse a página principal e na área de debug de o "play" no debug.
+                {
+                    // Use o IntelliSense para saber mais sobre os atributos possíveis.
+                    // Focalizar para exibir as descrições dos atributos existentes.
+                    // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+                    "version": "0.2.0",
+                    "configurations": [
+                        {
+                            "name": "Debug Angular",
+                            "url": "http://localhost:4200",
+                            "webRoot": "${workspaceFolder}"
+                        }
 
-        . No navegador vá até a página onde você que depurar e faça as ações para isso.
+                    ]
+                }
+
+            . Acesse o terminal para levantar o projeto (ng serve), no VSCode acesse a página principal e na área de debug de o "play" no debug.
+
+            . No navegador vá até a página onde você que depurar e faça as ações para isso.
+
+        . Angular 2, 4 and upcoming latest TypeScript HTML Snippets
+
+            . Dentro de algum template digite ngFor e tecle tab.
 
 Aula 8.7. Instalando e Criando um projeto angular CLI
 -----------------------------------------------------
@@ -4908,9 +4916,7 @@ Aula 09.03. Criando um componente
 
                 . Acesse a pasta raiz do projeto e digite o comando abaixo:
 
-                    ng g c curso
-
-                . Acesse o src/app/app.module.ts e retire qualquer referência do componente criado no passo anterior, caso houver.
+                    ng g c curso --module=curso
 
                 . Acesse o src/app/curso/curso.module.ts e faça a declaração do componente curso:
 
@@ -5196,7 +5202,7 @@ Aula 09.07. Usando event binding
             }
 
             salvar(){
-                console.log("Cliente ${nome} salvo!!!")
+                console.log(`Cliente ${this.nome} salvo!!!`)
             }
 
             alterarNome( event : any ){
@@ -5229,7 +5235,111 @@ Aula 09.07. Usando event binding
             console.log( event ); acesse a console do navegador; localize o item "target.value" para encontrar o valor 
             do campo digitado "nomeCliente".
 
+        . Nessa mesma tag HTML o evento que está (input)="alterarNome($event)", poderia ser (keyup)="alter..."
+
     . Execute a página, abra o console do navegador, digite um nome e acione o botão salvar
 
 
-// https://www.youtube.com/watch?v=Lczqac3paNM    
+
+Aula 09.08. Usando variável de referência
+-----------------------------------------
+
+    . Template de referência de variável é a forma como passar um objeto DOM dentro do template, ou para uma classe de componente.
+
+    . Um exemplo como utilizar um "template reference variable":
+
+        . Template
+
+            <div class="container">
+                <div class="alert alert-success" role="alert">
+                    Nome do Cliente : <strong> {{nome}} </strong>
+                </div>
+
+                <div class="form-group">
+                    <label for="clienteNome">Nome do Cliente</label>
+                    <input type="text" class="form-control" id="nomeCliente" #nomeInput >
+                    <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
+                </div>     
+
+                <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)">Salvar</button>                   
+            </div>
+
+            . Se ao passar o valor do campo "nome" passassemos somente "(click)="salvar(nomeInput)" seria passado 
+                todo o objeto DOM, com toda sua estrutura. La no componente a declaração seria: salvar( nome : any ), 
+                neste caso devemos pegar o valor do nome da seguinte forma: nome.value
+
+
+        . Componente
+
+            import { Component, OnInit } from '@angular/core';
+
+            @Component({
+                selector: 'app-cliente',
+                templateUrl: './cliente.component.html',
+                styleUrls: ['./cliente.component.css']
+            })
+            export class ClienteComponent implements OnInit {
+
+                cpf : String;
+                nome : String;
+                idade : Number;
+
+                constructor() { }
+
+                ngOnInit() {
+                    this.cpf = '106.523.608-58';
+                    this.idade = 55;
+                    this.nome = 'MARCO ANTONIO SILVA';
+
+                }
+
+                salvar( nome : string ){
+                    this.nome = nome;
+
+                    console.log(`Cliente ${this.nome} salvo!!!`)
+                }
+            }
+
+Aula 09.09. Usando property binding
+-----------------------------------
+
+    . Na aula 9.05 é falado sobre property binding.  Property binding, utilizado para ligar o dado de uma 
+        propriedade de um componente para o elemento DOM, por exemplo:
+
+        . Altere a tag da tag button do template 
+            
+            De:
+
+                <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)">Salvar</button>                   
+
+            Para:
+
+                <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value) [disabled]="nome.length==0">Salvar</button>                   
+
+        . Faça o teste para ver se o botão fica desabilitado quando o nome estiver vazio.
+
+    . A representação de um "property binding" é [Atributo] = "expressão que deverá retornar um conteúdo de acordo com a propriedade".
+
+    . Outro exemplo:
+
+        . Altere a tag input do template:
+
+            De:
+
+                <input type="text" class="form-control" id="nomeCliente" value="{{nome}} >
+
+            Para:
+
+                <input type="text" class="form-control" id="nomeCliente" #nomeInput [value]="nome" (keyup)="nome = nomeInput.value" >
+
+    . Para testar: tente pegar o exemplo do Template Reference Variable que utiliza "#" e utilize no exemplo abaixo:
+
+        De:
+
+            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)">Salvar</button>                   
+
+        Para:
+
+            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value) [disabled]="nomeInput.value.length==0">Salvar</button>                   
+            ou
+            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value) [disabled]="nome.length==0">Salvar</button>                   
