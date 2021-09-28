@@ -5350,3 +5350,139 @@ https://www.youtube.com/watch?v=Bg47WHVc020&list=PLGxZ4Rq3BOBoSRcKWEdQACbUCNWLcz
 https://www.baeldung.com/spring-boot-angular-web
 https://www.javaguides.net/2019/06/spring-boot-angular-7-crud-example-tutorial.html
 
+
+
+Aula 09.10. Usando two-way data binding
+---------------------------------------
+
+    . [(ngModel)] é a forma mais pratica na troca de informação entre o template e o componente, exemplo:
+
+        Forma convencional:
+
+            <input type="text" 
+                class="form-control"
+                (input)="alterarNome($event)"
+                [value]="nome">
+
+        Forma two-way:
+
+            <input type="text"
+                    class="form-control"
+                    [(ngModel)]="nome">
+
+            . Dessa forma todas as vezes que houver mudança do valor da propriedade "nome" no 
+                componente, tanto por parte do template, quanto por parte do componente o 
+                [(ngModel)] fará a troca.
+
+    . Para trabalhar com ngModel é necessário importar o pacote "FormsModule" dentro do componente "app.module.ts":
+
+
+        ...
+        import { FormsModule } from '@angular/forms';
+        ...
+        imports :[
+            ...
+            FormsModule
+        ]
+
+
+
+Aula 09.11. Introdução às diretivas
+-----------------------------------
+
+    . Diretivas são instruções que passamos para os templates.
+
+    . Existem 3 tipos de diretivas:
+
+        Componente - que passamos para o template:
+
+            <app-curso></app-curso>
+
+        Estrutural - Podem ser anexadas a elementos DOM (e componentes, pois são elementos DOM) para modificar a estrutura do DOM.
+
+            <h2 *ngIf="logado">Olá {{nome}}</h2>
+
+            <div *ngIf="hero" class="name">{{hero.name}}</div>
+
+        Atributo - Podem ser anexadas a elementos DOM (e componentes, pois são elementos DOM) para modificar a aparência 
+                    ou o comportamento de um elemento e não altera a estrutura do DOM.
+
+            <h2 [style.color]="'red'">{{nome}}</h2>
+
+
+
+
+Aula 09.12. Exibindo condicionalmente com as diretivas ngIf e hidden
+--------------------------------------------------------------------
+
+    . Acesse a classe src/app/cliente/app.component.ts e deixe como abaixo:
+
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-cliente',
+            templateUrl: './cliente.component.html',
+            styleUrls: ['./cliente.component.css']
+        })
+
+        export class ClienteComponent implements OnInit {
+
+            salvo : Boolean;       // Criado
+            cpf : String;
+            nome : String;
+            idade : Number;
+
+            constructor() { }
+
+            ngOnInit() {
+                this.cpf = '106.523.608-58';
+                this.idade = 55;
+                this.nome = 'MARCO ANTONIO SILVA';
+                this.adionado = false;
+
+            }
+
+
+            salvar( nome : string ){
+                this.salvo = true;     // Criado
+                this.nome = nome;
+
+                console.log(`Cliente ${this.nome} salvo!!!`);
+            }
+        }
+
+    . Acesse a classe src/app/cliente/app.component.html e deixe como abaixo:
+
+        <div class="container">
+                                                         <!-- Criado -->
+            <div class="alert alert-success" role="alert" *ngIf="salvo">
+                Nome do Cliente : <strong> {{nome}} </strong>
+            </div>
+
+            <div class="form-group">
+                <label for="clienteNome">Nome do Cliente</label>
+                <input type="text" class="form-control" id="nomeCliente" #nomeInput (keyup)="nome=nomeInput.value" [value]="nome" >
+                <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
+            </div>     
+
+            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)" [disabled]="nomeInput.value.length == 0">Salvar</button>                   
+        </div>
+
+
+        . O *ngIf é uma diretiva estrutural, porque altera a estrutura/layout do template.
+
+    . Execute o projeto e veja se a condição para mostrar o nome do cliente somente quando ele foi adiciona está sendo feito com sucesso.
+
+    . Altere o objeto HTML "nomeCliente" como abaixo:
+
+        <input type="text" class="form-control" id="nomeCliente" #nomeInput (keyup)="nome=nomeInput.value" [value]="nome" (focus)="salvo = false" >
+
+    . Execute o projeto e veja se a condição para mostrar o nome do cliente somente quando ele foi adiciona está sendo feito com sucesso.
+
+    . Altere a tag <div> como abaixo:
+
+            <div class="alert alert-success" role="alert" [hidden]="!salvo">
+                Nome do Cliente : <strong> {{nome}} </strong>
+            </div>
+
+    . Execute o projeto e veja se a condição para mostrar o nome do cliente somente quando ele foi adiciona está sendo feito com sucesso.
