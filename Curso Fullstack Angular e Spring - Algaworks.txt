@@ -4332,7 +4332,8 @@ Aula 8.1 a 8.6
 
     . Instalação do Plugin de debug no VSCode:
 
-        . Chrome:
+        . Chrome (Verificar se nas versões recentes do VSCode ele já vem instalado automaticamente, tente fazer os procedimentos abaixo
+                    sem instalar o plugin para ver se dá certo )
 
             // https://www.youtube.com/watch?v=Lczqac3paNM    
 
@@ -4357,13 +4358,20 @@ Aula 8.1 a 8.6
                     ]
                 }
 
-            . Acesse o terminal para levantar o projeto (ng serve), no VSCode acesse a página principal e na área de debug de o "play" no debug.
+            . Acesse o terminal para levantar o projeto 
+            
+                $ ng serve
+            
+            . No VSCode acesse a página principal.
+            
+            . Na área de debug de o "play" no debug.
 
             . No navegador vá até a página onde você que depurar e faça as ações para isso.
 
         . Angular 2, 4 and upcoming latest TypeScript HTML Snippets
 
             . Dentro de algum template digite ngFor e tecle tab.
+
 
 Aula 8.7. Instalando e Criando um projeto angular CLI
 -----------------------------------------------------
@@ -5486,3 +5494,303 @@ Aula 09.12. Exibindo condicionalmente com as diretivas ngIf e hidden
             </div>
 
     . Execute o projeto e veja se a condição para mostrar o nome do cliente somente quando ele foi adiciona está sendo feito com sucesso.
+
+
+
+Aula 09.13. Iterando com a diretiva ngFor
+-----------------------------------------
+
+    . Existe um site de fotos aleatória de pessoas https://www.randomuser.me . Neste lugar serão pego fotos
+        das pessoas.
+
+    . Acesse o template src/app/cliente/cliente.component.html e insira o código abaixo:
+
+
+        <div class="container" >
+            <div class="alert alert-success" role="alert" [hidden]="!salvo">
+                Nome do Cliente : <strong> {{nome}} </strong>
+            </div>
+
+            <div class="form-group">
+                <label for="clienteNome">Nome do Cliente</label>
+                <input type="text" class="form-control" id="nomeCliente" #nomeInput [(ngModel)]="nome" (focus)="salvo=false">
+                <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
+            </div>     
+
+            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)" [disabled]="nomeInput.value.length == 0">Salvar</button>                   
+
+            <div class="row" style="margin-top: 20px;" >
+                <div class="col-2" *ngFor="let cliente of clientes" >
+                <div class="card">
+                    <img src="https://randomuser.me/api/portraits/women/{{cliente.id}}.jpg">
+                    <div class="card-body">
+                        {{cliente.nome}}
+                    </div>
+                </div>  
+            </div>
+            </div>
+        </div>
+
+    . Acesse o componente src/app/cliente/cliente.component.ts e deixe o código como abaixo:
+
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-cliente',
+            templateUrl: './cliente.component.html',
+            styleUrls: ['./cliente.component.css']
+        })
+        export class ClienteComponent implements OnInit {
+
+        ultimoId : number = 1;
+        salvo : Boolean;
+        cpf : String;
+        nome : string;
+        idade : Number;
+
+        clientes : any[] = [];
+
+        constructor() { }
+
+        ngOnInit() {
+            this.salvo = false;
+            this.cpf = '106.523.608-58';
+            this.idade = 55;
+            this.nome = 'Jéssica';
+
+        }
+
+
+        salvar( nome : string ){
+                this.salvo = true;
+
+                this.nome = nome;
+
+                this.clientes.push({  id : ++this.ultimoId,
+                                    nome : this.nome});
+
+                console.log(`Cliente ${this.nome} salvo!!!`);
+            }
+        }
+
+    . Execute o projeto e veja o resultado.
+
+
+Aula 09.14. Binding de propriedades customizadas com @Input
+-----------------------------------------------------------
+
+    . A parte interna do card feito na aula anterior será colocado como um componente a parte.
+
+    . Acesse a raiz do projeto e execute o comando abaixo no prompt do SO:
+
+        $ ng g c cliente-card --spec=false
+
+    . Altere o arquivo src/app/cliente/cliente.component.html como abaixo:
+
+        <div class="container" >
+            <div class="alert alert-success" role="alert" *ngIf="salvo">
+                Nome do Cliente : <strong> {{nome}} </strong>
+            </div>
+
+            <div class="form-group">
+                <label for="clienteNome">Nome do Cliente</label>
+                <input type="text" class="form-control" id="nomeCliente" #nomeInput [(ngModel)]="nome" (focus)="salvo=false">
+                <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
+            </div>     
+
+            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)" [disabled]="nomeInput.value.length == 0">Salvar</button>                   
+
+            <div class="row" style="margin-top: 20px;" >
+                <div class="col-2" *ngFor="let c of clientes" >
+                    <!-- Foi retirado o codigo daqui de dentro e transferido para o componente cliente-card.component.html -->
+                    <app-cliente-card [cliente]="c"></app-cliente-card>
+                </div>
+            </div>
+        </div>
+
+    . Cópie o código HTML abaixo para o arquivo src/app/cliente-card/cliente-card.component.html
+
+        <div class="card">
+            <img src="https://randomuser.me/api/portraits/women/{{cliente.id}}.jpg">
+            <div class="card-body">
+                {{cliente.nome}}
+            </div>
+        </div>  
+
+
+    . Crie a propriedade abaixo no componente src/app/card-cliente/card-cliente-component.ts:
+
+        import { Component, Input, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-cliente-card',
+            templateUrl: './cliente-card.component.html',
+            styleUrls: ['./cliente-card.component.css']
+        })
+        export class ClienteCardComponent implements OnInit {
+
+            @Input()
+            cliente : any;
+
+            constructor() { }
+
+            ngOnInit() {
+            }
+
+        }
+
+    . Execute o projeto.
+
+
+Aula 09.15. Binding de eventos customizados com @Output e EventEmitter
+----------------------------------------------------------------------
+
+    . Na pasta raiz do projeto execute o comando abaixo no prompt do SO.
+
+        $ ng g c cliente-form
+
+    . Altere o conteúdo do arquivo src/app/cliente-form/cliente-form.component.html como abaixo:
+
+        <div class="alert alert-success" role="alert" *ngIf="salvo">
+            Nome do Cliente : <strong> {{nome}} </strong>
+        </div>
+
+        <div class="form-group">
+            <label for="clienteNome">Nome do Cliente</label>
+            <input type="text" class="form-control" id="nomeCliente" #nomeInput [(ngModel)]="nome" (focus)="salvo=false">
+            <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
+        </div>     
+
+        <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)" [disabled]="nomeInput.value.length == 0">Salvar</button>                   
+
+    . Altere o conteúdo do arquivo src/app/cliente/cliente.component.html como abaixo:
+
+        <div class="container" >
+            <app-cliente-form (clienteAdicionado)="aoAdicionar($event)"></app-cliente-form>
+
+            <div class="row" style="margin-top: 20px;" >
+                <div class="col-2" *ngFor="let c of clientes">
+                <app-cliente-card [cliente]="c"></app-cliente-card>
+            </div>
+        </div>
+
+    . Altere o codigo do componente src/app/cliente/cliente.component.ts como abaixo:
+
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-cliente',
+            templateUrl: './cliente.component.html',
+            styleUrls: ['./cliente.component.css']
+        })
+        export class ClienteComponent implements OnInit {
+
+            clientes : any[] = [];
+
+            ngOnInit() {
+
+                
+            }
+
+            aoAdicionar( cliente ){
+                this.clientes.push( cliente );
+            }
+
+        }
+
+    . Altere o codigo do componente src/app/cliente-form/cliente-form.component.ts como abaixo:
+
+        import { Component, EventEmitter, OnInit, EventEmmiter, Output } from '@angular/core';
+
+        @Component({
+            selector: 'app-cliente-form',
+            templateUrl: './cliente-form.component.html',
+            styleUrls: ['./cliente-form.component.css']
+        })
+        export class ClienteFormComponent implements OnInit {
+
+            ultimoId : number = 1;
+            salvo : Boolean;
+            cpf : String;
+            nome : string;
+            idade : Number;
+
+            @Output()
+            clienteAdicionado = new EventEmitter();
+
+
+            constructor() { 
+
+            }
+
+            ngOnInit() {
+                this.salvo = false;
+                this.cpf = '106.523.608-58';
+                this.idade = 55;
+                this.nome = 'Jéssica';
+
+            }
+
+            salvar( nome : string ){
+                this.salvo = true;
+
+                this.nome = nome;
+
+                const cliente =  { id : ++this.ultimoId,
+                                    nome : this.nome
+                                };
+
+                this.clienteAdicionado.emit( cliente );
+
+                console.log(`Cliente ${this.nome} salvo!!!`);
+            }
+        }
+
+    
+    . Altere o codigo do componente src/app/cliente/cliente.component.html como abaixo:
+
+        <div class="container" >
+            <app-cliente-form (clienteAdicionado)="aoAdicionar()"></app-cliente-form>
+
+            <div class="row" style="margin-top: 20px;" >
+                <div class="col-2" *ngFor="let c of clientes">
+                <app-cliente-card [cliente]="c"></app-cliente-card>
+                </div>
+            </div>
+        </div>
+
+    . Sequência de execução:
+
+        1. No componente cliente-form.component.ts é feito a declaração da propriedade do tipo "listener".
+            Ou seja, o EventEmitter ficará escutando por um método. Detalhe, o decorate @Output exporta
+            o objeto listener para o projeto inteiro, como se deixasse o objeto público.
+
+            @Output()
+            clienteAdicionado = new EventEmitter();
+
+        2. No template cliente.component.html é feito a associação entre o método do componente pertinente 
+            a ele "cliente.componente.aoAdicionar()" com o listener "clienteAdicionado" através de um 
+            property binding ...(clienteAdicionado)="aoAdicionar($event)"
+
+            <app-cliente-form (clienteAdicionado)="aoAdicionar($event)"></app-cliente-form>
+
+            . Importante: o parâmetro do método aoAdicionar, o $event, é necessário para manter o contrato da assinatura.
+                            No método cliente-form.component.salvar é feito a chamada ao listener com o objeto cliente, resumindo
+                            simplesmente coloque o $event. 
+
+                this.clienteAdicionado.emit( cliente );                            
+
+        3. Quando o botão salvar do template cliente-form.component.html é acionado é chamado o método "salvar"
+            do componente associado ao template.
+
+            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)" [disabled]="nomeInput.value.length == 0">Salvar</button>                   
+
+        4. No método salvar do componente client-form.component é feito a chamada do listener:
+
+            salvar( nome : string ){
+                ...
+
+                this.clienteAdicionado.emit( cliente );
+            }
+
+        5. O listener associado ao método aoAdicionar feito no passo 2, executa o metodo "cliente.componente.aoAdicionar( cliente )"
