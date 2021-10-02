@@ -5793,4 +5793,77 @@ Aula 09.15. Binding de eventos customizados com @Output e EventEmitter
                 this.clienteAdicionado.emit( cliente );
             }
 
-        5. O listener associado ao método aoAdicionar feito no passo 2, executa o metodo "cliente.componente.aoAdicionar( cliente )"
+        5. O listener associado ao método "aoAdicionar", feito no passo 2, executa o metodo "cliente.componente.aoAdicionar( cliente )"
+
+
+
+Aula 09.16. Adicionando estilos CSS em componentes
+--------------------------------------------------
+
+    . Existem várias maneiras de implementar um estilo css no angular.
+
+        . O primeiro seria no arquivo de estilo que é criado com o componente e o template.
+
+            . No componente src/app/cliente-form/cliente-form.component.ts existe dentro do decorate @Component a declaração do styleUrls, 
+                que aponta para o arquivo "cliente-form.component.css
+
+                @Component({
+                    ...
+                    styleUrls: ['./cliente-form.component.css']
+                })
+                export class ClienteComponent implements OnInit {
+
+            . Acesse o arquivo src/app/cliente/cliente-form.component.css e inclua o código abaixo:
+
+                label {
+                    color : red;
+                }
+
+            . Execute o projeto e verifique se o titulo/label do input ficou com a cor vermelha.
+
+        . A segunda forma seria implementar diretamente o style no decorate @Component:
+
+            . No componente src/app/cliente-card/cliente-card.component.ts existe dentro do decorate @Component a declaração do styleUrls, 
+                apague essa propriedade e no lugar coloque outra com nome de "style" como abaixo:
+
+                @Component({
+                    selector: 'app-cliente-card',
+                    templateUrl: './cliente-card.component.html',
+                    //  styleUrls: ['./cliente-card.component.css']
+                    styles : [ `
+                                .card-body { text-transform : uppercase;
+                                                color : blue; }
+                    
+                            `]
+                })
+                export class ClienteCardComponent implements OnInit {
+                ...
+
+            . Execute o projeto e verifique se o rodapé do card ficou maiusculo e azul.
+
+    . Nos dois casos devemos observar que as propriedades são declaradas através de arrays, neste 
+        caso podemos ter mais de um item na declaração.
+
+
+
+Aula 09.17. Estilos CSS dinâmicos com ngStyle
+---------------------------------------------
+        
+    . O "ngStyle" é uma diretiva que permite alterar dinamicamente o estilo dos elementos DOM.
+
+    . Uma forma de usar o "ngStyle" é atribuir um objeto fixo :
+
+        <div [ngStyle]="{'background-color':'green'}"></<div>            
+
+        . Toda diretiva deve ser colocada entre colchetes
+
+        . Por se tratar de uma diretiva as propriedades e valores dentro do objeto tem ser colocado entre aspas simples
+
+    . Outra forma de usar o "ngStyle" é atribuir um objeto dinamicamente:
+
+        <div [ngStyle]="{'background-color':person.country === 'UK' ? 'green' : 'red' }"></<div>    
+
+    . Desenvolva o exemplo do link abaixo:
+
+https://codecraft.tv/courses/angular/built-in-directives/ngstyle-and-ngclass/
+
