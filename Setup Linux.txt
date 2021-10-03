@@ -469,7 +469,68 @@ https://code.visualstudio.com/download
 	JQuery Code Snippets	- Basta digitar algo que comece com "jq"
 	Code Runner				- Ctrl + Shift + N, ou clique direito 
 	Regex Workbench			- Clique na estrela entre / / na barra de baixo
-	
+	MDX Preview				- Consulta em tela de arquivo com extensão .MD
+
+
+	Extensões para se trabalhar com o Angular:
+	------------------------------------------
+	Chrome 					(Verificar se nas versões recentes do VSCode ele já vem instalado automaticamente, tente fazer os procedimentos abaixo
+                    			sem instalar o plugin para ver se dá certo )
+
+            // https://www.youtube.com/watch?v=Lczqac3paNM    
+
+            				. Pré requisito que o navegador Chrome esteja instalado no sistema operacional.
+
+            				. Acesse o projeto, vá para a área de Debug, acione a criação do "launch.json" e informe o ambiente "Chrome".
+
+            				. Acesse o arquivo launch.json e altere o conteúdo pelo abaixo:
+
+                {
+                    // Use o IntelliSense para saber mais sobre os atributos possíveis.
+                    // Focalizar para exibir as descrições dos atributos existentes.
+                    // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+                    "version": "0.2.0",
+                    "configurations": [
+                        {
+                            "name": "Debug Angular",
+                            "url": "http://localhost:4200",
+                            "webRoot": "${workspaceFolder}"
+                        }
+
+                    ]
+                }
+
+            . Acesse o terminal para levantar o projeto 
+            
+                $ ng serve
+            
+            . No VSCode acesse a página principal.
+            
+            . Na área de debug de o "play" no debug.
+
+            . No navegador vá até a página onde você que depurar e faça as ações para isso.
+
+	Angular 2, 4 and upcoming latest TypeScript HTML Snippets
+
+		. Dentro de algum template digite ngFor e tecle tab.
+
+	tslint - Plugin para apontar ausências no padrão de programação, deixando em vermelhos os pontos que não estão
+				em conformidade. 
+
+		. Ao digitar Ctrl + Shift + P e digitar "tslint", surge vários comandos especificos do plugin
+
+		. Acrescente o trecho abaixo no arquivo launch.json para habilitar o plugin:
+
+			// Dentro do array "configurations"
+			"editor.codeActionsOnSave": {
+				"source.fixAll.tslint": true
+			}
+
+	. editorconfig for VS Code - Plugin destinado a manter o padrão de codificação
+
+		. As configurações dos padrões estão no arquivo .editorconfig
+
+
 	Testar
 
 	Gitlens

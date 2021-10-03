@@ -4372,6 +4372,28 @@ Aula 8.1 a 8.6
 
             . Dentro de algum template digite ngFor e tecle tab.
 
+        . tslint - Plugin para apontar ausências no padrão de programação, deixando em vermelhos os pontos que não estão
+                    em conformidade. 
+
+            . Ao digitar Ctrl + Shift + P e digitar "tslint", surge vários comandos especificos do plugin
+
+            . Acrescente o trecho abaixo no arquivo launch.json para habilitar o plugin:
+
+                // Dentro do array "configurations"
+                "editor.codeActionsOnSave": {
+                    "source.fixAll.tslint": true
+                }
+
+        . editorconfig for VS Code - Plugin destinado a manter o padrão de codificação
+
+            . As configurações dos padrões estão no arquivo .editorconfig
+
+
+        TESTAR
+
+        . Angular Snippets (version 12) - Plugin para ajudar na implementação dos componentes do angular através de templates de código.
+
+
 
 Aula 8.7. Instalando e Criando um projeto angular CLI
 -----------------------------------------------------
@@ -5866,4 +5888,50 @@ Aula 09.17. Estilos CSS dinâmicos com ngStyle
     . Desenvolva o exemplo do link abaixo:
 
 https://codecraft.tv/courses/angular/built-in-directives/ngstyle-and-ngclass/
+
+
+
+Aula 09.18. Classes CSS dinâmicas com ngClass
+---------------------------------------------
+
+    . O "ngClass" é uma diretiva que permite alterar dinamicamente o estilo dos elementos DOM, a diferença do ngStyle
+        é que o ngClass utiliza nomes de classes ".card-body" por exemplo:
+
+    . Exemplo: 
+        
+        <div class="card-body"><span [ngClass]="['badge','badge-primary']">{{cliente.nome}}</span></div>
+
+        ou 
+
+        // Template
+        <div class="card-body"><span [ngClass]="getListaClasseCSS()">{{cliente.nome}}</span></div>
+
+        // Component
+        ...
+        export class ClienteCardComponent{
+            ...
+
+            getClassCSS(){
+                return ['badge','badge-primary'];
+            }
+
+            ...
+        }
+
+        ou
+
+        // Template
+        <div class="card-body"><span [ngClass]="{'badge-danger' : isAdmin(), 'badge-primary' : !isAdmin()}"> {{cliente.nome}} </span></div>
+
+        // Component
+        ...
+        export class ClienteCardComponent{
+            ...
+
+            isAdmin(){
+                return this.cliente.nome.startsWith('T');
+            }
+
+            ...
+        }
 
