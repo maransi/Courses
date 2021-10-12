@@ -4409,6 +4409,14 @@ Aula 8.7. Instalando e Criando um projeto angular CLI
         
         # sudo npm install -g @angular/cli
 
+    . Para desinstalar o Angular
+
+        # sudo npm uninstall -g @angular/cli
+
+
+    . Para atualizar:
+
+        # sudo npm install --save-dev @angular/cli@latest    
 
     . Crie um projeto com os comandos abaixo:
 
@@ -4508,8 +4516,9 @@ https://www.devmedia.com.br/angular-cli-como-criar-e-executar-um-projeto-angular
           equipe do Angular.
 
         . package.json: Esse arquivo é o responsável por gerenciar as dependências do nosso projeto, quando nós 
-          executamos o comando npm install, ele verifica os pacotes que estão dentro desse arquivo e baixa para o nosso 
-          diretório node_modules conforme foi visto no passo anterior.
+          executamos o comando npm install [biblioteca] --save, ele verifica os pacotes que estão dentro desse arquivo e 
+          baixa para o nosso diretório node_modules conforme foi visto no passo anterior. O parâmetro --save é para deixar
+          registrado a dependência da biblioteca no arquivo package.json.
 
         . protractor.conf.js: Responsável pela execução dos nossos testes unitários que estão dentro do nosso diretório e2e.
 
@@ -5935,3 +5944,134 @@ Aula 09.18. Classes CSS dinâmicas com ngClass
             ...
         }
 
+
+Aula 10.02. Escolhendo uma biblioteca de componentes
+----------------------------------------------------
+
+    . Abaixo as principais bibliotecas angular para desenvolvimento:
+
+        https://material.angular.io/
+        https://materializecss.com/
+        https://ng-bootstrap.github.io/#/home
+        https://valor-software.com/ngx-bootstrap/#/
+        https://www.primefaces.org/primeng/
+
+
+
+Aula 10.03. Criando o projeto do curso e instalando o PrimeNG
+-------------------------------------------------------------
+
+    . Criação de um novo projeto angular. Acesse a pasta raiz de desenvolvimento dos projetos e digite o 
+        comando abaixo:
+
+        $ ng new algamoney-ui
+
+    . Acesse a pasta do projeto algamoney-ui no VSCode.
+
+    
+    . Acesse no terminal a pasta raiz do projeto e digite o comando abaixo:
+
+https://www.npmjs.com/package/primeng
+
+"primeng" : "^4.1.0",
+"font-awesome" : "^4.7.0"
+
+        . Utilize os comandos abaixo para manter a compatibilidade do curso:
+
+            $ npm install primeng@4.1.0 --save
+
+            $ npm install font-awesome@4.7.0 --save
+
+        . Caso queira a versão atual do PrimeNG:
+
+            $ npm install primeng --save
+
+            $ npm install primeicons --save
+
+            $ npm install font-awesome --save
+
+    . Demais configurações do PrimeNG no projeto:
+
+        . Utilize os comandos abaixo para manter a compatibilidade do curso:
+
+            . Acesse o arquivo .angular-cli.json e adicone as linhas abaixo dentro do item "style":
+
+                "styles": [
+                    "node_modules/font-awesome/css/font-awesome.min.css",
+                    "node_modules/primeng/resources/primeng.min.css",
+                    "node_modules/primeng/resources/themes/omega/theme.css",
+                    "styles.css"
+                ],
+
+            . Adicione a importação do componente prime dentro do arquivo src/app/app.module.ts
+
+                import {TabViewModule} from 'primeng/primeng';
+
+                ...
+
+                imports: [
+                    BrowserModule,
+                    TabViewModule
+                ],
+
+                ...
+
+
+        . Utilize a configuração abaixo para a versão atual do PrimeNG:
+
+            . Acesse o arquivo angularcli.json, adicione as linhas abaixo dentro do item "style":
+
+                "styles": [
+                    "node_modules/primeng/resources/themes/saga-blue/theme.css",
+                    "node_modules/font-awesome/css/font-awesome.min.css",
+                    "node_modules/primeng/resources/primeng.min.css",
+                    "node_modules/primeicons/primeicons.css",
+                    "styles.css"
+                ],
+
+            . Adicione a importação do componente prime dentro do arquivo src/app/app.module.ts
+
+                import {TabViewModule} from 'primeng/tabview';    
+
+                ...
+
+                imports: [
+                    BrowserModule,
+                    TabViewModule
+                ],
+
+                ...
+
+    . Substitua o conteúdo do arquivo src/app/app.component.html pelo abaixo:
+
+        <p-tabView>
+            <p-tabPanel header="Header 1">
+                Content 1
+            </p-tabPanel>
+            <p-tabPanel header="Header 2">
+                Content 2
+            </p-tabPanel>
+            <p-tabPanel header="Header 3">
+                Content 3
+            </p-tabPanel>
+        </p-tabView>
+
+
+
+Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
+---------------------------------------------------------------
+
+    . Acesse a URL abaixo para entender o esquema de grid css PrimeNG:
+
+        https://www.primefaces.org/showcase/ui/panel/grid.xhtml?jfwid=f514c    
+        https://www.primefaces.org/primeng/showcase/#/primeflex/grid
+        https://www.ti-enxame.com/pt/angular/grade-flexivel-nao-funciona-para-p-col-primeng-angular-5/807070731/
+
+    . A tela é dividida em 12 partes, em que é possível através de classes informar
+        quantas posições queremos ocupar no monitor.
+
+    . Podemos informar a quantidade de partes que queremos informar através das classes "ui-g-":
+
+        ui-g-12 ui-md-6 ui-lg-3
+
+    . 
