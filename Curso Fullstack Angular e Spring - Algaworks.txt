@@ -5969,20 +5969,7 @@ Aula 10.03. Criando o projeto do curso e instalando o PrimeNG
     . Acesse a pasta do projeto algamoney-ui no VSCode.
 
     
-    . Acesse no terminal a pasta raiz do projeto e digite o comando abaixo:
-
-https://www.npmjs.com/package/primeng
-
-"primeng" : "^4.1.0",
-"font-awesome" : "^4.7.0"
-
-        . Utilize os comandos abaixo para manter a compatibilidade do curso:
-
-            $ npm install primeng@4.1.0 --save
-
-            $ npm install font-awesome@4.7.0 --save
-
-        . Caso queira a versão atual do PrimeNG:
+    . Na pasta raiz do projeto execute os comandos abaixo:
 
             $ npm install primeng --save
 
@@ -5990,57 +5977,35 @@ https://www.npmjs.com/package/primeng
 
             $ npm install font-awesome --save
 
-    . Demais configurações do PrimeNG no projeto:
+            $ npm install @angular/animations --save
 
-        . Utilize os comandos abaixo para manter a compatibilidade do curso:
+            $ npm install primeflex --save
 
-            . Acesse o arquivo .angular-cli.json e adicone as linhas abaixo dentro do item "style":
+    . Acesse o arquivo angularcli.json, adicione as linhas abaixo dentro do item "style":
 
-                "styles": [
-                    "node_modules/font-awesome/css/font-awesome.min.css",
-                    "node_modules/primeng/resources/primeng.min.css",
-                    "node_modules/primeng/resources/themes/omega/theme.css",
-                    "styles.css"
-                ],
+        "styles": [
+            "node_modules/primeng/resources/themes/saga-blue/theme.css",
+            "node_modules/font-awesome/css/font-awesome.min.css",
+            "node_modules/primeng/resources/primeng.min.css",
+            "node_modules/primeicons/primeicons.css",
+            "node_modules/primeflex/primeflex.css",
+            "styles.css"
+        ],
 
-            . Adicione a importação do componente prime dentro do arquivo src/app/app.module.ts
+    . Adicione a importação do componente prime dentro do arquivo src/app/app.module.ts
 
-                import {TabViewModule} from 'primeng/primeng';
+        import {TabViewModule} from 'primeng/tabview';    
+        import {InputTextModule} from 'primeng/inputtext';
 
-                ...
+        ...
 
-                imports: [
-                    BrowserModule,
-                    TabViewModule
-                ],
+        imports: [
+            BrowserModule,
+            TabViewModule,
+            InputTextModule
+        ],
 
-                ...
-
-
-        . Utilize a configuração abaixo para a versão atual do PrimeNG:
-
-            . Acesse o arquivo angularcli.json, adicione as linhas abaixo dentro do item "style":
-
-                "styles": [
-                    "node_modules/primeng/resources/themes/saga-blue/theme.css",
-                    "node_modules/font-awesome/css/font-awesome.min.css",
-                    "node_modules/primeng/resources/primeng.min.css",
-                    "node_modules/primeicons/primeicons.css",
-                    "styles.css"
-                ],
-
-            . Adicione a importação do componente prime dentro do arquivo src/app/app.module.ts
-
-                import {TabViewModule} from 'primeng/tabview';    
-
-                ...
-
-                imports: [
-                    BrowserModule,
-                    TabViewModule
-                ],
-
-                ...
+        ...
 
     . Substitua o conteúdo do arquivo src/app/app.component.html pelo abaixo:
 
@@ -6061,17 +6026,22 @@ https://www.npmjs.com/package/primeng
 Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
 ---------------------------------------------------------------
 
-    . Acesse a URL abaixo para entender o esquema de grid css PrimeNG:
-
-        https://www.primefaces.org/showcase/ui/panel/grid.xhtml?jfwid=f514c    
-        https://www.primefaces.org/primeng/showcase/#/primeflex/grid
-        https://www.ti-enxame.com/pt/angular/grade-flexivel-nao-funciona-para-p-col-primeng-angular-5/807070731/
+    Sistema de grid do PrimeNG
+    --------------------------
 
     . A tela é dividida em 12 partes, em que é possível através de classes informar
         quantas posições queremos ocupar no monitor.
 
-    . Podemos informar a quantidade de partes que queremos informar através das classes "ui-g-":
+    . Podemos informar a quantidade de partes que queremos informar através das classes "grid" e "col":
 
-        ui-g-12 ui-md-6 ui-lg-3
+        .grid, .col .col-1, .col-2, ..., .col-12, .col-sm-1,...
+
+    .  Exemplo:
+
+        <div class="grid">
+            <div class="col">1</div>
+            <div class="col">2</div>
+            <div class="col">3</div>
+        </div>
 
     . 
