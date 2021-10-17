@@ -5961,6 +5961,21 @@ Aula 10.02. Escolhendo uma biblioteca de componentes
 Aula 10.03. Criando o projeto do curso e instalando o PrimeNG
 -------------------------------------------------------------
 
+
+https://app.algaworks.com/forum/topicos/69775/versao-do-cli
+
+
+    . IMPORTANTE: As versões do Angular e PrimeNG utilizadas estão abaixo:
+
+        Angular/cli
+
+            12.2.10    
+
+        PrimeNG
+
+            12.2.1
+
+
     . Criação de um novo projeto angular. Acesse a pasta raiz de desenvolvimento dos projetos e digite o 
         comando abaixo:
 
@@ -6130,4 +6145,112 @@ Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
         . O estilo "display : block;" da tag label serve como o p-fluid e jogar o conteúdo da label
             em cima dos campos Data Início e Fim.
 
+https://www.tutorialspoint.com/angular4/angular4_project_setup.htm
+https://stackoverflow.com/questions/42831527/create-project-with-angular-4-release-using-angular-cli/42833075
 
+
+
+
+
+
+
+ng generate class domain/lancamento --type=model --spec=false
+ng generate interface domain/lancamento
+
+
+Aula 10.5 - Adicionando uma tabela de dados
+-------------------------------------------
+
+    . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+        $ npm install @angular/cdk --save
+
+        $ ng generate interface domain/lancamento
+
+    . Acesse o arquivo domain/lancamento.ts e insira o código abaixo:
+
+        export interface Lancamento {
+            tipo?: string;
+            descricao?: string;
+            dataVencimento?: string;
+            dataPagamento?: string,
+            valor?: number,
+            pessoa?: string
+        }
+
+    . Acesse o arquivo app.component.ts e insira o código abaixo:
+
+        ...
+        import { Lancamento } from './domain/lancamento';
+
+        ...
+        export class AppComponent implements OnInit {
+            ...
+
+            lancamentos: Lancamento[] = [{
+                tipo: 'DESPESA',
+                descricao: 'Compra de pão',
+                dataVencimento: '30/06/2017',
+                dataPagamento: '01/07/2017',
+                valor: 4.55,
+                pessoa: 'Padaria do José'
+            },
+            {
+                tipo: 'DESPESA',
+                descricao: 'Compra de pão',
+                dataVencimento: '30/06/2017',
+                dataPagamento: '01/07/2017',
+                valor: 4.55,
+                pessoa: 'Padaria do José'
+            }];
+
+            ...
+        }
+
+    . Acesse o arquivo app.module.ts e insira o código abaixo:
+
+        ...
+        import {TableModule} from 'primeng/table';
+
+        ...
+        @NgModule({
+        ...        
+            imports: [
+                ...
+                TableModule
+            ],
+        ...
+
+    . Acesse o arquivo app.component.html e insira o código abaixo:
+
+        <div class="container">
+            <div class="grid">
+                <div class="col-12 p-inputtext-sm">
+                <p-table [value]="lancamentos" responsiveLayout="scroll">
+                    <ng-template pTemplate="header">
+                    <tr>
+                        <th>Pessoa</th>
+                        <th>Descrição</th>
+                        <th>Vencimento</th>
+                        <th>Pagamento</th>
+                        <th>Valor</th>
+                    </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-lancamento>
+                    <tr>
+                        <td>{{lancamento.pessoa}}</td>
+                        <td>{{lancamento.descricao}}</td>
+                        <td>{{lancamento.dataVencimento}}</td>
+                        <td>{{lancamento.dataPagamento}}</td>
+                        <td>{{lancamento.valor}}</td>
+                    </tr>
+                    </ng-template>
+                </p-table>
+
+                </div>
+            </div>
+        </div>
+
+    . Execute o comando abaixo e verifique se o código funcionou:
+
+        $ ng serve --open    
