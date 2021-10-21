@@ -5961,6 +5961,21 @@ Aula 10.02. Escolhendo uma biblioteca de componentes
 Aula 10.03. Criando o projeto do curso e instalando o PrimeNG
 -------------------------------------------------------------
 
+
+https://app.algaworks.com/forum/topicos/69775/versao-do-cli
+
+
+    . IMPORTANTE: As versões do Angular e PrimeNG utilizadas estão abaixo:
+
+        Angular/cli
+
+            12.2.10    
+
+        PrimeNG
+
+            12.2.1
+
+
     . Criação de um novo projeto angular. Acesse a pasta raiz de desenvolvimento dos projetos e digite o 
         comando abaixo:
 
@@ -6044,4 +6059,198 @@ Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
             <div class="col">3</div>
         </div>
 
-    . 
+    . A classe p-fluid serve para redimensionar o conteúdo da celula, ou seja, ela fará com que o 
+        conteúdo ocupe 100% do espaço da celula. Na prática ela deixa a tag <label> em cima da tag
+        <input>
+
+    Protótipo da tela de pesquisa 
+    -----------------------------
+
+    . No arquivo style.css do projeto insira o conteúdo abaixo:
+
+        body{
+            margin: 0;
+            font-family:  Arial, Helvetica, sans-serif;
+            color: #404C51;
+        }
+
+        label{
+            font-weight: bold;
+            font-size: small;
+        }
+
+        @media (min-width: 1200px){
+            .container{
+                width: 1170px;
+                margin: 0 auto;
+            }
+        }
+
+        . O @media funciona como uma regra, que é estipulada dentro dos (). Neste caso,
+            os valores definidos só servirá para monitores até 1200px, abaixo disso
+            considerará o tamanho fisico do monitor.
+
+        . margin : 0 auto - Servirá para centralizar o conteúdo, 0=zero de margin top, bottom, left e right
+                                                                 auto=para forçar a centralização.
+
+    . No componente src/app/app.module.ts coloque o código abaixo:
+
+        import { NgModule } from '@angular/core';
+        import { BrowserModule } from '@angular/platform-browser';
+
+        import { AppComponent } from './app.component';
+        import {InputTextModule} from 'primeng/inputtext';
+        import {ButtonModule} from 'primeng/button';
+
+        @NgModule({
+        declarations: [
+            AppComponent
+        ],
+        imports: [
+                BrowserModule,
+                InputTextModule,
+                ButtonModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+
+
+    . No componente src/app/app.component.html inclua o código abaixo:
+
+        <div class="container">
+            <div class="grid">
+                <div class="col-12">
+                    <h1>Lançamentos</h1>
+                </div>
+                <div class="col-12 p-fluid">
+                    <label for="descricao">Descrição</label>
+                    <input pInputText type="text" id="descricao" class="p-inputtext-sm">
+                </div>
+                <div class="col-12">
+                    <label style="display: block;">Vencimento</label>
+                    <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
+
+                    <label>Até</label>
+                    <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
+                </div>
+
+                <div class="col-12">
+                    <button pButton type="submit" label="Pesquisar" class="p-button-sm"></button>
+                </div>
+            </div>
+        </div>
+
+        . O estilo "display : block;" da tag label serve como o p-fluid e jogar o conteúdo da label
+            em cima dos campos Data Início e Fim.
+
+https://www.tutorialspoint.com/angular4/angular4_project_setup.htm
+https://stackoverflow.com/questions/42831527/create-project-with-angular-4-release-using-angular-cli/42833075
+
+
+
+
+
+
+
+ng generate class domain/lancamento --type=model --spec=false
+ng generate interface domain/lancamento
+
+
+Aula 10.5 - Adicionando uma tabela de dados
+-------------------------------------------
+
+    . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+        $ npm install @angular/cdk --save
+
+        $ ng generate interface domain/lancamento
+
+    . Acesse o arquivo domain/lancamento.ts e insira o código abaixo:
+
+        export interface Lancamento {
+            tipo?: string;
+            descricao?: string;
+            dataVencimento?: string;
+            dataPagamento?: string,
+            valor?: number,
+            pessoa?: string
+        }
+
+    . Acesse o arquivo app.component.ts e insira o código abaixo:
+
+        ...
+        import { Lancamento } from './domain/lancamento';
+
+        ...
+        export class AppComponent implements OnInit {
+            ...
+
+            lancamentos: Lancamento[] = [{
+                tipo: 'DESPESA',
+                descricao: 'Compra de pão',
+                dataVencimento: '30/06/2017',
+                dataPagamento: '01/07/2017',
+                valor: 4.55,
+                pessoa: 'Padaria do José'
+            },
+            {
+                tipo: 'DESPESA',
+                descricao: 'Compra de pão',
+                dataVencimento: '30/06/2017',
+                dataPagamento: '01/07/2017',
+                valor: 4.55,
+                pessoa: 'Padaria do José'
+            }];
+
+            ...
+        }
+
+    . Acesse o arquivo app.module.ts e insira o código abaixo:
+
+        ...
+        import {TableModule} from 'primeng/table';
+
+        ...
+        @NgModule({
+        ...        
+            imports: [
+                ...
+                TableModule
+            ],
+        ...
+
+    . Acesse o arquivo app.component.html e insira o código abaixo:
+
+        <div class="container">
+            <div class="grid">
+                <div class="col-12 p-inputtext-sm">
+                <p-table [value]="lancamentos" responsiveLayout="scroll">
+                    <ng-template pTemplate="header">
+                    <tr>
+                        <th>Pessoa</th>
+                        <th>Descrição</th>
+                        <th>Vencimento</th>
+                        <th>Pagamento</th>
+                        <th>Valor</th>
+                    </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-lancamento>
+                    <tr>
+                        <td>{{lancamento.pessoa}}</td>
+                        <td>{{lancamento.descricao}}</td>
+                        <td>{{lancamento.dataVencimento}}</td>
+                        <td>{{lancamento.dataPagamento}}</td>
+                        <td>{{lancamento.valor}}</td>
+                    </tr>
+                    </ng-template>
+                </p-table>
+
+                </div>
+            </div>
+        </div>
+
+    . Execute o comando abaixo e verifique se o código funcionou:
+
+        $ ng serve --open    
