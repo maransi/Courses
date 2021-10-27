@@ -5984,7 +5984,7 @@ Aula 10.03. Criando o projeto do curso e instalando o PrimeNG
     . Acesse o arquivo src/app/app.module.ts e inclua o modulo "TabViewModule":
 
         ...
-        import {TabViewModule} from 'primeng/primeng';
+        import {TabViewModule} from 'primeng/components/tabview/tabview';
 
         @NgModule({
             ...
@@ -6073,8 +6073,8 @@ Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
         import { BrowserModule } from '@angular/platform-browser';
 
         import { AppComponent } from './app.component';
-        import {InputTextModule} from 'primeng/primeng';
-        import {ButtonModule} from 'primeng/primeng';
+        import {InputTextModule} from 'primeng/components/inputtext/inputtext';
+        import {ButtonModule} from 'primeng/components/button/button';
 
         @NgModule({
         declarations: [
@@ -6094,15 +6094,15 @@ Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
     . No componente src/app/app.component.html inclua o código abaixo:
 
         <div class="container">
-            <div class="grid">
-                <div class="col-12">
+            <div class="ui-g">
+                <div class="ui-g-12">
                     <h1>Lançamentos</h1>
                 </div>
-                <div class="col-12 p-fluid">
+                <div class="ui-g-12 ui-fluid">
                     <label for="descricao">Descrição</label>
                     <input pInputText type="text" id="descricao" class="p-inputtext-sm">
                 </div>
-                <div class="col-12">
+                <div class="ui-g-12">
                     <label style="display: block;">Vencimento</label>
                     <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
 
@@ -6110,7 +6110,7 @@ Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
                     <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
                 </div>
 
-                <div class="col-12">
+                <div class="ui-g-12">
                     <button pButton type="submit" label="Pesquisar" class="p-button-sm"></button>
                 </div>
             </div>
@@ -6120,25 +6120,198 @@ Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
             em cima dos campos Data Início e Fim.
 
 
+Aula 10.05. Adicionando uma tabela de dados
+-------------------------------------------
+
+    . Acesse o arquivo src/app/app.module.ts e insira o import abaixo
+
+        ...
+        import {DataTableModule, SharedModule} from 'primeng/primeng';
+
+        ...
+        @NgModule({
+            ...
+            imports: [
+                BrowserModule,
+                TabViewModule,
+                InputTextModule,
+                ButtonModule,
+                DataTableModule,
+                SharedModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+        })
+
+    . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+        $ ng generate interface domain/lancamento
+
+    . Acesse o arquivo domain/lancamento.ts e insira o código abaixo:
+
+        export interface Lancamento {
+            tipo;
+            descricao;
+            dataVencimento;
+            dataPagamento;
+            valor;
+            pessoa;
+        }
 
 
+    . Acesse o arquivo app.component.ts e insira o código abaixo:
+
+        ...
+        import { Lancamento } from './domain/lancamento';
+
+        ...
+        export class AppComponent implements OnInit {
+            ...
+            lancamentos: Lancamento[] = [
+                                { tipo: 'DESPESA', descricao: 'Compra de pão', dataVencimento: '30/06/2017',
+                                dataPagamento: null, valor: 4.55, pessoa: 'Padaria do José' },
+                              { tipo: 'RECEITA', descricao: 'Venda de software', dataVencimento: '10/06/2017',
+                                dataPagamento: '09/06/2017', valor: 80000, pessoa: 'Atacado Brasil' },
+                              { tipo: 'DESPESA', descricao: 'Impostos', dataVencimento: '20/07/2017',
+                                dataPagamento: null, valor: 14312, pessoa: 'Ministério da Fazenda' },
+                              { tipo: 'DESPESA', descricao: 'Mensalidade de escola', dataVencimento: '05/06/2017',
+                                dataPagamento: '30/05/2017', valor: 800, pessoa: 'Escola Abelha Rainha' },
+                              { tipo: 'RECEITA', descricao: 'Venda de carro', dataVencimento: '18/08/2017',
+                                dataPagamento: null, valor: 55000, pessoa: 'Sebastião Souza' },
+                              { tipo: 'DESPESA', descricao: 'Aluguel', dataVencimento: '10/07/2017',
+                                dataPagamento: '09/07/2017', valor: 1750, pessoa: 'Casa Nova Imóveis' },
+                              { tipo: 'DESPESA', descricao: 'Mensalidade musculação', dataVencimento: '13/07/2017',
+                                dataPagamento: null, valor: 180, pessoa: 'Academia Top' }
+                            ];
+
+            ...
+        }
+
+    . Adicione as linhas abaixo no arquivo style.css do projeto:
+
+        .col-valor{
+            width: 120px;
+            text-align: right;
+        }
+
+        .col-data{
+            width: 120px;
+            text-align: center;
+        }
+
+    . Acesse o arquivo src/app/app.component.html e insira o código abaixo:
+
+        <div class="container">
+            <div class="ui-g-12">
+                <p-dataTable [value]="lancamentos">
+                    <p-column field="pessoa" header="Pessoa"></p-column>
+                    <p-column field="descricao" header="Descrição"></p-column>
+                    <p-column field="dataVencimento" header="Vencimento" styleClass="col-data"></p-column>
+                    <p-column field="dataPagamento" header="Pagto" styleClass="col-data"></p-column>
+                    <p-column field="valor" header="Valor" styleClass="col-valor"></p-column>
+                </p-dataTable>
+            </div>
+        </div>
 
 
+Aula 10.06. Customizando colunas com ng-template
+------------------------------------------------
+
+    . Inclua as linhas abaixo no arquivo style.css do projeto:
+
+        .col-acoes{
+            width: 90px;
+            text-align:center;
+        }
+
+    . Deixe o código do datatable do arquivo app.component.html como abaixo:
+
+        <div class="container">
+            <div class="ui-g-12">
+                <p-dataTable [value]="lancamentos">
+                    <p-column field="pessoa" header="Pessoa"></p-column>
+                    <p-column field="descricao" header="Descrição"></p-column>
+                    <p-column field="dataVencimento" header="Vencimento" styleClass="col-data"></p-column>
+                    <p-column field="dataPagamento" header="Pagto" styleClass="col-data"></p-column>
+                    <p-column field="valor" header="Valor" styleClass="col-valor">
+                        <ng-template let-lanc="rowData" pTemplate="body">
+            <!--              <span [ngStyle]="{ color: lanc.tipo === 'DESPESA' ? 'red' : 'blue' }">{{lanc.valor}}</span> -->
+                            <span [style.color]="lanc.tipo === 'DESPESA' ? 'red' : 'blue'">{{lanc.valor}}</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column styleClass="col-acoes">
+                        <ng-template pTemplate="body">
+                            <a pButton icon="fa-pencil"></a>
+                            <a pButton icon="fa-trash"></a>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+            </div>
+            <div class="ui-g-12">
+                <button pButton type="submit" label="Novo Lançamento" class="p-button-sm"></button>
+            </div>
+        </div>
+
+        . Observe que a coluna valor foi alterada. Dentro desta tag foi colocado a tag "ng-template".
+            O <ng-template>é um elemento angular para renderizar HTML. Use para diretivas estruturais como: 
+            ngIf, ngFor, ngSwitch, ..
+
+            Exemplo :
+
+                <ng-template [ngIf]="hero">
+                    <div class="name">{{hero.name}}</div>
+                </ng-template>
+
+        . O ng-template do nosso projeto utilizou o let-lanc="rowData". 
+        
+            "let-lanc" serve para dar um nome para cada lançamento que será renderezido, onde será utilizado para
+            definir a cor da DESPESA ( [style.color]="lanc.tipo === 'DESPESA' ? 'red' : 'blue'" ). A identificação
+            "lanc" está relacionado com o "let-lanc".
+
+            "rowData" refere-se a linha que está sendo renderezida e que será atribuida para a ocorrência "lanc"
+
+        . Foi acrescido mais uma coluna com os botões de edição e eliminação
+
+            <p-column styleClass="col-acoes">
+                <ng-template pTemplate="body">
+                    <a pButton icon="fa-pencil"></a>
+                    <a pButton icon="fa-trash"></a>
+                </ng-template>
+            </p-column>
 
 
+Aula 10.07. Fazendo paginação de dados
+--------------------------------------
+
+    . Acrescente paginator e rows na tag "p-dataTable"
+
+        <p-dataTable [value]="lancamentos" [paginator]=true [rows]=5>
 
 
+Aula 10.08. Adicionando tooltip
+-------------------------------
+
+    . Acrescente o import deste pacote no componente src/app/app.module.ts:
+
+        import {TooltipModule} from 'primeng/components/tooltip/tooltip';
+        ...
+        imports: [
+            ...
+            TooltipModule
+        ]
+
+    . Acrescente nos botões do dataTable as propriedades abaixo:
+
+        <a pButton icon="fa-pencil" pTooltip="Editar" tooltipPosition="top"></a>
+        <a pButton icon="fa-trash"  pTooltip="Eliminar" tooltipPosition="top"></a>
 
 
+Aula 10.09. Colocando a tabela de dados responsiva
+--------------------------------------------------
 
+    . Na tag <dataTable ...> insira o atributo [responsive]="true" como abaixo:
 
-
-
-
-
-
-
-
+        <p-dataTable [value]="lancamentos" [paginator]=true [rows]=5 [responsive]="true">
 
 
 
