@@ -5961,6 +5961,234 @@ Aula 10.02. Escolhendo uma biblioteca de componentes
 Aula 10.03. Criando o projeto do curso e instalando o PrimeNG
 -------------------------------------------------------------
 
+    . A versão do angular/cli para o curso é 1.1.2, vide aula 8.7
+
+    . Digite o comando abaixo no prompt do sistema operacional:
+
+        ng new algawork-ui
+
+    . Abra a pasta do projeto no VSCode.
+
+    . No prompt do sistema operacional, na pasta raiz do projeto recém criado digite o comando abaixo:
+
+        sudo npm i primeng@4.3.0 --save
+        
+        sudo npm i font-awesome@4.3.0 --save
+
+    . Acesse o arquivo .angular-cli.json e insira no item "style" as linhas abaixo:
+
+        "../node_modules/font-awesome/css/font-awesome.min.css",
+        "../node_modules/primeng/resources/primeng.min.css",
+        "../node_modules/primeng/resources/themes/omega/theme.css",
+
+    . Acesse o arquivo src/app/app.module.ts e inclua o modulo "TabViewModule":
+
+        ...
+        import {TabViewModule} from 'primeng/primeng';
+
+        @NgModule({
+            ...
+            imports: [
+                BrowserModule,
+                TabViewModule
+            ],
+            ...
+
+    . Acesse o arquivo src/app/app.component.html e substitua o código pelo abaixo:
+
+        <p-tabView>
+            <p-tabPanel header="Header 1">
+                    Mussum Ipsum, cacilds vidis litro abertis. Diuretics paradis num copo é motivis de denguis.
+                    Tá deprimidis, eu conheço uma cachacis que pode alegrar sua vidis. Todo mundo vê os porris
+                    que eu tomo, mas ninguém vê os tombis que eu levo! Interessantiss
+                    quisso pudia ce receita de bolis, mais bolis eu num gostis.
+            </p-tabPanel>
+            <p-tabPanel header="Header 2">
+                Content 2
+            </p-tabPanel>
+            <p-tabPanel header="Header 3">
+                Content 3
+            </p-tabPanel>
+        </p-tabView>
+
+
+Aula 10.04. Adicionando o formulário de pesquisa de lançamentos
+---------------------------------------------------------------
+
+    Sistema de grid do PrimeNG
+    --------------------------
+
+    . A tela é dividida em 12 partes, em que é possível através de classes informar
+        quantas posições queremos ocupar no monitor.
+
+    . Podemos informar a quantidade de partes que queremos informar através das classes "grid" e "col":
+
+        .ui-g .ui-g1, .ui-g2, ...
+
+    .  Exemplo:
+
+        <div class="ui-g">
+            <div class="ui-g-4">Col1</div>
+            <div class="ui-g-4">Col2</div>
+            <div class="ui-g-4">Col3</div>
+        </div>
+
+    . A classe ui-fluid serve para redimensionar o conteúdo da celula, ou seja, ela fará com que o 
+        conteúdo ocupe 100% do espaço da celula. Na prática ela deixa a tag <label> em cima da tag
+        <input>
+
+    Protótipo da tela de pesquisa 
+    -----------------------------
+
+    . No arquivo style.css do projeto insira o conteúdo abaixo:
+
+        body{
+            margin: 0;
+            font-family:  Arial, Helvetica, sans-serif;
+            color: #404C51;
+        }
+
+        label{
+            font-weight: bold;
+            font-size: small;
+        }
+
+        @media (min-width: 1200px){
+            .container{
+                width: 1170px;
+                margin: 0 auto;
+            }
+        }
+
+        . O @media funciona como uma regra, que é estipulada dentro dos (). Neste caso,
+            os valores definidos só servirá para monitores até 1200px, abaixo disso
+            considerará o tamanho fisico do monitor.
+
+        . margin : 0 auto - Servirá para centralizar o conteúdo, 0=zero de margin top, bottom, left e right
+                                                                 auto=para forçar a centralização.
+
+    . No componente src/app/app.module.ts coloque o código abaixo:
+
+        import { NgModule } from '@angular/core';
+        import { BrowserModule } from '@angular/platform-browser';
+
+        import { AppComponent } from './app.component';
+        import {InputTextModule} from 'primeng/primeng';
+        import {ButtonModule} from 'primeng/primeng';
+
+        @NgModule({
+        declarations: [
+            AppComponent
+        ],
+        imports: [
+                BrowserModule,
+                InputTextModule,
+                ButtonModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+
+
+    . No componente src/app/app.component.html inclua o código abaixo:
+
+        <div class="container">
+            <div class="grid">
+                <div class="col-12">
+                    <h1>Lançamentos</h1>
+                </div>
+                <div class="col-12 p-fluid">
+                    <label for="descricao">Descrição</label>
+                    <input pInputText type="text" id="descricao" class="p-inputtext-sm">
+                </div>
+                <div class="col-12">
+                    <label style="display: block;">Vencimento</label>
+                    <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
+
+                    <label>Até</label>
+                    <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
+                </div>
+
+                <div class="col-12">
+                    <button pButton type="submit" label="Pesquisar" class="p-button-sm"></button>
+                </div>
+            </div>
+        </div>
+
+        . O estilo "display : block;" da tag label serve como o p-fluid e jogar o conteúdo da label
+            em cima dos campos Data Início e Fim.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 https://app.algaworks.com/forum/topicos/69775/versao-do-cli
 
