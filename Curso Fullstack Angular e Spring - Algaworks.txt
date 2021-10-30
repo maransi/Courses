@@ -6162,7 +6162,7 @@ Aula 10.05. Adicionando uma tabela de dados
     . Acesse o arquivo app.component.ts e insira o código abaixo:
 
         ...
-        import { Lancamento } from './domain/lancamento';
+        import { Lancamento } from 'app/domain/lancamento';
 
         ...
         export class AppComponent implements OnInit {
@@ -6453,10 +6453,113 @@ Aula 10.12. Adicionando menu intercambiável
 Aula 10.13. Desafio criando componente de pesquisa de pessoas
 -------------------------------------------------------------
 
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        $ ng g c pessoa-pesquisa
+
+    . Acesse o componente src/app/pessoa-pesquisa/pessoa-pesquisa.component.html e inclua o código abaixo:
+
+        <div class="container">
+            <div class="ui-g">
+                <div class="ui-g-12">
+                <h1>Pessoas</h1>
+                </div>
+
+                <div class="ui-g-12 ui-fluid">
+                <label>Nome</label>
+                <input type="text"
+                        pInputText
+                        id="descricao"
+                        class="p-inputtext-sm">
+                </div>
+
+                <div class="ui-g-12">
+                <label style="display: block;">Vencimento</label>
+                <input type="text"
+                        pInputText
+                        class="p-inputtext-sm"
+                        style="width: 95px;">
+                <label>Até</label>
+                <input type="text"
+                        pInputText
+                        class="p-inputtext-sm"
+                        style="width: 95px;" >
+                </div>
+
+                <div class="ui-g-12">
+                <button pButton
+                        type="submit"
+                        label="Pesquisar"
+                        class="p-button-sm"></button>
+                </div>
+            </div>
+
+            <div class="ui-g-12">
+                <p-dataTable [value]="pessoas"
+                            [paginator]=true
+                            [rows]="5"
+                            [responsive]=true>
+                <p-column field="nome" header="Nome" ></p-column>
+                <p-column field="cidade" header="Cidade"></p-column>
+                <p-column field="estado" header="Estado"></p-column>
+                <p-column field="status" header="Status"></p-column>
+                <p-column styleClass="col-acoes">
+                    <ng-template pTemplate="body">
+                    <a pButton icon="fa-pencil" pTooltip="Editar" tooltipPosition="top"></a>
+                    <a pButton icon="fa-trash" pTooltip="Eliminar" tooltipPosition="top"></a>
+                    </ng-template>
+                </p-column>
+                </p-dataTable>
+            </div>
+
+            <div class="ui-g-12">
+                <button pButton
+                        class="p-button-sm"
+                        type="submit"
+                        label="Nova Pessoa"></button>
+            </div>
+        </div>
+
+
+    . Acesse o componente src/app/pessoa-pesquisa/pessoa-pesquisa.component.ts e inclua o código abaixo:
+
+        import { Component, OnInit } from '@angular/core';
+        import { Pessoa } from 'app/domain/pessoa';
+
+        @Component({
+            selector: 'app-pessoas-pesquisa',
+            templateUrl: './pessoas-pesquisa.component.html',
+            styleUrls: ['./pessoas-pesquisa.component.css']
+        })
+        export class PessoasPesquisaComponent implements OnInit {
+
+            pessoas: any[] ;
+
+            constructor() { }
+
+            ngOnInit() {
+                this.pessoas = [
+                    {nome: 'MARCO ANTONIO DA SILVA', cidade: 'SAO PAULO', estado: 'SP', status: 'ATIVO' },
+                    {nome: 'CATIA LOUISE F R SILVA', cidade: 'MURITIBA', estado: 'BAHIA', status: 'ATIVO'},
+                    {nome: 'GUSTAVO ROCHA DA SILVA', cidade: 'SAO PAULO', estado: 'SP', status: 'ATIVO'},
+                    {nome: 'JOSE DA SILVA', cidade: 'RECIFE', estado: 'PB', status: 'INATIVO'},
+                    {nome: 'JOAO DA SILVA', cidade: 'PORTO SEGURO', estado: 'BA', status: 'INATIVO'},
+                    {nome: 'MARIA DA SILVA', cidade: 'BELO HORIZONTE', estado: 'MG', status: 'ATIVO'},
+                    {nome: 'MARIA JOSE GUIMARAES', cidade: 'PORTO ALEGRE', estado: 'RS', status: 'INATIVO'},
+                ]
 
 
 
+            }
+        }
 
+        . Observe que o objeto "pessoas" foi declarado como "pessoas: any[];". Dessa forma não é preciso
+            criar uma interface especifica para o objeto.
+
+    . Acesse o componente src/app/app.component.html e deixe o código como abaixo:
+
+        <app-navbar></app-navbar>
+        <app-pessoas-pesquisa></app-pessoas-pesquisa>
 
 
 
