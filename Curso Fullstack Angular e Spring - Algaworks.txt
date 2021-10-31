@@ -6563,6 +6563,123 @@ Aula 10.13. Desafio criando componente de pesquisa de pessoas
 
 
 
+Aula 11.01. Criando diretivas customizadas
+------------------------------------------
+
+    . Revise o conceito diretiva nas aulas 9.11 a 9.14
+
+    . O código abaixo foi retirado da "Aula 09.15. Binding de eventos customizados com @Output e EventEmitter"
+
+        . Na pasta raiz do projeto execute o comando abaixo no prompt do SO.
+
+            $ ng g c cliente-form --spec=false
+
+        . Altere o conteúdo do arquivo src/app/cliente-form/cliente-form.component.html como abaixo:
+
+            <div class="alert alert-success" role="alert" *ngIf="salvo">
+                Nome do Cliente : <strong> {{nome}} </strong>
+            </div>
+
+            <div class="form-group">
+                <label for="clienteNome">Nome do Cliente</label>
+                <input type="text" class="form-control" id="nomeCliente" #nomeInput [(ngModel)]="nome" (focus)="salvo=false">
+                <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
+            </div>     
+
+            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)" [disabled]="nomeInput.value.length == 0">Salvar</button>                   
+
+    . Acesse o componente src/app/cliente-form/cliente-form.component.html e deixe conforme o conteúdo abaixo:
+
+        import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+
+        @Component({
+            selector: 'app-cliente-form',
+            templateUrl: './cliente-form.component.html',
+            styleUrls: ['./cliente-form.component.css']
+        })
+        export class ClienteFormComponent implements OnInit {
+
+            ultimoId: number = 1;
+            salvo: Boolean;
+            cpf: String;
+            nome: string;
+            idade: number;
+
+            @Output()
+            clienteAdicionado = new EventEmitter();
+
+
+            constructor() {
+
+            }
+
+            ngOnInit() {
+                this.salvo = false;
+                this.cpf = '106.523.608-58';
+                this.idade = 55;
+                this.nome = 'Jéssica';
+
+            }
+
+            salvar( nome : string ){
+                this.salvo = true;
+
+                this.nome = nome;
+
+                const cliente =  { id : ++this.ultimoId,
+                                    nome : this.nome
+                                };
+
+                this.clienteAdicionado.emit( cliente );
+
+                console.log(`Cliente ${this.nome} salvo!!!`);
+            }
+        }
+
+
+    . Altere o conteúdo do componente src/app/app.component.html pelo código abaixo:
+
+        <app-cliente-form></app-cliente-form>
+
+    . Na pasta raiz do projeto digite o código abaixo:
+
+        $ ng g d campo-colorido --spec=false
+
+    . Acesse o código do componente src/app/campo-colorido.directive.ts e altere o método
+        construtor como abaixo:
+
+        import { Directive, ElementRef, Renderer2 } from '@angular/core';
+
+        @Directive({
+            selector: '[appCampoColorido]'
+        })
+        export class CampoColoridoDirective {
+
+            constructor(  private elementRef: ElementRef,
+                            private renderer: Renderer2) {
+                                console.log( this.elementRef.nativeElement );
+
+                                this.renderer.setStyle( this.elementRef.nativeElement, 'background-color', 'yellow' );
+                            }
+
+        }
+
+        . Atente para colocar o ElementRef e Renderer2 no import
+
+        . O objeto ElementRef permite acessar as informações do objeto input do HTML
+
+        . O objeto Renderer2 permite manipular e alterar o objeto input HTML.
+
+    . Acesse o componente cliente-form.component.html e inclua a diretiva customizada "appCampoColorido" no input:text
+
+          <input type="text" class="form-control" id="nomeCliente" #nomeInput [(ngModel)]="nome" (focus)="salvo=false" appCampoColorido>
+
+
+
+
+
+
+
 
 
 
