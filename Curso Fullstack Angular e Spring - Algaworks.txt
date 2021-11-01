@@ -6568,6 +6568,8 @@ Aula 11.01. Criando diretivas customizadas
 
     . Revise o conceito diretiva nas aulas 9.11 a 9.14
 
+    . Objetivo desta aula será construir uma diretiva para alterar uma propriedade do input:text, no caso a cor dele.
+
     . O código abaixo foi retirado da "Aula 09.15. Binding de eventos customizados com @Output e EventEmitter"
 
         . Na pasta raiz do projeto execute o comando abaixo no prompt do SO.
@@ -6576,17 +6578,35 @@ Aula 11.01. Criando diretivas customizadas
 
         . Altere o conteúdo do arquivo src/app/cliente-form/cliente-form.component.html como abaixo:
 
-            <div class="alert alert-success" role="alert" *ngIf="salvo">
-                Nome do Cliente : <strong> {{nome}} </strong>
+            <div class="container">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                    <div class="alert alert-success" role="alert" *ngIf="salvo">
+                        Nome do Cliente : <strong> {{nome}} </strong>
+                    </div>
+                    </div>
+
+
+                    <div class="ui-g-12 ui-fluid">
+                    <label for="clienteNome">Nome do Cliente</label>
+                    <input type="text"
+                            pInputText
+                            id="nomeCliente"
+                            #nomeInput
+                            [(ngModel)]="nome"
+                            (focus)="salvo=false"
+                            placeholder="Informe o nome do cliente"
+                            appCampoColorido>
+                    </div>
+                    <div class="ui-g-12">
+                        <button   pButton
+                                    type="submit"
+                                    label="Salvar"
+                                    (click)="salvar(nomeInput.value)"
+                                    [disabled]="nomeInput.value.length == 0"></button>
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="clienteNome">Nome do Cliente</label>
-                <input type="text" class="form-control" id="nomeCliente" #nomeInput [(ngModel)]="nome" (focus)="salvo=false">
-                <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
-            </div>     
-
-            <button type="button" class="btn btn-primary" (click)="salvar(nomeInput.value)" [disabled]="nomeInput.value.length == 0">Salvar</button>                   
 
     . Acesse o componente src/app/cliente-form/cliente-form.component.html e deixe conforme o conteúdo abaixo:
 
@@ -6675,20 +6695,214 @@ Aula 11.01. Criando diretivas customizadas
           <input type="text" class="form-control" id="nomeCliente" #nomeInput [(ngModel)]="nome" (focus)="salvo=false" appCampoColorido>
 
 
+Aula 11.02. Respondendo a eventos do hospedeiro com @HostListener
+-----------------------------------------------------------------
+
+    . O objetivo desta aula será alterar a cor do campo quando o input receber o foco.
+
+    . Deixe o construtor do componente "campo-colorido.component.ts" sem conteúdo:
+
+        constructor(  private elementRef: ElementRef,
+                        private renderer: Renderer2) {
+        }
+
+    . No componente "campo-colorido.directive.ts" inclua o método abaixo:
+
+        import { Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
+        ...
+
+        @HostListener('focus')
+        onNomeFocus(){
+            this.renderer.setStyle( this.elementRef.nativeElement, 'background-color', 'yellow');
+        }
+
+        @HostListener('blur')
+        onNomeBlur() {
+            this.renderer.setStyle( this.elementRef.nativeElement, 'background-color', 'transparent');
+        }
 
 
+        . A annotation @HostListener servirá para relacionar o evento do objeto input com o método do 
+            componente campo-colorido.directive.ts. A annotation recebe como parâmetro o nome do evento
+            que queremos associar.
+
+        . Essa ação só ocorrera para os elementos HTML que tiver a identificação "appCampoColorido", no nosso caso 
+            o input:text abaixo:
+
+            <input type="text"
+                    pInputText
+                    id="nomeCliente"
+                    #nomeInput
+                    [(ngModel)]="nome"
+                    (focus)="salvo=false"
+                    placeholder="Informe o nome do cliente"
+                    appCampoColorido>
 
 
+Aula 11.03. Vinculando propriedades do hospedeiro com @HostBinding
+------------------------------------------------------------------
+
+    . Outra forma de alterar dinamicamente a propriedade do elemento HTML, neste caso a cor de fundo.
+
+    . Incluir a propriedade "corDeFundo" no componente campo-colorido.directive.ts e altere os métodos 
+        onNomeFocus e onNomeBlur como abaixo:
+
+        ...
+        export class CampoColoridoDirective {
+
+            @HostBinding('style.background-color')
+            corDeFundo: String;
+        ...
+
+            @HostListener('focus')
+            onNomeFocus(){
+                this.corDeFundo = 'yellow';
+            }
+
+            @HostListener('blur')
+            onNomeBlur(){
+                this.corDeFundo = 'transparent';
+            }
+        ...
+
+        . O HostBinding informa ao elemento HTML tipificado com "appCampoColorido" para alterar a cor de fundo
+            de acordo com o valor da propriedade "corDeFundo"
+
+    . Apague o constructor e os imports relacionado a eles, não haverá mais a necessidade de se utilizar 
+        ElementRef e o Renderer2. O componente ficará sem construtor
+
+    
+Aula 11.04. Usando property binding em diretivas customizadas
+-------------------------------------------------------------
+
+    . O objetivo da aula será como passar um valor de uma propriedade da tag input para a propriedade
+        de uma diretiva
+
+    . Inclua a propriedade "cor" e altere a propriedade "corDeFundo" conforme o código abaixo:
+
+        ...
+        export class CampoColoridoDirective {
+            cor : String = 'gray';
+
+            @HostBinding('style.background-color')
+            corDeFundo: String;
+        ...
+
+            @HostListener('focus')
+            onNomeFocus(){
+                this.corDeFundo = this.cor;
+            }
+
+            @HostListener('blur')
+            onNomeBlur(){
+                this.corDeFundo = 'transparent';
+            }
+        ...
+
+    . Teste até esse ponto o resultado da mudança.
+
+    . Adicione a annotation @Input() na propriedade cor do componente campo-colorido.directive.ts
+
+        @Input()
+        cor: String = 'gray';
+
+    . No componente cliente-form.component.html altere a tag do input, colocando a diretiva [cor]
+
+            <input type="text"
+                    pInputText
+                    id="nomeCliente"
+                    #nomeInput
+                    [(ngModel)]="nome"
+                    (focus)="salvo=false"
+                    placeholder="Informe o nome do cliente"
+                    appCampoColorido
+                    [cor]="'red'">
+
+        . Importante:   na tag HTML acima podemos utilizar ao invés [cor] = "'red'" o conteúdo 
+                        cor = "'red'", porém ficará mais claro que estamos utilizando uma diretiva
+                        binding quando utilizamos colchetes
+
+                        É obrigatório colocar o resultado entre aspas simples "'red'" dentro das aspas duplas.
+                        Caso contrário, o angular pensará que estamos nos referenciando a uma propriedade do 
+                        COMPONENTE, no nosso caso "cliente-form.component.ts"
+                    
+
+    . Execute o projeto e veja o resultado.
+
+    . Outra forma de obter o mesmo resultado seria, alterar a tag input HTML colocando uma diretiva binding entre
+        parenteses [corFundo] apagando a diretiva [cor] e alterar a annotation @Input('corFundo') do
+        componente campo-colorido.directive.ts
 
 
+            <input type="text"
+                    pInputText
+                    id="nomeCliente"
+                    #nomeInput
+                    [(ngModel)]="nome"
+                    (focus)="salvo=false"
+                    placeholder="Informe o nome do cliente"
+                    appCampoColorido
+                    [corFundo] = "'red'" >
 
 
+            @Input('corFundo')
+            cor: String;
 
 
+Aula 11.05. Exportando a API da diretiva para o template
+--------------------------------------------------------
+
+    . O objetivo desta aula será forçar a mudança de um atributo de uma tag HTML, independente
+        de um evento do componente input ocorrer.
+
+    . Crie dois botões no formulário cliente.form.component.html
+
+        <div class="ui-g-12">
+            <button   pButton
+                        type="submit"
+                        label="Salvar"
+                        (click)="salvar(nomeInput.value)"
+                        [disabled]="nomeInput.value.length == 0"></button>
+
+            <!-- Novos botões -->
+            <button pButton label="Colorir"></button>
+            <button pButton label="Colorir"></button>
+        </div>
+
+    . No componente campo-colorido.directive.ts acrescente o "exportAs" como abaixo:
 
 
+        import { Directive, HostBinding, HostListener, Input } from '@angular/core';
 
+        @Directive({
+            selector: '[appCampoColorido]',
+            exportAs: 'campoColorido'
+        })
+        export class CampoColoridoDirective {
+        ...
 
+        . O "exportAs" informa ao angular para exportar a diretiva com este nome.
+
+    . Acesse o componente cliente-form.component.html e acrescente o atributo #campo="campoColorido" na tag input:
+
+        <input type="text"
+                pInputText
+                id="nomeCliente"
+                #nomeInput
+                [(ngModel)]="nome"
+                (focus)="salvo=false"
+                placeholder="Informe o nome do cliente"
+                [corFundo] = "'gray'" 
+                appCampoColorido
+                #campo="campoColorido">
+
+        . Com isso será dado acesso a instância ao componente "campo-colorido.directive.ts"
+
+    . Nos botões criados Colorir e Descolorir adicione os events bidings abaixo:
+
+      <!-- Novos botões -->
+      <button pButton label="Colorir" (click)="campo.onNomeFocus()"></button>
+      <button pButton label="Descolorir" (click)="campo.onNomeBlur()"></button>
 
 
 
