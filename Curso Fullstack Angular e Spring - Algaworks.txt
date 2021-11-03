@@ -6905,15 +6905,144 @@ Aula 11.05. Exportando a API da diretiva para o template
       <button pButton label="Descolorir" (click)="campo.onNomeBlur()"></button>
 
 
+Aula 11.06. Conhecendo e usando pipes
+-------------------------------------
+
+    . Maiores detalhes podem ser encontrados em:
+
+        https://v4.angular.io/api?query=pipe    
+
+    . Acesse o componente src/app/app.component.ts e deixe conforme o código abaixo:
+
+        import { Component } from '@angular/core';
+
+        @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.css']
+        })
+        export class AppComponent {
+            nome: String = 'Marco Antonio';
+            dataAniversario: Date = new Date(1966, 10, 17);
+            preco: Number = 123456.66;
+            troco: Number= 500.01;
+        }
+
+    . Acesse o componente src/app/app.component.html e substitua com o código abaixo:
+
+        <div class="container">
+            <h1>{{ nome }}</h1>
+            <h1>{{ dataAniversario }}</h1>
+            <h1>{{ preco }}</h1>
+            <h1>{{ troco }}</h1>
+        </div>
+
+    . Execute o projeto e veja o resultado.
+
+    . Pipe "|" pega um valor de entrada e transforma noutro desejado.
+
+    . No VSCode o Plugin "Angular 2, 4 and..." possui um facilitador de auto-complete na criação dos pipes.
+        Basta digitar "ngPipe" + Space Bar para trazer todas as opções de pipes existentes.
+
+    . Altere a saída dos valores abaixo no componente app.component.html como abaixo:
+
+        <h1>{{ nome | uppercase }}</h1>
+
+        . Fará a saída do nome ficar maiúsculo "MARCO ANTONIO"
+
+        <h1>{{ dataAniversario | date }}</h1>
+    
+        . Saída no padrão data "Nov 17, 1966"  
+
+        <h1>{{preco | number}}  </h1>
+
+        <h1>{{ troco | currency }}</h1>
 
 
+Aula 11.07. Passando parâmetros para pipes
+------------------------------------------
+
+    . Altere a saída do nome como abaixo:
+
+        <h1>{{ dataAniversario | date: "dd/MM/y" }}</h1>
+
+        <h1>{{preco | number:"3.2-2"}}  </h1>
+
+        <h1>{{ troco | currency:"BRL":true:"1.2-2" }}</h1>
+
+    . Execute o projeto e verifique o resultado.
 
 
+Aula 11.08. Desafio usando pipes
+--------------------------------    
 
+    . Acesse o arquivo src/app/app.module.ts e insira as linhas abaixo:
 
+        import { LOCALE_ID } from '@angular/core';
+        ...
+        @NgModule({
+            ...
+            providers: [{provide: LOCALE_ID, useValue: 'pt-BR'}],
+            ...
+        })
+        ...
 
+        . Dessa forma será possível a troca do ponto pela virgula no padrão Brasil. 
 
+    . Altere a coleção de dados do arquivo src/app/lancamentos-pesquisa/lancamentos-pesquisa.component.ts
+        pelo abaixo:
 
+        lancamentos: Lancamento[] = [
+                    { tipo: 'DESPESA', descricao: 'Compra de pão', dataVencimento: new Date(2017, 6, 30),
+                    dataPagamento: null, valor: 4.55, pessoa: 'Padaria do José' },
+                    { tipo: 'RECEITA', descricao: 'Venda de software', dataVencimento: new Date(2017, 6, 10),
+                    dataPagamento: new Date(2017, 6, 9), valor: 80000, pessoa: 'Atacado Brasil' },
+                    { tipo: 'DESPESA', descricao: 'Impostos', dataVencimento: new Date(2017, 7, 20),
+                    dataPagamento: null, valor: 14312, pessoa: 'Ministério da Fazenda' },
+                    { tipo: 'DESPESA', descricao: 'Mensalidade de escola', dataVencimento: new Date(2017, 6, 5),
+                    dataPagamento: new Date(2017, 5, 30), valor: 800, pessoa: 'Escola Abelha Rainha' },
+                    { tipo: 'RECEITA', descricao: 'Venda de carro', dataVencimento: new Date(2017, 8, 18),
+                    dataPagamento: null, valor: 55000, pessoa: 'Sebastião Souza' },
+                    { tipo: 'DESPESA', descricao: 'Aluguel', dataVencimento: new Date(2017, 7, 10),
+                    dataPagamento: new Date(2017, 7, 9), valor: 1750, pessoa: 'Casa Nova Imóveis' },
+                    { tipo: 'DESPESA', descricao: 'Mensalidade musculação', dataVencimento: new Date(2017, 7, 13),
+                    dataPagamento: null, valor: 180, pessoa: 'Academia Top' }
+                ];
+
+        . Todos os campos string que representam datas foram alterados para "new Date(...)".
+
+    . Altere o formato dos campos datas e valores monetários do componente src/app/lancamentos-pesquisa/lancamentos-pesquisa.component.html
+        pelo conteúdo abaixo:
+
+        <p-column field="dataVencimento" header="Vencimento" styleClass="col-data">
+
+          <ng-template let-lanc="rowData" pTemplate="body">
+            {{lanc.dataVencimento | date:'dd/MM/y'}}
+          </ng-template>
+
+        </p-column>
+        <p-column field="dataPagamento" header="Pagto" styleClass="col-data">
+
+          <ng-template let-lanc="rowData" pTemplate="body">
+            {{lanc.dataPagamento | date:'dd/MM/y'}}
+          </ng-template>
+
+        </p-column>
+        <p-column field="valor" header="Valor" styleClass="col-valor">
+            <ng-template let-lanc="rowData" pTemplate="body">
+<!--              <span [ngStyle]="{ color: lanc.tipo === 'DESPESA' ? 'red' : 'blue' }">{{lanc.valor}}</span> -->
+              <span [style.color]="lanc.tipo === 'DESPESA' ? 'red' : 'blue'">{{lanc.valor|currency:"BRL":true:"1.2-2"}}</span>
+            </ng-template>
+        </p-column>
+        
+        . Observe que foi colocado o "ng-template", responsável pela renderização dos campos dentro do datatable; e dentro deles os pipes
+            para formatar os valores.
+
+    . Altere o conteúdo do arquivo src/app/app.component.html pelo abaixo:
+
+        <app-lancamentos-pesquisa></app-lancamentos-pesquisa>
+
+    . Execute o projeto.
 
 
 
