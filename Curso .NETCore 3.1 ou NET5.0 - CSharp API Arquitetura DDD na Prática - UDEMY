@@ -1428,9 +1428,10 @@ Aula 58. Api.Data - Criar Migrações e Atualização no Banco de Dados
 
     . Para criar as novas tabelas no banco utilizaremos o comando abaixo, que usará as classes migrations para isso:
 
-        donet ef database update
+        dotnet ef database update
 
-
+    . Caso houver mudanças nas tabela, é necessário executar o comando "dotnet ef migrations add [novo nome de migração]" e depois
+        executar "dotnet ef database update" para aplicar todas as alterações/patches existente na pasta Api.Data/Migrations
 
 Aula 59. Api.Domain - Criar a Interface de Repository (IRepository)    
 -------------------------------------------------------------------
@@ -1648,3 +1649,35 @@ Aula 64. api.Data - Repositório Genérico Método SelectAsync
                 
                 throw ex;
             }
+        }
+
+    . Acesse a pasta que contém a solução e compile o projeto com o comando abaixo:
+
+        dotnet build
+
+    . Sequênca de execução das camadas de objetos:
+
+
+                   +----Application --------+
+                   |        5 ^             |   1
+                   V          |-------------V
+                Domain <--------------- Service <-----------+
+                |   ^                       |               |
+                | 3 |                       |   2           |
+                |   |                       |               |
+                |   +---Infraestructure<----+               |
+                |           |       ^                       |
+                |           |       |                       |  4
+                |           +> Acesso ao banco de dados     |
+                |                                           |
+                +-------------------------------------------+
+
+
+// TODO: Voltar na aula 58 e ver porque o projeto não gera a tabela User com os comandos:
+
+dotnet ef migrations add UserMigration
+dotnet ef database update    
+
+
+https://zetcode.com/csharp/mysql/
+https://zetcode.com/all/#csharp
