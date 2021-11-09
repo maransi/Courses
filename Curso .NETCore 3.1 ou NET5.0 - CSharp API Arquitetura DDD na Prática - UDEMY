@@ -1673,11 +1673,125 @@ Aula 64. api.Data - Repositório Genérico Método SelectAsync
                 +-------------------------------------------+
 
 
-// TODO: Voltar na aula 58 e ver porque o projeto não gera a tabela User com os comandos:
-
-dotnet ef migrations add UserMigration
-dotnet ef database update    
-
-
 https://zetcode.com/csharp/mysql/
 https://zetcode.com/all/#csharp
+
+
+
+Aula 65. Api.Domain - Implementar Interface UserService
+-------------------------------------------------------
+
+    . Dentro da pasta Api.Domain/Interface crie a pasta "Services".
+
+    . Dentro da nova pasta "Services" crie a pasta "User".
+
+    . No VSCode, clique com o botão direito sobre a pasta "User", escolha a opção "New C# Interface" e
+        dê o nome da interface de "IUserService".
+
+    . Copie o código abaixo para a interface IUserService:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Threading.Tasks;
+        using Api.Domain.Entities;
+
+        namespace Api.Domain.Interfaces.Services.User
+        {
+            public interface IUserService
+            {
+                Task<UserEntity> Get(Guid id);
+                Task<IEnumerable<UserEntity>> GetAll();
+                Task<UserEntity> Post(UserEntity user);
+                Task<UserEntity> Put(UserEntity user);
+                Task<bool> Delete(Guid id);
+            }
+        }
+
+
+
+        . Faça os "imports" com a tecla Ctrl + . 
+
+    . Vá ao terminal, na pasta "src" e execute o comando abaixo:
+
+        dotnet build
+
+    
+Aula 66. Api.Service - Criar Referencias Api.Data, Api.CrossCutting e Api.Domain
+--------------------------------------------------------------------------------
+
+    . Vá ao terminal, na pasta "src" e execute o comando abaixo:
+
+        dotnet add ./Api.Service/ reference ./Api.Domain/
+
+        dotnet add ./Api.Service/ reference ./Api.Data/
+
+        dotnet add ./Api.Service/ reference ./Api.CrossCutting/
+
+    . Acesse o arquivo src/Api.Service/Service.cproj e verifique se as referências acima foram
+        inseridas corretamente neste arquivo.
+
+    . Na pasta "src" digite o comando abaixo no prompt do sistema operacional:
+
+        dotnet build
+
+
+Aula 67. Api.Service - Implementar UserService
+----------------------------------------------
+
+    . Dentro da pasta Api.Service crie a pasta "Services" com clique direito no VSCode.
+
+    . No VSCode, clique com o botão direito sobre a nova pasta "Services", escolha a opção "New C# Class" e
+        dê o nome da interface de "UserService".
+
+    . Digite o código abaixo na classe UserService:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Threading.Tasks;
+        using Api.Domain.Entities;
+        using Api.Domain.Interfaces;
+        using Api.Domain.Interfaces.Services.User;
+
+        namespace Api.Service.Services
+        {
+            public class UserService : IUserService
+            {
+                private IRepository<UserEntity> _repository;
+
+                public UserService(IRepository<UserEntity> repository)
+                {
+                    _repository = repository;
+                }
+
+                public async Task<bool> Delete(Guid id)
+                {
+                    return await _repository.DeleteAsync(id);
+                }
+
+                public async Task<UserEntity> Get(Guid id)
+                {
+                    return await _repository.SelectAsync(id);
+                }
+
+                public async Task<IEnumerable<UserEntity>> GetAll()
+                {
+                    return await _repository.SelectAsync();
+                }
+
+                public async Task<UserEntity> Post(UserEntity user)
+                {
+                    return await _repository.InsertAsync(user);
+                }
+
+                public async Task<UserEntity> Put(UserEntity user)
+                {
+                    return await _repository.UpdateAsync(user);
+                }
+            }
+        }
+
+        . Faça os "imports" com a tecla Ctrl + . 
+
+        . Clique na lâmpada e escolha a implementação dos métodos da interface
+
+        
