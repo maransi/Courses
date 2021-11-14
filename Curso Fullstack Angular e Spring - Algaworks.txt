@@ -7045,6 +7045,258 @@ Aula 11.08. Desafio usando pipes
     . Execute o projeto.
 
 
+Aula 12.01. Introdução aos formulários
+--------------------------------------
+
+    . Num desenvolvimento de um sistema Web padrão, o código desenvolvido seria parecido com o abaixo:
+
+        <form action="/cadastro" method="post">
+            <input type="text" name="nome">
+            <input type="text" name="email">
+            <input type="text" name="profissao">
+
+            <button type="submit">Salva</button>
+        </form> 
+
+        . Ao pressionar o botão o sistema envia os valores digitados nos campos para o servidor.
+
+    . No desenvolvimento Angular ficaria como abaixo:
+
+        <form #f="ngForm" (ngSubmit)="salvar(f)">
+            <input type="text" name="nome">
+            <input type="text" name="email">
+            <input type="text" name="profissao">
+
+            <button type="submit">Salva</button>
+        </form> 
+
+       . No angular não há um direcionamento dos dados para um servidor.
+
+       . Ao invés disso, o angular cria um objeto com as informações do formulario:
+
+            {
+                ...
+                value: {
+                    nome: "João da Silva",
+                    email: "joao.silva@gmail.com",
+                    profissao: "Programador"
+                }
+            }
+
+    . No angular existem duas formas de trabalhar com formulários:
+
+        . Template-Driven Forms (Trabalhando com diretivas da forma como vimos até aqui)
+        . Reactive Forms (Model-Driven). (Código typescript diretamente nas classes de componentes do forms)
+
+    
+Aula 12.02. Template-driven Forms Criando um formulário
+-------------------------------------------------------
+
+    . Suponhamos que o código abaixo estivesse no arquivo app.component.html:
+
+        <div class="container">
+            <form  >
+                <div class="form-group">
+                <label class="form-control-label">Nome</label>
+                <input type="text" class="form-control">
+                </div>
+
+                <div class="form-group">
+                <label class="form-control-label">Email</label>
+                <input type="text" class="form-control">
+                </div>
+
+                <div class="form-group">
+                <label class="form-control-label">
+                    Profissões
+                </label>
+
+                <select class="form-control">
+                    <option value="">Selecione</option>
+                    <option>Engenheiro</option>
+                    <option>Dentista</option>
+                </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+
+    . Do jeito que o código acima está, o formulário não está sendo controlado pelo angular. Para que isto ocorra precisamos
+        ir no arquivo app.module.ts e adicionar nos "imports:" o "FormsModule".
+
+        ...
+        @NgModule({
+            ...
+            imposts: [
+                BrowserModule,
+                FormsModule
+            ]
+
+        })
+
+    . Para saber se o formulário está, ou não, sendo gerenciado pelo Angular basta verificar se a tela sofre refresh quando 
+        pressionamos o botão "Salvar". Após incluirmos o "FormsModule" nos "imports" verificaremos que não ocorrerá mais o refresh,
+        agora a aplicação se tornou SPA.
+
+    . A partir desse momento temos condições de utilizar os recursos do angular, por exemplo:
+
+        . Na tag form adicione o databinding "ngSubmit":
+
+            <form (ngSubmit)="salvar()">
+
+        . No componente associado a página coloque método "salvar":
+
+            ...
+            export class AppComponent{
+
+                salvar(){
+                    console.log(Salvando');
+                }
+            }
+
+        . Execute o projeto, pressione o botão salvar, vá no console log do navegador e verifique se a mensagem "Salvando" está aparecendo.
+
+    . Altere o formulário como abaixo:
+
+        . Incremente uma variável de referência e inclua ela como parâmetro da chamada salvar na tag form:
+
+            <form #usuarioForm (ngSubmit)="salvar(usuarioForm)">
+
+        . Adicione na assinatura do método salvar o parâmetro form como abaixo:
+
+            ...
+            salvar( form: any){
+                console.log( form );
+            }
+
+        . Ao executar o projeto veremos na console do navegador o retorno do elemento form do HTML.
+
+        . Altere novamente a tag HTML form como abaixo:
+
+            <form #usuarioForm="ngForm" (ngSubmit)="salvar(usuarioForm)">
+
+        . Ao executar novamento o projeto veremos que agora o retorno será o objeto form
+
+        . Se abrirmos as propriedades do formulário (controls e values), não encontraremos os campos porque eles não estão sendo gerenciados pelo angular.
+            Para que isso ocorra é necessário identificá-los para o Angular como fizemos com a tag "form".
+
+        . Por fim, podemos alterar a assinatura do método salvar, mudando de "any" para "NgForm".
+
+
+Aula 12.03. Registrando os controles do formulário
+--------------------------------------------------
+
+    . Quando consultamos os detalhes dos campos do formulário na console do navegador não aparece, porque eles não estão
+        registrados no controle do angular. Para que isto ocorra é necessário colocar a identificação "ngModel" em cada campo como abaixo:
+
+        ...
+        <input type="text" class="form-control" name="nome" ngModel>
+
+        ...
+        <input type="text" class="form-control" name="email" ngModel>
+
+        ...
+        <select class="form-control" name="profissao" ngModel>
+            <option value="">Selecione</option>
+            <option>Engenheiro</option>
+            <option>Dentista</option>
+        </select>
+
+        . Não confundir o ([ngModel]) que é um data binding com a identificação ngModel que é um identificador que permitirá acessar as propriedades do objeto
+
+        . Quando utilizamos o ngModel é obrigatorio identificar cada objeto com a propriedade "name"
+         
+    . Execute o projeto, vá na console, consulte as informações do "form" e vá nos "values". Se tudo deu certo, no nó "values" aparecerá o conteúdo dos campos.
+
+        IMPORTANTE: Quando for consultar o resultado dos "values" clique ao lado da propriedade "values:object", sobre a palavra "object"
+        ---------------------------------------------------------------------------------------------------------------------------------
+
+    . Retorne a classe *.component.ts responsável pelo html e inclua a linha para apresentar um dos conteúdos dos campos:
+
+        ...
+        salvar( form: any){
+            console.log( form );
+            console.log( form.value.nome );
+        }
+
+    . Execute o projeto, vá na console, consulte as informações do "form" e vá nos "values". 
+
+
+Aula 12.04. Adicionando opções dinâmicas no campo de seleção
+------------------------------------------------------------
+
+    . Acesse o componente *.component.ts responsável pelo html e inclua a array abaixo:
+
+        ...
+        export class AppComponent{
+
+            profissoes = ['Programador','Empresário','Outra'];
+
+            ...
+        }
+
+    . Retorne a classe html e altere o bloco da tag "select" como abaixo, observe o uso do "*ngFor":
+
+        <select class="form-control" name="profissao" ngModel>
+            <option value="">Selecione</option>
+            <option *ngForm="let profissao of profissoes">{{ profissao }}</option>
+            
+            <!-- Abaixo outra forma de atualizar o valor do option, através de um property binding  -->
+            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao></option> -->
+        </select>
+
+
+Aula 12.05. Definindo o valor padrão em campos com ngModel
+----------------------------------------------------------
+
+    . Altere o ngModel pelo [ngModel] como abaixo
+
+        <select class="form-control" name="profissao" [ngModel]="'Empresário'" >
+            <option value="">Selecione</option>
+            <option *ngForm="let profissao of profissoes">{{ profissao }}</option>
+            
+            <!-- Abaixo outra forma de atualizar o valor do option, através de um property binding  -->
+            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao></option> -->
+        </select>
+
+        . Quando executar a lista ficará para na opção "Empresário", porque foi definido como uma constante 'Empresário' entre aspas.
+
+    . Outra forma para se fazer isto seria criar uma propriedade na classe *.component.ts e apontar no componente *.component.html:
+
+        <select class="form-control" name="profissao" [ngModel]="profissao" >
+            <option value="">Selecione</option>
+            <option *ngForm="let profissao of profissoes">{{ profissao }}</option>
+            
+            <!-- Abaixo outra forma de atualizar o valor do option, através de um property binding  -->
+            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao></option> -->
+        </select>
+
+
+        ...
+        export class AppComponent{
+
+            profissoes = ['Programador','Empresário','Outra'];
+            profissao = 'Outra';
+
+            ...
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
