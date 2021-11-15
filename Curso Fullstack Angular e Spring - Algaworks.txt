@@ -7058,7 +7058,7 @@ Aula 12.01. Introdução aos formulários
             <button type="submit">Salva</button>
         </form> 
 
-        . Ao pressionar o botão o sistema envia os valores digitados nos campos para o servidor.
+        . Ao pressionar o botão o sistema envia os valores digitados dos campos para o servidor.
 
     . No desenvolvimento Angular ficaria como abaixo:
 
@@ -7095,27 +7095,27 @@ Aula 12.02. Template-driven Forms Criando um formulário
     . Suponhamos que o código abaixo estivesse no arquivo app.component.html:
 
         <div class="container">
-            <form  >
+            <form>
                 <div class="form-group">
-                <label class="form-control-label">Nome</label>
-                <input type="text" class="form-control">
+                    <label class="form-control-label">Nome</label>
+                    <input type="text" class="form-control">
                 </div>
 
                 <div class="form-group">
-                <label class="form-control-label">Email</label>
-                <input type="text" class="form-control">
+                    <label class="form-control-label">Email</label>
+                    <input type="text" class="form-control">
                 </div>
 
                 <div class="form-group">
-                <label class="form-control-label">
-                    Profissões
-                </label>
+                    <label class="form-control-label">
+                        Profissões
+                    </label>
 
-                <select class="form-control">
-                    <option value="">Selecione</option>
-                    <option>Engenheiro</option>
-                    <option>Dentista</option>
-                </select>
+                    <select class="form-control">
+                        <option value="">Selecione</option>
+                        <option>Engenheiro</option>
+                        <option>Dentista</option>
+                    </select>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Salvar</button>
@@ -7151,7 +7151,7 @@ Aula 12.02. Template-driven Forms Criando um formulário
             export class AppComponent{
 
                 salvar(){
-                    console.log(Salvando');
+                    console.log('Salvando');
                 }
             }
 
@@ -7247,7 +7247,7 @@ Aula 12.04. Adicionando opções dinâmicas no campo de seleção
         </select>
 
 
-Aula 12.05. Definindo o valor padrão em campos com ngModel
+Aula 12.05. Definindo o valor padrão em campos com ngModel (One way data binding)
 ----------------------------------------------------------
 
     . Altere o ngModel pelo [ngModel] como abaixo
@@ -7257,10 +7257,12 @@ Aula 12.05. Definindo o valor padrão em campos com ngModel
             <option *ngForm="let profissao of profissoes">{{ profissao }}</option>
             
             <!-- Abaixo outra forma de atualizar o valor do option, através de um property binding  -->
-            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao></option> -->
+            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao"></option> -->
         </select>
 
         . Quando executar a lista ficará para na opção "Empresário", porque foi definido como uma constante 'Empresário' entre aspas.
+
+        . Porque "One way data binding"? porque é utilizado somente o "[" e não "([".
 
     . Outra forma para se fazer isto seria criar uma propriedade na classe *.component.ts e apontar no componente *.component.html:
 
@@ -7269,7 +7271,7 @@ Aula 12.05. Definindo o valor padrão em campos com ngModel
             <option *ngForm="let profissao of profissoes">{{ profissao }}</option>
             
             <!-- Abaixo outra forma de atualizar o valor do option, através de um property binding  -->
-            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao></option> -->
+            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao"></option> -->
         </select>
 
 
@@ -7283,21 +7285,163 @@ Aula 12.05. Definindo o valor padrão em campos com ngModel
         }
 
 
+Aula 12.06. Two-way binding com ngModel
+---------------------------------------
+
+    . Retorne ao componente *.component.html e defina um nome para cada input do formulário:
+
+        <div class="form-group">
+            <label class="form-control-label">Nome</label>
+            <input type="text" class="form-control" name="nome">
+        </div>
+
+        <div class="form-group">
+            <label class="form-control-label">Email</label>
+            <input type="text" class="form-control" name="email">
+        </div>
+
+        <div class="form-group">
+            <label class="form-control-label">
+                Profissões
+            </label>
+
+            <select class="form-control" name="profissao">
+                <option value="">Selecione</option>
+                <option>Engenheiro</option>
+                <option>Dentista</option>
+            </select>
+        </div>
 
 
 
+    . Acesse a classe *.component.ts e inclua a classe "Cliente" como abaixo:
+
+        import ...
+        ...
+        class Cliente {
+            nome: string;
+            email: string;
+            profissao: string;
+        }
+
+        @Component({
+            ...
+        })
+
+        export class AppComponent{
+            cliente: Cliente = new Cliente();
 
 
+            ...
+            salvar( form: NgForm ){
+                this.cliente.nome = form.value.nome;
+                this.cliente.email = form.value.email;
+                this.cliente.profissao = form.value.profissao;
+
+                console.log(form);
+                console.log(this.cliente);
+            }
+
+        }
+
+        . No desenvolvimento de projeto adote como padrão a definição de classes dentro do componente e armazene
+            os dados do formulários nessas classes.
+
+    . Execute o projeto e veja o resultado.
+
+    . Adicione a consulta dos dados da classe no formulário como abaixo:
+
+        <div class="container">
+            {{ cliente | json }}
+
+            <form>
+                ...
+            </form>
+        <div>
+
+    . Mudando para Two way databinding:
+
+        . Comente a atualização das informações da classe Cliente no método salvar:
+
+            ...
+            salvar( form: NgForm ){
+                // this.cliente.nome = form.value.nome;
+                // this.cliente.email = form.value.email;
+                // this.cliente.profissao = form.value.profissao;
+
+                console.log(form);
+                console.log(this.cliente);
+            }
+
+        . Retorne ao componente *.component.html e defina um nome para cada input do formulário:
+
+            <input type="text" class="form-control" name="nome" [(ngModel)]="cliente.nome">
+
+            <input type="text" class="form-control" name="email" [(ngModel)]="cliente.email">
+
+            <select class="form-control" name="profissao" [(ngModel)]="cliente.profissao">
+                <option value="">Selecione</option>
+                <option>Engenheiro</option>
+                <option>Dentista</option>
+            </select>
+
+    . Execute o projeto e veja o resultado.
 
 
+Aula 12.07. Adicionando validação em formulários
+------------------------------------------------
 
+    . Retorne ao componente *.component.html e faça as alterações abaixo:
 
+        . Inclua o data binding {{ usuarioForm.valid }}
 
+            <div class="container">
+                {{ cliente | json }}
+                {{ usuarioForm.valid }}
+                
+                <form>
+                    ...
+                </form>
+            <div>
 
+        . Altere a tag input abaixo colocando as propriedades de validação (required minlength):
 
+            <input type="text" 
+                    class="form-control" 
+                    name="nome" 
+                    [(ngModel)]="cliente.nome"
+                    required
+                    minlength="10">
 
+            <input type="text" 
+                    class="form-control" 
+                    name="email" 
+                    [(ngModel)]="cliente.email"
+                    required
+                    email>
 
+            <select class="form-control" 
+                    name="profissao" 
+                    [(ngModel)]="cliente.profissao"
+                    required>
 
+        . Execute o projeto e verifique se o formulário ficou valido conforme as validações de obrigatoriedade.
+
+    . Habilite o botão de salvar conforme o formulário fique válido:
+
+        <button type="submit" 
+                class="btn btn-primary"
+                [disabled]="!usuarioForm.valid">Salvar</button>
+
+        . Execute o projeto e verifique se o formulário ficou valido conforme as validações de obrigatoriedade.
+ 
+    . Existem diversos outros validadores, acesse https://v4.angular.io/api?query=pipe    
+
+        . Acesse no menu no canto esquerdo a opção "API"
+
+        . No campo "Filter" digite "valid" e veja todas as opções.
+
+        
 
 
 
