@@ -7582,11 +7582,11 @@ Aula 12.10. Rastreando o estado em controles do formulário
 
     . Altere o ngIf, substituindo o *.touched pelo *.dirty
 
-        <div *ngIf="nome.hasError('required') && nome.dirty">    <!-- alterado nome.dirty -->
+        <div *ngIf="nome.hasError('required') && nome.dirty" class="form-control-feedback">    <!-- alterado nome.dirty -->
             Informe um nome com conteúdo
         </div>
 
-        <div *ngIf="nome.hasError('minlength') && nome.dirty">    <!-- alterado nome.dirty -->
+        <div *ngIf="nome.hasError('minlength') && nome.dirty" class="form-control-feedback">    <!-- alterado nome.dirty -->
             Informe um nome com ao menos 10 dígitos
         </div>
 
@@ -7616,6 +7616,118 @@ Aula 12.10. Rastreando o estado em controles do formulário
 
 Aula 12.11. Estilizando os campos inválidos com classes CSS do Angular
 ----------------------------------------------------------------------
+
+    . Sempre que entramos na edição de qualquer campo, o angular coloca automaticamente classes nesses campos. Essas
+        classes não são definidas em nenhum lugar, elas são somente inseridas nos campos para que possamos defini-las de 
+        acordo com a nossa vontade.
+
+    . Podemos colocar o valor dessas classes no arquivo style.css, ou diretamente no arquivo "*.component.css":
+
+        /* Faz uso do css abaixo para os inputs invalidos e que não foram tocados */
+
+        input.ng-invalid.ng-touched, select.ng-invalid.ng-touched{
+            border: 1px solic red;
+        }
+
+    . Execute o projeto e veja o resultado.
+
+
+Aula 12.12. Estilizando os campos inválidos com Bootstrap
+---------------------------------------------------------
+
+    . Apague o conteúdo digitado na aula anterior.
+
+        <form auto="off" 
+                #usuarioForm="ngForm"
+                (ngSubmit)="salvar(usuarioForm)">
+            <div class="form-group"
+                    [class.has-danger]="nome.invalid && nome.touched">   <!-- Adicione o [class.has-danger] para cada "div.form-group" -->
+                <label class="form-control-label">Nome</label>
+
+                <input type="text" 
+                        class="form-control" 
+                        name="nome" 
+                        [(ngModel)]="cliente.nome"
+                        required
+                        minlength="10"
+                        autocomplete="off"
+                        #nome="ngModel">
+
+                <div *ngIf="nome.hasError('required') && nome.dirty" class="form-control-feedback">     <!-- Adicione a classe "form-control-feedback" -->
+                    Informe um nome com conteúdo
+                </div>
+
+                <div *ngIf="nome.hasError('minlength') && nome.dirty" class="form-control-feedback">     <!-- Adicione a classe "form-control-feedback" -->
+                    Informe um nome com ao menos 10 dígitos
+                </div>
+            </div>
+
+            <div class="form-group"
+                    [class.has-danger]="email.invalid && email.touched">    <!-- Adicione o [class.has-danger] para cada "div.form-group" -->
+                <label class="form-control-label">Email</label>
+                <input type="text" class="form-control" name="email">
+
+                <div *ngIf="email.hasError('required') && email.dirty" class="form-control-feedback">
+                    Informe um email válido
+                </div>
+            </div>
+
+            <div class="form-group"
+                    [class.has-danger]="profissao.invalid && profissao.touched">     <!-- Adicione o [class.has-danger] para cada "div.form-group" -->
+                <label class="form-control-label">
+                    Profissões
+                </label>
+
+                <select class="form-control" name="profissao">
+                    <option value="">Selecione</option>
+                    <option>Engenheiro</option>
+                    <option>Dentista</option>
+                </select>
+
+                <div *ngIf="profissao.hasError('required') && profissao.dirty" class="form-control-feedback">     <!-- Adicione a classe "form-control-feedback" -->
+                    Escolha um item
+                </div>
+            </div>
+        </form>
+
+
+    . Execute o projeto e veja o resultado.
+
+
+Aula 12.13. Limpando formulários (reset)
+----------------------------------------
+
+    . O objetivo seria apagar o conteúdo dos campos após clicar no botão salvar.
+
+    . Uma forma fácil de fazer isso seria atualizar a classe cliente do componente com um novo objeto no método salvar:
+
+            ...
+            export class AppComponent{
+
+                salvar(form: NgForm){
+                    console.log(form);
+
+                    this.cliente = new Cliente();
+                }
+            }
+
+        . Reinicialize o conteúdo 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

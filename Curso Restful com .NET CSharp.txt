@@ -1,3 +1,5 @@
+https://www.tutorialsteacher.com/webapi
+
 Curso Restful com .NET CSharp
 -----------------------------
 
@@ -177,6 +179,54 @@ Web API Controller
 
         . Veja que o controller extende a classe "ApiController" que dá suporte aos métodos GET, POST, PUT, DELETE, etc.
 
-    . Execute o projeto, acesse o Postman e faça a chamada dos métodos da API.
+    . Execute o projeto, acesse o Postman e faça as chamadas dos métodos da API.
 
-    
+    . Outra maneira de desenvolver os métodos das APIs sem a necessidade dos nomes dos métodos da classe serem os mesmos dos verbos HTTP, 
+        seria tipificar os métodos com [HttpGet], [HttpPost], etc.
+
+    . Altere a classe ValuesController com o código abaixo:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Net;
+        using System.Net.Http;
+        using System.Web.Http;
+
+        namespace prjWebApiHello2.Controllers
+        {
+            public class ValuesController : ApiController
+            {
+                [HttpGet]
+                public IEnumerable<string> Values()
+                {
+                    return new string[] { "value1", "value2" };
+                }
+
+                [HttpGet]
+                public string Value(int id)
+                {
+                    return "value";
+                }
+
+                [HttpPost]
+                public void SaveNewValue([FromBody]string value)
+                {
+                }
+
+                [HttpPut]
+                public void UpdateValue(int id, [FromBody]string value)
+                {
+                }
+
+                [HttpDelete]
+                public void RemoveValue(int id)
+                {
+                }
+            }
+        }
+
+
+Configure Web API
+-----------------
+
