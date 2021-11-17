@@ -1,0 +1,182 @@
+Curso Restful com .NET CSharp
+-----------------------------
+
+Criação de um projeto padrão Web API
+------------------------------------
+
+    . Web API com MVC Project
+
+        . Acesse no menu do Visual Studio as opções:
+
+            File -> New Project / Templates -> Visual C# -> Web -> ASP.Net Web Application (.NET Framework)
+
+        . Defina um nome para o projeto e a solução, juntamente com a localização.
+
+        . Acione o OK
+
+        . Na tela de templates, acesse a opção "Web API" e desmarque a opção "Host in the cloud"
+        
+        . Tecle ok.
+
+        . Na tela "Create App Service" acione o cancelar
+
+    . Na pasta "App_Start" existe o arquivo de configuração API "WebApiConfig.cs", neste arquivo podemos configurar as rotas e outras coisas
+        do web API, semelhante o que é feito no arquivo RouteConfig.cs usado para configurar as rotas MVC.
+
+    
+Criação de um projeto Web vázio
+-------------------------------
+
+    . Acesse no menu do Visual Studio as opções:
+
+        File -> New Project / Templates -> Visual C# -> Web -> ASP.Net Web Application (.NET Framework)
+
+    . Defina um nome para o projeto e a solução, juntamente com a localização.
+
+    . Acione o OK
+
+    . Na tela de templates, acesse a opção "Empty" e desmarque a opção "Host in the cloud".
+
+    . Tecle OK.
+
+    . Clique com o direito no projeto (ATENÇÃO, o clique tem que ser no projeto e não na solução) e escolha a opção 
+        "Manage Nuget Package...".
+
+    . Acesse o filtro "Browser" e digite "Microsoft ASP.NET Web API".
+
+    . Escolha o item "Microsoft ASP.NET Web API" DESCONSIDERE o "Microsoft ASP.NET Web API Core".
+
+    . Dê um clique esquerdo (Add -> New Folder) e crie as pasta "Controllers" e "Configuration".
+
+    . Crie na pasta "Configuration" o arquivo "HelloWebAPIConfig.cs" com o conteúdo abaixo:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Web;
+        using System.Web.Http;
+
+        namespace prjWebApiHello2.Configuration
+        {
+            public static class HelloWebAPIConfig
+            {
+                public static void Register(HttpConfiguration config)
+                {
+                    // Web API routes
+                    config.MapHttpAttributeRoutes();
+
+                    config.Routes.MapHttpRoute(
+                        name: "DefaultApi",
+                        routeTemplate: "api/{controller}/{id}",
+                        defaults: new { id = RouteParameter.Optional }
+                    );
+                }
+            }
+        }
+
+    . Clique com o direito no projeto ( Add-> New Item...) e escolha a opção (Web -> General -> Global Application Class).
+
+    . Insira o código abaixo no arquivo Globa.asax.
+
+        public class Global : System.Web.HttpApplication
+        {
+            protected void Application_Start(object sender, EventArgs e)
+            {
+                GlobalConfiguration.Configure(HelloWebAPIConfig.Register);
+            }
+        }
+
+        . Faça os imports necessário.
+
+        . Uma das responsabilidades deste arquivo seria de registrar as rotas do nosso projeto. Isto é feito pela linha:
+
+            GlobalConfiguration.Configure(HelloWebAPIConfig.Register);
+
+    . Clique com o botão direito na pasta "Controllers" acesse a opção ( Add -> Controller... );
+
+    . Selecione "Web Api 2 Controller - Empty" e acione o botão "Add".
+
+    . No formulário seguinte informe o nome do controller, no nossso caso "HelloController"
+
+    . Insira o código abaixo no arquivo "HelloController".
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Net;
+        using System.Net.Http;
+        using System.Web.Http;
+
+        namespace prjWebApiHello2.Controllers
+        {
+            public class HelloController : ApiController
+            {
+                public string Get()
+                {
+                    return "Hello World";
+                }
+            }
+        }
+
+    . Execute o projeto.
+
+    . Acesse o postman:
+
+        . Crie uma chamada com o método GET e com a URL abaixo:
+
+            http://localhost:xxxx/api/hello
+
+
+Web API Controller
+------------------
+
+    . Na pasta "Controllers" crie uma nova classe controller com o nome "ValuesController". Inclua o código abaixo nela:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Net;
+        using System.Net.Http;
+        using System.Web.Http;
+
+        namespace prjWebApiHello2.Controllers
+        {
+            public class ValuesController : ApiController
+            {
+                // GET: api/values
+                public IEnumerable<string> Get()
+                {
+                    return new string[] { "value1", "value2" };
+                }
+
+                // GET: api/values/5
+                public string Get(int id)
+                {
+                    return "value";
+                }
+
+                // POST: api/values
+                public void Post([FromUri]string value)
+                {
+                    Console.WriteLine(value);
+                }
+
+                // PUT: api/values/5
+                public void Put(int id, [FromBody]string value)
+                {
+                    Console.Write(value);
+                }
+
+                // DELETE: api/values/5
+                public void Delete(int id)
+                {
+                    Console.Write(id);
+                }
+            }
+        }
+
+        . Veja que o controller extende a classe "ApiController" que dá suporte aos métodos GET, POST, PUT, DELETE, etc.
+
+    . Execute o projeto, acesse o Postman e faça a chamada dos métodos da API.
+
+    
