@@ -7447,6 +7447,185 @@ https://www.digitalocean.com/community/tutorials/angular-reactive-forms-custom-v
 
 
 
+Aula 12.08. Exibindo erro de validação do formulário de forma global
+--------------------------------------------------------------------
+
+    . Retorne ao *.component.html, elimine as interpolações "{{ }}" existente no formulário e insira a "<div>" 
+        da mensagem de erro:
+
+            <div class="container">
+                <div *ngIf="usuarioForm.invalid" class="alert alert-danger">
+                    Preencha todos os campos corretamente.
+                </div>
+
+                <form #usuarioForm="ngForm" (ngSubmit)="salvar(usuarioForm)">
+                    ...
+                </form>
+            <div>
+
+    . Execute o projeto, digite as informações dos campos e veja o resultado.
+
+    . Detalhe, para se eliminar o autocomplete padrão dos campos input basta colocar a propriedade "autocomplete='off'"
+
+        <input type="text" 
+                class="form-control" 
+                name="nome" 
+                [(ngModel)]="cliente.nome"
+                required
+                minlength="10"
+                autocomplete="off">
+
+
+Aula 12.09. Exibindo erro de validação de controles do formulário de forma individual
+-------------------------------------------------------------------------------------
+
+    . Acrescente o ngModel em todos os campos "inputs" do formulário:
+
+            <input type="text" 
+                    class="form-control" 
+                    name="nome" 
+                    [(ngModel)]="cliente.nome"
+                    required
+                    minlength="10"
+                    autocomplete="off"
+                    #nome="ngModel">    <!-- ngModel acrescentado -->
+
+            <input type="text" 
+                    class="form-control" 
+                    name="email" 
+                    [(ngModel)]="cliente.email"
+                    required
+                    email
+                    autocomplete="off"
+                    #email="ngModel">    <!-- ngModel acrescentado -->
+
+            <select class="form-control" 
+                    name="profissao" 
+                    [(ngModel)]="cliente.profissao"
+                    required
+                    #profissao="ngModel">    <!-- ngModel acrescentado -->
+
+    . Acrescente a mensagem de alerta de informação inválida no input nome:
+
+            <input type="text" 
+                    class="form-control" 
+                    name="nome" 
+                    [(ngModel)]="cliente.nome"
+                    required
+                    minlength="10"
+                    autocomplete="off"
+                    #nome="ngModel">
+
+            <div *ngIf="nome.invalid">    <!-- Mensagem acrescentada -->
+                Informe um nome válido
+            </div>
+
+    . Execute o projeto e veja o resultado.
+
+    . Faça o mesmo procedimento para os demais inputs
+
+    . OUtra maneira de apresentar mensagem de informação inválida:
+
+        . Substitua a div de mensagem inválida anterior pela abaixo:
+
+            <div *ngIf="nome.hasError('required')">    <!-- Alterado pelo *.hasError -->
+                Informe um nome com conteúdo
+            </div>
+
+            <div *ngIf="nome.hasError('minlength')">    <!-- Alterado pelo *.hasError -->
+                Informe um nome com ao menos 10 dígitos
+            </div>
+
+    . Execute o projeto e veja o resultado.
+
+    . Faça o mesmo procedimento para os demais inputs
+
+
+Aula 12.10. Rastreando o estado em controles do formulário
+----------------------------------------------------------
+
+    . O angular possui propriedades que nos auxilia na verificação se já passamos com o cursor pelos campos:
+
+        . Acrescente as interpolações e acrescente elas na condição do *ngIf como abaixo:
+
+            <input type="text" 
+                    class="form-control" 
+                    name="nome" 
+                    [(ngModel)]="cliente.nome"
+                    required
+                    minlength="10"
+                    autocomplete="off"
+                    #nome="ngModel">
+
+            <!-- Interpolações incluidas -->
+
+            <-- Se o cursor já passou pelo campo -->
+            Touched: {{nome.touched}}<br>
+
+            <!-- Algo que está intacto, que não foi mexido -->
+            Pristine: {{nome.pristine}}<br>
+
+            <!-- Algo que está sujo, que já foi mexido -->
+            Dirty: {{nome.dirty}}
+
+            <div *ngIf="nome.hasError('required') && nome.touched">    <!-- incluido nome.touched -->
+                Informe um nome com conteúdo
+            </div>
+
+            <div *ngIf="nome.hasError('minlength') && nome.touched">    <!-- incluido nome.touched -->
+                Informe um nome com ao menos 10 dígitos
+            </div>
+
+            . Pristine e Dirty serão sempre contrários um do outro. Se um for verdadeiro, o outro será falso e vice-versa.
+
+    . Execute o projeto e veja o resultado:
+
+    . Altere o ngIf, substituindo o *.touched pelo *.dirty
+
+        <div *ngIf="nome.hasError('required') && nome.dirty">    <!-- alterado nome.dirty -->
+            Informe um nome com conteúdo
+        </div>
+
+        <div *ngIf="nome.hasError('minlength') && nome.dirty">    <!-- alterado nome.dirty -->
+            Informe um nome com ao menos 10 dígitos
+        </div>
+
+    . Faça o mesmo procedimento para os demais input.
+
+    . Execute o projeto e veja o resultado:
+
+    . Altere a mensagem principal do formulário apresentado na aula 12.8 como abaixo:
+
+        <div class="container">
+
+            <!-- Observe que foi acrescentado a condição a expressão "usuarioForm.dirty" -->
+
+            <div *ngIf="usuarioForm.invalid && usuarioForm.dirty" class="alert alert-danger">
+                Preencha todos os campos corretamente.
+            </div>
+
+            <form #usuarioForm="ngForm" (ngSubmit)="salvar(usuarioForm)">
+                ...
+            </form>
+        <div>
+
+    . Execute o projeto e veja o resultado.
+
+    . Utilize o usuarioForm.touched no lugar usuarioForm.dirty
+
+
+Aula 12.11. Estilizando os campos inválidos com classes CSS do Angular
+----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
 
 
 
