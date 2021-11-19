@@ -383,3 +383,208 @@ Web API Routing
 
 Parameter Binding in ASP.NET Web API
 ------------------------------------
+
+    . Podemos definir dois tipos de parâmetros:
+
+        Primitivos ( int, string, decimal, etc)
+        Tipos Complexos (Classes de Objetos)
+
+    . Se o parâmetro for primitivo ele será definido como sendo da query string (FromURI), caso contrário ele considera que virá do corpo da requisição (FromBody).
+
+    . Exemplo:
+
+        public class StudentController : ApiController
+        {
+            public Student Get(int id) 
+            {
+                    
+            }
+        }
+
+        . Neste caso a request sera: "http://localhost/api/student?id=1" com método GET.
+
+
+    . Multiplos Parâmetros Primitivo:
+
+        public class StudentController : ApiController
+        {
+            public Student Get(int id, string name) 
+            {
+
+            }
+        }
+
+        . A chamada será "http://localhost/api/student?id=1&name=steve" com método GET.
+
+    . Tipos Complexos de Parâmetros:
+
+        public class Student
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class StudentController : ApiController
+        {
+            public Student Post(Student stud)
+            {
+                
+            }
+        }
+
+        . A chamada será "http://localhost/api/student" método POST:
+
+            . Body : row : JSON 
+
+            .   { id: 1,
+                    name: "steve"
+                }
+
+    . Post método com parâmetros misturados:
+
+        public class Student
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class StudentController : ApiController
+        {
+            public Student Post(int age, Student student)
+            {
+
+            }
+        }
+
+        . A chamada será "http://localhost/api/student?age=25" método POST:
+
+            . Body : row : JSON 
+
+            .   { id: 1,
+                    name: "steve"
+                }
+
+    . [FromUri] e [FromBody]
+
+        [FromUri]   - Obtém as informações da query string da request (http://localhost:xxxx/api/student?id=1&name=steve)
+
+            public class StudentController : ApiController
+            {
+                public Student Post([FromUri]Student stud)
+                {
+
+                }
+            }
+
+        [FromBody]  - Obtém as informações do corpo da request 
+
+            public class StudentController : ApiController
+            {
+                public Student Post([FromBody]string name)
+                {
+
+                }
+            }
+
+        . A chamada será "http://localhost/api/student" método POST:
+
+            . Body : x-www-form-urlencoded 
+
+            . Um parâmetro somente com "Value" sem a "Key", neste caso "steve"
+
+    . IMPORTANTE: [FromBody] só pode ser aplicado somente a um parâmetro primitivo, não se pode aplicar a mais que um.
+
+
+Tipos de Retorno de ações dos métodos
+-------------------------------------
+
+    . Existem quatro tipos de retorno:
+
+        Void
+        
+        Primitive type or Complex type
+
+        HttpResponseMessage
+
+        IHttpActionResult
+
+    . Void - Não existe nenhum retorno no método da API e o Status Code retornado padrão será o "204 Ok"
+
+        public class StudentController : ApiController
+        {
+            public void Delete(int id)
+            {
+                DeleteStudentFromDB(id);
+            }
+        }
+
+    . Primitive type or Complex type - Retorna um JSon para o cliente que pode ser criado através de um tipo primitivo, ou um tipo complexo de objetos, 
+            juntamente com o StatusCode "200 Ok"
+
+        public class Student
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class StudentController : ApiController
+        {
+            public int GetId(string name)
+            {
+                int id = GetStudentId(name);
+            
+                return id;
+            }
+
+            public Student GetStudent(int id)
+            {
+                var student = GetStudentFromDB(id);
+            
+                return student;
+            }
+        }
+
+    . HttpResponseMessage - Forma amigável de configurar uma mensagem persolizada para o client.
+
+        public HttpResponseMessage Get(int id)
+        {
+            Student stud = GetStudentFromDB(id); 
+
+            if (stud == null) {
+                return Request.CreateResponse(HttpStatusCode.NotFound, id);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, stud);
+        }  
+
+    . IHttpActionResult 
+
+        public IHttpActionResult Get(int id)
+        {
+            Student stud = GetStudentFromDB(id);
+                    
+            if (stud == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(stud);
+        }
+
+        . Os métodos "NotFound" e "Ok" são implementados na classe extendida "ApiController" na classe Hello.
+
+            ApiController Method    Description
+            --------------------    -----------
+            BadRequest() 	        Creates a BadRequestResult object with status code 400.
+            Conflict() 	            Creates a ConflictResult object with status code 409.
+            Content() 	            Creates a NegotiatedContentResult with the specified status code and data.
+            Created() 	            Creates a CreatedNegotiatedContentResult with status code 201 Created.
+            CreatedAtRoute() 	    Creates a CreatedAtRouteNegotiatedContentResult with status code 201 created.
+            InternalServerError()   Creates an InternalServerErrorResult with status code 500 Internal server error.
+            NotFound() 	            Creates a NotFoundResult with status code404.
+            Ok() 	                Creates an OkResult with status code 200.
+            Redirect() 	            Creates a RedirectResult with status code 302.
+            RedirectToRoute() 	    Creates a RedirectToRouteResult with status code 302.
+            ResponseMessage() 	    Creates a ResponseMessageResult with the specified HttpResponseMessage.
+            StatusCode()         	Creates a StatusCodeResult with the specified http status code.
+            Unauthorized() 	        Creates an UnauthorizedResult with status code 401. 

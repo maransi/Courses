@@ -7711,7 +7711,22 @@ Aula 12.13. Limpando formulários (reset)
                 }
             }
 
-        . Reinicialize o conteúdo 
+        . Reinicialize o conteúdo do método salvar, retirando a criação do objeto this.cliente colocando no lugar o comando "form.reset()":
+
+            salvar(form: NgForm){
+                console.log(form);
+
+                form.reset({ profissao: '' });
+            }
+
+            . O método form.reset() é melhor do que a primeira solução, porque ele renova os estados dos campos (touched, pristini e dirty)
+
+            . O método form.reset() além de reiniciar o formulário ele também renova o objeto, sem a necessidade criar um novo objeto.
+
+            . O método form.reset() pode receber como parâmetro os campos com seus valores no padrão JSon.
+
+            
+
 
 
 
