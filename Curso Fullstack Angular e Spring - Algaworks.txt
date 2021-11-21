@@ -7209,8 +7209,8 @@ Aula 12.03. Registrando os controles do formulário
          
     . Execute o projeto, vá na console, consulte as informações do "form" e vá nos "values". Se tudo deu certo, no nó "values" aparecerá o conteúdo dos campos.
 
-        IMPORTANTE: Quando for consultar o resultado dos "values" clique ao lado da propriedade "values:object", sobre a palavra "object"
-        ---------------------------------------------------------------------------------------------------------------------------------
+        IMPORTANTE: Quando for consultar o resultado dos "values" clique ao lado da propriedade "values" nos "{...}"
+        ------------------------------------------------------------------------------------------------------------
 
     . Retorne a classe *.component.ts responsável pelo html e inclua a linha para apresentar um dos conteúdos dos campos:
 
@@ -7240,10 +7240,10 @@ Aula 12.04. Adicionando opções dinâmicas no campo de seleção
 
         <select class="form-control" name="profissao" ngModel>
             <option value="">Selecione</option>
-            <option *ngForm="let profissao of profissoes">{{ profissao }}</option>
+            <option *ngFor="let profissao of profissoes">{{ profissao }}</option>
             
             <!-- Abaixo outra forma de atualizar o valor do option, através de um property binding  -->
-            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao></option> -->
+            <!-- <option *ngFor="let profissao of profissoes" [value]="profissao></option> -->
         </select>
 
 
@@ -7254,10 +7254,10 @@ Aula 12.05. Definindo o valor padrão em campos com ngModel (One way data bindin
 
         <select class="form-control" name="profissao" [ngModel]="'Empresário'" >
             <option value="">Selecione</option>
-            <option *ngForm="let profissao of profissoes">{{ profissao }}</option>
+            <option *ngFor="let profissao of profissoes">{{ profissao }}</option>
             
             <!-- Abaixo outra forma de atualizar o valor do option, através de um property binding  -->
-            <!-- <option *ngForm="let profissao of profissoes" [value]="profissao"></option> -->
+            <!-- <option *ngFor="let profissao of profissoes" [value]="profissao"></option> -->
         </select>
 
         . Quando executar a lista ficará para na opção "Empresário", porque foi definido como uma constante 'Empresário' entre aspas.
