@@ -7243,7 +7243,7 @@ Aula 12.04. Adicionando opções dinâmicas no campo de seleção
             <option *ngFor="let profissao of profissoes">{{ profissao }}</option>
             
             <!-- Abaixo outra forma de atualizar o valor do option, através de um property binding  -->
-            <!-- <option *ngFor="let profissao of profissoes" [value]="profissao></option> -->
+            <!-- <option *ngFor="let profissao of profissoes" [value]="profissao"></option> -->
         </select>
 
 
@@ -7429,9 +7429,9 @@ Aula 12.07. Adicionando validação em formulários
 
     . Habilite o botão de salvar conforme o formulário fique válido:
 
-        <button type="submit" 
+        <button type="submit"
                 class="btn btn-primary"
-                [disabled]="!usuarioForm.valid">Salvar</button>
+                [disabled]="!usuarioForm.valid || cliente.profissao == 'Selecione um Item'">Salvar</button>
 
         . Execute o projeto e verifique se o formulário ficou valido conforme as validações de obrigatoriedade.
  
@@ -7540,6 +7540,7 @@ Aula 12.09. Exibindo erro de validação de controles do formulário de forma in
 
     . Faça o mesmo procedimento para os demais inputs
 
+// TODO: Continuar daqui em diante
 
 Aula 12.10. Rastreando o estado em controles do formulário
 ----------------------------------------------------------
