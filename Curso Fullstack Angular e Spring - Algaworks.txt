@@ -7727,16 +7727,158 @@ Aula 12.13. Limpando formulários (reset)
             . O método form.reset() pode receber como parâmetro os campos com seus valores no padrão JSon.
 
             
+Aula 13.01. Criando o protótipo do formulário de cadastro de lançamentos
+------------------------------------------------------------------------
+
+    . Acesse a pasta raiz do projeto das aulas das aula 10 e digite o comando abaixo:
+
+        ng g c lancamento-cadastro --spec=false
+
+    . Digite acesse o arquivo lancamento-cadastro.component.html e digite o código abaixo:
+
+        <div class="container">
+            <form>
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <h1>Novo Lançamento</h1>
+                    </div>
+
+                    <div class="ui-g-6 ui-md-3 ui-fluid">
+                        <label>Vencimento</label>
+                        <input type="text" pInputText>
+                    </div>
+
+                    <div class="ui-g-6 ui-md-3 ui-fluid">
+                        <label>Recebimento</label>
+                        <input type="text" pInputText>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-9 ui-fluid">
+                        <label>Descrição</label>
+                        <input type="text" pInputText>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-3 ui-fluid">
+                        <label>Valor</label>
+                        <input type="text" pInputText placeholder="0,00">
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-fluid">
+                        <label>Categoria</label>
+                        <input type="text" pInputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-fluid">
+                        <label>Pessoa</label>
+                        <input type="text" pInputText>
+                    </div>
+                    <div class="ui-g-12 ui-fluid">
+                        <label>Observação</label>
+                        <textarea  pInputTextArea row="3 "></textarea>
+                    </div>
+                    <div class="ui-g-12">
+                        <button pButton type="submit" label="Salvar"></button>
+                        <button pButton type="button" label="Novo" class="ui-button-info"></button>
+                        <a href="javascrip:;">Voltar para a pesquisa</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    . Acesse o componente app.componet.html e digite o código abaixo:
+
+        <app-navbar></app-navbar>
+
+        <app-lancamento-cadastro></app-lancamento-cadastro>
 
 
+    . Acesse o app.module.ts, insira no item "imports: [ ..., InputTextareaModule ] e faça o import "import { InputeTextareaModule } from 'primeng/coponents/inputtextarea/inputtextarea'"
+
+    . Execute o projeto e veja o resultado.
+
+Aula 13.02. Adicionando seletor de data (componente Calendar)
+-------------------------------------------------------------
+
+    . Acesse o componente app.module.ts e faça o import do "CalendarModule"
+
+        ...
+        import { InputeTextareaModule } from 'primeng/coponents/calendar/calendar';
+        import { BrowserAnimationModule } from '@angular/plataform-browser/animations';
+
+        impots: [
+            ...
+            CalendarModule,
+            BrowserAnimationModule
+        ]
+
+    . Substitua o "input text" do nosso protótipo que representam datas pelo código abaixo:
+
+        <div class="ui-g-6 ui-md-3 ui-fluid">
+            <label>Vencimento</label>
+            <p-calendar dateFormat="dd/mm/yy"></p-calendar>
+        </div>
+
+        <div class="ui-g-6 ui-md-3 ui-fluid">
+            <label>Pagamento</label>
+            <p-calendar dateFormat="dd/mm/yy"></p-calendar>
+        </div>
+
+    . Execute o projeto e veja o resultado do campo "Vencimento"
+
+    . Algumas propriedades que podem ser usadas na tag <p-calendar>:
+
+        [readonlyInput]="true"  // O campo deixa de ser editável, permitindo somente a escolha da data pelo calendar
+        [inline]="true"         // Deixa de mostrar o campo input da data, aparece somente o calendar para escolher.
+        [showIcon]="true"       // Serve para mostrar o icone ao lado do calendário
 
 
+Aula 13.03. Adicionando botão de seleção
+----------------------------------------
 
+    . Acesse o componente app.module.ts e faça o import do "SelectButtonModule"
 
+        ...
+        import { SelectButtonModule } from 'primeng/coponents/selectbutton/selectbutton'
 
+        impots: [
+            ...
+            SelectButtonModule
+        ]
 
+    . Acrescente o selectbutton em nossa página lancamento-cadastro.component.html:
 
+        <div class="container">
+            <form>
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <h1>Novo Lançamento</h1>
+                    </div>
 
+                    <p-selectButton [options]="tipos" #tipo></p-selectButton>
+
+                    ...
+                
+    . Acesse o componente lancamento-cadastro.component.ts e inclua o array abaixo:
+
+        ...
+        export class LancamentoCadastroComponent implements OnInit{
+
+            tipos = [
+                        { label: 'Receita', value: 'RECEITA'},
+                        { label: 'Despesa', value: 'DESPESA'}
+            ]
+
+        }
+        ...
+
+    . Altere a label da tag de Recebimento pelo código abaixo:
+
+        ...
+        <div class="ui-g-6 ui-md-3 ui-fluid">
+            <label>{{tipo.value == 'RECEBIMENTO' ? 'Recebimento' : 'Pagamento' }}</label>
+            <input type="text" pInputText>
+        </div>
+        ...
+
+    
 
 
 
