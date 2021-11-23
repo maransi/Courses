@@ -7878,14 +7878,97 @@ Aula 13.03. Adicionando botão de seleção
         </div>
         ...
 
+
+Aula 13.04. Adicionando caixa de seleção (componente Dropdown)
+--------------------------------------------------------------
+
+    . Acesse o componente "lancamento.cadastro.component.ts" e adicione o código abaixo:
+
+        ...
+        export class LancamentoCadastroComponent implements OnInit{
+            ...
+
+            categorias = [
+                            {label: 'Alimentação', value: 1 },
+                            {label: 'Transporte', value: 2 }
+            ]
+
+            pessoas = [
+                            {label: 'João da Silva', value: 1 },
+                            {label: 'Sebastião Souza', value: 2 }
+                            {label: 'Jose da Silva', value: 3 },
+                            {label: 'Maria Jose Souza', value: 4 }
+            ]
+        }
+
+    . Acesse o componente app.module.ts e faça o import do "SelectButtonModule"
+
+        ...
+        import { DropdownModuleModule } from 'primeng/coponents/dropdown/dropdown';
+
+        impots: [
+            ...
+            DropDownModule
+        ]
+
+    . Acesse o componente lancamento-cadastro.component.html e substitua o input "Categoria" pelo código abaixo:
+
+        ...
+        <p-dropdown [options]="categorias" 
+                    [autoWidth]="false" 
+                    placeholder="Selecione">
+        </p-dropdown>
+        ...
     
+        . A prorpriedade [autoWidth] informa ao angular para que a tag ocupe 100% do espaço da grid e não o deixe ocupando somente
+            o tamanho do maior item da lista.
+
+        . "placeholder" coloca um item de acordo com o que foi definido nesta propriedade "Selecione". Com isso, deixa de existir a necessidade
+            de colocarmos mais um item com essa descrição na lista.
+
+    . Execute o projeto e veja o resultado.
+
+    . Apresentando o valor do item escolhido, altere o a tag da categoria conforme abaixo:
 
 
+        ...
+        <label>Categoria {{ categoria.value }}</label>
+        <p-dropdown [options]="categorias" 
+                    [autoWidth]="false" 
+                    placeholder="Selecione"
+                    #categoria>
+        </p-dropdown>
+        ...
 
+    . Execute o projeto e veja o resultado.
 
+    . Altere o conteúdo da tag "Pessoa" pelo código abaixo:
 
+        ...
+        <label>Pessoa {{ pessoa.value }}</label>
+        <p-dropdown [options]="pessoas" 
+                    [autoWidth]="false" 
+                    placeholder="Selecione"
+                    [filter]="true"
+                    #pessoa>
+        </p-dropdown>
+        ...
 
+        . A propriedade "filter" nos dá acesso a input text dentro do Dropdown para digitarmos um conteúdo e filtrar a lista com o que foi digitado.
 
+        . Passo opcional: Para melhorar a estética do objeto dropdown, acesse o arquivo "style.css" e digite o conteúdo abaixo:
+
+            .ui-dropdown-filter-container{
+                width: 100%;
+            }
+
+            . Esse style servirá para o input:text que se abre dentro do dropdown ocupe 100% do espaço dentro do dropdown.
+
+        
+Aula 13.05. Adicionando máscara de dinheiro com ng2-mask-money
+--------------------------------------------------------------
+
+    . 
 
 
 
