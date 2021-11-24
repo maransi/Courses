@@ -7968,7 +7968,289 @@ Aula 13.04. Adicionando caixa de seleção (componente Dropdown)
 Aula 13.05. Adicionando máscara de dinheiro com ng2-mask-money
 --------------------------------------------------------------
 
-    . 
+    . Na pasta raiz do projeto execute os comandos abaixo:
+
+        $ npm i ng2-currency-mask@4.4.1 --save
+
+    . Acesse o componente app.module.ts e faça o import do "CurrencyMaskModule"
+
+        ...
+        import { CurrencyMaskModule } from 'ng2-currency-mask'
+
+        impots: [
+            ...
+            CurrencyMaskModule
+        ]
+
+    . Acesse a tag "Valor" no arquivo lancamento-cadastro.component.html e substitua pelo código abaixo:
+
+        ...
+        <div class="ui-g-12 ui-md-3 ui-fluid">
+            <label>Valor</label>
+            <input type="text" pInputText placeholder="0,00" currencyMask>
+        </div>
+        ...
+
+        . Observe que foi inserido o atributo "currencyMask" na tag input
+
+    . Execute o projeto e veja o resultado.
+
+    . Acesse a tag "Valor" no arquivo lancamento-cadastro.component.html e substitua pelo código abaixo:
+
+        ...
+        <div class="ui-g-12 ui-md-3 ui-fluid">
+            <label>Valor</label>
+            <input type="text" 
+                    pInputText 
+                    placeholder="0,00" 
+                    currencyMask
+                    [options]="{ prefix: 'R$', thousands: '.', decimal: ',', allowNegative: false}>
+        </div>
+        ...
+
+        . Observe que foi colocado o databinding [options] para configurar o padrão monetário brasileiro.
+
+    . Execute o projeto e veja o resultado.
+
+    . Acesse o link "https://www.npmjs.com/package/ng2-currency-mask/v/4.4.1" para mais detalhes 
+
+
+Aula 13.06. Desafio criando o protótipo do formulário de cadastro de pessoa
+---------------------------------------------------------------------------
+
+
+
+
+
+
+
+Aula 13.07. Adicionando campo com máscara (componente InputMask)
+----------------------------------------------------------------
+
+    . Acesse o componente app.module.ts e faça o import do "FormsModule"
+
+        ...
+        import { FormsModule } from '@nagular/forms';
+
+        impots: [
+            ...
+            FormsModule
+        ]
+
+    . Acesse a tag "Valor" no arquivo *** pessoa-cadastro.component.html *** e substitua pelo código abaixo:
+
+        ...
+        <div class="ui-g-12 ui-md-3 ui-fluid">
+            <label>CEP</label>
+            <input type="text" pInputText placeholder="0,00" currencyMask>
+            <p-inputMask mask="99099-999"></p-InputMask>
+        </div>
+        ...
+
+    . Execute o projeto e veja o resultado.
+
+
+Aula 13.08. Validando controles de formulário com PrimeNG
+---------------------------------------------------------
+
+    . Acesse o componente app.module.ts e faça o import do "SelectButtonModule"
+
+        ...
+        import { InputMaskModule } from 'primeng/components/inputmask/inputmask';
+
+        impots: [
+            ...
+            InputMaskModule
+        ]
+
+
+    . Acesse a tag descrição do arquivo *** lancamento-cadastro.component.html *** e subsitua pelo código abaixo:
+
+        <div class="ui-g-12 ui-md-9 ui-fluid">
+            <label>Descrição</label>
+            <input type="text" 
+                    pInputText 
+                    name="descricao" 
+                    ngModel
+                    #descricao="ngModel"
+                    required
+                    minlength="5">
+        </div>
+
+    . Para testar a situação de validação insira a interpolação abaixo e execute o projeto:
+
+        <div class="ui-g-12 ui-md-9 ui-fluid">
+            <label>Descrição {{ descricao.errors | json }} </label>
+            <input type="text" 
+                    pInputText 
+                    name="descricao" 
+                    ngModel
+                    #descricao="ngModel"
+                    required
+                    minlength="5">
+
+            <div class="ui-message ui-message-error" 
+                    *ngIf="descricao.hasError('required') && descricao.dirty">
+                Informe uma descrição válida
+            </div>
+
+            <div class="ui-message ui-message-error" 
+                    *ngIf="descricao.hasError('minlength') && descricao.dirty">
+                Mínimo de {{ descricao.errors.minlength.requiredLength }} caracteres
+            </div>
+        </div>
+
+        . Observe que na mensagem de validação foi utilizado a interpolação {{ descricao.errors.minlength.requiredLength }}.
+            Com isso não precisamos nos preocupar em colocar a quantidade de digitos, pois dessa forma ela vem automaticamente.
+
+        . Para que a validação funcione precisamos seguir os passos abaixo:
+
+            . Na tag de input devemos colocar:
+
+                name="descricao"
+                ngModel = Para que o campo seja gerenciado pelo angular
+                #descricao="ngModel" = declarando uma variavel para que esse campo posso ser referenciado em outros lugares.
+                requerid
+                minlength
+
+            . Inserir as mensagens de validação
+
+                <div class="ui-message ui-message-error" 
+                        *ngIf="descricao.hasError('required') && descricao.dirty">
+                    Informe uma descrição válida
+                </div>
+
+                <div class="ui-message ui-message-error" 
+                        *ngIf="descricao.hasError('minlength') && descricao.dirty">
+                    Mínimo de 5 caracteres
+                </div>
+
+    . Execute o projeto e veja o resultado.
+
+    . O campo "Valor" está dando erro na console. Para fazer parar esse erro temos que colocar as propriedades:
+
+        ngModel
+
+        name="valor"
+
+
+        ...
+        <div class="ui-g-12 ui-md-3 ui-fluid">
+            <label>Valor</label>
+            <input type="text" 
+                    pInputText 
+                    placeholder="0,00" 
+                    currencyMask
+                    [options]="{ prefix: 'R$', thousands: '.', decimal: ',', allowNegative: false}
+                    ngModel
+                    name="valor">
+        </div>
+        ...
+
+
+Aula 13.09. Criando componente de mensagem de erro de validação
+---------------------------------------------------------------
+
+    . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+        ng g c message --spec=false --inline-template --inline-style
+
+        . inline-template e inline_style especifica para criar essas componentes dentro do arquivo *.component.ts e deixa de ser criado
+            separadamente.
+
+    . Acesse o arquivo criado "message.component.ts" e substitua pelo código abaixo:
+
+        import { Component } from '@angular/core';
+
+        @Component({
+            selector: 'app-message',
+            template: `<div class="ui-message ui-message-error" 
+                        *ngIf="temErro()">
+                    {{ text }}
+                </div>`,
+            styles: [`
+                        .ui-messages-error{
+                            margin: 0;
+                            margin-top: 4px;
+                        } 
+                    `       
+            ]
+        })
+
+        // O style .ui-message-error é para deixar a mensagem em baixo do campo input mais legível.
+
+        export class MessageComponent{
+            @Input() error: string;
+            @Input() control: FormControl;
+            @Input() text: string;
+
+            tempErro(): boolean{
+                return this.control.hasError(this.error) && this.control.dirty;
+            }
+
+        }
+
+
+    . Acesse o componente lancamento-cadastro.component.html e insira a tag "<app-message...>" como abaixo:
+
+        ...
+        <div class="ui-g-12 ui-md-9 ui-fluid">
+            <label>Descrição {{ descricao.errors | json }} </label>
+            <input type="text" 
+                    pInputText 
+                    name="descricao" 
+                    ngModel
+                    #descricao="ngModel"
+                    required
+                    minlength="5">
+
+            <app-message [control]="descricao" 
+                            error="required" 
+                            text="Informe uma descrição"></app-message>
+
+            <app-message [control]="descricao" 
+                            error="minlength" 
+                            text="Mínimo de {{ descricao.errors?.minlength?.requiredLength }} caracteres"></app-message>
+        </div>
+
+        . O objetivo é retirar as divs de mensagem e colocar as tags de mensagem em seu lugar.
+
+        . Observe as interrogações dentro da interpolação {{ descricao.errors?.minlength?.requiredLength }}. Isso ocorre para evitar
+            erros em tempo de execução, pois se a expressão for avaliada quando o input estiver nulo dara erro e quebrará a página.
+            Colocando-se "?" diz ao angular se caso estiver nulo o conteúdo até aquele momento é para não continuar a expressão.
+
+        . As tags <app-message> substituiu as duas divs de mensagem:
+
+            <div class="ui-message ui-message-error" 
+                    *ngIf="descricao.hasError('required') && descricao.dirty">
+                Informe uma descrição válida
+            </div>
+
+            <div class="ui-message ui-message-error" 
+                    *ngIf="descricao.hasError('minlength') && descricao.dirty">
+                Mínimo de {{ descricao.errors?.minlength?.requiredLength }} caracteres
+            </div>
+
+
+Aula 13.10. Desafio controles, validações e mensagens de erro
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+Aula 13.11. Desafio criando mais componentes
+--------------------------------------------
+
+
+
+
+
+
 
 
 
