@@ -8253,20 +8253,284 @@ Aula 13.11. Desafio criando mais componentes
 
 
 
+Aula 14.01. Introdução aos módulos
+----------------------------------
+
+    . Vide "Modularizando os componentes (Conteúdo Extra)" na aula 9.3.
+
+    . Modularizar seria agrupar os componentes, diretivas e pipes nos arquivos *.module.ts.
+
+    . Os componentes dentro dos arquivos *.module.ts devem exportar os componentes e o modulo que for utilizar o componente deve
+        importar o componente exportado.
 
 
+Aula 14.02. Criando um módulo e exportando um componente
+--------------------------------------------------------
 
 
+    . A classe de modulos central é o arquivo src/app/app.modules.ts. Uma classe normal como qualquer outra, porém 
+        decorada/anotada com o @NgModule.
+
+    . A estrutura da classe app.modules.ts:
+
+                import { BrowserModule } from '@angular/platform-browser';
+                import { NgModule } from '@angular/core';
+
+                import { AppComponent } from './app.component';
+
+                @NgModule({
+                declarations: [
+                    AppComponent
+                ],
+                imports: [
+                    BrowserModule
+                ],
+                providers: [],
+                bootstrap: [AppComponent]
+                })
+
+                export class AppModule { }
+
+        . Seções do AppModule:
+
+            . Os imports são:
+
+                // Suporte a navegação pelo Browser
+                import { BrowserModule } from '@angular/platform-browser';
+
+                // Utilizado devido ao decorate @NgModule
+                import { NgModule } from '@angular/core';
+
+                import { AppComponent } from './app.component';
+
+            . O decorate/annotation @NgModule:
+
+                @NgModule({
+                declarations: [
+                    AppComponent
+                ],
+                imports: [
+                    BrowserModule
+                ],
+                providers: [],
+                bootstrap: [AppComponent]
+                })
+
+                . Dentro do decorate existe os metadados:
+
+                    declarations :[ ... ] - Local para realizar a declaração dos componentes do nosso projeto.
+                                            Cada componente incluido neste metadado deverá ser feito o "import",
+                                            Exemplo: Observe o componente HelloWorld
+
+                        ...
+                        import { AppComponent } from './app.component';
+                        import { HelloComponent } from './hello/hello.component';
+
+                        @NgModule({
+                            declarations: [
+                                AppComponent,
+                                HelloComponent
+                            ],
+                            ...
+                        })
+                        export class AppModule { }
+
+                    imports: [...] - Importação das biblitecas que iremos utilizar no projeto. Cada componente declarado
+                                    neste metadado deverá ser feito o "import".
+                                    Exemplo: Observe o BrowserModule
+
+                        import { BrowserModule } from '@angular/platform-browser';
+                        ...
+
+                        @NgModule({
+                            ...
+                            imports: [
+                                BrowserModule
+                            ],
+                            ...
+                        })
+
+                    providers : [...] - Local para configurar os serviços que serão utilizados no projeto, como:
+                                        Autenticação, rotas, etc.
+
+                    bootstrap : [AppComponent] - O objeto principal do projeto, que fará a inicialização da aplicação.
+
+            . Declaração da classe:
+
+                export class AppModule { }
+
+    . Acesse a pasta raiz do projeto e digito o comando abaixo:
+
+        $ ng g m botoes
+
+        . Criará o componente botoes.module.ts dentro da paras src/app/botoes/
+
+    . Uma diferença entre o arquivo de modulo criado acima com o app.module.ts seria que o botoes.component.ts tem o imports: [ CommonModule ]; já
+        o app.module.ts tem imports: [BrowserModule].
+
+    . Acesse a pasta raiz do projeto e digito o comando abaixo:
+
+        $ ng g c botoes/botao-grande --spec=false
+
+    . Será criado dentro da pasta src/app/botoes a pasta botao-grande com o componente botao-grande.component.css .html .ts
+
+    . Ao criar o componente botao-grande dentro da pasta src/app/botoes declarou automaticamente no item "declarations: [BotaoGrandeComponent]" dentro do 
+        arquivo botoes.module.ts.
+
+    . Acesse o arquivo botao-grande.component.html e coloque o código abaixo:
+
+        <button type="button" class="btn btn-primary btn-lg"{{ label }}</button>
+
+    . Acesse o arquivo "botao-grande.component.ts" e adicione a propriedade abaixo:
+
+        export class BotaoGrandeComponent implements OnInit{
+            @Input() label: string;
+
+            ...
+        }
+
+    . Acesse o arquivo "src/app/botoes/botoes.modules.ts" e faça o export do componente botao-grande.component
+
+        @NgModule({
+            ...
+            exports: [BotaoGrandeComponent]
+
+        })
 
 
+    . Acesse o arquivo app.module.ts e declare BotoesModule no paragrafo "imports:[]"
+
+        imports:[
+            ...
+            BotoesModule
+        ]
 
 
+    .  Acesse o arquivo "app.component.html" e insira o código abaixo:
+
+        <div class="container">
+            <app-botao-grande label="App"></App-botao-grande>
+        </div>
+
+    . Execute o projeto e verifique o resultado.
 
 
+Aula 14.03. Reexportando um módulo
+----------------------------------
+
+    . Digite o comando abaixo na pasta raiz do projeto:
+
+        $ ng g m navegacao
+
+        . O comando acima criará a pasta src/app/navegacao com o arquivo navegacao.module.ts dentro dele.
+
+    . Digite o comando abaixo na pasta raiz do projeto:
+
+        $ ng g c navegacao/menu --spec=false
+
+    . O comando acima criou os arquivos menu.component.css .html .ts dentro da pasta src/app/navegacao/menu
+
+    . Acesso o arquivo app.module.ts e faça a importação do modulo NavegacaoModule
+
+        ...
+        @NgModule({
+            ...
+            imports: [
+                        BrowserModule,
+                        NavegacaoModule
+            ]
+        })
+        ...
+
+    . Acesse o arquivo navegacao.module.ts e faça o export do component "MenuComponent" e faça o import do BotoesModule no item "imports":
+
+        ...
+        @NgModule({
+            imports: [
+                        CommonModule,
+                        BotoesModule
+            ]
+            declarations: [MenuComponent],
+            exports:[ MenuComponent ]
+
+        })
+        ...
+
+    . Acesse o arquivo menu.component.html e insira o código abaixo:
+
+        <app-botao-grande label="Item menu 1"></app-botao-grande>
+
+        <app-botao-grande label="Item menu 2"></app-botao-grande>
+
+    . Execute o projeto e veja o resultado.
+
+    . É possivel exportar um module que foi importado, basta declará-lo no item "exports" o mesmo que foi feito o "imports":
+
+        @NgModule({
+            imports: [
+                CommonModule,
+                BotoesModule
+            ],
+            ...
+            exports: [
+                MenuComponent,
+                BotoesModule            // O mesmo que foi feito o import
+            ]
 
 
+        })
+
+    . Acesse o componente app.component.ts e digite o código abaixo:
+
+        <div class="container">
+            <app-menu></app-menu>
+            <br>
+            <app-botao-grande label="App"></app-botao-grande>
+        </div>
 
 
+    . Execute o projeto e veja o resultado.
+
+
+Aula 14.06. Criando um Feature Module
+-------------------------------------    
+
+    . Iremos modularizar o sistema que estamos desenvolvendo.
+
+    . Na pasta raiz do projeto digite o comando abaixo:
+
+        $ ng g m lancamentos
+
+    . Será criado a pasta src/app/lancamentos. Arraste todos os componentes de lancamento.* para dentro dessa pasta.
+
+    . Acesse o arquivo lancamentos.module.ts e faça a declaração desses componentes dentro do modulo.
+
+        ...
+        @NgModule({
+            imports: [
+                ...
+            ],
+            declarations:[
+                LancamentoCadastroComponent,
+                LancamentosPesquisaComponent,
+                LancamentosGridComponent
+            ],
+            exports: [ LancamentosPesquisaComponent,
+                        LancamentoCadastroComponent ]
+        })
+        ...
+
+    . Acesse o arquivo app.module.ts, elimine a importação de todos os componentes que se refere ao "Lancamentos*" e insira o modulo "LancamentosModule" nos imports.
+
+    . Execute o projeto e veja o resultado.
+
+    . Acesse o arquivo lancamentos.module.ts e insira nos "imports" o "FormsModule".
+
+    . Acesse o arquivo app.module.ts, copie todos os imports referente ao PrimeNG e cole-os no "imports" do lancamento.module.ts.
+
+    . Acesse o arquivo lancamento-cadastro.component.html e comente todas as tags <app-message> <!-- -->
+
+    . Execute o projeto.
 
 
 
