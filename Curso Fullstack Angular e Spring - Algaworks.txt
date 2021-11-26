@@ -4317,17 +4317,27 @@ Aula 8.1 a 8.6
 
     . Instalação do Nodejs
 
-        # Caso não tenha o "curl" instalado
-        # sudo apt-get install curl python-software-properties
-        curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
-        sudo apt-get install -y nodejs
-        node -v
-        npm -v
+        . No Linux
 
-        ou
+            # Caso não tenha o "curl" instalado
+            # sudo apt-get install curl python-software-properties
+            curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+            sudo apt-get install -y nodejs
+            node -v
+            npm -v
 
-        sudo apt-get install nodejs
-        sudo apt-get install npm
+            ou
+
+            sudo apt-get install nodejs
+            sudo apt-get install npm
+
+        . No Windows
+
+            . Acesse o site do Node, baixe e instale a versão 11, não pode ser a versão atual:
+
+                https://nodejs.org/download/release/v11.6.0/            
+
+            . Talvez seja necessário instalar o Python 2.7, mas não instale nesse primeiro momento, somente quando formos instalar o Angular saberemos.
 
 
     . Instalação do Plugin de debug no VSCode:
@@ -4432,6 +4442,7 @@ Aula 8.7. Instalando e Criando um projeto angular CLI
 
         # sudo npm uninstall -g @angular/cli
 
+        # sudo npm cache clean --force
 
     . Para atualizar:
 
@@ -4447,7 +4458,15 @@ Aula 8.7. Instalando e Criando um projeto angular CLI
 
         Angular Extension Pack 
         Material Icon
-        
+
+    . Instalação no Windows 10
+
+        . Para a versão do curso do Angular 4 nos testes o que funcionou foi o comando abaixo:
+
+            npm install -g @angular/cli@1.1.2
+
+        . Talvez seja necessário instalar o Python 2.7, caso dê erro na instalação do Angular.
+
 
 Aula 8.8. Abrindo o projeto no VSCode
 -------------------------------------
@@ -8550,6 +8569,66 @@ Aula 14.06. Criando um Feature Module
     . Acesse o arquivo lancamento-cadastro.component.html e comente todas as tags <app-message> <!-- -->
 
     . Execute o projeto.
+
+
+
+Aula 14.07. Desafio criando o feature module de pessoas
+-------------------------------------------------------
+
+. Verificar os passos para fazer a reconfiguração dos module
+
+
+
+
+
+
+Aula 14.08. O que são Shared Modules
+------------------------------------
+
+    . Shared Module seria uma biblioteca de modulos que podem ser compartilhada entre os modulos da aplicação, como por exemplo: A tag de mensagem de validação.
+
+
+Aula 14.09. Criando um Shared Module
+------------------------------------
+
+    . Digite o comando abaixo no prompt do SO:
+
+        $ ng g m shared
+
+    . No navegador de pastas do VSCode arraste a pasta "message" para dentro da pasta "shared".
+
+    . Acesse o componente src/app/shared/shared.module.ts e faça os acertos abaixo:
+
+        ...
+        import { MessageComponent } from './message/message.component';
+
+        @NgModule({
+
+            imports: [
+                CommonModule
+            ],
+            declarations: [ MessageComponent ],
+            exports: [MessageComponent]
+
+        })
+        ...
+
+    . Acesse o component "app.module.ts" e apague as referências do MessageComponent que consta no item "declarations".
+
+    . Acesse os componentes "*.component.html" e descomente todas tags "<app-message>".
+
+    . Acesse os arquivos "*.module.ts" e insira no item "imports" a referência do "SharedModule".
+
+
+
+Aula 14.10. O que é Core Module
+-------------------------------
+
+    . 
+
+
+
+
 
 
 
