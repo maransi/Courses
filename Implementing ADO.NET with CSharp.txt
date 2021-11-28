@@ -74,3 +74,55 @@ The Classes of ADO.NET
 ORMs and ADO.NET
 ----------------
 
+    . Exemplos de ORMs:
+
+        . EF
+        . Dapper
+        . NHibernate
+
+    . Possui auto mapper.
+
+    . Abstrai o banco de dados em objetos.
+
+    . Podemos utilizar a linguagem LINQ (Trata-se de um “framework” dentro do .NET destinado a auxiliar os 
+        desenvolvedores a escrever expressões de consulta diretamente em C# de maneira agnóstica)
+
+        . Abstrai a complexidade envolvida na utilização de diferentes linguagens de consulta, como SQL, xPath e xQuery. 
+            Essa abstração é feita em cima de uma API de alto nível compatível com as linguagens integrantes do .NET Framework. 
+            Ou seja: você consegue consultar uma base de dados relacional, um arquivo XML uma coleção de objetos através 
+            de uma API unificada, invocada através de uma linguagem integrante do .NET Framework. 
+            
+        . Trazendo para um exemplo mais palpável: você consegue unicamente com código C# fazer consultas a conjuntos de objetos, 
+            bases de dados relacionais e arquivos XML, sendo o LINQ o encarregado de fazer a devida “tradução” para cada 
+            uma das fontes a serem consultadas.
+
+
+The Connection Class
+--------------------
+
+    . Passando string de conexão:
+
+        var cnn = new SqlConnection( cnnString );
+
+    . Podemos utilizar para o comando acima ODBC, SqlServer, OleDb, MySQL, etc.
+
+    . Abrindo conexão:
+
+        cnn.Open();
+
+    . Fechando a conexão:
+
+        cnn.Close();
+
+    . Descartando recursos não gerenciados:
+
+        cnn.Dispose();
+
+
+Openning a Connection
+---------------------
+
+    . 
+
+
+ 
