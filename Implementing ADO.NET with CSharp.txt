@@ -136,6 +136,12 @@ Openning a Connection
         dotnet add package MySql.Data
         code .
 
+    . Acesse o MySQL e execute a DDL abaixo:
+
+        CREATE TABLE cliente( codigo bigint NOT NULL AUTOINCREMENT PRIMARY KEY,
+                                nome VARCHAR(50),
+                                dataAniversario DATE);
+
     . Para abrirmos uma conexão precisamos de uma string de conexão:
   
         string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
@@ -302,19 +308,69 @@ Openning a Connection
         Use quando for preencher um DropDownList, CheckBoxList, RadioButtonList. ExecuteReader é somente leitura e 
         não pode ser usado para outros fins.
 
-    . ExecuteNonQuery - Não retorna dados de consulta, mas retorna o número de linhas afetadas em UPDATE, INSERT e DELETE 
-        (para os demais retornará -1), é utilizado geralmente para fazer Inserts, Updates e Deletes. Use para inserir, atualizar
-        e apagar dados do banco de dados.
-
     https://cbsa.com.br/post/diferencas-entre-executereader-executenonquery-executescalar-quando-usar-e-qual-usar.aspx
 
 
 . Submit an INSERT Statement using ExecuteNonQuery
 
-    . Implemente o método abaixo:
+    . Implemente o método abaixo na classe ConnectionModel.cs:
+
+        public long InsertCliente(){
+            long rowsAffected = 0;
+            string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
+            string sql = @"INSERT INTO cliente( nome, dataAniversario ) VALUES( @nome, @dataAniversario )";
+
+            try
+            {
+                using( MySqlConnection cn = new MySqlConnection(cs)){
+                    using( MySqlCommand cmd = new MySqlCommand(sql, cn)){
+                        cmd.CommandType = CommandType.Text;
+
+                        cn.Open();
+
+                        cmd.Parameters.AddWithValue("@nome","Cecilia Meireles");
+                        cmd.Parameters.AddWithValue("@dataAniversario","1966-10-17");
+
+                        rowsAffected = cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                
+                throw new Exception( "Ocorreu o seguinte erro: " + ex.ToString());
+            }
+
+            return rowsAffected;
+        }
+
+        . ExecuteNonQuery - Não retorna dados de consulta, mas retorna o número de linhas afetadas em UPDATE, INSERT e DELETE 
+            (para os demais retornará -1), é utilizado geralmente para fazer Inserts, Updates e Deletes. Use para inserir, atualizar
+            e apagar dados do banco de dados.
+
+        . Os parâmetros também podem ser enviados da seguinte forma:
+
+            cmd.Parameters.Add( new MySqlParameter("@nome", "Jose Saramago"));
+            cmd.Parameters.Add( new MySqlParameter("@dataAniversario", "2010-10-17"));
+
+            ou
+
+            cmd.Parameters.Add( new MySqlParameter( parameterName : "@dataAniversario", value: "2010-10-17"));
+
+        . Veja mais opções de declarar "Parameters" no link https://csharp.hotexamples.com/pt/examples/-/MySqlDbType/-/php-mysqldbtype-class-examples.html
+
+    . Altere o Program.cs para efetuar a chamada do método acima:
+
+        using AdoNetSystem;
+
+        using ( ConnectionModel connectionModel = new ConnectionModel()){
+            connectionModel.InsertCliente();
+        }
+
+    . Execute o projeto e veja o resultado.
 
 
-
+. Using OUTPUT Parameters
 
 
 
