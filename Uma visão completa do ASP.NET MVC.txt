@@ -1,0 +1,188 @@
+Uma visão completa do ASP.NET MVC
+---------------------------------
+
+Aula 1. Instalação
+------------------
+
+    . Como funciona a Web?
+
+        . Para uma aplicação funcionar é necessário o conjunto abaixo:
+
+            . HTTP - Protocolo utilizado para transferência de informações
+
+            . REQUEST - Requisição feita ao servidor
+
+            . RESPONSE - Resposta que o servidor ofrerece em relação a um Requisição
+
+            . POST - Envio de informações
+
+            . GET - Obtenção de informações
+
+        . Os envolvidos nesse ambiente:
+
+            . Client
+
+                . Cliente: O Browser (Menos seguro)
+
+                . Server: Azure, UOL, HOST, ETC. ( Mais seguro )
+
+        . As linguagens:
+
+            . HTML
+
+            . CSS        
+
+            . Javascript
+
+            . ASP.NET
+
+            . C#
+
+            . Razor - Interações C# em um arquivo HTML
+
+    
+    . Sequência de eventos num ambiente ASP.NET:
+
+        . Toda comunicação entre o Cliente e o Servidor ocorre através do protocolo HTTP.
+
+        . O cliente faz uma Requisição (REQUEST) ao servidor, por POST ( FORM/URLENCODE ) por exemplo.
+
+        . O servidor faz o processamento, utilizando ASP.NET, C#, RAZOR.
+
+        . O servidor responde (RESPONSE) ao cliente (GET - HTML, CSS, JS) 
+
+    . Padrão MVC
+
+        . O que significa a sigla MVC:
+
+            . Model - Classes, objetos, representação do seu BD
+
+            . View - Html por exemplo.
+
+            . Controllers - Interage com o model para preparar as informações para as views.
+
+        . Normalmente usado para o desenvolvimento de interfaces de usuário que divide uma aplicação em partes (camadas/componentes) interconectadas. 
+            Isto é feito para separar representações de informação internas dos modos como a informação é apresentada para e aceita pelo usuário,
+            levando ao desenvolvimento paralelo de maneira eficiente.
+
+        . Vantagens
+
+            . Alto desacoplamento
+
+            . Altamente testável
+
+            . Maior organização
+
+            . Boa divisão  de responsabilidades
+
+    . Como funciona o ASP.NET MVC
+
+        . Implementação do padrão MVC sobre o ASP.NET
+
+        . Utiliza toda base do ASP.NET
+
+            . Pipeline
+
+            . Autenticação
+
+            . Acesso a dados 
+
+        . Modelo MVC dentro do ASP.NET:
+
+            . Model - Representado pelas classes C#, exemplo: Produto.cs, Categoria.cs.
+
+            . View - Arquivos CSHTML (RAZOR)
+
+            . Controller
+            
+                . Classes que herdam de controller
+
+                . Action - Um método do controller que executa algum código e retorna uma view
+
+                . Route - Rotas para alcançar um controller/action via url
+
+        . Sequência de eventos num ambiente ASP.NET MVC
+
+            . O Cliente faz uma requisição HTTP ( HTTP Request );
+
+            . A request passar pelas rotas (Roteamento);
+
+            . O roteamento encontra a rota e instância o controller (Criação do controller);
+
+            . O controller criado é feito a Autenticação/Autorização. Se o cliente não tem direito a rota é retornado uma request
+                com statuscode 404.
+
+            . De para (Model Binding). É o processo pelo qual o ASP.NET Core MVC recebe uma solicitação HTTP e "liga" partes dessa solicitação, 
+                bem como outras fontes de dados, a entradas (por exemplo, parâmetros) em uma Action do controlador.  
+                
+                Por exemplo, vamos ver um URL simples: http://www.meusite.com/blog/posts/5
+
+                Sabemos que esse URL está tentando recuperar a postagem do blog com o ID 5 da seção /blog do meusite.com. Mas o ASP.NET não 
+                tem como saber quais são as nossas intenções e, portanto, usa a vinculação de modelo para analisar a URL. Por padrão, 
+                o ASP.NET Core MVC usa a seguinte rota para mapear URLs de entrada: {controller}/{action}/{id?}
+        
+            . Execução da Action
+
+            . Execução do resultado (view, file, etc).
+
+            . Http Response.
+
+        . Criando uma aplicação
+
+            . Acesse o Visual Studio
+
+            . Acesse File / New Project 
+
+            . Na tela que abrirá escolha o "framework 4.2"; ASP.NET Web Application; informe o "Name:", "Location: " e o "Solution Name:"; 
+                e pressione o botão OK.
+
+            . Na próxima tela  de templates, escolha a opção "MVC"; Na parte de "Change Authentication", escolha "No Authentication"; 
+                pressione o botão OK.
+
+            . Ao final da criação, podemos notar que na estrutura do projeto foi criado as pastas: Models, Views e Controllers.
+
+            . Clique com o botão direito sobre a pasta "Models", acione "Add/Class...". Dê o nome de Product.cs.
+
+            . Na classe criada, implemente as propriedades abaixo:
+
+                ...
+                public class Product
+                {
+                    public int Id{ get; set; }
+                    public string Title {get; set;}
+                }
+                ...
+
+            . Acesse a opção "Build/Rebuild Solution"
+
+            . Clique com o botão direito sobre a pasta "Controllers"; Escolha "Add new Controller"; Escolha a opção 
+                "MVC5 Controller with views, using Entity framework"; acione o botão "Add".
+
+            . Na tela seguinte informe os parâmetros abaixo:
+
+                Model Class: Product
+                Data Context class: "Acesse o botão de +; informe o conteúdo [Nome da aplicação].Models.AppDataContext"; Acione o "Add".
+
+                . Pressione o botão "Add".
+
+            . Dê um "run" na aplicação;
+
+            . No navegador acione a url: localhost:51773/Products e testes a operações de CRUD da página.
+
+            
+
+
+
+
+
+
+            
+
+
+
+
+
+
+
+
+
