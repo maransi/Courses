@@ -1,6 +1,9 @@
 Uma visão completa do ASP.NET MVC
 ---------------------------------
 
+Fundamentos
+-----------
+
 Aula 1. Instalação
 ------------------
 
@@ -169,16 +172,275 @@ Aula 1. Instalação
 
             . No navegador acione a url: localhost:51773/Products e testes a operações de CRUD da página.
 
-            
+
+Introdução ao ASP.NET
+---------------------
+
+Aula 2. Criando o Modelo
+------------------------
+
+    . Sobre o Model
+
+        . É o coração do sistema
+
+        . Também chamado de domínio.
+
+        . Se possível de ser criado um projeto web separado
+
+        . Quanto mais puro, melhor.
+
+        . Cada item da sua composição pode ser chamado de entidade (produto, categoria, empregado)
+
+    
+    . Criando uma aplicação
+
+        . Acesse o Visual Studio
+
+        . Acesse File / New Project 
+
+        . Na tela que abrirá escolha o "framework 4.2"; ASP.NET Web Application; informe o "Name:" como "BookStore", "Location: " e o "Solution Name:"; 
+            e pressione o botão OK.
+
+        . Na próxima tela  de templates, escolha a opção "MVC"; Na parte de "Change Authentication", escolha "No Authentication"; 
+            pressione o botão OK.
+
+        . Ao final da criação, podemos notar que na estrutura do projeto foi criado as pastas: Models, Views e Controllers.
+
+        . Clique com o botão direito sobre a pasta "Models", acione "Add/Class...". Dê o nome de Categoria.cs.
+
+        . Clique com o botão direito sobre a pasta "Models", acione "Add/Class...". Dê o nome de Livro.cs.
+
+        . Clique com o botão direito sobre a pasta "Models", acione "Add/Class...". Dê o nome de Autor.cs.
+
+        . Na classe criada, implemente as propriedades abaixo:
+
+            ...
+            public class Categoria
+            {
+                public int Id{ get; set; }
+                public string Nome {get; set;}
+
+                public ICollection<Livro> Livros{ get; set; }
+
+                public Categoria()
+                {
+                    this.Livros = new List<Livro>();
+                }
+            }
+            ...
+
+            . Sempre que tiver uma collection num model faça a inicialização dela dentro do construtor.
+
+            ...
+            public class Livro
+            {
+                public int Id{ get; set; }
+                public string Nome {get; set;}
+                public string ISBN {get; set;}
+                public DateTime DataLancamento {get; set;}
+
+                public int CategoriaId { get; set; }
+                public Categoria Categoria{ get; set; }
+
+                public ICollection<Autor> Autores{ get; set; }
+
+                public Livro()
+                {
+                    this.Autores = new List<Autor>();
+                }
+
+            }
+            ...
 
 
+            . Através do CategoriaId será feito o relacionamento com a classe Categoria.
 
 
+            ...
+            public class Autor
+            {
+                public int Id{ get; set; }
+                public string Nome {get; set;}
+
+                public ICollection<Livro> Livros { get; set; }
+
+                public Autor()
+                {
+                    this.Livros = new List<Livro>();
+                }
 
 
-            
+            }
+            ...
+
+            . IMPORTANTE: Quando for implementar as propriedades, se for digitado "prop" + Tab + Tab ocorre o autocomplete 
+
+                            "public int MyProperty { get; set; }"
+
+                          Outra forma de fazer isso seria com o comando "propfull"
+
+                          Para realizar o autocomplete do Constructor digite "ctor"
+
+    . Decorando as entidades
+
+        . Uma entidade pode ser decorada (Required, stringlength, datatype)
+
+        . Isto ger um metada que é utilizado pela view nas validações de formulários e pelo Entity Franework na geração do banco de dados.
+
+        . Data Annotations.
 
 
+    . Domínios e bancod de dados
+
+        . Frameworks ORM abstraem nossa responsabilidade sobre o banco de dados.
+
+        . Entity Framework é o ORM da Microsoft.
+
+        . Instalado via NuGet
+        
+        . Precisa apenas de uma classe para trabalhar.
+
+
+    . Decorando as entidades
+
+        . Acesse a opção de menu "Project / Add Reference"
+
+        . Localize a referência "System.ComponentModel.DataAnnotations"     
+        
+        . Acesse a classe Categoria e faça o decoration [Key] na propriedade Id que representa a chave da tabela e o [Required], 
+            [StringLength] na propriedade Nome.
+
+            ...
+            public class Categoria
+            {
+                [Key]
+                public int Id{ get; set; }
+
+                [Required(ErrorMessage = "Campo Obrigatório")]
+                [StringLength(30, MinumumLength = 3, ErrorMessage="Tamanho do campo entre 3 a 30 digitos")]
+                public string Nome {get; set;}
+
+            ...
+
+    . Classe Livro
+
+        ...
+        public class Livro
+        {
+            [Key]
+            public int Id{ get; set; }
+
+            [Required(ErrorMessage = "Campo Obrigatório")]
+            [StringLength(30, MinumumLength = 3, ErrorMessage="Tamanho do campo entre 3 a 30 digitos")]
+            public string Nome {get; set;}
+
+            [Required(ErrorMessage = "Campo Obrigatório")]
+            [StringLength(30, MinumumLength = 3, ErrorMessage="Tamanho do campo entre 3 a 30 digitos")]
+            public string ISBN {get; set;}
+
+            [Required(ErrorMessage = "Campo Obrigatório")]
+            [DataType(Datatype.Date)]
+            public DateTime DataLancamento {get; set;}
+
+            public int CategoriaId { get; set; }
+            public Categoria Categoria{ get; set; }
+
+            public ICollection<Autor> Autores{ get; set; }
+
+            public Livro()
+            {
+                this.Autores = new List<Autor>();
+            }
+
+        }
+        ...
+
+    . Classe Autor
+
+        ...
+        public class Autor
+        {
+            [Key]
+            public int Id{ get; set; }
+
+            [Required(ErrorMessage = "Campo Obrigatório")]
+            [StringLength(30, MinumumLength = 3, ErrorMessage="Tamanho do campo entre 3 a 30 digitos")]
+            public string Nome {get; set;}
+
+            public ICollection<Livro> Livros { get; set; }
+
+            public Autor()
+            {
+                this.Livros = new List<Livro>();
+            }
+
+
+        }
+        ...
+
+
+    . Acesse a opção "Build/Rebuild"
+
+    . Com click direito sobre o nó principal do projeto "BookStore", escolha a opção "Manage NuGet Packages...", localize a referência 
+        entityframework e faça a instalação.
+
+    . Outra forma de fazer isso é via pacote (dê preferência a essa forma), acesse "View/Other Windows/Package Manager Console", sugirá no rodapé do IDE a aba 
+        "Package Manager Console". Acesse essa aba e digite o comando abaixo:
+
+            install-package entityframework
+
+    . Acesse o arquivo "package.config" e verifique as dependências criadas.
+
+    . Acesse o nó principal do projeto "BookStore" com o botão direito, escolha "Add/New Folder..." e nomeie com "Context".
+
+    . Clique com o botão direito sobre a pasta "Context", Escolha "Add/Class" e coloque o nome da classe como "BookStoreDataContext".
+
+    . Acesse a classe "BookStoreDataContext" e implemente o código abaixo:
+
+        ...
+        namespace BookStore.Context
+        {
+            public class BookStoreDataContext : DbContext
+            {
+                public BookStoreDataContext()
+                    :base("BookStoreConnectionString")
+                {
+
+                }
+
+                public DbSet<Autor> Autores{ get; set; }
+                public DbSet<Categoria> Categorias{ get; set; }
+                public DbSet<Livro> Livros{ get; set; }
+            }
+        }
+
+    . Acesse o arquivo Web.Config e digite o trecho abaixo dentro da tag <configuration>:
+
+        <configuration>
+            ...
+            <connectionStrings>
+                <add name="BookStoreConnectionString" connectionString="Server=.\sqlexpress;Database=bookstore;User ID=sa;Password=sqlexpress;providerName="System.Data.SqlClient"/>
+            </connectionStrings>
+            ...
+        </configuration>            
+
+        . A senha do sa no banco local ficou "Joao3.16"
+
+    . Acione "Build/Clean" e "Build/Rebuild".
+
+    . Acesse "Package Manager Console" no rodapé da IDE e digite o comando abaixo:
+
+        enable-migrations
+
+        . Esse comando criará uma classe "Configuration.cs" dentro da pasta "Migrations".
+
+    . Digite na "Package Manager Console" o comando abaixo:
+
+        add-migration v1
+
+    . Digite também:
+
+        update-database
 
 
 
