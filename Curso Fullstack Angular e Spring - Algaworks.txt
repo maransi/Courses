@@ -7246,8 +7246,6 @@ Aula 12.03. Registrando os controles do formulário
          
     . Execute o projeto, vá na console, consulte as informações do "form" e vá nos "values". Se tudo deu certo, no nó "values" aparecerá o conteúdo dos campos.
 
-        IMPORTANTE: Quando for consultar o resultado dos "values" clique ao lado da propriedade "values" nos "{...}"
-        ------------------------------------------------------------------------------------------------------------
 
     . Retorne a classe *.component.ts responsável pelo html e inclua a linha para apresentar um dos conteúdos dos campos:
 
@@ -7259,6 +7257,7 @@ Aula 12.03. Registrando os controles do formulário
 
     . Execute o projeto, vá na console, consulte as informações do "form" e vá nos "values". 
 
+        IMPORTANTE: Quando for consultar o resultado dos "values" clique ao lado da propriedade "values" nos "{...}"
 
 Aula 12.04. Adicionando opções dinâmicas no campo de seleção
 ------------------------------------------------------------
@@ -7577,7 +7576,6 @@ Aula 12.09. Exibindo erro de validação de controles do formulário de forma in
 
     . Faça o mesmo procedimento para os demais inputs
 
-// TODO: Continuar daqui em diante
 
 Aula 12.10. Rastreando o estado em controles do formulário
 ----------------------------------------------------------
@@ -7597,7 +7595,7 @@ Aula 12.10. Rastreando o estado em controles do formulário
 
             <!-- Interpolações incluidas -->
 
-            <-- Se o cursor já passou pelo campo -->
+            <!-- Se o cursor já passou pelo campo -->
             Touched: {{nome.touched}}<br>
 
             <!-- Algo que está intacto, que não foi mexido -->
@@ -7652,6 +7650,20 @@ Aula 12.10. Rastreando o estado em controles do formulário
     . Utilize o usuarioForm.touched no lugar usuarioForm.dirty
 
 
+    . Se quiser deixar mais simples a validação, podemos utilizar a expressão do *ngIf com o ".invalid", exemplo:
+
+          <div class="alert alert-danger"
+                *ngIf="profissao.invalid">
+
+            <!-- *ngIf="profissao.hasError('required') && profissao.dirty"> -->
+            Escolha um item da lista de profissões
+          </div>
+
+    . A URL abaixo mostra as diversas forma para se fazer validações nos vários tipos de input type:
+
+        https://www.concretepage.com/angular-2/angular-2-4-required-validation-example#Select-Element
+
+
 Aula 12.11. Estilizando os campos inválidos com classes CSS do Angular
 ----------------------------------------------------------------------
 
@@ -7664,7 +7676,7 @@ Aula 12.11. Estilizando os campos inválidos com classes CSS do Angular
         /* Faz uso do css abaixo para os inputs invalidos e que não foram tocados */
 
         input.ng-invalid.ng-touched, select.ng-invalid.ng-touched{
-            border: 1px solic red;
+            border: 1px solid red;
         }
 
     . Execute o projeto e veja o resultado.
@@ -7675,58 +7687,91 @@ Aula 12.12. Estilizando os campos inválidos com Bootstrap
 
     . Apague o conteúdo digitado na aula anterior.
 
-        <form auto="off" 
-                #usuarioForm="ngForm"
-                (ngSubmit)="salvar(usuarioForm)">
-            <div class="form-group"
-                    [class.has-danger]="nome.invalid && nome.touched">   <!-- Adicione o [class.has-danger] para cada "div.form-group" -->
-                <label class="form-control-label">Nome</label>
+        <div class="container">
 
-                <input type="text" 
-                        class="form-control" 
-                        name="nome" 
-                        [(ngModel)]="cliente.nome"
-                        required
-                        minlength="10"
-                        autocomplete="off"
-                        #nome="ngModel">
+            {{ cliente | json }} <br>
+            {{ usuarioForm.valid }} <br>
 
-                <div *ngIf="nome.hasError('required') && nome.dirty" class="form-control-feedback">     <!-- Adicione a classe "form-control-feedback" -->
-                    Informe um nome com conteúdo
-                </div>
-
-                <div *ngIf="nome.hasError('minlength') && nome.dirty" class="form-control-feedback">     <!-- Adicione a classe "form-control-feedback" -->
-                    Informe um nome com ao menos 10 dígitos
-                </div>
+            <div *ngIf="usuarioForm.invalid && usuarioForm.dirty" class="alert alert-danger">
+                Preencha os dados corretamente
             </div>
 
-            <div class="form-group"
-                    [class.has-danger]="email.invalid && email.touched">    <!-- Adicione o [class.has-danger] para cada "div.form-group" -->
-                <label class="form-control-label">Email</label>
-                <input type="text" class="form-control" name="email">
+            <form #usuarioForm="ngForm"
+                    (ngSubmit)="salvar(usuarioForm)">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text"
+                            class="form-control"
+                            id="nome"
+                            name="nome"
+                            [(ngModel)]="cliente.nome"
+                            required
+                            minlength="10"
+                            autocomplete="off"
+                            #nome="ngModel"
+                            [class.is-invalid]="nome.invalid && nome.touched">                        <!-- Adicionado -->
 
-                <div *ngIf="email.hasError('required') && email.dirty" class="form-control-feedback">
-                    Informe um email válido
+                    <div *ngIf="nome.hasError('required') && nome.dirty" class="invalid-feedback">    <!-- Alterado pelo *.hasError -->
+                        Informe um nome com conteúdo
+                    </div>
+
+                    <div *ngIf="nome.hasError('minlength') && nome.dirty"  class="invalid-feedback">    <!-- Alterado pelo *.hasError -->
+                        Informe um nome com ao menos 10 dígitos
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group"
-                    [class.has-danger]="profissao.invalid && profissao.touched">     <!-- Adicione o [class.has-danger] para cada "div.form-group" -->
-                <label class="form-control-label">
-                    Profissões
-                </label>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text"
+                            class="form-control"
+                            name="email"
+                            [(ngModel)]="cliente.email"
+                            required
+                            email
+                            autocomplete="off"
+                            #email="ngModel"
+                            [class.is-invalid]="nome.invalid && nome.touched">                              <!-- Adicionado -->
 
-                <select class="form-control" name="profissao">
-                    <option value="">Selecione</option>
-                    <option>Engenheiro</option>
-                    <option>Dentista</option>
-                </select>
+                    <div class="invalid-feedback"
+                            *ngIf="email.hasError('required') && email.dirty">
+                        Informe um email com conteúdo
+                    </div>
 
-                <div *ngIf="profissao.hasError('required') && profissao.dirty" class="form-control-feedback">     <!-- Adicione a classe "form-control-feedback" -->
-                    Escolha um item
+                    <div class="invalid-feedback"
+                            *ngIf="email.hasError('email') && email.dirty">
+                        Informe um email válido
+                    </div>
                 </div>
-            </div>
-        </form>
+
+                <div class="form-group">
+                    <label>
+                        Profissões
+                    </label>
+
+                    <select class="form-control"
+                            name="profissao"
+                            [(ngModel)]="cliente.profissao"
+                            required
+                            #profissao="ngModel"
+                            [class.is-invalid]="profissao.invalid && profissao.touched">
+                        <option value="">Selecione um Item</option>
+
+                        <option *ngFor="let profissao of profissoes" [value]="profissao">{{profissao}}</option>
+                    </select>
+
+                    <div class="invalid-feedback"
+                            *ngIf="profissao.invalid && profissao.touched">
+
+            <!--            *ngIf="profissao.hasError('required') && profissao.dirty"> -->
+                        Escolha um item da lista de profissões
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary"
+                        [disabled]="!usuarioForm.valid || cliente.profissao == 'Selecione um Item'">Salvar</button>
+            </form>
+        </div>
 
 
     . Execute o projeto e veja o resultado.
@@ -7763,7 +7808,8 @@ Aula 12.13. Limpando formulários (reset)
 
             . O método form.reset() pode receber como parâmetro os campos com seus valores no padrão JSon.
 
-            
+
+// TODO: Continuar daqui em diante
 Aula 13.01. Criando o protótipo do formulário de cadastro de lançamentos
 ------------------------------------------------------------------------
 
@@ -8624,6 +8670,31 @@ Aula 14.10. O que é Core Module
 -------------------------------
 
     . 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
