@@ -324,10 +324,13 @@ Aula 2. Criando o Modelo
 
     . Classe Livro
 
-        ...
+        using System;
+        using System.Collections.Generic;
+        using System.ComponentModel.DataAnnotations;    
+
         public class Livro
         {
-            [Key]
+            [Key]            
             public int Id{ get; set; }
 
             [Required(ErrorMessage = "Campo Obrigatório")]
@@ -442,11 +445,213 @@ Aula 2. Criando o Modelo
 
         update-database
 
-56:50
+    . Acesse o SQL Server e verifique se foi criado as classes com sucesso.
+
+    . Reutlizando os models:
+
+        . O domínio é o coração do seu sistema, ele pode ser reutilizado em vários pontos.
+
+        . Manter o domínio separado da aplicação web poder ser uma boa escolha.
+
+        . Evitar uso de pacotes adicionais na criação do domínio.
+
+    Separando o domínio do projeto Web
+    ----------------------------------
+
+    . Clique com o botão direito do mouse sobre a solução, escolha "Add/New project", escolha "Windows/Class Library", 
+        informe o nome do projeto "BookStore.Domain.
+
+    . Selecione as Classes "Model" (Autor, Categoria, Livro) e mova elas para o projeto "BookStore.Domain".
+
+    . Acesse a classe Livro.cs e elimine tudo que se refere ao decorator "DataAnnotations":
 
 
+        using System;
+        using System.Collections.Generic;
+        // using System.ComponentModel.DataAnnotations;     // Eliminar
+
+        namespace BookStore.Domain          // Inclua o Domain no namespace
+        {
+            public class Livro
+            {
+                // [Key]                                        // Eliminar
+                public int Id{ get; set; }
+
+                // [Required(ErrorMessage = "Campo Obrigatório")]       // Eliminar
+                // [StringLength(30, MinumumLength = 3, ErrorMessage="Tamanho do campo entre 3 a 30 digitos")] // Eliminar
+                public string Nome {get; set;}
+
+                // [Required(ErrorMessage = "Campo Obrigatório")]       // Eliminar
+                // [StringLength(30, MinumumLength = 3, ErrorMessage="Tamanho do campo entre 3 a 30 digitos")] // Eliminar
+                public string ISBN {get; set;}
+
+                // [Required(ErrorMessage = "Campo Obrigatório")]       // Eliminar
+                // [DataType(Datatype.Date)]                            // Eliminar
+                public DateTime DataLancamento {get; set;}
+
+                public int CategoriaId { get; set; }
+                public Categoria Categoria{ get; set; }
+
+                public ICollection<Autor> Autores{ get; set; }
+
+                public Livro()
+                {
+                    this.Autores = new List<Autor>();
+                }
+
+            }
+        }
+        ...
+
+    . Faça o mesmo procedimento acima para as demais classes Model.
+
+    . Acesso o projeto "BookStore" com o clique direito do mouse, selecione a opção "References Manager", vá em "Projects" e escolha o projeto
+        "BookStore.Domain".
+
+    . Retorne ao projeto "BookStore", acesse a classe "BookStoreDataContext.cs", faça a importação dos models com "Ctrl + .".
+
+    . Acesse o projeto "BookStore" com o botão direito do mouse, escolha "Add/New Folder" e renomeie ela para "ViewModels".
+
+    . Dê um clique direito sobre a pasta "ViewModels", escolha "Add/Class Diagram", dê o nome a ela de "VincularLivroAutorViewModel".
+
+    . Implemente o código abaixo na classe "VincularLivroAutorViewModel":
+
+        using System.ComponentModel.DataAnnotations;
+
+        namespace BookStore.ViewModels
+        {
+            public class VincularLivroAutorViewModel
+            {
+                [Required(ErrorMessage="*")]
+                public int AutorId { get; set; }
+
+                [Required(ErrorMessage="*")]
+                public int LivroId { get; set; }
+            }
+        }
+
+    . Acesse o SQL Server e apague o banco de dados "BookStore".
+
+    . Acesse a pasta "Migrations", apague o arquivo com a terminação "*_v1.cs".
+
+    . Acesse o "Package Manager Console" no rodapé e digite os comandos abaixo:
+
+        add-migration v1
+
+        update-database
+
+    . Acesse o SQL Server e veja:
+
+        . A criação da tabela de relacionamento "LivroAutors".
+
+        . As especificações de tamanho de campo, campos requeridos, etc. Observe que agora não existe mais nenhuma definição porque retiramos
+            todos os decoration dos models.
+
+    . Acesse o SQL Server e apague o banco de dados "BookStore".
+    
+    . Acesse a pasta "Migrations", apague o arquivo com a terminação "*_v1.cs".
 
 
+    Forma diferente de mapear os models para o banco de dados
+    ---------------------------------------------------------
 
+    . Acesse o projeto "BookStore" com o botão direito do mouse, escolha "Add/New Folder" e renomeie ela para "Mappings".
 
+    . Dê um clique direito sobre a pasta "Mapping", escolha "Add/Class Diagram", dê o nome a ela de "CategoriaMap".
 
+    . Implemente o código abaixo na classe "CategoriaMap":
+
+        using BookStore.Domain;
+        using System.Data.Entity.ModelConfiguration;
+
+        namespace BookStore.Mapping
+        {
+            public class CategoriaMap : EntityTypeConfiguration<Categoria>
+            {
+                public CategoriaMap()
+                {
+                    ToTable("Categoria");
+
+                    HasKey( x => x.Id);
+                    Property( x => x.Nome ).HasMaxLength(30).IsRequered();
+
+                    HasMany( x=> x.Livros).WithRequired( x => x.Categoria);
+                }
+            }
+        }
+
+        . Dessa forma podemos ter mais flexibilidade para configurar as nossas classes entity. Verifique as propriedades disponíveis
+            nos métodos do "Property()." e "HasMany()."
+
+        
+    . Dê um clique direito sobre a pasta "Mapping", escolha "Add/Class Diagram", dê o nome a ela de "AutorMap".
+
+    . Implemente o código abaixo na classe "AutorMap":
+
+        using BookStore.Domain;
+        using System.Data.Entity.ModelConfiguration;
+
+        namespace BookStore.Mapping
+        {
+            public class AutorMap : EntityTypeConfiguration<Autor>
+            {
+
+                public AutorMap()
+                {
+                    ToTable("Autor");
+
+                    HasKey( x => x.Id);
+                    Property( x => x.Nome ).HasMaxLength(60).IsRequered();
+
+                    HasMany( x=> x.Livros)
+                        .WithMany( x => x.Autores)
+                        .Map( x => x.ToTable("LivroAutor"));
+                }
+            }
+        }
+
+    . Dê um clique direito sobre a pasta "Mapping", escolha "Add/Class Diagram", dê o nome a ela de "LivroMap".
+
+    . Implemente o código abaixo na classe "LivroMap":
+
+        using BookStore.Domain;
+        using System.Data.Entity.ModelConfiguration;
+
+        namespace BookStore.Mapping
+        {
+            public class LivroMap : EntityTypeConfiguration<Livro>
+            {
+                public LivroMap()
+                {
+                    ToTable("Livro");
+
+                    HasKey( x => x.Id);
+                    Property( x => x.Nome ).HasMaxLength(60).IsRequered();
+                    Property( x => x.ISBN ).HasMaxLength(32).IsRequered();
+                    Property( x => x.DataLancamento ).IsRequered();
+                }
+            }
+        }
+        
+    . Retorne a classe "BookStoreDataContext" e implemente o método abaixo na classe:
+
+        ...
+        protected override void OnModelCreating( DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Configurations.Add( new AutorMap() );
+            modelBuilder.Configurations.Add( new CategoriaMap() );
+            modelBuilder.Configurations.Add( new LivroMap() );
+        }
+
+    . Acesse o "Package Manager Console" no rodapé e digite os comandos abaixo:
+
+        add-migration v1
+
+        update-database
+
+    . Acesse o SQL Server e veja:
+
+        . A criação da tabela de relacionamento "LivroAutor".
+
+        . As especificações de tamanho de campo, campos requeridos, etc. Observe que agora não existe mais nenhuma definição porque retiramos
+            todos os decoration dos models.
