@@ -7809,7 +7809,6 @@ Aula 12.13. Limpando formulários (reset)
             . O método form.reset() pode receber como parâmetro os campos com seus valores no padrão JSon.
 
 
-// TODO: Continuar daqui em diante
 Aula 13.01. Criando o protótipo do formulário de cadastro de lançamentos
 ------------------------------------------------------------------------
 
@@ -7873,7 +7872,7 @@ Aula 13.01. Criando o protótipo do formulário de cadastro de lançamentos
         <app-lancamento-cadastro></app-lancamento-cadastro>
 
 
-    . Acesse o app.module.ts, insira no item "imports: [ ..., InputTextareaModule ] e faça o import "import { InputeTextareaModule } from 'primeng/coponents/inputtextarea/inputtextarea'"
+    . Acesse o app.module.ts, insira no item "imports: [ ..., InputTextareaModule ] e faça o import "import { InputTextareaModule } from 'primeng/components/inputtextarea/inputtextarea'"
 
     . Execute o projeto e veja o resultado.
 
@@ -7883,13 +7882,13 @@ Aula 13.02. Adicionando seletor de data (componente Calendar)
     . Acesse o componente app.module.ts e faça o import do "CalendarModule"
 
         ...
-        import { InputeTextareaModule } from 'primeng/coponents/calendar/calendar';
-        import { BrowserAnimationModule } from '@angular/plataform-browser/animations';
+        import { CalendarModule } from 'primeng/coponents/calendar/calendar';
+        import { BrowserAnimationsModule } from '@angular/plataform-browser/animations';
 
         impots: [
             ...
             CalendarModule,
-            BrowserAnimationModule
+            BrowserAnimationsModule
         ]
 
     . Substitua o "input text" do nosso protótipo que representam datas pelo código abaixo:
@@ -7912,6 +7911,9 @@ Aula 13.02. Adicionando seletor de data (componente Calendar)
         [inline]="true"         // Deixa de mostrar o campo input da data, aparece somente o calendar para escolher.
         [showIcon]="true"       // Serve para mostrar o icone ao lado do calendário
 
+    . Acesse o arquivo style.css do projeto e deixe a propriedade da tag "a" como abaixo:
+
+
 
 Aula 13.03. Adicionando botão de seleção
 ----------------------------------------
@@ -7919,7 +7921,7 @@ Aula 13.03. Adicionando botão de seleção
     . Acesse o componente app.module.ts e faça o import do "SelectButtonModule"
 
         ...
-        import { SelectButtonModule } from 'primeng/coponents/selectbutton/selectbutton'
+        import { SelectButtonModule } from 'primeng/components/selectbutton/selectbutton'
 
         impots: [
             ...
@@ -7935,7 +7937,9 @@ Aula 13.03. Adicionando botão de seleção
                         <h1>Novo Lançamento</h1>
                     </div>
 
-                    <p-selectButton [options]="tipos" #tipo></p-selectButton>
+                    <div class="ui-g-12">
+                        <p-selectButton [options]="tipos" #tipo></p-selectButton>
+                    </div>
 
                     ...
                 
@@ -7961,7 +7965,7 @@ Aula 13.03. Adicionando botão de seleção
         </div>
         ...
 
-
+// TODO: Continuar daqui em diante
 Aula 13.04. Adicionando caixa de seleção (componente Dropdown)
 --------------------------------------------------------------
 
