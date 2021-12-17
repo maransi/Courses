@@ -532,7 +532,6 @@ Aula 2. Criando o Modelo
             }
         }
 
-TODO: Continuar daqui
     . Acesse o SQL Server e apague o banco de dados "BookStore".
 
     . Acesse a pasta "Migrations", apague o arquivo com a terminação "*_v1.cs".
@@ -658,3 +657,119 @@ TODO: Continuar daqui
 
         . As especificações de tamanho de campo, campos requeridos, etc. Observe que agora não existe mais nenhuma definição porque retiramos
             todos os decoration dos models.
+
+
+TODO: Continuar daqui
+
+3. Criando um Controller
+------------------------
+
+    . Um pouco mais sobre o controller...
+
+        . Nada mais é do que uma classe que herda de uma classe base.
+
+        . Possui métodos públicos acessíveis via URL.
+
+        . Ficam armazenados na pasta controllers da aplicação.
+
+    . Abra a classe HomeController.cs e observe herança da classe "Controller".
+
+    . Métodos "public" no controller serão acessíveis via URL.
+
+    . Actions:
+
+        . São métodos públicos dentro de controllers.
+
+        . Retornam views (cshtml), arquivos, strings, json, inteiros, etc. Baseados no action result.
+
+        . Podem ser nterrompidas antes ou depois de sua exeução.
+
+        . Pode ter um retorno genérico (actionresult) ou um retorno específico (viewresult, fileresult...).
+
+    . Existem vários tipos de retornos de um métodos controller ( ActionResult, ViewResult, etc) :
+
+        ...
+        public ActionResult Index()     // No lugar do retorno ActionResult poderiamos retornar uma ViewResult neste caso.
+        {                               // ActionResult é o mais generico de todos os results
+            return View();
+        }
+
+
+    . Action Results
+
+        . São os resultados da execução de uma action
+
+        . Possuem classes espcíficas para otimizar o retorno.
+
+    . De um clique direito sobre a pasta "Controllers", acione "Add/Class..."; porém o correto seria "Add/Controller..."
+
+    . Informe o nome da classe "TesteController.cs"
+
+    . Implemente o código abaixo na classe "TesteController.cs":
+
+        using System.Web.Mvc;
+
+        namespace Bookstore.Controllers
+        {
+            public class TesteController: Controller
+            {
+                public string Teste()
+                {
+                    return "Testado";
+                }
+            }
+        }
+
+    . Execute o projeto, vá no navegador e acione a url abaixo:
+
+        localhost:[porta]/Teste/Teste
+
+    . Altere o código da classe TesteController como abaixo:
+
+        using System.Web.Mvc;
+
+        namespace Bookstore.Controllers
+        {
+            public class TesteController: Controller
+            {
+                public Autor Teste()
+                {
+                    var autor = Autor{
+                        Id=1,
+                        Nome="Marco Antonio"
+                    };
+
+                    return Json( autor, JsonRequestBehavior.AllowGet);
+                }
+            }
+        }
+
+    . Execute o projeto, vá no navegador e acione a url abaixo:
+
+        localhost:[porta]/Teste/Teste
+
+    . Recebendo parâmetros:
+
+        . Podemos receber parâmetros via query string.
+
+        . Podemos receber parâmetros via post.
+
+        . Podemos receber objetos complexos.
+
+    . Uma requisição é coposta por um cabeçalho (Header) e um corpo (body).
+
+    . O cabeçalho contém uma lista (chave/valor) informando vários parâmetros como tipo de dados do corpo, token de segurança e afins.
+
+    . O corpo em sí contém as informações que devem ser serializadas de acordo com o parâmetro "contenttype" presente no cabeçalho.
+
+    . Model Binder:
+
+        . Faz a atribuição dos parâmetros recebidos no corpo da requisição.
+
+        . Consegue instanciar objetos complexos.
+
+        . Tenta obrigatoriamente mapear todos os parâmetros não nulos da requisição.
+
+
+Aula 3 - Entendendo as URL amigáveis.
+-------------------------------------        
