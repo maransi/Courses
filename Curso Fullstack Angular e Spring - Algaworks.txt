@@ -8202,18 +8202,17 @@ Aula 13.06. Desafio criando o protótipo do formulário de cadastro de pessoa
 
 
 
-// TODO: Continuar daqui em diante
 Aula 13.07. Adicionando campo com máscara (componente InputMask)
 ----------------------------------------------------------------
 
-    . Acesse o componente app.module.ts e faça o import do "FormsModule"
+    . Acesse o componente app.module.ts e faça o import do "InputMaskModule"
 
         ...
         import { FormsModule } from '@nagular/forms';
 
         impots: [
             ...
-            FormsModule
+            InputMaskModule
         ]
 
     . Acesse a tag "Valor" no arquivo *** pessoa-cadastro.component.html *** e substitua pelo código abaixo:
@@ -8231,17 +8230,6 @@ Aula 13.07. Adicionando campo com máscara (componente InputMask)
 
 Aula 13.08. Validando controles de formulário com PrimeNG
 ---------------------------------------------------------
-
-    . Acesse o componente app.module.ts e faça o import do "SelectButtonModule"
-
-        ...
-        import { InputMaskModule } from 'primeng/components/inputmask/inputmask';
-
-        impots: [
-            ...
-            InputMaskModule
-        ]
-
 
     . Acesse a tag descrição do arquivo *** lancamento-cadastro.component.html *** e subsitua pelo código abaixo:
 
@@ -8294,12 +8282,12 @@ Aula 13.08. Validando controles de formulário com PrimeNG
 
             . Inserir as mensagens de validação
 
-                <div class="ui-message ui-message-error" 
+                <div class="ui-message ui-messages-error" 
                         *ngIf="descricao.hasError('required') && descricao.dirty">
                     Informe uma descrição válida
                 </div>
 
-                <div class="ui-message ui-message-error" 
+                <div class="ui-message ui-messages-error" 
                         *ngIf="descricao.hasError('minlength') && descricao.dirty">
                     Mínimo de 5 caracteres
                 </div>
@@ -8343,7 +8331,7 @@ Aula 13.09. Criando componente de mensagem de erro de validação
 
         @Component({
             selector: 'app-message',
-            template: `<div class="ui-message ui-message-error" 
+            template: `<div class="ui-message ui-messages-error" 
                         *ngIf="temErro()">
                     {{ text }}
                 </div>`,
@@ -8356,7 +8344,7 @@ Aula 13.09. Criando componente de mensagem de erro de validação
             ]
         })
 
-        // O style .ui-message-error é para deixar a mensagem em baixo do campo input mais legível.
+        // O style .ui-messages-error é para deixar a mensagem em baixo do campo input mais legível.
 
         export class MessageComponent{
             @Input() error: string;
@@ -8431,7 +8419,7 @@ Aula 13.11. Desafio criando mais componentes
 
 
 
-
+// TODO: Continuar daqui em diante
 Aula 14.01. Introdução aos módulos
 ----------------------------------
 
