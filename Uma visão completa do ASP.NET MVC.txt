@@ -682,7 +682,7 @@ TODO: Continuar daqui
 
         . Retornam views (cshtml), arquivos, strings, json, inteiros, etc. Baseados no action result.
 
-        . Podem ser nterrompidas antes ou depois de sua exeução.
+        . Podem ser interrompidas antes ou depois de sua execução.
 
         . Pode ter um retorno genérico (actionresult) ou um retorno específico (viewresult, fileresult...).
 
@@ -732,9 +732,9 @@ TODO: Continuar daqui
         {
             public class TesteController: Controller
             {
-                public Autor Teste()
+                public JsonResult Teste()
                 {
-                    var autor = Autor{
+                    var autor = new Autor{
                         Id=1,
                         Nome="Marco Antonio"
                     };
@@ -806,9 +806,9 @@ Aula 3 - Entendendo as URL amigáveis.
     . Acesse a classe TesteController e altere o nome da propriedade "Teste" para "UmaAction".
 
         ...
-        public Autor UmaAction()
+        public JsonResult UmaAction()
         {
-            var autor = Autor{
+            var autor = new Autor{
                 Id=1,
                 Nome="Marco Antonio"
             };
@@ -827,11 +827,11 @@ Aula 3 - Entendendo as URL amigáveis.
                                 |
                                 +---> irá chamar a classe controller "public class TesteController: Controller"
 
-    . Execute a URL http://localhost:52147/Teste e veja o resultado:
+    . Execute a URL http://localhost:52147/Index e veja o resultado:
 
         . Dará erro porque a classe TesteController não tem o método/action com o nome "index".
 
-        . Acrescente o método abaixo e execute novamente a url "http://localhost:52147/Teste"
+        . Acrescente o método abaixo e execute novamente a url "http://localhost:52147/Index"
 
             ... 
             public string Index()
@@ -901,7 +901,7 @@ Aula 3 - Entendendo as URL amigáveis.
         ...
         public Autor UmaAction( int id, string nome)
         {
-            var autor = Autor{
+            var autor = new Autor{
                 Id= id,
                 Nome=nome
             };
@@ -927,10 +927,10 @@ Aula 3 - Entendendo as URL amigáveis.
 
 
         ...
-        public Autor UmaAction( int? id, string nome)   // Alterado int?
+        public Autor UmaAction( int? id, string nome)   // Alterado int?. Neste caso deve-se colocar um valor default 0
         {
-            var autor = Autor{
-                Id= id,
+            var autor = new Autor{
+                Id= 0,
                 Nome=nome
             };
 
@@ -1015,3 +1015,181 @@ Aula 3 - Entendendo as URL amigáveis.
 
 Aula 4 - Travegando informações para a View
 ------------------------------------------- 
+
+    . Um pouco mais sobre as Views
+
+        . São HTML, CSS e Javascript.
+
+        . Podem executar funções do C# com Razor (View Engine).
+
+        . Podem interagir com objetos enviados a ela.
+
+        . São processadas no servidor e enviadas para o cliente.
+
+        . As Views podem receber parâmetros como variáveis ou tipos complexos.
+
+        . Estes parâmetros são recebidos através da sintaxe @Model
+
+        . Se um parâmetro diferente do esperado for enviado a view, causará um erro.
+
+            . Este erro só ocorrerá em tempo de execução.
+
+        . Além dados fisos, a view pode receber dados de outras formas.
+
+    . Outras formas de enviar informações:
+
+        . ViewBag
+
+            . Tipo dinâmico, um wrapper para o viewdata, é automaticamente excluído após a rendererização da view.
+
+        . ViewData
+
+            . Criado informando uma string, no modelo chave/valor, é automaticamente excluído após a rendererização da view
+
+        . TempData
+
+            . Criado informando uma string, no modelo chave/valor, é automaticamente excluído após a segunda requisição.
+
+        . Session
+
+            . Criado informando uma string, no modelo chave/valor, permanece no servidor por um tempo determinado pelo desenvolvedor.
+
+    . Cuidados com Session
+
+        . Não escala.
+
+        . Pode acumular lixo no servidor
+
+        . É fracamente tipada.
+
+        . Manipula na tela tudo que ocê precisar.
+
+    . Inclua o método abaixo na classe "TesteController":
+
+        ...
+        public ViewResult Dados( int id)
+        {
+            return View( id );
+        }
+        ...
+
+    . Dê um clique direito sobre a Action, sobre o nome do método "Dados"  e escolha a opção "Add View..."
+
+    . Acione o botão "Ok" da tela seguinte.
+
+    . Acesse o componenete Dados.cshtml e insira o código abaixo:
+
+        @model int
+        @{
+            ViewBag.Title = "Dados";
+        }
+
+        <h2>Dados da @Model</h2>
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:52147/Teste/Dados/1
+
+    
+    . Altere o método "Dados" do "TesteController" como abaixo:
+
+        ...
+        public ViewResult Dados( int id)
+        {
+            return View( "" );  // Alterado o id pelo ""
+        }
+        ...
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:52147/Teste/Dados/1
+
+        . Observe que dará erro porque durante a conversação do parâmetro não foi possivel transformar para inteiro.
+
+    . Repita a mesma operação, porém utilizado um parâmetro data.
+
+        ...
+        public ViewResult Dados( int id)
+        {
+            return View( DateTime.Now );  // Alterado o id pelo DateTime.Now
+        }
+        ...
+
+    . Altere o metodo "Dados" pelo conteúdo abaixo:
+
+        ...
+        public ViewResult Dados( int Id )
+        {
+            var autor = new Autor{
+                Id = 1,
+                Nome = "Marco"
+            };
+
+            return View(autor);
+        }
+        ...
+
+    . Acesse o componenete Dados.cshtml e insira o código abaixo:
+
+        @model BookStore.Domain.Autor
+        @{
+            ViewBag.Title = "Dados";
+        }
+
+        <h2>Dados da @Model.Nome</h2>
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:52147/Teste/Dados/1
+
+
+    . Altere o metodo "Dados" pelo conteúdo abaixo:
+
+        ...
+        public ViewResult Dados( int Id )
+        {
+            var autor = new Autor{
+                Id = 1,
+                Nome = "Marco"
+            };
+
+            ViewBag.Categoria = "Produtos de Limpeza";
+            ViewData["Categoria"] = "Produtos de Informática";
+            TempData["Categoria"] = "Produtos de Escritória";
+            Session["Categoria"] = "Móveis";
+
+
+            return View(autor);
+        }
+        ...
+
+    . Acesse o componenete Dados.cshtml e insira o código abaixo:
+
+        @model BookStore.Domain.Autor
+        @{
+            ViewBag.Title = "Dados";
+        }
+
+        <h2>Dados da @Model.Nome</h2>
+
+        <ul>
+            <li>ViewBag: @ViewBag.Categoria</li>
+            <li>ViewData: @ViewData["Categoria"]</li>
+            <li>TempData: @TempData["Categoria"]</li>
+            <li>Session: @Session["Categoria"]</li>
+        </ul>
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:52147/Teste/Dados/1
+
+    . Evite de usar ViewBag, ViewData, TempData e Session. Utilize o viewModel "@Model" que acaba sendo muito mais eficiente.
+
+
+
+Rotas
+-----
+
+Aula 5. Criando rotas customizadas
+----------------------------------
+
