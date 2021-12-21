@@ -682,7 +682,7 @@ TODO: Continuar daqui
 
         . Retornam views (cshtml), arquivos, strings, json, inteiros, etc. Baseados no action result.
 
-        . Podem ser nterrompidas antes ou depois de sua exeução.
+        . Podem ser interrompidas antes ou depois de sua execução.
 
         . Pode ter um retorno genérico (actionresult) ou um retorno específico (viewresult, fileresult...).
 
@@ -732,9 +732,9 @@ TODO: Continuar daqui
         {
             public class TesteController: Controller
             {
-                public Autor Teste()
+                public JsonResult Teste()
                 {
-                    var autor = Autor{
+                    var autor = new Autor{
                         Id=1,
                         Nome="Marco Antonio"
                     };
@@ -773,3 +773,423 @@ TODO: Continuar daqui
 
 Aula 3 - Entendendo as URL amigáveis.
 -------------------------------------        
+
+    . Sobre a rota padrão do MVC
+
+        . http://localhost:2030/
+
+            . localhost - Representa seu domínio, ou seja, localhost significa rodando localmente.
+
+            . :2030 - Representa a porta na qual o site está respondendo.
+
+        . Se nda for informado após a porta do domínio, o ASP.NET MVC interpreta a rota padrão:
+
+            . http://dominio:porta/controller/action/parâmetros
+
+                . O controller padrão é o homeController
+
+                . A action padrão é sempre a index.
+
+    . Sobre a rota padrão do MVC
+
+        . Um controller no MVC sempre possui o sufixo "controller" que é ignorado na URL:
+
+            . http://localhost:2030/home/sobre
+            . http://localhost:2030/home/empresa
+            . http://localhost:2030/home/contato
+            
+
+        . Caso nenhuma action seja informada, o ASP.NET MVC tentará mapear uma action chamada "index" no controller
+
+            . http://localhost:3020/cliente - busca automaticamente uma action chamada "index" no controller "clienteController"
+
+    . Acesse a classe TesteController e altere o nome da propriedade "Teste" para "UmaAction".
+
+        ...
+        public JsonResult UmaAction()
+        {
+            var autor = new Autor{
+                Id=1,
+                Nome="Marco Antonio"
+            };
+
+            return Json( autor, JsonRequestBehavior.AllowGet);
+        }
+        ...
+
+
+    . Execute o projeto e no navegador execute a URL abaixo:
+
+        http://localhost:52147/Teste/UmaAction
+                                |       |
+                                |       |
+                                |       +----> Irá chamar o método "public Autor UmaAction()"
+                                |
+                                +---> irá chamar a classe controller "public class TesteController: Controller"
+
+    . Execute a URL http://localhost:52147/Index e veja o resultado:
+
+        . Dará erro porque a classe TesteController não tem o método/action com o nome "index".
+
+        . Acrescente o método abaixo e execute novamente a url "http://localhost:52147/Index"
+
+            ... 
+            public string Index()
+            {
+                return "Index";
+            }
+            ...
+
+    . Sobre a rota padrão do MVC
+
+        . Uma action pode ser decorada com um atributo actionName, para trocar seu nome.
+
+        . Por padrão, uma parâmetro do tipo inteiro, opcional, é esperado no final da rota.
+
+        . Caso este parâmetro seja informado ele é automaticamente mapeado para um parâmetro "id" da action:
+
+            http://localhost:2030/produto/detalhes/23
+
+    . Altere o método "Index" da classe "TesteController" acrescentando o parâmetro "Id":
+
+        ... 
+        public string Index( int Id )
+        {
+            return "Index " + Id.ToString();
+        }
+        ...
+
+    . Execute o projeto e no navegador execute a URL abaixo:
+
+        http://localhost:52147/Teste/Index/1
+
+    
+    . Sobre a rota padrão do MVC
+
+        . Em resumo, podemos definir a rota padrão do ASP.NET MVC como:
+
+            . http://{dominio}:{porta}/{controller}/{action}/{id?}
+
+            . Onde "id" é um parâmetro opcional, o "?" seria para representar essa definição.
+
+        . Sendo assim, se temos um controller chamado {LivroController}, com uma action chamada {detalhes}, recebendo um {id}
+            do livro a ser exibido como {parâmetro}, teriamos a seguinte URL:
+
+          http://localhost:2030/livro/detalhes/32
+
+
+        . Parâmetros adicionais podem ser passados para a rota via query string:
+
+            . http://localhost:2030/livro/listar?categoria=2
+
+            . Lista todos os livros da categoria 2
+
+        . Neste caso, a action deve esperar um parâmetro chamado "categoria" do tipo inteiro
+
+        . Em caso de parâmetros adionais deve-se utilizaro "&"
+
+            . http://localhost:2030/livro/listar?categoria=2&autor=1
+
+            . Lista todos os livros da categoria 2 cujo "id" do autor é 1
+
+        . Existe um limite de 1024 caracteres para uma URL
+
+        . Em caso de muitos parâmetros, realize um POST.
+
+    . Acesse a classe TesteController e altere o método "UmaAction" conforme abaixo:
+
+        ...
+        public Autor UmaAction( int id, string nome)
+        {
+            var autor = new Autor{
+                Id= id,
+                Nome=nome
+            };
+
+            return Json( autor, JsonRequestBehavior.AllowGet);
+        }
+        ...
+
+    . Execute o projeto e no navegador execute a URL abaixo:
+
+        http://localhost:52147/Teste/UmaAction
+
+        . A URL acima dará erro porque não foram informado os parâmetros da URL.
+
+    . Execute o projeto e no navegador execute a URL abaixo com os parâmetros necessários:
+
+        http://localhost:52147/Teste/UmaAction?id=1&nome=MARCO
+
+    . O parâmetro "nome" por ser uma "string" ele é opcional, porém o "id" que é um "int" este é Obrigatório. Para deixar o parâmetro
+        opcional devemos utilizar o caracter "?" no tipo do parâmetro.
+
+    . Altere a assinatura do método "UmaAction" como abaixo:
+
+
+        ...
+        public Autor UmaAction( int? id, string nome)   // Alterado int?. Neste caso deve-se colocar um valor default 0
+        {
+            var autor = new Autor{
+                Id= 0,
+                Nome=nome
+            };
+
+            return Json( autor, JsonRequestBehavior.AllowGet);
+        }
+        ...
+
+    . Execute o projeto e no navegador execute a URL abaixo:
+
+        http://localhost:52147/Teste/UmaAction
+
+        . Agora não dará mais erro porque o parâmetro "id" agora é opcional.
+
+    . O recurso de querystring somente é interessante qdo estamos trabalhando com paginação:
+
+        http://localhost:52147/Teste/UmaAction?listar=10&pagina=5
+
+    . Evitar o uso de querystring devido a limitação de 1024 byte de tamanho da querystring
+
+    . Acrescente o método "ActionDois" na classe "TesteController" como abaixo:
+
+        ...
+        [HttpPost]
+        public JsonResult ActionDois( Autor autor)
+        {
+            return Json( autor );
+        }
+        ...
+
+    . Acesse o Postman, crie uma nova URL como:
+
+        method: POST
+        url: http://localhost:52147/Teste/ActionDois
+        body: [
+            raw
+            type: JSON
+            parameters: { 
+                        "Id": "1",
+                        "Nome": "Marco"
+            }
+        ]
+
+    . Coloque um "BreakPoint" na linha com "return Json( autor )" na classe "TesteController" e execute a URL no Postman.
+
+    . Outra forma para executar a URL "ActionDois" com parâmetros dentro do Postman seria fazendo uso do "form-data".
+
+        . Dentro da aba "Body", escolha o tipo "form-data".
+
+        . Insira os parâmetros abaixo:
+
+            . Id: 1
+            . Nome: "Marco"
+
+        . Execute a URL no Postman.
+
+    . Insira a decoration "ActionName" no método "ActionDois" como abaixo:
+
+        ...
+        [HttpPost]
+        [ActionName="Autor"]
+        public JsonResult ActionDois( Autor autor)
+        {
+            return Json( autor );
+        }
+        ...
+
+    . No Postman altere a chamada da URL como abaixo:
+
+        url: http://localhost:52147/Teste/Autor
+
+
+    . Route Table
+
+        . Existe uma ordem na execução das rotas no ASP.NET MVC.
+
+        . A rota padrão pode ser alterada.
+
+        . Caso a rota não seja encontrada, a padrão é acionada.
+
+        . Caso a rota padrão seja incompatível, o erro 404 será lançado.
+
+
+Aula 4 - Travegando informações para a View
+------------------------------------------- 
+
+    . Um pouco mais sobre as Views
+
+        . São HTML, CSS e Javascript.
+
+        . Podem executar funções do C# com Razor (View Engine).
+
+        . Podem interagir com objetos enviados a ela.
+
+        . São processadas no servidor e enviadas para o cliente.
+
+        . As Views podem receber parâmetros como variáveis ou tipos complexos.
+
+        . Estes parâmetros são recebidos através da sintaxe @Model
+
+        . Se um parâmetro diferente do esperado for enviado a view, causará um erro.
+
+            . Este erro só ocorrerá em tempo de execução.
+
+        . Além dados fisos, a view pode receber dados de outras formas.
+
+    . Outras formas de enviar informações:
+
+        . ViewBag
+
+            . Tipo dinâmico, um wrapper para o viewdata, é automaticamente excluído após a rendererização da view.
+
+        . ViewData
+
+            . Criado informando uma string, no modelo chave/valor, é automaticamente excluído após a rendererização da view
+
+        . TempData
+
+            . Criado informando uma string, no modelo chave/valor, é automaticamente excluído após a segunda requisição.
+
+        . Session
+
+            . Criado informando uma string, no modelo chave/valor, permanece no servidor por um tempo determinado pelo desenvolvedor.
+
+    . Cuidados com Session
+
+        . Não escala.
+
+        . Pode acumular lixo no servidor
+
+        . É fracamente tipada.
+
+        . Manipula na tela tudo que ocê precisar.
+
+    . Inclua o método abaixo na classe "TesteController":
+
+        ...
+        public ViewResult Dados( int id)
+        {
+            return View( id );
+        }
+        ...
+
+    . Dê um clique direito sobre a Action, sobre o nome do método "Dados"  e escolha a opção "Add View..."
+
+    . Acione o botão "Ok" da tela seguinte.
+
+    . Acesse o componenete Dados.cshtml e insira o código abaixo:
+
+        @model int
+        @{
+            ViewBag.Title = "Dados";
+        }
+
+        <h2>Dados da @Model</h2>
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:52147/Teste/Dados/1
+
+    
+    . Altere o método "Dados" do "TesteController" como abaixo:
+
+        ...
+        public ViewResult Dados( int id)
+        {
+            return View( "" );  // Alterado o id pelo ""
+        }
+        ...
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:52147/Teste/Dados/1
+
+        . Observe que dará erro porque durante a conversação do parâmetro não foi possivel transformar para inteiro.
+
+    . Repita a mesma operação, porém utilizado um parâmetro data.
+
+        ...
+        public ViewResult Dados( int id)
+        {
+            return View( DateTime.Now );  // Alterado o id pelo DateTime.Now
+        }
+        ...
+
+    . Altere o metodo "Dados" pelo conteúdo abaixo:
+
+        ...
+        public ViewResult Dados( int Id )
+        {
+            var autor = new Autor{
+                Id = 1,
+                Nome = "Marco"
+            };
+
+            return View(autor);
+        }
+        ...
+
+    . Acesse o componenete Dados.cshtml e insira o código abaixo:
+
+        @model BookStore.Domain.Autor
+        @{
+            ViewBag.Title = "Dados";
+        }
+
+        <h2>Dados da @Model.Nome</h2>
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:52147/Teste/Dados/1
+
+
+    . Altere o metodo "Dados" pelo conteúdo abaixo:
+
+        ...
+        public ViewResult Dados( int Id )
+        {
+            var autor = new Autor{
+                Id = 1,
+                Nome = "Marco"
+            };
+
+            ViewBag.Categoria = "Produtos de Limpeza";
+            ViewData["Categoria"] = "Produtos de Informática";
+            TempData["Categoria"] = "Produtos de Escritória";
+            Session["Categoria"] = "Móveis";
+
+
+            return View(autor);
+        }
+        ...
+
+    . Acesse o componenete Dados.cshtml e insira o código abaixo:
+
+        @model BookStore.Domain.Autor
+        @{
+            ViewBag.Title = "Dados";
+        }
+
+        <h2>Dados da @Model.Nome</h2>
+
+        <ul>
+            <li>ViewBag: @ViewBag.Categoria</li>
+            <li>ViewData: @ViewData["Categoria"]</li>
+            <li>TempData: @TempData["Categoria"]</li>
+            <li>Session: @Session["Categoria"]</li>
+        </ul>
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:52147/Teste/Dados/1
+
+    . Evite de usar ViewBag, ViewData, TempData e Session. Utilize o viewModel "@Model" que acaba sendo muito mais eficiente.
+
+
+
+Rotas
+-----
+
+Aula 5. Criando rotas customizadas
+----------------------------------
+
