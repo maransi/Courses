@@ -990,7 +990,7 @@ Aula 3 - Entendendo as URL amigáveis.
 
         ...
         [HttpPost]
-        [ActionName="Autor"]
+        [ActionName("Autor")]
         public JsonResult ActionDois( Autor autor)
         {
             return Json( autor );
@@ -1192,4 +1192,276 @@ Rotas
 
 Aula 5. Criando rotas customizadas
 ----------------------------------
+
+    . Qunado a rota padrão não atende:
+
+        . Podemos criar rotas customizadas no ASP.NET MVC habilitando a opção:
+
+            ROUTES.MAPMVCATTRIBUTEROUTESO;
+
+        . Os mapamentos devem ser feitos antes da rota padrão, ou seja, esta configuração deve ficar antes do "ROUTES.MAPROUTE" padrão.
+
+        . Feito isto, basta decorara os controllers com o atributo routing
+
+            [Route("produto/{id?}")]
+
+        . Com isto, conseguimos manter a escrita do código em inglês e as rotas em português.
+
+    . Podemos colocar as rotas dentro do arquivo "App_Start/RouteConfig.cs". Conteúdo inicial deste arquivo seria:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Web;
+        using System.Web.Mvc;
+        using System.Web.Routing;
+
+        namespace BookStore
+        {
+            public class RouteConfig
+            {
+                public static void RegisterRoutes(RouteCollection routes)
+                {
+                    routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+
+                    routes.MapRoute(
+                        name: "Default",
+                        url: "{controller}/{action}/{id}",
+                        defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                    );
+                }
+            }
+        }
+
+        . Atentar para o detalhe que as rotas identificadas dentro do método "RegisterRoutes" segui a sequência de declarações, 
+            a primeira que for encontrada será executada.
+
+    . Mapeamento
+
+        . Basicamente, o qur escrito no atributo será capturado via URL, ou seja, se decorar uma ação com o atributo:
+
+            [Route("loja/promocoes/produto/{id?})]        
+
+        . Sua URL ficará:
+
+            http://localhost:[porta]/loja/promocoes/produto/1
+
+        . A captura de parâmetros na URL é feita pelo nome do mesmo entre chaves, e no caso de parâmetros nullable, adiciona-se um 
+            sinal de interrogação ao final do mesmo.
+
+        . Caso queria definir um valor padrão para o parâmetro, basta adicionar "=valor"
+
+    . Parâmetro padrão:
+
+        . Parâmetro padrão:
+
+            [Route("loja/promocoes/prodto/{id}")]
+        
+        . Parâmetro nullable
+
+            [Route("loja/promocoes/prodto/{id?}")]
+
+        . Parâmetro com valor padrão
+
+            [Route("loja/promocoes/prodto/{id}=1")]
+
+        . Parâmetro tipado com valor padrão
+
+            [Route("loja/promocoes/prodto/{id:int=1}")]
+
+
+    . Acesse o arquivo "RouteConfig.cs" e insirá a linha "routes.MapMvcAttributeRoutes()":
+
+        ...
+        public static void RegisterRoutes(RouteCollection routes)
+        {
+            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+
+            routes.MapMvcAttributeRoutes();     // Linha inserida
+
+            routes.MapRoute(
+                name: "Default",
+                url: "{controller}/{action}/{id}",
+                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+            );
+        }
+
+        . Serve para ativar o roteamento baseado em atributo no ASP.NET MVC 5
+
+    . Acesse a classe "TesteController.cs" e implemente o método abaixo:
+
+        ... 
+        [Route("minharota")]
+        public string MinhaAction()
+        {
+            return "Ok! Cheguei na rota";
+        }
+        ...
+
+        . Nesse caso a URL ficará somente http://localhost:[porta]/minharota
+
+    . Insira o parâmetro "id" na rota e na assinatura do método:
+
+        ... 
+        [Route("minharota/{id}")]
+        public string MinhaAction(int id)
+        {
+            return "Ok! Cheguei na rota";
+        }
+        ...
+
+        . Execute a URL  http://localhost:[porta]/minharota/1
+
+        . Neste caso o parâmetro é Obrigatório, caso não for fornecido um "id" na url obteremos o statuscode 404. 
+
+        . Para não deixar obrigatório o parâmetro precisamos colocar o "?" nos parâmetros da URL e da assinatura do método
+
+            ... 
+            [Route("minharota/{id?}")]
+            public string MinhaAction(int? id)
+            {
+                return "Ok! Cheguei na rota";
+            }
+            ...
+
+        . Execute a URL  http://localhost:[porta]/minharota/
+
+        . Para deixar obrigatório o parâmetro como um inteiro precisamos definir o tipo na rota
+
+            ... 
+            [Route("minharota/{id:int}")]
+            public string MinhaAction(int id)
+            {
+                return "Ok! Cheguei na rota";
+            }
+            ...
+
+        . Execute a URL  http://localhost:[porta]/minharota/banana para dar erro
+
+        . Execute a URL  http://localhost:[porta]/minharota/1
+
+    . Prefixo de rota
+
+        . Cria um prefixo antes de uma, ou mais rotas de controller
+
+        . Otimiza seu tempo na escrita de rotas personalizadas
+
+        . Utiliza o atributo routePrefix para realização do mesmo
+
+        . Basta decorar um controller com RoutPrefix para utilizar
+
+        . Requer que o mapamento de rotas esteja habilitado.
+
+
+    . Prefixo de rota
+
+        . Toda rota para este controller deve iniciar com loja
+
+            [RoutePrefix("loja")]
+
+        . Rota com parâmetro não obrigatório:
+
+            [Route("produto/{id?})]
+
+            http://localhost:[porta]/loja/produto/1
+
+            ou
+
+            http://localhost:[porta]/loja/produto/
+
+        . Para ignorar o RoutPrefix em uma action exclusivamente, utilize "~" antes da rota
+
+            [Route("~/produto/detalhes/{id?})]
+
+            http://localhost:[porta]/produto/detalhes/1     // Sem loja como prefixo.
+
+
+    . Acesse a classe "TesteController.cs" e acrescente o decorator [RoutePrefix("teste")]    
+
+        ...
+        [RoutePrefix("teste")]
+        public class TesteController: Controller
+        {
+            ...
+        }
+        ...
+
+        . A partir desse momento toda chamada a essa api deverá vir acrescida no pathname a constante "teste", exemplo:
+
+            http://localhost:[porta]/teste/minharota/1
+
+        . Para ignorar o prefixo "teste" podemos utilizar o "~" na definição da rota do método.
+
+            ... 
+            [Route("~/minharota/{id:int}")]
+            public string MinhaAction(int id)
+            {
+                return "Ok! Cheguei na rota";
+            }
+            ...
+
+            . Execute o projeto com a URL http://localhost:[porta]/minharota/1
+
+    . Clique com o botão direito do mouse sobre a pasta "Controllers", escolha "Add/New Controller..." e escolha 
+        "Controller MVC 5 Empty"
+
+    . Dê o nome de "AuthorController"
+
+    . Acesse a classe "AuthorController" e implemente o código abaixo:
+
+        ...
+        namespace BookStore.Controllers
+        {
+
+            [RoutePrefix("autores")]
+            public class AuthorController: Controller
+            {
+                [Route("listar")]
+                public ActionResult Index()
+                {
+                    return View();
+                }
+
+                [Route("criar")]
+                public ActionResult Create()
+                {
+                    return View();
+                }
+
+                [Route("editar/{id:int}")]
+                public ActionResult Edit(int id)
+                {
+                    return View();
+                }
+
+                [Route("excluir/{id:int}")]
+                public ActionResult Delete(int id)
+                {
+                    return View();
+                }
+
+            }
+        }
+
+    . Clique com o botão direito sobre o nome do método "Index, Create, Edit e Delete", escolha "Add/New Action..."
+
+    . Execcute as URLs abaixo:
+
+        http://localhost:[porta]/autores/listar
+
+        http://localhost:[porta]/autores/criar
+
+        http://localhost:[porta]/autores/editar/1
+
+        http://localhost:[porta]/autores/excluir/1
+
+
+Aula 6. Restringindo Rotas
+--------------------------
+
+
+
+
+
+    
 
