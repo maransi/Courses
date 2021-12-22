@@ -8402,7 +8402,164 @@ Aula 13.09. Criando componente de mensagem de erro de validação
 Aula 13.10. Desafio controles, validações e mensagens de erro
 -------------------------------------------------------------
 
+    . pessoa-cadastro.component.html
 
+        <div class="container">
+            <form>
+                <div class="ui-g">
+                <div class="ui-g-12">
+                    <h1>Cadastramento de Pessoa</h1>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-fluid">
+                    <label for="nome">Nome</label>
+                    <input type="text"
+                            name="nome"
+                            id="nome"
+                            pInputText
+                            autocomplete="off"
+                            ngModel
+                            #nome="ngModel"
+                            required
+                            minlength=5>
+
+                    <app-message [control]="nome"
+                                error="required"
+                                text="Informe um nome válido"></app-message>
+
+                    <app-message [control]="nome"
+                                error="minlength"
+                                text="Mínimo de {{ nome.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+
+                <div class="ui-g-11 ui-md-11 ui-sm-9 ui-fluid">
+                    <label for="logradouro">Logradouro</label>
+                    <input type="text"
+                            name="logradouro"
+                            id="logradouro"
+                            pInputText
+                            autocomplete="off"
+                            ngModel
+                            #logradouro="ngModel"
+                            required
+                            minlength=5>
+                    <app-message [control]="logradouro"
+                                error="required"
+                                text="Informe um logradouro válido"></app-message>
+
+                    <app-message [control]="logradouro"
+                                error="minlength"
+                                text="Mínimo de {{ logradouro.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+
+                <div class="ui-g-1 ui-md-1 ui-sm-3 ui-fluid">
+                    <label for="numero">No.</label>
+                    <input type="text"
+                            name="numero"
+                            id="numero"
+                            pInputText
+                            autocomplete="off"
+                            ngModel
+                            #numero="ngModel"
+                            required
+                            minlength=1>
+
+                    <app-message [control]="numero"
+                                error="required"
+                                text="Informe um número válido"></app-message>
+
+                    <app-message [control]="numero"
+                                error="minlength"
+                                text="Mínimo de {{ numero.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+
+                <div class="ui-g-4 ui-md-4 ui-sm-12 ui-fluid">
+                    <label for="complemento">Complemento</label>
+                    <input type="text"
+                            name="complemento"
+                            id="complemento"
+                            pInputText
+                            autocomplete="off"
+                            ngModel
+                            #complemento="ngModel">
+                </div>
+
+                <div class="ui-g-4  ui-md-4 ui-sm-12 ui-fluid">
+                    <label for="bairro">Bairro</label>
+                    <input type="text"
+                            name="bairro"
+                            id="bairro"
+                            pInputText
+                            autocomplete="off"
+                            ngModel
+                            #bairro="ngModel"
+                            required
+                            minlength=5>
+                    <app-message [control]="bairro"
+                            error="required"
+                            text="Informe um bairro válido"></app-message>
+
+                    <app-message [control]="bairro"
+                            error="minlength"
+                            text="Mínimo de {{ bairro.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+
+                <div class="ui-g-3 ui-md-3 ui-sm-12 ui-fluid">
+                    <label for="cidade">Cidade</label>
+                    <input type="text"
+                            name="cidade"
+                            id="cidade"
+                            pInputText
+                            autocomplete="off"
+                            ngModel
+                            #cidade="ngModel"
+                            required
+                            minlength=5>
+                    <app-message [control]="cidade"
+                                error="required"
+                                text="Informe uma cidade válida"></app-message>
+
+                    <app-message [control]="cidade"
+                                error="minlength"
+                                text="Mínimo de {{ cidade.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+
+                <div class="ui-g-1  ui-md-1 ui-sm-6 ui-fluid">
+                    <label>CEP</label>
+                    <p-inputMask mask="99999-999"
+                                id="cep"
+                                name="cep"
+                                autocomplete="off"
+                                ngModel
+                                #cep="ngModel"
+                                required
+                                minlength=5></p-inputMask>
+                    <app-message [control]="cep"
+                                error="required"
+                                text="Informe um CEP válido"></app-message>
+
+                    <app-message [control]="cep"
+                                error="minlength"
+                                text="Mínimo de {{ cep.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+
+                <div class="ui-g-2 ui-md-2 ui-sm-6 ui-fluid">
+                    <label>Estado {{ estado.value }}</label>
+                    <p-dropdown [options]="estados"
+                                [autoWidth]="false"
+                                [placeholder]="Selecione"
+                                [filter]="true"
+                                #estado></p-dropdown>
+                </div>
+                <div class="ui-g-1 ui-md-2 ui-sm-12 ui-fluid" style="padding: 25px;">
+                    <p-checkbox name="status" id="status" value="ATIVO" label="Ativo"></p-checkbox>
+                </div>
+                </div>
+            </form>
+        </div>
+
+
+    . lancamento-cadastro.component.html
 
 
 
