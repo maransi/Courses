@@ -659,8 +659,6 @@ Aula 2. Criando o Modelo
             todos os decoration dos models.
 
 
-TODO: Continuar daqui
-
 3. Criando um Controller
 ------------------------
 
@@ -1578,9 +1576,9 @@ ATENÇÃO: A demo abaixo não ocorreu com sucesso. Fazer pesquisa para ver se co
             {
                 private readonly string[] validOptions;
                 
-                public ValuesConstrait( string options )
+                public ValuesConstraint( string options )
                 {
-                    validOptions = options.Split("|");
+                    validOptions = options.Split('|');
                 }
 
                 public bool Match( HttpContextBase httpContxt, 
@@ -1622,18 +1620,26 @@ https://www.c-sharpcorner.com/UploadFile/ff2f08/custom-route-constraints-in-Asp-
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+            /* Valores Inseridos */
+            routes.MapRoute(name: "newRoute",
+                    url: "api/rota/estacao/{estacao:values(primavera|verao|outono|inverno)}",
+                    defaults: new { controller = "Teste", action = "MinhaAction4" },
+                    constraints: new { name = new ValuesConstraint("primavera|verao|outono|inverno") }
+            );
+            /* */
         }
 
     . Implemente o método abaixo na classe "TesteController.cs":
 
         ...
-        [Route("rota/estacao/{estacao:Values(primavera|verao|outono|inverno)}")]
-        public string MinhaAction4( string estacao )
+        [Route("rota/estacao/{estacao:Values(primavera|outono|verao|inverno)}")]
+        public string MinhaAction4(string estacao)
         {
             return "Olá, estamos no " + estacao;
         }
 
-
+TODO: Continuar daqui
 Aula 7. Action Filters
 ----------------------
  
