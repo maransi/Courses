@@ -1195,9 +1195,9 @@ Aula 5. Criando rotas customizadas
 
     . Qunado a rota padrão não atende:
 
-        . Podemos criar rotas customizadas no ASP.NET MVC habilitando a opção:
+        . Podemos criar rotas customizadas no ASP.NET MVC habilitando a opção no arquivo RouteConfig.cs:
 
-            ROUTES.MAPMVCATTRIBUTEROUTESO;
+            routes.MapMvcAttributeRoutes();
 
         . Os mapamentos devem ser feitos antes da rota padrão, ou seja, esta configuração deve ficar antes do "ROUTES.MAPROUTE" padrão.
 
@@ -1445,7 +1445,7 @@ Aula 5. Criando rotas customizadas
 
     . Clique com o botão direito sobre o nome do método "Index, Create, Edit e Delete", escolha "Add/New Action..."
 
-    . Execcute as URLs abaixo:
+    . Execute as URLs abaixo:
 
         http://localhost:[porta]/autores/listar
 
@@ -1459,9 +1459,289 @@ Aula 5. Criando rotas customizadas
 Aula 6. Restringindo Rotas
 --------------------------
 
+    . Tipos de parâmetros das rotas:
 
+        Constraint              Descrição                                                               Exemplo
+        ----------              ---------                                                               -------
+        alpha                   Matches uppercase or lowercase latin alphabet characters (a-z, A-Z)     {x:alpha}
+        bool                    Matches a boolean value                                                 {x:bool}
+        datetime                                                                                        {x:datetime}
+        double                  64 bit floating-point                                                   {x:double}
+        float                   32 bit                                                                  {x:float}
+        guid                                                                                            {x:guid}
+        int                                                                                             {x:int}
+        length                                                                                          {x:length(6)} {x:length(1,20)}
+        long                    64 bit integer                                                          {x:long}
+        max                     Matches an integer with a maximum value                                 {x:max(10)}
+        min                     Matches an integer with a minimum value                                 {x:min(10)}                                                                                   
+        minlength               String with a minumum length                                            {x:minlength(10)}
+        range                                                                                           {x:range(10,50)}
+        regex                                                                                           {x:regex(^\d{3}-\d{3}-\d{4}$)}
 
+    . Restrições nas rotas
 
+        . O atributo route permite a plicaão de restrições nas rotas
 
+        . O atributo abaixo etá restrito a receber apenas parâmetros inteiros:
+
+            [Route("produto/detalhes/{id:int}")]
+
+        . Estas restrições interferem em como as rotas são chamadas.
+
+        . Por exemplo, se houverem duas rotas:
+
+            [Route("produto/detalhes/{id:int}")]
+
+            [Route("produto/detalhes/{name}")]
+
+        . Caso um inteiro seja informado, a primeira rota será executada, caso contrário, a segunda.
+
+        . As restrições nas rotas podem ser cumulativas:
+
+            [Route("produto/{id:int:min(1)}")]
+
+            [Route("produtos/{categoria:maxlength(3)?}")]
     
+    . Acesse a classe "TesteController.cs" e implemente o código abaixo:
 
+        ...
+        [Route("rota/{caegoria:minlength(3)}")]
+        public string MinhaAction3( string categoria){
+            return "MinhaAction3 " + caegoria;
+        }
+        ...
+
+        . Execute no navegador a URL abaixo:
+
+            . Para testar com erro:
+
+            http://localhost:[porta]/teste/rota/ab
+        
+            . Para testar sem erro:
+
+            http://localhost:[porta]/teste/rota/abc
+
+        . Altere o datatype do parametro, colocando "alpha":
+
+            ...
+            [Route("rota/{caegoria:alpha:minlength(3)}")]
+            public string MinhaAction3( string categoria){
+                return "MinhaAction3 " + caegoria;
+            }
+            ...
+
+        . Execute no navegador a URL abaixo:
+
+            . Para testar com erro:
+
+            http://localhost:[porta]/teste/rota/123
+        
+            . Para testar sem erro:
+
+            http://localhost:[porta]/teste/rota/abc
+
+    . Customizando as restrições
+
+        . Podemos criar nossa própria restrição para  rota
+
+        . Basta criar uma class e implemntar a interface [RoutConstraint]
+
+        . Muito útil qdo trabalhamos com enumeradores por exemplo
+
+        . Dada a classe contrída, é necssário adicionar a restrição a lista de restrições padrão:
+
+            var constraintResolver = new DefaultInlineConstraintResolver();
+
+            ConstraintResolver.ConstraintMap.Add("tipoProduto", typeOf(tipoProdutoConstraint));
+
+    . Clique com o botão direito sobre o projeto BookStore, escolha "Add/New Folder" e dê o nome de "RoutesConstraints".
+
+    . Clique com o botão direito sobre a pasta "RoutesConstraints", "Add/New Class" e dê o nome de "ValuesConstraint.cs".
+
+
+
+ATENÇÃO: A demo abaixo não ocorreu com sucesso. Fazer pesquisa para ver se consegue corrigir
+--------------------------------------------------------------------------------------------
+
+    . Implemente o código abaixo na classe criada:
+16:07
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Web;
+        using System.Web.Routing;
+
+        namespace BookStore.RoutesConstraints
+        {
+
+            public class ValuesConstraint: IRouteConstraint
+            {
+                private readonly string[] validOptions;
+                
+                public ValuesConstrait( string options )
+                {
+                    validOptions = options.Split("|");
+                }
+
+                public bool Match( HttpContextBase httpContxt, 
+                                    Route route, string parameterName, 
+                                    RouteValueDictionary values, 
+                                    RouteDirection routeDirection )
+                {
+                    object value;
+
+                    if (values.TryGetValue( parameterName, out value ) &&  value!= null)
+                    {
+                        return validOptions.Contains( value.ToString(), StringComparer.OrdinalIgnoreCase );
+                    }
+
+                    return false;
+                }
+            }
+        }
+
+https://www.c-sharpcorner.com/UploadFile/ff2f08/custom-route-constraints-in-Asp-Net-mvc-5/
+
+    . Acesse a classe RouteConfig.cs e insira o código abaixo:
+
+        ...
+        public static void RegisterRoutes(RouteCollection routes)
+        {
+            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+
+            /* Valores Inseridos */
+            var constraintsResolver = new DefaultInlineConstraintResolver();
+            
+            constraintsResolver.ConstraintMap.Add("values", typeof( ValuesConstraint ));
+            /* */
+
+            routes.MapMvcAttributeRoutes( constraintsResolver );     // Linha Alterada
+
+            routes.MapRoute(
+                name: "Default",
+                url: "{controller}/{action}/{id}",
+                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+            );
+        }
+
+    . Implemente o método abaixo na classe "TesteController.cs":
+
+        ...
+        [Route("rota/estacao/{estacao:Values(primavera|verao|outono|inverno)}")]
+        public string MinhaAction4( string estacao )
+        {
+            return "Olá, estamos no " + estacao;
+        }
+
+
+Aula 7. Action Filters
+----------------------
+ 
+    . Filtros
+
+        . Action Filter é um atributo que você pode aplicar a uma action ou um controller.
+
+        . Uma action/controller pode conter vários filtros.
+
+        . Existem 4 tipos de filtros
+
+            . Authorization filters - Implementam autorização
+
+            . Action filters - Genéricos, implementao de IActionFilter
+
+            . Result filters - Formatam os resultados, implementam IResultFilter
+
+            . Exception Filters - Tratam exceções, implementa IExceptionFilter.
+
+    . Os filtros possuem uma ordem de execução:
+
+        . Authorization Filters.
+
+        . Action Filters
+
+        . Result Filters
+
+        . Exception Filters.
+
+    . O filtro padrão, que implementa o IActionFilterAttribute possui os seguintes métodos:
+
+        . OnActionExceuting
+
+            . Executado antes da chamado da action
+
+        . OnActionExecuted
+
+            . Executado depois da chamada a action
+
+        . OnResultExecuting
+
+            . Executado antes do retorno do resultado da action
+
+        . OnResultExecuted
+
+            . Executado depois do retorno do resultado da action.
+
+    . Clique com o botão direito sobre o projeto BookStore, escolha "Add/New Folder" e dê o nome de "Filters".
+
+    . Clique com o botão direito sobre a pasta "Filters", "Add/New Class" e dê o nome de "LogActionFilter.cs".
+
+    . Implemente o código abaixo na classe recém criada:
+
+        using System;
+        using System.Diagnostics;
+        using System.Web.Mvc;
+        using System.Web.Routing;
+
+        namespace BookStore.Filters
+        {
+            public class LogActionFilter: ActionFilterAttribute
+            {
+                public override voi OnActionExecuting( ActionExecutingContext filterContext )
+                {
+                    Log("OnActonExecuting", filterContext.RouteData);
+                }
+
+                public override void OnActionExecuted( ActionExecutedContext filterContext )
+                {
+                    Log("OnActionExecuted", filterContext.RouteData);
+                }
+
+                public override void OnResultExecution( ResultExecutingContext filterContext )
+                {
+                    Log("OnResultExceuting", filterContext.RouteData);
+                }
+
+                public override void OnResultExecuted( ResultExecutingContext filterContext )
+                {
+                    Log("OnResultExecuted", filterContext.RouteData);
+                }
+
+                private void Log( string methodName, RouteData routeData )
+                {
+                    var controllerName = routeData.Values["controller"];
+                    var actionName = routeData.VAlues["action"];
+                    var message = String.Format("{0} controller: {1} action: {2}", methodName, controllerName, actionName );
+
+                    Debug.WriteLine( message, "ACtion Filter Log");
+                }
+
+            }
+        }
+        
+        
+    . Acesse a classe AuthorController e insira [LogActionFilter()] como abaixo:
+
+        ...
+        namespace BookStore.Controllers
+        {
+            [RoutePrefix("autores")]
+            [LogActionFilter()]
+            public class AuthorController: Controller
+            {
+                ...
+            }
+        }
+
+    . Coloque "BreakPoints" na classe LogActionFilter, dentro de cada método sobreescrito e execute o projeto.
+
+    . O decorator [LogActionFilter()] pode ser colocado em um método especifico 
