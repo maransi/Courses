@@ -1700,35 +1700,37 @@ Aula 7. Action Filters
 
         namespace BookStore.Filters
         {
-            public class LogActionFilter: ActionFilterAttribute
+            public class LogActionFilter : ActionFilterAttribute
             {
-                public override voi OnActionExecuting( ActionExecutingContext filterContext )
+                public override void OnActionExecuting(ActionExecutingContext filterContext)
                 {
                     Log("OnActonExecuting", filterContext.RouteData);
                 }
 
-                public override void OnActionExecuted( ActionExecutedContext filterContext )
+                public override void OnActionExecuted(ActionExecutedContext filterContext)
                 {
                     Log("OnActionExecuted", filterContext.RouteData);
                 }
 
-                public override void OnResultExecution( ResultExecutingContext filterContext )
+
+
+                public override void OnResultExecuting(ResultExecutingContext filterContext)
                 {
                     Log("OnResultExceuting", filterContext.RouteData);
                 }
-
-                public override void OnResultExecuted( ResultExecutingContext filterContext )
+        /*
+                public override void OnResultExecuted(ResultExecutingContext filterContext)
                 {
                     Log("OnResultExecuted", filterContext.RouteData);
                 }
-
-                private void Log( string methodName, RouteData routeData )
+        */
+                private void Log(string methodName, RouteData routeData)
                 {
                     var controllerName = routeData.Values["controller"];
-                    var actionName = routeData.VAlues["action"];
-                    var message = String.Format("{0} controller: {1} action: {2}", methodName, controllerName, actionName );
+                    var actionName = routeData.Values["action"];
+                    var message = String.Format("{0} controller: {1} action: {2}", methodName, controllerName, actionName);
 
-                    Debug.WriteLine( message, "ACtion Filter Log");
+                    Debug.WriteLine(message, "ACtion Filter Log");
                 }
 
             }
@@ -1751,3 +1753,7 @@ Aula 7. Action Filters
     . Coloque "BreakPoints" na classe LogActionFilter, dentro de cada método sobreescrito e execute o projeto.
 
     . O decorator [LogActionFilter()] pode ser colocado em um método especifico 
+
+
+Aula 8. Global Filters
+----------------------
