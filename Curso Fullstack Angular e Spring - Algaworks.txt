@@ -8561,22 +8561,210 @@ Aula 13.10. Desafio controles, validações e mensagens de erro
 
     . lancamento-cadastro.component.html
 
+        <div class="container">
+            <form>
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <h1>Novo Lançamento</h1>
+                    </div>
 
+                    <div class="ui-g-12">
+                        <p-selectButton [options]="tipos" #tipo></p-selectButton>
+                    </div>
 
+                    <div class="ui-g-6 ui-md-3 ui-fluid">
+                        <label>Vencimento</label>
+                        <p-calendar dateFormat="dd/mm/yy"
+                                    [showIcon]="true"
+                                    name="vencimento"
+                                    id="vencimento"
+                                    ngModel
+                                    #vencimento="ngModel"
+                                    required></p-calendar>
 
+                        <app-message [control]="vencimento"
+                                    error="required"
+                                    text="Informe uma data válida"></app-message>
+                    </div>
 
+                    <div class="ui-g-6 ui-md-3 ui-fluid">
+                        <label>{{ tipo.value == 'RECEITA' ? 'Recebimento' : 'Pagamento' }}</label>
+                        <p-calendar dateFormat="dd/mm/yy" [showIcon]="true"></p-calendar>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-9 ui-fluid">
+                        <label>Descrição </label>
+                        <input type="text"
+                                name="descricao"
+                                ngModel
+                                #descricao="ngModel"
+                                required
+                                minlength="5"
+                                autocomplete="off"
+                                pInputText>
+
+                            <app-message [control]="descricao"
+                                        error="required"
+                                        text="Informe uma descrição válida"></app-message>
+
+                            <app-message [control]="descricao"
+                                        error="minlength"
+                                        text="Mínimo de {{ descricao.errors?.minlength?.requiredLength }} caracteres"></app-message>
+            <!--
+                        <div class="ui-message ui-messages-error" *ngIf="descricao.hasError('required') && descricao.dirty">
+                            Informe uma descrição válida
+                        </div>
+
+                        <div class="ui-message ui-messages-error" *ngIf="descricao.hasError('minlength') && descricao.dirty">
+                            Tamanho mínimo da descrição deve ser de {{ descricao.errors.minlength.requiredLength }} caracteres
+                        </div>
+            -->
+                    </div>
+                    <div class="ui-g-12 ui-md-3 ui-fluid">
+                        <label>Valor</label>
+                        <input type="text"
+                                pInputText
+                                placeholder="0,00"
+                                currencyMask
+                                ngModel
+                                name="valor"
+                                [options]="{ prefix: 'R$', thousands: '.', decimal: ',', allowNegative: false}">
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-fluid">
+                        <label>Categoria {{ categoria.value }}</label>
+                        <p-dropdown [options]="categorias"
+                                    [autoWidth]="false"
+                                    [placeholder]="Selecione"
+                                    [filter]="true"
+                                    #categoria></p-dropdown>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-fluid">
+                        <label>Pessoa {{pessoa.value}}</label>
+                        <p-dropdown  [options]="pessoas"
+                                        [autoWidth]="false"
+                                        [placeholder]="Selecione"
+                                        [filter]="true"
+                                        #pessoa></p-dropdown>
+                    </div>
+                    <div class="ui-g-12 ui-fluid">
+                        <label>Observação</label>
+                        <textarea [rows]="5" [cols]="30" pInputTextarea autoResize="autoResize"></textarea>
+                    </div>
+                    <div class="ui-g-12">
+                        <button pButton type="submit" label="Salvar"></button>
+                        <button pButton type="button" label="Novo" class="ui-button-info"></button>
+                        <a href="javascrip:;">Voltar para a pesquisa</a>
+                    </div>
+                </div>
+            </form>
+        </div>
 
 
 Aula 13.11. Desafio criando mais componentes
 --------------------------------------------
 
+    . Na pasta raiz do projeto execute o comando abaixo:
+
+        $ ng g c lancamentos-grid --spec=false
+
+    . Acesse o componente lancamentos-grid.component.html e implemente o código abaixo:
+
+      <p-dataTable [value]="lancamentos" [paginator]=true [rows]=5 [responsive]="true">
+        <p-column field="pessoa" header="Pessoa"></p-column>
+        <p-column field="descricao" header="Descrição"></p-column>
+        <p-column field="dataVencimento" header="Vencimento" styleClass="col-data">
+
+          <ng-template let-lanc="rowData" pTemplate="body">
+            {{lanc.dataVencimento | date:'dd/MM/y'}}
+          </ng-template>
+
+        </p-column>
+        <p-column field="dataPagamento" header="Pagto" styleClass="col-data">
+
+          <ng-template let-lanc="rowData" pTemplate="body">
+            {{lanc.dataPagamento | date:'dd/MM/y'}}
+          </ng-template>
+
+        </p-column>
+        <p-column field="valor" header="Valor" styleClass="col-valor">
+            <ng-template let-lanc="rowData" pTemplate="body">
+<!--              <span [ngStyle]="{ color: lanc.tipo === 'DESPESA' ? 'red' : 'blue' }">{{lanc.valor}}</span> -->
+              <span [style.color]="lanc.tipo === 'DESPESA' ? 'red' : 'blue'">{{lanc.valor|currency:"BRL":true:"1.2-2"}}</span>
+            </ng-template>
+        </p-column>
+        <p-column styleClass="col-acoes">
+          <ng-template pTemplate="body">
+            <a pButton icon="fa-pencil" pTooltip="Editar" tooltipPosition="top"></a>
+            <a pButton icon="fa-trash"  pTooltip="Eliminar" tooltipPosition="top"></a>
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+
+    . Acesse o componente lancamentos-pesquisa.component.html e altere conforme abaixo:
+
+        <div class="container">
+            <div class="ui-g">
+                <div class="ui-g-12">
+                    <h1>Lançamentos</h1>
+                </div>
+                <div class="ui-g-12 ui-fluid">
+                    <label for="descricao">Descrição</label>
+                    <input pInputText type="text" id="descricao" class="p-inputtext-sm">
+                </div>
+                <div class="ui-g-12">
+                    <label style="display: block;">Vencimento</label>
+                    <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
+
+                    <label>Até</label>
+                    <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
+                </div>
+
+                <div class="ui-g-12">
+                    <button pButton type="submit" label="Pesquisar" class="p-button-sm"></button>
+                </div>
+            </div>
+            </div>
+
+            <div class="container">
+            <div class="ui-g-12">
+                <!-- Tag incluida no lugar da tag <p-DataTable> -->
+
+                <app-lancamentos-grid [lancamentos]="lancamentos"></app-lancamentos-grid>
+
+                <!-- -->
+            </div>
+            <div class="ui-g-12">
+                <button pButton type="submit" label="Novo Lançamento" class="p-button-sm"></button>
+            </div>
+        </div>
+
+    . Acesse o componente lancamentos.grid.component.ts e deixe o código como abaixo:
+
+        import { Component, Input, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-lancamentos-grid',
+            templateUrl: './lancamentos-grid.component.html',
+            styleUrls: ['./lancamentos-grid.component.css']
+        })
+        export class LancamentosGridComponent implements OnInit {
+
+            @Input() lancamentos = [];
+
+            constructor() { }
+
+            ngOnInit() {
+            }
+
+        }
+
+    . Acesse o componente app.component.html e o deixe o código como abaixo:
+
+        <app-navbar></app-navbar>
+
+        <app-lancamentos-pesquisa></app-lancamentos-pesquisa>
 
 
-
-
-
-
-// TODO: Continuar daqui em diante
 Aula 14.01. Introdução aos módulos
 ----------------------------------
 
@@ -8816,6 +9004,7 @@ Aula 14.03. Reexportando um módulo
     . Execute o projeto e veja o resultado.
 
 
+// TODO: Continuar daqui em diante
 Aula 14.06. Criando um Feature Module
 -------------------------------------    
 
