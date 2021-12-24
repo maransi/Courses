@@ -1718,12 +1718,12 @@ Aula 7. Action Filters
                 {
                     Log("OnResultExceuting", filterContext.RouteData);
                 }
-        /*
-                public override void OnResultExecuted(ResultExecutingContext filterContext)
+
+                public override void OnResultExecuted(ResultExecutedContext filterContext)
                 {
                     Log("OnResultExecuted", filterContext.RouteData);
                 }
-        */
+
                 private void Log(string methodName, RouteData routeData)
                 {
                     var controllerName = routeData.Values["controller"];
@@ -1757,3 +1757,320 @@ Aula 7. Action Filters
 
 Aula 8. Global Filters
 ----------------------
+
+    . Filtros globais
+
+        . Os filtros criados podem ser implementados globalmente
+
+        . Evita a necessidade de decorar as actions ou controllers
+
+        . Não tem perigo de esquecer 
+
+        . Com o filtro criado, é só registrá-lo no global.asax
+
+            . Globalfilters, filters, add( new myActionFilterAttribute());
+
+            . RegisterGlobalFilter(GlobalFilters.filters)
+
+    . Acesse a classe AuthorController e comente todas as linhas com o decoration "[LogActionFilter]"
+
+    . Acesse o arquivo Global.asax e implemente as linhas abaixo:
+
+        ...
+        namespace BookStore
+        {
+            public class MvcApplication: System.Web.HttpApplication
+            {
+                /* Linhas inseridas */
+                GlobalFilters.Filters.Add( new LogActionFilter());
+                /* */
+
+                ...
+            }
+        }
+
+    . Execute a aplicação e verifique se os "BreakPoints" do filter continua funcionando.
+
+    . IMPORTANTE: Tomar cuidado com o consumo de recurso que os filtros podem tomar da aplicação. Como é um filtro 
+                    global, ou seja, executado para todos os controllers, ele executará todos os métodos disponíveis
+                    na classe filter. Dependendo do que for feito nesses métodos o tempo de resposta ficará alto, impactando
+                    na performance da aplicação.
+
+
+Aula 9. Entendendo o Repository Pattern
+---------------------------------------
+
+    . Sobre Design Patterns
+
+        . São padrões de desenvolvimento de softwares
+
+        . Pregam boas práticas na escrita e arquitetura de softwares.
+
+        . É mais importante saber quando, do que como utilizar.
+
+    . Sobre o uso de interfaces
+
+        . Interface é um contrato
+
+        . Define quais métodos e propriedades um objeto deve expor
+
+        . O ideal é sempre depender do contrato (interface) e nunca da implementação.
+
+        . Um contrato pode ter várias implementações.
+
+    . Um pouco mais sobre EF
+
+        . Data Context
+
+            . É a representação do banco de dados em memória.
+
+            . Podemos adicionar, atualizar e excluir objetos em memória
+
+            . Só persiste no banco quando chamamos o saveChanges()
+
+            . Podemos ter vários data Contexts.
+
+        . CRUD
+
+            . Sigla para create, read, update, delete.
+
+            . São as operações básicas.
+
+        . Migration
+
+            . Como abstraimos o banco de dados, o migrations se encarrga de atualiá-lo sempre que nosso
+                modelo (domínio) mudar.
+
+    . Sobre o repository pattern
+
+        . Padrão para desaboplamento do acesso à dados da sua aplicação web.
+
+        . Cria uma unidade de acesso à dados para cda entidade do modelo
+
+        . Cada qual é responsável pela leitura e persistência das informações referentes a entidade.
+
+        . Caso precise alterar alguma fonte de dados um dia, sua aplicação continua a mesma.
+
+    . Sobre os repositórios genéricos
+
+        . É possível criar um repositório genérico, mas...
+
+        . Estude com cuidado cada query que o EF executa
+
+        . Querendo ou não, o banco de dados é algo importante para a aplicação.
+
+        . É muito importante otimizar a leitura e escrita nele.
+
+    . Clique com o botão direito sobre o projeto BookStore, escolha "Add/New Folder" e dê o nome de "Repositories".
+
+    . Clique com o botão direito sobre a pasta recém criada, escolha "Add/New Folder" e dê o nome de "Contracts".
+
+    . Clique com o botão direito sobre a pasta "Contracts", "Add/New Class" e dê o nome de "IAuthorRepository.cs".
+
+    . Dentro da classe IAuthorRepository insira o código abaixo, detalhe: esse objeto não é uma classe e sim uma INTERFACE.
+
+        using BookStore.Domain;
+        using System;
+        using System.Collections.Generic;
+
+        namespace BookStore.Repositories.Contracts
+        {
+            // 1. Identificação que o objeto é uma interface
+            // 2. IDispose - Para implementar os métodos de inicialização e finalização, para criar as conexões e destruição da 
+            //                  conexão com o banco.
+            public interface IAuthorRepository: IDispose
+            {
+                List<Autor> Get();
+
+                Autor Get( int id);
+
+                List<Autor> GetByName( string name );
+
+                bool Create( Autor autor);
+
+                bool Update( Autor autor);
+
+                void Delete( int id );
+            }
+        }
+
+    . Clique com o botão direito sobre a pasta "Repository", "Add/New Class" e dê o nome de "AuthorRepository.cs".
+
+    . Dentro da classe AuthorRepository insira o código abaixo.
+
+        using BookStore.Doamain;
+        using BookStore.Repositories.Contracts;
+        using Sytem.Collections.Generic;
+
+        using BookStore.Context;
+        using BookStore.Domain;
+        using BookStore.Repositories.Contracts;
+        using System;
+        using System.Linq;
+        using System.Collections.Generic;
+        using System.Data.Entity;
+
+        namespace BookStore.Repositories
+        {
+            public class AuthorRepository: IAuthorRepository
+            {
+
+                private BookStoreDataContext _db = new BookStoreDataContext();
+
+                public List<Autor> Get()
+                {
+                    return _db.Autores.ToList();   
+                }
+
+                public Autor Get( int id)
+                {
+                    return _db.Autores.Find(id);
+                    
+                }
+
+
+                public List<Autor> GetByName( string name )
+                {
+                    return _db.Autores.Where( x => x.Nome.Contains( name ) ).ToList();
+                }
+
+
+                public bool Create( Autor autor)
+                {
+                    try
+                    {
+                        _db.Autores.Add( autor );
+                        _db.SaveChanges();
+
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+
+
+                public bool Update( Autor autor)
+                {
+                    try
+                    {
+                        _db.Entry<Autor>(autor).State = EntityState.Modified;
+                        _db.Autores.Add( autor );
+                        _db.SaveChanges();
+
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                    
+                }
+
+
+                public void Delete( int id )
+                {
+                    var autor = _db.Autores.Find(id);
+
+                    _db.Autores.Remove( autor );
+                    _db.SaveChanges();
+                }
+
+                public void Dispose()
+                {
+                    _db.Dispose();
+                }
+
+            }
+        }
+
+    . Acesse a classe AuthorController e implemente as linhas abaixo:
+
+        ...
+        namespace BookStore.Controllers
+        {
+            [RoutePrefix("autores")]
+            public class AuthorController: Controller
+            {
+                private IAuthorRepository repository;       // Incluido
+
+                public AuthorController(){
+                    repository = new AuthorRepository();    // Incluido
+                }
+
+                [Route("listar")]
+                public ActionResult Index()
+                {
+                    var autores = respository.Get();    // Incluido
+
+                    return View(autores);               // Alterado
+                }
+
+                [Route("criar")]
+                public ActionResult Create()
+                {
+                    return View();
+                }
+
+                                                        /* Método novo */
+                [Route("criar")]
+                [HttpPost]                              // Incluido
+                public ActionResult Create(Autor autor) // Alterado
+                {
+                    if (repository.Create(autor))          // Incluido
+                        return RedirectToAction("Index");   // Incluido
+
+                    return View(autor);                 // Alterado
+                }
+
+                [Route("editar/{id:int}")]
+                public ActionResult Edit(int id)
+                {
+                    var autor = repository.Get(id);     // Incluido
+
+                    return View();
+                }
+
+                                                        /* Método criado */
+                [Route("editar/{id:int}")]
+                [HttpPost]
+                public ActionResult Edit(Autor autor)
+                {
+                    if (repository.Update(autor))          // Incluido
+                        return RedirectToAction("Index");   // Incluido
+
+                    return View(autor);                 // Alterado
+                }
+
+                [Route("excluir/{id:int}")]
+                public ActionResult Delete(int id)
+                {
+                    var autor = repository.Get(id);     // Incluido
+                    
+                    return View(autor);
+                }
+
+                                                        /* Método criado */
+                [Route("excluir/{id:int}")]
+                [HttpPost]
+                [ActionName("Delete")]
+                public ActionResult DeletConfirme(int id)
+                {
+                    repository.Delete(id);
+
+                    return RedirectToAction("Index");
+                }
+
+            }
+        }
+
+
+Aula 9. Definindo os contratos dos repositórios (Desafio Criar repositorio para Livro e Categoria)
+--------------------------------------------------------------------------------------------------
+
+
+
+Aula 10. Injetando os repositórios no controller
+-----------------------------------------------
+
