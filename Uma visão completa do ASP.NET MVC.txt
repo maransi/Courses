@@ -1639,7 +1639,6 @@ https://www.c-sharpcorner.com/UploadFile/ff2f08/custom-route-constraints-in-Asp-
             return "Olá, estamos no " + estacao;
         }
 
-TODO: Continuar daqui
 Aula 7. Action Filters
 ----------------------
  
@@ -1876,9 +1875,9 @@ Aula 9. Entendendo o Repository Pattern
         namespace BookStore.Repositories.Contracts
         {
             // 1. Identificação que o objeto é uma interface
-            // 2. IDispose - Para implementar os métodos de inicialização e finalização, para criar as conexões e destruição da 
+            // 2. IDisposable - Para implementar os métodos de inicialização e finalização, para criar as conexões e destruição da 
             //                  conexão com o banco.
-            public interface IAuthorRepository: IDispose
+            public interface IAuthorRepository: IDisposable
             {
                 List<Autor> Get();
 
@@ -1956,7 +1955,6 @@ Aula 9. Entendendo o Repository Pattern
                     try
                     {
                         _db.Entry<Autor>(autor).State = EntityState.Modified;
-                        _db.Autores.Add( autor );
                         _db.SaveChanges();
 
                         return true;
@@ -2029,7 +2027,7 @@ Aula 9. Entendendo o Repository Pattern
                 {
                     var autor = repository.Get(id);     // Incluido
 
-                    return View();
+                    return View(autor);
                 }
 
                                                         /* Método criado */
@@ -2070,7 +2068,87 @@ Aula 9. Definindo os contratos dos repositórios (Desafio Criar repositorio para
 --------------------------------------------------------------------------------------------------
 
 
-
+TODO: Continuar daqui
 Aula 10. Injetando os repositórios no controller
 -----------------------------------------------
+
+    . Sobre injeção de dependência
+
+        . Em inglês. Dependecy Injection ou DI
+
+        . é mais simples do que você imagina
+
+        . Você tem uma class A, que para funcionar, depende da classe B
+
+        . Esta classe B depende da classe C e assim port diante.
+
+        . Neste momento, você tem um problema... Como resolver todas estas dependências?
+
+    . Sua classe sempre deve depender de um cotrato da qual sua dependência possui.
+
+    . Sendo assim, proque não...
+
+        1. Ter um local onde dado um contrato, é retornada a instância da classe.
+
+        2. Resolve as dependências em cascata, de form automática.
+
+    . Unity
+
+        . A Microsoft tem isto pronto em um pacote chamado Unity.
+
+        . Basta instalar e criar um "container" que ficará responsável por resolver as dependências.
+
+        . Feito isto, basta inicializar seu container sempre que sua aplicação iniciar.
+
+    . Repopsitórios nos controlllers
+
+        . A regra para uso dos repositórios nos controllers é a mesma...
+
+            . Dependemos da interface e não da implementação.
+
+        . Feito isto, temos os controllers desacoplados da fonte de dados.
+
+    . Acesse a classe AuthoRepository para deixar o objeto BookStoreDataContext com Injeção de dependência.
+
+        ...
+        private BookStoreDataContext _db;       // Eliminado a instanciação do objeto.
+
+        public AuthorRepository( BookStoreDataContext context)      // Incluido o construtor
+        {
+            _db = context;
+        }
+
+    . Acesse o componente AuthorController e proceda as alterações abaixo:
+
+        ... 
+        private IAuthorRepository _repository   // Mudança do nome 
+
+        public AuthorController( IAuthorRepository _repository ){   // Alterado a assinatura do construtor
+            _repository = new AuthorRepository();                   // Modificado o nome do componente.
+        }
+
+        // Alterar o nome do ojeto repository por _repository nos métodos abaixo
+
+        ...
+
+    . Acesse o Package Manager e execute o código abaixo:
+
+        Install-Package Unity.Mvc5
+
+    . Dentro da pasta "App_Start" acesse o arquivo "UnityConfig.cs" e inclua a linha abaixo:
+
+        container.RegisterType<IAuthorRepository, AuthorRepository>();
+        container.RegisterType<BokStoreDataContext, BookStoreDataContext>();
+
+    . Acesse o arquivo Globa.asax.cs e insira o código abaixo:
+
+        ... 
+        protected void Application_Star()
+        {
+            ...
+            Unity.RegisterComponents()
+        }
+
+
+    . Execute o projeto, cuidado porque na video aula deu problema na classe de log, comente o código desta classe.
 
