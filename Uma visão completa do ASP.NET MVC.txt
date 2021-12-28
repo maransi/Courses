@@ -2068,7 +2068,6 @@ Aula 9. Definindo os contratos dos repositórios (Desafio Criar repositorio para
 --------------------------------------------------------------------------------------------------
 
 
-TODO: Continuar daqui
 Aula 10. Injetando os repositórios no controller
 -----------------------------------------------
 
@@ -2127,6 +2126,12 @@ Aula 10. Injetando os repositórios no controller
             _repository = new AuthorRepository();                   // Modificado o nome do componente.
         }
 
+        public AuthorController(IAuthorRepository repository)   // Alterado a assinatura do construtor
+        {
+            _repository = repository;                           // Eliminado a instanciação e inserido no lugar o objeto da assinatura
+        }
+
+
         // Alterar o nome do ojeto repository por _repository nos métodos abaixo
 
         ...
@@ -2146,9 +2151,375 @@ Aula 10. Injetando os repositórios no controller
         protected void Application_Star()
         {
             ...
-            Unity.RegisterComponents()
+            UnityConfig.RegisterComponents()
         }
 
 
     . Execute o projeto, cuidado porque na video aula deu problema na classe de log, comente o código desta classe.
+
+
+
+TODO: Continuar daqui
+Aula 11. Razor View Engine
+--------------------------
+
+    . Aulas 11, 12, 13 e 14
+
+        . Razor View Engine
+
+        . Entendendo o @Html
+
+        . Criando funçoes com Razor Helper
+
+        . Trabalhando com PartialViews
+
+    . View Engines
+
+        . São mecanismos para interagir com funções C# no HTML
+
+        . Fornecem recursos adiocionais ao HTML
+
+        . O mais famoso é o Razor
+
+        . São identificados por partes diferentes no HTML:
+
+            <a href="@url.action('index', 'home')">Voltar</a>
+
+
+    . Razor View Engine
+
+        . É o mecanismo mais utilizado no desenvolvimento ASP.NET MVC.
+
+        . Poderoso
+
+        . Incorpora muitas funções do C# como:
+
+            . if, while, for, foreach
+
+            . Podemos criar funções próprias
+
+            . @Html e @Url (Helpers)
+
+            . Podemos cria nossos próprios helpers.
+
+
+Aula 12. Enendendo o @Html
+--------------------------
+
+    . Sobre o Helper @Html
+
+        . São utilitários para construção de componentes do HTML
+
+        . No final gera um código Html mesmo
+
+        . Podem ser criados sem referência de uma propriedade.
+
+            @Html.Display("Name")
+
+        . Ou referenciando uma propriedade:
+
+            @Html.DisplayFor( x => x.Name )
+
+    . Os principais Helpers são:
+
+        . Formulários
+
+            . @Html.BeginForm
+
+        . Componentes
+
+            . Editor
+
+            . TextArea
+
+            . Label
+
+            . Display
+
+            . CheckBox
+
+            . DropDownList
+
+    . Dê clique direito sobre a pasta Controllers e escolha "Add/New Controller", selecione um "Empty Controller" e dê o nome de "LivroController"
+
+    . Insira o código abaixo na classe recém criada:
+
+        ...
+        namespace BookStore.Controllers
+        {
+            [RoutePrefix("livro")]
+            public class LivroController: Controller
+            {
+                [Route("criar")]
+                public ActionResult Create()
+                {
+                    return View();
+                }
+
+            }
+        }
+
+
+    . Clique com o botão direito do mouse sobre o nome do método "Create" e escolha "Go to View".
+
+    . Execute o projeto e no navegador execute a url abaixo:
+
+        http://localhost:[porta]/livro/criar
+
+    . Dê clique direito sobre a pasta "ViewModules" e escolha "Add/New Class", selecione um "Empty Controller" e dê o nome de "CreateBookViewModel"
+
+    . Insira o código abaixo na classe recém criada:
+
+        ...
+        namespace BookStore.ViewModels
+        {
+            public class CreateBookViewModel
+            {
+                [Required( ErrorMessage="*")]
+                public string Nome { get; set; }
+
+                [Required( ErrorMessage="*")]
+                public string ISBN { get; set; }
+
+                [Required( ErrorMessage="*")]
+                public DateTime DataLancamento { get; set; }
+
+                [Required( ErrorMessage="*")]
+                public int CategoriaId { get; set; }
+
+
+            }
+        }
+
+    . Execute o projeto e no navegador execute a url abaixo:
+
+        http://localhost:[porta]/livro/criar
+
+    
+    . Acesse a view "Create.cshtml" e implemente o código abaixo:
+
+        @{
+            ViewBag.Title = "Criando um novo livro..."
+        }
+
+        <h2>Novo Livro</h2>
+
+        <form>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Email address</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+            </div>
+
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+
+    . Acesse o componente LivroController e implemente o método abaixo:
+
+        ...
+        [Route("criar")]
+        [HttpPost]
+        public ActionResult Create( CreateBookViewModel model )
+        {
+            return View();
+        }
+
+
+    . Execute o projeto e no navegador execute a url abaixo:
+
+        http://localhost:[porta]/livro/criar
+
+
+    . Na view "Create.cshtml" substitua a tag label pelo código abaixo:
+
+        <form>
+            <div class="form-group">
+
+                <!-- Substituido 
+
+                <label for="exampleInputEmail1">Email address</label>
+
+                -->
+
+                @Html.LabelFor(model => model.Nome )
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+            </div>
+
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+
+    . Execute o projeto, no navegador execute a url abaixo e verifique se o conteúdo @Html.LabelFor foi criado com sucesso.
+
+        http://localhost:[porta]/livro/criar
+
+    . Acesse o componente "CreateBookViewModel" e insira o decorator abaixo na propriedade "Nome"
+
+        ..
+        public class CreateBookViewModel
+            {
+                [Required( ErrorMessage="*")]
+                [Display( Name = "Nome do Livro")]
+                public string Nome { get; set; }
+                
+                ...
+
+    . Execute o projeto, no navegador execute a url abaixo e verifique se o conteúdo do decorator [Display( Name = "Nome do Livro")] foi 
+        renderizado com sucesso.
+
+        http://localhost:[porta]/livro/criar
+
+    . Na view "Create.cshtml" substitua a tag "email" pelo código abaixo:
+
+        <form>
+            <div class="form-group">
+
+                <!-- Substituido 
+
+                <label for="exampleInputEmail1">Email address</label>
+
+                -->
+
+                @Html.LabelFor(model => model.Nome )
+
+                <!-- Substituido 
+
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+
+                -->
+
+                @Html.EditorFor( model => model.Nome, new { @class = "form-controle" } )
+            </div>
+
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+
+    . Execute o projeto, no navegador execute a url abaixo e verifique se o conteúdo do @Html.EditorFor foi renderizado com sucesso.
+
+        http://localhost:[porta]/livro/criar
+
+    . Acesse a view "Create.cshtml" e insira o código abaixo:
+
+        ...
+        <form>
+            <div class="form-group">
+                ...
+
+                <!-- Código inserido -->
+
+                @Html.LabelFor(model => model.ISBN )
+                @Html.EditorFor( model => model.ISBN, new { @class = "form-controle" } )
+
+                @Html.LabelFor(model => model.DataLancamento )
+                @Html.EditorFor( model => model.DataLancamento, new { @class = "form-controle" } )
+
+            </div>
+        </form>
+
+    . Acesse o componente "CreateBookViewModel" e insira o decorator abaixo na propriedade "DataLancamento"
+
+        ..
+        public class CreateBookViewModel
+            {
+                [Required( ErrorMessage="*")]
+                [Display( Name= "Data de Lançamento" )]
+                [DataType( DataType.Date)]
+                public DateTime DataLancamento { get; set; }
+                
+                ...
+
+    . Execute o projeto, no navegador execute a url abaixo e verifique se o conteúdo do @Html.EditorFor foi renderizado com sucesso.
+
+        http://localhost:[porta]/livro/criar
+
+
+    . Acesse o componente "CreateBookViewModel" e insira o código abaixo:
+
+        public SelectList CategoriaOptions { get; set; }
+
+    . Acesse o componente LivroController e insira o código abaixo:
+
+        ...
+        namespace BookStore.Controllers
+        {
+            BookStoreDataContext _db = new BookStoreDataContext();  // Linha inserida.
+
+            [RoutePrefix("livro")]
+            public class LivroController: Controller
+            {
+                [Route("criar")]
+                public ActionResult Create()
+                {
+                    var categorias = _db.Categorias.ToList();       // Linha inserida
+
+                    var model = new CreateBookViewModel             // Linhas inseridas
+                    {
+                        Nome = "",
+                        ISBN = "",
+                        CategoriaId = 0,
+                        CategoriaOptions = new SelectList( categorias, "Id", "Nome" )
+                    }
+
+                    return View( model );
+                }
+
+                ...
+            }
+        }
+
+    . Acesse a view "Create.cshtml" e insira o código abaixo:
+
+        ...
+        <form>
+            <div class="form-group">
+                ...
+                @Html.LabelFor( model => modl.CategoriaId )
+                @Html.DropDownListFor( m => m.CaegoriaId, 
+                                        Model.CategoriaOptions,
+                                        "Selecione uma opção...",
+                                        new { @class = "form-controle" })
+
+    . Acesse o SQLServer e insira algumas categorias.
+
+    . Execute o projeto, no navegador execute a url abaixo e verifique se o conteúdo do @Html.DropDownListFor foi renderizado com sucesso.
+
+        http://localhost:[porta]/livro/criar
+
+
+
+Aula 13. Criando funções com Razor Helper
+-----------------------------------------
+
+    . Razor Helper
+
+        . É possível criar funções no razor
+
+        . É interessante deixar estas funções no topo do arquivo
+
+        . Feita a função, basta invocá-la, coo um método qualquer.
+
+
+    . Acesse a view "Create.cshtml" e insira o código abaixo:
+
+        @model BookStore.ViewModels.CreateBookViewModel
+
+        @{
+            ViewBag.Title = "Criando um novo livro...
+        }
+
+        @helper MinhaFuncao( string nome ){     // Linhas inseridas
+            <text>O nome informado é @nome</text>
+        }
+
+        ...
+
+        <form>
+            ...
+        </form>
+
+        <p>
+            @MinhaFuncao("Marco")
+        </p>
+
+
+Aula 14. Trabalhando com PartialViews
+--------------------------------------        
 
