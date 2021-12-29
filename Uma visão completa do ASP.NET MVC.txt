@@ -2347,6 +2347,10 @@ Aula 12. Enendendo o @Html
             <button type="submit" class="btn btn-default">Submit</button>
         </form>
 
+        @section Scripts { 
+            @Scripts.Render("~/bundles/jqueryval")
+        }
+
     . Execute o projeto, no navegador execute a url abaixo e verifique se o conteúdo @Html.LabelFor foi criado com sucesso.
 
         http://localhost:[porta]/livro/criar
@@ -2392,6 +2396,10 @@ Aula 12. Enendendo o @Html
             <button type="submit" class="btn btn-default">Submit</button>
         </form>
 
+        @section Scripts { 
+            @Scripts.Render("~/bundles/jqueryval")
+        }
+
     . Execute o projeto, no navegador execute a url abaixo e verifique se o conteúdo do @Html.EditorFor foi renderizado com sucesso.
 
         http://localhost:[porta]/livro/criar
@@ -2407,12 +2415,17 @@ Aula 12. Enendendo o @Html
 
                 @Html.LabelFor(model => model.ISBN )
                 @Html.EditorFor( model => model.ISBN, new { @class = "form-controle" } )
+            </div>
 
+            <div class="form-group">
                 @Html.LabelFor(model => model.DataLancamento )
                 @Html.EditorFor( model => model.DataLancamento, new { @class = "form-controle" } )
-
             </div>
         </form>
+
+        @section Scripts { 
+            @Scripts.Render("~/bundles/jqueryval")
+        }
 
     . Acesse o componente "CreateBookViewModel" e insira o decorator abaixo na propriedade "DataLancamento"
 
@@ -2519,7 +2532,230 @@ Aula 13. Criando funções com Razor Helper
             @MinhaFuncao("Marco")
         </p>
 
+        @section Scripts { 
+            @Scripts.Render("~/bundles/jqueryval")
+        }
 
 Aula 14. Trabalhando com PartialViews
 --------------------------------------        
 
+    . Partial Views
+
+        . São pedaços de uma view
+
+        . Podem ser retornadas do controller
+
+        . Pode ser chamadas a partir de outra view ou partial view.
+
+    . Acesse a classe CreateBookViewModel e renomei a classe
+
+        ...                                 // Mudança do nome de CreateBookViewModel para EditorBookViewMOdel
+        public class EditorBookViewModel    // Dê Ctrl + . para fazer o rename em todo o projeto
+        {
+            public int Id { get; set; }     // Linha incluida
+            ...                            
+        }
+        ...
+
+    . Acesse a pasta "Views/Livro" e crie um folder com o nome "Partials".
+
+    . Na pasta recém criada dê um "Add/New view" e dê o nome de "EditorBookPartial" (Marque ele como PartialView).
+
+    . Na PartialView recém criada insira o código abaixo:
+
+        @{
+            ViewBag.Title = "Criando um novo livro..."
+        }
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Nome )
+            @Html.EditorFor( model => model.Nome, new { @class = "form-controle" } )
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ISBN )
+            @Html.EditorFor( model => model.ISBN, new { @class = "form-controle" } )
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DataLancamento )
+            @Html.EditorFor( model => model.DataLancamento, new { @class = "form-controle" } )
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor( model => modl.CategoriaId )
+            @Html.DropDownListFor( m => m.CaegoriaId, 
+                                    Model.CategoriaOptions,
+                                    "Selecione uma opção...",
+                                    new { @class = "form-controle" })
+        </div>
+
+    . Acesse a view Create.cshtml e substitua todo o conteúdo da tag <form> pelo conteúdo abaixo:
+
+
+        @{
+            ViewBag.Title = "Criando um novo livro..."
+        }
+
+        @helper.MinhaFuncao(string nome)
+        {
+            <text>O nome informado é @nome</text>
+        }
+
+        <p>
+            @MinhaFuncao("Marco")
+        </p>
+
+        <h2>Novo Livro</h2>
+
+<!--         <form> -->
+        @using (Html.BeginForm())
+        {
+            @Html.Partial("Partials/EditorBookPartial", Model)
+
+            <button type="submit" class="btn btn-default">Criar</button>
+        }
+<!--        </form> -->
+
+        @section Scripts { 
+            @Scripts.Render("~/bundles/jqueryval")
+        }
+    
+    . Execute o projeto e verifique se a renderização da página continua funcionando corretamente.
+
+    . Clique com o botão direito sobre a pasta "Views/Livro", dê um "Add/New View...", renomei a view para "Edit", desmarque o item "Create a partial view"
+
+    . Implemente o código abaixo na view recém criada.
+
+        @{
+            ViewBag.Title = "Editando um novo livro..."
+        }
+
+        @helper.MinhaFuncao(string nome)
+        {
+            <text>O nome informado é @nome</text>
+        }
+
+        <p>
+            @MinhaFuncao("Marco")
+        </p>
+
+        <h2>Novo Livro</h2>
+
+        @using (Html.BeginForm())
+        {
+            @Html.HiddenFor( model => model.Id )
+            @Html.Partial("Partials/EditorBookPartial", Model)
+
+            <button type="submit" class="btn btn-default">Salvar</button>
+        }
+
+        @section Scripts { 
+            @Scripts.Render("~/bundles/jqueryval")
+        }
+
+    . Acesse o componente "LivroController" e insira os métodos abaixo:
+
+        [Route("lista")]
+        public ActionResult Index()
+        {
+            return View( _db.Livros.ToList());
+        }
+
+
+
+        [Route("editar")]
+        public ActionResult Edit( int id)
+        {
+            var categorias = _db.Categorias.ToList();
+
+            var livro = _db.Livro.Find(id);
+
+            var model = new EditorBookViewModel
+            {
+                Nome = livro.Nome,
+                ISBN = livro.ISBN,
+                CategoriaId = livro.CategoriaId,
+                CategoriaOptions = new SelectList( categorias, "Id", "Nome")
+            };
+
+            return View(model);
+        }
+
+    . Clique o botão direito sobre o nome do método "Index", dê "Add new View" e informe os seguintes parâmetros na próxima tela:
+    
+        "Template": "List"
+        "Model Class": "Livro (BookStore.Domain)"
+
+    . Acesse o componente LivroController e altere o método abaixo. ATENÇÃO: pegue o método com a assinatura abaixo:
+
+        ...
+        [Route("criar")]
+        [HttpPost]
+        public ActionResult Create( CreateBookViewModel model )
+        {
+            var livro = new Livro();
+
+            livro.Nome = model.Nome;
+            livro.ISBN = model.ISBN;
+            livro.DataLancamento = model.DataLancamento;
+            livro.CategoriaId = model.CategoriaId;
+
+            _db.Livros.Add( livro );
+            _db.SaveChanges();
+
+//            return View();
+
+            return RedirectToAction("Index");
+        }
+    
+    . Acesse o componente "LivroController" e insira os métodos abaixo:
+
+        [Route("editar")]
+        [HttpPost]
+        public ActionResult Edit( EditorBookViewModel model )
+        {
+            var livro = _db.Livro.Find(id);
+
+            _db.Entry<Livro>().State = System.Data.Entity.EntityState.Modified;
+            _db.SAveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+    . Acesse a view Index.cshtml do controller "LivroController", retire o conteúdo da tag "<table class="table">", mantenha esse conteúdo
+        para copiá-lo numa outra "PartialView".
+
+        @model IEnumarable<BookStore.Domain.Livro>
+
+        @{
+            ViewBag.Title = "Index";
+        }
+
+        <h2>Index</h2>
+
+        <p>
+            @Html.ActionLink("Create New", "Create")
+        </p>
+
+    . Clique com o botão direito sobre a pasta "Livro/Partials", dê um "Add/New View" e informe os seguintes parâmetros:
+
+        "View Name": "ListBookPartial"
+        "Template": "Empty (without model)"
+        "Create a Partial view": True
+
+    . Quando abrir a view, cole o conteúdo copiado da view anterior.
+    
+    . Altere o model do Edit.cshtml como abaixo:
+
+        @model BookStore.ViewModels.EditorBookViewModel
+
+    . Na view Index.cshtml coloque na última linha o código abaixo:
+
+        @Html.Partial("Partials/LIstBookPartial", Model)
