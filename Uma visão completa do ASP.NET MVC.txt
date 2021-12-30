@@ -2159,7 +2159,6 @@ Aula 10. Injetando os repositórios no controller
 
 
 
-TODO: Continuar daqui
 Aula 11. Razor View Engine
 --------------------------
 
@@ -2260,13 +2259,13 @@ Aula 12. Enendendo o @Html
         }
 
 
-    . Clique com o botão direito do mouse sobre o nome do método "Create" e escolha "Go to View".
+    . Clique com o botão direito do mouse sobre o nome do método "Create" e escolha "Add View".
 
     . Execute o projeto e no navegador execute a url abaixo:
 
         http://localhost:[porta]/livro/criar
 
-    . Dê clique direito sobre a pasta "ViewModules" e escolha "Add/New Class", selecione um "Empty Controller" e dê o nome de "CreateBookViewModel"
+    . Dê clique direito sobre a pasta "ViewModules" e escolha "Add/New Class" e dê o nome de "CreateBookViewModel"
 
     . Insira o código abaixo na classe recém criada:
 
@@ -2331,6 +2330,8 @@ Aula 12. Enendendo o @Html
 
     . Na view "Create.cshtml" substitua a tag label pelo código abaixo:
 
+        @model BookStore.ViewModels.CreateBookViewModel
+
         <form>
             <div class="form-group">
 
@@ -2361,7 +2362,7 @@ Aula 12. Enendendo o @Html
         public class CreateBookViewModel
             {
                 [Required( ErrorMessage="*")]
-                [Display( Name = "Nome do Livro")]
+                [Display("Nome do Livro")]
                 public string Nome { get; set; }
                 
                 ...
@@ -2390,7 +2391,7 @@ Aula 12. Enendendo o @Html
 
                 -->
 
-                @Html.EditorFor( model => model.Nome, new { @class = "form-controle" } )
+                @Html.EditorFor(model => model.Nome, new { htmlAttributes = new { @class = "form-control", placeholder="Email" } })
             </div>
 
             <button type="submit" class="btn btn-default">Submit</button>
@@ -2414,12 +2415,12 @@ Aula 12. Enendendo o @Html
                 <!-- Código inserido -->
 
                 @Html.LabelFor(model => model.ISBN )
-                @Html.EditorFor( model => model.ISBN, new { @class = "form-controle" } )
+                @Html.EditorFor(model => model.ISBN, new { htmlAttributes = new { @class = "form-control", placeholder = "ISBN" } })
             </div>
 
             <div class="form-group">
                 @Html.LabelFor(model => model.DataLancamento )
-                @Html.EditorFor( model => model.DataLancamento, new { @class = "form-controle" } )
+                @Html.EditorFor(model => model.DataLancamento, new { htmlAttributes = new { @class = "form-control" } })
             </div>
         </form>
 
@@ -2438,6 +2439,9 @@ Aula 12. Enendendo o @Html
                 public DateTime DataLancamento { get; set; }
                 
                 ...
+
+        . O decorator [DataType( DataType.Date)] além de outras coisas faz com que a mascara da data (dd/mm/yyyy) seja colocada automaticamente no campo
+            da view.
 
     . Execute o projeto, no navegador execute a url abaixo e verifique se o conteúdo do @Html.EditorFor foi renderizado com sucesso.
 
@@ -2469,7 +2473,7 @@ Aula 12. Enendendo o @Html
                         ISBN = "",
                         CategoriaId = 0,
                         CategoriaOptions = new SelectList( categorias, "Id", "Nome" )
-                    }
+                    };
 
                     return View( model );
                 }
@@ -2484,11 +2488,11 @@ Aula 12. Enendendo o @Html
         <form>
             <div class="form-group">
                 ...
-                @Html.LabelFor( model => modl.CategoriaId )
-                @Html.DropDownListFor( m => m.CaegoriaId, 
+                @Html.LabelFor( model => model.CategoriaId )
+                @Html.DropDownListFor( m => m.CategoriaId,
                                         Model.CategoriaOptions,
                                         "Selecione uma opção...",
-                                        new { @class = "form-controle" })
+                                        new {  @class = "form-control" } )
 
     . Acesse o SQLServer e insira algumas categorias.
 
@@ -2536,6 +2540,7 @@ Aula 13. Criando funções com Razor Helper
             @Scripts.Render("~/bundles/jqueryval")
         }
 
+TODO: Continuar daqui
 Aula 14. Trabalhando com PartialViews
 --------------------------------------        
 
