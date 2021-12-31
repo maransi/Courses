@@ -384,6 +384,34 @@ Aula 2. Criando o Modelo
 
     . Acesse a opção "Build/Rebuild"
 
+    . No Visual Studio:
+
+        . Acesse a opção "Ferramentas/SQL Server/New Query".
+
+        . Escolha na tela que se abrir os parâmetros abaixo e dê "OK":
+        
+            Local: MSSQLLocalDB
+            Server Name: (localdb)\MSSQLLocalDB
+            Authentication: Windows Authentication
+            User Name: [nome da máquina]/[Nome do Usuário da máquina]
+
+    . No script que se abrir execute a DDL abaixo:
+
+        ALTER LOGIN [sa]
+            WITH PASSWORD = 'admin';
+
+
+        GO
+        ALTER LOGIN [sa] enable;
+
+    . Acesse no menu "Ferramentas/Add SQL Server..." e informe os parâmetros abaixo:
+
+        Local: MSSQLLocalDB
+        Server Name: (localdb)\MSSQLLocalDB
+        Authentication: SQL Server Authentication
+        User Name: sa
+        Password: admin
+
     . Com click direito sobre o nó principal do projeto "BookStore", escolha a opção "Manage NuGet Packages...", localize a referência 
         entityframework e faça a instalação.
 
