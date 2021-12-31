@@ -9118,11 +9118,78 @@ Aula 15.01. Introdução aos serviços
 Aula 15.02. Implementando um serviço
 ------------------------------------
 
-    . Acesse o projeto de funcionarios 
+    . Acesse o projeto de clientes https://github.com/maransi/helloworld2
+
+    . Clique com o botão direito sobre a pasta "app/src", escolha "Novo Arquivo" e dê o nome de 
+        cliente.service.ts.
+
+    . Na classe cliente.service.ts implemente o código abaixo:
+
+        export class ClienteService{
+
+            ultimoId = 1;
+            funcionarios = [{ id: 1, nome: 'João'}];
+
+            adicionar( nome ){
+                const funcionario = {
+                    id: 0,
+                    nome: nome
+                };
+
+                this.funcionarios.push( funcionario );
+
+                console.log( JSON.stringify( this.funcionarios) );
+            }
+
+            consultar(){
+                return this.funcionarios;
+            }
+        }
+
+    . Altere o código da classe "cliente.component.html" pelo código abaixo:
+
+        import { Component, OnInit, Output, EventEmitter } from '@angular/core'
+
+        @Component({
+            selector: 'app-cliente',
+            templateUrl: './cliente.component.html',
+            styleUrls: ['.cliente.component.css']
+        })
+
+        export class ClienteComponent{
+
+            clienteService: ClienteService; 
+
+            constructor(){
+                this.clienteService = new ClienteService();
+            }
 
 
+            adicionar( nome: string ){
+                this.clienteService.adicionar(nome);
+            }
+        }
 
+    . Altere o app.component.ts com o código abaixo:
 
+        ... 
+        export class AppComponent implements OnInit{
+
+            clientes: [];
+            clienteService: ClienteService; 
+
+            constructor(){
+                this.clienteService = new ClienteService();
+            }
+
+            ngOnInit(){
+                this.clientes = this.clienteService.consultar();
+            }
+
+        }
+
+    . Acessar o projeto desenvolvido e adequa-lo conforme orientação acima. Comece
+        pela classe cliente.component.ts
 
 
 
