@@ -5589,13 +5589,13 @@ Aula 09.13. Iterando com a diretiva ngFor
 
             <div class="row" style="margin-top: 20px;" >
                 <div class="col-2" *ngFor="let cliente of clientes" >
-                <div class="card">
-                    <img src="https://randomuser.me/api/portraits/women/{{cliente.id}}.jpg">
-                    <div class="card-body">
-                        {{cliente.nome}}
-                    </div>
-                </div>  
-            </div>
+                    <div class="card">
+                        <img src="https://randomuser.me/api/portraits/women/{{cliente.id}}.jpg">
+                        <div class="card-body">
+                            {{cliente.nome}}
+                        </div>
+                    </div>  
+                </div>
             </div>
         </div>
 
@@ -9120,19 +9120,120 @@ Aula 15.02. Implementando um serviço
 
     . Acesse o projeto de clientes https://github.com/maransi/helloworld2
 
+    . Para a construção do projeto necessário para esta aula vamos seguir os procedimentos abaixo:
+
+        . Acesse a pasta raiz de projetos das aulas e execute no prompt de comandos as linhas abaixo:
+
+            $ ng new algamoney-funcionario
+
+            $ cd algamoney-funcionario
+
+            $ npm install bootstrap@4.5.3 --save
+
+            $ ng g c funcionario
+
+            $ code .
+
+        . Acesse o arquivo ".angular-cli.json" e insira a linha abaixo:
+
+            ...
+            "styles": [
+                ...
+                "../node_modules/bootstrap/dist/css/bootstrap.css"
+            ]
+            ...
+
+        . Acesse o componente "funcionario.component.html" e atualize pelo código abaixo:
+
+            <div class="container">
+                <div *ngIf="Property" >
+                    
+                </div>
+
+                <div class="alert alert-success" 
+                        role="alert" 
+                        *ngIf="salvo">
+                    Nome do Funcionário : <strong> {{nome}} </strong>
+                </div>
+
+                <div class="form-group">
+                    <label for="nome">Nome do Funcionário</label>
+                    <input type="text" 
+                            class="form-control" 
+                            id="nome" 
+                            #nomeInput 
+                            [(ngModel)]="nome">
+                    <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
+                </div>
+
+                <button type="button" 
+                        class="btn btn-primary" 
+                        (click)="adicionar(nomeInput.value)"
+                        [disabled]="nome.length==0">Salvar</button>
+            </div>
+
+        . Acesse o componente "funcionario.component.ts" e atualize pelo código abaixo:
+
+            import { Component, OnInit } from '@angular/core';
+
+            @Component({
+                selector: 'app-funcionario',
+                templateUrl: './funcionario.component.html',
+                styleUrls: ['./funcionario.component.css']
+            })
+            export class FuncionarioComponent implements OnInit {
+                funcionarios: any[] = [];
+                nome: string;
+                ultimoId: number = 1;
+                salvo: boolean;
+
+                constructor() { }
+
+                ngOnInit() {
+                    this.nome = '';
+                    this.funcionarios.push( { id: 1, nome: 'Catia'});
+                    this.salvo = false;
+                }
+
+                adicionar(nome: string){
+                    this.funcionarios.push( { id: ++this.ultimoId, nome: nome})
+
+                    console.log( `Funcionário ${this.nome} salvo!!!` );
+
+                    this.salvo = true;
+                }
+            }
+
+        . Acesse o componente "app.module.ts" e insira a linha abaixo:
+
+            ...
+            imports: [
+                ...
+                FormsModule
+            ],
+            ...
+
+        . Acess o componente "app.component.html" e atualize pelo código abaixo:
+
+            <app-funcionario></app-funcionario>        
+
+        . Execute o projeto e verifique se tudo deu certo:
+
+            $ ng serve --open
+
     . Clique com o botão direito sobre a pasta "app/src", escolha "Novo Arquivo" e dê o nome de 
-        cliente.service.ts.
+        funcionario.service.ts.
 
-    . Na classe cliente.service.ts implemente o código abaixo:
+    . Na classe funcionario.service.ts implemente o código abaixo:
 
-        export class ClienteService{
+        export class FuncionarioService{
 
             ultimoId = 1;
             funcionarios = [{ id: 1, nome: 'João'}];
 
             adicionar( nome ){
                 const funcionario = {
-                    id: 0,
+                    id: ++ultimoId,
                     nome: nome
                 };
 
@@ -9146,27 +9247,20 @@ Aula 15.02. Implementando um serviço
             }
         }
 
-    . Altere o código da classe "cliente.component.html" pelo código abaixo:
+    . Altere o código da classe "funcionario.component.ts" pelo código abaixo:
 
-        import { Component, OnInit, Output, EventEmitter } from '@angular/core'
+        ...
+        export class FuncionarioComponent{
 
-        @Component({
-            selector: 'app-cliente',
-            templateUrl: './cliente.component.html',
-            styleUrls: ['.cliente.component.css']
-        })
-
-        export class ClienteComponent{
-
-            clienteService: ClienteService; 
+            funcionarioService: FuncionarioService; 
 
             constructor(){
-                this.clienteService = new ClienteService();
+                this.funcionarioService = new FuncionarioService();
             }
 
 
             adicionar( nome: string ){
-                this.clienteService.adicionar(nome);
+                this.funcionarioService.adicionar(nome);
             }
         }
 
@@ -9175,15 +9269,15 @@ Aula 15.02. Implementando um serviço
         ... 
         export class AppComponent implements OnInit{
 
-            clientes: [];
-            clienteService: ClienteService; 
+            funcionarios: [];
+            funcionarioService: FuncionarioService; 
 
             constructor(){
-                this.clienteService = new ClienteService();
+                this.funcionarioService = new FuncionarioService();
             }
 
             ngOnInit(){
-                this.clientes = this.clienteService.consultar();
+                this.funcionarios = this.funcionarioService.consultar();
             }
 
         }
@@ -9191,7 +9285,18 @@ Aula 15.02. Implementando um serviço
     . Acessar o projeto desenvolvido e adequa-lo conforme orientação acima. Comece
         pela classe cliente.component.ts
 
+    . Execute o projeto e verificaremos que a adição de um novo funcionário deixou de ocorrer. Porque
+        isto deixou de funcionar? 
 
+        , Foi criado duas referências da classe "FuncionarioService":
+
+            . Uma na classe AppComponent e outra no FuncionarioComponent. Cada um com sua própria coleção 
+                de funcionários.
+
+        . Testar para averiguar se realmente parou de funcionar a listagem de funcionários e consequentemente 
+            a atualização da coleção de funcionários.
+
+            
 
 
 
