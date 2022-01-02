@@ -9229,11 +9229,11 @@ Aula 15.02. Implementando um serviço
         export class FuncionarioService{
 
             ultimoId = 1;
-            funcionarios = [{ id: 1, nome: 'João'}];
+            funcionarios = [{ id: 1, nome: 'Samara'}];
 
             adicionar( nome ){
                 const funcionario = {
-                    id: ++ultimoId,
+                    id: ++this.ultimoId,
                     nome: nome
                 };
 
@@ -9250,7 +9250,9 @@ Aula 15.02. Implementando um serviço
     . Altere o código da classe "funcionario.component.ts" pelo código abaixo:
 
         ...
-        export class FuncionarioComponent{
+        export class FuncionarioComponent implements OnInit{
+
+            funcionarios = [];
 
             funcionarioService: FuncionarioService; 
 
@@ -9258,6 +9260,9 @@ Aula 15.02. Implementando um serviço
                 this.funcionarioService = new FuncionarioService();
             }
 
+            ngOnInit(): void {
+                this.funcionarios = this.funcionarioService.consultar();
+            }
 
             adicionar( nome: string ){
                 this.funcionarioService.adicionar(nome);
@@ -9282,9 +9287,6 @@ Aula 15.02. Implementando um serviço
 
         }
 
-    . Acessar o projeto desenvolvido e adequa-lo conforme orientação acima. Comece
-        pela classe cliente.component.ts
-
     . Execute o projeto e verificaremos que a adição de um novo funcionário deixou de ocorrer. Porque
         isto deixou de funcionar? 
 
@@ -9293,14 +9295,75 @@ Aula 15.02. Implementando um serviço
             . Uma na classe AppComponent e outra no FuncionarioComponent. Cada um com sua própria coleção 
                 de funcionários.
 
-        . Testar para averiguar se realmente parou de funcionar a listagem de funcionários e consequentemente 
-            a atualização da coleção de funcionários.
+        . Testar 
 
             
+Aula 15.3. O que é injeção de dependências?
+-------------------------------------------
+
+    . Acesse o componente app.component.ts e adapte a linha abaixo:
+
+        ...
+        providers: [
+            FuncionarioService
+        ],
+        ...
+
+    . Acesse o componente funcionario.componente.ts e altere o construtor dele como abaixo:
+
+        ...
+        funcionarios = [];
+
+        // funcionarioService: FuncionarioService;  // Apague a linha com a declaração do "funcionarioService"
+                                                    // o "constructor( private funcionarioService ... )" faz isto automaticamente
+
+        constructor(private funcionarioService: FuncionarioService){
+            this.nome = '';
+        }
+        ...
+
+    . Acesse o componente app.component.ts e faça a mesma modificação acima:
+
+        ...
+        funcionarios = [];
+        
+        constructor(private funcionarioService: FuncionarioService){
+
+        }
+        
+        ngOnInit(): void {
+            this.funcionarios = this.funcionarioService.consultar();
+        }
+        ...
+
+    . O "private" dentro da assinatura do contrutor tem o papel de uma propriedade.
+
+    . Execute o projeto.
 
 
+Aula 15.4. Configurando o injetor com provider por classe
+---------------------------------------------------------
 
+    . Acesse a classe funcionario.service.ts e implemente o código abaixo no final do arquivo:
 
+        ...
+        public class FuncionarioAbreviadoService extends FuncionarioService{
+            adicionar( nome: string ){
+                super.adicionar( nome.substr(0,3) + '...');
+            }
+        }
+        ...
+
+    . Acesse o componente app.component.ts e adapte a linha abaixo:
+
+        ...
+        providers: [
+            { provide: FuncionarioService, useClass: FuncionarioAbreviadoService }
+        ],
+        ...
+
+Aula 15.5. Configurando o injetor com provider por fábrica
+----------------------------------------------------------
 
 
 
