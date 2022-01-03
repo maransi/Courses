@@ -5589,13 +5589,13 @@ Aula 09.13. Iterando com a diretiva ngFor
 
             <div class="row" style="margin-top: 20px;" >
                 <div class="col-2" *ngFor="let cliente of clientes" >
-                <div class="card">
-                    <img src="https://randomuser.me/api/portraits/women/{{cliente.id}}.jpg">
-                    <div class="card-body">
-                        {{cliente.nome}}
-                    </div>
-                </div>  
-            </div>
+                    <div class="card">
+                        <img src="https://randomuser.me/api/portraits/women/{{cliente.id}}.jpg">
+                        <div class="card-body">
+                            {{cliente.nome}}
+                        </div>
+                    </div>  
+                </div>
             </div>
         </div>
 
@@ -9118,17 +9118,252 @@ Aula 15.01. Introdução aos serviços
 Aula 15.02. Implementando um serviço
 ------------------------------------
 
-    . Acesse o projeto de funcionarios 
+    . Acesse o projeto de clientes https://github.com/maransi/helloworld2
+
+    . Para a construção do projeto necessário para esta aula vamos seguir os procedimentos abaixo:
+
+        . Acesse a pasta raiz de projetos das aulas e execute no prompt de comandos as linhas abaixo:
+
+            $ ng new algamoney-funcionario
+
+            $ cd algamoney-funcionario
+
+            $ npm install bootstrap@4.5.3 --save
+
+            $ ng g c funcionario
+
+            $ code .
+
+        . Acesse o arquivo ".angular-cli.json" e insira a linha abaixo:
+
+            ...
+            "styles": [
+                ...
+                "../node_modules/bootstrap/dist/css/bootstrap.css"
+            ]
+            ...
+
+        . Acesse o componente "funcionario.component.html" e atualize pelo código abaixo:
+
+            <div class="container">
+                <div *ngIf="Property" >
+                    
+                </div>
+
+                <div class="alert alert-success" 
+                        role="alert" 
+                        *ngIf="salvo">
+                    Nome do Funcionário : <strong> {{nome}} </strong>
+                </div>
+
+                <div class="form-group">
+                    <label for="nome">Nome do Funcionário</label>
+                    <input type="text" 
+                            class="form-control" 
+                            id="nome" 
+                            #nomeInput 
+                            [(ngModel)]="nome">
+                    <small id="emailHelp" class="form-text text-muted">Informe o nome do cliente</small>
+                </div>
+
+                <button type="button" 
+                        class="btn btn-primary" 
+                        (click)="adicionar(nomeInput.value)"
+                        [disabled]="nome.length==0">Salvar</button>
+            </div>
+
+        . Acesse o componente "funcionario.component.ts" e atualize pelo código abaixo:
+
+            import { Component, OnInit } from '@angular/core';
+
+            @Component({
+                selector: 'app-funcionario',
+                templateUrl: './funcionario.component.html',
+                styleUrls: ['./funcionario.component.css']
+            })
+            export class FuncionarioComponent implements OnInit {
+                funcionarios: any[] = [];
+                nome: string;
+                ultimoId: number = 1;
+                salvo: boolean;
+
+                constructor() { }
+
+                ngOnInit() {
+                    this.nome = '';
+                    this.funcionarios.push( { id: 1, nome: 'Catia'});
+                    this.salvo = false;
+                }
+
+                adicionar(nome: string){
+                    this.funcionarios.push( { id: ++this.ultimoId, nome: nome})
+
+                    console.log( `Funcionário ${this.nome} salvo!!!` );
+
+                    this.salvo = true;
+                }
+            }
+
+        . Acesse o componente "app.module.ts" e insira a linha abaixo:
+
+            ...
+            imports: [
+                ...
+                FormsModule
+            ],
+            ...
+
+        . Acess o componente "app.component.html" e atualize pelo código abaixo:
+
+            <app-funcionario></app-funcionario>        
+
+        . Execute o projeto e verifique se tudo deu certo:
+
+            $ ng serve --open
+
+    . Clique com o botão direito sobre a pasta "app/src", escolha "Novo Arquivo" e dê o nome de 
+        funcionario.service.ts.
+
+    . Na classe funcionario.service.ts implemente o código abaixo:
+
+        export class FuncionarioService{
+
+            ultimoId = 1;
+            funcionarios = [{ id: 1, nome: 'Samara'}];
+
+            adicionar( nome ){
+                const funcionario = {
+                    id: ++this.ultimoId,
+                    nome: nome
+                };
+
+                this.funcionarios.push( funcionario );
+
+                console.log( JSON.stringify( this.funcionarios) );
+            }
+
+            consultar(){
+                return this.funcionarios;
+            }
+        }
+
+    . Altere o código da classe "funcionario.component.ts" pelo código abaixo:
+
+        ...
+        export class FuncionarioComponent implements OnInit{
+
+            funcionarios = [];
+
+            funcionarioService: FuncionarioService; 
+
+            constructor(){
+                this.funcionarioService = new FuncionarioService();
+            }
+
+            ngOnInit(): void {
+                this.funcionarios = this.funcionarioService.consultar();
+            }
+
+            adicionar( nome: string ){
+                this.funcionarioService.adicionar(nome);
+            }
+        }
+
+    . Altere o app.component.ts com o código abaixo:
+
+        ... 
+        export class AppComponent implements OnInit{
+
+            funcionarios: [];
+            funcionarioService: FuncionarioService; 
+
+            constructor(){
+                this.funcionarioService = new FuncionarioService();
+            }
+
+            ngOnInit(){
+                this.funcionarios = this.funcionarioService.consultar();
+            }
+
+        }
+
+    . Execute o projeto e verificaremos que a adição de um novo funcionário deixou de ocorrer. Porque
+        isto deixou de funcionar? 
+
+        , Foi criado duas referências da classe "FuncionarioService":
+
+            . Uma na classe AppComponent e outra no FuncionarioComponent. Cada um com sua própria coleção 
+                de funcionários.
+
+        . Testar 
+
+            
+Aula 15.3. O que é injeção de dependências?
+-------------------------------------------
+
+    . Acesse o componente app.component.ts e adapte a linha abaixo:
+
+        ...
+        providers: [
+            FuncionarioService
+        ],
+        ...
+
+    . Acesse o componente funcionario.componente.ts e altere o construtor dele como abaixo:
+
+        ...
+        funcionarios = [];
+
+        // funcionarioService: FuncionarioService;  // Apague a linha com a declaração do "funcionarioService"
+                                                    // o "constructor( private funcionarioService ... )" faz isto automaticamente
+
+        constructor(private funcionarioService: FuncionarioService){
+            this.nome = '';
+        }
+        ...
+
+    . Acesse o componente app.component.ts e faça a mesma modificação acima:
+
+        ...
+        funcionarios = [];
+        
+        constructor(private funcionarioService: FuncionarioService){
+
+        }
+        
+        ngOnInit(): void {
+            this.funcionarios = this.funcionarioService.consultar();
+        }
+        ...
+
+    . O "private" dentro da assinatura do contrutor tem o papel de uma propriedade.
+
+    . Execute o projeto.
 
 
+Aula 15.4. Configurando o injetor com provider por classe
+---------------------------------------------------------
 
+    . Acesse a classe funcionario.service.ts e implemente o código abaixo no final do arquivo:
 
+        ...
+        public class FuncionarioAbreviadoService extends FuncionarioService{
+            adicionar( nome: string ){
+                super.adicionar( nome.substr(0,3) + '...');
+            }
+        }
+        ...
 
+    . Acesse o componente app.component.ts e adapte a linha abaixo:
 
+        ...
+        providers: [
+            { provide: FuncionarioService, useClass: FuncionarioAbreviadoService }
+        ],
+        ...
 
-
-
-
+Aula 15.5. Configurando o injetor com provider por fábrica
+----------------------------------------------------------
 
 
 
