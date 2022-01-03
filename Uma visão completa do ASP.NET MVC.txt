@@ -2305,8 +2305,8 @@ Aula 12. Enendendo o @Html
 
         <form>
             <div class="form-group">
-                <label for="exampleInputEmail1">Email address</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" placeholder="Nome">
             </div>
 
             <button type="submit" class="btn btn-default">Submit</button>
@@ -2337,12 +2337,12 @@ Aula 12. Enendendo o @Html
 
                 <!-- Substituido 
 
-                <label for="exampleInputEmail1">Email address</label>
+                <label for="nome">Nome</label>
 
                 -->
 
                 @Html.LabelFor(model => model.Nome )
-                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                <input type="text" class="form-control" id="nome" placeholder="Nome">
             </div>
 
             <button type="submit" class="btn btn-default">Submit</button>
@@ -2379,7 +2379,7 @@ Aula 12. Enendendo o @Html
 
                 <!-- Substituido 
 
-                <label for="exampleInputEmail1">Email address</label>
+                <label for="nome">NOme</label>
 
                 -->
 
@@ -2387,11 +2387,11 @@ Aula 12. Enendendo o @Html
 
                 <!-- Substituido 
 
-                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                <input type="text" class="form-control" id="nome" placeholder="Nome">
 
                 -->
 
-                @Html.EditorFor(model => model.Nome, new { htmlAttributes = new { @class = "form-control", placeholder="Email" } })
+                @Html.EditorFor(model => model.Nome, new { htmlAttributes = new { @class = "form-control", placeholder="Nome" } })
             </div>
 
             <button type="submit" class="btn btn-default">Submit</button>
@@ -2485,7 +2485,7 @@ Aula 12. Enendendo o @Html
     . Acesse a view "Create.cshtml" e insira o código abaixo:
 
         ...
-        <form>
+        balta<form>
             <div class="form-group">
                 ...
                 @Html.LabelFor( model => model.CategoriaId )
@@ -2540,7 +2540,7 @@ Aula 13. Criando funções com Razor Helper
             @Scripts.Render("~/bundles/jqueryval")
         }
 
-TODO: Continuar daqui
+
 Aula 14. Trabalhando com PartialViews
 --------------------------------------        
 
@@ -2562,46 +2562,41 @@ Aula 14. Trabalhando com PartialViews
         }
         ...
 
+        . Acesse a arquivo da solution, encontre o arquivo CreateBookViewModel e dê o rename para "EditorBookViewModel"
+
     . Acesse a pasta "Views/Livro" e crie um folder com o nome "Partials".
 
     . Na pasta recém criada dê um "Add/New view" e dê o nome de "EditorBookPartial" (Marque ele como PartialView).
 
     . Na PartialView recém criada insira o código abaixo:
 
-        @{
-            ViewBag.Title = "Criando um novo livro..."
-        }
-
+        @model BookStore.ViewModels.EditorBookViewModel
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Nome )
-            @Html.EditorFor( model => model.Nome, new { @class = "form-controle" } )
+            @Html.LabelFor(model => model.Nome)
+            @Html.EditorFor(model => model.Nome, new { htmlAttributes = new { @class = "form-control", placeholder="Nome" } })
         </div>
 
         <div class="form-group">
-            <label for="exampleInputEmail1">Email address</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+            @Html.LabelFor(model => model.ISBN)
+            @Html.EditorFor(model => model.ISBN, new { htmlAttributes = new { @class = "form-control", placeholder="ISBN" } })
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.ISBN )
-            @Html.EditorFor( model => model.ISBN, new { @class = "form-controle" } )
+            @Html.LabelFor(model => model.DataLancamento)
+            @Html.EditorFor(model => model.DataLancamento, new { htmlAttributes = new { @class = "form-control", placeholder="Data Lançamento" } })
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.DataLancamento )
-            @Html.EditorFor( model => model.DataLancamento, new { @class = "form-controle" } )
+            @Html.LabelFor(model => model.CategoriaId)
+            @Html.DropDownListFor(m => m.CategoriaId,
+                                            Model.CategoriaOptions,
+                                            "Selecione uma opção...",
+                                            new { @class = "form-control" })
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor( model => modl.CategoriaId )
-            @Html.DropDownListFor( m => m.CaegoriaId, 
-                                    Model.CategoriaOptions,
-                                    "Selecione uma opção...",
-                                    new { @class = "form-controle" })
-        </div>
 
-    . Acesse a view Create.cshtml e substitua todo o conteúdo da tag <form> pelo conteúdo abaixo:
+    . Acesse a view Views/Livro/Create.cshtml e substitua todo o conteúdo da tag <form> pelo conteúdo abaixo:
 
 
         @{
@@ -2632,7 +2627,9 @@ Aula 14. Trabalhando com PartialViews
             @Scripts.Render("~/bundles/jqueryval")
         }
     
-    . Execute o projeto e verifique se a renderização da página continua funcionando corretamente.
+    . Execute o projeto e verifique se a renderização da página continua funcionando corretamente:
+
+        localhost:[porta]/livros/criar
 
     . Clique com o botão direito sobre a pasta "Views/Livro", dê um "Add/New View...", renomei a view para "Edit", desmarque o item "Create a partial view"
 
@@ -2667,7 +2664,7 @@ Aula 14. Trabalhando com PartialViews
 
     . Acesse o componente "LivroController" e insira os métodos abaixo:
 
-        [Route("lista")]
+        [Route("listar")]
         public ActionResult Index()
         {
             return View( _db.Livros.ToList());
@@ -2695,6 +2692,7 @@ Aula 14. Trabalhando com PartialViews
 
     . Clique o botão direito sobre o nome do método "Index", dê "Add new View" e informe os seguintes parâmetros na próxima tela:
     
+        "View name: "Index"
         "Template": "List"
         "Model Class": "Livro (BookStore.Domain)"
 
@@ -2724,16 +2722,27 @@ Aula 14. Trabalhando com PartialViews
 
         [Route("editar")]
         [HttpPost]
-        public ActionResult Edit( EditorBookViewModel model )
+        public ActionResult Edit(EditorBookViewModel model)
         {
-            var livro = _db.Livro.Find(id);
+            Livro livro = _db.Livros.Find(model.Id);
 
-            _db.Entry<Livro>().State = System.Data.Entity.EntityState.Modified;
-            _db.SAveChanges();
+            livro.Nome = model.Nome;
+            livro.ISBN = model.ISBN;
+            livro.DataLancamento = model.DataLancamento;
+            livro.CategoriaId = model.CategoriaId;
+
+            _db.Entry<Livro>(livro).State = System.Data.Entity.EntityState.Modified;
+            _db.SaveChanges();
 
             return RedirectToAction("Index");
         }
 
+    . Execute o projeto e teste o create e o edit:
+
+        localhost:[porta]/livro/listar
+
+
+TODO: Continuar daqui
     . Acesse a view Index.cshtml do controller "LivroController", retire o conteúdo da tag "<table class="table">", mantenha esse conteúdo
         para copiá-lo numa outra "PartialView".
 
@@ -2764,3 +2773,197 @@ Aula 14. Trabalhando com PartialViews
     . Na view Index.cshtml coloque na última linha o código abaixo:
 
         @Html.Partial("Partials/LIstBookPartial", Model)
+
+
+
+Aula 15. Entendendo o _Layout e Layouts Master
+----------------------------------------------
+
+    . Layout Master
+
+        . Entendendo o _Layout e Layouts Master
+
+        . Trabalhando com sections
+
+    . _Layout
+
+        . Funciona como o slide mestre do power point
+
+        . Você define um padrão que será utilizado por toda a aplicação.
+
+        . Toda a página permance, mudando apensas o "miolo"
+
+        . A regição que irá mudar é identificada pelo @Renderbody()
+
+        . Podemos ter vários layouts
+
+            . Um para login
+
+            . Um para setor administrativo
+
+            . Um para a loja.
+
+    . Acessando a pasta "Views/Shared" encontramos o arquivo _Layout.cshtml.
+
+        . Ele possui um menu. Acrescente um um item no menu como abaixo:
+
+            <div class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                    </div>
+                    <div class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            <li>@Html.ActionLink("Home", "Index", "Home")</li>
+
+                            <!-- Acrescente a linha abaixo, onde o método ActionLink recebe três parâmetros (Nome no menu, Action e o controller ) -->
+                            <li>@Html.ActionLink("Livros", "Index", "Livro")</li>
+
+                            <li>@Html.ActionLink("About", "About", "Home")</li>
+                            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        . Ele possui o miolo da página:
+
+            <div class="container body-content">
+                @RenderBody()
+                <hr />
+                <footer>
+                    <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+                </footer>
+            </div>
+
+            . O @RenderBody() é o responsável pela montagem da página.
+
+    . Clique com o botão direito sobre a pasta "Views/Shared", acione "Add/View" e na tela que aparecer insira os parâmetros abaixo:
+
+        View Name: _LayoutNovo,
+        TEmplate: Empty (without model),
+        Create as a partial view: False,
+        Use a layout page: False
+
+    . Na view criada insira o código abaixo:
+
+        <!DOCTYPE html>
+
+        <html>
+        <head>
+            <meta name="viewport" content="width=devide-width" />
+            <title>_LayoutNOvo</title>
+
+            <!-- Site de templates para o Bootstrap -->
+            <link rel="stylesheet" href="https://bootswatch.com/cerulean/bootstrap.min.css" media="all" />
+
+        </head>
+
+        <body>
+            <div class="col-md-4">
+                <h3<Menu</div>
+                @RenderSection("menu", true)
+            </div>
+            <div class="container well col-md-8">
+                @RenderBody()
+            </div>
+
+            <!-- A decoration abaixo irá na view buscar o decorate @section com a identificação enviada como parâmetro e renderizará na página -->
+            @RenderSection("Scripts", false)
+        </body>
+        </html>
+
+    . Acesse a view "Views/Livro/Index.cshtml" e acrescente a linha abaixo:
+
+        @model IEnumerable<BookStore.Domain.Livro>
+
+        @{
+            ViewBag.Title = "Index";
+            Layout = "~/Views/Shared/_LayoutNovo.cshtml";                // Linha incluida 
+        }
+
+        ...
+
+        . Detalhe, na pasta "Views" existe um arquivo como nome _ViewStart.cshtml. Nele podemos definir o layout padrão para todas as páginas do projeto.
+            Se quisermos deixar isso individual, basta na view desejada configurar o layout como acima.
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        localhost:[porta]/livros/listar
+
+    . Acesse a view "Views/Livro/Index.cshtml" e acrescente as linhas no final da dela como abaixo:
+
+        ...
+        @section menu{
+            <div>
+                Olá vc está na página principal
+            </div>
+        }
+
+        @section Scripts{
+            @Scripts.Render("~/bundles/jqueryval")
+        }
+
+    . Acesse a view "Views/Livro/Create.cshtml" e acrescente as linhas no final da dela como abaixo:
+
+
+        @model IEnumerable<BookStore.Domain.Livro>
+
+        @{
+            ViewBag.Title = "Criando um novo livro...";
+            Layout = "~/Views/Shared/_LayoutNovo.cshtml";                // Linha incluida 
+        }
+
+        ...
+        @section menu{
+            <div>
+                Olá vc está na página criação
+                <p>
+                    <a href="@Utl.Action("Index")">Voltar</a>
+                </p>
+            </div>
+        }
+
+        @section Scripts{
+            @Scripts.Render("~/bundles/jqueryval")
+        }
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        localhost:[porta]/livros/listar
+        localhost:[porta]/livros/criar
+
+    . Uma configuração possível no layout:
+
+        . Acesse o _LayoutNovo.cshtml e coloque a redenrização do menu dentro de um "@if" como abaixo:
+
+            ...
+            <body>
+                @if (IsSectionDefined("menu"))
+                {
+                    <div class="col-md-4">
+                        <h3<Menu</div>
+                        @RenderSection("menu", false)       // Alterado para não requerido "false"
+                    </div>
+                }
+
+                <div class="container well">            <!-- Foi retirado a class  col-md-8 -->
+                    @RenderBody()
+                </div>
+...
+
+        . Acesse a view "Views/Livro/Index.cshtml" e retire o "@section menu" para deixar opcional a renderização acima.
+
+        . Acesse o navegador e execute a URL abaixo:
+
+            // Deixou de aparecer o menu
+            localhost:[porta]/livros/listar
+
+            // Continua aparecendo
+            localhost:[porta]/livros/criar
+
