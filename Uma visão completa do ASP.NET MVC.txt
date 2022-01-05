@@ -3413,5 +3413,141 @@ Aula 21. Utilizando autenticações internas
 
     . Abra um novo projeto no Visual Studio "File/New/Project", informe como "ASP.NET Web Application", informe o nome do projeto como "IdentitySample"
 
-    . 
+    . Selecione:
+
+        . MVC
+
+        . Change Authetication: Individual User Accounts
+
+    . Esse novo tipo de projeto criou novos arquivos que não vinhas trabalhando:
+
+        Pasta App_Start
+
+            IdentityConfig.cs
+            Startup.Auth.cs
+
+        Pasta Controller
+
+            AccountController.cs
+            ManageController.cs
+
+        Pasta Models
+
+            AccountViewModels.cs
+            IdentityModels.cs
+            ManageViewModels.cs
     
+    . Execute o projeto, faça o registro de um novo usuário, login e logout
+
+    . Acesse o arquivo "App_Start/Startup.Auth.cs". Nele é possível configurar várias formas de autenticação, basta descomentar as linhas
+        com autenticação através do facebook, twitter, etc.
+
+
+    . Acesse o arquivo "Web.config" e localize a tag <connectionStrigs>. Aqui é configurado a conexão de acesso ao banco de dados. Nesse tipo de projeto
+        já vem configurado uma conexão "Default", porém podemos alterar de acordo com a nossa necessidade.
+
+    . Acesse a view "Views/Home/Index.cshtml" e substitua o código dela pelo abaixo:
+
+        @{
+            ViewBag.Title = "Home Page";
+        }
+
+        <h1>
+            Você está autenticado como @User.Identity.Name
+        </h1>
+
+    . Execute a URL abaixo:
+
+        localhost:[porta]/Home/Index
+
+    . Faça o login
+
+    . Acesse o arqquivo "WebConfig.cs"
+
+        . Apague de dentro da tag <connectionStrings> a tag <add name="DefaultConnection"...
+
+        . Acrescente a tag abaixo dentro da tag <connectionStrings>
+
+            <connectionStrings>
+                <add    name="DefaultConnection"
+                        connectionString="Server=.\sqlexpress;Database=idsample;User ID=sa;Password=Joao3.16"
+                        providerName="System.DAta.SqlClient" />
+            </connectionStrings>
+             
+    . Execute a URL abaixo:
+
+        localhost:[porta]/Home/Index
+
+    . Faça o registro de um novo login
+
+    . Acesse o SQLServer e verifique se foi criado com sucesso o database "idsample", execute as DMLs abaixo:
+
+        INSERT INTO AspNetRoles( id, name) VALUES( NEWID(), 'Admin')
+        INSERT INTO AspNetRoles( id, name) VALUES( NEWID(), 'User')
+
+    . Execute a URL abaixo:
+
+        localhost:[porta]/Home/Index
+
+    . Faça o registro de um novo login com o nome de "batman@live.com". Depois faça o login com esse novo usuário.
+
+    . Acesse o SQLServer execute as DMLs abaixo:
+
+        INSERT INTO AspNetUserRoles( userId, roleId ) VALUES({pegue o ID do usuário Admin}, {Role do Admin})
+        INSERT INTO AspNetUserRoles( userId, roleId ) VALUES({pegue o ID do usuário User}, {Role do User})
+
+    . Acesse o component "HomeController" e insira os decorate de "Authorize" como abaixo:
+
+        namespace IdentitySample.Controllers
+        {
+            public class HomeController: Controller
+            {
+                [Authorize]
+                public ActionResult Index()
+                {
+                    ...
+                }
+
+                [Authorize( Roles = "Admin, User" )]
+                public ActionResult About()
+                {
+                    ...
+                }
+
+                [Authorize( Roles = "Admin")]
+                public ActionResult Contact()
+                {
+                    ...
+                }
+            }
+        }
+
+    . Faça o login com os usuários Admin e User  e Execute a URL abaixo:
+
+        localhost:[porta]/Home/Index
+
+        . Verifique o comportamento dos links da página.
+
+
+Aula 22. Utilizando autenticações externas
+------------------------------------------
+
+    . O identity permite utilizar autenticações já existentes, dentre elas...
+
+        . Facebook
+
+        . Twitter
+
+        . Google
+
+        . Microsoft
+
+    . Isto é feito porque estas plataformas utilizam OAuth como base.
+
+    . Basta acessar o arquivo Startup.Auth.cs e descomentar os vários tipos de autenticação.
+
+
+Aula 23. Customizando o Identity
+--------------------------------
+
+
