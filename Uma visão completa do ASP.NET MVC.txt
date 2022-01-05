@@ -1,6 +1,10 @@
 Uma visão completa do ASP.NET MVC
 ---------------------------------
 
+https://www.completecsharptutorial.com/asp-net-mvc5/html-hiddenfor-example-aspnet-mvc5.php
+https://dotnettutorials.net/lesson/asp-net-core-project-file/
+https://asp.net-tutorials.com/
+
 Fundamentos
 -----------
 
@@ -2626,6 +2630,7 @@ Aula 14. Trabalhando com PartialViews
 
     . Acesse a view Views/Livro/Create.cshtml e substitua todo o conteúdo da tag <form> pelo conteúdo abaixo:
 
+        @model BookStore.ViewModels.EditorBookViewModel
 
         @{
             ViewBag.Title = "Criando um novo livro..."
@@ -2663,30 +2668,23 @@ Aula 14. Trabalhando com PartialViews
 
     . Implemente o código abaixo na view recém criada.
 
+        @model BookStore.ViewModels.EditorBookViewModel
+
         @{
-            ViewBag.Title = "Editando um novo livro..."
+            ViewBag.Title = "Editando um novo livro...";
         }
-
-        @helper.MinhaFuncao(string nome)
-        {
-            <text>O nome informado é @nome</text>
-        }
-
-        <p>
-            @MinhaFuncao("Marco")
-        </p>
 
         <h2>Novo Livro</h2>
 
         @using (Html.BeginForm())
         {
-            @Html.HiddenFor( model => model.Id )
+            @Html.HiddenFor(model => model.Id)
             @Html.Partial("Partials/EditorBookPartial", Model)
 
             <button type="submit" class="btn btn-default">Salvar</button>
         }
 
-        @section Scripts { 
+        @section Scripts {
             @Scripts.Render("~/bundles/jqueryval")
         }
 
@@ -2770,7 +2768,6 @@ Aula 14. Trabalhando com PartialViews
         localhost:[porta]/livro/listar
 
 
-TODO: Continuar daqui
     . Acesse a view Index.cshtml do controller "LivroController", retire o conteúdo da tag "<table class="table">", mantenha esse conteúdo
         para copiá-lo numa outra "PartialView".
 
@@ -2887,24 +2884,29 @@ Aula 15. Entendendo o _Layout e Layouts Master
             <meta name="viewport" content="width=devide-width" />
             <title>_LayoutNOvo</title>
 
-            <!-- Site de templates para o Bootstrap -->
-            <link rel="stylesheet" href="https://bootswatch.com/cerulean/bootstrap.min.css" media="all" />
+            <!-- Site de templates para o Bootstrap https://bootswatch.com/help/ -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" 
+                    rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" 
+                    crossorigin="anonymous">
 
         </head>
 
         <body>
             <div class="col-md-4">
                 <h3<Menu</div>
+        
+                @RenderSection("menu", false)
+
+            </div>
+            <div class="container well col-md-4">
                 @RenderSection("menu", true)
             </div>
-            <div class="container well col-md-8">
-                @RenderBody()
-            </div>
-
-            <!-- A decoration abaixo irá na view buscar o decorate @section com a identificação enviada como parâmetro e renderizará na página -->
-            @RenderSection("Scripts", false)
         </body>
         </html>
+
+        . O decorate  @RenderSection("menu", false) quando é informado o último parâmetro como "false" se caso não houver a seção do 
+            primeiro parâmetro "menu" deixa de ser obrigatório. Caso fique como "true" e não existir essa section em algum lugar dará erro.
+
 
     . Acesse a view "Views/Livro/Index.cshtml" e acrescente a linha abaixo:
 
@@ -2933,14 +2935,10 @@ Aula 15. Entendendo o _Layout e Layouts Master
             </div>
         }
 
-        @section Scripts{
-            @Scripts.Render("~/bundles/jqueryval")
-        }
-
     . Acesse a view "Views/Livro/Create.cshtml" e acrescente as linhas no final da dela como abaixo:
 
 
-        @model IEnumerable<BookStore.Domain.Livro>
+        @model IEnumerable<BookStore.ViewModels.EditorBookViewModel>
 
         @{
             ViewBag.Title = "Criando um novo livro...";
@@ -2952,7 +2950,7 @@ Aula 15. Entendendo o _Layout e Layouts Master
             <div>
                 Olá vc está na página criação
                 <p>
-                    <a href="@Utl.Action("Index")">Voltar</a>
+                    <a href="@Url.Action("Index")">Voltar</a>
                 </p>
             </div>
         }
@@ -2975,8 +2973,8 @@ Aula 15. Entendendo o _Layout e Layouts Master
                 @if (IsSectionDefined("menu"))
                 {
                     <div class="col-md-4">
-                        <h3<Menu</div>
-                        @RenderSection("menu", false)       // Alterado para não requerido "false"
+                        <h3>Menu</h3>
+                        @RenderSection("menu", false)   // Alterado para false
                     </div>
                 }
 
@@ -2995,3 +2993,425 @@ Aula 15. Entendendo o _Layout e Layouts Master
             // Continua aparecendo
             localhost:[porta]/livros/criar
 
+
+Aula 16. Trabalhando com Sections
+---------------------------------
+
+    . Sections
+
+        . São espaços reservados nos layouts
+
+        . Podemos definir uma section em qualquer lugar do layout
+
+        . Podemos renderizar qualquer contuéudo em uma section.
+
+
+TODO: Continuar daqui
+Aula 17. Entendendo o ValidationMessage
+---------------------------------------
+
+    . O ASP.NET MVC possui um mecanismo de envio de mensagens de erro para tela.
+
+    . Isto é chamado de modelState.
+
+    . Ele serve tanto para saber se podemos prosseguir na execução de um código 
+
+        . Caso o modelState seja válido, está tudo ok.
+
+    . Qaunto para enviar alguma mensagem customizada para tela.
+
+    . Está estritamente ligado com o metadados gerado pelos dataAnnotations
+
+    . JQuery validation auxilia na geração de erros no cliente
+
+    . Evita ficar postando apágina para receber os erros (é assíncrono)
+
+    . Se baseia nos metadados gerados pelos dataAnnotation para criação de validações no cliente.
+
+
+    . ValidationMessages
+
+        . São as famosas mensagens de erro
+
+        . Pode ser utilizada assincronamente
+
+            . Dependem do JQuery validation
+
+        . Pode ser aplicadas diretamente nos campos ou sumarizada
+
+        . Podem ser genéricas
+
+            . @html.validationmessagefor( x => x.name)
+
+        . Cappturam os erros do modelstate.
+
+    . Acesse o arquivo "Views/Livro/Index.cshtml" e comente a linha do do "Layout" como abaixo:
+
+        @model IEnumerable<BookStore.Domain.Livro>
+
+        @{
+            ViewBag.Title = "Index";
+            // Layout = "~/Views/Shared/_LayoutNovo.cshtml";                // Linha incluida 
+        }
+
+        ...
+
+    . Acesse o arquivo "Views/Livro/Create.cshtml" e comente a linha do do "Layout" como abaixo:
+
+        @model IEnumerable<BookStore.ViewModels.EditorBookViewModel>
+
+        @{
+            ViewBag.Title = "Criando um novo livro...";
+            // Layout = "~/Views/Shared/_LayoutNovo.cshtml";                // Linha incluida 
+        }
+
+        ...
+
+
+        . Remova a section menu
+
+            /*
+            ...
+            @section menu{
+                <div>
+                    Olá vc está na página criação
+                    <p>
+                        <a href="@Utl.Action("Index")">Voltar</a>
+                    </p>
+                </div>
+            }
+            ...
+            */
+        
+    . Execute a URL abaixo:
+
+        localhost:[porta]/livros/criar
+
+    . Acesse o arquivo "Views/Livro/Create.cshtml" e implemente a linha de código abaixo:
+
+        ...
+        @using (Html.BeginForm())
+        {
+            @Html.ValidationSummary( true, "", new { @ class = "text-danger"})      // Linha Inserida
+
+            <div class="alert alert-danger">                // Linha inserida
+                @Html.ValidationMessage("Mensagem")         // Linha inserida
+            </div>                                          // Linha inserida
+
+            @Html.Partial("Partials/EditorBookPartial", Model)
+        }
+        ...
+
+        . O primeiro parâmetro do ValidationSummary indica se as msgs serão exibidas nos próprios campos, ou se haverá 
+            uma área especifica para isso.
+    
+    . Acesse o componente LivroController e implemente as linhas de código abaixo:
+
+        ...
+        [Route("criar")]
+        public ActionResult Create()
+        {
+            ModelState.AddModelError("Mensagem", "Algum erro ocorreu");     // Linha inserida
+
+            var categorias = _db.Categorias.ToList();
+            ...
+        }
+        ...
+
+    . Execute a URL abaixo:
+
+        localhost:[porta]/livros/criar
+
+    . Acesse o arquivo "Views/Livro/Create.cshtml" e altere o parâmetro do ValidationSummary para "false"
+
+        ...
+        @using (Html.BeginForm())
+        {
+            @Html.ValidationSummary(      false       , "", new { @ class = "text-danger"})      // Linha Alterada
+        ...
+
+        . Com o false, os erros ficaram em lista.
+
+    . Execute a URL abaixo:
+
+        localhost:[porta]/livros/criar
+
+
+    . Acesse o componente LivroController e elimine o ModelState
+
+        ...
+        [Route("criar")]
+        public ActionResult Create()
+        {
+            // ModelState.AddModelError("Mensagem", "Algum erro ocorreu");     // Linha apagada
+
+            var categorias = _db.Categorias.ToList();
+            ...
+        }
+        ...
+
+    . Acesse o método LivroController.Create( EditorBookViewModel ) e implemente as linhas abaixo:
+
+        [Route("criar")]
+        [HttpPost]
+        public ActionResult Create( EditorBookViewModel model)
+        {
+
+            if (!ModelState.Valid)
+            {
+                var categorias = _db.Categorias.ToList();
+
+                var viewModel = new EditorBookViewModel
+                {
+                    Nome = "",
+                    ISBN = "",
+                    CategoriaId = 0,
+                    CategoriaOptions = new SelectList(categorias, "Id", "Nome");
+                };
+
+                return View( viewModel );
+            }
+
+            ...
+
+            try
+            {
+                throw new Exception("Falha no banco"); // ATENÇÃO, está linha é somente para testar o catch abaixo. Depois ela tem que sair.
+
+                _db.SaveChanges();
+            }        
+            catch( Exception ex )
+            {
+                ModelState.AddModelError("Mensagem", ex.Message);
+
+                var categorias = _db.Cateforias.ToList();
+                var categorias = _db.Categorais.ToList();
+                model.CategoriaOpetions = new SelectList(categorias, "Id", "Nome");
+
+                return View(model);
+            }
+            ....
+
+    . Execute a URL abaixo:
+
+        localhost:[porta]/livros/criar
+
+        . Entre com um novo livro e verifique o comportamento.
+
+
+    . Altere os decorate de validação do componente "EditorBookViewModel", retirando os "*" dos validadores e colocando uma descrição de erro condizente.
+
+
+
+Aula 18. Criando Validações customizadas.
+-----------------------------------------
+
+    . Quando o padrão não atende
+
+        . Em alguns casos, as validações padrões não vão te atender.
+
+        . É possível criar validações (escritas em C#) e utiliza-las para decorar uma propriedade.
+
+        , Feito isto, automaticamente será adicionada a validação no lado do servidor.
+
+        . Ainda é possível realizar esta operação assíncrona, mapeando a valiação com o JQuery Validation.
+
+    . Clique com o botão direito sobre o projeto "BookStore", dê um "Add/New Class" e dê o nome "CheckAgeValidator".
+
+    . Implemente o código abaixo na classe recém criada:
+
+
+        using System;
+        using System.ComponentModel.Validators;
+
+        namespace BookStore.Validators
+        {
+
+            public class CheckAgeValidator: ValidationAttribuite
+            {
+                protected override ValidationResult IsValid( object value, ValidationContext validateionContext )
+                {
+                    DateTime date = (DateTime)value;
+
+                    if ((date.Year - 18) > 0 )
+                        return new ValidateionResult("Somente maiores de 18 anos");
+
+                    return ValidationResult.Success;
+                }
+            }
+        }
+
+    . Acesse o componente "EditorBookViewModel.cs" e implemente o método abaixo:
+
+        ...
+        namespace BookStore.ViewModels
+        {
+            public class EditorBookViewModel
+            {
+                ...
+
+                [CheckAgeValidator]
+                public DateTime Age { get; set; }
+                ...
+            }
+        }
+
+    . Acesse o componente "EditorBookPartial.cshtml" e implemente as linhas abaixo:
+
+        ...
+
+        <div class="form-group">
+            @Html.EdirotFor( x => x.Age)                
+            @Html.ValidatinMessageFor( x => x.Age)     
+        </div>
+
+    . Acesse a URL abaixo para fazer o teste:
+
+        localhost:[porta]/livros/criar
+
+
+Aula 18. Trabalhado com Bundle
+------------------------------
+
+    . Emapacotar para otimizar
+
+        . O browser suporta apensa seis requisições concorrentes.
+
+        . Bundle nada mais é do que compilar vários arquivos em apensa um.
+
+        . Se ao invés de fazer 18 requisições para arquivos javascript, fizermos apensa um para um arquivo maior, ela será otimizada.
+
+        . Funciona como a cópia de arquivos no windows.
+
+    . Acesse o arquivo "App_Start/BundleConfig.cs".
+
+    . Dentro do "BundleConfig.cs" ocorre o registro de vários arquivo "*.js, *.css" para a aplicaçãop, como o exemplo abaixo:
+
+        ...
+        public static void RegisterBundles(BundleCollection bundles)
+        {
+            bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
+                        "~/Scripts/jquery-{version}.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
+                        "~/Scripts/jquery.validate*"));
+
+            bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
+                        "~/Scripts/modernizr-*"));
+
+            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
+                      "~/Scripts/bootstrap.js",
+                      "~/Scripts/respond.js"));
+
+            bundles.Add(new StyleBundle("~/Content/css").Include(
+                      "~/Content/bootstrap.css",
+                      "~/Content/site.css"));
+        }
+        ...
+
+        . Observe os coringas "*-{version}" e "*" no parâmetro do método ".include". Em algum lugar podemos definiar a versão que queremos desses arquivos.
+
+    . Ao invés de colocarmos nos arquivos de layouts (_Layout.cshtml, _LayoutNovo.cshtml) a especificação desses arquivos "*.js", podemos fazer isso diretamente
+        no BundleConfig.cs.
+
+    . No _Layout.cshtml temos:
+
+        ...
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>@ViewBag.Title - My ASP.NET Application</title>
+            @Styles.Render("~/Content/css")
+            @Scripts.Render("~/bundles/modernizr")
+        </head>
+        ...
+
+        . Observe o @Style.Render e o @Scripts.Render, eles fazem relação como o que foi registrado pelo Bundle para fazer uso destes arquivos.
+
+    . A lógica seria a seguinte:
+
+        . Primeiro faz o registro do pacote no bundle, com o nome do pacote "~/Content/css" e o include dos arquivo "include("~/Content/bootstrap.css")"
+
+            bundles.Add(new StyleBundle("~/Content/css").Include(
+                      "~/Content/bootstrap.css",
+                      "~/Content/site.css"));
+
+        . Nas páginas de layout fazemos a inserção, renderiza os arquivos associado ao bundle registrado:
+
+            ...
+            <html>
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>@ViewBag.Title - My ASP.NET Application</title>
+                @Styles.Render("~/Content/css")
+                @Scripts.Render("~/bundles/modernizr")
+            </head>
+            ...
+            <body>
+                ...
+                @Scripts.Render("~/bundles/jquery")
+                @Scripts.Render("~/bundles/bootstrap")
+                @RenderSection("scripts", required: false)
+            </body>
+            </html>
+
+
+Aula 19. Trabalhando com Minification
+--------------------------------------
+
+    . Minificação:
+
+        . O browser não precisa de quebra de linha, espaços extras e comentários
+
+        . Ele se baseia no ";" para isto
+
+        . Toda a identação do código é apenas para o humano ver melhor
+
+        . Se pudéssemos retirar todos estes espaços, salvaríamos vários KBS.
+
+
+Aula 20. Introdução ao Identity
+-------------------------------
+
+    . O que é o Identity?
+
+        . Uma plataforma completa de autenticação/Autorização
+        
+        . Simples, leve e extensível
+
+        . Uma evolução do Membership
+
+        . Provê acesso via usuários e perfis.
+
+        . Pode ser utilizado tanto com ASP.NET MVC quanto Web Forms.
+
+        . Prove o controle sobre o esquema de usuários e perfis.
+
+        . Utiliza Entity Framework para persistir os dados no banco.
+
+        . FAcilmente alterado para utilizar ad, ou outro método de autenticação.
+
+        . Pode ser desacoplado, é fácil de testar 
+
+        . Suporta autenticações eternas, como facebook e twitter
+
+        . Utiliza Owin como base
+
+        . Distribuido via Nuget.
+
+
+Aula 21. Utilizando autenticações internas
+------------------------------------------        
+
+    . Utilizando o Identity
+
+        . Autenticação interna serve quando você precisa do controle do usuário
+
+        . Você será responsável por armazená-los.
+
+
+    . Abra um novo projeto no Visual Studio "File/New/Project", informe como "ASP.NET Web Application", informe o nome do projeto como "IdentitySample"
+
+    . 
+    
