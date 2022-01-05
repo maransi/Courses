@@ -9168,7 +9168,7 @@ Aula 15.02. Implementando um serviço
 
                 <button type="button" 
                         class="btn btn-primary" 
-                        (click)="adicionar(nomeInput.value)"
+                        (click)="adicionar(nomeInput.value); nomeInput.value=''; nomeInput.focus()"
                         [disabled]="nome.length==0">Salvar</button>
             </div>
 
@@ -9362,22 +9362,143 @@ Aula 15.4. Configurando o injetor com provider por classe
         ],
         ...
 
+
+TODO: Continuar daqui
 Aula 15.5. Configurando o injetor com provider por fábrica
 ----------------------------------------------------------
 
+    . Acesse a classe funcionario.service.ts e implemente na classe "FuncionarioAbreviadoService" o construtor:
+
+        export class funcionarioAbreviadoService extends FuncionarioService{
+
+            constructor( private numeroCaracteres: number){
+                super();
+            }
+
+            ...
+        }
+
+    . Acesse o componente "app.module.ts" e implemente a função abaixo, logo abaixo dos "imports":
+
+        import ...
+        ...
+
+        const criarFuncionarioService = () => {
+            return new FuncionarioAbreviadoService(2);
+        }
+
+        ...
+
+    . Altere o "provider" conforme abaixo, mudando o parâmetro "useFactory: criarFuncionarioService":
+
+        @NgModule({
+            ...
+            providers: [
+                { provide: FuncionarioService, useFactory: criarFuncionarioService }
+            ],
+            ...
+        })
+
+
+Aula 15.6. Configurando o injetor com provider por valor e o decorator @Inject
+------------------------------------------------------------------------------
+
+    . Acesse a classe "funcionario.service.ts" e apague a classe "FuncionarioAbreviadoService"
+
+    . Acesse o componente "app.component.ts" e altere o provider para o FuncionarioService como abaixo:
+
+        @NgModule({
+            ...
+            providers: [
+                FuncionarioService
+            ],
+            ...
+        })
+
+    . Dentro da pasta "app" inclua um novo arquivo com o nome "log.service.ts" e acrescente o código abaixo:
+
+        export class LogService{
+
+            constructor( @Inject('LogPrefixo') private prefixo: string){}
+
+            log( msg: string){
+                console.log( `${this.prefixo}: ${msg}`);
+            }
+        }
+
+        . O @Inject('LogPrefixo') será configurado logo abaixo no "app.module.ts" para trazer um valor 
+            a ser injetado.
+
+    . Acesse a classe "funcionario.component.ts" e insira o logService no construtor como abaixo:
+
+
+        ..
+        constructor(private funcionarioService: FuncionarioService,
+                    private logService: LogService){
+            this.nome = '';
+        }
+        ...
+
+    . Acesse a classe "funcionario.component.ts" e insira a linha do logService no método "adicionar" como abaixo:
+
+        adicionar( nome: string){
+            this.logService.log(`Adicionando ${nome}`);
+        }
+
+    . Acesse o "app.module.ts" e acrescente a classe "LogService" nos "providers":
+
+        @NgModule({
+            ...
+            providers: [
+                FuncionarioService,
+                LogService,
+                { provide: 'LogPrefixo', useValue: 'LOG' }
+            ],
+            ...
+        })
+
+    . Execute o projeto e veja o resultado.
+
+
+Aula 15.7. Injetando serviços dentro de serviços e o decorador @Injectable
+--------------------------------------------------------------------------
+
+    . Acesse o componente "funcionario.service.ts", Acrescente o decorate @Injectable, o construtor e a saída do log no método "adicionar":
+
+        ...
+        @Injectable()
+        export class FuncionarioService{
+            ...
+
+            constructor( private logService: LogService){}
+
+            adicionar( nome: string){
+                this.logService.log(`Adicionando nome ${nome}...`);
+                ...
+            }
+
+        }
+
+        . Fazer teste retirado o @Injectable para ver se o projeto funciona.
+
+        . O decorate @Injectable até a versão 5 do angular era uma mera convenção, colocando, ou não, não tinha
+            nenhuma mudança. Já da versão 6 em diante podemos utilizá-lo com mais efetividade, pois ao usá-lo
+            deixa de haver a necessidade de declará-lo nos "providers" do "app,module.ts".
+
+
+Aula 15.8. Como funciona o Injetor Hierárquico
+----------------------------------------------
+
+    . O objeto injetado retornará sempre um "singleton", ou seja, uma mesma instância do objeto.
+
+    . Podemos registrar a injeção no "providers" de outros *.module.ts", nos nosso exemplos só trabalhamos 
+        com o "app.module.ts". Quando fazemos o registro em outro modulo, o angular deixa disponível para todos 
+        os outros módulos normalmente.
 
 
 
-
-
-
-
-
-
-
-
-
-
+Aula 16.1. Por que precisamos de requisições HTTP?
+--------------------------------------------------
 
 
 
