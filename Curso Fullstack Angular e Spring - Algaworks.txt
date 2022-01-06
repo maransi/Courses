@@ -9451,7 +9451,8 @@ Aula 15.6. Configurando o injetor com provider por valor e o decorator @Inject
     . Acesse a classe "funcionario.component.ts" e insira a linha do logService no método "adicionar" como abaixo:
 
         adicionar( nome: string){
-            this.logService.log(`Adicionando ${nome}`);
+            this.funcionarioService.adicionar(nome);            
+            this.logService.log(`Adicionando ${nome}`);     // Linha inserida
         }
 
     . Acesse o "app.module.ts" e acrescente a classe "LogService" nos "providers":
@@ -9504,7 +9505,57 @@ Aula 15.8. Como funciona o Injetor Hierárquico
         com o "app.module.ts". Quando fazemos o registro em outro modulo, o angular deixa disponível para todos 
         os outros módulos normalmente.
 
+    . Sequência para implementar DI num projeto Angular:
 
+        . Criar uma classe:
+
+            export class LibService{
+
+                showMessage( msg: string ){
+                    console.log( msg );
+                }
+            }
+
+        . Declarar ela no componente app.module.ts no paragrafo "providers":
+            
+            ...
+            providers: [ 
+                FuncionarioService,
+                LogService,
+                { provide: 'LogPrefixo', useValue: 'LOG'},
+                LibService
+            ],
+            ...
+
+        . Declarar a classe no construtor da classe onde é necessário utilizá-la.
+
+            . Utilizando o decorate @Inject, não havendo a definição o tipo da classe:
+
+                ...
+                export class FuncionarioComponent implements OnInit{
+                    nome: string;
+                    funcionarios = [];
+
+                    constructor(@Inject(FuncionarioService) private funcionarioService,       // : FuncionarioService,
+                                @Inject(LogService) private logService,              // : LogService,
+                                @Inject(LibService) private libService){
+                        this.nome = '';
+                    }
+                    ...
+
+            . Sem usar o @Inject, porém informando o tipo da classe na assinatura do construtor;
+
+                ...
+                export class FuncionarioComponent implements OnInit{
+                    nome: string;
+                    funcionarios = [];
+
+                    constructor(private funcionarioService: FuncionarioService,   
+                                private logService: LogService, 
+                                private libService: LibService) {
+                        this.nome = '';
+                    }
+                    ...
 
 Aula 16.1. Por que precisamos de requisições HTTP?
 --------------------------------------------------
