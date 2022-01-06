@@ -9363,7 +9363,6 @@ Aula 15.4. Configurando o injetor com provider por classe
         ...
 
 
-TODO: Continuar daqui
 Aula 15.5. Configurando o injetor com provider por fábrica
 ----------------------------------------------------------
 
@@ -9389,6 +9388,13 @@ Aula 15.5. Configurando o injetor com provider por fábrica
 
         ...
 
+    . Altere o numero de caracteres a ser apresentado, colocando o valor da propriedade "numeroCaracter"
+        ...
+        adicionar( nome: string ){
+            super.adicionar( nome.substr(0,this.numeroCaracter) + '...');   // Alterado
+        }
+        ...
+
     . Altere o "provider" conforme abaixo, mudando o parâmetro "useFactory: criarFuncionarioService":
 
         @NgModule({
@@ -9399,7 +9405,10 @@ Aula 15.5. Configurando o injetor com provider por fábrica
             ...
         })
 
+    . Execute o projeto e veja se os nomes dos funcionarios estão saindo abreviados.
 
+
+TODO: Continuar daqui
 Aula 15.6. Configurando o injetor com provider por valor e o decorator @Inject
 ------------------------------------------------------------------------------
 
