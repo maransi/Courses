@@ -3070,7 +3070,7 @@ Aula 17. Entendendo o ValidationMessage
 
         . Remova a section menu
 
-            /*
+            @*
             ...
             @section menu{
                 <div>
@@ -3081,7 +3081,7 @@ Aula 17. Entendendo o ValidationMessage
                 </div>
             }
             ...
-            */
+            *@
         
     . Execute a URL abaixo:
 
@@ -3092,7 +3092,7 @@ Aula 17. Entendendo o ValidationMessage
         ...
         @using (Html.BeginForm())
         {
-            @Html.ValidationSummary( true, "", new { @ class = "text-danger"})      // Linha Inserida
+            @Html.ValidationSummary( true, "", new { htmlAttributes = new { @class = "text-danger" } } )  // Linha Inserida
 
             <div class="alert alert-danger">                // Linha inserida
                 @Html.ValidationMessage("Mensagem")         // Linha inserida
@@ -3156,21 +3156,14 @@ Aula 17. Entendendo o ValidationMessage
         [HttpPost]
         public ActionResult Create( EditorBookViewModel model)
         {
-
-            if (!ModelState.Valid)
+            if (!ModelState.IsValid)
             {
+
                 var categorias = _db.Categorias.ToList();
+                model.CategoriaOptions = new SelectList(categorias, "Id", "Nome");
 
-                var viewModel = new EditorBookViewModel
-                {
-                    Nome = "",
-                    ISBN = "",
-                    CategoriaId = 0,
-                    CategoriaOptions = new SelectList(categorias, "Id", "Nome");
-                };
-
-                return View( viewModel );
-            }
+                return View(model);
+            };
 
             ...
 
@@ -3179,14 +3172,13 @@ Aula 17. Entendendo o ValidationMessage
                 throw new Exception("Falha no banco"); // ATENÇÃO, está linha é somente para testar o catch abaixo. Depois ela tem que sair.
 
                 _db.SaveChanges();
-            }        
-            catch( Exception ex )
+            }
+            catch (Exception ex)
             {
                 ModelState.AddModelError("Mensagem", ex.Message);
 
-                var categorias = _db.Cateforias.ToList();
-                var categorias = _db.Categorais.ToList();
-                model.CategoriaOpetions = new SelectList(categorias, "Id", "Nome");
+                var categorias = _db.Categorias.ToList();
+                model.CategoriaOptions = new SelectList(categorias, "Id", "Nome");
 
                 return View(model);
             }
