@@ -3127,7 +3127,7 @@ Aula 17. Entendendo o ValidationMessage
         ...
         @using (Html.BeginForm())
         {
-            @Html.ValidationSummary(      false       , "", new { @ class = "text-danger"})      // Linha Alterada
+            @Html.ValidationSummary( true, "", new { htmlAttributes = new { @class = "text-danger" } } )  // Linha Alterada
         ...
 
         . Com o false, os erros ficaram em lista.
@@ -3541,5 +3541,86 @@ Aula 22. Utilizando autenticações externas
 
 Aula 23. Customizando o Identity
 --------------------------------
+
+    . Por padrão, o identity nos fornece um usuário padrão.
+
+    . É plenamente possível alterar este usuário, adicionando ou removendo campos.
+
+    . Acesse o arquivo "Views/Account/Register.cshtml":
+
+        . Observe que o model dele é o IdetitySample.Models.RegisterViewModel
+        
+        . De um clique direito sobre o nome "RegisterViewModel" e escolha
+            a opção "Go to definition".
+
+        . Crie uma nova propriedade:
+
+            ...
+            public class RegisterViewModel
+            {
+                [Required]
+                [Display( Name = "Name")]
+                public string Name { get; set; }
+                
+                ...
+            }
+
+    . Retorne ao arquivo "Register.cshtml" e implemente o código abaixo:
+
+        ...
+        @Html.AntiFogeryToken()
+        <h4>Create a new account.</h4>
+        <hr>
+        @Html.ValidationSummary( "", new { htmlAttributes = new { @class = "text-danger" } } )  
+
+        <!-- Linhas inseridas -->
+
+        <div class="form-group">
+            @Html.LabelFor( m => m.Name, new { htmlAttributes = new { @class = "col-md-2 control-label" } } )
+
+            <div class="col-md-10">
+                @Html.TextBoxFor( m => m.Name, { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+    . Acesse a classe "Models/IdentityModel" e insira a propriedade abaixo:
+
+        public class ApplicationUser: IdentityUser
+        {
+            public string Name { get; set; }    // Linha inserida
+            ...
+        }
+
+
+
+    . Acesse o arquivo "Controllers/AccountController.cs", acesse o método abaixo:
+
+        ... 
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Register( RegisterViewModel model)
+        {
+            if ( Models.Stat.IsValid)
+            {
+                var user = new ApplicationUser { ... }
+                ...
+            }
+            ...
+        }
+        
+    . Insira o parâmetro "Name" nos atributos da classe:
+
+        var user = new ApplicationUser { Name = model.Name, ... }
+
+    . Acesse o SQLServer e apague o database referente ao projeto identity "idsample"
+    
+    . Execute a URL abaixo e verifique se o nome apareceu com sucesso:
+
+        localhost:[porta]/Account/Register
+
+    . Acesse o SQLServer e verifique se foi criado o campo "Name" na tabela "AspNetUsers"
+
+
 
 
