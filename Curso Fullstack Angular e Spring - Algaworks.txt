@@ -9557,8 +9557,141 @@ Aula 15.8. Como funciona o Injetor Hierárquico
                     }
                     ...
 
-Aula 16.1. Por que precisamos de requisições HTTP?
---------------------------------------------------
+Aula 16.2. Instalando e testando o json-server
+----------------------------------------------
+
+    . Acesse o prompt do SO e execute o comando abaixo:
+
+        sudo npm install -g json-server
+
+    . Crie uma pasta e dentro dela crie o arquivo db-exemplo.json com o conteúdo abaixo:
+
+        {
+            "produtos": [
+                {
+                    "id": 1,
+                    "nome": "Hambúrguer",
+                    "descricao": "Pão, bife de hambúrguer 90g, salada e batata.",
+                    "preco": 8.5,
+                    "categoria_id": 1
+                },
+                {
+                    "id": 2,
+                    "nome": "X-Búrguer",
+                    "descricao": "Pão, bife de hambúrguer 90g, 1 fatia de queijo, salada e batata.",
+                    "preco": 10.5,
+                    "categoria_id": 1
+                },
+                {
+                    "id": 3,
+                    "nome": "X-Bacon",
+                    "descricao": "Pão, bife de hambúrguer 90g, 1 fatia de queijo, 2 fatia de bacon, salada e batata.",
+                    "preco": 12.5,
+                    "categoria_id": 1
+                },
+                {
+                    "id": 4,
+                    "nome": "X-Tudo",
+                    "descricao": "Pão, 2 bifes de hambúrguer 90g, 2 fatias de queijo, 4 fatias de bacon, salada e batata.",
+                    "preco": 14.5,
+                    "categoria_id": 1
+                },
+                {
+                    "id": 5,
+                    "nome": "Coca cola 350ml",
+                    "descricao": "",
+                    "preco": 5.5,
+                    "categoria_id": 2
+                },
+                {
+                    "id": 6,
+                    "nome": "Coca cola 600ml",
+                    "descricao": "",
+                    "preco": 7.5,
+                    "categoria_id": 2
+                }
+            ],
+            "categorias": [
+                {
+                    "id": 1,
+                    "nome": "Hambúrgueres"
+                },
+                {
+                    "id": 2,
+                    "nome": "Refrigerantes"
+                }
+            ]
+        }
+
+    . Dentro da pasta criada execute o comando abaixo:
+
+        json-server --watch db-exemplo.json    
+
+    . Acesse o postman e execute a URL abaixo:
+
+        GET http://localhost:3000/produtos/    
+
+        GET http://localhost:3000/produtos/1
+
+        POST http://localhost:3000/produtos/
+
+            Content-Type: application/json
+            {
+                "nome": "Hambúrguer de frango",
+                "descricao": "Pão, bife de hambúrguer 90g de frango, salada e batata.",
+                "preco": 9.5,
+                "categoria_id": 1
+            }
+
+
+        PUT http://localhost:3000/produtos/1
+
+            Content-Type: application/json
+            {
+                "nome": "Hambúrguer de frango",
+                "descricao": "Pão, bife de hambúrguer 90g de frango, salada e batata.",
+                "preco": 10.5,
+                "categoria_id": 1
+            }
+
+        PATCH http://localhost:3000/produtos/1
+
+            Content-Type: application/json
+            {
+                "nome": "Hambúrguer de frango artezanal"
+            }
+
+        DELETE http://localhost:3000/produtos/1
+        Content-Type: application/json
+
+        GET http://localhost:3000/produtos?nome=X-Búrguer
+
+        GET http://localhost:3000/produtos/?_page=1&_limit=2
+
+    . Para parar o servidor json-server basta dar Ctrl+C
+
+    . Crie na pasta json-server outro arquivo json com o nome db.json e com o conteúdo abaixo:
+
+        {
+            "cidades": [
+                {
+                    "nome": "Uberlândia",
+                    "id": 1
+                },
+                {
+                    "nome": "São Paulo",
+                    "id": 2
+                },
+                {
+                    "nome": "Fortaleza",
+                    "id": 3
+                }
+            ]
+        }
+
+
+
+
 
 
 
