@@ -9099,7 +9099,7 @@ Submetendo um projeto local para o Git
 https://medium.com/singapore-rails-learning-group/how-to-push-your-code-to-github-and-publish-your-first-page-8b0e1f4caf2a
 
 
-// TODO: Continuar daqui em diante - Fazer o desafio da aula 14.7
+
 Aula 15.01. Introdução aos serviços
 -----------------------------------
 
@@ -9408,7 +9408,6 @@ Aula 15.5. Configurando o injetor com provider por fábrica
     . Execute o projeto e veja se os nomes dos funcionarios estão saindo abreviados.
 
 
-TODO: Continuar daqui
 Aula 15.6. Configurando o injetor com provider por valor e o decorator @Inject
 ------------------------------------------------------------------------------
 
@@ -9690,11 +9689,175 @@ Aula 16.2. Instalando e testando o json-server
         }
 
 
+Aula 16.3. Fazendo requisição com GET e recebendo o retorno
+-----------------------------------------------------------
+
+    . Digite o comando abaixo para criar um projeto angular:
+
+        $ ng new algamoney-modulo16
+
+    . Acesse o arquivo "src/app/app.component.html" e insira o código abaixo:
+
+        <div class="container">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" class="form-control" #nome>
+            </div>
+
+            <button type="button" class="btn btn-primary"
+                (click)="adicionar(nome.value); nome.value = ''">Adicionar</button>
+
+            <table class="table" style="margin-top: 20px">
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let cidade of cidades">
+                    <td>{{ cidade.id }}</td>
+                    <td>
+                    <div class="input-group">
+                        <input type="text" class="form-control" [(ngModel)]="cidade.nome">
+                        <span class="input-group-btn">
+                        <button class="btn btn-primary"
+                            (click)="atualizar(cidade)">Atualizar</button>
+                        </span>
+                    </div>
+                    </td>
+                    <td>
+                    <button class="btn btn-danger"
+                        (click)="excluir(cidade.id)">Excluir</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    . Acesse o arquivo "src/app/app.component.ts" e insira o código abaixo:
+
+        import { CidadeService } from './cidade.service';
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.css']
+        })
+        export class AppComponent implements OnInit {
+
+        cidades = [];
+
+        constructor(private cidadeService: CidadeService) {}
+            ngOnInit() {
+                this.cidadeService.consultar()
+                .then(dados => {
+                    this.cidades = dados;
+                })
+            }
+
+            adicionar(nome: string) {
+                alert(nome);
+            }
+
+            excluir(id: number) {
+                alert(id);
+            }
+
+            atualizar(cidade: any) {
+                alert(JSON.stringify(cidade));
+            }
+        }
+
+    . Acesse o arquivo "src/app/app.module.ts" e insira o código abaixo:
+
+        import { HttpModule } from '@angular/http';
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { FormsModule } from '@angular/forms';
+
+        import { AppComponent } from './app.component';
+        import { CidadeService } from './cidade.service';
+
+        @NgModule({
+            declarations: [
+                AppComponent
+            ],
+            imports: [
+                BrowserModule,
+                FormsModule,
+                HttpModule
+            ],
+            providers: [CidadeService],
+            bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+
+    . Execute o comando abaixo na pasta raiz do projeto:
+
+        $ ng c s cidade --spec=false    
+
+    . Acesse o arquivo "src/app/cidade.service.ts" e insira o código abaixo:
+
+        import { Http } from '@angular/http';
+        import { Injectable } from '@angular/core';
+        import 'rxjs/add/operator/toPromise';
+
+        @Injectable()
+        export class CidadeService {
+
+            constructor(private http: Http) { }
+
+            consultar(): Promise<any> {
+                return this.http.get('http://localhost:3000/cidades')
+                .toPromise()
+                .then(response => response.json())
+            }
+        }    
+
+    . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
+
+        $ npm install bootstrap@4.5.3 --save
+
+    . Dentro do arquivo .angular-cli.json, encontre o paragrafo style e insira a referência ao 
+        bootstrap:
+
+        ...
+        "styles": [
+            ...
+            "../node_modules/bootstrap/dist/css/bootstrap.css"
+        ],     
+        ...   
 
 
+    . Na raiz do projeto crie a pasta "data"
 
+    . Dentro da pasta "data" crie o arquivo db.json com o conteúdo abaixo:
 
+        {
+            "cidades": [
+                {
+                    "nome": "Uberlândia",
+                    "id": 1
+                },
+                {
+                    "nome": "São Paulo",
+                    "id": 2
+                },
+                {
+                    "nome": "Fortaleza",
+                    "id": 3
+                }
+            ]
+        }
 
+    . Dentro da pasta data execute o comando abaixo:
+
+        $ json-server --watch db.json    
+
+TODO: Assistir novamente a aula e realizar as anotações em cada ponto com todos os detalhes.
 
 
 
