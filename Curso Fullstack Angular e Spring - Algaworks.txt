@@ -9884,11 +9884,92 @@ Aula 16.3. Fazendo requisição com GET e recebendo o retorno
             this.cidadeService.consultar()
                 .then( dados => {
                                     this.cidades = dados;
-                    })
+                    });
         }
         ...
 
     . Execute o projeto e verifique se o formulário está exibindo corretamente as informações.
+
+
+Aula 16.4. Fazendo requisição com POST
+--------------------------------------
+
+    . Acesse o componente "cidade.service.ts" e implemente o código abaixo no método "adicionar":
+
+        ...
+        adicionar( cidades: any): Promisse<any>{}
+
+            return this.http.post()'http://localhost:3000/cidades', cidades )      // O segund parâmetro representa o body da request
+                        .toPromise()
+                        .then(response => response.json() );
+
+        }
+        ...
+
+    . Acesse o componente "app.component.ts" e implemente o código abaixo no método adicionar.
+
+        ...
+        consultar(){
+            this.cidadeService.consultar()
+                .then( dados => {
+                                    this.cidades = dados;
+                    });
+        }
+
+        adicionar( nome: string){
+            this.cidadeService.adicionar( { nome })
+                .then( dado => {
+                        alert( `Cidade "${dado.nome}" adicionada com código ${dado.id}` );
+         
+                       this.consultar();
+                    });
+
+        }
+        ...
+
+        . Atenção: a chamada do método consultar foi realizada dentro do "then" para que seja 
+                    executada após o retorno do método "cidadeService.adicionar". Caso colocarmos
+                    em outro lugar, a execução do "consultar" será feito em paralelo e não
+                    conseguiremos pegar o retorno da inclusão da cidade.
+
+    . No componente "app.component.ts" altere o método ngOnInit() conforme abaixo:
+
+        ...
+        ngOnInit(){
+            this.consultar();
+        }
+        ...
+    
+    . Execute o projeto, informe um nome de cidade e acione o botão "Adicionar".
+
+
+Aula 16.5. Fazendo requisição com DELETE
+----------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
