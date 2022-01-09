@@ -9688,13 +9688,139 @@ Aula 16.2. Instalando e testando o json-server
             ]
         }
 
-
+TODO: Parei aqui
 Aula 16.3. Fazendo requisição com GET e recebendo o retorno
 -----------------------------------------------------------
+
+    . Na raiz do projeto crie a pasta "data"
+
+    . Dentro da pasta "data" crie o arquivo db.json com o conteúdo abaixo:
+
+        {
+            "cidades": [
+                {
+                    "nome": "Uberlândia",
+                    "id": 1
+                },
+                {
+                    "nome": "São Paulo",
+                    "id": 2
+                },
+                {
+                    "nome": "Fortaleza",
+                    "id": 3
+                }
+            ]
+        }
+
+    . Dentro da pasta data execute o comando abaixo:
+
+        $ json-server --watch db.json    
 
     . Digite o comando abaixo para criar um projeto angular:
 
         $ ng new algamoney-modulo16
+
+    . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
+
+        $ npm install bootstrap@4.5.3 --save
+
+    . Dentro do arquivo .angular-cli.json, encontre o paragrafo style e insira a referência ao 
+        bootstrap:
+
+        ...
+        "styles": [
+            ...
+            "../node_modules/bootstrap/dist/css/bootstrap.css"
+        ],     
+        ...   
+
+    . Execute o comando abaixo na pasta raiz do projeto:
+
+        $ ng c s cidade --spec=false    
+
+    . Acesse o arquivo "src/app/app.module.ts" e insira o código abaixo:
+
+        imports: [
+            ...
+            FormsModule,
+            HttpModule
+        ],
+        providers: [
+            CidadeService
+        ]
+
+    . Acesse o arquivo "src/app/cidade.service.ts" e insira o código abaixo:
+
+        import { Http } from '@angular/http';
+        import { Injectable } from '@angular/core';
+        import 'rxjs/add/operator/toPromise';
+
+        @Injectable()
+        export class CidadeService {
+
+            constructor(private http: Http) { }     // a. Injeção de dependência
+                                                    // b. Obrigatório o import do HttModule no app.module.ts
+
+            consultar() {
+                this.http.get('http://localhost:3000/cidades')   // c. Métodos do componente "http" (get, post, etc)
+                .toPromise()
+                .then(response => {
+                    console.log(response);
+                }
+            }
+        }    
+
+        a. Primeira coisa que devemos fazer é a injeção de dependência do objeto que faz
+            a comunicação com o servidor Rest para acessar os dados.
+
+        b. Para ter acesso desse componente no projeto é obrigatório antes fazer o import da 
+            biblioteca "HttpModule" no arquivo "app.module.ts"
+
+        c. O método ".get( url )" retorna um objeto "Observable" da biblioteca "rsjs". Esse objeto observable é convertido
+            para um "promisse", através do método ".toPromisse()". Para esse método ser válido é preciso fazer o
+            "import 'rxjs/add/operator/toPromise';". 
+
+    . Acesse o arquivo "src/app/app.component.ts" e insira o código abaixo:
+
+        import { CidadeService } from './cidade.service';
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.css']
+        })
+        export class AppComponent {
+
+            cidades = [];
+
+            adicionar(nome: string) {
+                alert(nome);
+            }
+
+            excluir(id: number) {
+                alert(id);
+            }
+
+            atualizar(cidade: any) {
+                alert(JSON.stringify(cidade));
+            }
+        }
+
+    . Adicione um construtor e um método OnInit na classe "app.component.ts":
+
+        ...
+        export class AppComponent implements OnInit {
+        ...
+        constructor(private cidadeService: CidadeService) {}
+        
+        ngOnInit() {
+            this.cidadeService.consultar();
+        }
+        ...
+
+
 
     . Acesse o arquivo "src/app/app.component.html" e insira o código abaixo:
 
@@ -9736,131 +9862,33 @@ Aula 16.3. Fazendo requisição com GET e recebendo o retorno
             </table>
         </div>
 
-    . Acesse o arquivo "src/app/app.component.ts" e insira o código abaixo:
+    . Execute o projeto, acesse o navegador e na área do DevTools (F12) na console acompanhe os resultados
 
-        import { CidadeService } from './cidade.service';
-        import { Component, OnInit } from '@angular/core';
-
-        @Component({
-            selector: 'app-root',
-            templateUrl: './app.component.html',
-            styleUrls: ['./app.component.css']
-        })
-        export class AppComponent implements OnInit {
-
-        cidades = [];
-
-        constructor(private cidadeService: CidadeService) {}
-            ngOnInit() {
-                this.cidadeService.consultar()
-                .then(dados => {
-                    this.cidades = dados;
-                })
-            }
-
-            adicionar(nome: string) {
-                alert(nome);
-            }
-
-            excluir(id: number) {
-                alert(id);
-            }
-
-            atualizar(cidade: any) {
-                alert(JSON.stringify(cidade));
-            }
-        }
-
-    . Acesse o arquivo "src/app/app.module.ts" e insira o código abaixo:
-
-        import { HttpModule } from '@angular/http';
-        import { BrowserModule } from '@angular/platform-browser';
-        import { NgModule } from '@angular/core';
-        import { FormsModule } from '@angular/forms';
-
-        import { AppComponent } from './app.component';
-        import { CidadeService } from './cidade.service';
-
-        @NgModule({
-            declarations: [
-                AppComponent
-            ],
-            imports: [
-                BrowserModule,
-                FormsModule,
-                HttpModule
-            ],
-            providers: [CidadeService],
-            bootstrap: [AppComponent]
-        })
-        export class AppModule { }
-
-    . Execute o comando abaixo na pasta raiz do projeto:
-
-        $ ng c s cidade --spec=false    
-
-    . Acesse o arquivo "src/app/cidade.service.ts" e insira o código abaixo:
-
-        import { Http } from '@angular/http';
-        import { Injectable } from '@angular/core';
-        import 'rxjs/add/operator/toPromise';
-
-        @Injectable()
-        export class CidadeService {
-
-            constructor(private http: Http) { }
-
-            consultar(): Promise<any> {
-                return this.http.get('http://localhost:3000/cidades')
-                .toPromise()
-                .then(response => response.json())
-            }
-        }    
-
-    . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
-
-        $ npm install bootstrap@4.5.3 --save
-
-    . Dentro do arquivo .angular-cli.json, encontre o paragrafo style e insira a referência ao 
-        bootstrap:
+    . Altere o conteúdo do método "consultar" da componente "CidadeService" como abaixo:
 
         ...
-        "styles": [
-            ...
-            "../node_modules/bootstrap/dist/css/bootstrap.css"
-        ],     
-        ...   
+        consultar(): Promise<any> {
+            return this.http.get('http://localhost:3000/cidades')   
+            .toPromise()
+            .then(response => {
+                const cidades = response.json();    // Retorno agora é o response.json()
 
-
-    . Na raiz do projeto crie a pasta "data"
-
-    . Dentro da pasta "data" crie o arquivo db.json com o conteúdo abaixo:
-
-        {
-            "cidades": [
-                {
-                    "nome": "Uberlândia",
-                    "id": 1
-                },
-                {
-                    "nome": "São Paulo",
-                    "id": 2
-                },
-                {
-                    "nome": "Fortaleza",
-                    "id": 3
-                }
-            ]
+                console.log( cidades );
+            })
         }
+        ...
 
-    . Dentro da pasta data execute o comando abaixo:
+    . No componente "app.component.ts" altere o método "ngOnInit()" pelo conteúdo abaixo:
+        ...
+        ngOnInit() {
+            this.cidadeService.consultar()
+                .then( dados => {
+                                    this.cidades = dados;
+                    })
+        }
+        ...
 
-        $ json-server --watch db.json    
-
-TODO: Assistir novamente a aula e realizar as anotações em cada ponto com todos os detalhes.
-
-
-
+    . Execute o projeto e verifique se o formulário está exibindo corretamente as informações.
 
 
 
