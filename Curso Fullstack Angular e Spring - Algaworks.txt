@@ -9995,10 +9995,45 @@ Aula 16.6. Fazendo requisição com PUT
         }
         ...
 
+    . Execute o projeto, tente fazer alguma alteração e veja o resultado.
+
 Aula 16.7. Tratando erros de requisições HTTP
 ---------------------------------------------
 
+    . Acesse o componente "cidade.service.ts" e implemente o código abaixo no método "atualizar":
 
+        ...
+        atualizar(cidade: any): Promise<any> {
+            return this.http.put(`http://localhost:3000/cidades/${cidade.id}`, cidade)
+                .toPromise()
+                .then(response => response.json())
+                .catch(erro => {                                // Acrescentado o método catch
+                    return Promise.reject(`Erro ao alterar cidade ${cidade.id}.`);
+                });
+        }
+        ...
+
+
+    . Acesse o componente "app.component.ts" e implemente o código abaixo no método "atualizar":
+
+        ...
+        atualizar(cidade: any) {
+            this.cidadeService.atualizar(cidade)
+                .then(() => {
+                    alert('Cidade alterada com sucesso!');
+                })
+                .catch(erro => {            // Acrescentado o método "catch"
+                    alert(erro);
+                });
+        }
+        ...
+
+    . Execute o projeto, tente fazer alguma alteração e veja o resultado.
+
+        . No método "atualizar" do componente "cidade.service.ts" altere a URL para forçar o erro.
+            Coloque uma porta inválida, ou o path "/cidade", ao invés de "/cidades".
+
+    . Faça o mesmo tratamento para as demais operações.
 
 
 
