@@ -9946,14 +9946,57 @@ Aula 16.4. Fazendo requisição com POST
 Aula 16.5. Fazendo requisição com DELETE
 ----------------------------------------
 
+    . Acesse o componente "cidade.service.ts" e implemente o código abaixo no método "excluir":
 
+        ...
+        excluir( id: number): Promise<void>{
+            return this.http.delete(`http://localhost:3000/cidades/${id}`)
+                            .toPromisse()
+                            .then( () => null);
+        }
+        ...
 
+    . No componente "app.component.ts" altere o método excluir() conforme abaixo:
 
+        ...
+        excluir( id: number){
+            this.cidadeService.excluir(id)
+                .then( () => {
+                    alert('Cidade excluída com sucesso!');
 
+                    this.consultar();
+                }
+        }
+        ...
 
+Aula 16.6. Fazendo requisição com PUT
+-------------------------------------
 
+    . Acesse o componente "cidade.service.ts" e implemente o código abaixo no método "atualizar":
 
+        ...
+        atualizar( cidade: any ){
+            return this.http.put(`http://localhost:3000/cidades/${id}`)
+                            .toPromisse()
+                            .then( () => null);
+        }
+        ...
 
+    . No componente "app.component.ts" altere o método ataulizar() conforme abaixo:
+
+        ...
+        atualizar( id: number){
+            this.cidadeService.excluir(id)
+                .then( () => {
+                    alert('Cidade alterada com sucesso!');
+
+//                    this.consultar();
+                }
+        }
+        ...
+
+Aula 16.7. Tratando erros de requisições HTTP
+---------------------------------------------
 
 
 
