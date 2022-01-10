@@ -9561,7 +9561,7 @@ Aula 16.2. Instalando e testando o json-server
 
     . Acesse o prompt do SO e execute o comando abaixo:
 
-        sudo npm install -g json-server
+        sudo npm install -g json-server@0.12.0
 
     . Crie uma pasta e dentro dela crie o arquivo db-exemplo.json com o conteúdo abaixo:
 
@@ -9688,9 +9688,26 @@ Aula 16.2. Instalando e testando o json-server
             ]
         }
 
-TODO: Parei aqui
 Aula 16.3. Fazendo requisição com GET e recebendo o retorno
 -----------------------------------------------------------
+
+    . Digite o comando abaixo para criar um projeto angular:
+
+        $ ng new algamoney-modulo16
+
+    . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
+
+        $ npm install bootstrap@4.5.3 --save
+
+    . Dentro do arquivo .angular-cli.json, encontre o paragrafo style e insira a referência ao 
+        bootstrap:
+
+        ...
+        "styles": [
+            ...
+            "../node_modules/bootstrap/dist/css/bootstrap.css"
+        ],     
+        ...   
 
     . Na raiz do projeto crie a pasta "data"
 
@@ -9716,24 +9733,6 @@ Aula 16.3. Fazendo requisição com GET e recebendo o retorno
     . Dentro da pasta data execute o comando abaixo:
 
         $ json-server --watch db.json    
-
-    . Digite o comando abaixo para criar um projeto angular:
-
-        $ ng new algamoney-modulo16
-
-    . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
-
-        $ npm install bootstrap@4.5.3 --save
-
-    . Dentro do arquivo .angular-cli.json, encontre o paragrafo style e insira a referência ao 
-        bootstrap:
-
-        ...
-        "styles": [
-            ...
-            "../node_modules/bootstrap/dist/css/bootstrap.css"
-        ],     
-        ...   
 
     . Execute o comando abaixo na pasta raiz do projeto:
 
@@ -9868,13 +9867,9 @@ Aula 16.3. Fazendo requisição com GET e recebendo o retorno
 
         ...
         consultar(): Promise<any> {
-            return this.http.get('http://localhost:3000/cidades')   
+            return this.http.get('http://localhost:3000/cidades')
             .toPromise()
-            .then(response => {
-                const cidades = response.json();    // Retorno agora é o response.json()
-
-                console.log( cidades );
-            })
+            .then(response => response.json())
         }
         ...
 
@@ -9897,9 +9892,9 @@ Aula 16.4. Fazendo requisição com POST
     . Acesse o componente "cidade.service.ts" e implemente o código abaixo no método "adicionar":
 
         ...
-        adicionar( cidades: any): Promisse<any>{}
+        adicionar( cidades: any): Promise<any>{
 
-            return this.http.post()'http://localhost:3000/cidades', cidades )      // O segund parâmetro representa o body da request
+            return this.http.post()'http://localhost:3000/cidades', cidade )      // O segund parâmetro representa o body da request
                         .toPromise()
                         .then(response => response.json() );
 
@@ -9917,7 +9912,7 @@ Aula 16.4. Fazendo requisição com POST
         }
 
         adicionar( nome: string){
-            this.cidadeService.adicionar( { nome })
+            this.cidadeService.adicionar( { nome } )
                 .then( dado => {
                         alert( `Cidade "${dado.nome}" adicionada com código ${dado.id}` );
          
@@ -9931,6 +9926,9 @@ Aula 16.4. Fazendo requisição com POST
                     executada após o retorno do método "cidadeService.adicionar". Caso colocarmos
                     em outro lugar, a execução do "consultar" será feito em paralelo e não
                     conseguiremos pegar o retorno da inclusão da cidade.
+
+                    No método "this.cidadeSevice.adicionar( { nome } )" tem que ser envidado com "{ }",
+                    pois é um objeto que está sendo enviado.
 
     . No componente "app.component.ts" altere o método ngOnInit() conforme abaixo:
 
@@ -9969,24 +9967,26 @@ Aula 16.5. Fazendo requisição com DELETE
         }
         ...
 
+    . Execute o projeto e tente fazer uma exclusão.
+
 Aula 16.6. Fazendo requisição com PUT
 -------------------------------------
 
     . Acesse o componente "cidade.service.ts" e implemente o código abaixo no método "atualizar":
 
         ...
-        atualizar( cidade: any ){
-            return this.http.put(`http://localhost:3000/cidades/${id}`)
-                            .toPromisse()
-                            .then( () => null);
+        atualizar( cidade: any ): Promise<any>{
+            return this.http.put(`http://localhost:3000/cidades/${cidade.id}`, cidade)
+            .toPromise()
+            .then( () => null );
         }
         ...
 
     . No componente "app.component.ts" altere o método ataulizar() conforme abaixo:
 
         ...
-        atualizar( id: number){
-            this.cidadeService.excluir(id)
+        atualizar( cidade: any ){
+            this.cidadeService.atualizar( cidade )
                 .then( () => {
                     alert('Cidade alterada com sucesso!');
 
@@ -9997,6 +9997,7 @@ Aula 16.6. Fazendo requisição com PUT
 
     . Execute o projeto, tente fazer alguma alteração e veja o resultado.
 
+TODO: Parei aqui
 Aula 16.7. Tratando erros de requisições HTTP
 ---------------------------------------------
 
@@ -10035,6 +10036,10 @@ Aula 16.7. Tratando erros de requisições HTTP
 
     . Faça o mesmo tratamento para as demais operações.
 
+
+
+Aula 17.01. Revisando e iniciando o back-end do projeto do curso
+----------------------------------------------------------------
 
 
 
