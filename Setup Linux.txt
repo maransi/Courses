@@ -151,10 +151,13 @@
 		# Passo opcional caso queira melhorar o nivel de segurança do banco
 		# sudo mysql_secure_installation
 
+		sudo mysql -u root
+
+		ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'brasil2';
+
 		create user 'marco'@'localhost' identified by 'brasil2';
 
 		GRANT ALL PRIVILEGES ON *.* to 'marco'@'localhost' WITH GRANT OPTION;
-
 
 		mysql -u marco -p
 

@@ -10041,6 +10041,36 @@ Aula 16.7. Tratando erros de requisições HTTP
 Aula 17.01. Revisando e iniciando o back-end do projeto do curso
 ----------------------------------------------------------------
 
+    . Acesse a URL https://github.com/algaworks/curso-angular-rest-spring-boot-api e faça o download do projeto
+
+    . Acesse o arquivo zipada baixado, localize e descompacte o projeto da aula 7.9 
+
+    . Abra o projeto pelo IntelliJ.
+
+    . No canto superior direito acesse as opções do Maven.
+
+    . Na toolbar da tela que abrir acesse o botão com o simbolo do Mavem "m".
+
+    . Execute o comando abaixo para gerar o arquivo jar do projeto:
+
+        mvn package
+
+    . No prompt do terminal acesse a subpasta do projeto "target" e execute o comando abaixo:
+
+        java -jar Algamoneu-api-[versao].jar -spring.datasource.username=sa --spring.datasource.password
+
+        // versão criado pelo maven "0.0.1"
+
+    . Acesse o postman e execute a API com os parâmetros abaixo:
+
+        GET     http://localhost:8080/pessoa/api
+
+        Authorization:
+
+            type: Basic Auth
+            Username: admin
+            Password: admin
+
 
 
 
