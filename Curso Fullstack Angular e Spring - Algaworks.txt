@@ -10047,6 +10047,16 @@ Aula 17.01. Revisando e iniciando o back-end do projeto do curso
 
     . Abra o projeto pelo IntelliJ.
 
+    . Acesse o pom.xml e inclua a dependência abaixo:
+
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+
+    . Instale a versão 5.7 do MySQL e deixe a senha do "root" com "root".
+
     . No canto superior direito acesse as opções do Maven.
 
     . Na toolbar da tela que abrir acesse o botão com o simbolo do Mavem "m".
@@ -10063,13 +10073,28 @@ Aula 17.01. Revisando e iniciando o back-end do projeto do curso
 
     . Acesse o postman e execute a API com os parâmetros abaixo:
 
-        GET     http://localhost:8080/pessoa/api
+        GET     http://localhost:8080/lancamentos
 
-        Authorization:
+        Faça um dos procedimentos abaixo:
 
-            type: Basic Auth
-            Username: admin
-            Password: admin
+            Authorization:
+
+                type: Basic Auth
+                Username: admin@algamoney.com
+                Password: admin
+
+            ou
+
+            Headers:
+
+                Authorization: Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==
+
+                . Para conseguir a chave do Authorization, acesse o site https://www.base64encode.org/
+
+                . No campo "Encode to Base64 format" digite "admin@algamoney.com:admin" e mande codificar. O valor
+                    que surgir é o que comporá a expressão do "Authorization".
+
+            
 
 
 
