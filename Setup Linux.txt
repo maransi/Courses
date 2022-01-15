@@ -1080,30 +1080,61 @@ sudo apt install gnome-shell-extension-prefs
 
 32. Instalação do Docker
 
+https://docs.docker.com/get-started/
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04-pt
+
 	. Instalação
 
 		sudo apt install docker.io
 		sudo systemctl enable --now docker
 		sudo usermod -aG docker marco
+		sudo adduser $USER docker
+		sudo chown "$USER":"$USER" /var/run/docker.sock -R
 		docker --version
 
 	. Utilização
 
-		docker ps
-		sudo docker ps
 		docker run hello-world
-		sudo docker run hello-world
+		docker images
+
+		docker ps -a
 		docker stop eb7f2d547904
 		docker ps -a
-		docker rm hello-world
-		docker rm cc7b6a4c73c1
+		docker rm eb7f2d547904
 
 	. Instalação do container do MySQL
 
 		docker pull mysql
-		docker ps
-		docker run -e MYSQL_ROOT_PASSWORD=root --name algamoney -d mysql:5.7
-		docker inspect algamoney | grep IPAddress
-		docker start/restart c342845054d1
-		docker ps
-		docker stop c342845054d1
+		docker images
+
+
+		. Executando o container MySQL criado:
+		
+			. Forma 1 - De forma pura sem nenhuma configuração
+
+				docker run -e MYSQL_ROOT_PASSWORD=root --name algamoney -d mysql:5.7
+
+				docker inspect algamoney | grep IPAddress
+
+				mysql -u root -p -h [ IPAddress "172.17.02" ]			ou 			docker exec -it algamoney bash	
+
+				docker start/restart c342845054d1
+				docker ps
+				docker stop c342845054d1
+
+			. Forma 2 - Acessando o container e executando o MySQL dentro dele
+
+				docker run -e MYSQL_ROOT_PASSWORD=root --name algamoney -d mysql:5.7 				
+					ou 
+				docker start 1fa7691c5482
+
+				docker ps -a
+				docker exec -it algamoney bash	
+				mysql -u root -p
+
+			. Forma 3 - Executando o Container do MySQL no localhost numa porta diferente 3306:
+
+				docker run -e MYSQL_ROOT_PASSWORD=root --name algamoney-1 -d -p 6603:3306 mysql	
+				docker ps
+				mysql -u root -p -h 127.0.0.1 -P 6603
+
