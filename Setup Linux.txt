@@ -1078,3 +1078,32 @@ sudo apt install gnome-shell-extension-prefs
 	sudo apt-get install ncdu
 
 
+32. Instalação do Docker
+
+	. Instalação
+
+		sudo apt install docker.io
+		sudo systemctl enable --now docker
+		sudo usermod -aG docker marco
+		docker --version
+
+	. Utilização
+
+		docker ps
+		sudo docker ps
+		docker run hello-world
+		sudo docker run hello-world
+		docker stop eb7f2d547904
+		docker ps -a
+		docker rm hello-world
+		docker rm cc7b6a4c73c1
+
+	. Instalação do container do MySQL
+
+		docker pull mysql
+		docker ps
+		docker run -e MYSQL_ROOT_PASSWORD=root --name algamoney -d mysql:5.7
+		docker inspect algamoney | grep IPAddress
+		docker start/restart c342845054d1
+		docker ps
+		docker stop c342845054d1
