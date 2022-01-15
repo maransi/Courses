@@ -10041,11 +10041,21 @@ Aula 16.7. Tratando erros de requisições HTTP
 Aula 17.01. Revisando e iniciando o back-end do projeto do curso
 ----------------------------------------------------------------
 
+    . Instale a versão 5.7 do MySQL e deixe a senha do "root" com "root", ou instale um container docker. 
+
+        . Para mais detalhes de como configurar um container docker MySQL, acesse o arquivo "Setup Linux.txt", 
+            acesse o item "32. Instalação do Docker" e siga os passos.
+
     . Acesse a URL https://github.com/algaworks/curso-angular-rest-spring-boot-api e faça o download do projeto
 
     . Acesse o arquivo zipada baixado, localize e descompacte o projeto da aula 7.9 
 
     . Abra o projeto pelo IntelliJ.
+
+    . Caso foi utilizado um container Docker, reconfigure a propriedade "spring.datasource.url" do arquivo 
+        "application.properties", por exemplo:
+
+        spring.datasource.url=jdbc:mysql://172.17.0.2/algamoneyapi?createDatabaseIfNotExist=true&useSSL=false
 
     . Acesse o pom.xml e inclua a dependência abaixo:
 
@@ -10054,8 +10064,6 @@ Aula 17.01. Revisando e iniciando o back-end do projeto do curso
 			<artifactId>jakarta.xml.bind-api</artifactId>
 			<version>2.3.2</version>
 		</dependency>
-
-    . Instale a versão 5.7 do MySQL e deixe a senha do "root" com "root".
 
     . No canto superior direito acesse as opções do Maven.
 
