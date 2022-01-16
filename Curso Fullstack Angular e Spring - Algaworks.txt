@@ -10075,9 +10075,10 @@ Aula 17.01. Revisando e iniciando o back-end do projeto do curso
 
     . No prompt do terminal acesse a subpasta do projeto "target" e execute o comando abaixo:
 
-        java -jar Algamoneu-api-[versao].jar -spring.datasource.username=sa --spring.datasource.password
+        java -jar Algamoneu-api-[versao].jar -spring.datasource.username=root --spring.datasource.password=root --algamoney.origin-permitida=http://localhost:4200
 
-        // versão criado pelo maven "0.0.1"
+        // versão -> criado pelo maven "0.0.1"
+        // --algamoney.origin-permitida=http://localhost:4200 -> Mais a frente este parâmetro permitirá que o navegador faça chamadas para o localhost:8080, ou seja outro endereço
 
     . Acesse o postman e execute a API com os parâmetros abaixo:
 
@@ -10102,7 +10103,149 @@ Aula 17.01. Revisando e iniciando o back-end do projeto do curso
                 . No campo "Encode to Base64 format" digite "admin@algamoney.com:admin" e mande codificar. O valor
                     que surgir é o que comporá a expressão do "Authorization".
 
+    . Execute outras URLs no mesmo padrão do item anterior:
+
+        GET     http://localhost:8080/lancamentos?resumo
+
+        GET     http://localhost:8080/pessoas
+
+        GET     http://localhost:8080/categorias
+
+
+Aula 17.2. Criando o serviço de consulta de lançamentos
+-------------------------------------------------------
+
+    . Montagem do projeto angular:
+
+        git clone https://www.github.com/maransi/algamoney-ui8
+        cd algamoney-ui8
+        git remote set-url origin https://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@github.com/maransi/algamoney-ui8    
+
+        ng serve --open
+
+    . Acesse o projeto angular no VSCode, abra o componente "lancamentos-pesquisa.component.ts" e elimine o valor do 
+        array abaixo:
+
+        ...
+        export class LancamentosPesquisaComponent implements OnInit{
             
+            lancamentos = [];
+
+            constructor( private lancamentoService: LancamentoService){}
+
+            ngOnInit(){
+                this.pesquisar();
+            }
+
+            pesquisar(){
+                this.lancamentoService.pesquisar()
+                    .then( () => null );
+            }
+
+        }
+
+    . Acesse a pasta raiz do projeto angular e crie o serviço lancamento como abaixo:
+
+        . Atenção: Gerar esta class dentro do modulo "Lancamentos"
+
+        ng g s lancamentos/lancamento --spec=false --module=lancamentos
+
+    . Implemente o código abaixo no componente "lancamentos/lancamento.service.ts":
+
+        import { Http, Headers } from '@angular/http';
+        import { Injectable } from @angular/core';
+
+        import 'rxjs/add/operator/toPromise';
+
+        @Injectable()
+        export class LancamentoService{
+
+            lancamentosUrl = 'http://localhost:8080/lancamentos';
+
+            constructor( private Http http){ }
+
+            pesquisar(): Promise{any}{
+                const headers: Headers();
+
+                headers.append("Authorization", "Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
+
+                return this.http.get(`${this.lancamentos}?resumo`, { headers: headers })        // Pode ser passado somente { headers }
+                            .toPromise()
+                            .then( response => {
+                                console.log( response.json() );
+                            });
+            }
+        }
+
+    . Acesse o componente "lancamentos/lancamentos.module.ts" e importe o "HttpModule":
+
+        ... 
+        imports:[
+            ...
+            HttpModule
+        ]
+
+    . Acesse o componente "lancamentos/lancamentos.module.ts" e coloque no "providers" o 
+        "LancamentoService":
+
+        ...
+        providers:[
+            LancamentoService
+        ],
+        ...
+    
+    . Acesse o projeto angular, acesse o componente app.component.html e implemente o código abaixo:
+
+        <app-navbar></app-navbar>
+
+        <app-lancamentos-pesquisa></app-lancamentos-pesquisa>
+
+    . Acesse a pasta raiz do projeto angular e execute o comando abaixo:
+
+        ng serve --open
+
+    . Acesse o navegador e execute a URL http://localhost:4200
+
+    . Acesse a console do navegador e verifique o valor do "content" do "Object"
+
+    . Acesse o componente "lancamentos/lancamento.service.ts" e altere o retorno do método "pesquisar":
+
+            pesquisar(): Promise{any}{
+                const headers: Headers();
+
+                headers.append("Authorization", "Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
+
+                return this.http.get(`${this.lancamentos}?resumo`, { headers: headers })        
+                            .toPromise()
+                            .then( response => response.json().content );   // Linha alterada
+            }
+
+    . Acesse o componente "lancamentos.pesquisa.component.ts" e altere o conteúdo do método "pesquisar":
+
+        export class LancamentosPesquisaComponent implements OnInit{
+
+            ...
+
+            pesquisar(){
+                this.lancamentoService.pesquisar()
+                    .then( lancamentos => this.lancamentos = lancamentos );     // Linha alterada
+            }
+
+        }
+
+    . Acesse o navegador, execute a URL http://localhost:4200 e verifique se o formulário veio com as infs da grid.
+
+
+Aula 17.3. Adicionando filtro por descrição na pesquisa de lançamentos
+----------------------------------------------------------------------    
+
+
+
+
+
+
+
+
 
 
 
