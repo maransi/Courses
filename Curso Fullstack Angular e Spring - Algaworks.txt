@@ -5643,7 +5643,6 @@ Aula 09.13. Iterando com a diretiva ngFor
 
     . Execute o projeto e veja o resultado.
 
-TODO: Revisão
 Aula 09.14. Binding de propriedades customizadas com @Input
 -----------------------------------------------------------
 
@@ -10257,21 +10256,313 @@ Aula 17.2. Criando o serviço de consulta de lançamentos
 Aula 17.3. Adicionando filtro por descrição na pesquisa de lançamentos
 ----------------------------------------------------------------------    
 
+    . Altere o método pesquisa do componente "lancamento.service.ts" e inclua a interface como abaixo:
+
+        import { URLSearchParams } from '@angular/http';    // Import incluido
+        ...
+
+        export interface LancamentoFiltro{                  // Interface incluida
+            descricao: string;
+        }
 
 
+        @Injectable()
+        export class LancamentoService {
+            ...
+            pesquisar( filtro: LancamentoFiltro ): Promise<any>{             // Alterado a assinatura do método
+
+                const headers: Headers = new Headers();
+
+                const parms = new URLSearchParams();                    // Adicionado constante
+
+                headers.append("Authorization","Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
+
+                if (filtro.descricao){
+                    params.set("descricao", filtro.descricao ); 
+                }
+
+                return this.http.get(`${this.lancamentoUrl}?resumo`, { headers: headers, search: params })        // Inclusão do search
+                        .toPromise()
+                        .then( response => response.json().content );
+
+            }
+            ...
+        }
+
+    . Acesse o componente "lancamentos-pesquisa.component.ts" e efetue as alterações abaixo:
+
+        ...
+        export class LancamentosPesquisaComponent implements OnInit{
+            descricao: string;                                              // Inclusão da propriedade
+            ...
+            pesquisar(){
+                this.lancamentoService
+                    .pesquisar( { descricao: this.descricao })              // Alteração na assinatura do método call
+                    .then( lancamentos => this.lancamentos = lancamentos );
+
+            }
+        }
+
+    . Acesse o componente "lancamento-pesquisa.component.html" e realize as alterações abaixo:
+
+        <div class="container">
+            <div class="ui-g">
+                <form autocomplete="off" (ngSubmit)="pesquisar()">      <!-- Linha Incluida -->
+                    <div class="ui-g-12">
+                        <h1>Lançamentos</h1>
+                    </div>
+                    <div class="ui-g-12 ui-fluid">
+                        <label for="descricao">Descrição</label>
+                        <input pInputText 
+                                type="text" 
+                                id="descricao" 
+                                class="p-inputtext-sm"
+                                name="descricao"                <!-- Incluido -->
+                                [(descricao)]="descricao">      <!-- Incluido -->
+                    </div>
+                    <div class="ui-g-12">
+                        <label style="display: block;">Vencimento</label>
+                        <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
+
+                        <label>Até</label>
+                        <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">
+                    </div>
+
+                    <div class="ui-g-12">
+                        <button pButton type="submit" label="Pesquisar" class="p-button-sm"></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="ui-g-12">
+                <app-lancamentos-grid [lancamentos]="lancamentos"></app-lancamentos-grid>
+            </div>
+            <div class="ui-g-12">
+                <button pButton type="submit" label="Novo Lançamento" class="p-button-sm"></button>
+            </div>
+        </div>
+
+    . Levante:
+    
+        . O container docker com o banco de dados:
+
+            docker start algamoney3
+
+        . O projeto Restful:
+
+            java -jar algamoney-api-1.0.0-SNAPSHOT.jar --algamoney.origin-permitida=http://localhost:4200
+
+        . O projeto angular:
+
+            ng serve --open
+
+    . Execute o projeto no navegador e verifique se está funcionando a pesquisa por descricao.
 
 
+Aula 17.4. Adicionando filtro por datas na pesquisa de lançamentos
+------------------------------------------------------------------
+
+    . Acesse a pasta raiz do projeto e instale a biblioteca "moment.js", ela servirá para colocar a data
+        no padrão das nossas APIs "yyyy-mm-dd".
+
+        npm i moment@2.19.4 --save
+
+        . Essa é a versão de 2018 
+
+    . Acesse o componente "lancamentos-pesquisa.component.ts" e efetue as alterações abaixo:
+
+        ...
+        export class LancamentosPesquisaComponent implements OnInit{
+            descricao: string;                                              
+            dataVencimentoInicio: Date;             // Inclusão da propriedade
+            dataVencimentoFim: Date;            // Inclusão da propriedade
+
+            pesquisar(){
+                const filtro: LancamentoFiltro = {                  // Objeto incluido
+                    descricao: this.descricao,
+                    dataVencimentoInicio: this.dataVencimentoInicio,
+                    dataVencimentoFim: this.dataVencimentoFim
+                };
+                this.lancamentoService
+                    .pesquisar( filtro )              // Alteração na assinatura do método call
+                    .then( lancamentos => this.lancamentos = lancamentos );
+
+            }
 
 
+    . Altere interface "LancamentoFiltro" do componente "lancamento.service.ts"  como abaixo:
 
 
+        import * as moment from 'moment';  
+        ...
+
+        export interface LancamentoFiltro{                  
+            descricao: string;
+            dataVencimentoInicio: Date;             // Inclusão da propriedade
+            dataVencimentoFim: Date;            // Inclusão da propriedade
+        }
 
 
+        @Injectable()
+        export class LancamentoService {
+            ...
+            pesquisar( filtro: LancamentoFiltro ): Promise<any>{             
 
+                ...
+                if (filtro.descricao){
+                    params.set("descricao", filtro.descricao ); 
+                }
 
+                if (filtro.dataVencimentoInicio){
+                    params.set("descricao", filtro.descricao ); 
+                    params.set("dataVencimentoDe", moment(filtro.dataVencimentoInicio).format("YYYY-MM-DD") );   // Inclusão do parâmetro
+                }
 
+                if (filtro.dataVencimentoFim){
+                    params.set("descricao", filtro.descricao ); 
+                    params.set("dataVencimentoAte", moment(filtro.dataVencimentoFim).format("YYYY-MM-DD") );     // Inclusão do parâmetro
+                }
+                ...
 
+    . Acesse o componente "lancamento-pesquisa.component.html" e realize as alterações abaixo:
 
+        <div class="ui-g-12">
+            <label style="display: block;">Vencimento</label>
+            <!-- <input pInputText type="text" class="p-inputtext-sm" style="width:95px;">          Apagar essa linha -->
+            
+            <!-- Incluido -->
+            <p-calendar dateForma="dd/mm/yy"                                            
+                        [inputStyle]="{width: '95px'}"
+                        name="vencimentoInicio"
+                        [(ngModel)]="dataVencimentoInicio"></p-calendar>
+
+            <label>Até</label>
+            <!-- <input pInputText type="text" class="p-inputtext-sm" style="width:95px">          Apagar essa linha -->
+            
+            <!-- Incluido -->
+            <p-calendar dateFormat="dd/mm/yy"
+                        [inputStyle] = "{width: '95px'}"
+                        name="vencimentoFim"
+                        [(ngModel)]="dataVencimentoFim"></p-calendar>
+        </div>
+
+    . Execute o projeto e verifique se a página está funcionando com todos os parâmetros de pesquisa, 
+        principalmente com os campos datas.
+
+TODO: Parei aqui
+Aula 17.5. Implementando a paginação no serviço de lançamentos
+--------------------------------------------------------------
+
+    . Acesse o componente "lancamento.service.ts" e altere a interface "LancamentoFiltro":
+
+        export class LancamentoFiltro{          // Alteração de interface para classe
+            descricao: string;
+            dataVencimentoInicio: Date;
+            dataVencimentoFim: Date;
+
+            pagina = 0;                         // Inclusão
+            itensPorPagina = 5;                 // Inclusão
+        }
+
+    . Acesse o componente "lancamento.service.ts" e altere o método "pesquisar":
+
+        pesquisar( filtro: LancamentoFiltro): Promise<any>{
+            ...
+
+            params.set("page", filtro.pagina.toString() );          // Inclusão
+            params.set("size", filtro.itensPorPagina.toString() );  // Inclusão
+
+            if ( filtro.descricao ){ ... }
+
+            ...
+        }
+
+    . Acesse o componente "lancamento.pesquisa.component.ts" e faça a mudança das propriedades de 
+        pesquisa pela classe criada no primeiro passo:
+
+        export class LancamentoPesquisaComponent implements OnInit{
+
+            /*  Apagar
+            descricao: string;
+            dataVencimentoInicio: Date;
+            dataVencimentoFim: Date;
+            */
+
+            filtro = new LancamentoFiltro();
+
+            ...
+            pesquisar(){
+                /* Apagar
+                const filtro: LancamentoFiltro = {
+                    descricao: this.descricao,
+                    dataVencimentoInicio: this.dataVencimentoInicio,
+                    dataVencimentoFim: this.dataVencimentoFim
+                };
+                */
+
+                this.lancamentoService
+                    .pesquisar( this.filtro )           // Alterado
+                    .then( resultado => {
+                            this.lancamentos = resultado.lancamento;
+                    });
+
+            }
+
+        }
+
+    . Acesse o componente "lancamentos.pesquisa.component.html" e faça as alterações abaixo:
+
+        <div class="ui-g-12 ui-fluid">
+            <label for="descricao">Descrição</label>
+            <input pInputText 
+                    type="text" 
+                    id="descricao" 
+                    class="p-inputtext-sm"
+                    name="descricao"
+                    [(ngModel)] = "filtro.descricao">   <!-- Alterado -->
+        </div>
+        <div class="ui-g-12">
+            <label style="display: block;">Vencimento</label>
+            <p-calendar dateFormat="dd/mm/yy"
+                        [inputStyle]="{width: '95px'}"
+                        name="vencimentoInicio"
+                        [(ngModel)]="filtro.dataVencimentoInicio"></p-calendar> <!- Alterado -->
+            <label>Até</label>
+            <p-calendar dateFormat="dd/mm/yy"
+                        [inputStyle]="{width: '95px'}"
+                        name="vencimentoFim"
+                        [(ngModel)]="filtro.dataVencimentoFim"></p-calendar> <!-- Alterado -->
+        </div>
+
+    . Execute o projeto no navegador e perceba que está vindo somente a primeira página.
+
+    . Acesse o componente "lancamento.service.ts" e altere o método "pesquisar" como abaixo:
+
+        pesquisar( filtro: LancamentoFiltro ): Promise<any>{
+
+            ...
+            /*
+            return this.http.get(`${this.lancamentoUrl}?resumo`, { headers: headers, search: params  })        // Pode ser passado somente { headers }
+                    .toPromise()
+                    .then( response => response.json().content );
+            */
+
+            return this.http.get(`${this.lancamentoUrl}?resumo`, { headers: headers, search: params  })        // Pode ser passado somente { headers }
+                    .toPromise()
+                    .then( response => {
+                            const responseJson = response.json();
+                            const lancamentos = responseJson.content;
+
+                            const resultado = {
+                                lancamentos,
+                                total: responseJson.totalElements
+                            };
+
+                            return resultado;
+                    });
+        }
 
 
 
