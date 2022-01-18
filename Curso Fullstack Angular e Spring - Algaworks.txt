@@ -9559,6 +9559,14 @@ Aula 15.8. Como funciona o Injetor Hierárquico
 Aula 16.2. Instalando e testando o json-server
 ----------------------------------------------
 
+    Excelente exemplo de Crud:
+
+        https://medium.com/@fernandoevangelista_28291/consumindo-api-rest-com-httpclient-no-angular-8-62c5d733ffb6
+
+    Exemplos de como funciona HttpClient, Observable
+
+        https://www.telerik.com/blogs/angular-basics-how-to-use-httpclient    
+
     . Acesse o prompt do SO e execute o comando abaixo:
 
         sudo npm install -g json-server@0.12.0
@@ -10115,6 +10123,10 @@ Aula 17.01. Revisando e iniciando o back-end do projeto do curso
 Aula 17.2. Criando o serviço de consulta de lançamentos
 -------------------------------------------------------
 
+    Exemplos de como funciona HttpClient, Observable
+
+        https://www.telerik.com/blogs/angular-basics-how-to-use-httpclient    
+
     . Montagem do projeto angular:
 
         git clone https://www.github.com/maransi/algamoney-ui8
@@ -10123,15 +10135,15 @@ Aula 17.2. Criando o serviço de consulta de lançamentos
 
         ng serve --open
 
-    . Acesse o projeto angular no VSCode, abra o componente "lancamentos-pesquisa.component.ts" e elimine o valor do 
-        array abaixo:
+    . Acesse o projeto angular no VSCode, abra o componente "lancamentos-pesquisa.component.ts", elimine o valor do 
+        array abaixo e implemente os demais métodos:
 
         ...
         export class LancamentosPesquisaComponent implements OnInit{
             
             lancamentos = [];
 
-            constructor( private lancamentoService: LancamentoService){}
+            constructor( @Inject(LancamentoService) private lancamentoService){}
 
             ngOnInit(){
                 this.pesquisar();
@@ -10162,10 +10174,10 @@ Aula 17.2. Criando o serviço de consulta de lançamentos
 
             lancamentosUrl = 'http://localhost:8080/lancamentos';
 
-            constructor( private Http http){ }
+            constructor( private http: Http){ }
 
-            pesquisar(): Promise{any}{
-                const headers: Headers();
+            pesquisar(): Promise<any>{
+                const headers: Headers = new Headers();
 
                 headers.append("Authorization", "Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
 
@@ -10185,7 +10197,7 @@ Aula 17.2. Criando o serviço de consulta de lançamentos
             HttpModule
         ]
 
-    . Acesse o componente "lancamentos/lancamentos.module.ts" e coloque no "providers" o 
+    . Acesse o componente "lancamentos.module.ts" e coloque no "providers" o 
         "LancamentoService":
 
         ...
@@ -10199,6 +10211,11 @@ Aula 17.2. Criando o serviço de consulta de lançamentos
         <app-navbar></app-navbar>
 
         <app-lancamentos-pesquisa></app-lancamentos-pesquisa>
+
+    . Certifique-se que o projeto restful está ativo com os parâmetros abaixo, especial atenção para o 
+        "--algamoney.origin-permitida=http://localhost:4200" senão dará problema de CORS:
+
+        java -jar Algamoneu-api-[versao].jar -spring.datasource.username=root --spring.datasource.password=root --algamoney.origin-permitida=http://localhost:4200
 
     . Acesse a pasta raiz do projeto angular e execute o comando abaixo:
 
@@ -10232,6 +10249,7 @@ Aula 17.2. Criando o serviço de consulta de lançamentos
             }
 
         }
+
 
     . Acesse o navegador, execute a URL http://localhost:4200 e verifique se o formulário veio com as infs da grid.
 
