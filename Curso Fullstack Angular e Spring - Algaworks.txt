@@ -10568,7 +10568,72 @@ TODO: Parei aqui
 Aula 17.6. Configurando a paginação lazy do PrimeNG
 ---------------------------------------------------
 
+    . Acesse o componente "lancamentos-pesquisa.component.ts" e acrescente o código abaixo:
 
+        import{ LazyLoadEvent } from 'primeng/components/commom/api'     // Linha incluida
+        ...
+        export class LancamentosPesquisaComponent implements OnInit {
+
+            totalRegistros = 0;                 // Linha incluida
+            filtro = new LancamentoFiltro();
+
+            ...
+
+            ngOnInit(){
+                // this.pesquisar();      // Eliminar linha
+            }
+
+            pesquisar( pagina = 0 ){            // Linha alterada
+                this.filtro.pagina = pagina     // Linha incluida
+
+                this.lancamentoService
+                    .pesquisar( this.filtro )
+                    .then( resultado => {
+                        this.totalRegistros = resultado.total;      // Linha incluida
+                        this.lancamentos = resultado.lancamentos;
+                    });
+            }
+
+            // Método incluido
+            aoMudaPagina( event: LazyLoadEvent ): void{
+                const pagina = event.first / event.rows;
+
+                this.pesquisar( pagina );
+            }
+        }
+
+    . Acesse o componente "lancamentos-pesquisa.component.html" e implemente o código abaixo:
+
+
+        <div class="container">
+            <div class="ui-g-12">
+
+            <!--    ATENÇÃO: Pegue o código do componente lancamentos-grid.component.ts e substitua no lugar da tag abaixo
+                <app-lancamentos-grid [lancamentos]="lancamentos"></app-lancamentos-grid>
+            -->    
+
+                <p-dataTable [value]="lancamentos" 
+                                [paginator]=true 
+                                [rows]="filtro.itensPorPagina"                  // Linha Alterada
+                                [responsive]="true"
+                                emptyMessage = "Nenhum registro encontrado"     // Linha Incluida
+                                [lazy] = "true"                                 // Linha Incluida
+                                [totalRecords] = "totalRegistros"               // Linha Incluida
+                                (onLazyLoad) = "aoMudaPagina( $event )">        // Linha Incluida
+                            ...
+                </p-dataTable>
+            </div>
+        </div>
+
+        . A mudança do codigo da grid html para a pesquisa seria para facilitar na comunicações de todas
+            propriedades do componente lancamentos-pesquisa.component.ts com lancamento-pesquisa.component.html 
+            (filtro, totais, etc)
+
+    . Execute o projeto no navegador e examine se a paginação está funcionando.
+
+
+17.7. Desafio: criando a consulta e listagem de pessoas
+-------------------------------------------------------    
 
 
 
