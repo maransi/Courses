@@ -10140,7 +10140,7 @@ Aula 17.2. Criando o serviço de consulta de lançamentos
         ...
         export class LancamentosPesquisaComponent implements OnInit{
             
-            lancamentos = [];
+            lancamentos = [];       // Linha Incluida
 
             constructor( @Inject(LancamentoService) private lancamentoService){}
 
@@ -10564,7 +10564,6 @@ Aula 17.5. Implementando a paginação no serviço de lançamentos
                     });
         }
 
-TODO: Parei aqui
 Aula 17.6. Configurando a paginação lazy do PrimeNG
 ---------------------------------------------------
 
@@ -10634,6 +10633,188 @@ Aula 17.6. Configurando a paginação lazy do PrimeNG
 
 17.7. Desafio: criando a consulta e listagem de pessoas
 -------------------------------------------------------    
+
+    . Acesse o componente "pessoa-pequisa.component.ts" e elimine o conteúdo da coleção "pessoas":
+
+          pessoas: any[] ;
+
+    . Acesse o método OnInit do componente "pessoa-pesquisa.component.ts" e deixe sem conteúdo:
+
+        ...
+        ngOnInit() {
+
+        }
+        ...
+
+    . Acesse a pasta raiz do projeto e crie o componente "pessoa-service.ts" como abaixo:
+
+        ng g s pessoas/pessoa --spec=false --module=pessoas
+
+    . Acesse o componente "pessoa-service.ts" e copie  o código abaixo:
+
+        import { Injectable } from '@angular/core';
+        import { Http, Headers } from '@angular/http';
+        import { HttpClient, HttpHeaders } from '@angular/common/http';
+        import { Observable } from 'rxjs/Observable';
+        import { Lancamento } from 'app/domain/lancamento';
+        import { URLSearchParams} from '@angular/http';
+        import * as moment from 'moment';
+
+        export class PessoaFiltro{
+            nome: string;
+
+            pagina = 0;
+            itensPorPagina = 3;
+        }
+
+
+        @Injectable()
+        export class PessoaService {
+
+            pessoaUrl = 'http://localhost:8080/pessoas';
+
+            constructor( private http: Http) { }
+
+            pesquisar( filtro: PessoaFiltro ): Promise<any>{
+
+                const headers: Headers = new Headers();
+
+                const params = new URLSearchParams();
+
+                headers.append("Authorization","Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
+
+                params.set("page", filtro.pagina.toString() );
+                params.set("size", filtro.itensPorPagina.toString());
+
+                if ( filtro.nome ){
+                params.set("nome", filtro.nome );
+                }
+
+                return this.http.get(`${this.pessoaUrl}?resumo`, { headers: headers, search: params  })        // Pode ser passado somente { headers }
+                        .toPromise()
+                        .then( response => {
+                                        const responseJson = response.json();
+                                        const pessoas = responseJson.content;
+
+                                        const resultado = {
+                                            pessoas,
+                                            total: responseJson.totalElements
+                                        };
+
+                                        return resultado;
+                                });
+            }
+
+        }
+
+    . Acesse o component "pessoa-pesquisa.component.ts" e transfira o código abaixo:
+
+        import { Component, Inject, OnInit } from '@angular/core';
+        import { Pessoa } from 'app/domain/pessoa';
+        import { PessoaFiltro, PessoaService } from '../pessoa.service';
+        import { LazyLoadEvent } from 'primeng/components/common/api';
+
+        @Component({
+            selector: 'app-pessoas-pesquisa',
+            templateUrl: './pessoas-pesquisa.component.html',
+            styleUrls: ['./pessoas-pesquisa.component.css']
+        })
+        export class PessoasPesquisaComponent implements OnInit {
+
+            pessoas: Pessoa[] ;
+
+            totalRegistros = 0;
+
+            filtro = new PessoaFiltro();
+
+            constructor(@Inject( PessoaService ) private pessoaService) { }
+
+            ngOnInit() {
+            }
+
+            pesquisar( pagina = 0 ){
+                this.filtro.pagina = pagina;
+
+                this.pessoaService
+                    .pesquisar( this.filtro )
+                    .then( resultado => {
+                        this.totalRegistros = resultado.total;
+                        this.pessoas = resultado.pessoas;
+                    });
+            }
+
+            aoMudarPagina( event: LazyLoadEvent ){
+                const pagina = event.first / event.rows;
+
+                this.pesquisar( pagina );
+            }
+        }
+
+    . Acesse o componente "pessoa.pesquisa.component.html" e transfira o código abaixo:
+
+        <div class="container">
+            <form autocomplete="off"
+                    (ngSubmit) = "pesquisar()">
+                <div class="ui-g">
+                <div class="ui-g-12">
+                    <h1>Pessoas</h1>
+                </div>
+
+                <div class="ui-g-12 ui-fluid">
+                    <label>Nome</label>
+                    <input type="text"
+                            pInputText
+                            id="nome"
+                            class="p-inputtext-sm"
+                            name="nome"
+                            [(ngModel)]="filtro.nome">
+                </div>
+
+                <div class="ui-g-12">
+                    <button pButton
+                            type="submit"
+                            label="Pesquisar"
+                            class="p-button-sm"></button>
+                </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="container">
+            <div class="ui-g-12">
+                <p-dataTable [value]="pessoas"
+                            [paginator]=true
+                            [rows]="filtro.itensPorPagina"
+                            [responsive]=true
+                            emptyMessage = "Nenhum registro encontrado"
+                            [lazy]=true
+                            [totalRecords]="totalRegistros"
+                            (onLazyLoad) = "aoMudarPagina( $event )">
+                <p-column field="nome" header="Nome" ></p-column>
+                <p-column field="cidade" header="Cidade"></p-column>
+                <p-column field="estado" header="Estado"></p-column>
+                <p-column field="status" header="Status"></p-column>
+                <p-column styleClass="col-acoes">
+                    <ng-template pTemplate="body">
+                    <a pButton icon="fa-pencil" pTooltip="Editar" tooltipPosition="top"></a>
+                    <a pButton icon="fa-trash" pTooltip="Eliminar" tooltipPosition="top"></a>
+                    </ng-template>
+                </p-column>
+                </p-dataTable>
+            </div>
+
+            <div class="ui-g-12">
+                <button pButton
+                        class="p-button-sm"
+                        type="submit"
+                        label="Nova Pessoa"></button>
+            </div>
+        </div>
+
+
+TODO: Parei aqui
+Aula 17.8. Excluindo lançamentos e o decorador @ViewChild
+---------------------------------------------------------
 
 
 
