@@ -10816,8 +10816,206 @@ TODO: Parei aqui
 Aula 17.8. Excluindo lançamentos e o decorador @ViewChild
 ---------------------------------------------------------
 
+    . Acesse o componente "lancamento.service.ts" e inclua o método abaixo:
 
+        ...
+        excluir( codigo: number ): Promise<void{
+            const headers = new Headers();
 
+            headers.append("Authorization",""Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
+
+            return this.http.delete(`${this.lancamentoUrl}/${codigo}`, { headers: headers })        // Pode ser passado somente { headers }
+                        .toPromise()
+                        .then( () => null );
+        }
+        ...
+
+    . Acesse o componente "lancamento-pesquisa.component.ts" e inclua o método abaixo:
+
+        export class LancamentosPesquisaComponent implements OnInit{
+            @ViewChid('tabela') grid;           // Incluido
+            ...
+            excluir( lancamento: any ){         // Inlcuido
+                this.lancamentoService.excluir( lancamento.codigo )
+                    .then( () => {
+                        if ( this.grid.first === 0 ){
+                            this.pesquisar();
+                        } else {
+                            this.grid.first = 0;
+                        }
+                    })
+            }
+            ...
+        }
+
+    . Acesse o componente "lancamento-pesquisa.component.html" e realize a alteração abaixo:
+
+    <p-dataTable [value]="lancamentos" 
+                  [paginator]=true 
+                  [rows]="filtro.itensPorPagina"
+                  [responsive]="true"
+                  emptyMessage = "Nenhum registro encontrado"
+                  [lazy] = true
+                  [totalRecords] = "totalRegistros"
+                  (onLazyLoad) = "aoMudarPagina( $event )"
+                  #tabela>      <!-- Incluido -->
+        ...
+        <p-column styleClass="col-acoes">
+            <ng-template 
+                let-lanc="rowData"      <!-- Incluido ->
+                pTemplate="body">
+                <a pButton icon="fa-pencil" pTooltip="Editar" tooltipPosition="top"></a>
+                <a pButton icon="fa-trash"  
+                    pTooltip="Eliminar" 
+                    tooltipPosition="top"
+                    (click)="excluir(lanc)"></a>    <!-- Incluido -->
+            </ng-template>
+        </p-column>
+        ...
+
+    . Teste a aplicação no navegador.
+
+Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
+-------------------------------------------------------------
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        npm install ng2-toasty --save
+
+        . Verifique se a versão atual será compativel com o projeto
+
+    . Acesse o componente "app.module.ts" e faça o import do "toasty":
+
+        import { ToastyModule } from 'ng2-toasty';
+        ...
+        import: [
+            ...
+            ToastyModule.forRoot(),
+        ]
+
+    . Acesse o arquivo "app.component.ts" e implemente o construtor:
+
+        ...
+        export class AppComponent{
+
+            constructor( private toastyConfig: ToastyConfig ){
+                this.toastyConfig.theme = "bootstrap";
+            }
+        }
+
+    . Acesse o arquivo .angular-cli.json e registre o style do "toasty":
+
+        ...
+        style: [
+            ...
+            "../node_modules/ng2-toasty/style-bootstrap.css"
+        ]
+
+    . Acesse o arquivo "app.component.html" e acrescente a tag abaixo:
+
+        ...
+        <ng2-toasty></ng2-toasty>
+
+    . Acesse o componente "lancamentos-pesquisa.component.ts" e faça a injeção do "toasty":
+
+        ...
+        constructor( private lancamentoService: LancamentoService,
+                    private toasty: ToastyService ){}
+        ...
+        excluir( lancamento: any ){         // Inlcuido
+            this.lancamentoService.excluir( lancamento.codigo )
+                .then( () => {
+                    if ( this.grid.first === 0 ){
+                        this.pesquisar();
+                    } else {
+                        this.grid.first = 0;
+                    }
+
+                    this.toasty.success("Lançamento excluído com sucesso")
+                });
+        }
+        ...
+
+    . Teste a aplicação no navegador.
+
+17.10. Adicionando diálogo de confirmação antes da exclusão
+-----------------------------------------------------------
+
+    . Acesse o componente "app.module.ts" e faça o import do "ConfirmDialog" e o provider:
+
+        import { ConfirmDialogModule } from 'primeng/components/confirmdialog/confirmdialog';
+        import { ConfirmationSErvice} from 'primeng/components/common/api';
+        ...
+        import: [
+            ...
+            ConfirmDialogModule,
+        ],
+        providers:[
+            ...
+            ConfirmationService
+        ]
+
+    . Acesse o componente "lancamentos-pesquisa.component.ts" e faça a injeção do "confirmationService":
+
+        ...
+        constructor( private lancamentoService: LancamentoService,
+                    private toasty: ToastyService,
+                    private confirmationService: ConfirmationService ){}    // Incluido
+        ...
+        confirmarExclusao( lancamento: any){
+            this.confirmation.confirm( {
+                message: "Tem certeza que deseja excluir?",
+                accept: () => {
+                    this.excluir( lancamento );
+                }
+            });
+        }
+        ...
+
+    . Acesse o componente "lancamento-pesquisa.component.html" e realize a alteração abaixo:
+
+        <p-dataTable [value]="lancamentos" 
+                    [paginator]=true 
+                    [rows]="filtro.itensPorPagina"
+                    [responsive]="true"
+                    emptyMessage = "Nenhum registro encontrado"
+                    [lazy] = true
+                    [totalRecords] = "totalRegistros"
+                    (onLazyLoad) = "aoMudarPagina( $event )"
+                    #tabela>      
+            ...
+            <p-column styleClass="col-acoes">
+                <ng-template 
+                    let-lanc="rowData"      
+                    pTemplate="body">
+                    <a pButton icon="fa-pencil" pTooltip="Editar" tooltipPosition="top"></a>
+                    <a pButton icon="fa-trash"  
+                        pTooltip="Eliminar" 
+                        tooltipPosition="top"
+                        (click)="confirmarExclusao(lanc)"></a>           <!-- Alterado -->
+                </ng-template>
+            </p-column>
+            ...
+
+    . Acesse o arquivo "app.component.html" e acrescente a tag abaixo:
+
+        ...
+        <p-confirmDialog header="Confirmação">
+                        icon="fa fa-question-circle"
+                        #confirmacao>
+            <p-footer>
+                <button type="button" 
+                        pButton 
+                        icon="fa-check" 
+                        label="Sim"
+                        (click)="confirmacao.accept()"></button>
+                <button type="button" 
+                        pButton 
+                        icon="fa-times" 
+                        label="Não"
+                        (click)="confirmacao.reject()"></button>
+            </p-footer>                
+        </p-confirmDialog>
 
 
 
