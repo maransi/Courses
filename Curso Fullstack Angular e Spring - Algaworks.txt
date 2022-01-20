@@ -10004,7 +10004,6 @@ Aula 16.6. Fazendo requisição com PUT
 
     . Execute o projeto, tente fazer alguma alteração e veja o resultado.
 
-TODO: Parei aqui
 Aula 16.7. Tratando erros de requisições HTTP
 ---------------------------------------------
 
@@ -10793,7 +10792,14 @@ Aula 17.6. Configurando a paginação lazy do PrimeNG
                 <p-column field="nome" header="Nome" ></p-column>
                 <p-column field="cidade" header="Cidade"></p-column>
                 <p-column field="estado" header="Estado"></p-column>
-                <p-column field="status" header="Status"></p-column>
+                <p-column field="ativo" header="Status">
+                    <ng-template let-pes="rowData" pTemplate="body">
+                        <a href="javascript:;" [pTooltip]="pes.ativo ? 'Desativar' : 'Ativar'"
+                            tooltipPosition="top">
+                        {{ pes.ativo ? 'Ativo' : 'Inativo' }}
+                        </a>
+                    </ng-template>
+                </p-column>
                 <p-column styleClass="col-acoes">
                     <ng-template pTemplate="body">
                     <a pButton icon="fa-pencil" pTooltip="Editar" tooltipPosition="top"></a>
@@ -10812,17 +10818,22 @@ Aula 17.6. Configurando a paginação lazy do PrimeNG
         </div>
 
 
-TODO: Parei aqui
 Aula 17.8. Excluindo lançamentos e o decorador @ViewChild
 ---------------------------------------------------------
+
+    . Acesse o componente "app.component.html" e atualize com o código abaixo:
+
+        <app-navbar></app-navbar>
+
+        <app-lancamentos-pesquisa></app-lancamentos-pesquisa> 
 
     . Acesse o componente "lancamento.service.ts" e inclua o método abaixo:
 
         ...
-        excluir( codigo: number ): Promise<void{
+        excluir( codigo: number ): Promise<void>{
             const headers = new Headers();
 
-            headers.append("Authorization",""Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
+            headers.append("Authorization","Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
 
             return this.http.delete(`${this.lancamentoUrl}/${codigo}`, { headers: headers })        // Pode ser passado somente { headers }
                         .toPromise()
@@ -10895,6 +10906,7 @@ Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
 
     . Acesse o arquivo "app.component.ts" e implemente o construtor:
 
+        import { ToastyConfig } from 'ng2-toasty';
         ...
         export class AppComponent{
 
@@ -10938,6 +10950,7 @@ Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
 
     . Teste a aplicação no navegador.
 
+TODO: Parei aqui
 17.10. Adicionando diálogo de confirmação antes da exclusão
 -----------------------------------------------------------
 
