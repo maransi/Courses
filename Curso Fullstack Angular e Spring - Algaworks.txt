@@ -10950,7 +10950,6 @@ Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
 
     . Teste a aplicação no navegador.
 
-TODO: Parei aqui
 17.10. Adicionando diálogo de confirmação antes da exclusão
 -----------------------------------------------------------
 
@@ -10976,7 +10975,7 @@ TODO: Parei aqui
                     private confirmationService: ConfirmationService ){}    // Incluido
         ...
         confirmarExclusao( lancamento: any){
-            this.confirmation.confirm( {
+            this.confirmationService.confirm( {
                 message: "Tem certeza que deseja excluir?",
                 accept: () => {
                     this.excluir( lancamento );
@@ -11029,6 +11028,54 @@ TODO: Parei aqui
                         (click)="confirmacao.reject()"></button>
             </p-footer>                
         </p-confirmDialog>
+
+    . Execute o projeto e verifique se o Dialog de confirmação no botão de exclusão está funcionando.
+
+TODO: Parei aqui
+Aula 17.11. Alterando o locale da aplicação para pt-BR
+------------------------------------------------------
+
+    . Na pasta raiz do projeto execute o comando abaixo:
+
+        ng g s core/error-handler --spec=false --module=core
+
+    . Acesse o arquivo "core/core.module.ts" e implemente o código abaixo:
+
+        ...
+        exports:[
+            ...
+            ToastyModule,
+            ConfirmDialogModule
+        ]
+        providers: [
+            ErrorHandlerService,
+            {provide: LOCALE_ID, useValue: 'pt-BR'}            
+        ]
+        ...
+
+    . Acesse o componente "app.module.ts" e elimine a importação abaixo:
+
+        imports:[
+            ...
+//            ToastyModule.forRoot(),
+//            ConfirmDialogModule,
+            ...
+        ]
+
+    . Acesse o arquivo "core/core.module.ts" e importe os módulos abaixo:
+
+        import { ToastyModule } from 'ng2-toasty';
+        ...
+        imports:[
+            ...
+            ToastyModule.forRoot(),
+            ConfirmDialogModule,
+            ...
+        ]
+
+    . Execute o projeto e verifique se tudo continua funcionando.
+
+6 minutos
 
 
 
