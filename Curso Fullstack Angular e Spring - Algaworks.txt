@@ -11032,8 +11032,8 @@ Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
     . Execute o projeto e verifique se o Dialog de confirmação no botão de exclusão está funcionando.
 
 TODO: Parei aqui
-Aula 17.11. Alterando o locale da aplicação para pt-BR
-------------------------------------------------------
+17.12. Criando um serviço de tratamento de erros
+------------------------------------------------
 
     . Na pasta raiz do projeto execute o comando abaixo:
 
@@ -11075,9 +11075,194 @@ Aula 17.11. Alterando o locale da aplicação para pt-BR
 
     . Execute o projeto e verifique se tudo continua funcionando.
 
-6 minutos
+    . Implemente o código abaixo no arquivo "error-handler.service.ts":
+
+        import { Injectable } from '@angular/core';
+
+        @Injectable()
+        export class ErrorHandlerService{
+
+            constructor( @Inject(ToastService) private toast){
+
+            }
+
+            handle( errorResponse: any){
+                let msg: string;
+
+                if ( typeof errorResponse === 'string' ){
+                    msg = errorResponse;
+                }else{
+                    msg = 'Erro ao processar serviço remoto. Tente novamente';
+
+                    console.log('Ocorreu um erro', errorResponse);
+                }
+
+                this.toasty.error( msg );
+            }
+        }
+
+    . Acesse o componente "lancamentos-pesquisa.component.ts" e implemente o código abaixo:
+
+        ...
+        @Component({
+            selector: 'app-lancamentos-pesquisa',
+            templateUrl: './lancamentos-pesquisa.component.html',
+            styleUrls: ['./lancamentos-pesquisa.component.css']
+        })
+        export class LancamentosPesquisaComponent implements OnInit {
+            ...
+
+            constructor( @Inject(LancamentoService) private lancamentoService,
+                            @Inject(ToastyService) private toasty,
+                            @Inject(ConfirmationService) private confirmationService
+                            @Inject( ErrorHandlerService) private errorHandler ){}      // Inlcuido
+
+            pesquisar( pagina = 0 ){
+
+                this.filtro.pagina = pagina;
+
+                this.lancamentoService
+                        .pesquisar( this.filtro )
+                        .then( resultado => {
+                        this.totalRegistros = resultado.total;
+                        this.lancamentos = resultado.lancamentos;
+                        })
+                        .catch( erro => this.errorHandler.handle(erro) );   // Inlcluido
+            }
+
+            ...
+            excluir( lancamento: any ){
+                this.lancamentoService.excluir( lancamento.codigo )
+                .then( () => {
+                    if ( this.grid.first === 0 ){
+                        this.pesquisar();
+                    }else{
+                        this.grid.first = 0;
+                    }
+
+                    this.toasty.success("Lançamento excluido com sucesso!!");
+                })
+                .catch( erro => this.errorHandler( erro ) );            // Incluido
+            }
 
 
+        }
+
+    . Acesse o componente "lancamento.service.ts" e altere o valor da propriedade "lancamentosUrl":
+
+        ...
+        @Injectable()
+        export class LancamentoService {
+            ...
+
+            excluir( codigo: number): Promise<void>{
+                const headers = new Headers();
+
+                headers.append("Authorization","Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
+/*
+                return this.http.delete(`${this.lancamentoUrl}/${codigo}`, { headers: headers })
+                        .toPromise()
+                        .then( () => null );
+*/                        
+                // Altere a URL de chamada
+                return this.http.delete(`${this.lancamentoUrl}/${codigo}12345`, { headers: headers })
+                        .toPromise()
+                        .then( () => null );
+            }
+
+        }
+
+    . Teste no navegador a exclusão e verifique se está apresentando erro, tanto na tela quanto na console.
+
+    . Acesse o componente "lancamento.service.ts", retorne a linha correta comentada e apaghe a errada.
+
+
+
+17.17. Listando as categorias cadastradas no dropdown
+-----------------------------------------------------
+
+    . Criar o componente categoria-service. Pegar o projeto dessa aula.
+
+        ng g s categoria/categoria --spec=false --module=categoria
+
+    . Acesse o arquivo "categoria/categoria.module.ts" e inclua no provider o componente "CategoriaService":
+
+        ...
+        providers: [CategoriaService]
+        ...
+
+    . Acesse o componente "categoria-service.ts" e inclua o conteúdo abaixo:
+
+        import { Injectable } from '@angular/core';
+        import { Http, Headers } from '@angular/http';
+
+        import 'rxjs/add/operator/toPromise';
+
+        @Injectable()
+        export class CategoriaService {
+
+            categoriasUrl = 'http://localhost:8080/categorias';
+
+            constructor(private http: Http) { }
+
+            listarTodas(): Promise<any> {
+                const headers = new Headers();
+                headers.append('Authorization', 'Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==');
+
+                return this.http.get(this.categoriasUrl, { headers })
+                .toPromise()
+                .then(response => response.json());
+            }
+        }    
+
+    . Acesse o componente "lancamento-cadastro.component.ts" e retire todo o conteúdo da coleção categorias:
+
+        ...
+        @Component({
+            selector: 'app-lancamento-cadastro',
+            templateUrl: './lancamento-cadastro.component.html',
+            styleUrls: ['./lancamento-cadastro.component.css']
+        })
+        export class LancamentoCadastroComponent implements OnInit {
+
+            tipos = [{label: 'Receita', value: 'RECEITA' },
+                        {label: 'Despesa', value: 'DESPESA'}];
+
+            categorias = [ ];   // Linha alterada
+
+            ...
+
+            constructor( @Inject( CategoriaService ) private categoriaService,      // constructor alterado
+                         @Inject( ErrorHandlerService ) private errorHandler){}
+
+            OnInit(){
+                this.carregarCategorias();
+            }
+            ...
+
+            carregarCategorias(){                               // Metodo incluido
+                return this.categoriaService.listarTodas()
+                            .then( categorias => categorias.map( c => ({         // o metodo "map" lê cada ocorrencia da coleção "categorias"
+                                    return { label: c.nome, value: c.codigo });
+                                });
+                            )
+                            .catch( erro => this.errorHandler.handle( erro ));
+            }                       
+        }
+
+
+    . Carregue o projeto e verifique se a lista de categorias está funcionando.
+
+
+
+
+
+Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
+-------------------------------------------------------------------------
+
+
+
+ 
 
 
 
