@@ -11031,7 +11031,6 @@ Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
 
     . Execute o projeto e verifique se o Dialog de confirmação no botão de exclusão está funcionando.
 
-TODO: Parei aqui
 17.12. Criando um serviço de tratamento de erros
 ------------------------------------------------
 
@@ -11041,9 +11040,18 @@ TODO: Parei aqui
 
     . Acesse o arquivo "core/core.module.ts" e implemente o código abaixo:
 
+        import { ToastyModule } from 'ng2-toasty';
         ...
         exports:[
+            ...,
+            ToastyModule,
+            ConfirmDialogModule
+        ]
+        imports:[
             ...
+            LancamentoService,
+            PessoaService,
+            ConfirmationService,
             ToastyModule,
             ConfirmDialogModule
         ]
@@ -11060,44 +11068,36 @@ TODO: Parei aqui
 //            ToastyModule.forRoot(),
 //            ConfirmDialogModule,
             ...
-        ]
-
-    . Acesse o arquivo "core/core.module.ts" e importe os módulos abaixo:
-
-        import { ToastyModule } from 'ng2-toasty';
-        ...
-        imports:[
-            ...
-            ToastyModule.forRoot(),
-            ConfirmDialogModule,
-            ...
+        ],
+        providers: [
+//            {provide: LOCALE_ID, useValue: 'pt-BR'},
+//            ConfirmationService            
         ]
 
     . Execute o projeto e verifique se tudo continua funcionando.
 
     . Implemente o código abaixo no arquivo "error-handler.service.ts":
 
-        import { Injectable } from '@angular/core';
+        import { Inject, Injectable } from '@angular/core';
+        import { ToastyService } from 'ng2-toasty';
 
         @Injectable()
-        export class ErrorHandlerService{
+        export class ErrorHandlerService {
 
-            constructor( @Inject(ToastService) private toast){
+            constructor( @Inject( ToastyService ) private toasty) { }
 
-            }
-
-            handle( errorResponse: any){
+            handle( errorResponse: any ){
                 let msg: string;
 
-                if ( typeof errorResponse === 'string' ){
-                    msg = errorResponse;
+                if ( typeof errorResponse === "string"){
+                msg = errorResponse;
                 }else{
-                    msg = 'Erro ao processar serviço remoto. Tente novamente';
+                msg = "Erro ao processar serviço remoto. Tente novamente!!!";
 
-                    console.log('Ocorreu um erro', errorResponse);
+                console.log("Ocorreu um erro ", errorResponse );
                 }
 
-                this.toasty.error( msg );
+                this.toasty.error(msg);    
             }
         }
 
@@ -11165,7 +11165,7 @@ TODO: Parei aqui
                         .then( () => null );
 */                        
                 // Altere a URL de chamada
-                return this.http.delete(`${this.lancamentoUrl}/${codigo}12345`, { headers: headers })
+                return this.http.delete(`${this.lancamentoUrl}/${codigo}/12345`, { headers: headers })
                         .toPromise()
                         .then( () => null );
             }
@@ -11178,6 +11178,7 @@ TODO: Parei aqui
 
 
 
+TODO: Parei aqui
 17.17. Listando as categorias cadastradas no dropdown
 -----------------------------------------------------
 
@@ -11254,7 +11255,8 @@ TODO: Parei aqui
     . Carregue o projeto e verifique se a lista de categorias está funcionando.
 
 
-
+17.18. Desafio: listando as pessoas cadastradas no dropdown
+-----------------------------------------------------------
 
 
 Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
