@@ -11184,9 +11184,9 @@ TODO: Parei aqui
 
     . Criar o componente categoria-service. Pegar o projeto dessa aula.
 
-        ng g s categoria/categoria --spec=false --module=categoria
+        ng g s lancamentos/categoria/categoria --spec=false --module=lancamentos
 
-    . Acesse o arquivo "categoria/categoria.module.ts" e inclua no provider o componente "CategoriaService":
+    . Acesse o arquivo "lancamentos/lancamentos.module.ts" e inclua no provider o componente "CategoriaService":
 
         ...
         providers: [CategoriaService]
@@ -11243,13 +11243,27 @@ TODO: Parei aqui
 
             carregarCategorias(){                               // Metodo incluido
                 return this.categoriaService.listarTodas()
-                            .then( categorias => categorias.map( c => ({         // o metodo "map" lê cada ocorrencia da coleção "categorias"
-                                    return { label: c.nome, value: c.codigo });
-                                });
-                            )
-                            .catch( erro => this.errorHandler.handle( erro ));
+                                    .then(categorias => {
+                                                            this.categorias = categorias.map(c => ({ label: c.nome, value: c.codigo }));
+                                    })
+                                    .catch(erro => this.errorHandler.handle(erro));
             }                       
         }
+
+
+    . Acesse o componente "lancamento-cadastro.component.ts" e atualize a tag de categoria:
+
+          <div class="ui-g-12 ui-md-6 ui-fluid">
+              <label>Categoria {{ categoria.value }}</label>
+              <p-dropdown [options]="categorias"
+                          [autoWidth]="false"
+                          placeholder="Selecione"   <!-- Alterado -->
+                          [filter]="true"
+                          ngModel               <!-- Incluido -->
+                          name="categoria"      <!-- Incluido -->
+                          required              <!-- Incluido -->
+                          #categoria></p-dropdown>
+          </div>
 
 
     . Carregue o projeto e verifique se a lista de categorias está funcionando.
