@@ -11178,7 +11178,6 @@ Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
 
 
 
-TODO: Parei aqui
 17.17. Listando as categorias cadastradas no dropdown
 -----------------------------------------------------
 
@@ -11272,9 +11271,233 @@ TODO: Parei aqui
 17.18. Desafio: listando as pessoas cadastradas no dropdown
 -----------------------------------------------------------
 
+    . Acessar o componente "lancamento-cadastro.component.ts" e deixar sem conteúdo o array "pessoas":
 
+        ...
+        pessoas = [ /* { label: 'Selecione', value: 0},
+                    { label: 'Marco Antonio', value: 1},
+                    { label: 'Catia Louse', value: 2 },
+                    { label: 'Gustavo Rocha', value: 3},
+                    { label: 'Jose Silva', value: 4},
+                    { label: 'João Silva', value: 5 },
+                    { label: 'Maria Jose', value: 6 },
+                    { label: 'Lucia Marins', value: 7 },
+                    { label: 'Mariana Fontes', value: 8 },
+                    { label: 'Carlos Eduardo', value: 9 }
+                    */
+                ];    
+        ...
+
+
+    . Acesse o componente "pessoa.service.ts" e implemente o código abaixo:
+
+        ...
+        listarTodas(): Promise<any>{
+            const headers = new Headers();
+
+            headers.append("Authorization", "Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==")
+
+
+            return this.http.get(this.pessoaUrl, { headers })
+                    .toPromise()
+                    .then( response => {
+                                            const responseJson = response.json()
+                                            const pessoas = responseJson.content;
+
+                                            return pessoas;
+                    });
+        }
+        ...
+
+    . Acesse o componente "lancamento-cadastro.component.ts" e implemente o código abaixo:
+
+        ...
+        carregarPessoas(){
+            this.pessoaService.listarTodas()
+                .then( 
+                pessoas => {
+                    this.pessoas = pessoas.map( p => ({ label: p.nome, value: p.codigo}));
+                }
+                )
+                .catch( erro => this.errorHandler.handle(erro));
+        }
+        ...
+
+    . Acesse o componente "lancamento-cadastro.component.html" e altere a tag abaixo:
+
+        ...
+        <div class="ui-g-12 ui-md-6 ui-fluid">
+            <label>Pessoa {{pessoa.value}}</label>
+            <p-dropdown  [options]="pessoas"
+                        [autoWidth]="false"
+                        placeholder="Selecione"
+                        [filter]="true"
+                        #pessoa
+                        ngModel
+                        name="pessoa"
+                        required></p-dropdown>
+        </div>
+        ...
+    
+    . Execute o projeto e verifique se o combo pessoa está trazendo as pessoas com sucesso.
+
+
+TODO: Parei aqui
 Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
 -------------------------------------------------------------------------
+
+    . Acesse o componente "lancamento-cadastro.component.ts" e implemente o método abaixo:
+
+        export class LancamentoCadastroComponente implements OnInit{
+            ...
+            lancamentos = new Lancamento();
+
+            ...
+            salvar(form: FormControl){
+                console.log( this.lancamento );
+            }
+            ...
+        }
+
+    . Clique com o botão direito sobre a pasta "core" e crie um novo arquivo "model.ts" com o conteúdo abaixo:
+
+        export class Pessoa{
+            codigo: number;
+        }
+
+        export class Categoria{
+            codigo: number;
+        }
+
+        export class Lancamento{
+            codigo: number;
+            tipo: 'RECEITA';
+            descricao: string;
+            dataVencimento: Date;
+            dataPagamento: Date;
+            valor: number;
+            observacao: string;
+            pessoa = new Pessoa();
+            categoria = new Categoria();
+
+        }
+
+    . Faça os bidings dos campos da tela com a propriedade "lancamento" do componente "LancamentoCadastroComponent":
+
+        <div class="container">
+            <form #f="ngForm" autocomplete="off" [ngSubmit]="salvar(f)">                  <!-- Alterado -->
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <h1>Novo Lançamento</h1>
+                    </div>
+
+                    <div class="ui-g-12">
+                        <p-selectButton [options]="tipos" 
+                                        #tipo
+                                        name="tipo"                                         <!-- Incluido -->
+                                        [(ngModel)]="lancamento.tipo"></p-selectButton>     <!-- Incluido -->
+                    </div>
+
+                    <div class="ui-g-6 ui-md-3 ui-fluid">
+                        <label>Vencimento</label>
+                        <p-calendar dateFormat="dd/mm/yy"
+                                    [showIcon]="true"
+                                    name="vencimento"
+                                    id="vencimento"
+                                    [(ngModel)]="lancamento.dataVencimento"                 <!-- Alterado -->
+                                    #vencimento="ngModel"
+                                    required></p-calendar>
+                        <app-message [control]="vencimento"
+                                    error="required"
+                                    text="Informe uma data válida"></app-message>
+                    </div>
+
+                    <div class="ui-g-6 ui-md-3 ui-fluid">
+                        <label>{{ tipo.value == 'RECEITA' ? 'Recebimento' : 'Pagamento' }}</label>
+                        <p-calendar dateFormat="dd/mm/yy" [showIcon]="true"></p-calendar>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-9 ui-fluid">
+                        <label>Descrição </label>
+                        <input type="text"
+                                name="descricao"
+                                [(ngModel)]="lancamento.descricao"                      <!-- Alterado -->
+                                #descricao="ngModel"
+                                required
+                                minlength="5"
+                                autocomplete="off"
+                                pInputText>
+                            <app-message [control]="descricao"
+                                        error="required"
+                                        text="Informe uma descrição válida"></app-message>
+
+                            <app-message [control]="descricao"
+                                        error="minlength"
+                                        text="Mínimo de {{ descricao.errors?.minlength?.requiredLength }} caracteres"></app-message>
+            <!--
+                        <div class="ui-message ui-messages-error" *ngIf="descricao.hasError('required') && descricao.dirty">
+                            Informe uma descrição válida
+                        </div>
+
+                        <div class="ui-message ui-messages-error" *ngIf="descricao.hasError('minlength') && descricao.dirty">
+                            Tamanho mínimo da descrição deve ser de {{ descricao.errors.minlength.requiredLength }} caracteres
+                        </div>
+            -->
+                    </div>
+                    <div class="ui-g-12 ui-md-3 ui-fluid">
+                        <label>Valor</label>
+                        <input type="text"
+                                pInputText
+                                placeholder="0,00"
+                                currencyMask
+                                [(ngModel)]="lancamento.valor"              <-- Alterado -->
+                                name="valor"
+                                [options]="{ prefix: 'R$', thousands: '.', decimal: ',', allowNegative: false}">
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-fluid">
+                        <label>Categoria {{ categoria.value }}</label>
+                        <p-dropdown [options]="categorias"
+                                    [autoWidth]="false"
+                                    placeholder="Selecione"
+                                    [filter]="true"
+                                    [(ngModel)]="lancamento.categoria.codigo"   <!-- Alterado -->
+                                    name="categoria"
+                                    required
+                                    #categoria></p-dropdown>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-fluid">
+                        <label>Pessoa {{pessoa.value}}</label>
+                        <p-dropdown  [options]="pessoas"
+                                        [autoWidth]="false"
+                                        placeholder="Selecione"
+                                        [filter]="true"
+                                        #pessoa
+                                        [(ngModel)]="lancamento.pessoa.codigo"          <!-- Alterado -->
+                                        name="pessoa"
+                                        required></p-dropdown>
+                    </div>
+                    <div class="ui-g-12 ui-fluid">
+                        <label>Observação</label>
+                        <textarea [rows]="5" 
+                                    [cols]="30" 
+                                    pInputTextarea 
+                                    autoResize="autoResize"
+                                    [(ngModel)="lancamento.observacao"]></textarea>     <!-- Alterado -->
+                    </div>
+                    <div class="ui-g-12">
+                        <button pButton type="submit" label="Salvar"></button>
+                        <button pButton type="button" label="Novo" class="ui-button-info"></button>
+                        <a href="javascrip:;">Voltar para a pesquisa</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    . Execute o projeto e verifique o conteúdo da estrutura "lancamento" no console do navegador.
+
+
+Aula 17.20. Implementando o serviço de cadastro de lançamentos
+--------------------------------------------------------------
 
 
 
