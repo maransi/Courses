@@ -11499,14 +11499,205 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
 Aula 17.20. Implementando o serviço de cadastro de lançamentos
 --------------------------------------------------------------
 
+    . Acesse o componente "lancamento.service.ts" e inclua o método abaixo:
 
+        ...
+        adicionar(): Promise<Lancamento>{
+            const headers = new Headers();
+
+            headers.append("Authorization", "Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==")
+            headers.append("Content-Type", "application/json");
+
+            return this.http.post( this.lancamentoUrl, 
+                                    JSON.stringify( lancamento), 
+                                    { headers } )
+                                .toPromise()
+                                .then( response => response.json() );
+        }
 
  
+    . Acesse o componente "lancamento-cadastro.component.ts" e inclua o método abaixo:
+
+        import { ToastyService } from 'ng2-toasty';
+        import { LancamentoService } from './../lancamento.service';
+        ...
+        export class LancamentoCadastroComponent implements OnInit {
+            ...
+
+            constructor( @Inject( CategoriaService) private categoriaService,
+                            @Inject(PessoaService) private pessoaService,
+                            @Inject(LancamentoService) private lancamentoService,
+                            @Inject(ToastyService) private toasty,
+                            @Inject( ErrorHandlerService) private errorHandler) { }
+
+            ...
+            salvar( form: FormControl ){
+                this.lancamentoService.adicionar( this.lancamento )
+                    .then( () => {
+                        this.toasty.sucess( "Lançamento adicionado com sucesso!!!");
+                    })
+                    .catch( erro => erroHandelr.handle( erro ));
+
+                form.reset();
+                this.lancamento = new Lancamento();
+            }
+
+    . Levante a aplicação e tente fazer uma inclusão de lançamento.
+
+    . Acesse o postman e tente recuperar o lançamento incluido.
+
+        http://localhost:8080/lancamentos?descricao=[Descrição inserida]
+
+
+Aula 17.21. Desafio: implementando o cadastro de pessoas
+--------------------------------------------------------
 
 
 
 
+18.1. Introdução a rotas
+------------------------
 
+    . Para mudar dinamicamente o conteúdo da nossa página principal do projeto "app.component.html" será 
+        associado com o pathname da chamada da URL, por exemplo:
+
+        localhost:4200/lancamentos :    lancamento-pesquisa.component.html
+        localhost:4200/lancamentos/novo :    lancamento-cadastro.component.html
+        
+    . Para fazer essa associação utilizaremos a tag abaixo no "app.component.html"
+
+        <router-outlet>
+
+18.2. Configurando rotas na aplicação
+-------------------------------------
+
+    . Acesse o componente app.module.ts e insira o código abaixo:
+
+        ...
+        import { Routes, RouterModule } from '@angular/router';
+        import {}
+
+        const routes: Routes = [
+            { path: "lancamentos", component: LancamentoPesquisaComponent },
+            { path: "lancamentos/novo", component: LancamentoCadastroComponent },
+            { path: "pessoas", component: PessoaPesquisaComponent}
+        ]
+
+        @NgModule({
+            ...
+            imports: [
+                ...
+                RouterMOdule.forRoot( routes )
+            ]
+        });
+        ...
+
+        . O atributo "path" contém a parte final do pathname escolhido, exemplo:
+
+            http://localhost:4200/lancamentos -> lancamentos
+            http://localhost:4200/lancamentos/novo -> lancamentos/novo
+
+    
+    . Acesse o componente "app.component.html", comente todas as tags que se referem aos componentes e 
+        insira a tag <router-outlet> como abaixo:
+
+        <router-outlet></router-outlet>
+
+
+Aula 18.3. Navegando com Router Link
+------------------------------------
+
+    . Se acessar o componente "navbar.component.html" responsável pelo menu lateral, podemos definir as chamadas
+        das URLs tranquilamente:
+
+        <ul class="navbar-menu" [hidden]="!exibindoMenu">
+            <li class="navbar-usuario">Jose da Silva</li>
+            <li class="navbar-menuitem"><a href="/lancamentos">Lançamentos</a></li> <!-- URL alterada -->
+            <li class="navbar-menuitem"><a href="/pessoas">Pessoas</a></li>         <!-- URL alterada -->
+            <li class="navbar-menuitem"><a href="#">Logout</a></li>
+        </ul>
+
+    . Se formos testar agora o sistema chamando as páginas pelo menu eles funcionarão, porém não de uma maneira ideal.
+        Todas as vezes que chamamos dessa forma a aplicação é reiniciada e com isso um maior tempo de resposta.
+
+    . Ao invés de somente alterar as URLs da página "navbar.component.html", vamos alterar a tag <a href..> para <a routerLink...>:
+
+        <ul class="navbar-menu" [hidden]="!exibindoMenu">
+            <li class="navbar-usuario">Jose da Silva</li>
+            <li class="navbar-menuitem"><a routerLink="/lancamentos">Lançamentos</a></li> <!-- URL alterada -->
+            <li class="navbar-menuitem"><a routerLink="/pessoas">Pessoas</a></li>         <!-- URL alterada -->
+            <li class="navbar-menuitem"><a href="#">Logout</a></li>
+        </ul>
+
+    . Importe o RouterModule no componente "core.module.ts", pois o componente acima pertence a ele:
+
+        ...
+        @NgModule({
+            imports: [
+                ...
+                RouterModule,
+                ...
+            ],
+            ...
+        })
+
+    . Faça o teste no navegador e acompanhe as chamadas na console dele na parte de "Network". Veja que agora virá
+        somente os dados necessário para apresentar na tela e não mais o formulário inteiro.
+
+    . Acesse o componente "lancamento-cadaso.component.html" e altere a chamada do link do botão "Voltar":
+
+        <div class="ui-g-12">
+            <button ...>
+            <a routerLink="/lancamentos">Voltar para a pesquisa</a>     <!-- Tag alterada -->
+        </div>    
+
+    . Acesse o componente "lancamentos-pesquisa.component.ts" e proceda com a mesma mudança no botão "Novo Lançamento":
+
+        <div class="ui-g-12">
+            <a routerLink="/lancamentos/novo">Novo Lançamento</a>     <!-- Tag alterada -->
+        </div>    
+
+    . Importe o RouterModule no componente "lancamentos.module.ts", pois o componente acima pertence a ele:
+
+        ...
+        @NgModule({
+            imports: [
+                ...
+                RouterModule,
+                ...
+            ],
+            ...
+        })
+
+    . Faça o teste das páginas alteradas no navegador.
+
+
+Aula 18.4. Estilizando links da rota ativa
+------------------------------------------
+
+    . Acesse o componente "navbar.component.css" e inclua a classe abaixo:
+
+        .navbar-menuitem.ativo{
+            background-color: #494541;
+        }
+
+    . Acesse o componente "navbar.component.html" e inclua "routerLinkActive" como abaixo:
+
+        <ul class="navbar-menu" [hidden]="!exibindoMenu">
+            <li class="navbar-usuario">Jose da Silva</li>
+            <li class="navbar-menuitem" routerLinkActive="ativo"><a routerLink="/lancamentos">Lançamentos</a></li> <!-- URL alterada -->
+            <li class="navbar-menuitem" routerLinkActive="ativo"><a routerLink="/pessoas">Pessoas</a></li>         <!-- URL alterada -->
+            <li class="navbar-menuitem"><a href="#">Logout</a></li>
+        </ul>
+
+    . Faça os testes no navegador, verifique se o link do menu ficou acionado após a escolha.
+
+
+Aula 18.5. Recebendo parâmetros da rota
+---------------------------------------
+
+
+    
 
 
 
