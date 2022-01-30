@@ -11696,6 +11696,92 @@ Aula 18.4. Estilizando links da rota ativa
 Aula 18.5. Recebendo parâmetros da rota
 ---------------------------------------
 
+    . Para configurar uma URL com código para acessar um item especifico precisamos configurar nas rotas com um 
+        parâmetros coringa, exemplo:
+
+        url: http://localhost:8080/lancamentos/12
+        rota: lancamentos/:codigo
+
+    . Acesse o componente "app.module.ts" e configure a rota acima:
+
+        ...
+        const routes: Routes = [
+            { path: "lancamentos", component: LancamentoPesquisaComponent },
+            { path: "lancamentos/novo", component: LancamentoCadastroComponent },
+            { path: "pessoas", component: PessoaPesquisaComponent},
+            { path: "lancamentos/:codigo", component: LancamentoCadastroComponent }
+        ]
+        ...
+
+    . Acesse o navegador e teste a rota abaixo:
+
+        http://localhost:8080/lancamentos/123
+
+        . Ela não dará, porém chamará sempre o equivalente "http://localhost:8080/lancamentos/novo", que seria
+            o configurado para a rota "lancamentos/novo"
+
+    . Acesse o componente "lancamentos-cadastro.component.ts" e implemente o código abaixo:
+
+        import { ActivatedRoute } from "@angular/router";           // Incluido
+        ...
+        export class LancamentoCadastroComponent implements OnInit {
+            ...
+
+            constructor( @Inject( CategoriaService) private categoriaService,
+                            @Inject(PessoaService) private pessoaService,
+                            @Inject(LancamentoService) private lancamentoService,
+                            @Inject(ToastyService) private toasty,
+                            @Inject( ErrorHandlerService) private errorHandler,
+                            @Inject( ActivatedRoute ) private route ) { }       // Incluido
+            ...
+            ngOnInit() {
+                console.log( this.route.snapshot.parms );          // Incluido
+
+                this.carregarCategorias();
+                this.carregarPessoas();
+            }
+            ...
+        }
+
+    . Execute o projeto e verifique o resultado na console log do navegador.
+
+    . Altere o valor do console.log para o abaixo, faça o teste e veja o resultado:
+
+        console.log( this.route.snapshot.parms["codigo"] );          // Incluido
+
+    . Acesse o componente "lancamentos-pesquisa.component.html" e proceda o código no botão de edição:
+
+        <p-column styleClass="col-acoes">
+            <ng-template pTemplate="body"
+                        let-lanc="rowData">
+            <a pButton icon="fa-pencil" 
+                        pTooltip="Editar" 
+                        tooltipPosition="top"
+                        [routerLink]="['/lacamentos', lanc.codigo ]"></a>   <!-- Incluido -->
+            <a pButton icon="fa-trash"  
+                        pTooltip="Eliminar" 
+                        tooltipPosition="top"
+                        (click)="confirmarExclusao(lanc)"></a>
+            </ng-template>
+        </p-column>
+
+    . Execute o projeto, clique no botão de edição e verifique o resultado na console log do navegador.
+
+
+Aula 18.6. Desafio: implementando os serviços de atualização e busca por código
+-------------------------------------------------------------------------------
+
+    . Reveja o video da aula para entender a questão de conversão das datas do JSON para as propriedades do componente.
+
+
+
+Aula 18.7. Preenchendo os campos na edição de lançamentos
+---------------------------------------------------------
+
+
+
+
+
 
     
 
