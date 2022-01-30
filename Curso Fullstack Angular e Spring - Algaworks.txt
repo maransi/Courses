@@ -8647,7 +8647,7 @@ Aula 13.10. Desafio controles, validações e mensagens de erro
                     </div>
                     <div class="ui-g-12 ui-fluid">
                         <label>Observação</label>
-                        <textarea [rows]="5" [cols]="30" pInputTextarea autoResize="autoResize"></textarea>
+                        <textarea rows="5" cols="30" pInputTextarea autoResize="autoResize"></textarea>
                     </div>
                     <div class="ui-g-12">
                         <button pButton type="submit" label="Salvar"></button>
@@ -11342,22 +11342,8 @@ Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
     . Execute o projeto e verifique se o combo pessoa está trazendo as pessoas com sucesso.
 
 
-TODO: Parei aqui
 Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
 -------------------------------------------------------------------------
-
-    . Acesse o componente "lancamento-cadastro.component.ts" e implemente o método abaixo:
-
-        export class LancamentoCadastroComponente implements OnInit{
-            ...
-            lancamentos = new Lancamento();
-
-            ...
-            salvar(form: FormControl){
-                console.log( this.lancamento );
-            }
-            ...
-        }
 
     . Clique com o botão direito sobre a pasta "core" e crie um novo arquivo "model.ts" com o conteúdo abaixo:
 
@@ -11382,10 +11368,26 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
 
         }
 
-    . Faça os bidings dos campos da tela com a propriedade "lancamento" do componente "LancamentoCadastroComponent":
+    . Acesse o componente "lancamento-cadastro.component.ts" e implemente o método abaixo:
+
+        export class LancamentoCadastroComponente implements OnInit{
+            ...
+            lancamento = new Lancamento();
+
+            ...
+            salvar(form: FormControl){
+                console.log( this.lancamento );
+            }
+            ...
+        }
+
+    . Faça os bidings dos campos da tela com a propriedade "lancamento" do componente "LancamentoCadastroComponent.html":
 
         <div class="container">
-            <form #f="ngForm" autocomplete="off" [ngSubmit]="salvar(f)">                  <!-- Alterado -->
+            <form #f="ngForm"
+                autocomplete="off"
+                (ngSubmit)="salvar(f)">
+
                 <div class="ui-g">
                     <div class="ui-g-12">
                         <h1>Novo Lançamento</h1>
@@ -11394,8 +11396,8 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
                     <div class="ui-g-12">
                         <p-selectButton [options]="tipos" 
                                         #tipo
-                                        name="tipo"                                         <!-- Incluido -->
-                                        [(ngModel)]="lancamento.tipo"></p-selectButton>     <!-- Incluido -->
+                                        name="tipo"
+                                        [(ngModel)]="lancamento.tipo"></p-selectButton>
                     </div>
 
                     <div class="ui-g-6 ui-md-3 ui-fluid">
@@ -11404,7 +11406,7 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
                                     [showIcon]="true"
                                     name="vencimento"
                                     id="vencimento"
-                                    [(ngModel)]="lancamento.dataVencimento"                 <!-- Alterado -->
+                                    [(ngModel)]="lancamento.dataVencimento"
                                     #vencimento="ngModel"
                                     required></p-calendar>
                         <app-message [control]="vencimento"
@@ -11414,45 +11416,50 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
 
                     <div class="ui-g-6 ui-md-3 ui-fluid">
                         <label>{{ tipo.value == 'RECEITA' ? 'Recebimento' : 'Pagamento' }}</label>
-                        <p-calendar dateFormat="dd/mm/yy" [showIcon]="true"></p-calendar>
+                        <p-calendar dateFormat="dd/mm/yy" 
+                                    [showIcon]="true"
+                                    name="pagamento"
+                                    id="pagamento"
+                                    [(ngModel)]="lancamento.dataPagamento"
+                                    #pagamento="ngModel"></p-calendar>
                     </div>
 
                     <div class="ui-g-12 ui-md-9 ui-fluid">
                         <label>Descrição </label>
                         <input type="text"
                                 name="descricao"
-                                [(ngModel)]="lancamento.descricao"                      <!-- Alterado -->
+                                [(ngModel)]="lancamento.descricao"
                                 #descricao="ngModel"
                                 required
-                                minlength="5"
-                                autocomplete="off"
-                                pInputText>
-                            <app-message [control]="descricao"
-                                        error="required"
-                                        text="Informe uma descrição válida"></app-message>
+                            minlength="5"
+                            autocomplete="off"
+                            pInputText>
+                        <app-message [control]="descricao"
+                                    error="required"
+                                    text="Informe uma descrição válida"></app-message>
 
-                            <app-message [control]="descricao"
-                                        error="minlength"
-                                        text="Mínimo de {{ descricao.errors?.minlength?.requiredLength }} caracteres"></app-message>
-            <!--
-                        <div class="ui-message ui-messages-error" *ngIf="descricao.hasError('required') && descricao.dirty">
-                            Informe uma descrição válida
-                        </div>
+                        <app-message [control]="descricao"
+                                    error="minlength"
+                                    text="Mínimo de {{ descricao.errors?.minlength?.requiredLength }} caracteres"></app-message>
+        <!--
+                    <div class="ui-message ui-messages-error" *ngIf="descricao.hasError('required') && descricao.dirty">
+                        Informe uma descrição válida
+                    </div>
 
-                        <div class="ui-message ui-messages-error" *ngIf="descricao.hasError('minlength') && descricao.dirty">
-                            Tamanho mínimo da descrição deve ser de {{ descricao.errors.minlength.requiredLength }} caracteres
-                        </div>
-            -->
+                    <div class="ui-message ui-messages-error" *ngIf="descricao.hasError('minlength') && descricao.dirty">
+                        Tamanho mínimo da descrição deve ser de {{ descricao.errors.minlength.requiredLength }} caracteres
+                    </div>
+        -->
                     </div>
                     <div class="ui-g-12 ui-md-3 ui-fluid">
                         <label>Valor</label>
                         <input type="text"
-                                pInputText
-                                placeholder="0,00"
-                                currencyMask
-                                [(ngModel)]="lancamento.valor"              <-- Alterado -->
-                                name="valor"
-                                [options]="{ prefix: 'R$', thousands: '.', decimal: ',', allowNegative: false}">
+                            pInputText
+                            placeholder="0,00"
+                            currencyMask
+                            [(ngModel)]="lancamento.valor"
+                            name="valor"
+                            [options]="{ prefix: 'R$', thousands: '.', decimal: ',', allowNegative: false}">
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-fluid">
                         <label>Categoria {{ categoria.value }}</label>
@@ -11460,7 +11467,7 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
                                     [autoWidth]="false"
                                     placeholder="Selecione"
                                     [filter]="true"
-                                    [(ngModel)]="lancamento.categoria.codigo"   <!-- Alterado -->
+                                    [(ngModel)]="lancamento.categoria.codigo"
                                     name="categoria"
                                     required
                                     #categoria></p-dropdown>
@@ -11468,21 +11475,23 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
                     <div class="ui-g-12 ui-md-6 ui-fluid">
                         <label>Pessoa {{pessoa.value}}</label>
                         <p-dropdown  [options]="pessoas"
-                                        [autoWidth]="false"
-                                        placeholder="Selecione"
-                                        [filter]="true"
-                                        #pessoa
-                                        [(ngModel)]="lancamento.pessoa.codigo"          <!-- Alterado -->
-                                        name="pessoa"
-                                        required></p-dropdown>
+                                    [autoWidth]="false"
+                                    placeholder="Selecione"
+                                    [filter]="true"
+                                    #pessoa
+                                    [(ngModel)]="lancamento.pessoa.codigo"
+                                    name="pessoa"
+                                    required></p-dropdown>
                     </div>
+
                     <div class="ui-g-12 ui-fluid">
                         <label>Observação</label>
-                        <textarea [rows]="5" 
-                                    [cols]="30" 
-                                    pInputTextarea 
-                                    autoResize="autoResize"
-                                    [(ngModel)="lancamento.observacao"]></textarea>     <!-- Alterado -->
+                        <textarea pInputTextarea 
+                                rows="3" 
+                                cols="30"
+                                name="observacao"
+                                autoResize="autoResize"
+                                [(ngModel)]="lancamento.observacao"></textarea>              
                     </div>
                     <div class="ui-g-12">
                         <button pButton type="submit" label="Salvar"></button>
@@ -11493,9 +11502,36 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
             </form>
         </div>
 
+
+    . Altere a tag do componente "app.component.html" como abaixo:
+
+
+        <app-navbar></app-navbar>
+
+        <!-- <app-lancamentos-pesquisa></app-lancamentos-pesquisa> -->
+        <app-lancamento-cadastro></app-lancamento-cadastro> 
+
+        <!-- <app-pessoas-pesquisa></app-pessoas-pesquisa> -->
+        <!-- <app-pessoa-cadastro></app-pessoa-cadastro> -->
+        <!-- <app-cliente-form></app-cliente-form> -->
+
+        <ng2-toasty></ng2-toasty>
+
+        <p-confirmDialog header="Confirmação" icon="fa fa-question-circle" #confirmacao>
+            <p-footer>
+                <button type="button" pButton icon="fa-check" label="Sim"
+                (click)="confirmacao.accept()"></button>
+                <button type="button" pButton icon="fa-times" label="Não"
+                (click)="confirmacao.reject()"></button>
+            </p-footer>
+        </p-confirmDialog>
+
+
+
     . Execute o projeto e verifique o conteúdo da estrutura "lancamento" no console do navegador.
 
 
+TODO: Parei aqui
 Aula 17.20. Implementando o serviço de cadastro de lançamentos
 --------------------------------------------------------------
 
