@@ -11531,17 +11531,17 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
     . Execute o projeto e verifique o conteúdo da estrutura "lancamento" no console do navegador.
 
 
-TODO: Parei aqui
+
 Aula 17.20. Implementando o serviço de cadastro de lançamentos
 --------------------------------------------------------------
 
     . Acesse o componente "lancamento.service.ts" e inclua o método abaixo:
 
         ...
-        adicionar(): Promise<Lancamento>{
+    adicionar( lancamento: Lancamento): Promise<Lancamento>{
             const headers = new Headers();
 
-            headers.append("Authorization", "Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==")
+            headers.append("Authorization", "Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");
             headers.append("Content-Type", "application/json");
 
             return this.http.post( this.lancamentoUrl, 
@@ -11570,9 +11570,9 @@ Aula 17.20. Implementando o serviço de cadastro de lançamentos
             salvar( form: FormControl ){
                 this.lancamentoService.adicionar( this.lancamento )
                     .then( () => {
-                        this.toasty.sucess( "Lançamento adicionado com sucesso!!!");
+                        this.toasty.success( "Lançamento adicionado com sucesso!!!");
                     })
-                    .catch( erro => erroHandelr.handle( erro ));
+                    .catch( erro => this.errorHandler.handle( erro ));
 
                 form.reset();
                 this.lancamento = new Lancamento();
@@ -11587,6 +11587,247 @@ Aula 17.20. Implementando o serviço de cadastro de lançamentos
 
 Aula 17.21. Desafio: implementando o cadastro de pessoas
 --------------------------------------------------------
+
+    . Acesse o componente "model.ts" e altere a classe "pessoa" como abaixo:
+
+        ...
+        export class Pessoa{
+            codigo: number;
+            nome: string;
+            logradouro: string;
+            numero: number;
+            complemento: string;
+            bairro: string;
+            cep: string;
+            cidade: string;
+            estado: string;
+            ativo: number;
+        }  
+        ...
+
+    . Acesse o componente "pessoa-cadastro.component.ts" e implemente o código abaixo:
+
+        @Component({
+        selector: 'app-pessoa-cadastro',
+        templateUrl: './pessoa-cadastro.component.html',
+        styleUrls: ['./pessoa-cadastro.component.css']
+        })
+        export class PessoaCadastroComponent implements OnInit {
+        //    pessoa = { nome: '', cidade: '', estado: '', status: '' };
+            pessoa = new Pessoa();
+            ...
+        }
+
+    . Acesse o componente "pessoa-cadastro.componente.html" e faça o binding dos campos da tela:
+
+        <div class="container">
+            <form #p="ngForm"
+                    autocomplete="off"
+                    (ngSubmit)="salvar(p)">
+                <div class="ui-g">
+                <div class="ui-g-12">
+                    <h1>Cadastramento de Pessoa</h1>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-fluid">
+                    <label for="nome">Nome</label>
+                    <input type="text"
+                            name="nome"
+                            id="nome"
+                            pInputText
+                            autocomplete="off"
+                            [(ngModel)]="pessoa.nome"
+                            #nome="ngModel"
+                            required
+                            minlength=5>
+
+                    <app-message [control]="nome"
+                                error="required"
+                                text="Informe um nome válido"></app-message>
+
+                    <app-message [control]="nome"
+                                error="minlength"
+                                text="Mínimo de {{ nome.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+                <div class="ui-g-11 ui-md-11 ui-sm-9 ui-fluid">
+                    <label for="logradouro">Logradouro</label>
+                    <input type="text"
+                    name="logradouro"
+                    id="logradouro"
+                    pInputText
+                    autocomplete="off"
+                    [(ngModel)]="pessoa.logradouro"
+                    #logradouro="ngModel"
+                    required
+                    minlength=5>
+                    <app-message [control]="logradouro"
+                    error="required"
+                    text="Informe um logradouro válido"></app-message>
+                    
+                    <app-message [control]="logradouro"
+                    error="minlength"
+                    text="Mínimo de {{ logradouro.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+                
+                <div class="ui-g-1 ui-md-1 ui-sm-3 ui-fluid">
+                    <label for="numero">No.</label>
+                    <input type="text"
+                    name="numero"
+                    id="numero"
+                    pInputText
+                    autocomplete="off"
+                    [(ngModel)]="pessoa.numero"
+                    #numero="ngModel"
+                    required
+                    minlength=1>
+                    
+                    <app-message [control]="numero"
+                    error="required"
+                    text="Informe um número válido"></app-message>
+                    
+                    <app-message [control]="numero"
+                    error="minlength"
+                    text="Mínimo de {{ numero.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+                
+                <div class="ui-g-4 ui-md-4 ui-sm-12 ui-fluid">
+                    <label for="complemento">Complemento</label>
+                    <input type="text"
+                    name="complemento"
+                    id="complemento"
+                    pInputText
+                    autocomplete="off"
+                    [(ngModel)]="pessoa.complemento"
+                    #complemento="ngModel">
+                </div>
+                
+                <div class="ui-g-4  ui-md-4 ui-sm-12 ui-fluid">
+                    <label for="bairro">Bairro</label>
+                    <input type="text"
+                    name="bairro"
+                    id="bairro"
+                    pInputText
+                    autocomplete="off"
+                    [(ngModel)]="pessoa.bairro"
+                    #bairro="ngModel"
+                    required
+                    minlength=5>
+                    <app-message [control]="bairro"
+                    error="required"
+                    text="Informe um bairro válido"></app-message>
+                    
+                    <app-message [control]="bairro"
+                    error="minlength"
+                    text="Mínimo de {{ bairro.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+                
+                <div class="ui-g-3 ui-md-3 ui-sm-12 ui-fluid">
+                    <label for="cidade">Cidade</label>
+                    <input type="text"
+                    name="cidade"
+                    id="cidade"
+                    pInputText
+                    autocomplete="off"
+                    [(ngModel)]="pessoa.cidade"
+                    #cidade="ngModel"
+                    required
+                    minlength=5>
+                    <app-message [control]="cidade"
+                    error="required"
+                    text="Informe uma cidade válida"></app-message>
+                    
+                    <app-message [control]="cidade"
+                    error="minlength"
+                    text="Mínimo de {{ cidade.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+                
+                <div class="ui-g-1  ui-md-1 ui-sm-6 ui-fluid">
+                    <label>CEP</label>
+                    <p-inputMask mask="99999-999"
+                    id="cep"
+                    name="cep"
+                    autocomplete="off"
+                    [(ngModel)]="pessoa.cep"
+                    #cep="ngModel"
+                    required
+                    minlength=5></p-inputMask>
+                    <app-message [control]="cep"
+                    error="required"
+                    text="Informe um CEP válido"></app-message>
+                    
+                    <app-message [control]="cep"
+                    error="minlength"
+                    text="Mínimo de {{ cep.errors?.minlength?.requiredLength }} caracteres"></app-message>
+                </div>
+                
+                <div class="ui-g-2 ui-md-2 ui-sm-6 ui-fluid">
+                    <label>Estado {{ estado.value }}</label>
+                    <p-dropdown [options]="estados"
+                                [autoWidth]="false"
+                                placeholder="Selecione"
+                                [filter]="true"
+                                name="estado"
+                                id="estado"
+                                [(ngModel)]="pessoa.estado"
+                                required
+                                #estado="ngModel"></p-dropdown>
+                </div>
+                <!--
+                <div class="ui-g-1 ui-md-2 ui-sm-12 ui-fluid" style="padding: 25px;">
+                    <p-checkbox name="status" id="status" value="ATIVO" label="Ativo"></p-checkbox>
+                </div>
+                -->    
+                <div class="ui-g-12">
+                    <button pButton type="submit" label="Salvar"></button>
+                    <button pButton type="button" label="Novo" class="ui-button-info"></button>
+                    <a href="javascrip:;">Voltar para a pesquisa</a>
+                </div>
+            </div>
+            </form>
+        </div>
+
+    . Altere a tag do componente "app.component.html" como abaixo:
+
+
+        <app-navbar></app-navbar>
+
+        <!-- <app-lancamentos-pesquisa></app-lancamentos-pesquisa> -->
+        <!-- <app-lancamento-cadastro></app-lancamento-cadastro> -->
+
+        <!-- <app-pessoas-pesquisa></app-pessoas-pesquisa> -->
+        <app-pessoa-cadastro></app-pessoa-cadastro> 
+        <!-- <app-cliente-form></app-cliente-form> -->
+
+        <ng2-toasty></ng2-toasty>
+
+        <p-confirmDialog header="Confirmação" icon="fa fa-question-circle" #confirmacao>
+            <p-footer>
+                <button type="button" pButton icon="fa-check" label="Sim"
+                (click)="confirmacao.accept()"></button>
+                <button type="button" pButton icon="fa-times" label="Não"
+                (click)="confirmacao.reject()"></button>
+            </p-footer>
+        </p-confirmDialog>
+
+
+
+TODO: Parei aqui - Aula 17.20. Implementando o serviço de cadastro de lançamentos
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
