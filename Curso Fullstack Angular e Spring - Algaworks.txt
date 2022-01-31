@@ -11847,7 +11847,7 @@ Aula 17.21. Desafio: implementando o cadastro de pessoas
                     .then( () => {
                     this.toasty.success("Pessoa adicionada com sucesso!!!");
                     })
-                    .catch( erro => this.errorHandler.handle( erro ));
+                    .catch( erro => this.errorHandler.handleError( erro ));
 
                 form.reset();
 
@@ -11858,7 +11858,7 @@ Aula 17.21. Desafio: implementando o cadastro de pessoas
 
     . Levante a aplicação e tente fazer uma inclusão de uma pessoa.
 
-TODO: Parei aqui
+
 18.1. Introdução a rotas
 ------------------------
 
@@ -11882,7 +11882,7 @@ TODO: Parei aqui
         import {}
 
         const routes: Routes = [
-            { path: "lancamentos", component: LancamentoPesquisaComponent },
+            { path: "lancamentos", component: LancamentosPesquisaComponent },
             { path: "lancamentos/novo", component: LancamentoCadastroComponent },
             { path: "pessoas", component: PessoaPesquisaComponent}
         ]
@@ -11906,6 +11906,12 @@ TODO: Parei aqui
         insira a tag <router-outlet> como abaixo:
 
         <router-outlet></router-outlet>
+
+    . Levante o projeto e teste no navegador as URLs abaixo:
+
+        http://localhost:4200/lancamentos -> lancamentos
+        http://localhost:4200/lancamentos/novo -> lancamentos/novo
+
 
 
 Aula 18.3. Navegando com Router Link
@@ -11948,17 +11954,19 @@ Aula 18.3. Navegando com Router Link
     . Faça o teste no navegador e acompanhe as chamadas na console dele na parte de "Network". Veja que agora virá
         somente os dados necessário para apresentar na tela e não mais o formulário inteiro.
 
-    . Acesse o componente "lancamento-cadaso.component.html" e altere a chamada do link do botão "Voltar":
-
+    . Acesse o componente "lancamento-cadastro.component.html" e altere a chamada do link do botão "Voltar":
+        ...
         <div class="ui-g-12">
-            <button ...>
-            <a routerLink="/lancamentos">Voltar para a pesquisa</a>     <!-- Tag alterada -->
-        </div>    
+            <button pButton type="submit" label="Salvar" [disabled]="f.invalid"></button>            <!-- Tag alterada -->
+            <button pButton type="button" label="Novo" class="ui-button-info"></button>
+            <a routerLink="/lancamentos">Voltar para a pesquisa</a>                                  <!-- Tag alterada -->
+        </div>
+        ...
 
     . Acesse o componente "lancamentos-pesquisa.component.ts" e proceda com a mesma mudança no botão "Novo Lançamento":
 
         <div class="ui-g-12">
-            <a routerLink="/lancamentos/novo">Novo Lançamento</a>     <!-- Tag alterada -->
+            <a pButton label="Novo Lançamento" routerLink="/lancamentos/novo"></a>     <!-- Tag alterada -->
         </div>    
 
     . Importe o RouterModule no componente "lancamentos.module.ts", pois o componente acima pertence a ele:
@@ -12071,7 +12079,7 @@ Aula 18.5. Recebendo parâmetros da rota
 
     . Execute o projeto, clique no botão de edição e verifique o resultado na console log do navegador.
 
-
+TODO: Parei aqui
 Aula 18.6. Desafio: implementando os serviços de atualização e busca por código
 -------------------------------------------------------------------------------
 
