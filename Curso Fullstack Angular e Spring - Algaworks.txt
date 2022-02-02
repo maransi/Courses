@@ -11357,7 +11357,7 @@ Aula 17.19. Criando classes de modelo e usando no cadastro de lançamentos
 
         export class Lancamento{
             codigo: number;
-            tipo: 'RECEITA';
+            tipo = 'RECEITA';
             descricao: string;
             dataVencimento: Date;
             dataPagamento: Date;
@@ -12079,20 +12079,137 @@ Aula 18.5. Recebendo parâmetros da rota
 
     . Execute o projeto, clique no botão de edição e verifique o resultado na console log do navegador.
 
-TODO: Parei aqui
+
 Aula 18.6. Desafio: implementando os serviços de atualização e busca por código
 -------------------------------------------------------------------------------
 
-    . Reveja o video da aula para entender a questão de conversão das datas do JSON para as propriedades do componente.
+    . Acesse o componente "lancamento.service.ts" e implemente o código abaixo:
+
+        atualizar(lancamento: Lancamento): Promise<Lancamento> {
+            const headers = new Headers();
+            headers.append('Authorization', 'Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==');
+            headers.append('Content-Type', 'application/json');
+
+            return this.http.put(`${this.lancamentosUrl}/${lancamento.codigo}`,
+                JSON.stringify(lancamento), { headers })
+            .toPromise()
+            .then(response => {
+                const lancamentoAlterado = response.json() as Lancamento;
+
+                this.converterStringsParaDatas([lancamentoAlterado]);
+
+                return lancamentoAlterado;
+            });
+        }
+
+        buscarPorCodigo(codigo: number): Promise<Lancamento> {
+            const headers = new Headers();
+            headers.append('Authorization', 'Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==');
+
+            return this.http.get(`${this.lancamentosUrl}/${codigo}`, { headers })
+            .toPromise()
+            .then(response => {
+                const lancamento = response.json() as Lancamento;
+
+                this.converterStringsParaDatas([lancamento]);
+
+                return lancamento;
+            });
+        }
+
+        private converterStringsParaDatas(lancamentos: Lancamento[]) {
+            for (const lancamento of lancamentos) {
+            lancamento.dataVencimento = moment(lancamento.dataVencimento,
+                'YYYY-MM-DD').toDate();
+
+            if (lancamento.dataPagamento) {
+                lancamento.dataPagamento = moment(lancamento.dataPagamento,
+                'YYYY-MM-DD').toDate();
+            }
+            }
+        }
 
 
 
+TODO: Parei aqui
 Aula 18.7. Preenchendo os campos na edição de lançamentos
 ---------------------------------------------------------
 
+    . Acesse o compoente "lancamento-cadastro.component.ts" e implemente o código abaixo:
+
+        ...
+        ngOnInit() {
+            // console.log( this.route.snapshot.params['codigo'] );     // linha eliminada
+
+            const codigoLancamento = this.route.snapshot.params['codigo']   // Linha incluida
+
+            if ( codigoLancamento ){                                    // if incluido
+                carregarLancamento( codigoLancamento );
+            }
+
+            this.carregarCategorias();
+            this.carregarPessoas();
+        }
+
+        carregarLancamento( codigo: number ){                           // Método incluido
+            this.lancamentoService.buscarPorCodigo( codigo )
+                                    .then( lancamento => this.lancamento = lancamento )
+                                    .catch( erro => this.errorHandler( erro ) );
+        }
+
+    . Acesse o componente "lancamento-cadastro.component.html" e altere conforme código abaixo:
+        ...
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <!-- <h1>Novo Lançamento</h1>           Alterado --> 
+                <h1>{{ editando ? 'Edição de ': 'Novo' }} Lançamento </h1>
+             </div>
+        ...
+
+    . Acesse o componente "lancamento-cadastro.component.ts" e insira o código abaixo:
+
+        ...
+        get editando(){
+            return Boolean( lancamento.codigo );
+        }
+        ...
+
+    . Levante o projeto faça a edição e a inclusão verificando se as informações são preenchidas, ou não,
+        conforme a ação solicitada.
 
 
+Aula 18.8. Salvando lançamentos editados
+----------------------------------------
 
+    . Acesse o componente "lancamento-cadastro.component.ts" e altere o nome do método "salvar" por "adicionarLancamento".
+
+    . No componente "lancamento-cadastro.component.ts" acrescente os métodos abaixo:
+
+        ...
+        salvar( form: FormControl ){
+            if ( this.editando ){
+                atualizarLancamento( form );
+            }else {
+                adicionarLancamento( form );
+            }
+        }
+
+        atualizarLancamento( form: FormControl ){
+            this.lancamentoService.atualizar( this.lancamento )
+                                .then( lancamento => {
+                                    this.lancamento = lancamento;
+
+                                    this.toasty.success( "Lancamento alterado com sucesso!!!" );
+                                })
+                                .catch( erro => this.errorHandler.handle( erro ) );
+        }
+        ...
+
+    . Levante o projeto e faça as operações de inclusão e alteração.
+
+
+Aula 18.9. Implementando navegação imperativa
+---------------------------------------------
 
 
     
