@@ -12211,8 +12211,439 @@ Aula 18.8. Salvando lançamentos editados
 Aula 18.9. Implementando navegação imperativa
 ---------------------------------------------
 
+    . Acesse o componente "lcnamento-cadastro.component.ts" e implemente o código abaixo:
+
+        import { ActivatedRoute, Router }                          // Linha alterada
+        ...
+        constructor( @Inject( CategoriaService) private categoriaService,
+            @Inject(PessoaService) private pessoaService,
+            @Inject( ErrorHandlerService) private errorHandler,
+            @Inject( ToastyService ) private toasty,
+            @Inject( LancamentoService ) private lancamentoService,
+            @Inject( ActivatedRoute ) private route
+            @Inject(  Router ) private router ) { }     // Linha incluida
+
+        ...
+        adicionarLancamento( form: FormControl){
+            this.lancamentoService.adicionar( this.lancamento )
+                                .then( () => { 
+                                                this.toasty.success( "Lançamento adicionado com sucesso!!!"); 
+
+                                                // form.reset();                        // Linha excluida
+
+                                                /// this.lancamento = new Lancamento(); // Linha excluida
+
+                                                this.router.navigate(["/lancamentos"]); // Linha incluida
+                                            })
+                                .catch( erro => this.errorHandler.handle( erro ));
+        }
+    
+    . Levante o projeto, faça uma operação de inclusão de lançamentos e verifique se ao final se o fluxo do 
+        sistema foi direcionado para a tela de pesquisa.
+
+    . Na tela de pesquisa consulte o lançamento incluído se aparece na pesquisa
+
+    . Altere o código do método "adicionarLancamento" como abaixo:
+
+            this.lancamentoService.adicionar( this.lancamento )
+                                .then( lancamentoAdicionado => {                                  // Linha alterada
+                                                this.toasty.success( "Lançamento adicionado com sucesso!!!"); 
+
+                                                // form.reset();                        
+
+                                                /// this.lancamento = new Lancamento(); 
+
+                                                this.router.navigate(["/lancamentos", lancamentoAdicionado.codigo]); // Linha alterada
+                                            })
+                                .catch( erro => this.errorHandler.handle( erro ));
+
+    . Faça uma operação de inclusão de lançamentos e verifique se ao final se o fluxo do 
+        sistema foi direcionado para a tela de alteração de lançamento.
+
+    . Na tela de pesquisa consulte o lançamento incluído se aparece na pesquisa
+
+    . Acesse o componente "lancamento-cadastro.component.html" e faça as alterações abaixo:
+
+
+        <!-- <button pButton type="button" label="Novo" class="ui-button-info"></button> -->
+        <button pButton 
+                type="button" 
+                label="Novo" 
+                class="ui-button-info"
+                (click)="novo(f)></button>
+
+    . Retorne ao componente "lancamento-cadastro.component.ts" e implemente o código abaixo:
+
+        ...
+        novo( form: FormControl ){
+            form.reset();                        
+
+            setTimeout( function(){
+                this.lancamento = new Lancamento(); 
+            }.bind(this),1);
+
+            this.route.navigate(["/lancamentos"]);
+        }
+        ...
+
+        . A função "setTimeout" está sendo utilizada para forçar a geração do "new Lancamento()" com as propriedades padrões
+            preenchidas. Devido a algum problema no Angular 4, o tipo do lançamento não está ficando com o seu valor padrão
+            "RECEITA" quando é criado um novo objeto "Lancamento", por isso será necessário dar um intervalo de tempo de 
+            1 milisegundo.
+
+        . O .bind(this) informa a função para utilizar/referenciar o mesmo "this" do componente "lancamento-cadastro.component.ts".
+
+        . Faça um teste, ao invés de usar a função "setTimeout", force a atribuição do valor na propriedade "tipo" manualmente.
+
+            this.lancamento.tipo = "RECEITA";
+
+    . Faça uma operação de inclusão de lançamentos, através do botão "NOvo" da tela "lancamento-cadastro.component.html", ou seja,
+        inicie uma edição, ou inclusão, e no meio da operação acione o botão "Novo" para ver se o fluxo será desviado para a 
+        inclusão.
 
     
+Aula 18.10. Fazendo redirecionamento
+------------------------------------
+
+    . Para resolver o redirecionamento para uma página especifica quando acessamos o endereço "http://localhost:4200" sem um path 
+        especifico.
+
+    . Acesse o componente "app.module.ts" e insira a linha abaixo na coleção de rotas:
+
+        ...
+        const routes: Routes = [
+            { path: "", redirectTo: "lancamentos", pathMatch: "full"},              // Linha inserida
+            { path: "lancamentos", component: LancamentosPesquisaComponent },
+            { path: "lancamentos/novo", component: LancamentoCadastroComponent },
+            { path: "pessoas", component: PessoaPesquisaComponent}
+        ]
+        ...
+
+    . Levante o projeto, acesse o endereço abaixo e verifique se o fluxo foi desviado para a tela de pesquisa de lançamentos.
+
+
+Aula 18.11. Tratando rota não encontrada
+----------------------------------------
+
+    . Acesse a raiz do projeto no prompt do sistema operacional e execute o comando abaixo:
+
+        ng g c core/pagina-nao-encontrada --inline--style --inline-template --flat --spec=false
+
+    . Acesse o componente "app.module.ts" e implemente as linhas abaixo:
+
+        ...
+        import { PaginaNaoEncontrada } from './core/pagina-nao-encontrada.component';
+        ...
+        const routes: Routes = [
+            { path: "", redirectTo: "lancamentos", pathMatch: "full"},              
+            { path: "lancamentos", component: LancamentosPesquisaComponent },
+            { path: "lancamentos/novo", component: LancamentoCadastroComponent },
+            { path: "pessoas", component: PessoaPesquisaComponent},
+            { path: "pagina-nao-encontrada", component: PaginaNaoEncontradaComponent }  // Linha inserida
+            { path: "**", redirectTo: "pagina-nao-encontrada" }                         // Linha inserida
+        ]
+        ...
+
+        . Qualquer página não encontrada, devido a algum path errado na URL, cairá no item "path: '**'".
+
+
+    . Acesse o componente "core/pagina-nao-encontrada.component.ts" e insira o código abaixo:
+
+        ...
+        @Component({
+            ...
+            template: `
+                        <div class="container">
+                            <h1 class="text-center">Página não encontrada</h1>
+                        </div>
+                      `,
+            ...
+        })
+
+    . No navegador acesse páginas válidas e inválidas para verificar o resultado.
+
+    . Acesse os componentes "lancamentos.module.ts" e "pessoas.module.ts" e retire os exports existente.
+        Como agora estamos trabalhando com rotas não existe a necessidade de exportar os componentes mais.
+        Ao substituir as tags especificas "<app-pessoa-pesquisa>", ou "<app-lancamento-pesquisa>" pela tag "<router-outlet></router-outlet>"
+        deixou de ser necessário o export.
+        Porém continua sendo necessário a declaração "declaration" destes componentes.
+
+    . No navegador acesse páginas válidas e inválidas para verificar o resultado.
+
+
+Aula 18.12. Definindo o título da página dinamicamente
+------------------------------------------------------
+
+    . Acesse o componente "lancamento-pesquisa.component.ts" e insira o código abaixo:
+
+        ...
+        import { Title } from '@angular/pataform-browser';      // Linha inserida
+        ...
+        constructor( ...
+            @Inject( Title ) private title      // Linha inserida
+        ){}
+        ...
+
+        ngOnINit(){
+            this.title.setTitle("Pesquisa de lançamentos");         // Linha inserida
+        }
+
+    . Acesse o componente "core.module.ts" e insira o código abaixo:
+
+        ...
+        import { Title } from '@angular/pataform-browser';      // Linha inserida
+        ...
+        @ngModule({
+            ...
+            providers: [
+                ...
+                Title,                  // Linha inserida
+                ...
+            ]
+        })
+        ...
+
+    . Faça o mesmo procedimento para as demais telas de cadastro e pesquisa.
+
+    . Levante o projeto e verifique no formulário de pesquisa se o titulo ficou "Pesquisa de lançamentos".
+
+    . Acesse o componente "lancamentos-cadastro.component.ts" e implemente o código abaixo:
+
+        ...
+        atualizarTituloEdicao(){                                                        // Método inserido
+            this.title.setTitle( `Edição de lançamento: ${this.lancamento.descricao}`);
+        }
+        ...
+        carregarLancamento( codigo: number ){                                       // Método alterado
+            this.lancamentoService.buscarPorCodigo( codigo )
+                                    .then( lancamento => {
+                                            this.lancamento = lancamento;
+                                            this.atualizarTituloEdicao();
+
+                                    })
+                                    .catch( erro => this.errorHandler( erro ) );
+        }
+        ...
+        atualizarLancamento( form: FormControl ){
+            this.lancamentoService.atualizar( this.lancamento )
+                                .then( lancamento => {
+                                    this.lancamento = lancamento;
+
+                                    this.toasty.success( "Lancamento alterado com sucesso!!!" );
+
+                                    this.atualizarTituloEdicao();                           // Linha inserida
+                                })
+                                .catch( erro => this.errorHandler.handle( erro ) );
+        }
+
+    . Levante o projeto e faça os testes para validar o titulo dos formulários.
+
+
+Aula 18.13. Refatorando as rotas para usar Routing Module
+---------------------------------------------------------
+
+    . Clique com o botão direito sobre o nó do projeto "app" e escolha a inclusão de novo arquivo.
+
+    . Dê o nome do arquivo novo de "app-routing.module.ts".
+
+    . No arquivo de módulo das rotas coloque o conteúdo abaixo nele:
+
+        import { NgModule } from '@angular/core';
+        import { Routes, RouterModule } from '@angular/router';
+
+        import { PaginaNaoEncontradaComponent } from './core/pagina-nao-encontrada.component';
+        import { PessoasPesquisaComponent } from './pessoas/pessoas-pesquisa/pessoas-pesquisa.component';
+        import { LancamentoCadastroComponent } from './lancamentos/lancamento-cadastro/lancamento-cadastro.component';
+        import { LancamentosPesquisaComponent } from './lancamentos/lancamentos-pesquisa/lancamentos-pesquisa.component';
+
+        const routes: Routes = [
+            { path: '', redirectTo: 'lancamentos', pathMatch: 'full' },
+            { path: 'lancamentos', component: LancamentosPesquisaComponent },
+            { path: 'lancamentos/novo', component: LancamentoCadastroComponent },
+            { path: 'lancamentos/:codigo', component: LancamentoCadastroComponent },
+            { path: 'pessoas', component: PessoasPesquisaComponent },
+            { path: 'pagina-nao-encontrada', component: PaginaNaoEncontradaComponent },
+            { path: '**', redirectTo: 'pagina-nao-encontrada' }
+        ];
+
+        @NgModule({
+            imports: [
+                RouterModule.forRoot(routes)
+            ],
+            exports: [RouterModule]
+        })
+        export class AppRoutingModule { }
+
+    . Deixe o "app.module.ts" como abaixo:
+
+        import { HttpModule } from '@angular/http';
+        import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+
+        import { AppComponent } from './app.component';
+        import { CoreModule } from './core/core.module';
+        import { PessoasModule } from './pessoas/pessoas.module';
+        import { LancamentosModule } from './lancamentos/lancamentos.module';
+        import { AppRoutingModule } from './app-routing.module';
+
+
+/*                                                                  // Bloco de código eliminado
+        const routes: Routes = [
+            { path: '', redirectTo: 'lancamentos', pathMatch: 'full' },
+            { path: 'lancamentos', component: LancamentosPesquisaComponent },
+            { path: 'lancamentos/novo', component: LancamentoCadastroComponent },
+            { path: 'lancamentos/:codigo', component: LancamentoCadastroComponent },
+            { path: 'pessoas', component: PessoasPesquisaComponent },
+            { path: 'pagina-nao-encontrada', component: PaginaNaoEncontradaComponent },
+            { path: '**', redirectTo: 'pagina-nao-encontrada' }
+        ];
+*/
+
+        @NgModule({
+            declarations: [
+                AppComponent
+            ],
+            imports: [
+                BrowserModule,
+                BrowserAnimationsModule,
+                HttpModule,
+                // RouterModule.forRoot(routes),        // Linha excluida
+                CoreModule,
+                LancamentosModule,
+                PessoasModule,
+                AppRoutingModule                        // Linha inserida
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+
+    . Levante o projeto e verifique se a navegação continua funcionando.
+
+
+Aula 18.14. Criando um Routing Module para o módulo de funcionalidade
+---------------------------------------------------------------------
+
+    . Clique com o botão direito sobre o nó do projeto "app/lancamentos" e escolha a inclusão de novo arquivo.
+
+    . Dê o nome do arquivo novo de "lancamentos-routing.module.ts".
+
+    . No arquivo de módulo das rotas coloque o conteúdo abaixo nele:
+
+        import { Routes, RouterModule } from '@angular/router';
+        import { NgModule } from '@angular/core';
+
+        import { LancamentoCadastroComponent } from './lancamento-cadastro/lancamento-cadastro.component';
+        import { LancamentosPesquisaComponent } from './lancamentos-pesquisa/lancamentos-pesquisa.component';
+
+        const routes: Routes = [
+            { path: 'lancamentos', component: LancamentosPesquisaComponent },
+            { path: 'lancamentos/novo', component: LancamentoCadastroComponent },
+            { path: 'lancamentos/:codigo', component: LancamentoCadastroComponent }
+        ];
+
+        @NgModule({
+            imports: [
+                RouterModule.forChild(routes)
+            ],
+            exports: [RouterModule]
+        })
+        export class LancamentosRoutingModule { }
+
+        . Nos imports é chamado "RouterModule.forChild(routes)" ao invés "RouterModule.forRoot(routes)".
+            Sempre que formos criar módulos de rotas dentro de um sub-módulo será chamado o método ".forChild";
+            quando for do módulo principal "app" é chamado o método ".forRoot".
+
+    . Acesse o componente "lancamentos.module.ts" e deixe como abaixo:
+
+        import { RouterModule } from '@angular/router';
+        import { FormsModule } from '@angular/forms';
+        import { NgModule } from '@angular/core';
+        import { CommonModule } from '@angular/common';
+
+        import { CurrencyMaskModule } from 'ng2-currency-mask';
+        import { DropdownModule } from 'primeng/components/dropdown/dropdown';
+        import { SelectButtonModule } from 'primeng/components/selectbutton/selectbutton';
+        import { CalendarModule } from 'primeng/components/calendar/calendar';
+        import { InputTextareaModule } from 'primeng/components/inputtextarea/inputtextarea';
+        import { TooltipModule } from 'primeng/components/tooltip/tooltip';
+        import { DataTableModule } from 'primeng/components/datatable/datatable';
+        import { ButtonModule } from 'primeng/components/button/button';
+        import { InputTextModule } from 'primeng/components/inputtext/inputtext';
+
+        import { LancamentosRoutingModule } from './lancamentos-routing.module';                                // Linha inserida
+        import { SharedModule } from './../shared/shared.module';
+        import { LancamentosPesquisaComponent } from './lancamentos-pesquisa/lancamentos-pesquisa.component';
+        import { LancamentoCadastroComponent } from './lancamento-cadastro/lancamento-cadastro.component';
+
+        @NgModule({
+            imports: [
+                CommonModule,
+                FormsModule,
+                // RouterModule,                // Linha eliminada
+                InputTextModule,
+                ButtonModule,
+                DataTableModule,
+                TooltipModule,
+                InputTextareaModule,
+                CalendarModule,
+                SelectButtonModule,
+                DropdownModule,
+                CurrencyMaskModule,
+
+                SharedModule,
+                LancamentosRoutingModule        // Linha inserida
+            ],
+            declarations: [
+                LancamentoCadastroComponent,
+                LancamentosPesquisaComponent
+            ],
+            exports: []
+        })
+        export class LancamentosModule { }
+
+    . Acesse o componente "app-roting.module.ts" e elimine as rotas referentes a lançamentos:
+
+        import { NgModule } from '@angular/core';
+        import { Routes, RouterModule } from '@angular/router';
+
+        import { PaginaNaoEncontradaComponent } from './core/pagina-nao-encontrada.component';
+        import { PessoasPesquisaComponent } from './pessoas/pessoas-pesquisa/pessoas-pesquisa.component';
+        import { LancamentoCadastroComponent } from './lancamentos/lancamento-cadastro/lancamento-cadastro.component';
+        import { LancamentosPesquisaComponent } from './lancamentos/lancamentos-pesquisa/lancamentos-pesquisa.component';
+
+        const routes: Routes = [
+            { path: '', redirectTo: 'lancamentos', pathMatch: 'full' },
+/*                                                                                  // Trecho eliminado            
+            { path: 'lancamentos', component: LancamentosPesquisaComponent },
+            { path: 'lancamentos/novo', component: LancamentoCadastroComponent },
+            { path: 'lancamentos/:codigo', component: LancamentoCadastroComponent },
+*/            
+            { path: 'pessoas', component: PessoasPesquisaComponent },
+            { path: 'pagina-nao-encontrada', component: PaginaNaoEncontradaComponent },
+            { path: '**', redirectTo: 'pagina-nao-encontrada' }
+        ];
+
+        @NgModule({
+            imports: [
+                RouterModule.forRoot(routes)
+            ],
+            exports: [RouterModule]
+        })
+        export class AppRoutingModule { }
+
+    . Levante o projeto e verifique se a navegação continua funcionando.
+
+
+Aula 18.15. Desafio: roteamento e edição de pessoas
+---------------------------------------------------
+
+
+
+
+
+
 
 
 
