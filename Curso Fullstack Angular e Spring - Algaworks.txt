@@ -12131,7 +12131,7 @@ Aula 18.6. Desafio: implementando os serviços de atualização e busca por cód
 
 
 
-TODO: Parei aqui
+
 Aula 18.7. Preenchendo os campos na edição de lançamentos
 ---------------------------------------------------------
 
@@ -12144,7 +12144,7 @@ Aula 18.7. Preenchendo os campos na edição de lançamentos
             const codigoLancamento = this.route.snapshot.params['codigo']   // Linha incluida
 
             if ( codigoLancamento ){                                    // if incluido
-                carregarLancamento( codigoLancamento );
+                this.carregarLancamento( codigoLancamento );
             }
 
             this.carregarCategorias();
@@ -12154,7 +12154,7 @@ Aula 18.7. Preenchendo os campos na edição de lançamentos
         carregarLancamento( codigo: number ){                           // Método incluido
             this.lancamentoService.buscarPorCodigo( codigo )
                                     .then( lancamento => this.lancamento = lancamento )
-                                    .catch( erro => this.errorHandler( erro ) );
+                                    .catch( erro => this.errorHandler.handle( erro ) );
         }
 
     . Acesse o componente "lancamento-cadastro.component.html" e altere conforme código abaixo:
@@ -12170,7 +12170,7 @@ Aula 18.7. Preenchendo os campos na edição de lançamentos
 
         ...
         get editando(){
-            return Boolean( lancamento.codigo );
+            return Boolean( this.lancamento.codigo );
         }
         ...
 
@@ -12188,9 +12188,9 @@ Aula 18.8. Salvando lançamentos editados
         ...
         salvar( form: FormControl ){
             if ( this.editando ){
-                atualizarLancamento( form );
+                this.atualizarLancamento( form );
             }else {
-                adicionarLancamento( form );
+                this.adicionarLancamento( form );
             }
         }
 
@@ -12206,7 +12206,6 @@ Aula 18.8. Salvando lançamentos editados
         ...
 
     . Levante o projeto e faça as operações de inclusão e alteração.
-
 
 Aula 18.9. Implementando navegação imperativa
 ---------------------------------------------
@@ -12301,7 +12300,7 @@ Aula 18.9. Implementando navegação imperativa
         inicie uma edição, ou inclusão, e no meio da operação acione o botão "Novo" para ver se o fluxo será desviado para a 
         inclusão.
 
-    
+TODO: PAREI AQUI
 Aula 18.10. Fazendo redirecionamento
 ------------------------------------
 
