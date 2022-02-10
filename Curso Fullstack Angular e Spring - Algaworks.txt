@@ -10070,6 +10070,18 @@ Aula 17.01. Revisando e iniciando o back-end do projeto do curso
 			<artifactId>jakarta.xml.bind-api</artifactId>
 			<version>2.3.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+			<version>2.3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+
+        . Essas dependências são necessárias devido a versão do java que estamos trabalhando "java 11".
 
     . No canto superior direito acesse as opções do Maven.
 
@@ -12637,6 +12649,210 @@ Aula 18.14. Criando um Routing Module para o módulo de funcionalidade
 TODO: PAREI AQUI 
 Aula 18.15. Desafio: roteamento e edição de pessoas
 ---------------------------------------------------
+
+
+
+
+Aula 19.2. Revisando a segurança da API com OAuth 2 e JWT
+---------------------------------------------------------
+
+    . Daqui pra frente para levantar o projeto teremos que acrescentar mais um parâmetro na linha de comando:
+
+        java -jar algamoney-api-1.0.0-SNAPSHOT.jar --algamoney.origin-permitida=http://localhost:4200 --spring.profile.active=oauth-security
+
+    . Acesse o Postman e submeta a pesquisa de pessoas com os parâmetros abaixo:
+
+        . Aquisição do Token 
+
+            url: http://localhost:8080/oauth/token
+            headers: {
+                Content-Type: "application/x-www-form-urlenconded,
+            }
+            body: {
+                client_id: angular,
+                username: admin@algamoney.com,
+                password: admin,
+                grant_type: password
+            }
+
+        . Consumindo a API
+
+            url: http://localhost:8080/pessoas
+            method: GET
+            Headerts: { 
+                    Authorization: "Bearer " + [token adquirido no item acima]
+            }
+
+
+Aula 19.3. Desafio: módulo de segurança e protótipo da tela de login
+--------------------------------------------------------------------
+
+    . Acesse a raiz do projeto e execute os comandos abaixo:
+
+        ng g m seguranca
+
+        ng g c seguranca/login-form --module=seguranca --spec=false
+
+    . Acesse o componente "login-form.component.html" e implemente o código abaixo:
+
+        <div class="container">
+            <div class="ui-g" style="padding: 200px;">
+                <div class="ui-g-4">
+                </div>
+                <div class="ui-g-4">
+                    <p-panel>
+                        <p-header>
+                            <div class="ui-helper-clearfix">
+                                <span class="ui-panel-title" style="font-size:16px;display:inline-block;margin-top:2px">Login</span>
+                            </div>
+                        </p-header>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-fluid">
+                                <label for="username">Usuário</label>
+                                <input type="text" 
+                                        pInputText 
+                                        id="usuario" 
+                                        name="usuario" 
+                                        autocomplete="off"
+                                        #usuario/>
+
+                                <label for="password">Usuário</label>
+                                <input type="password" 
+                                        pPassword
+                                        id="senha"
+                                        name="senha"
+                                        promptLabel="Entre com a sua senha"
+                                        feedback=false
+                                        #senha/>
+                            </div>
+                        </div>
+                        <p-footer>
+                            <button pButton type="button" label="Login" class="ui-button-info" (click)="login(usuario.value, senha.value) "></button>
+                            <button pButton type="button" icon="fa-plus" label="Registrar" class="ui-button-info"></button>
+                        </p-footer>
+                    </p-panel>	
+                </div>
+            </div>
+        </div>
+
+    . Acesse o componente "login-form.component.ts" e implemente o código abaixo:
+
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-login-form',
+            templateUrl: './login-form.component.html',
+            styleUrls: ['./login-form.component.css']
+        })
+        export class LoginFormComponent implements OnInit {
+
+            constructor() { }
+
+            ngOnInit() {
+            }
+
+            login( usuario: string, senha: string){
+                console.log(usuario);
+                console.log(senha);
+            }
+        }
+
+    . Acesse o componente "seguranca.module.ts" e implemente o código abaixo:
+
+        import { NgModule } from '@angular/core';
+        import { CommonModule } from '@angular/common';
+        import { LoginFormComponent } from './login-form/login-form.component';
+        import { ButtonModule, InputTextModule, PanelModule, PasswordModule } from 'primeng/primeng';
+
+        @NgModule({
+            imports: [
+                CommonModule,
+                PanelModule,
+                InputTextModule,
+                PasswordModule,
+                ButtonModule
+            ],
+            declarations: [LoginFormComponent],
+            exports: [LoginFormComponent]
+        })
+        export class SegurancaModule { }
+
+    . Acesse o componente "app.module.ts" e inclua o module "SegurancaModule" nos imports:
+
+        imports...
+
+        @NgModule({
+            ...
+            imports: [
+                ...
+                SegurancaModule
+            ],
+            ...
+        })
+        export class AppModule { }
+
+    . Acesse o arquivo "app-routing.module.ts" e acrescente a rota do login como abaixo:
+
+        const routes: Routes = [
+            ...
+            { path: '', redirectTo: 'login', pathMatch: 'full' },
+            { path: 'login', component: LoginFormComponent },
+        ];
+
+    . Levante o projeto e verifique se o formulário de login está apresentando o usuário e a senha no 
+        console.log.
+
+
+Aula 19.2. Revisando a segurança da API com OAuth 2 e JWT
+---------------------------------------------------------
+
+    . Para levantar o projeto com autenticação "oauth" execute o comando abaixo no prompt do sistema operacional:
+
+        java -jar algamoney-api-1.0.0-SNAPSHOT.jar --algamoney.origin-permitida=http://localhost:4200  --spring.profiles.active=oauth-security
+
+    . Acesse o Postman, configure e execute a pesquisa do token como abaixo:
+
+        method: "POST",
+        url: "http://localhost:8080/oauth/token",
+        Headers: {
+            Content-Type: "application/x-www-form-urlencoded"
+            Authorization: "Basic YW5ndWxhcjpAbmd1bEByMA=="
+        },
+        Body: {
+            client: "angular",
+            username: "admin@algamoney.com",
+            password, "admin",
+            grant_typ: "password"
+        }
+
+        . Para configurar a senha do "Authorization" do "Header" siga os passos abaixo:
+
+            Authorization: "Basic  YW5ndWxhcjpAbmd1bEByMA=="
+
+            . Para conseguir a chave do Authorization, acesse o site https://www.base64encode.org/
+
+            . No campo "Encode to Base64 format" digite "angular:@ngul@r0" e mande codificar. O valor
+                que surgir é o que comporá a expressão do "Authorization".
+
+        . Caso não queira usar o "Authorization" do "Header" acima e optar pelo "Authorization" use os parâmetros abaixo,
+            assim podemos suprimir o "Authorization" do "Header" deixando como abaixo:
+
+            Authorization: { 
+                username: "angular",
+                passqword: "@ngul@r0"
+            }
+
+        . Importante: Ao acessar a área de "Cookies" encontraremos o "refreshToken".
+
+    . Execute a pesquisa de pessoas como abaixo:
+
+        method: "GET",
+        url: "http://localhost:8080/pessoas"
+        Headers: {
+            Authorization: "Bearer " + [Token]
+        }
+
+    . 
 
 
 
