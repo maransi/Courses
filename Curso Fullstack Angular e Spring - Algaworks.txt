@@ -12646,7 +12646,6 @@ Aula 18.14. Criando um Routing Module para o módulo de funcionalidade
 
     . Levante o projeto e verifique se a navegação continua funcionando.
 
-TODO: PAREI AQUI 
 Aula 18.15. Desafio: roteamento e edição de pessoas
 ---------------------------------------------------
 
@@ -12656,32 +12655,51 @@ Aula 18.15. Desafio: roteamento e edição de pessoas
 Aula 19.2. Revisando a segurança da API com OAuth 2 e JWT
 ---------------------------------------------------------
 
-    . Daqui pra frente para levantar o projeto teremos que acrescentar mais um parâmetro na linha de comando:
+    . Para levantar o projeto com autenticação "oauth" execute o comando abaixo no prompt do sistema operacional:
 
-        java -jar algamoney-api-1.0.0-SNAPSHOT.jar --algamoney.origin-permitida=http://localhost:4200 --spring.profile.active=oauth-security
+        java -jar algamoney-api-1.0.0-SNAPSHOT.jar --algamoney.origin-permitida=http://localhost:4200  --spring.profiles.active=oauth-security
 
-    . Acesse o Postman e submeta a pesquisa de pessoas com os parâmetros abaixo:
+    . Acesse o Postman, configure e execute a pesquisa do token como abaixo:
 
-        . Aquisição do Token 
+        method: "POST",
+        url: "http://localhost:8080/oauth/token",
+        Headers: {
+            Content-Type: "application/x-www-form-urlencoded"
+            Authorization: "Basic YW5ndWxhcjpAbmd1bEByMA=="
+        },
+        Body: {
+            client: "angular",
+            username: "admin@algamoney.com",
+            password, "admin",
+            grant_typ: "password"
+        }
 
-            url: http://localhost:8080/oauth/token
-            headers: {
-                Content-Type: "application/x-www-form-urlenconded,
+        . Para configurar a senha do "Authorization" do "Header" siga os passos abaixo:
+
+            Authorization: "Basic  YW5ndWxhcjpAbmd1bEByMA=="
+
+            . Para conseguir a chave do Authorization, acesse o site https://www.base64encode.org/
+
+            . No campo "Encode to Base64 format" digite "angular:@ngul@r0" e mande codificar. O valor
+                que surgir é o que comporá a expressão do "Authorization".
+
+        . Caso não queira usar o "Authorization" do "Header" acima e optar pelo "Authorization" use os parâmetros abaixo,
+            assim podemos suprimir o "Authorization" do "Header" deixando como abaixo:
+
+            Authorization: { 
+                username: "angular",
+                passqword: "@ngul@r0"
             }
-            body: {
-                client_id: angular,
-                username: admin@algamoney.com,
-                password: admin,
-                grant_type: password
-            }
 
-        . Consumindo a API
+        . Importante: Ao acessar a área de "Cookies" encontraremos o "refreshToken".
 
-            url: http://localhost:8080/pessoas
-            method: GET
-            Headerts: { 
-                    Authorization: "Bearer " + [token adquirido no item acima]
-            }
+    . Execute a pesquisa de pessoas como abaixo:
+
+        method: "GET",
+        url: "http://localhost:8080/pessoas"
+        Headers: {
+            Authorization: "Bearer " + [Token]
+        }
 
 
 Aula 19.3. Desafio: módulo de segurança e protótipo da tela de login
@@ -12803,54 +12821,8 @@ Aula 19.3. Desafio: módulo de segurança e protótipo da tela de login
         console.log.
 
 
-Aula 19.2. Revisando a segurança da API com OAuth 2 e JWT
----------------------------------------------------------
-
-    . Para levantar o projeto com autenticação "oauth" execute o comando abaixo no prompt do sistema operacional:
-
-        java -jar algamoney-api-1.0.0-SNAPSHOT.jar --algamoney.origin-permitida=http://localhost:4200  --spring.profiles.active=oauth-security
-
-    . Acesse o Postman, configure e execute a pesquisa do token como abaixo:
-
-        method: "POST",
-        url: "http://localhost:8080/oauth/token",
-        Headers: {
-            Content-Type: "application/x-www-form-urlencoded"
-            Authorization: "Basic YW5ndWxhcjpAbmd1bEByMA=="
-        },
-        Body: {
-            client: "angular",
-            username: "admin@algamoney.com",
-            password, "admin",
-            grant_typ: "password"
-        }
-
-        . Para configurar a senha do "Authorization" do "Header" siga os passos abaixo:
-
-            Authorization: "Basic  YW5ndWxhcjpAbmd1bEByMA=="
-
-            . Para conseguir a chave do Authorization, acesse o site https://www.base64encode.org/
-
-            . No campo "Encode to Base64 format" digite "angular:@ngul@r0" e mande codificar. O valor
-                que surgir é o que comporá a expressão do "Authorization".
-
-        . Caso não queira usar o "Authorization" do "Header" acima e optar pelo "Authorization" use os parâmetros abaixo,
-            assim podemos suprimir o "Authorization" do "Header" deixando como abaixo:
-
-            Authorization: { 
-                username: "angular",
-                passqword: "@ngul@r0"
-            }
-
-        . Importante: Ao acessar a área de "Cookies" encontraremos o "refreshToken".
-
-    . Execute a pesquisa de pessoas como abaixo:
-
-        method: "GET",
-        url: "http://localhost:8080/pessoas"
-        Headers: {
-            Authorization: "Bearer " + [Token]
-        }
+Aula 19.4. Implementando o serviço de autenticação com OAuth 2
+--------------------------------------------------------------
 
     . 
 
