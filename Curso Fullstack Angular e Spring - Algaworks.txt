@@ -12821,13 +12821,256 @@ Aula 19.3. Desafio: módulo de segurança e protótipo da tela de login
         console.log.
 
 
+
+// PAREI AQUI
 Aula 19.4. Implementando o serviço de autenticação com OAuth 2
 --------------------------------------------------------------
 
-    . 
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        ng g s seguranca/auth --spec=false
+
+    . Acesse o componente "core/core.module.ts" e declare o componente "AuthService" nos "providers":
+
+        ...
+        providers: [
+            ...
+            AuthService
+        ]
+
+    . Acesse o componente "AuthService" e implemente o código abaixo:
+
+        import { Http, Headers } from '@angular/http';
+        import { Injectable } from '@angular/core';
+
+        import 'rxjs/add/operator/toPromise';
+
+        @Injectable()
+        export class AuthService {
+
+            oauthTokenUrl = 'http://localhost:8080/oauth/token';
+
+            constructor(private http: Http) { }
+
+            login(usuario: string, senha: string): Promise<void> {
+                const headers = new Headers();
+                headers.append('Content-Type', 'application/x-www-form-urlencoded');
+                headers.append('Authorization', 'Basic YW5ndWxhcjpAbmd1bEByMA==');
+
+                const body = `username=${usuario}&password=${senha}&grant_type=password`;
+
+                return this.http.post(this.oauthTokenUrl, body, { headers })
+                    .toPromise()
+                    .then(response => {
+                        console.log(response);
+                    })
+                    .catch(response => {
+                        console.log(response);
+                    });
+            }
+
+        }    
+
+    . Acesse a classe "login-form.component.ts", altere o construtor e o método login:
+
+        ...
+        constructor( @Inject( AuthService ) private auth){}
+
+        login( usuario: string, senha: string){
+            this.auth.login( usuario, senha );
+        }
+        ...
+
+    . Levante o projeto, faça o login com os dados abaixo e verifique a console do navegador.
+
+        usuario:    "admin@algamoney.com"
+        password:   "admin"
+
+        . Verifique se o token está vindo com sucesso.
+
+        . Faça outro teste colocando a senha incorreta e verifique o resultado.
 
 
+Aula 19.5. Decodificando o JWT e armazenando no Local Storage
+-------------------------------------------------------------
 
+
+    . Utilizaremos a biblioteca "angular2-jwt", para mais detalhes sobre essa biblioteca acesse a URL abaixo:
+
+        https://github.com/auth0/angular2-jwt#using-jwthelper-in-components
+
+    . Acesse a raiz do projeto e execute o comando abaixo:
+
+        npm install angular2-jwt --save
+
+    . Acesse o componente "core.module.ts" e declare o componente "JwtHelper" no provider:
+
+        ...
+        providers: [
+            ...
+            JwtHelper
+        ]
+
+    . Acesse o componente "auth.service.ts", injete o componente "JwtHelper", crie o "jwtPayload":
+
+        jwtPayload: any;                                            // Linha inserida
+
+        constructor( @Inject(Http) private http,
+                        @Inject(JwtHelper) private jwtHelper){     // Linha incluida
+
+                        this.carrgarToken();                        // Linha inserida
+
+                        }
+        ...
+
+        login(usuario: string, senha: string): Promise<void> {
+            const headers = new Headers();
+            headers.append('Content-Type', 'application/x-www-form-urlencoded');
+            headers.append('Authorization', 'Basic YW5ndWxhcjpAbmd1bEByMA==');
+
+            const body = `username=${usuario}&password=${senha}&grant_type=password`;
+
+            return this.http.post(this.oauthTokenUrl, body, { headers })
+                .toPromise()
+                .then(response => {
+                    console.log(response);
+                    this.armazenarToken( response.json().access_token );    // Linha inserida
+                })
+                .catch(response => {
+                    console.log(response);
+                });
+        }
+        ...
+
+        private armazenarToken( token: string ){                            // Método inserido
+            this.jwtPayload = this.hwtHelper.decodeToken( token );
+            localStorage.setItem('token', token );
+        }
+
+        private carrgarToken(){                                             // Método inserido
+            const token = localStorage.getItem('token');
+
+            if (token){
+                this.armazenarToken( token );
+            }
+        }
+
+        . O "localStorage" funciona semelhantemente a uma "session". No caso de um refresh da tela pelo usuário, os dados
+            não serão perdidos.
+
+    . Acesse o componente "login-form.component.html" e insira o código abaixo:
+
+        <div class="container"
+                style="max-width: 400px; margin= auto;">
+            
+            {{ auth.jwtPayload | json }}                        <!-- Linha inserida -->
+
+            <form ...>
+                ...
+            </form>
+        </div>
+    
+    . Levante o projeto, faça o login corretamente e verifique se o "Payload" apareceu corretamente na tela.
+
+    . Faça refresh da tela e verifique se o Payload aparece com sucesso, independente da nossa autenticação.
+
+
+Aula 19.6. Tratando casos de erros e sucesso de autenticação
+------------------------------------------------------------
+
+    . Acesse o componente "auth.service.ts" e implemente as alterações abaixo:
+
+        ...
+
+        login(usuario: string, senha: string): Promise<void> {
+            const headers = new Headers();
+            headers.append('Content-Type', 'application/x-www-form-urlencoded');
+            headers.append('Authorization', 'Basic YW5ndWxhcjpAbmd1bEByMA==');
+
+            const body = `username=${usuario}&password=${senha}&grant_type=password`;
+
+            return this.http.post(this.oauthTokenUrl, body, { headers })
+                .toPromise()
+                .then(response => {
+//                    console.log(response);                                    // Linha eliminada
+                    this.armazenarToken( response.json().access_token );    
+                })
+                .catch(response => {
+//                    console.log(response);                                    // Linha eliminada
+
+                    if (response.status === 400 ){                              // IF incluido
+                        const responseJson = respons.json();  
+
+                        if (responseJson.error === "invalid_grant){
+                            return Promise.reject("Usuário ou senha inválida!!!");
+                        }
+
+                        return Promise.reject( response );
+                    }
+                });
+        }
+        ...
+
+    . Acesse o componente "login-form.component.ts" e implemente as linhas de código abaixo:
+
+        ...
+        export class LoginFormComponent implements OnInit {
+
+            constructor( @Inject( AuthService ) private auth,
+                            @Inject( ErrorHandelrService ) private errorHandler,
+                            @Inject( Router ) private router ){}
+
+
+            ngOnInit() {
+            }
+
+            login( usuario: string, senha: string){
+                this.auth.login( usuario, senha )
+                    .then( () => {
+                        this.router.navigate(["/lancamentos"]);
+                    })
+                    .catch( erro => {
+                        this.errorHandler.handle(error);
+                    });
+            }
+        }
+
+    . Acesse o componente "login-form.component.html" e proceda a alteração abaixo:
+
+        ...
+        <div class="ui-g-12">
+            <button pButton
+                    type="submit"
+                    label="Login"
+                    [disable]="!f.valid"
+                    (click)="login( usuario.value, senha.value); senha.value='';"></button>     <!-- Linha alterada -->
+        </div>    
+        ...
+
+
+Aula 19.7. Adicionando o Access Token nas chamadas HTTP
+-------------------------------------------------------
+
+    . Acesse o componente "seguranca.module.ts" e implemente o provider:
+
+        import { AuthHttp, AuthConfig } from 'angular2-jwt';
+        ...
+        export function authHttpServiceFactory( http: Http, options: RequestOptions ){
+            return new AuthHttp( new AuthConfig(), http, options );
+        }
+
+        @NgModule({
+            ...
+            providers: [
+                {
+                    provide: AuthHttp,
+                    useFactory: authHttpServiceFactory,
+                    deps: [Http, RequestOptions]
+                }
+            ]
+        })
+
+5:55
 
 
 
