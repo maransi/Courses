@@ -13070,7 +13070,98 @@ Aula 19.7. Adicionando o Access Token nas chamadas HTTP
             ]
         })
 
-5:55
+    . Acesse a classe "lancamento.service.ts", altere a assinatura do construtor, onde era injetado "Http", agora
+        será "AuthHttp"
+
+        impot { AuthHttp } from 'angular2-jwt';                 // Linha inserida
+        import { Headers } from '@angular/http';                // Linha alterada (eliminado o Http )
+
+        ...
+        constructor( // private http: Http,                     // Linha eliminada
+                        private http: AuthHttp,                 // Linha inserida
+                        private httpClient: HttpClient) { }
+
+        ...
+        pesquisar( filtro: LancamentoFiltro ): Promise<any>{
+
+//            const headers: Headers = new Headers();                                           // Linha eliminada
+
+            const params = new URLSearchParams();
+
+//            headers.append("Authorization","Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==");     // Linha eliminada
+
+            params.set("page", filtro.pagina.toString() );
+            params.set("size", filtro.itensPorPagina.toString());
+
+            if ( filtro.descricao ){
+                params.set("descricao", filtro.descricao );
+            }
+
+            if ( filtro.dataVencimentoInicio ){
+                params.set("dataVencimentoDe", moment(filtro.dataVencimentoInicio).format("YYYY-MM-DD") );
+            }
+
+            if ( filtro.dataVencimentoFim ){
+                params.set("dataVencimentoAte", moment(filtro.dataVencimentoFim).format("YYYY-MM-DD") );
+            }
+
+
+            return this.http.get(`${this.lancamentoUrl}?resumo`, { search: params  })        // Linha alterada ( Não será mais passado o Headers )
+                    .toPromise()
+                    .then( response => {
+                                    const responseJson = response.json();
+                                    const lancamentos = responseJson.content;
+
+                                    const resultado = {
+                                        lancamentos,
+                                        total: responseJson.totalElements
+                                    };
+
+                                    return resultado;
+                            });
+        }
+        ...
+
+        . A linha do "Authorization" é eliminada porque agora a inserção do "Authorization" será implicita,
+            sem a necessidade de incluir manualmente, pois a biblioteca "angular2-jwt" faz isso pra nós agora.
+
+        . O headers também deixará de ser necessário devido ao envio implicito do "Token" no "Authorization"
+
+    . Levante o projeto e verifique se o formulário de lançamentos, na tela de pesquisa está funcionando.
+
+    . Acesse a console do navegador na parte "Network", acesse a chamada a API de "lancamentos?resumo&..." no "Headers" e 
+        verifique na "Request Headers" o "Authoritation" com o Token.
+
+    . O Token inserido automaticamente na chamada veio da configuração feita na classe "auth.service.ts", nela fizemos o armazenamento 
+        do token no localStore.getItem("token"). Por padrão o "AuthHtpp" lê o "token" guardado na "localStorage" e inseri implicitamente
+        nas chamadas http.
+
+        ...
+        private armazenarToken( token: string ){                            // Método inserido
+            this.jwtPayload = this.hwtHelper.decodeToken( token );
+            localStorage.setItem('token', token );
+        }
+        ...
+
+    . Na mesma classe de "lancamento.service.ts" elimine todas os "Headers" e "Authorization".
+
+    . Acesse a classe "seguranca.module.ts" e implemente o código abaixo:
+
+        import { AuthHttp, AuthConfig } from 'angular2-jwt';
+        ...
+        export function authHttpServiceFactory( http: Http, options: RequestOptions ){
+            const config = new AuthConfig({                                                     // Linha inserida
+                globalHeaders: [{ 'Content-Type: 'application/json }]
+            });                                                
+
+//            return new AuthHttp( new AuthConfig(), http, options );                       
+            return new AuthHttp( config, http, options );                         // Linha alterada ()
+        }
+
+    . Levante o projeto e verifique se a inclusão, alteração e exclusão estão funcionando corretamente.
+
+
+7:19
 
 
 
