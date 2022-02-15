@@ -12888,7 +12888,7 @@ Aula 19.4. Implementando o serviço de autenticação com OAuth 2
 
         . Faça outro teste colocando a senha incorreta e verifique o resultado.
 
-// PAREI AQUI
+
 Aula 19.5. Decodificando o JWT e armazenando no Local Storage
 -------------------------------------------------------------
 
@@ -12916,7 +12916,7 @@ Aula 19.5. Decodificando o JWT e armazenando no Local Storage
         constructor( @Inject(Http) private http,
                         @Inject(JwtHelper) private jwtHelper){     // Linha incluida
 
-                        this.carrgarToken();                        // Linha inserida
+                        this.carregarToken();                        // Linha inserida
 
                         }
         ...
@@ -12941,11 +12941,11 @@ Aula 19.5. Decodificando o JWT e armazenando no Local Storage
         ...
 
         private armazenarToken( token: string ){                            // Método inserido
-            this.jwtPayload = this.hwtHelper.decodeToken( token );
+            this.jwtPayload = this.jwtHelper.decodeToken( token );
             localStorage.setItem('token', token );
         }
 
-        private carrgarToken(){                                             // Método inserido
+        private carregarToken(){                                             // Método inserido
             const token = localStorage.getItem('token');
 
             if (token){
@@ -12997,9 +12997,9 @@ Aula 19.6. Tratando casos de erros e sucesso de autenticação
 //                    console.log(response);                                    // Linha eliminada
 
                     if (response.status === 400 ){                              // IF incluido
-                        const responseJson = respons.json();  
+                        const responseJson = response.json();  
 
-                        if (responseJson.error === "invalid_grant){
+                        if (responseJson.error === "invalid_grant"){
                             return Promise.reject("Usuário ou senha inválida!!!");
                         }
 
@@ -13015,7 +13015,7 @@ Aula 19.6. Tratando casos de erros e sucesso de autenticação
         export class LoginFormComponent implements OnInit {
 
             constructor( @Inject( AuthService ) private auth,
-                            @Inject( ErrorHandelrService ) private errorHandler,
+                            @Inject( ErrorHandlerService ) private errorHandler,
                             @Inject( Router ) private router ){}
 
 
@@ -13045,13 +13045,16 @@ Aula 19.6. Tratando casos de erros e sucesso de autenticação
         </div>    
         ...
 
+    . Levante o projeto, faça login digitando uma senha válida e outra inválida.
 
+// PAREI AQUI
 Aula 19.7. Adicionando o Access Token nas chamadas HTTP
 -------------------------------------------------------
 
     . Acesse o componente "seguranca.module.ts" e implemente o provider:
 
         import { AuthHttp, AuthConfig } from 'angular2-jwt';
+        import { Http, RequestOptions } from '@angular/http';
         ...
         export function authHttpServiceFactory( http: Http, options: RequestOptions ){
             return new AuthHttp( new AuthConfig(), http, options );
@@ -13149,7 +13152,7 @@ Aula 19.7. Adicionando o Access Token nas chamadas HTTP
         ...
         export function authHttpServiceFactory( http: Http, options: RequestOptions ){
             const config = new AuthConfig({                                                     // Linha inserida
-                globalHeaders: [{ 'Content-Type: 'application/json }]
+                globalHeaders: [{ 'Content-Type': 'application/json' }]
             });                                                
 
 //            return new AuthHttp( new AuthConfig(), http, options );                       
@@ -13159,8 +13162,7 @@ Aula 19.7. Adicionando o Access Token nas chamadas HTTP
     . Levante o projeto e verifique se a inclusão, alteração e exclusão estão funcionando corretamente.
 
 
-7:19
-
+Adaptar pessoa.service.ts e categoria.service.ts para trabalhar com o "angular2-jwt"
 
 
 
