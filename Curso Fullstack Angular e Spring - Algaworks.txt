@@ -13047,7 +13047,7 @@ Aula 19.6. Tratando casos de erros e sucesso de autenticação
 
     . Levante o projeto, faça login digitando uma senha válida e outra inválida.
 
-// PAREI AQUI
+
 Aula 19.7. Adicionando o Access Token nas chamadas HTTP
 -------------------------------------------------------
 
@@ -13162,7 +13162,68 @@ Aula 19.7. Adicionando o Access Token nas chamadas HTTP
     . Levante o projeto e verifique se a inclusão, alteração e exclusão estão funcionando corretamente.
 
 
-Adaptar pessoa.service.ts e categoria.service.ts para trabalhar com o "angular2-jwt"
+// PAREI AQUI
+Aula 19.8. Exibindo o nome do usuário logado
+--------------------------------------------
+
+    . Acesse o componente "navbar.component.ts" e faça a injeção abaixo:
+
+        ...
+        constructor( @Inject( AuthService ) auth){}
+        ...
+
+    . Acesse o componente "navbar.component.html" e acrescente o código abaixo:
+
+        ...
+        <ul class="navbar-menu" [hidden]="!exibindoMenu">
+            <li class="navbar-usuario">{{ auth.jwtPayload?.nome }}</li>                                             <!-- Linha Alterada -->
+            <li class="navbar-menuitem" routerLinkActive="ativo"><a routerLink="/lancamentos">Lançamentos</a></li>
+            <li class="navbar-menuitem"  routerLinkActive="ativo"><a routerLink="/pessoas">Pessoas</a></li>
+            <li class="navbar-menuitem"><a href="#">Logout</a></li>
+        </ul>
+
+
+    . Levante a aplicação e verifique se o nome do usuário está saindo no topo do menu.
+
+Aula 19.9. Exibindo o menu do sistema conforme permissões do usuário
+--------------------------------------------------------------------
+
+    . Acesse o componente "auth.service.ts" e insira o código abaixo:
+
+        ...
+        temPermissao( permissao: string )    {
+            return this.jwtPayload && this.jwtPayload.authorities.includes( permissao );
+
+        }
+
+    . Acesse o componente "navbar.component.html" e faça alteração abaixo:
+
+        ...
+        <ul class="navbar-menu" [hidden]="!exibindoMenu">
+            <li class="navbar-usuario">{{ auth.jwtPayload?.nome }}</li>                                             
+            <li class="navbar-menuitem" 
+                routerLinkActive="ativo"
+                *ngIf="auth.temPermissao('ROLE_PESQUISAR_LANCAMENTO')"><a routerLink="/lancamentos">Lançamentos</a></li>    <!-- Linha Alterada -->
+            <li class="navbar-menuitem"  
+                routerLinkActive="ativo"
+                *ngIf="auth.temPermissao('ROLE_PESQUISAR_PESSOA')"><a routerLink="/pessoas">Pessoas</a></li>                <!-- Linha Alterada -->
+            <li class="navbar-menuitem"><a href="#">Logout</a></li>
+        </ul>
+
+    . Levante a aplicação e verifique se está apresentando somente as opções disponíveis ao usuário.
+
+
+Aula 19.10. Obtendo um novo access token
+----------------------------------------
+
+    . Acesse o projeto java, altere o tempo de expiração do token para 5 segundos.
+
+    . 
+
+
+
+
+
 
 
 
