@@ -13218,7 +13218,90 @@ Aula 19.10. Obtendo um novo access token
 
     . Acesse o projeto java, altere o tempo de expiração do token para 5 segundos.
 
-    . 
+    . Acesse o componente "auth.service.ts" e implemente o método abaixo:
+
+        login(usuario: string, senha: string): Promise<void> {
+            const headers = new Headers();
+            headers.append('Content-Type', 'application/x-www-form-urlencoded');
+            headers.append('Authorization', 'Basic YW5ndWxhcjpAbmd1bEByMA==');
+
+            const body = `username=${usuario}&password=${senha}&grant_type=password`;
+
+            return this.http.post(this.oauthTokenUrl, body,
+                { headers, withCredentials: true })                             // Linha alterada
+            .toPromise()
+            .then(response => {
+                this.armazenarToken(response.json().access_token);
+            })
+            .catch(response => {
+                if (response.status === 400) {
+                const responseJson = response.json();
+
+                if (responseJson.error === 'invalid_grant') {
+                    return Promise.reject('Usuário ou senha inválida!');
+                }
+                }
+
+                return Promise.reject(response);
+            });
+        }
+        ...
+        obterNovoAccessToken(): Promise<void> {
+            const headers = new Headers();
+            headers.append('Content-Type', 'application/x-www-form-urlencoded');
+            headers.append('Authorization', 'Basic YW5ndWxhcjpAbmd1bEByMA==');
+
+            const body = 'grant_type=refresh_token';
+
+            return this.http.post(this.oauthTokenUrl, body,
+                { headers, withCredentials: true })
+            .toPromise()
+            .then(response => {
+                this.armazenarToken(response.json().access_token);
+
+                console.log('Novo access token criado!');
+
+                return Promise.resolve(null);
+            })
+            .catch(response => {
+                console.error('Erro ao renovar token.', response);
+                return Promise.resolve(null);
+            });
+        }
+        ...
+
+        . withCredentials: true - Serve para liberar os Cookies do controle CORS cross-site
+
+    . Acesse o componente "navbar.component.ts" e inclua o método abaixo:
+
+        ...
+        criarNovoAccessToken() {
+            this.auth.obterNovoAccessToken();
+        }        
+        ...
+
+    . Acesse o componente "navbar.component.html" e inclua o botão abaixo:
+
+        <nav class="navbar">
+
+            <div class="container">
+                <div class="ui-g">
+                <div class="ui-g-12">
+                    <a href="javascript:;" class="navbar-toggle" (click)="exibindoMenu = !exibindoMenu"><i class="fa fa-bars"></i></a>
+                    <button type="button" (click)="criarNovoAccessToken()">Novo access token</button>                                       <!-- Linha Incluida -->
+                </div>
+                </div>
+            </div>
+            ...
+        </nav>
+
+    . Levante o projeto, acesse a tela de Lançamento Pesquisa, quando o token expirar clique no botão "Novo Token" e continue
+        a paginação para ver se o erro de "Token Expired" desapareceu.
+
+
+Aula 19.11. Interceptando chamadas HTTP para tratar a expiração do access token
+-------------------------------------------------------------------------------
+
 
 
 
