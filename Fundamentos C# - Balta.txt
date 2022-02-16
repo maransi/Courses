@@ -33,7 +33,7 @@ https://balta.io/blog/dotnet-instalacao-configuracao-e-primeiros-passos#criando-
 Instalação das extensões do VSCode
 ----------------------------------
 
-        C#
+        C# 
         C# Extensions
         C# XML Documentation Comments
         vscode-icons (Opcional)
@@ -179,16 +179,20 @@ Criando uma Solution
         -n : name da aplicação (Nome do projeto HelloWorld.csproj )
         -o : output (nome da pasta que será criado para criar as classes)
 
+    . Para baixar todos os pacotes do projeto usamos o comando abaixo:
+
+        dotnet restore
+
+        . Basicamente o "restore" é feito somente a primeira vez que abrimos o projeto para baixar os pacotes de dependência.
+
     . A estrutura de pastas ficará:
 
-        CSharpBasico
-            |
-            +----------- obj
-            |
-            +----------- helloWorld
-            |               +----   HelloWorld.csproj
-            |               +----   Program.cs
-            CSharpBasico.sln
+        HelloWorld
+        |
+        +------ obj
+        |
+        + HelloWorld.csproj
+        + Program.cs
 
     . Agora precisamos associar o projeto a solution
 
@@ -198,12 +202,50 @@ Criando uma Solution
 
         dotnet sln list
 
+    . Para limpar os arquivos de cache execute o comando abaixo:
+
+        dotnet clean
+
+    . Para compilar o projeto execute os comandos abaixo:
+
+        dotnet clean
+        dotnet build
+
+
     . O arquivo Program.cs possui um método main. Para executarmos a classe Program.cs digite os
         comandos abaixo:
 
         cd CSharpBasico/helloWorld
 
         dotnet run
+
+
+Variáveis de Ambiente
+---------------------
+
+    . Para trabalhar com variáveis de ambiente podemos passar como parâmetro no comando "dotnet run":
+
+        dotnet run --enviroment=$SEU_AMBIENTE
+        dotnet run --enviroment=development
+        dotnet run --enviroment=production
+
+
+Dica para alterar a versão do dotnet de um projeto "console"
+------------------------------------------------------------
+
+    . Acesse o arquivo .csproj e altere o valor da tag <TargetFramework> para.
+
+        netcoreapp3.1
+        net5.0
+
+        Exemplo:
+
+        <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+                <OutputType>Exe</OutputType>
+                <TargetFramework>netcoreapp3.1</TargetFramework>
+            </PropertyGroup>
+        </Project>
 
 
 Dica de como alterar a versão do AspNetCore em um novo Projeto
@@ -272,8 +314,8 @@ Debugando dentro do VSCode
 
     ou
 
-    . Dentro da pasta src acesse o VSCode, ao entrar ele irá fazer uma pergunta para colocar o build e o debug no projeto,
-        responda "Yes"
+    . Dentro da pasta src acesse o VSCode, ao entrar pela primeira vez ele irá fazer uma pergunta para colocar o build e o debug no projeto,
+        "Install C# Extensions", responda "Yes".
 
         code .
 
@@ -317,14 +359,84 @@ Debugando dentro do VSCode
         +-----------------------------+-----------------------------+-----------------------------+
 
 
+Escopo de Programa
+------------------
+
+    using System;               // Importações
+
+    namespace HelloWorld        // Equivalente aos pacotes/divisões lógica
+    {
+        class Program           // Definição da classe
+        {
+            static void Main(string[] args)     // Método
+            {
+                string texto = "Hello World";
+
+                Console.WriteLine(texto);
+            }
+        }
+    }
+    
+
+    . Namespace, Using
+
+        . Crie dentro do projeto a classe abaixo Oi.cs:
+
+            using System;
+
+            namespace Teste
+            {
+                class Oi
+                {
+                    public void BoaNoite( string nome)
+                    {
+                        Console.WriteLine("Boa Noite " + nome);
+                    }
+
+                }
+            }
+
+        . Altere o Program.cs como abaixo:
+
+            using System;
+            using Teste;            // Importe da package "Teste" para acessar a classe Oi
+
+            namespace HelloWorld
+            {
+                class Program
+                {
+                    static void Main(string[] args)
+                    {
+                        Oi oi = new Oi();
+
+                        oi.BoaNoite("Marco");
+                    }
+                }
+            }
 
 
+    . Variáveis, Constante
 
+        . Uma variável pode ser iniciada pelo tipo (int, long, float, ...), ou pela palavra reservada "var":
 
+            int idade = 10;
+            var idade = 10;
+
+            . "var" obriga que um valor seja informado, pois é através dele que o compilador determina o tipo da variável.
+
+                int idade;      // Válido
+                var idade;      // Inválido
+
+        . Declaração de constantes
+
+            const int IDADE_MINIMA = 10;
+            const var IDADE_MINIMA = 10;
+            const var IDADE_MINIMA;     // Inválido
+        
 Tipagem de Dados
 ----------------
 
-    Tipos por valor:
+    Tipos por valor ou primitivos:
 
         . São alocados diretamente na pilha.
         . Não precisam ser inicializados com o operador new.
@@ -383,7 +495,7 @@ Tipagem de Dados
                 As structs fornecem uma alternativa mais “leve e barata” às classes, onde o custo do uso das classes 
                 (alocação dinâmica de memória, métodos virtuais e uso de ponteiros) seria muito caro. Por exemplo, um ponto (coordenada X, Y).
 
-    Tipos por Referência:
+    Tipos por Referência, ou complexos:
 
         . São alocados em um heap e sujeitos à “coleta de lixo” (“garbage collection”) quando não forem mais usados.
         . Devem ser inicializados com o operador new.
