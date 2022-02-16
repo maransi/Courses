@@ -1,0 +1,552 @@
+Fundamentos C# - Balta
+
+Instalação AspNetCore 3.1
+-------------------------
+
+https://balta.io/blog/dotnet-instalacao-configuracao-e-primeiros-passos#criando-seu-primeiro-app
+
+    . Acesse o link abaixo para baixar o .NET Core 3.1
+
+        https://dotnet.microsoft.com/download
+
+    . Acesse o download "All .NET Core downloads" e baixe a versão 3.1
+
+    . Acesse o link "Package manager instructions" 
+
+    . Localize a versão do Ubuntu que está sendo utilizado, copie e execute os comandos no 
+        terminal:
+
+        wget https://packages.microsoft.com/config/ubuntu/20.10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        sudo apt-get update;   sudo apt-get install -y apt-transport-https &&   sudo apt-get update &&   sudo apt-get install -y dotnet-sdk-5.0
+        sudo apt-get update;   sudo apt-get install -y apt-transport-https &&   sudo apt-get update &&   sudo apt-get install -y aspnetcore-runtime-5.0
+
+    . Para testar a instalação execute os comandos abaixo:
+
+        dotnet --version
+        dotnet --help
+        dotnet --list
+        dotnet --list-runtimes
+        dotnet --list-sdks
+
+
+Instalação das extensões do VSCode
+----------------------------------
+
+        C#
+        C# Extensions
+        C# XML Documentation Comments
+        vscode-icons (Opcional)
+
+
+Configurar Visual Studio Code para .NETCore
+-------------------------------------------
+
+    . Acesse File / Preferences / Settings
+
+    . Digite C#
+
+    . Acesse "C# Configuration / CSharp Format Enabled" e habilite a configuração
+
+    . Digite "Format on save" e habilite a configuração
+
+    . Digite "Final" e habilite a configuração "Files: Insert final newline" e habilite a configuração
+
+
+.NET Core Command-Line Interface (CLI)    
+--------------------------------------
+
+    . Digite no terminal "dotnet --info" para apresentar informações variadas da instação do dotnet
+
+    . Digite no terminal "dotnet new" irá apresentar as várias possibilidades de criar diversos projetos, exemplo:
+
+        dotnet new mvc
+
+        dotnet run
+
+        #Acesse o navegador e digite a URL: https://localhost:5001/ para ver o resultado do projeto criado.
+
+    . Ctrl + C no terminal acaba com a execução do projeto:
+
+https://www.infoq.com/br/articles/netcore-cli/    
+
+
+    . Comandos dotnet cli:
+
+        dotnet new console          => Novo Console Application
+        dotnet new classlib         => Nova Class Library
+        dotnet new web              => Novo projeto ASP.NET Core
+        dotnet new mvc              => Novo projeto ASP.NET Core
+        dotnet new webapi           => Novo projeto ASP.NET Core
+        dotnet new mstest           => Novo projeto Microsoft Test
+
+Instalar pacotes através do Nuget.org
+-------------------------------------
+
+    . Ao ser compilada, uma biblioteca gera um arquivo DLL. Será esta DLL que os outros projetos irão utilizar. 
+        O NuGet aproveita desta característica da plataforma para definir seus pacotes.
+
+    . Na prática, um pacote NuGet é um arquivo compactado com a extensão .nupkg que contém um código compilado (DLL), 
+        outros arquivos relacionados a este código (como imagens, etc.) e um arquivo de configuração que contém 
+        informações sobre o pacote, como: número de versão, criador, etc.
+
+    . Estes pacotes .nupkg podem ser publicados em repositórios públicos ou privados, onde os desenvolvedores podem 
+        consumi-los, adicionando-os em seus projetos e utilizando no código as funcionalidades que fornecerem.
+
+    . Em se tratando de projeto, como se fosse as dependências de bibliotecas.
+
+    . Acesse o site nuget.org, digite "Microsoft Entity Framework Core" e faça a pesquisa.
+
+    . Acesse o item Microsoft.EntityFrameworkCore.
+
+    . Acesse uma das versões, atualmente 5.0.5.
+    
+    . Acesse a aba .NetCli.
+
+    . Copie o comando sugerido por esse caminho:
+
+        dotnet add package Microsoft.EntityFrameworkCore --version 5.0.5
+
+    . Acesse o terminal, vá na pasta do projeto e execute o comando acima. Cuidado é necessário acessar a pasta do projeto
+        e não da solução, exemplo: ~/workspace-two/CSharpBasico/helloWorld.
+
+
+    . Após a execução, no terminal, execute um dos comandos abaixo:
+
+        dotnet restore
+
+        ou
+
+        dotnet build
+
+    . Acesse o Visual Studio Code "code ." para entrar no projeto e acesse o arquivo com extensão "*.csproj". Podemos verificar 
+        que agora temos o pacote dentro da aplicação:
+
+        <ItemGroup>
+            <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+        </ItemGroup>
+
+    . Retorne ao Home do site nuget.org e digite "Pomelo Entity Framework core" e acesse o link do MySQL.
+
+    . Acesse a aba "PackageReference" e copie o comando sugerido:
+
+    . Acesse novamente o arquivo com a extensão *.csproj e insira a dependência copiada dentro do nó "ItemGroup":
+
+        <ItemGroup>
+            <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+            <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />    
+        </ItemGroup>
+
+    . Salve o conteúdo do arquivo, o VsCode irá pedir para dar o "Restore", confirme o restore.
+
+    . Se quiser podemos dar o "dotnet restore", ou o "dotnet build", no terminal.
+
+    . Caso haja a necessidade de retirar alguma dependência do nó "ItemGroup", acesse o terminal, e execute os comandos abaixo:
+
+        dotnet clean
+        dotnet restore
+
+
+Documentação do C# e o que eu posso fazer com C#
+------------------------------------------------
+
+    . A documentação da Microsoft encontra-se no link abaixo:
+
+        https://docs.microsoft.com/pt-br/dotnet/csharp
+
+
+Criando uma Solution
+--------------------
+
+    . Crie uma pasta com o nome CSharpBasico
+
+    . Digite o comando abaixo para verificar as opções do compilador dotnet:
+
+        dotnet new
+
+    . Dentro da pasta CSharpBasico digite o comando abaixo:
+
+        dotnet new sln --name CSharpBasico
+
+    . Para acessar a solução com o VisualStudio Code digite o comando abaixo:
+
+        code .
+
+    . Dentro da "Solution" criaremos um projeto, do tipo console:
+
+        dotnet new console -n HelloWorld -o helloWorld
+        
+        -n : name da aplicação (Nome do projeto HelloWorld.csproj )
+        -o : output (nome da pasta que será criado para criar as classes)
+
+    . A estrutura de pastas ficará:
+
+        CSharpBasico
+            |
+            +----------- obj
+            |
+            +----------- helloWorld
+            |               +----   HelloWorld.csproj
+            |               +----   Program.cs
+            CSharpBasico.sln
+
+    . Agora precisamos associar o projeto a solution
+
+        dotnet sln add helloWorld/
+
+    . Digite o comando abaixo para verificar os projetos que compoem a solution:
+
+        dotnet sln list
+
+    . O arquivo Program.cs possui um método main. Para executarmos a classe Program.cs digite os
+        comandos abaixo:
+
+        cd CSharpBasico/helloWorld
+
+        dotnet run
+
+
+Dica de como alterar a versão do AspNetCore em um novo Projeto
+--------------------------------------------------------------
+
+    . As configurações abaixo só funcionarão se houver mais de um SDK instalado no sistema operacional.
+
+    . Acesse nosso diretório de projetos e crie as pastas abaixo:
+
+        mkdir curso_api_netcore
+        mkdir curso_api_netcore/src
+        cd curso_api_netcore
+
+    . No terminal digite o comando abaixo para verificar a versão dos SDKs disponível
+
+        dotnet --list-sdks
+
+    . Acesse o code e dentro da pasta curso_api_netcore/src crie o arquivo global.json
+
+    . Coloque o conteúdo abaixo no arquivo global.json:
+
+        {
+            "sdk" : {
+                "version" : "3.1.408"
+            }     
+
+        }
+
+    . Acesse o terminal novamente, acesse a pasta curso_api_netcore/src e verifique a versão do SDK:
+
+        dotnet --version
+
+    . Acesse qualquer outra pasta e verifique novamente a versão
+
+        dotnet --version
+
+    . Se tudo der certo, teremos um SDK na pasta src diferente das outras pastas
+
+    . Acesse a pasta src e digite o comando abaixo:
+
+        dotnet new -n teste -o teste
+
+    . Acesse a pasta do projeto teste dentro do VSCode e verifique o conteúdo do arquivo teste.csproj
+
+        <Project Sdk="Microsoft.NET.Sdk.Web">
+
+        <PropertyGroup>
+            <TargetFramework>netcoreapp3.1</TargetFramework>
+        </PropertyGroup>
+
+        </Project>
+
+    . Veja que o <TargetFramework> está configurado automaticamente para o SDK 3.1
+
+
+Debugando dentro do VSCode
+--------------------------
+
+    . Digite Ctrl + Shift + P
+
+    . Digite ".Net: Generate Assests for Build and Debug" para criar o "launch.json" e o "task.json"
+
+    ou 
+
+    . Acesse o projeto, vá para a área de Debug, acione a criação do "launch.json".
+
+    ou
+
+    . Dentro da pasta src acesse o VSCode, ao entrar ele irá fazer uma pergunta para colocar o build e o debug no projeto,
+        responda "Yes"
+
+        code .
+
+        . Ao responder "Yes", o VSCode ira criar uma pasta do projeto .vscode. Dentro desta pasta teremos dois arquivos
+            ( launch.json e tasks.json). Esses arquivos criados automaticamente tem as configurações para depuração.
+
+        . Podemos acessar a execução do projeto do icone com triângulo na barra vertical do VSCode, que surgira a "Side Bar".
+            Neste ponto surgirá os botões de execução do projeto. 
+
+        . Execute o projeto e no navegador execute a URL abaixo:
+
+            http://localhost:5000/WeatherForecast
+
+    
+    . Pare a aplicação, e elimine os arquivos abaixo do projeto:
+
+        /WeatherForecast.cs
+        Controllers/WeatherForecastController.cs
+        
+    . No VSCode acesse a opção Terminal / Run Task... e escolha a opção "build"
+
+
+.NET Standard
+-------------
+
+        +-----------------------------+-----------------------------+-----------------------------+
+        |    .NET FRAMEWORK           |          .NET Core          |        XAMARIN              |
+        +-----------------------------+-----------------------------+-----------------------------+
+        |   WPF        Windows Forms  |          UWP                |     iOS                     |
+        |        ASP.NET              |      ASP.NET Core           |               Android       |
+        |                             |                             |    OS X                     |
+        +-----------------------------+-----------------------------+-----------------------------+
+        |                          .NET STANDARD LIBRARY                                          |
+        |                                                                                         |
+        +-----------------------------+-----------------------------+-----------------------------+
+
+        +-----------------------------+-----------------------------+-----------------------------+
+        |                       COMMON INFRASTRUCTURE                                             |
+        +-----------------------------+-----------------------------+-----------------------------+
+        |       Compilers             |     Languages               |        Runtime Components   |
+        +-----------------------------+-----------------------------+-----------------------------+
+
+
+
+
+
+
+Tipagem de Dados
+----------------
+
+    Tipos por valor:
+
+        . São alocados diretamente na pilha.
+        . Não precisam ser inicializados com o operador new.
+        . A variável armazena o valor diretamente.
+        . A atribuição de uma variável a outra copia o conteúdo, criando efetivamente outra cópia da variável.
+        . Normalmente usados com tipos de pequeno tamanho (menos que 16 bytes), onde o uso de referências traria um custo muito grande.
+        . Podem ser automaticamente convertidos para referências em um processo chamado “boxing”,
+
+        Tipo        Implementação
+        ----        -------------
+        byte 	    Inteiro de 8 bits sem sinal (0 a 255).
+        sbyte 	    Inteiro de 8 bits com sinal (-127 a 128).
+        ushort 	    Inteiro de 16 bits sem sinal (0 a 65 535).
+        short 	    Inteiro de 16 bits com sinal (-32 768 a 32 767).
+        uint 	    Inteiro de 32 bits sem sinal (0 a 4 294 967 295).
+        int 	    Inteiro de 32 bits com sinal (-2 147 483 648 a 2 147 483 647).
+        ulong 	    Inteiro de 64 bits sem sinal (0 a 18 446 744 073 709 551 615).
+        long 	    Inteiro de 64 bits com sinal (-9 223 372 036 854 775 808 a 9 223 372 036 854 775 807).
+        double 	    Ponto flutuante binário IEEE de 8 bytes (±5.0×10-324 a ±1.7×10308), 15 dígitos decimais de precisão.
+        float 	    Ponto flutuante binário IEEE de 4 bytes (±1.5×10-45 a ±3.4×1038), 7 dígitos decimais de precisão.
+        decimal 	Ponto flutuante decimal de 128 bits. (1.0×10-28 a 7.9×1028), 28 dígitos decimais de precisão.
+        bool 	    Pode ter os valores true e false. Não é compatível com inteiro.
+        char 	    Um único caractere Unicode de 16 bits. Não é compatível com inteiro.
+
+        Tipos definidos pelo usuário:
+
+            enum
+
+                Permite declarar uma seqüência de identificadores associados, mas incompatíveis com inteiros e com outras enumerações. 
+                Praticamente idêntico às enumerações do Delphi. Exemplo:
+
+                enum Days {Sun, Mon, Tue, Wed, Thu, Fri, Sat};
+
+            struct
+
+                Permite declarar tipos que contém vários valores, identificados por um nome. Semelhante ao record do Delphi. Exemplo:
+
+                    public struct Point { 
+                        public int x, y; 
+                        
+                        public Point(int p1, int p2) { 
+                            x = p1; 
+                            y = p2;    
+                        } 
+                    }
+
+                As structs possuem algumas características em comum com as classes:
+
+                    . Podem ter métodos.
+                    . Podem ter construtores. Entretanto, existem diferenças em relação às classes:
+                    . Elas são tipos por valor enquanto as classes são tipos por referência.
+                    . Não podemos declarar um construtor que não aceite argumentos.
+                    . Podemos atribuir à variável this, correspondente ao self no Delphi;
+                    . Não suportam herança; elas são implicitamente sealed.
+
+                As structs fornecem uma alternativa mais “leve e barata” às classes, onde o custo do uso das classes 
+                (alocação dinâmica de memória, métodos virtuais e uso de ponteiros) seria muito caro. Por exemplo, um ponto (coordenada X, Y).
+
+    Tipos por Referência:
+
+        . São alocados em um heap e sujeitos à “coleta de lixo” (“garbage collection”) quando não forem mais usados.
+        . Devem ser inicializados com o operador new.
+        . A variável armazena uma “referência”, uma espécie de ponteiro; o conteúdo em si fica no heap.
+        . A atribuição de uma variável a outra copia a referência; podemos ter muitas variáveis referindo-se ao mesmo valor.
+        . Normalmente usados com tipos de grande tamanho (mais que 16 bytes), onde o custo da alocação dinâmica é relativamente 
+            pequeno frente a sua flexibilidade.
+        . Podem conter o valor null, embora se usarmos uma variável com o valor null a exception NullReferenceException será gerada.
+
+
+        Arrays
+
+            Um array é sempre criado dinamicamente em tempo de execução. Podemos ter arrays de várias dimensões e arrays de arrays. 
+            Veja um exemplo de criação e inicialização de um array de inteiros de uma dimensão:
+
+                int[] myIntArray = new int[5] { 1, 2, 3, 4, 5 };
+
+        Class
+
+            Tipo definido pelo usuário e correspondem a uma class no Delphi As classes são sempre derivadas de object e podem conter campos, 
+            métodos e propriedades. Uma classe pode derivar de uma única outra classe, e também de várias interfaces. Veja um exemplo:
+
+                public class Tempo {
+                    protected int H; protected int M; protected int S;
+
+                    public Tempo() {
+                        Ajusta(0, 0, 0);
+                    }
+
+                    public Tempo(int _H, int _M, int _S) {
+                        Ajusta(_H, _M, _S);
+                    }
+
+                    public void Ajusta(int _H, int _M, int _S) {
+                        H = _H; M = _M; S = _S;
+                        Normaliza();
+                    }
+
+                    public string ParaString() {
+                        return string.Format("{0}:{1}:{2}", new object[] {H, M, S});
+                    }
+                    
+                    void Normaliza() {
+                        M = M + S / 60;
+                        S = S % 60;
+                        H = H + M / 60;
+                        M = M % 60;
+                    }
+
+                    public double Hora {
+                        get {
+                            return H + (M / 60.0) + (S / 3600.0);
+                        }
+
+                        set {
+                            M = 0; S = 0;
+                            H = (int) value;
+                            double Sobra = value - H;
+                            S = (int)(Sobra * 3600);
+                            Normaliza();
+                        }
+                    }
+
+                    override public string ToString() {
+                        return ParaString();
+                    }
+                }
+
+        Interface
+
+            Tipo definido pelo usuário. Uma interface é uma espécie de classe, mas contém apenas os “protótipos” dos métodos, 
+            sem a sua implementação. Corresponde no Delphi a uma interface. Uma classe, além de ser derivada de outra, pode 
+            implementar várias interfaces. Veja um exemplo:
+
+	
+                // Declara a interface
+                interface IControl
+                {
+                    void Paint();
+                }
+    
+                // Cria um interface derivada
+                interface ITextBox: IControl
+                {
+                    void SetText(string text);
+                }
+        
+                // A classe implementa a interface
+                class TextBox: ITextBox
+                {
+                    void IControl.Paint() {...}
+                    void ITextBox.SetText(string text) {...}
+                }
+
+        Delegate
+
+            Tipo definido pelo usuário. É um “ponteiro de função orientado a objeto. Podemos atribuir uma lista de métodos a um delegate e 
+            chamá-los ao invocar o delegate. O delegate corresponde mais ou menos a um “procedure of object” do Delphi, mas pode também apontar 
+            para métodos static (métodos class no Delphi) e para uma lista de métodos.Veja um exemplo:
+
+
+                // Declara um delegate. É um método que não aceita argumentos e retorna inteiros
+                delegate int MyDelegate();
+
+                // Declara uma classe. Note que os métodos tem a mesma “assinatura” do delegate acima:
+                // retornam um inteiro e não aceitam argumentos
+                public class MyClass
+                {
+                    public int InstanceMethod ()
+                    {
+                        Console.WriteLine("A message from the instance method.");
+            
+                        return 0;
+                    }
+
+                    static public int StaticMethod ()
+                    {
+                        Console.WriteLine("A message from the static method.");
+                        return 0;
+                    }
+                }
+
+                public class MainClass
+                {
+                    static public void Main ()
+                    {
+                        MyClass p = new MyClass();
+                        
+                        // Mapeia o delegate ao método da classe criada acima
+                        MyDelegate d = new MyDelegate(p.InstanceMethod);
+                        
+                        // Chama o método via delegate
+                        d();
+                        
+                        // Mapeia outro método (agora é static)
+                        d = new MyDelegate(MyClass.StaticMethod);
+                
+                        // Chama o método via delegate
+                        d();
+                    }
+                }
+
+        Tipo string
+
+            As strings são tecnicamente um tipo por referência, mas possuem algumas características especiais:
+
+                . Não precisam ser inicializadas com o operador new.
+                . A atribuição de uma variável a outra funciona como se copiasse o conteúdo, criando efetivamente outra cópia da variável.
+                . Uma string contendo o valor null é uma string vazia; não é um erro usá-la.
+                . Você não pode criar uma classe derivada de string.
+
+            As strings contêm caracteres Unicode e podem ter até 1G de comprimento. Veja um exemplo:
+
+                // Declara e inicializa uma string
+                string Name = "Mary";
+
+                // Copia para outra string. Se alterarmos uma delas, a outra manterá o seu valor
+                string NewName = Name;
+
+                // Atribui à string antiga
+                Name = "John";
+
+                // Exibe "John - Mary"
+                System.Console.WriteLine(Name + " - " + NewName);
+
+
