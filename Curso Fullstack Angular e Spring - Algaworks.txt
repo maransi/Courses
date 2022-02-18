@@ -11189,6 +11189,49 @@ Aula 17.9. Adicionando mensagem de sucesso com Angular Toasty
     . Acesse o componente "lancamento.service.ts", retorne a linha correta comentada e apaghe a errada.
 
 
+17.14. Desafio: mensagem de erro de usuário na exclusão de pessoa
+-----------------------------------------------------------------
+
+    . Acesse o componente "hanler.service.ts" e copie o código abaixo:
+
+        import { Injectable } from '@angular/core';
+        import { Response } from '@angular/http';
+
+        import { ToastyService } from 'ng2-toasty';
+
+        @Injectable()
+        export class ErrorHandlerService {
+
+            constructor(private toasty: ToastyService) { }
+
+            handle(errorResponse: any) {
+                let msg: string;
+
+                if (typeof errorResponse === 'string') {
+                   msg = errorResponse;
+                } else if (errorResponse instanceof Response
+                    && errorResponse.status >= 400 && errorResponse.status <= 499) {
+                    let errors;
+                    msg = 'Ocorreu um erro ao processar a sua solicitação';
+
+                    try {
+                        errors = errorResponse.json();
+
+                        msg = errors[0].mensagemUsuario;
+                    } catch (e) { }
+
+                    console.error('Ocorreu um erro', errorResponse);
+
+                } else {
+                    msg = 'Erro ao processar serviço remoto. Tente novamente.';
+                    console.error('Ocorreu um erro', errorResponse);
+                }
+
+                this.toasty.error(msg);
+            }
+        }
+
+
 
 17.17. Listando as categorias cadastradas no dropdown
 -----------------------------------------------------
@@ -13412,7 +13455,400 @@ Aula 19.11. Interceptando chamadas HTTP para tratar a expiração do access toke
 Aula 19.12. Protegendo componentes
 ----------------------------------
 
+    . Acesse o componente "error-handler.service.ts" e implemente as linhas abaixo:
 
+        ...
+        @Injectable()
+        export class ErrorHandlerService {
+            constructor(private toasty: ToastyService) { }
+
+            handle(errorResponse: any) {
+                let msg: string;
+
+                if (typeof errorResponse === 'string') {
+                    msg = errorResponse;
+
+                } else if (errorResponse instanceof Response
+                    && errorResponse.status >= 400 && errorResponse.status <= 499) {
+                    let errors;
+                    msg = 'Ocorreu um erro ao processar a sua solicitação';
+
+                    if ( errorResponse.Status === 403 ){                                // IF Incluido
+                        msg = "Você não tem permissão para executar esta ação!!!";
+                    }
+
+                    try {
+                        errors = errorResponse.json();
+
+                        msg = errors[0].mensagemUsuario;
+                    } catch (e) { }
+
+                    console.error('Ocorreu um erro', errorResponse);
+                } else {
+                    msg = 'Erro ao processar serviço remoto. Tente novamente.';
+                    console.error('Ocorreu um erro', errorResponse);
+                }
+
+                this.toasty.error(msg);
+            }
+
+        }
+
+    . Acesse o componente "lancamento-pesquisa.component.ts" e inclua as alterações abaixo:
+
+        ...
+        export class LancamentosPesquisaComponent implements OnInit {
+
+            lancamentos: Lancamento[];
+            lancamentosObs: Observable<Lancamento[]>;
+
+            totalRegistros = 0;
+
+            filtro = new LancamentoFiltro();
+
+            @ViewChild('tabela') grid;
+            
+            constructor( @Inject(LancamentoService) private lancamentoService,
+                            @Inject(ToastyService) private toasty,
+                            @Inject(ConfirmationService) private confirmationService,
+                            @Inject( ErrorHandlerService ) private errorHandler,
+                            @Inject( AuthService ) private auth,                    // Linha Inserida
+                            @Inject( Title ) private title ){}
+
+
+
+    . Acesse o componente "lancaento-pesquisa.component.html" e altere o código abaixo:
+
+        ...
+        <p-column styleClass="col-acoes">
+            <ng-template pTemplate="body"
+                        let-lanc="rowData">
+            <a pButton icon="fa-pencil" 
+                        pTooltip="Editar" 
+                        tooltipPosition="top"
+                        [routerLink]="['/lancamentos', lanc.codigo]"></a>
+            <a pButton icon="fa-trash"  
+                        pTooltip="Eliminar" 
+                        tooltipPosition="top"
+                        [disabled]="!auth.temPermissao('ROLE_REMOVER_LANCAMENTO')"               // Linha incluida
+                        (click)="confirmarExclusao(lanc)"></a>
+            </ng-template>
+        </p-column>
+        ..
+
+    . Levante o projeto, log com o usuário "Maria" e verifique se o botão de exclusão está desabilitado.
+
+
+ATENÇÃO: Retorne a aula 6.11 - 14.53 e coloque a classe GeradorSenha dentro do projeto e da documentação do curso.
+
+
+
+Aula 19.13. Protegendo rotas com guarda de rotas (CanActivate)
+--------------------------------------------------------------
+
+    . IMPORTANTE: O objetivo desta aula é criar um mecanismo que não permita o usuário acessar uma funcionalidade que ele 
+        não tenha acesso.
+
+    . Acesse a raiz do projeto no prompt do sistema operacional e execute o comando abaixo:
+
+        ng g c core/nao-autorizado --inline-style --inline-template --flat --spec=false
+
+    . Inclua o código abaixo no componente "nao-autorizado.component.ts":
+
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            template: `
+            <div class="container">
+                <h1 class="text-center">Acesso negado!</h1>
+            </div>
+            `,
+        })
+        export class NaoAutorizadoComponent implements OnInit {
+
+            constructor() { }
+
+            ngOnInit() {
+            }
+
+        }
+
+    . Acesse o componente "app-routing.component.ts" e inclua a rota abaixo:
+
+        ...
+        const routes: Routes = [
+            ...
+            { path: 'nao-autorizado', component: NaoAutorizadoComponent }
+        ];
+        ...        
+
+    . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+        ng g g seguranca/auth --spec=false
+
+        . Acesse o componente "auth.service.ts" e implemente o método abaixo:
+
+        ...
+        temQualquerPermissao(roles) {
+            for (const role of roles) {
+                if (this.temPermissao(role)) {
+                    return true;
+                }
+            }
+        
+            return false;
+        }
+        ...
+    
+    . Digite o código abaixo no componente "auth.guard.ts":
+
+        import { Router } from '@angular/router';
+
+        import { Injectable } from '@angular/core';
+        import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+        import { Observable } from 'rxjs/Observable';
+        
+        import { AuthService } from './auth.service';
+        
+        @Injectable()
+        export class AuthGuard implements CanActivate {
+            
+            constructor(
+                private auth: AuthService,
+                private router: Router
+            ) {}
+            
+            canActivate(
+                next: ActivatedRouteSnapshot,
+                state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+            
+                if (next.data.roles && !this.auth.temQualquerPermissao(next.data.roles)) {
+                    this.router.navigate(['/nao-autorizado']);
+                    return false;
+                }
+            
+                return true;
+            }
+        
+        }
+
+    . Acesse o arquivo "seguranca.module.ts" e adicione o "AuthGuard" nos providers:
+
+        ... 
+        providers: [
+            ...
+            AuthGuard
+        ]
+        ...    
+            
+    . Acesse o componente "lancamento-routing.module.ts" e altere a rota colocando [AuthGuard]:
+
+        import { AuthGuard } from './../seguranca/auth.guard';                      // Linha inserida
+        ...
+        const routes: Routes = [
+            {
+                path: 'lancamentos',
+                component: LancamentosPesquisaComponent,
+                canActivate: [AuthGuard],                                           // Linha inserida
+                data: { roles: ['ROLE_PESQUISAR_LANCAMENTO'] }                      // Linha inserida
+            },
+            {
+                path: 'lancamentos/novo',
+                component: LancamentoCadastroComponent,
+                canActivate: [AuthGuard],                                           // Linha inserida
+                data: { roles: ['ROLE_CADASTRAR_LANCAMENTO'] }                      // Linha inserida
+            },
+            {
+                path: 'lancamentos/:codigo',
+                component: LancamentoCadastroComponent,
+                canActivate: [AuthGuard],                                           // Linha inserida
+                data: { roles: ['ROLE_CADASTRAR_LANCAMENTO'] }                      // Linha inserida
+            }
+        ];
+        ...
+
+    . Levante o projeto com o usuário "maria@algamoney.com" e verifique se a tela de lancamento pesquisa está funcionando.
+
+        
+Aula 19.14. E se o Refresh Token expirar?
+-----------------------------------------
+
+    . Altere o projeto para fazer o refresh token expirar em 10 segundos.
+
+
+    . Acesse o componente "money-http.ts" e inclua o código abaixo:
+
+        import ...
+        ...
+        export class NotAuthenticatedError {}               // Linha inserida
+
+        @Injectable()
+        export class MoneyHttp extends AuthHttp {
+            ...
+            private fazerRequisicao(fn: Function): Observable<Response> {
+                if (this.auth.isAccessTokenInvalido()) {
+                  console.log('Requisição HTTP com access token inválido. Obtendo novo token...');
+            
+                  const chamadaNovoAccessToken = this.auth.obterNovoAccessToken()
+                    .then(() => {
+                      if (this.auth.isAccessTokenInvalido()) {              // If inserido
+                        throw new NotAuthenticatedError();
+                      }
+            
+                      return fn().toPromise();
+                    });
+            
+                  return Observable.fromPromise(chamadaNovoAccessToken);
+                } else {
+                  return fn();
+                }
+              }
+        }            
+
+    
+
+    . Acesse o componente "error-handler.service.ts" e inclua o "else" abaixo:
+
+        import { NotAuthenticateError } from './../seguranca/money-http';           Linha inserida
+        ...
+        constructor(
+            private toasty: ToastyService,
+            private router: Router                  // Linha inserida
+        ) { }
+    
+        handle(errorResponse: any) {
+            let msg: string;
+        
+            if (typeof errorResponse === 'string') {
+                msg = errorResponse;
+        
+            } else if (errorResponse instanceof NotAuthenticatedError) {                    // Else inserido
+                msg = 'Sua sessão expirou!';
+                this.router.navigate(['/login']);
+            ...
+            }
+            ...
+        }    
+
+    . Faça o teste verificando se o token expira e renova de 5 em 5 segundos; e o refresh token de 10 em 10 segundos.
+        Quando o refresh token expira, o sistema desvia o usuário para a tela de login para nova autenticação e consequentemente
+        novo refresh token
+
+        . Certifique-se que o token está configurado para expirar de 5 em 5 segundos; e o refresh token de 10 em 10.
+
+
+Aula 19.15. Tratando acessos de usuários deslogados na AuthGuard
+----------------------------------------------------------------
+
+    . Acesse as configurações do navegador e limpe todos os cookies.
+
+    . Levante a aplicação e tente acessar qualquer URL diferente /login. Sempre que tentar esses acessos o sistema desviará o fluxo
+        do sistema para a tela de "Acesso Negado".
+
+    . Acesse o componente "auth.guard.ts" e altere o if abaixo:
+
+        ...
+        if (this.auth.isAccessTokenInvalido()) {                                            // If alterado
+            console.log('Navegação com access token inválido. Obtendo novo token...');
+      
+            return this.auth.obterNovoAccessToken()
+              .then(() => {
+                if (this.auth.isAccessTokenInvalido()) {
+                  this.router.navigate(['/login']);
+                  return false;
+                }
+      
+                return true;
+              });
+          } else if (next.data.roles && !this.auth.temQualquerPermissao(next.data.roles)) {     // Else if alterado
+            this.router.navigate(['/nao-autorizado']);
+            return false;
+          }
+        }        
+        ...
+
+    . Acesse as configurações do navegador e limpe todos os cookies.
+
+    . Levante a aplicação e tente acessar qualquer URL diferente /login. Sempre que tentar esses acessos o sistema desviará o fluxo
+        do sistema para a tela de login.
+
+Aula 19.16. Implementando o logout
+----------------------------------
+
+    . Acesse o componente "auth.service.ts" e insira o IF abaixo:
+
+        ...
+        limparAccessToken() {
+            localStorage.removeItem('token');
+            this.jwtPayload = null;
+        }
+        ...
+        
+    . Acesse a pasta raiz do projeto e execute a linha abaixo:
+
+        ng g s seguranca/logout --spec=false
+
+    . Acesse o componente "logout.service.ts" e insira o código abaixo:
+
+        import { AuthService } from './auth.service';
+        import { AuthHttp } from 'angular2-jwt';
+        import { Injectable } from '@angular/core';
+        
+        @Injectable()
+        export class LogoutService {
+        
+            tokensRenokeUrl = 'http://localhost:8080/tokens/revoke';
+            
+            constructor(
+                private http: AuthHttp,
+                private auth: AuthService
+            ) { }
+            
+            logout() {
+                return this.http.delete(this.tokensRenokeUrl, { withCredentials: true })
+                .toPromise()
+                .then(() => {
+                    this.auth.limparAccessToken();
+                });
+            }
+            
+        }
+
+    . Acesse o componente "seguranca.module.ts" e adicione o "LogoutService" nos "providers:
+
+        ...
+        providers: [
+            ...
+            LogoutService
+        ]
+
+    . Acesse o componente "navbar.component.ts" e insira o método "logout":
+
+        constructor(
+            private auth: AuthService,
+            private logoutService: LogoutService,                   // Linha inserida
+            private errorHandler: ErrorHandlerService,              // Linha inserida
+            private router: Router                                  // Linha inserida
+        ) { }
+        ...
+        logout() {
+            this.logoutService.logout()
+            .then(() => {
+                this.router.navigate(['/login']);
+            })
+            .catch(erro => this.errorHandler.handle(erro));
+        }
+        ...
+
+    . Acesse o componente "navbar.component.html" e insira o event binding abaixo:
+
+        <ul class="navbar-menu" [hidden]="!exibindoMenu">
+            ...
+            <li class="navbar-menuitem"><a href="javascript:;" (click)="logout()">Logout</a></li>   <!-- (click) inserido -->
+        </ul>        
+    
+    . Levante o projeto, faça a autenticação, dê um "logout" e tente acessar qualquer URL de dentro do sistema. Ele deve nesse último
+        passo ir para a tela de login.
 
 
 
