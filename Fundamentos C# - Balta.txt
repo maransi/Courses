@@ -4,6 +4,8 @@ Instalação AspNetCore 3.1
 -------------------------
 
 https://balta.io/blog/dotnet-instalacao-configuracao-e-primeiros-passos#criando-seu-primeiro-app
+https://www.tutorialsteacher.com/csharp
+
 
     . Acesse o link abaixo para baixar o .NET Core 3.1
 
@@ -432,7 +434,8 @@ Escopo de Programa
             const int IDADE_MINIMA = 10;
             const var IDADE_MINIMA = 10;
             const var IDADE_MINIMA;     // Inválido
-        
+
+
 Tipagem de Dados
 ----------------
 
@@ -461,7 +464,40 @@ Tipagem de Dados
         bool 	    Pode ter os valores true e false. Não é compatível com inteiro.
         char 	    Um único caractere Unicode de 16 bits. Não é compatível com inteiro.
 
-        Tipos definidos pelo usuário:
+
+        . float, double e decimal são tipos para uso com casas decimais. O decimal mais usado para valores monetários com calculos financeiro.
+
+            double salario = 2.500; 
+
+            float salario = 2.500f;     // Float é necessário colocar a letra "f" quando for declarar "hardcode"
+
+            decimal salario = 2.500m    // Idem para decimal, porém a letra é o "m"
+
+        . var
+
+            . Substitui o nome de um tipo
+            . Será do tipo do primeiro valor atribuido
+            . Rcomendado o uso ( DEixe pra usar va quando j´dominar os tipos)
+
+            . A grande vantagem em usar o var é na economia de código, por exemplo:
+
+                IEnumerable<Cliente> clientes = new IEnumerable<Cliente>();
+
+                ou
+
+                var clientes = new IEnumerable<Cliente>();
+
+        . Object é usado da mesma forma do var
+
+            var idade = 10;
+
+            object idade = 10;
+
+            . O tipo object é mais versatil do que o var:
+
+                object idade;       // Não dá erro como o var
+
+        . Tipos definidos pelo usuário:
 
             enum
 
@@ -660,5 +696,27 @@ Tipagem de Dados
 
                 // Exibe "John - Mary"
                 System.Console.WriteLine(Name + " - " + NewName);
+
+    Nullabel Types
+
+        . Significa vazio, nada
+        . Diferente de zero ou uma string vazia
+        . Todo tipo primitivo, ou complexo, pode receber o valor null
+        . O tipo deve ser marcado como Nullable Type
+
+        . Podemos atribuir null a um objeto, desde que o mesmo seja marcado como nullable, usando interrogação na frente do tipo.
+        . Se uma chamada a um valor nulo for feita um erro sera apresentado.
+
+            int? idade = null;
+
+        
+
+System
+------
+
+    . No .NET tudo começa de um tipo base chamado "system"
+    . Ele é a base de todos os objetos no .NET
+    . Todos os tipos é devirados do "System"
+
 
 
