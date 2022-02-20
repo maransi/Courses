@@ -13450,7 +13450,6 @@ Aula 19.11. Interceptando chamadas HTTP para tratar a expiração do access toke
     . Levante o projeto e verifique se o formulário de "lancamento.pesquisa.html" está
         paginando sem expiração do AccessToken.
 
-// PAREI AQUI
 Aula 19.12. Protegendo componentes
 ----------------------------------
 
@@ -13522,22 +13521,26 @@ Aula 19.12. Protegendo componentes
         <p-column styleClass="col-acoes">
             <ng-template pTemplate="body"
                         let-lanc="rowData">
-            <a pButton icon="fa-pencil" 
-                        pTooltip="Editar" 
+<!-- Bloco alterado - Substituir código pelo abaixo -->                        
+                <a pButton 
+                    icon="fa-pencil" 
+                    pTooltip="Editar"
+                    tooltipPosition="top"
+                    [routerLink]="['/lancamentos', lanc.codigo]"></a>
+                <button pButton 
+                        icon="fa-trash"
+                        pTooltip="Excluir" 
                         tooltipPosition="top"
-                        [routerLink]="['/lancamentos', lanc.codigo]"></a>
-            <a pButton icon="fa-trash"  
-                        pTooltip="Eliminar" 
-                        tooltipPosition="top"
-                        [disabled]="!auth.temPermissao('ROLE_REMOVER_LANCAMENTO')"               // Linha incluida
-                        (click)="confirmarExclusao(lanc)"></a>
+                        (click)="confirmarExclusao(lanc)"
+                        [disabled]="!auth.temPermissao('ROLE_REMOVER_LANCAMENTO')"></button>            -- Linha de controle de permissão inserida
+<!-- Fim de bloco alterado -->                        
             </ng-template>
         </p-column>
         ..
 
     . Levante o projeto, log com o usuário "Maria" e verifique se o botão de exclusão está desabilitado.
 
-
+// PAREI AQUI
 ATENÇÃO: Retorne a aula 6.11 - 14.53 e coloque a classe GeradorSenha dentro do projeto e da documentação do curso.
 
 
