@@ -13205,7 +13205,6 @@ Aula 19.7. Adicionando o Access Token nas chamadas HTTP
     . Levante o projeto e verifique se a inclusão, alteração e exclusão estão funcionando corretamente.
 
 
-// PAREI AQUI
 Aula 19.8. Exibindo o nome do usuário logado
 --------------------------------------------
 
@@ -13278,11 +13277,11 @@ Aula 19.10. Obtendo um novo access token
             })
             .catch(response => {
                 if (response.status === 400) {
-                const responseJson = response.json();
+                    const responseJson = response.json();
 
-                if (responseJson.error === 'invalid_grant') {
-                    return Promise.reject('Usuário ou senha inválida!');
-                }
+                    if (responseJson.error === 'invalid_grant') {
+                        return Promise.reject('Usuário ou senha inválida!');
+                    }
                 }
 
                 return Promise.reject(response);
@@ -13357,7 +13356,7 @@ Aula 19.11. Interceptando chamadas HTTP para tratar a expiração do access toke
         }  
         ...
 
-    . Crie o componente "money-http.ts"  com o conteúdo abaixo:
+    . Crie o componente "money-http.ts" dentro da pasta segurança  com o conteúdo abaixo:
 
 
         import { Injectable } from '@angular/core';
@@ -13451,7 +13450,7 @@ Aula 19.11. Interceptando chamadas HTTP para tratar a expiração do access toke
     . Levante o projeto e verifique se o formulário de "lancamento.pesquisa.html" está
         paginando sem expiração do AccessToken.
 
-
+// PAREI AQUI
 Aula 19.12. Protegendo componentes
 ----------------------------------
 
