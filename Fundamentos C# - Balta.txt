@@ -718,5 +718,331 @@ System
     . Ele é a base de todos os objetos no .NET
     . Todos os tipos é devirados do "System"
 
+Valores Padrões
+---------------
 
+    int, float, decimal => 0
+    bool => false
+    char => '\0'
+    String => ""
+
+Conversão Implícita
+-------------------
+
+    . Conversões implícitas ocorre quando somente fazemos a passagem de dados e com tipos compatíveis:
+
+        float valor = 25.8f;
+        int outro = 25;
+
+        valor = outro;      // Conversão implicita, é permitido converter inteiro para float
+
+        outro = valor;      // Erro de conversão, float não pode ser convertido para int;
+
+    . Retorno no passo "Tipagem de Dados" e observe o valor máximo de cada tipo. O tamanho de cada tipo também limitará 
+        a conversão implícita.
+
+    . Conversões implícita válidas:
+
+        De	        Para
+        --          ----
+        sbyte	    short , int, long, float, double, ou decimal
+        byte	    short , ushort, int, uint, long, ulong, float, double, ou decimal
+        short	    int , long, float, double, ou decimal
+        ushort	    int , uint, long, ulong, float, double, ou decimal
+        int	        long , float, double, ou decimal
+        uint	    long , ulong, float, double, ou decimal
+        long	    float , double, ou decimal
+
+
+Conversão Explícita
+-------------------
+
+    . Para realizar este tipo, você deve declarar à frente da variável da direita e entre parênteses o tipo de dado que deseja.
+
+        Exemplo 1:
+
+            using System;
+
+            namespace ConversionExplicit
+            {
+                class Program
+                {
+                    static void Main(string[] args)
+                    {
+                        sbyte a = 10;
+                        short b = (short)a;
+                        int c = (int)b;
+                        long d = (long)c;
+                        float e = (long)d;
+                        double f = (float)e;
+                        Console.Write(f);
+                        Console.Read();
+                    }
+                }
+            }
+
+        Exemplo 2
+
+        namespace ConversionExplicitRefenceType
+        {
+            class Humano
+            {
+                //Propriedades e Métodos
+            }
+            class Feminino : Humano
+            {
+                //Propriedades e Métodos
+            }
+            class Masculino : Humano
+            {
+                //Propriedades e Métodos
+            }
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    Feminino Mulher = new Feminino();
+                    Humano SerHumano = Mulher;
+                    Feminino OutraMulher = (Feminino)SerHumano;
+
+                    // Feminino OutraMulher = SerHumano as Feminino;        // Outra forma "as"
+                }
+            }
+        }
+
+
+Parse
+-----
+
+    int.Parse() - lança uma exceção se a conversão falhar;
+
+    As exceções possíveis usando ambos os métodos são:
+
+        Exceção 	            Condição
+        -------                 --------
+        ArgumentNullException 	s é  null.
+        FormatException 	    s não esta em um formato válido
+        OverflowException 	    s esta fora da faixa dos números inteiros
+
+        Conversão para int usando Int.Parse() 	            resultado
+        -------------------------------------               ---------
+        string valor1 = "100"                               O valor é convertido sem erros
+        int valor2 = int.Parse(valor1); 	                valor2 = 100
+
+        string valor1 =null;                                
+        int valor2 = int.Parse(valor1); 	                Lança a exceção ArgumentNullException
+        
+        string valor1 = "100.99";               
+        int valor2 = int.Parse(valor1); 	                Lança a exceção FormatException
+
+        string valor1 = "999999999999999999999999999999";
+        int valor2 = int.Parse(valor1); 	                Lança a exceção OverflowException
+
+
+TryParse
+--------
+
+    int.TryParse() - Se a conversão falhar retorna zero;
+
+
+    Conversão para int usando Int.TryParse() 	            resultado
+    ----------------------------------------                ---------
+    string valor1 = "100"
+    int resultado;                                          O valor é convertido sem erros.
+    bool sucesso = int.TryParse(valor1, out resultado); 	resultado = 1000  e sucesso = true
+
+    string valor1 = null;
+    int resultado;                                          Conversão falhou
+    bool sucesso = int.TryParse(valor1, out resultado); 	resultado = 0  e sucesso = false
+
+    string valor1 = "100.99"
+    int resultado;                                          Conversão falhou
+    bool sucesso = int.Parse(valor1, out resultado); 	    resultado = 0  e sucesso = false
+
+    string valor1 = "999999999999999999999"
+    int resultado;                                          Conversão falhou
+    bool sucesso = int.Parse(valor1, out resultado); 	    resultado = 0  e sucesso = false
+
+Convert
+-------
+
+    . Convert.ToInt32 é utilizado para converter outros tipos de objeto (object, bool, string, etc) em um int, 
+        internamente ele utiliza int.Parse, porem adicionando a feature de retornar zero se o valor convertido 
+        for null, no mais é igual ao int.Parse.
+
+        int x = Convert.ToInt32("123");// 123
+        int x = Convert.ToInt32("");//System.FormatException
+        int x = Convert.ToInt32("123@");//System.FormatException
+        int x = Convert.ToInt32(null);// 0
+
+    . Sugestão: 
+        
+        Se você tem uma string e espera que sempre lhe retorne um inteiro (por exemplo, o retorno de uma chamada a um web service) 
+        você deve utilizar int.Parse. 
+        
+        Se você esta fazendo leitura de dados inseridos pelo usuário, você deve usar int.TryParse que possui um melhor controle na 
+        situação do usuário inserir entradas inválidas.
+
+        Você deve utilizar Convert.ToInt32 nos mesmos casos citados acima para int.Parse porem quando o argumento não for do tipo string.
+
+
+Operadores de comparação
+------------------------
+
+    ==      igual
+    !=      diferente
+    >       Maior que
+    <       Menor que
+    >=
+    <=
+
+    Exemplo:
+
+        int x = 25;
+
+        x == 0;     // False
+        x != 0;     // True
+        x > 0;      // True
+        x < 0;      // False
+
+
+Operadores Lógicos
+------------------
+
+    &&      And
+    ||      Or
+    !       Not
+
+    Exemplo:
+
+        int x= 12;
+
+        bool entre = ( x > 25 ) && ( x < 40 );      // False
+        bool ou = ( x < 25 ) || ( x < 40 );         // True
+        bool negacao = !( x < 25 );                 // False
+
+
+
+Operadores Condicionais - IF
+---------------------------    
+
+    Exemplo 1:
+
+        if(condition)
+        {
+            // code block to be executed when if condition evaluates to true
+        }
+
+    Exemplo 2:
+
+        if (condicao)
+            Console.log("Fim");
+
+    Exemplo 2:
+
+        if(condition1)
+        {
+            // code block to be executed when if condition1 evaluates to true
+        }
+        else if(condition2)
+        {
+            // code block to be executed when 
+            //      condition1 evaluates to flase
+            //      condition2 evaluates to true
+        }
+        else if(condition3)
+        {
+            // code block to be executed when 
+            //      condition1 evaluates to flase
+            //      condition2 evaluates to false
+            //      condition3 evaluates to true
+        }
+
+Switch
+------
+
+    int x = 10;
+
+    switch (x)
+    { 
+        case 5:
+            Console.WriteLine("Value of x is 5");
+            break;
+        case 10:
+            Console.WriteLine("Value of x is 10");
+            break;
+        case 15:
+            Console.WriteLine("Value of x is 15");
+            break;
+        default:
+            Console.WriteLine("Unknown value");
+            break;
+    }
+
+    . The switch cases without break, return, or goto statement or with the same constant values would give a compile-time error.
+
+For
+---
+
+    Exemplo 1
+
+        for(int i = 0; i < 10; i++)
+        {
+            Console.WriteLine("Value of i: {0}", i);
+        }
+
+    Exemplo 2
+
+        for(int i = 0; i < 10; i++)
+            Console.WriteLine("Value of i: {0}", i);
+
+    Exemplo 3
+
+        int i = 0;
+
+        for(;;)
+        {
+            if (i < 10)
+            {
+                Console.WriteLine("Value of i: {0}", i);
+                i++;
+            }
+            else
+                break;
+        }
+
+    Exemplo 4
+
+        for(int i = 10; i > 0; i--)
+        {
+            Console.WriteLine("Value of i: {0}", i);
+        }
+
+
+While
+
+    Exemplo 1
+
+        int i = 0; // initialization
+
+        while (i < 10) // condition
+        {
+            Console.WriteLine("i = {0}", i);
+
+            i++; // increment
+        }
+
+    Exemplo 2
+
+        int i = 0;
+
+        while (true)
+        {
+            Console.WriteLine("i = {0}", i);
+
+            i++;
+
+            if (i > 10)
+                break;
+        }
 
