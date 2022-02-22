@@ -40,6 +40,21 @@ Instalação das extensões do VSCode
         C# XML Documentation Comments
         vscode-icons (Opcional)
 
+    . Atalhos:
+
+        Ctrl + K + D ou Shit + Alt + F:             Identa todo o seu código automaticamente;
+        Ctrl + K + C:                               comenta um bloco de linhas;
+        Ctrl + K + U:                               descomenta um bloco de linhas;
+        Alt + Left Arrow:                           durante a programação, volta um método que você estava navegando;
+        Alt + Right Arrow:                          durante a programação, avança um método que você estava navegando;
+        Ctrl + .:                                   implementa o método/classe inexistente que você acabou de escrever;
+        Ctrl + M + O:                               esconde todas as regions da classe atual;
+        Ctrl + Shift + B:                           compila todos os projetos;
+        F5:                                         manda depurar um projeto;
+        Ctrl + F5:                                  manda executar um projeto;
+        F10:                                        durante a depuração, avança uma linha;
+        F11:                                        durante a depuração, avança uma linha entrando nos detalhes da mesma;
+
 
 Configurar Visual Studio Code para .NETCore
 -------------------------------------------
@@ -416,6 +431,17 @@ Escopo de Programa
                 }
             }
 
+        . Sugestão:
+            
+            . Crie o nome das namespace de acordo com a pasta do projeto, por exemplo:
+
+                namespace Tutorial.Calculo
+                {
+                    ...
+                }
+
+                . Coloque a classe na pasta Tutorial.Calculo
+
 
     . Variáveis, Constante
 
@@ -504,7 +530,43 @@ Tipagem de Dados
                 Permite declarar uma seqüência de identificadores associados, mas incompatíveis com inteiros e com outras enumerações. 
                 Praticamente idêntico às enumerações do Delphi. Exemplo:
 
-                enum Days {Sun, Mon, Tue, Wed, Thu, Fri, Sat};
+                enum Days { Sun, // 0
+                            Mon, // 1
+                            Tue, 
+                            Wed, 
+                            Thu, 
+                            Fri, 
+                            Sat}; // 6
+
+
+                enum Categories
+                {
+                    Electronics = 1,  
+                    Food = 5, 
+                    Automotive = 6, 
+                    Arts = 10, 
+                    BeautyCare = 11, 
+                    Fashion = 15,
+                    WomanFashion = 15
+                }
+
+                enum WeekDays
+                {
+                    Monday, 
+                    Tuesday,
+                    Wednesday,
+                    Thursday, 
+                    Friday, 
+                    Saturday,
+                    Sunday 
+                }
+
+                Console.WriteLine(WeekDays.Friday); //output: Friday 
+                int day = (int) WeekDays.Friday; // enum to int conversion
+                Console.WriteLine(day); //output: 4 
+                        
+                var wd = (WeekDays) 5; // int to enum conversion
+                Console.WriteLine(wd);//output: Saturday 
 
             struct
 
@@ -958,6 +1020,14 @@ Operadores Condicionais - IF
             //      condition3 evaluates to true
         }
 
+    . Podemos substituir IFs por Operadores Ternários:
+
+        int x = 10;
+        int y = 20;
+        int max = (x > y) ? x : y;
+
+
+
 Switch
 ------
 
@@ -1020,6 +1090,7 @@ For
 
 
 While
+-----
 
     Exemplo 1
 
@@ -1045,4 +1116,197 @@ While
             if (i > 10)
                 break;
         }
+
+
+C# Class
+--------
+
+    Exemplo
+
+        using System;                       // 1. Importação das bibliotecas. Equivalente aos imports do java
+
+        namespace SysUtil.Tutorial          // 2. Área de configuração para divisão lógica das classes, equivalente as packages do java
+        {
+            // 3. Modificador de acesso
+            public class MyClass    // 4. Nome da classe
+            {
+                public string  myField = string.Empty;  // 5. Propriedade de classe
+
+                public MyClass()                        // 6. Construtor
+                {
+                }
+
+                public void MyMethod(int parameter1, string parameter2)     // 7. Método/Função
+                {
+                    Console.WriteLine("First Parameter {0}, second parameter {1}", 
+                                                                parameter1, parameter2);
+                }
+
+                public int MyAutoImplementedProperty { get; set; }      // 8. Auto-implemented property
+
+                private int myPropertyVar;                              // 9. Propriedade
+                
+                public int MyProperty                                   // 9. Propriedade
+                {
+                    get { return myPropertyVar; }
+                    set { myPropertyVar = value; }
+                } 
+            }
+        }
+
+    . Propriedades podem ser declaradas de duas formas:
+
+        . Simplificada - Quando não existe necessidade de nenhuma lógica/regra ( vide item 8 )
+
+        . Completa - Quando a necessidade de alguma lógica extra, por exemplo:
+
+            private int _myPropertyVar;
+
+            public int MyProperty
+            {
+                get {
+                    return _myPropertyVar / 2;
+                }
+
+                set {
+                    if (value > 100)
+                        _myPropertyVar = 100;
+                    else
+                        _myPropertyVar = value; ;
+                }
+            }
+
+    . No vSCode algumas atalhos (Snippet) estão disponíveis para facilitar na implementação do código:
+
+        prop + [Ctrl + Space]
+
+            public int MyProperty { get; set; }
+
+
+        propfull + [Ctrl + Space]
+
+            private int myVar;
+            public int MyProperty
+            {
+                get { return myVar; }
+                set { myVar = value; }
+            }
+
+        ctor  + [Ctrl + Space]  - Implementa o construtor
+
+            public Calculadora(Parameters)
+            {
+                
+            }
+
+        for  + [Ctrl + Space]  -  monta um laço for padrão;
+
+        if + [Ctrl + Space]  -  monta uma estrutura if padrão;
+
+        cw + [Ctrl + Space]  -  chama um Console.WriteLine();
+
+        do + [Ctrl + Space]  -  cria um bloco do/while;
+
+        equals + [Ctrl + Space]  -  sobrescreve o método equals de Object;
+
+        foreach + [Ctrl + Space]  -  monta um laço foreach padrão;
+
+        try + [Ctrl + Space]  -  cria um bloco try/catch padrão;
+
+        while + [Ctrl + Space]  -  cria um bloco while padrão;
+
+    . Podemos iniciar uma classe de duas formas:
+
+        Calculadora calc = new Calculadora(10, 10);
+
+        int m = calc.soma();
+
+        ou
+
+        Calculadora calc = new Calculadora{a = 10, b = 10};
+
+        int m = calc.soma();
+
+    . Podemos deixar os parâmetros dos métodos opcionais. Basta na assinatura do método dar um valor para o parâmetro:
+
+        public int soma( int a, int b, bool formata = false );
+
+        . Dessa forma se houver o uso deste método somente com dois parâmetros não dará erro.
+
+String
+------
+
+    . Guid - O struct Guid representa um identificador único global: um valor de 16 bytes que, se gerado randomicamente, irá gerar um identificador (quase) único
+
+            var id = Guid.NewGuid();
+
+            var idString = id.ToString();
+
+            System.Console.WriteLine( id );     // 2c04a03a-f15d-44b0-a85e-f90fce3e2141
+
+    . Interpolação:
+
+            var price = 10.2;
+
+            string texto = string.Format("O preço do produto é {0}", price );
+
+            System.Console.WriteLine( texto );  // O preço do produto é 10,2
+
+    
+            ou
+
+            var price = 10.2;
+
+            string texto = $"O preço do produto é {price}";
+
+            System.Console.WriteLine( texto );  // O preço do produto é 10,2
+
+
+    . Comparação de strings
+
+        string texto = "Testando";
+
+        System.Console.WriteLine( texto.CompareTo("Testando") );        // Exibirá "0"
+        System.Console.WriteLine( texto.CompareTo("testando") );        // Exibirá "1"
+        
+                
+        System.Console.WriteLine( texto.Contains("Test" ) );        // Exibirá True
+        System.Console.WriteLine( texto.Contains("test" ) );        // Exibirá False
+        System.Console.WriteLine( texto.Contains("testando", StringComparison.OrdinalIgnoreCase ) );        // Exibirá True
+
+        . CompareTo retorna um inteiro 0 - ok e 1 - Não Ok
+
+        . StringComparison.OrdinalIgnoreCase - Ignora o case sensitive.
+
+    . StartsWith e EntsWith
+
+        string texto = "Testando";
+
+        System.Console.WriteLine( texto.StartsWith("Test") );        // Exibirá true
+        System.Console.WriteLine( texto.EndsWith("test") );        // Exibirá false
+
+    . Equals
+
+        string texto = "Testando";
+
+        System.Console.WriteLine( texto.Equals("Testando") );        // Exibirá true
+        System.Console.WriteLine( texto.Equals("testando") );        // Exibirá false
+        System.Console.WriteLine( texto.Equals("testando", StringComparison.OrdinalIgnoreCase) );        // Exibirá true
+
+        . Equals é utilizado em outros tipo de objetos.
+
+    . IndexOf   - Retorna a posição da string dentro de outra string    texto.IndexOf("esta") // exibirá 1
+
+    . ToUpper e ToLower para deixar em caixa alta e baixa
+
+    . Replace para trocar um texto por outro
+
+    . Split para quebrar em um array
+
+    . Substring( inicio, tamanho )
+
+    . 
+
+
+    
 
