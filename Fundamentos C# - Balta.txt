@@ -433,14 +433,15 @@ Escopo de Programa
 
         . Sugestão:
             
-            . Crie o nome das namespace de acordo com a pasta do projeto, por exemplo:
+            . Crie o nome das namespace levemente parecido com a pasta do projeto, por exemplo:
 
                 namespace Tutorial.Calculo
                 {
                     ...
                 }
 
-                . Coloque a classe na pasta Tutorial.Calculo
+                . Coloque a classe na pasta [Nome do projeto].Tutorial.Calculo. Se ambos forem iguais dará erro durante a compilação, 
+                    pois não encontrará as referências das classes nas packages/namespace.
 
 
     . Variáveis, Constante
@@ -1121,7 +1122,48 @@ While
 C# Class
 --------
 
-    Exemplo
+    . No vSCode algumas atalhos (Snippet) estão disponíveis para facilitar na implementação do código:
+
+        prop + [Ctrl + Space]
+
+            public int MyProperty { get; set; }
+
+
+        propfull + [Ctrl + Space]
+
+            private int myVar;
+            public int MyProperty
+            {
+                get { return myVar; }
+                set { myVar = value; }
+            }
+
+        ctor  + [Ctrl + Space]  - Implementa o construtor
+
+            public Calculadora(Parameters)
+            {
+                
+            }
+
+        for  + [Ctrl + Space]  -  monta um laço for padrão;
+
+        if + [Ctrl + Space]  -  monta uma estrutura if padrão;
+
+        cw + [Ctrl + Space]  -  chama um Console.WriteLine();
+
+        do + [Ctrl + Space]  -  cria um bloco do/while;
+
+        equals + [Ctrl + Space]  -  sobrescreve o método equals de Object;
+
+        foreach + [Ctrl + Space]  -  monta um laço foreach padrão;
+
+        try + [Ctrl + Space]  -  cria um bloco try/catch padrão;
+
+        while + [Ctrl + Space]  -  cria um bloco while padrão;
+
+
+
+    . Template de Exemplo
 
         using System;                       // 1. Importação das bibliotecas. Equivalente aos imports do java
 
@@ -1176,44 +1218,6 @@ C# Class
                 }
             }
 
-    . No vSCode algumas atalhos (Snippet) estão disponíveis para facilitar na implementação do código:
-
-        prop + [Ctrl + Space]
-
-            public int MyProperty { get; set; }
-
-
-        propfull + [Ctrl + Space]
-
-            private int myVar;
-            public int MyProperty
-            {
-                get { return myVar; }
-                set { myVar = value; }
-            }
-
-        ctor  + [Ctrl + Space]  - Implementa o construtor
-
-            public Calculadora(Parameters)
-            {
-                
-            }
-
-        for  + [Ctrl + Space]  -  monta um laço for padrão;
-
-        if + [Ctrl + Space]  -  monta uma estrutura if padrão;
-
-        cw + [Ctrl + Space]  -  chama um Console.WriteLine();
-
-        do + [Ctrl + Space]  -  cria um bloco do/while;
-
-        equals + [Ctrl + Space]  -  sobrescreve o método equals de Object;
-
-        foreach + [Ctrl + Space]  -  monta um laço foreach padrão;
-
-        try + [Ctrl + Space]  -  cria um bloco try/catch padrão;
-
-        while + [Ctrl + Space]  -  cria um bloco while padrão;
 
     . Podemos iniciar uma classe de duas formas:
 
@@ -1232,6 +1236,28 @@ C# Class
         public int soma( int a, int b, bool formata = false );
 
         . Dessa forma se houver o uso deste método somente com dois parâmetros não dará erro.
+
+    . Exemplos
+
+        Exemplo 1 - Usando o tipo do objeto a classe
+
+            // IMPORTANTE: Para se criar os objetos como abaixo, as classes é obrigatório ter um construtor sem parâmetros. Pois na parte "new Student(){...}" o construtor que está
+            //              sendo chamado é o construtor sem parâmetros. Podemos criar construtores com parâmetros, mas é obrigatório sem parâmetros.
+            
+            Student student = new Student(){ Id = 1, Name = "MARCO ANTONIO", LastName = "SILVA", Address = new Address(){ Id = 1, StreetName = "RUA CARIOBA 360", City = "SÃO PAULO", State = "SP", ZipCode = "02423-100" }  };
+
+            System.Console.WriteLine( student.Id );
+            System.Console.WriteLine( student.Name );
+            System.Console.WriteLine( student.Address.ToString());
+
+        Exemplo 2 - Usando o tipo do objeto de forma anônima. Nesse caso não se trata de classe e não fazemos mensão nenhuma a qq classe, usando o tipo "var"
+
+            var student = new { Id = 1, Name = "MARCO ANTONIO", LastName = "SILVA", address = new { Id = 1, StreetName = "RUA CARIOBA 360", City = "SÃO PAULO", State = "SP", ZipCode = "02423-100" }  };
+
+            System.Console.WriteLine( student.Id );
+            System.Console.WriteLine( student.Name );
+            System.Console.WriteLine( student.Address.ToString());
+
 
 String
 ------
@@ -1305,8 +1331,91 @@ String
 
     . Substring( inicio, tamanho )
 
-    . 
+
+DateTime
+--------
+
+    //assigns default value 01/01/0001 00:00:00
+    DateTime dt1 = new DateTime(); 
+
+    int ano = dt3.Year;
+    int mes = dt3.Month;
+    int day = dt3.Day;
+    int hr = dt3.Hour;
+    int minuto = dt3.Minute;
+    int diaSemana = (int) dt3.DayOfWeek;
 
 
-    
+
+    //  I M P O R T A N T E   assigns year, month, day
+    DateTime dt2 = new DateTime(2015, 12, 31); 
+
+    //  I M P O R T A N T E     year, month, day, hour, min, seconds
+    DateTime dt3 = new DateTime(2015, 12, 31, 5, 10, 20);
+
+    DateTime currentDateTime = DateTime.Now;  //returns current date and time
+    DateTime todaysDate = DateTime.Today; // returns today's date
+
+
+    . Subtração de datas
+
+        DateTime dt1 = new DateTime(2015, 12, 31); 
+        DateTime dt2 = new DateTime(2016, 2, 2);
+
+        TimeSpan result = dt2.Subtract(dt1);//33.00:00:00
+
+    . Operadores 
+
+        DateTime dt1 = new DateTime(2015, 12, 20);  
+        DateTime dt2 = new DateTime(2016, 12, 31, 5, 10, 20); 
+
+        TimeSpan time = new TimeSpan(10, 5, 25, 50);
+
+        Console.WriteLine(dt2 + time); // 1/10/2017 10:36:10 AM
+
+        Console.WriteLine(dt2 - dt1); //377.05:10:20
+        Console.WriteLine( (dt2 - dt1).Days ); // 377
+        Console.WriteLine( (dt2 - dt1).TotalDays ); // 377
+        Console.WriteLine("Horas: " + (date_2 - date_1).TotalHours );     // Horas: 10152
+
+
+        Console.WriteLine(dt1 == dt2); //False
+        Console.WriteLine(dt1 != dt2); //True
+        Console.WriteLine(dt1 > dt2); //False
+        Console.WriteLine(dt1 < dt2); //True
+        Console.WriteLine(dt1 >= dt2); //False
+        Console.WriteLine(dt1 <= dt2);//True
+
+    . Convertendo String em DateTime
+
+        var str = "5/12/2020";
+        DateTime dataResult;
+
+        var isValidDate = DateTime.TryParse(str, out dataResult);
+
+        if (isValidDate)
+            Console.WriteLine(dataResult);
+        else
+            Console.WriteLine($"{str} is not a valid date string");
+
+    . Formatação
+
+        y (year) 
+        M (month)
+        d (day) 
+        h (hour 12)
+        H (hour 24)
+        m (minute)
+        s (second)
+        f (second fraction)
+        F (second fraction, trailing zeroes are trimmed)t (P.M or A.M) and z (time zone).
+
+        Exemplo:
+
+            DateTime dataAtual = DateTime.Now;
+
+            System.Console.WriteLine( String.Format("{0:dd/MM/yyyy}", dataAtual ) );
+
+
+
 
