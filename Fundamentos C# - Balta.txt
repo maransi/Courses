@@ -1345,6 +1345,9 @@ DateTime
     int minuto = dt3.Minute;
     int diaSemana = (int) dt3.DayOfWeek;
 
+    DateTime hoje = DateTime.Now.Date;      // dd/mm/yyyy 00:00:00  - Somente a data do dia, sem hr, min, segundos
+
+
 
 
     //  I M P O R T A N T E   assigns year, month, day
@@ -1425,6 +1428,163 @@ DateTime
 
             System.Console.WriteLine( String.Format("{0:dd/MM/yyyy}", dataAtual ) );
 
-    . 
+    . Datas Nulas
+
+        DateTime? dataPagamento = null;     // Para termos uma data nula é necessário declará-la como "DateTime?"
+                                            // obrigatório o uso da interrogação.
+
+    . Comparação de datas
+
+        DateTime hoje = DateTime.Now.Date;
+
+        if ( hoje == DateTime.Now.Date ){
+            Console.WriteLine( "São iguais");
+        }  
+
+Moeda
+-----
+
+    decimal valor = 10536.25m;
+
+    Console.WriteLine(valor.ToString(CultureInfo.CreateSpecificCulture("pt-BR")));          // 10536,25
+
+    Console.WriteLine(valor.ToString("G",   // Formatador númerico                                          
+                                        CultureInfo.CreateSpecificCulture("pt-BR")));       // 10536,25
+
+    Console.WriteLine(valor.ToString("C", // Formatador de Moeda/Currency
+                                        CultureInfo.CreateSpecificCulture("pt-BR")));       // R$ 10.536,25
+
+    Console.WriteLine(valor.ToString("F",  // Fração, com uma casa decimal a mais
+                                        CultureInfo.CreateSpecificCulture("pt-BR")));       // 10536,250
+
+    Console.WriteLine(valor.ToString("N", // Númerico
+                                        CultureInfo.CreateSpecificCulture("pt-BR")));       // 10.536,25
+
+Arrays
+------
+
+    . Declaração
+
+        int[] evenNums;
+
+        string[] cities;
+
+        int[] evenNums = int[5]{1,2,3,4,5};
+
+        string[] cities = strint[5]{"Ana", "Jose", "Antonio", "Tobias", "Carlos"};
+
+        . Todas as formas acima podem utilizar var no lugar do tipo "var evenNums..."
+
+        int[] evenNums = {1,2,3,4,5};
+
+        string[] cities = {"Ana", "Jose", "Antonio", "Tobias", "Carlos"};
+
+    . Declarações inválidas
+
+        //must specify the size 
+        int[] evenNums = new int[]; 
+
+        //number of elements must be equal to the specified size 
+        int[] evenNums = new int[5] { 2, 4 };
+
+        //cannot use var with array initializer
+        var evenNums = { 2, 4, 6, 8, 10}; 
+
+
+    . Declaração com inicialização tardia.
+
+        int[] evenNums;
+
+        evenNums = new int[5];
+        // or
+        evenNums = new int[]{ 2, 4, 6, 8, 10 };
+
+    . Acesso aos elementos utilizando o índice:
+
+        int[] evenNums = new int[5];
+        evenNums[0] = 2;
+        evenNums[1] = 4;
+        //evenNums[6] = 12;  //Throws run-time exception IndexOutOfRange
+
+        Console.WriteLine(evenNums[0]);  //prints 2
+        Console.WriteLine(evenNums[1]);  //prints 4
+
+    . Acessando os elementos através de um loop
+
+        int[] evenNums = { 2, 4, 6, 8, 10 };
+
+        for(int i = 0; i < evenNums.Length; i++)
+            Console.WriteLine(evenNums[i]);  
+
+        for(int i = 0; i < evenNums.Length; i++)
+            evenNums[i] = evenNums[i] + 10;  // update the value of each element by 10
+
+    . Acessando os elementos através de um foreach
+
+        int[] evenNums = { 2, 4, 6, 8, 10}; 
+        string[] cities = { "Mumbai", "London", "New York" }; 
+
+        foreach(var item in evenNums)
+            Console.WriteLine(item);   
+
+        foreach(var city in cities)
+            Console.WriteLine(city);  
+
+    . Métodos do array
+
+        int[] nums = new int[5]{ 10, 15, 16, 8, 6 };
+
+        Array.Sort(nums);                               // sorts array 
+        Array.Reverse(nums);                            // sorts array in descending order
+        Array.ForEach(nums, n => Console.WriteLine(n)); // iterates array
+        Array.BinarySearch(nums, 5);                    // binary search 
+
+    . Passando array como argumento
+
+        public static void Main(){
+            int[] nums = { 1, 2, 3, 4, 5 };
+
+            UpdateArray(nums); 
+
+            foreach(var item in nums)
+                Console.WriteLine(item);   
+        }
+                            
+        public static void UpdateArray(int[] arr)
+        {
+            for(int i = 0; i < arr.Length; i++)
+                arr[i] = arr[i] + 10;   
+        }
+
+    . Exemplo de Sort de Array
+
+        private static void sortedByArray()
+        {
+            int[] numeros = {2,20,6,15,11,1};
+            int[] novosNumero = new int[6];
+            int idNovosNumero;
+
+            foreach( int numero in numeros ){
+                for ( idNovosNumero = novosNumero.Length - 1; idNovosNumero > 0 ; idNovosNumero-- ){
+                    if (novosNumero[ idNovosNumero ] < numero)
+                        break;
+                }
+
+                for( int i = 0; i < idNovosNumero; i++){
+                    novosNumero[i] = novosNumero[ i + 1];
+                }
+
+                novosNumero[ idNovosNumero ] = numero;
+                
+            }
+
+            foreach( int numero in novosNumero ){
+                System.Console.WriteLine( numero );
+            }
+
+
+
+        }
+
 
 
