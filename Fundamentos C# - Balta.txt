@@ -1719,3 +1719,321 @@ Exception
         }
 
 
+Classes Genérica
+----------------
+
+    class DataStore<T>
+    {
+        public T Data { get; set; }
+    }
+
+
+    class KeyValuePair<TKey, TValue>
+    {
+        public TKey Key { get; set; }
+        public TValue Value { get; set; }
+    }
+
+
+    . Instanciando uma classe genérica
+
+        DataStore<string> store = new DataStore<string>();
+
+    . Utilização de classes genérica
+
+        DataStore<string> strStore = new DataStore<string>();
+        strStore.Data = "Hello World!";
+        //strStore.Data = 123; // compile-time error
+
+        DataStore<int> intStore = new DataStore<int>();
+        intStore.Data = 100;
+        //intStore.Data = "Hello World!"; // compile-time error
+
+        KeyValuePair<int, string> kvp1 = new KeyValuePair<int, string>();
+        kvp1.Key = 100;
+        kvp1.Value = "Hundred";
+
+        KeyValuePair<string, string> kvp2 = new KeyValuePair<string, string>();
+        kvp2.Key = "IT";
+        kvp2.Value = "Information Technology";
+
+    . Campos/Propriedades de classes genéricas
+
+        class DataStore<T>
+        {
+            public T data;
+        }
+
+        ou
+
+        class DataStore<T>
+        {
+            public T[] data = new T[10];
+        }
+
+    . Métodos genéricos
+
+        class DataStore<T>
+        {
+            private T[] _data = new T[10];
+            
+            public void AddOrUpdate(int index, T item)
+            {
+                if(index >= 0 && index < 10)
+                    _data[index] = item;
+            }
+
+            public T GetData(int index)
+            {
+                if(index >= 0 && index < 10)
+                    return _data[index];
+                else 
+                    return default(T);
+            }
+        }
+
+    
+        DataStore<string> cities = new DataStore<string>();
+        cities.AddOrUpdate(0, "Mumbai");
+        cities.AddOrUpdate(1, "Chicago");
+        cities.AddOrUpdate(2, "London");
+
+        DataStore<int> empIds = new DataStore<int>();
+        empIds.AddOrUpdate(0, 50);
+        empIds.AddOrUpdate(1, 65);
+        empIds.AddOrUpdate(2, 89);
+
+    . Métodos genéricos sobrecarregados
+
+        public void AddOrUpdate(int index, T data) { }
+        public void AddOrUpdate(T data1, T data2) { }
+        public void AddOrUpdate<U>(T data1, U data2) { }
+        public void AddOrUpdate(T data) { }
+
+    . Métodos genéricos em classes não genéricas
+
+        class Printer
+        {
+            public void Print<T>(T data)
+            {
+                Console.WriteLine(data);
+            }
+        }
+
+        Printer printer = new Printer();
+        printer.Print<int>(100);
+        printer.Print(200); // type infer from the specified value
+        printer.Print<string>("Hello");
+        printer.Print("World!"); // type infer from the specified value
+
+Coleções
+--------
+
+        . ArrayList
+
+            . ArrayList não aceita Generic e tem menos recursos que o List
+
+            . Criando um arraylist
+
+                using System.Collections;
+
+                ArrayList arlist = new ArrayList(); 
+                // or 
+                var arlist = new ArrayList();         
+
+            . Adicionando elementos
+
+                // adding elements using ArrayList.Add() method
+                var arlist1 = new ArrayList();
+                arlist1.Add(1);
+                arlist1.Add("Bill");
+                arlist1.Add(" ");
+                arlist1.Add(true);
+                arlist1.Add(4.5);
+                arlist1.Add(null);
+
+                // adding elements using object initializer syntax
+                var arlist2 = new ArrayList()
+                                {
+                                    2, "Steve", " ", true, 4.5, null
+                                };
+            
+            . Acessando um elemento de um ArrayList
+
+
+
+                var arlist = new ArrayList()
+                                {
+                                    1,
+                                    "Bill",
+                                    300,
+                                    4.5f
+                                };
+
+                //Access individual item using indexer
+                int firstElement = (int) arlist[0]; //returns 1
+                string secondElement = (string) arlist[1]; //returns "Bill"
+                //int secondElement = (int) arlist[1]; //Error: cannot cover string to int
+
+                //using var keyword without explicit casting
+                var firstElement = arlist[0]; //returns 1
+                var secondElement = arlist[1]; //returns "Bill"
+                //var fifthElement = arlist[5]; //Error: Index out of range
+
+                //update elements
+                arlist[0] = "Steve"; 
+                arlist[1] = 100;
+                //arlist[5] = 500; //Error: Index out of range
+
+            . Iterando um ArrayList
+
+                ArrayList arlist = new ArrayList()
+                                        {
+                                            1,
+                                            "Bill",
+                                            300,
+                                            4.5F
+                                        };
+
+                foreach (var item in arlist)
+                    Console.Write(item + ", "); //output: 1, Bill, 300, 4.5, 
+                            
+                for(int i = 0 ; i < arlist.Count; i++)
+                    Console.Write(arlist[i] + ", "); //output: 1, Bill, 300, 4.5, 
+
+
+                pessoas.ForEach( item => { 
+                    System.Console.WriteLine( item );
+                } );
+
+            . Checando a existência de um item
+
+                ArrayList arList = new ArrayList()
+                                {
+                                    1,
+                                    "Bill",
+                                    300,
+                                    4.5f,
+                                    300
+                                };
+
+                Console.WriteLine(arList.Contains(300)); // true
+                Console.WriteLine(arList.Contains("Bill")); // true
+                Console.WriteLine(arList.Contains(10)); // false
+                Console.WriteLine(arList.Contains("Steve")); // false
+
+            . Métodos e propriedades
+
+                ArrayList  Properties
+
+                Properties 	        Description
+                ----------          -----------
+                Capacity 	        Gets or sets the number of elements that the ArrayList can contain.
+                Count 	            Gets the number of elements actually contained in the ArrayList.
+                IsFixedSize 	    Gets a value indicating whether the ArrayList has a fixed size.
+                IsReadOnly 	        Gets a value indicating whether the ArrayList is read-only.
+                Item 	            Gets or sets the element at the specified index.
+
+                ArrayList Methods
+
+                Methods 	            Description
+                -------                 -----------
+                Add()/AddRange() 	    Add() method adds single elements at the end of ArrayList.
+                AddRange()              method adds all the elements from the specified collection into ArrayList.
+                Insert()/InsertRange() 	Insert() method insert a single elements at the specified index in ArrayList.
+                InsertRange()           method insert all the elements of the specified collection starting from specified index in ArrayList.
+                Remove()/RemoveRange() 	Remove() method removes the specified element from the ArrayList.
+                RemoveRange()           method removes a range of elements from the ArrayList.
+                RemoveAt() 	            Removes the element at the specified index from the ArrayList.
+                Sort() 	                Sorts entire elements of the ArrayList.
+                Reverse() 	            Reverses the order of the elements in the entire ArrayList.
+                Contains 	            Checks whether specified element exists in the ArrayList or not. Returns true if exists otherwise false.
+                Clear 	                Removes all the elements in ArrayList.
+                CopyTo 	                Copies all the elements or range of elements to compitible Array.
+                GetRange 	            Returns specified number of elements from specified index from ArrayList.
+                IndexOf 	            Search specified element and returns zero based index if found. Returns -1 if element not found.
+                ToArray 	            Returns compitible array from an ArrayList. 
+
+        . List
+
+            . Aceita o uso de Generic
+
+            . Criando uma lista
+
+                List<int> primeNumbers = new List<int>();
+                primeNumbers.Add(1); // adding elements using add() method
+                primeNumbers.Add(3);
+                primeNumbers.Add(5);
+                primeNumbers.Add(7);
+
+                var cities = new List<string>();
+                cities.Add("New York");
+                cities.Add("London");
+                cities.Add("Mumbai");
+                cities.Add("Chicago");
+                cities.Add(null);// nulls are allowed for reference type list
+
+                //adding elements using collection-initializer syntax
+                var bigCities = new List<string>()
+                                    {
+                                        "New York",
+                                        "London",
+                                        "Mumbai",
+                                        "Chicago"                    
+                                    };
+
+            . Adicionando objetos num List
+
+                var students = new List<Student>() { 
+                    new Student(){ Id = 1, Name="Bill"},
+                    new Student(){ Id = 2, Name="Steve"},
+                    new Student(){ Id = 3, Name="Ram"},
+                    new Student(){ Id = 4, Name="Abdul"}
+                };
+
+            . Acessando lista
+
+                List<int> numbers = new List<int>() { 1, 2, 5, 7, 8, 10 };
+                Console.WriteLine(numbers[0]); // prints 1
+                Console.WriteLine(numbers[1]); // prints 2
+                Console.WriteLine(numbers[2]); // prints 5
+                Console.WriteLine(numbers[3]); // prints 7
+
+                // using foreach LINQ method
+                numbers.ForEach(num => Console.WriteLine(num + ", "));//prints 1, 2, 5, 7, 8, 10,
+
+                // using for loop
+                for(int i = 0; i < numbers.Count; i++)
+                    Console.WriteLine(numbers[i]);
+
+            . Verificando a existência de um item
+
+                var numbers = new List<int>(){ 10, 20, 30, 40 };
+                numbers.Contains(10); // returns true
+                numbers.Contains(11); // returns false
+                numbers.Contains(20); // returns true
+
+            . List<T> Class Properties and Methods
+
+                Property 	    Usage
+                --------        -----
+                Items 	        Gets or sets the element at the specified index
+                Count 	        Returns the total number of elements exists in the List<T>
+
+                Method 	        Usage
+                ------          -----
+                Add 	        Adds an element at the end of a List<T>.
+                AddRange 	    Adds elements of the specified collection at the end of a List<T>.
+                BinarySearch 	Search the element and returns an index of the element.
+                Clear 	        Removes all the elements from a List<T>.
+                Contains 	    Checks whether the specified element exists or not in a List<T>.
+                Find 	        Finds the first element based on the specified predicate function.
+                Foreach 	    Iterates through a List<T>.
+                Insert 	        Inserts an element at the specified index in a List<T>.
+                InsertRange 	Inserts elements of another collection at the specified index.
+                Remove 	        Removes the first occurrence of the specified element.
+                RemoveAt 	    Removes the element at the specified index.
+                RemoveRange 	Removes all the elements that match the supplied predicate function.
+                Sort 	        Sorts all the elements.
+                TrimExcess 	    Sets the capacity to the actual number of elements.
+                TrueForAll 	    Determines whether every element in the List<T> matches the conditions defined by the specified predicate. 
