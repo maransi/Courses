@@ -3065,7 +3065,25 @@ Aula 06.11. Movendo o usuário para o banco de dados
 https://www.javadevjournal.com/spring/spring-security-userdetailsservice/
         
 
+    . IMPORTANTE: Para gerar uma nova senha para um usuário é necessário executar o método "passwordEncoder()". 
+                    Gere a classe abaixo e execute e execute o método "main", passando como parâmetro a string
+                    que se deseja "encodar":
 
+        package com.example.algamoney.api.security.util;
+
+        import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+        public class GeradorSenha {
+
+            public static void main(String[] args) {
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                System.out.println(encoder.encode("admin"));        // String para encodar
+            }
+            
+        }
+
+        . É só executar o método main acima para consultar o valor encodado e utilizá-lo na senha no momento 
+            do Cadastramento no banco de dados.
 
 Aula 06.12. Adicionando permissões de acesso
 --------------------------------------------
@@ -13540,11 +13558,6 @@ Aula 19.12. Protegendo componentes
 
     . Levante o projeto, log com o usuário "Maria" e verifique se o botão de exclusão está desabilitado.
 
-// PAREI AQUI
-ATENÇÃO: Retorne a aula 6.11 - 14.53 e coloque a classe GeradorSenha dentro do projeto e da documentação do curso.
-
-
-
 Aula 19.13. Protegendo rotas com guarda de rotas (CanActivate)
 --------------------------------------------------------------
 
@@ -13579,8 +13592,12 @@ Aula 19.13. Protegendo rotas com guarda de rotas (CanActivate)
 
         ...
         const routes: Routes = [
-            ...
-            { path: 'nao-autorizado', component: NaoAutorizadoComponent }
+            { path: '', redirectTo: 'login', pathMatch: 'full' },
+            { path: 'nao-autorizado', component: NaoAutorizadoComponent},                   // Página "nao-autorizado" deve ter prioridade sobre a rota "pagina-nao-encontrada"
+            { path: 'pessoas', component: PessoasPesquisaComponent },                       //          ou seja, deve ser inserida acima dela
+            { path: 'pagina-nao-encontrada', component: PaginaNaoEncontradaComponent },
+            { path: 'login', component: LoginFormComponent },
+            { path: '**', redirectTo: 'pagina-nao-encontrada' }
         ];
         ...        
 
@@ -13671,7 +13688,6 @@ Aula 19.13. Protegendo rotas com guarda de rotas (CanActivate)
 
     . Levante o projeto com o usuário "maria@algamoney.com" e verifique se a tela de lancamento pesquisa está funcionando.
 
-        
 Aula 19.14. E se o Refresh Token expirar?
 -----------------------------------------
 
@@ -13711,7 +13727,7 @@ Aula 19.14. E se o Refresh Token expirar?
 
     . Acesse o componente "error-handler.service.ts" e inclua o "else" abaixo:
 
-        import { NotAuthenticateError } from './../seguranca/money-http';           Linha inserida
+        import { NotAuthenticatedError } from './../seguranca/money-http';           Linha inserida
         ...
         constructor(
             private toasty: ToastyService,
@@ -13738,7 +13754,7 @@ Aula 19.14. E se o Refresh Token expirar?
 
         . Certifique-se que o token está configurado para expirar de 5 em 5 segundos; e o refresh token de 10 em 10.
 
-
+// PAREI AQUI
 Aula 19.15. Tratando acessos de usuários deslogados na AuthGuard
 ----------------------------------------------------------------
 
