@@ -1153,13 +1153,16 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 
 				docker start/restart c342845054d1
 				docker ps
-				docker stop c342845054d1
+				docker stop c342845054d1 		ou 	docker stop algamoney
 
 			. Forma 2 - Acessando o container e executando o MySQL dentro dele
 
 				docker run -e MYSQL_ROOT_PASSWORD=root --name algamoney -d mysql:5.7 				
 					ou 
 				docker start 1fa7691c5482
+					ou 
+				docker start algamoney
+				docker stop c342845054d1 		ou 	docker stop algamoney
 
 				docker ps -a
 				docker exec -it algamoney bash	
@@ -1168,6 +1171,9 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 			. Forma 3 - Executando o Container do MySQL no localhost numa porta diferente 3306:
 
 				docker run -e MYSQL_ROOT_PASSWORD=root --name algamoney-1 -d -p 6603:3306 mysql	
+				docker start algamoney
 				docker ps
 				mysql -u root -p -h 127.0.0.1 -P 6603
+
+				docker stop c342845054d1 		ou 	docker stop algamoney
 
