@@ -1,0 +1,217 @@
+Curso Dicker essencial para a plataforma .NET
+
+
+Aula 5. Instalando o Docker
+---------------------------
+
+. No caso do windows, acesse a URL abaixo e baixe o instalador:
+
+    https://store.docker.com/editions/community/docker-ce-desktop-windows
+
+. Utilizar a versão Community Edition (CE)
+
+. No caso do Linux execute os comandos abaixo no prompt no terminal:
+
+    . A URL abaixo tem os passos atualizado para instalação do Docker:
+
+        https://docs.docker.com/engine/install/ubuntu/
+
+	. Instalação Atualizada
+
+        sudo apt-get update
+        sudo apt-get install \
+            ca-certificates \
+            curl \
+            gnupg \
+            lsb-release
+
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+        echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+        sudo apt-get update
+        sudo apt-get install docker-ce docker-ce-cli containerd.io
+        sudo docker --version
+
+        sudo groupadd docker
+        sudo gpasswd -a <usuario> docker
+        sudo service docker restart
+
+        # Verificar se o nome "Docker" seria o correto "docker"
+        newgrp Docker
+
+    . Instalação simplificada
+
+		sudo apt install docker.io
+		sudo systemctl enable --now docker
+		sudo usermod -aG docker marco
+		sudo adduser $USER docker
+		sudo chown "$USER":"$USER" /var/run/docker.sock -R
+		docker --version
+
+Aula 6. Instalando o .NET Core SDK
+----------------------------------
+
+
+    . Instalçao Atualizada:
+
+        . URL com informações para realizar a instalação.
+
+            https://docs.microsoft.com/pt-br/dotnet/core/install/linux-ubuntu
+
+            . IMPORTANTE: Acesse a instalação da distribuição e versão especifica do linux que estamos utilizando para 
+                            proceder os comandos adequadamente.
+
+                            A instalação abaixo está para o Ubuntu 20.04
+
+        wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        rm packages-microsoft-prod.deb
+
+        # Instalação do SDK
+        sudo apt-get update; \
+        sudo apt-get install -y apt-transport-https && \
+        sudo apt-get update && \
+        sudo apt-get install -y dotnet-sdk-6.0
+
+        # Instalação do runtime
+        sudo apt-get update; \
+        sudo apt-get install -y apt-transport-https && \
+        sudo apt-get update && \
+        sudo apt-get install -y aspnetcore-runtime-6.0
+
+        sudo apt-get install -y dotnet-runtime-6.0
+
+    . Instalação simplificada        
+
+        . Acesse o link abaixo para baixar o .NET Core 3.1
+
+            https://dotnet.microsoft.com/download
+
+        . Acesse o download "All .NET Core downloads" e baixe a versão 3.1
+
+        . Acesse o link "Package manager instructions" 
+
+        . Localize a versão do Ubuntu que está sendo utilizado, copie e execute os comandos no 
+            terminal:
+
+            wget https://packages.microsoft.com/config/ubuntu/20.10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            sudo apt-get update;   sudo apt-get install -y apt-transport-https &&   sudo apt-get update &&   sudo apt-get install -y dotnet-sdk-5.0
+            sudo apt-get update;   sudo apt-get install -y apt-transport-https &&   sudo apt-get update &&   sudo apt-get install -y aspnetcore-runtime-5.0
+
+    . Para testar a instalação execute os comandos abaixo:
+
+        dotnet --version
+        dotnet --help
+        dotnet --list
+        dotnet --list-runtimes
+        dotnet --list-sdks
+
+
+Aula 7. Instalando o VS Code
+----------------------------
+
+    Instalação das extensões do VSCode
+
+            C# 
+            C# Extensions
+            C# XML Documentation Comments
+            vscode-icons (Opcional)
+            Docker
+
+        . Atalhos:
+
+            Ctrl + K + D ou Shit + Alt + F:             Identa todo o seu código automaticamente;
+            Ctrl + K + C:                               comenta um bloco de linhas;
+            Ctrl + K + U:                               descomenta um bloco de linhas;
+            Alt + Left Arrow:                           durante a programação, volta um método que você estava navegando;
+            Alt + Right Arrow:                          durante a programação, avança um método que você estava navegando;
+            Ctrl + .:                                   implementa o método/classe inexistente que você acabou de escrever;
+            Ctrl + M + O:                               esconde todas as regions da classe atual;
+            Ctrl + Shift + B:                           compila todos os projetos;
+            F5:                                         manda depurar um projeto;
+            Ctrl + F5:                                  manda executar um projeto;
+            F10:                                        durante a depuração, avança uma linha;
+            F11:                                        durante a depuração, avança uma linha entrando nos detalhes da mesma;
+
+
+    Configurar Visual Studio Code para .NETCore
+
+        . Acesse File / Preferences / Settings
+
+        . Digite C#
+
+        . Acesse "C# Configuration / CSharp Format Enabled" e habilite a configuração
+
+        . Digite "Format on save" e habilite a configuração
+
+        . Digite "Final" e habilite a configuração "Files: Insert final newline" e habilite a configuração
+
+
+Aula 10. Criando Contêineres - I
+--------------------------------
+
+    . Criando um container a partir de uma imagem pronta
+
+        docker container run <imagem>
+
+    . Testando o docker:
+
+        docker container run hello-world
+          |       |       |     +-> É a imagem existente usada para criar o container
+          |       |       |
+          |       |       +-> É a porta de entrada no Docker e realiza 4 operações:
+          |       |
+          |       |            . Baixa a imagem não localizada localmente: docker image pull
+          |       |            . Cria um container: docker container create
+          |       |            . Inicializa o container: docker container start
+          |       |            . Uso do modo interativo executando um comando: docker container exec
+          |       |
+          |       |
+          |       +-> Indica que o comando irá atuar em um container
+          |
+          +-> Executor do comando
+
+        . Importante: o "run" executa o container, mas cria sempre um novo container. Faça isso somente uma vez para a imagem desejada.
+                        Utilize o comando abaixo "docker container start <nome do container> para executar o container.
+
+    . Exibindo todos os container em processamento no momento:
+
+        docker container ps
+
+    . Exibindo todos os container independente se está, ou não, em processamento
+
+        docker container ps -a
+
+    . Exibindo as imagens
+
+        docker images
+
+Aula 11. Criando Contêineres - II
+--------------------------------
+
+    . Baixando uma image
+
+        # Para consultar as imagens localmente
+        docker images   
+
+        # Para baixar uma imagem
+        docker image pull alpine
+
+        # Se quiser fornecer uma versão especifica da imagem utilize como abaixo
+        docker image pull alpine:3.6
+
+        # Para consultar as imagens localmente
+        docker images   
+
+        # Executar o container
+        docker container run alpine ls -l
+
+        # Consultando os containeres
+        docker container ps -a
+
+        
+    
