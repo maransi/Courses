@@ -207,11 +207,83 @@ Aula 11. Criando Contêineres - II
         # Para consultar as imagens localmente
         docker images   
 
-        # Executar o container
+        # Executa, cria um container e envia um comando para ser executado no container
         docker container run alpine ls -l
 
         # Consultando os containeres
         docker container ps -a
 
-        
+        # Executa, cria e permanece dentro do container
+        docker container run -it alpine /bin/sh
+
+        # Executa um container existente. Importante: Neste caso deixa o container em execução
+        docker container start < 4 primeiras posições do CONTAINER ID, ou todo o código do CONTAINER ID >
+
+        # Executa um comando dentro de um container em execução
+        docker container exec < 4 primeiras posições do CONTAINER ID, ou todo o código do CONTAINER ID > ls -l
     
+        # Parar o container em execução.
+        docker container stop < 4 primeiras posições do CONTAINER ID, ou todo o código do CONTAINER ID >
+
+        # Criando container com nome
+        docker container run --name alp3 -it alpine 
+        docker container start alp3
+        docker ps
+        
+        # Acessará o container, no prompt de comando do SO.
+        docker container attach alp3
+        docker ps
+
+        # Criando container com nome o banco de dados MySQL
+        docker container run -e MYSQL_ROOT_PASSWORD=root --name algamoney -d mysql:5.7 				
+        docker start algamoney
+
+        docker ps -a
+        docker exec -it algamoney bash	
+        mysql -u root -p
+
+        docker stop algamoney
+
+
+https://docs.microsoft.com/pt-br/sql/linux/quickstart-install-connect-docker?view=sql-server-ver15&pivots=cs1-bash
+https://docs.microsoft.com/pt-br/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver15#ubuntu
+
+
+sudo docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=<YourStrong@Passw0rd>"    -p 1433:1433 --name sql1 --hostname sql1    -d mcr.microsoft.com/mssql/server:2019-latest
+sudo docker ps -a
+docker ps -a
+docker exec -t sqlrhel cat /var/opt/mssql/log/errorlog | grep connection
+docker exec -t sql1 cat /var/opt/mssql/log/errorlog | grep connection
+sudo docker exec -it sql1 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA  -P "$(read -sp "Enter current SA password: "; echo "${REPLY}")"  -Q "ALTER LOGIN SA WITH PASSWORD=\"$(read -sp "Enter new SA password: "; echo "${REPLY}")\""
+docker exec -it sql1 "bash"
+ifconfig
+ifconfig -I
+ifconfig -i
+hostname -I
+ip a
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+sudo apt-get update 
+sudo apt-get install mssql-tools unixodbc-dev
+sudo apt-get update 
+sudo apt-get install mssql-tools
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+source ~/.bashrc
+hostname -I
+sqlcmd -S 192.168.0.82,1433 -U SA -P "Joao3.16"
+
+
+
+
+
+
+        # Elimnando container
+        docker container rm <container ID ou container name>
+
+
+Aula 13. Container - Mapeando pastas
+------------------------------------
+
+
+
