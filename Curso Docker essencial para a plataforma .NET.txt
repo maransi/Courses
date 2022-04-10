@@ -37,10 +37,10 @@ Aula 5. Instalando o Docker
 
         sudo groupadd docker
         sudo gpasswd -a <usuario> docker
+        sudo chown "$USER":"$USER" /var/run/docker.sock -R
         sudo service docker restart
 
-        # Verificar se o nome "Docker" seria o correto "docker"
-        newgrp Docker
+        docker --version
 
     . Instalação simplificada
 
@@ -51,9 +51,21 @@ Aula 5. Instalando o Docker
 		sudo chown "$USER":"$USER" /var/run/docker.sock -R
 		docker --version
 
+
+    . Instalando o MySQL
+
+        # Criando container com nome o banco de dados MySQL
+        docker container run -e MYSQL_ROOT_PASSWORD=root --name algamoney -d mysql:5.7 				
+        docker start algamoney
+
+        docker ps -a
+        docker exec -it algamoney bash	
+        mysql -u root -p
+
+        docker stop algamoney
+
 Aula 6. Instalando o .NET Core SDK
 ----------------------------------
-
 
     . Instalçao Atualizada:
 
@@ -66,23 +78,32 @@ Aula 6. Instalando o .NET Core SDK
 
                             A instalação abaixo está para o Ubuntu 20.04
 
+        # Instalação do SDK
         wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
         sudo dpkg -i packages-microsoft-prod.deb
-        rm packages-microsoft-prod.deb
 
-        # Instalação do SDK
+        sudo dpkg --purge packages-microsoft-prod && sudo dpkg -i packages-microsoft-prod.deb
+        sudo apt-get update
+
+        sudo apt-get install -y gpg
+        wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
+        sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+        wget https://packages.microsoft.com/config/ubuntu/{os-version}/prod.list
+        sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+        sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+        sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+
         sudo apt-get update; \
         sudo apt-get install -y apt-transport-https && \
         sudo apt-get update && \
         sudo apt-get install -y dotnet-sdk-6.0
 
-        # Instalação do runtime
-        sudo apt-get update; \
         sudo apt-get install -y apt-transport-https && \
         sudo apt-get update && \
         sudo apt-get install -y aspnetcore-runtime-6.0
 
         sudo apt-get install -y dotnet-runtime-6.0
+
 
     . Instalação simplificada        
 
@@ -234,15 +255,6 @@ Aula 11. Criando Contêineres - II
         docker container attach alp3
         docker ps
 
-        # Criando container com nome o banco de dados MySQL
-        docker container run -e MYSQL_ROOT_PASSWORD=root --name algamoney -d mysql:5.7 				
-        docker start algamoney
-
-        docker ps -a
-        docker exec -it algamoney bash	
-        mysql -u root -p
-
-        docker stop algamoney
 
 
 https://docs.microsoft.com/pt-br/sql/linux/quickstart-install-connect-docker?view=sql-server-ver15&pivots=cs1-bash
