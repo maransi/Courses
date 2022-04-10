@@ -285,5 +285,54 @@ sqlcmd -S 192.168.0.82,1433 -U SA -P "Joao3.16"
 Aula 13. Container - Mapeando pastas
 ------------------------------------
 
+    # Mapeando a porta, faz a associação da porta externa com a interna do container
+    docker container run --name ws1 -p 80:80 nginx
+                                        |  |
+                                        |  +-> No. da porta de dentro do container
+                                        +-> No. da porta externa, da máquina de fora
+    . Acesse a url abaixo:
+
+        http://localhost:80
 
 
+    # Execução em segund plano
+    docker container run --name ws2 -p 80:80 -d nginx
+                                              |
+                                              +-> Informa ao docker para executar em segundo plano
+
+
+Aula 14. Container - Mapeando pastas
+------------------------------------
+
+    # Mapeando pasta da máquina local para dentro do container
+    docker container run --name ws3 -p 80:80 -v $(pwd)/html:/usr/share/nginx/html -d nginx
+                                                |----------||-------------------|
+                                                 pasta local  pasta de dentro do
+                                                 da máquina     container
+
+    . Acesse a url abaixo:
+
+        # Dará erro de página não encontrada
+        http://localhost:80
+
+    . Crie o arquivo abaixo na pasta ~/html/index.html
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+        </head>
+        <body>
+            Hello World
+        </body>
+        </html>
+
+
+Aula 15. 
+
+https://hub.docker.com/_/microsoft-dotnet-sdk
+
+docker pull mcr.microsoft.com/dotnet/sdk
