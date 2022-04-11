@@ -286,37 +286,6 @@ Aula 11. Criando Contêineres - II
         docker container attach alp3
         docker ps
 
-
-
-https://docs.microsoft.com/pt-br/sql/linux/quickstart-install-connect-docker?view=sql-server-ver15&pivots=cs1-bash
-https://docs.microsoft.com/pt-br/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver15#ubuntu
-
-
-docker container run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Joao3.16"    -p 1433:1433 --name sql1 --hostname sql1    -d mcr.microsoft.com/mssql/server:2019-latest
-docker container ps -a
-docker container exec -t sql1 cat /var/opt/mssql/log/errorlog | grep connection
-# Testar no linux, não funcionou no windows
-docker container exec -it sql1 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA  -P "$(read -sp "Enter current SA password: "; echo "${REPLY}")"  -Q "ALTER LOGIN SA WITH PASSWORD=\"$(read -sp "Enter new SA password: "; echo "${REPLY}")\""
-docker exec -it sql1 "bash"
-hostname -I
-ip a
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
-sudo apt-get update 
-sudo apt-get install mssql-tools unixodbc-dev
-sudo apt-get update 
-sudo apt-get install mssql-tools
-echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
-echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-source ~/.bashrc
-hostname -I
-sqlcmd -S 192.168.0.82,1433 -U SA -P "Joao3.16"
-
-
-
-
-
-
         # Elimnando container
         docker container rm <container ID ou container name>
 
@@ -370,8 +339,36 @@ Aula 14. Container - Mapeando pastas
         </html>
 
 
-Aula 15. 
+Aula 15. Container Docker com .NET
+----------------------------------
 
-https://hub.docker.com/_/microsoft-dotnet-sdk
+    https://hub.docker.com/_/microsoft-dotnet-sdk
 
-docker pull mcr.microsoft.com/dotnet/sdk
+
+    # Para baixar a imagem
+    docker pull mcr.microsoft.com/dotnet/sdk        ou      docker pull mcr.microsoft.com/dotnet/sdk:3.1        ou          docker pull mcr.microsoft.com/dotnet/sdk:5.0
+
+    docker images
+
+    docker container ps -a
+
+    # Para baixar a imagem e executar em um container
+    docker container run --name demo-dotnet -it mcr.microsoft.com/doentnet/sdk:5.0
+
+    # Dentro do container execute os comandos abaixo
+    mkdir workspace-dotnet
+    mkdir hello-world
+    cd workspace-dotnet/hello-world
+    dotnet new console
+    dotnet build
+    dotnet run
+    exit
+
+    # Para acessar o container
+    docker container ps 
+
+    docker container start -ia demo-dotnet
+    
+
+
+
