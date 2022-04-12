@@ -353,7 +353,7 @@ Aula 15. Container Docker com .NET
     docker container ps -a
 
     # Para baixar a imagem e executar em um container
-    docker container run --name demo-dotnet -it mcr.microsoft.com/doentnet/sdk:5.0
+    docker container run --name demo-dotnet -it mcr.microsoft.com/dotnet/sdk:5.0
 
     # Dentro do container execute os comandos abaixo
     mkdir workspace-dotnet
@@ -370,5 +370,95 @@ Aula 15. Container Docker com .NET
     docker container start -ia demo-dotnet
     
 
+Aula 18. Criando imagens usando Dockfile
+----------------------------------------
 
+https://www.alura.com.br/artigos/desvendando-o-dockerfile
+
+    . No Dockfile são definidas instruções que oDocker vai seguir para conseguir realizar a criação de uma image.
+
+        Dockerfile    ------------------>  Docker image
+                        docker build
+
+        Dockerfile  ------> Image   ----------> Container
+                    build               run
+
+    . Dockfile é como um arquivo de lote que contém instruções com uma sintaxe definica (INSTRUÇÃO arqumento) que devemos seguir para que 
+        uma imagem seja criada.
+
+    . Vamos criar uma imagem do Debian 8 com o servidor nginx, os passos para isso são:
+
+        a. Definir uma imagem base
+
+        b. Definir infs para a imagem
+
+        c. Executar comandos para instalar e iniciar o nginx
+
+        d. Expor qual porta o servidor vai atender (no container)
+
+        e. Definir o ponto de entrada a aplicação
+
+        f. Definir a execução de um comando para inicalizar o servidor nginx
+
+    . Cria uma pasta especifica para criar o Dockerfile
+
+    . Dentro da pasta crie um arquivo com o nome "Dockerfile" com o conteúdo abaixo:
+
+        # Identifica a imagem, ou o ponto de partida
+        FROM debian:8
+
+        # Descrição da imagem
+        LABEL version="1.0" description="Debian/Nginx"
+
+        # Comandos a ser executado na etapa de criação de camadas da imagem
+        RUN apt-get update && apt-get install -y nginx && apt-get clean
+
+        # Porta que será exposta
+        EXPOSE 80
+
+        # Comando a ser executado, o "nginx" não é uma pasta e sim um comando 
+        ENTRYPOINT  ["/usr/sbin/nginx"]
+
+        # Complemento ao comando do ENTRYPOINT a ser executado ficando desta forma "/usr/sbin/nginx -g daemon off;"
+        CMD ["-g", "daemon off;"]
+
+    . Após criado o arquivo Dockerfle com o conteúdo acima, execute o comando abaixo no prompt de comandos dentro da pasta
+        do Dockerfile:
+
+        docker build -t marcoratti/img:1.0  .
+                |     |     |               |
+                |     |     |               +-> Significa a pasta local para fazer o build
+                |     |     +-> Nome da imagem e a tag atribuida a imagem
+                |     +-> Usado p/informar que a imagem pertence ao meu usuário
+                +-> Comando que constrói a imagem
+
+    . Depois de construida a imagem, verifique se a imagem foi criada com sucesso:
+
+        docker images
+
+    . Crie um novo container com a imagem recém criada
+
+        docker container run -d -p 80:80 --name=ws1 marcoratti/img:1.0
+
+    . Verifique se o container está em execução:
+
+        docker container ps
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:80
+
+    . Para publicar a imagem criada no docker hub execute os comandos abaixo:
+
+        docker login
+
+        docker push <nome da imagem>
+
+    . Para verificar informações da imagem:
+
+        docker image inspect marcoratti/img:1.0
+
+Aula 20. Criando uma aplicação ASP.NET Core MVC
+-----------------------------------------------
+    
 
