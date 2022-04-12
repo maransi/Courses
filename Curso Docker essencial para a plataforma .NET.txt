@@ -92,9 +92,6 @@ Aula 5. Instalando o Docker
         sqlcmd -S 192.168.0.82,1433 -U SA -P "Joao3.16"
 
 
-
-
-
 Aula 6. Instalando o .NET Core SDK
 ----------------------------------
 
@@ -507,6 +504,24 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
             }
         }
 
+    . Dentro da pasta Models crie a classe abaixo:
+
+        using System.Collections.Generic;
+
+        namespace mvc1.Models
+        {
+            public class ProdutoRepository : IRepository
+            {
+                private AppDbContext context;
+                public ProdutoRepository(AppDbContext ctx) {
+                    context = ctx;
+                }
+                public IEnumerable<Produto> Produtos => context.Produtos;
+
+            }
+        }
+
+
     . Crie a classe "TesteRepository" dentro da pasta Models:
 
         using System.Collections.Generic;
@@ -555,6 +570,9 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
         ...
+
+PAREI AQUI
+
 
     . Altere o "HomeController" como abaixo, Atente para a injeçao de dependência no construtor da classe:
 
