@@ -461,4 +461,175 @@ https://www.alura.com.br/artigos/desvendando-o-dockerfile
 Aula 20. Criando uma aplicação ASP.NET Core MVC
 -----------------------------------------------
     
+    . Crie uma pasta para o projeto MVC
+
+        mkdir ~/workspace-dotnet/mvc1
+
+    . Dentro da pasta criada acima crie um projeto dotnet MVC:
+
+        cd ~/workspace-dotnet/mvc1
+
+        dotnet new mvc
+
+        # Responda "Yes" para criar os arquivos de debug
+        code .
+
+    . Dentro da pasta "Models" cria a classe abaixo:
+
+        namespace mvc1.Models
+        {
+            public class Produto
+            {
+                public Produto (string nome=null, string categoria=null,
+                decimal preco=0)
+                {
+                    this.Nome = nome;
+                    this.Categoria = categoria;
+                    this.Preco= preco;
+                }
+
+                public int ProdutoId {get; set;}
+                public string Nome {get; set;}
+                public string Categoria {get; set;}
+                public decimal Preco {get; set;}
+            }
+        }
+
+    . Crie a interface IRepository dentro da pasta "Models":
+
+        using System.Collections.Generic;
+
+        namespace mvc1.Models
+        {
+            public interface IRepository
+            {
+                IEnumerable<Produto> Produtos { get; }
+            }
+        }
+
+    . Crie a classe "TesteRepository" dentro da pasta Models:
+
+        using System.Collections.Generic;
+
+        namespace mvc1.Models
+        {
+            public class TesteRepository : IRepository
+            {
+                private static Produto[] produtos = new Produto[] 
+                {
+                    new Produto{ ProdutoId=10, Nome="Caneta",Categoria="Material", Preco=2.0M},
+                    new Produto{ ProdutoId=20, Nome="Borracha",Categoria="Material", Preco=1.5M},
+                    new Produto{ ProdutoId=30, Nome="Estojo",Categoria="Material", Preco=3.0M}
+
+                };
+                public IEnumerable<Produto> Produtos { get => produtos;}
+            }
+        }
+
+    . Acesse a classe "Startup.cs" e implemente a linha abaixo:
+    
+        ...
+        using mvc1.Models;
+
+        ...
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            var host = Configuration["DBHOST"] ?? "localhost";
+            var port = Configuration["DBPORT"] ?? "3306";
+            var password = Configuration["DBPASSWORD"] ?? "numsey";
+            
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseMySql($"server={host};userid=root;pwd={password};"
+                    + $"port={port};database=produtosdb"));
+
+            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddTransient<IRepository, ProdutoRepository>();    // LINHA ADICIONADA
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+        }
+        ...
+
+    . Altere o "HomeController" como abaixo, Atente para a injeçao de dependência no construtor da classe:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Diagnostics;
+        using System.Linq;
+        using System.Threading.Tasks;
+        using Microsoft.AspNetCore.Mvc;
+        using Microsoft.Extensions.Configuration;
+        using mvc1.Models;                          // LINHA INCLUIDA
+
+        namespace mvc1.Controllers
+        {
+            public class HomeController : Controller
+            {
+                private IRepository repository;
+                private string message;
+                public HomeController(IRepository repo, IConfiguration config)  // LINHA ALTERADA
+                {
+                    repository = repo;                              // LINHA ALTERADA
+                    message = config["MESSAGE"] ?? "ASP NET Core MVC - Docker";     // LINHA ALTERADA
+                }
+                public IActionResult Index()
+                {
+                    ViewBag.Message = message;              // ADICIONADO MSG e o REPOSITORIO na VIEW
+                    return View(repository.Produtos);
+                }
+            }
+        }
+
+    . Altere o código da classe /Views/Home/Index.cshtml pelo abaixo:
+
+        @model IEnumerable<mvc1.Models.Produto>
+        @{
+            Layout = null;
+        }
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width" />
+            <title>App</title>
+            <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        </head>
+        <body>
+            <div class="m-1 p-1">
+                <h4 class="bg-primary text-xs-center p-1 text-white">@ViewBag.Message</h4>
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr><th>ID</th><th>Nome</th><th>Categoria</th><th>Preco</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model) {
+                            <tr>
+                                <td>@p.ProdutoId</td>
+                                <td>@p.Nome</td>
+                                <td>@p.Categoria</td>
+                                <td>$@p.Preco.ToString("F2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </body>
+        </html>
+
+    . No prompt do SO digito o comando abaixo:
+
+        dotnet build
+
+        dotnet run
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        http://localhost:5000
+        
+                
 
