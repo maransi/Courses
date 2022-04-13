@@ -571,9 +571,6 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
         }
         ...
 
-PAREI AQUI
-
-
     . Altere o "HomeController" como abaixo, Atente para a injeçao de dependência no construtor da classe:
 
         using System;
@@ -589,8 +586,8 @@ PAREI AQUI
         {
             public class HomeController : Controller
             {
-                private IRepository repository;
-                private string message;
+                private IRepository repository;         // LINHA INCLUIDA
+                private string message;                 // LINHA INCLUIDA
                 public HomeController(IRepository repo, IConfiguration config)  // LINHA ALTERADA
                 {
                     repository = repo;                              // LINHA ALTERADA
@@ -647,7 +644,7 @@ PAREI AQUI
 
     . Acesse o navegador e execute a URL abaixo:
 
-        http://localhost:5000
+        https://localhost:5000
         
                 
 
