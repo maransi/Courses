@@ -647,4 +647,58 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
         https://localhost:5000
         
                 
+Aula 21. Criar imagem para a aplicação ASP.NET Core MVC
+-------------------------------------------------------
+
+    . Publicação da aplicação - Acesse a pasta raiz do projeto ASP.NET e execute o comando abaixo:
+
+        dotnet publish --configuration Realease --output dist
+                            |                       |
+                            |                       +-> Especifica que o projeto compilado será copiado para uma pasta .../dist
+                            |
+                            +-> Indica que estamos usando o modo Release que é o modo usado na produção
+
+    . Sequência de execução a ser criado no Dockerfile:
+
+        . Definir uma imagem base
+        . Defiir infs para a imagem
+        . Definir a pasta de trabalho (/app)
+        . Copiar os arquivos da pasta dist para uma pasta no container (/app)
+        . Expor a porta do container e definir em qual porta o servidor vai atender
+        . Definir o ponto de entrada a aplicação.
+
+    . Criar um arquivo Dockerfle na pasta raiz do projeto
+
+        FROM mcr.microsoft.com/dotnet/sdk:5.0
+        LABEL version="1.0.1" description="Aplicação ASP.NET Core MVC"
+        COPY dist app/
+        WORKDIR /app
+        EXPOSE 5000
+        ENV ASPNETCORE_URLS=http://*:5000
+        ENTRYPOINT ["dotnet","mvc1.dll"]
+
+    . Execute o comando abaixo na pasta raiz do projeto
+
+        docker build -t aspnetcoremvc/app1:1.0 .
+
+    . Confira se a imagem foi criada com sucesso:
+
+        docker images
+
+    . Crie o container com o comando abaixo:
+
+        docker container create -p 50:5000 --name mvcprodutos aspnetcoremvc/app1:1.0 
+
+        docker container ps -a
+
+        docker container start mvcprodutos
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        localhost:50
+
+        
+https://www.pluralsight.com/blog/software-development/how-to-build-custom-containers-docker
+
+
 
