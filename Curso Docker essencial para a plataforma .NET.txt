@@ -650,6 +650,8 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
 Aula 21. Criar imagem para a aplicação ASP.NET Core MVC
 -------------------------------------------------------
 
+    https://www.pluralsight.com/blog/software-development/how-to-build-custom-containers-docker
+
     . Publicação da aplicação - Acesse a pasta raiz do projeto ASP.NET e execute o comando abaixo:
 
         dotnet publish --configuration Realease --output dist
@@ -697,8 +699,245 @@ Aula 21. Criar imagem para a aplicação ASP.NET Core MVC
 
         localhost:50
 
-        
-https://www.pluralsight.com/blog/software-development/how-to-build-custom-containers-docker
+
+Aula 24. Apresentando Volumes
+-----------------------------        
+
+    . Sintaxe para associar uma pasta do host com a pasta do container:
+
+        docker container run -v <pasta_host>:<pasta_container> <imagem>
+
+        -v $(pwd)/teste:/usr/share
+             |      |       |
+             |      |       +-> pasta do container
+             |      +-> pasta do host
+             +-> pasta local posicionado (retorna o equivalente ao comando "pwd") 
+
+    . Exemplo
+
+        # Execute o comando abaixo, após o container subir verifique se no host foi criado a pasta "teste".
+        # Importante: a pasta "teste" será criada dentro da pasta que foi montado o container
+        docker container run -it --name alp1 -v $(pwd)/teste:/usr/share alpine
 
 
+Aula 25. Criando Volums: Database MySQL.
+----------------------------------------
 
+    . Criação de volumes
+
+        # Cria um novo volume que os containeres podem consumir e onde podem armazenar dados
+        # Se um nome não for especificado, o Docker vai gerar um nome aleatório
+        docker volume create <nome>
+
+        # Neste comando o Docker mostra qual o nome do voluma e o seu driver. 
+        # Geralmente é usado o driver local que é o driver padrão do Docker
+        docker volume ls
+
+    . Teste de criação de volumes para o bando de dados MySQL
+
+        docker volume create dadosdb
+
+        docker volume ls
+
+        docker image pull mysql:5.7
+
+        # Na saída deste comando vemos a seção volumes que indica que esta imagem usa o
+        # volume para o diretório /var/lib/mysql que é o local onde o MySQL armazena os seus arquivos
+        docker image inspect mysql:5.7
+
+        docker container run -d --name mysql -v dadosdb:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=brasil2 mysql:5.7
+
+        # Ao executar o comando abaixo, entraremos na linha de comando do container. Digite o comando abaixo:
+        #
+        #   mysql -u root -p
+        #
+        # Informe a senha "brasil2"
+        #
+        #       create database macoratti;
+        #
+        docker container exec -it mysql /bin/bash
+
+        docker container stop mysql
+        docker container rm mysql
+        docker volume ls
+
+        # Crie novamente um container MySQL, mudando o nome "mysql-1"
+        docker container run -d --name mysql-1 -v dadosdb:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=brasil2 mysql:5.7
+
+        # Ao executar o comando abaixo, entraremos na linha de comando do container. Digite o comando abaixo e verifique
+        #   se o database "macoratti continua existindo
+        #
+        #   mysql -u root -p
+        #
+        # Informe a senha "brasil2"
+        #
+        #       show databases; 
+        #
+        docker container exec -it mysql-1 /bin/bash
+
+
+Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
+----------------------------------------------------------
+
+    . Incluindo os pacotes para MySQL e o EF Core
+
+        # Provedor de acesso para o MySQL
+        Pomelo.EntityFrameworkCore.MySql
+
+        # Permite acesso aos comandos "dotnet ef"
+        Pomelo.EntityFramworkCore.MySql.Design
+
+        # Permite acessar as ferramentas do console de fetenciados de pacotes
+        Microsoft.EntityFrameworkCore.Tools
+
+        dotnet add package <Nome_do_pacote_versao>
+
+    . Para mais informações sobre o framework acesse a URL abaixo:
+
+        https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql/    
+
+    . Acesse a pasta raiz do nosso projeto ASP.NET e execute o comando abaixo:
+
+        # Para verificar que não temos nenhuma referência a package Pomelo
+        cat mv1.csproj    
+
+        dotnet add package Pomelo.EntityFrameworkCore.MySql
+        dotnet add package Pomelo.EntityFrameworkCore.MySql.Design
+        dotnet add package Microsoft.EntityFrameworkCore.Tools
+
+        # Agora o pacote do Pomelo estará incluido
+        cat mv1.csproj    
+
+    . Classe de contexto:
+
+        public class AppDbContext: DbContext
+        {
+            public AppDbContext( DbContextOptions< AppDbContext > options ): base(options){}
+
+            public DbSet<Produto> Produtos {get; set; }
+                            |       |
+                            |       +-> Tabela produtos
+                            +-> Classe Produto
+        }                   
+
+        . Uma instância de DbContext representa uma sessão com o banco de dados que pode ser usado para consultar 
+            e salvar instâncias de suas entidades em um banco de dados 
+
+        . Define o mapeamento entre entidade Produto da aplicação e a tabela "Produtos" usando a propriedade DbSet<>
+
+    . Classe de repositório:
+
+        public class ProdutoRepository: IRepository
+        {
+            private AppDbContext context;
+
+            public ProdutoRepository( AppDbContext ctx )
+            {
+                context = ctx;
+            }
+
+            public IEnumerable<Produto> Produtos => context.Produtos;
+        }
+
+        . Essa classe vai substituir a classe TesteRepository e vai acessar os dados da tabela "Produtos" mapeada na 
+            classe de contexto.
+
+    . Dentro da pasta Models do nosso projeto insira a classe "AppDbContext" com o código abaixo:
+
+        public class AppDbContext: DbContext
+        {
+            public AppDbContext( DbContextOptions< AppDbContext > options ): base(options){}
+
+            public DbSet<Produto> Produtos {get; set; }
+        }                   
+
+    . Dentro da pasta Models do nosso projeto insira a classe "ProdutoRepository" com o código abaixo:
+
+        public class ProdutoRepository: IRepository
+        {
+            private AppDbContext context;
+
+            public ProdutoRepository( AppDbContext ctx )
+            {
+                context = ctx;
+            }
+
+            public IEnumerable<Produto> Produtos => context.Produtos;
+        }
+
+    . Dentro da pasta Models insira a classe "IncluiDadosDB" com o código abaixo:
+
+        using System.Linq;
+        using Microsoft.AspNetCore.Builder;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.Extensions.DependencyInjection;
+
+        namespace mvc1.Models
+        {
+            public static class Populadb
+            {
+                public static void IncluiDadosDB(IApplicationBuilder app) 
+                {
+                        IncluiDadosDB(
+                            app.ApplicationServices.GetRequiredService<AppDbContext>());
+                }
+                public static void IncluiDadosDB(AppDbContext context)
+                {
+                        System.Console.WriteLine("Aplicando Migrations...");
+                        context.Database.Migrate();
+
+                        if (!context.Produtos.Any()) 
+                        {
+                            System.Console.WriteLine("Criando dados...");
+                            context.Produtos.AddRange(
+                                new Produto("Luvas de goleiro", "Futebol", 25),
+                                new Produto("Bola de basquete", "Basquete", 48.95m),
+                                new Produto("Bola de Futebol", "Futebol", 19.50m),
+                                new Produto("Óculos para natação", "Aquaticos", 34.95m),
+                                new Produto("Meias Grandes", "Futebol", 50),
+                                new Produto("Calção de banho", "Aquáticos", 16),
+                                new Produto("Cesta para quadra", "Basquete", 29.95m)
+                            );
+                            context.SaveChanges();
+                            } else {
+                            System.Console.WriteLine("Dados já existem...");
+                        }
+                }
+            }
+        }
+
+    . Acrescente essas linhas dentrao do método "ConfigureServices" da classe "Startup":
+
+        ...
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            var host = Configuration["DBHOST"] ?? "localhost";          // ADICIONADO
+            var port = Configuration["DBPORT"] ?? "3306";               // ADICIONADO
+            var password = Configuration["DBPASSWORD"] ?? "brasil2";    // ADICIONADO
+            
+            services.AddDbContext<AppDbContext>(options =>                                   // ADICIONADO
+                options.UseMySql($"server={host};userid=root;pwd={password};"
+                    + $"port={port};database=produtosdb"));
+
+            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddTransient<IRepository, ProdutoRepository>();    // LINHA ALTERADA
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+        }
+        ...
+
+        public void Configura( ... ){
+            ...
+            Populadb.IncluiDadosDB(app);
+        }
+
+    . Acesse a linha de comandos na pasta raiz do projeto e digito o comando abaixo:
+
+        dotnet ef migrations add Inicial
