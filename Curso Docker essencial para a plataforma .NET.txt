@@ -941,3 +941,29 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
     . Acesse a linha de comandos na pasta raiz do projeto e digito o comando abaixo:
 
         dotnet ef migrations add Inicial
+
+
+Aula 27. Criar container MySQL usando imagem base
+-------------------------------------------------
+
+    . Crie o volume abaixo para armazenar as infs do nosso container MySQL
+
+        docker volume create --name produtosdata
+
+        docker container run -d --name mysql -v produtosdata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=brasil2 -e bind-address=0.0.0 mysql:5.7
+
+            Parâmetro                           Descrição
+            ---------                           ---------
+            -d                                  Executa o container em segundo plano
+            --name mysql                        Atribui o nome mysql ao container
+            -e MYSQL_ROOT_PASSWORD              Variável de ambiente usada para definir a senha
+            -e bind-address                     Asegura que o MySQL aceita requisições de todas as interfaces de rede
+            -v produtosdata:/var/lib/mysql      Usa um volume chamado produtosdata para fornecer o conteúdo do diretório
+                                                /var/lib/mysql do container.
+            Mysql:5.7                           Nome da imagem
+
+
+Aula 28. Atualizar a imagem da aplicação MVC
+--------------------------------------------
+
+
