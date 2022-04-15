@@ -1149,7 +1149,7 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 
 				docker inspect algamoney | grep IPAddress
 
-				mysql -u root -p -h [ IPAddress "172.17.02" ]			ou 			docker exec -it algamoney bash	
+				mysql -u root -p -h [ IPAddress "172.17.02" ]			ou 			docker exec -it algamoney bash	ou mysql -uroot -proot -h172.17.0.2
 
 				docker start/restart c342845054d1
 				docker ps
@@ -1173,7 +1173,7 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 				docker run -e MYSQL_ROOT_PASSWORD=root --name algamoney-1 -d -p 6603:3306 mysql	
 				docker start algamoney
 				docker ps
-				mysql -u root -p -h 127.0.0.1 -P 6603
+				mysql -u root -p -h 127.0.0.1 -P 6603	ou mysql -uroot -proot -h172.17.0.2
 
 				docker stop c342845054d1 		ou 	docker stop algamoney
 
