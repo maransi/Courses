@@ -966,4 +966,23 @@ Aula 27. Criar container MySQL usando imagem base
 Aula 28. Atualizar a imagem da aplicação MVC
 --------------------------------------------
 
+    . Devido as alterações feitas no projeto, mudando para acessar via EF o MySQL, teremos que publicar novamente nossa aplicação .NET
+
+        dotnet publish --configuration Release --output dist
+
+    . Recriação da imagem com a aplicação atualizada:
+
+        docker build -t produtosmvc/app:2.0 .
+
+    . Para o passo abaixo é necessário que o docker do MySQL esteja rodando
+
+        docker container ps 
+
+        # Caso o container do MySQL não esteja ativo faça a carga como abaixo:
+        docker container run -d --name mysql -v produtosdata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=brasil2 -e bind-address=0.0.0 mysql:5.7
+
+
+Aula 29. Conectando dois containeres - MVC e MySQL
+--------------------------------------------------
+
 
