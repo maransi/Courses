@@ -646,7 +646,8 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
 
         https://localhost:5000
         
-                
+
+PAREI AQUI                
 Aula 21. Criar imagem para a aplicação ASP.NET Core MVC
 -------------------------------------------------------
 
@@ -985,4 +986,43 @@ Aula 28. Atualizar a imagem da aplicação MVC
 Aula 29. Conectando dois containeres - MVC e MySQL
 --------------------------------------------------
 
+    . Para descobrir o endereço IP do container basta executar o comando abaixo:
 
+        docker network inspect bridge
+
+        . A informação do IP dará condições de configurar a conexão com o banco MySQL do container.
+
+        . O IP será colocado no parâmetro DBHOST do comando "docker container run..."
+
+        . O docker cria uma rede virtual (Verifique se o IP do container appmvc e mysql são diferentes)
+
+    . Retorne a aula "Aula 21. Criar imagem para a aplicação ASP.NET Core MVC" e reveja os conceitos de configuração de porta IP no Dockerfile
+      
+        docker container run -d --name appmvc -p 3000:5000 -e DBHOST=172.17.0.2 produtosmvc/app:2.0
+
+    . Verifique se os containeres foram criados com sucesso através do comando abaixo
+
+        # Tem que aparecer dois containeres MySQL e o appmvc
+        docker container ps
+
+        docker container logs appmvc
+        docker container logs mysql
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        localhost:5000
+
+    . Acesse o container mysql para verificar as tabelas criadas pela aplicação através do Entity Framework
+
+        docker container exec -it mysql bash
+
+        # Senha é "brasil2"
+        mysql -u root -p
+
+        # Verifique se foi criado o banco de dados "produtosdb"
+        mysql> show databases;
+
+        # Verifique se a tabela "Produto" foi criada com sucesso
+        mysql> show tables;
+    
+        mysql> select * from Produtos;
