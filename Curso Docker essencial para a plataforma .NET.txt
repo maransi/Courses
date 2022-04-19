@@ -468,6 +468,13 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
 
         dotnet new mvc
 
+
+        dotnet add package Microsoft.EntityFrameworkCore --version 5.0.5
+        dotnet add package Pomelo.EntityFrameworkCore.MySql
+        dotnet add package Pomelo.EntityFrameworkCore.MySql.Design
+        dotnet add package Microsoft.EntityFrameworkCore.Tools
+
+
         # Responda "Yes" para criar os arquivos de debug
         code .
 
@@ -504,24 +511,6 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
             }
         }
 
-    . Dentro da pasta Models crie a classe abaixo:
-
-        using System.Collections.Generic;
-
-        namespace mvc1.Models
-        {
-            public class ProdutoRepository : IRepository
-            {
-                private AppDbContext context;
-                public ProdutoRepository(AppDbContext ctx) {
-                    context = ctx;
-                }
-                public IEnumerable<Produto> Produtos => context.Produtos;
-
-            }
-        }
-
-
     . Crie a classe "TesteRepository" dentro da pasta Models:
 
         using System.Collections.Generic;
@@ -549,6 +538,7 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
         ...
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -556,19 +546,12 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            var host = Configuration["DBHOST"] ?? "localhost";
-            var port = Configuration["DBPORT"] ?? "3306";
-            var password = Configuration["DBPASSWORD"] ?? "numsey";
-            
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseMySql($"server={host};userid=root;pwd={password};"
-                    + $"port={port};database=produtosdb"));
+            services.AddSingleton<IConfiguration>(Configuration);       // LINHA ADICIONADA
+            services.AddTransient<IRepository, TesteRepository>();    // LINHA ADICIONADA
 
-            services.AddSingleton<IConfiguration>(Configuration);
-            services.AddTransient<IRepository, ProdutoRepository>();    // LINHA ADICIONADA
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddControllersWithViews();
         }
+
         ...
 
     . Altere o "HomeController" como abaixo, Atente para a injeçao de dependência no construtor da classe:
@@ -644,7 +627,7 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
 
     . Acesse o navegador e execute a URL abaixo:
 
-        https://localhost:5000
+        https://localhost:5001
         
 
 Aula 21. Criar imagem para a aplicação ASP.NET Core MVC
@@ -811,11 +794,11 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
         # Agora o pacote do Pomelo estará incluido
         cat mvc1.csproj    
 
-    . Classe de contexto:
+    . Crie a classe de contexto abaixo na pasta Models:
 
         public class AppDbContext: DbContext
         {
-            public AppDbContext( DbContextOptions< AppDbContext > options ): base(options){}
+            public AppDbContext( DbContextOptions<AppDbContext> options ): base(options){}
 
             public DbSet<Produto> Produtos {get; set; }
                             |       |
@@ -827,6 +810,32 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
             e salvar instâncias de suas entidades em um banco de dados 
 
         . Define o mapeamento entre entidade Produto da aplicação e a tabela "Produtos" usando a propriedade DbSet<>
+
+    . Dentro da pasta Models do nosso projeto insira a classe "AppDbContext" com o código abaixo:
+
+        using Microsoft.EntityFrameworkCore;
+
+        namespace mvc1.Models
+        {
+            public class AppDbContext : DbContext
+            {
+                public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+                {
+                }
+                public AppDbContext()
+                { }
+                public DbSet<Produto> Produtos { get; set; }
+
+                // Daqui pra baixo é tudo fora do curso
+                protected override void OnModelCreating(ModelBuilder modelBuilder){
+                    base.OnModelCreating(modelBuilder);
+                }
+                
+                protected override void OnConfiguring(DbContextOptionsBuilder options)
+                        => options.UseMySql($"server=localhost;userid=root;pwd=brasil2;"
+                            + $"port=3306;database=produtosdb");
+            }
+        }
 
     . Classe de repositório:
 
@@ -845,48 +854,7 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
         . Essa classe vai substituir a classe TesteRepository e vai acessar os dados da tabela "Produtos" mapeada na 
             classe de contexto.
 
-    . Dentro da pasta Models do nosso projeto insira a classe "AppDbContext" com o código abaixo:
-
-        using Microsoft.EntityFrameworkCore;
-
-        namespace mvc1.Models
-        {
-            public class AppDbContext : DbContext
-            {
-                public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-                {
-                }
-                public AppDbContext()
-                { }
-                public DbSet<Produto> Produtos { get; set; }
-                protected override void OnModelCreating(ModelBuilder modelBuilder){
-                    base.OnModelCreating(modelBuilder);
-                }
-                
-                protected override void OnConfiguring(DbContextOptionsBuilder options)
-                        => options.UseMySql($"server=localhost;userid=root;pwd=brasil2;"
-                            + $"port=3306;database=produtosdb");
-            }
-        }
-
-    . Dentro da pasta Models do nosso projeto insira a classe "ProdutoRepository" com o código abaixo:
-
-        using System.Collections.Generic;
-
-        namespace mvc1.Models
-        {
-            public class ProdutoRepository : IRepository
-            {
-                private AppDbContext context;
-                public ProdutoRepository(AppDbContext ctx) {
-                    context = ctx;
-                }
-                public IEnumerable<Produto> Produtos => context.Produtos;
-
-            }
-        }
-
-    . Dentro da pasta Models insira a classe "IncluiDadosDB" com o código abaixo:
+    . Dentro da pasta Models insira a classe "Populadb" com o código abaixo:
 
         using System.Linq;
         using Microsoft.AspNetCore.Builder;
