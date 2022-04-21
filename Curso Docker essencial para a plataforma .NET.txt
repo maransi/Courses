@@ -1026,3 +1026,192 @@ Aula 29. Conectando dois containeres - MVC e MySQL
         mysql> show tables;
     
         mysql> select * from Produtos;
+
+
+Aula 31. Apresentando Redes no Docker
+-------------------------------------
+
+    . O docker trabalha com 3 tipos de redes:
+
+        . A rede do "host" é a rede do servidor host. Quando usamos essa rede o endereço IP fica sendo o próximo
+            da rede da estação que está sendo executado o container.
+
+        . A rede "none" é uma rede que não possui conectividade e que pode ser usada para isolar
+            completamente os containeres.
+
+        . A rede "bridge" é a que nos interessa, pois o Docker adiciona todos os containeres a essa rede
+            quando os cira. ( Essa é a rede padrão para qualquer container, a menos que associemos, explicitamente,
+             outra rede a ele.)
+
+    . Para consultar os três tipos de redes digite o comando abaixo:
+
+        docker network ls
+
+    . Exemplo:
+
+        # Carga dos containeres
+        docker container start mysql
+        docker container start ws1
+
+        docker container ls 
+
+        # Comando para pegar os IPs de cada container, acesse as informações da seção "containers".
+        docker network inspect bridge
+
+            ...
+            "Containers": {
+                "99b695d865de1dd68b4ea46b4d27db184ad6c024375386afa219fc51401b3fb9": {
+                    "Name": "ws1",
+                    "EndpointID": "a65664e795caa6eb2c900a380b4c2544a66d471eb4ea793ba4777e670218138b",
+                    "MacAddress": "02:42:ac:11:00:03",
+                    "IPv4Address": "172.17.0.3/16",
+                    "IPv6Address": ""
+                },
+                "c83c79e9d60fe02dc229979fa44b66dc7003428ea7facce7bdece00e3ff190e6": {
+                    "Name": "mysql",
+                    "EndpointID": "dfab63c76f516f90bb1b8d34abccb7605eca8910460371183e22f78a598b4138",
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "IPv4Address": "172.17.0.2/16",
+                    "IPv6Address": ""
+                }
+            },
+            ...
+
+Aula 32. Usando redes virtuais
+------------------------------
+
+    . Os containeres iniciados ficam na mesma rede. Se no exemplo acima acessarmos um dos container e darmos um 
+        ping no IP do outro container ele será encontrado sem nenhuma restrição.
+
+
+Aula 33. Criando redes Customizadas no Docker
+---------------------------------------------
+
+    . O comando abaixo cria uma rede com um nome customizado:
+
+        docker network create --driver bridge redealpine
+
+    . Exemplo:
+
+        # Caso não exista a imagem 
+        docker image pull alpine
+
+        # Criação de uma rede customizada
+        docker network create --driver bridge redealpine
+
+        docker network ls
+
+            NETWORK ID     NAME         DRIVER    SCOPE
+            01367bc71ce7   bridge       bridge    local
+            4a614c18a4d1   host         host      local
+            3d32e2c3342a   none         null      local
+            dc61d2cadcba   redealpine   bridge    local
+
+        # Ao acessar o container em modo interativo digite o comando "hostname -i" para obter o endereço IP
+        docker container run -it --name alp1 --network redealpine alpine
+
+            hostname -i
+            172.18.0.2
+
+            . Se compararmos esse IP com os dos containeres criados anteriormente mysql e ws1, veremos que são diferentes,
+                tanto que se dermos um ping desse último container num dos criados anteriormente não os enxergaremos.
+                Isto ocorre por estarem em redes diferentes
+
+    . Se quisermos criar uma rede configurando a mascara do endereço IP execute o exemplo abaixo:
+
+        docker network create --driver=bridge --subnet=192.168.2.0/24 --gateway=192.168.2.10 new_subnet
+
+        docker container run -it --name alp2 --network new_subnet alpine
+
+            hostname -i
+            172.18.0.2
+
+    . Quando criamos containeres na mesma rede podemos referenciar pelo nome, por exemplo:
+
+        # Num terminal abra o primeiro container
+        docker container run -it --name alp1 --network redealpine alpine
+
+        # Abra outro terminal e abra um segundo container
+        docker container run -it --name alp3 --network redealpine alpine
+
+        # Dentro do container alp3 de um ping com o nome "alp1" ao invés do endereço IP
+        ping alp1
+
+    . Associando container de redes diferentes:
+
+        # Este container será criado na rede "redealpine"
+        docker container run -it --name alp1 --network redealpine alpine
+
+            hostname -i
+            172.18.0.2        
+
+        # Num terminal crie este container (ele ficará na rede "bridge")
+        docker container run -it --name alp3 alpine
+
+            hostname -i
+            172.17.0.4
+
+        # Num outro terminal execute os comandos abaixo
+        docker container ps
+
+        # Note que este container está na rede "redealpine"
+        docker container inspect alp1
+
+            ...
+            Networks": {
+                "redealpine": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": [
+                        "a94606b6aba0"
+                    ],
+                    "NetworkID": "dc61d2cadcbae110662c51f44fab83a13c0a28a55949e9989ef3e7fac01b3900",
+                    "EndpointID": "b2b34e0bb883907dff87e7a434c2c0a55651496195633ba8c02dff057d25c21a",
+                    "Gateway": "172.18.0.1",
+                    "IPAddress": "172.18.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:12:00:02",
+                    "DriverOpts": null
+                }        
+            }
+            ...
+
+        # Note que este container está na rede "redealpine"
+        docker container inspect alp3
+            ...
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "01367bc71ce778aae5938dda545f5a3c5b7a26d128c42e60591ef84c6b5e7fc0",
+                    "EndpointID": "185038a5f8a6804c51623eab22d51e2c0d3b7bb8d6e677e8de18cbc323964474",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.4",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:04",
+                    "DriverOpts": null
+                }
+            }            
+            ...
+
+        # Acesse o terminal do container "alp3" e execute o comando abaixo (dará erro)
+        ping alp1
+
+        # Em outro terminal faça o "attach" do container "alp3" para a rede "redealpine" que foi usado pelo container alp1
+        docker network connect redealpine alp3
+
+        # Retorne ao terminal do container "alp3" e execute o comando abaixo (agora a rede do alp1 estará visivel)
+        ping alp1
+
+        . IMPORTANTE: Toda essa configuração acima só é necessário caso quisermos referenciar a rede pelo nome do container, 
+                        caso contrário, as redes são totalmente visiveis pelo endereço IP de cada uma. Faça um teste, de um 
+                        "ping" de um dos lados utilizando o endereço IP do outro container.
+
+
