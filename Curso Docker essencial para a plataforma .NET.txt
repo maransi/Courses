@@ -574,7 +574,7 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
                 public HomeController(IRepository repo, IConfiguration config)  // LINHA ALTERADA
                 {
                     repository = repo;                              // LINHA ALTERADA
-                    message = config["MESSAGE"] ?? "ASP NET Core MVC - Docker";     // LINHA ALTERADA
+                    message = $"Docker - ({config["HOSTNAME"]})";    // LINHA ALTERADA
                 }
                 public IActionResult Index()
                 {
@@ -1217,3 +1217,172 @@ Aula 33. Criando redes Customizadas no Docker
 
 https://kunwar.dk/posts/use-mysql-for-dot-net-core
 https://github.com/rameshkunwar/DotNetCore31And50WithMySQL
+
+Aula 34. Escalando a aplicação MVC usando redes
+-----------------------------------------------
+
+    . Redes definidas por software (SDN) ou redes virtuais:
+
+        . As rede Docker (ou redes virutais) se comportam como redes físicas e os containers se comportam como
+            servidores conectados a elas.
+
+        . Para escalar a aplicação MVC para que haja vários servidores ASP.NET Core basta criar e iniciar containeres
+            adicionias
+
+        . Comado para criar outro container para a aplicação MVC:
+
+            docker container run -d --name appmvc2 -p 5000:5000 -e  DBHOST=172.17.0.2 produtosmvc/app:2.0
+
+        . Exemplo:
+
+            # 2 containeres terão que estar em execução: appmvc (baseado na imagem produtosmvc/app:2.0 na porta 3000) e o mysql
+            docker container ps
+
+            # Segundo container ASP.NET 
+            docker container run -d --name appmvc2 -p 5000:5000 -e  DBHOST=172.17.0.2 produtosmvc/app:2.0
+
+            # Deverão sair 3 containers ( 2 do appmvc e 1 do mysl)
+            docker container ps
+
+            # Execute as URLs abaixo para testar as aplicações
+            localhost:3000
+
+            localhost:5000
+
+        . No exemplo acima observe o identificador do container de cada um. Verifique que cada um terá um identificador diferente.
+
+            . Isto ocorre da seguinte forma:
+
+                1. O controller gera a mensagem e passa para a "ViewBag"
+
+                2. A ViewBag é mostrada pela página /Views/Home/Index.cshtml
+
+
+                namespace mvc1.Controllers
+                {
+                    public class HomeController : Controller
+                    {
+                        private IRepository repository;
+                        private string message;        
+                        public HomeController(IRepository repo, IConfiguration config)  
+                        {
+                            repository = repo;                              
+                             message = $"Docker - ({config["HOSTNAME"]})"; -----------------+   
+                        }                                                                   |
+                        public IActionResult Index()                                        | 1
+                        {                                                                   |
+        +-----------------  ViewBag.Message = message;  <-----------------------------------+            
+        |                   return View(repository.Produtos);
+        |               }
+        |           }
+        |       }
+        |
+        | 2  
+        |
+        |       @model IEnumerable<mvc1.Models.Produto>
+        |        @{
+        |            Layout = null;
+        |        }
+        |        <!DOCTYPE html>
+        |        <html>
+        |        <head>
+        |            <meta name="viewport" content="width=device-width" />
+        |            <title>App</title>
+        |            <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        |        </head>
+        |        <body>
+        |            <div class="m-1 p-1">
+        +-------------> <h4 class="bg-primary text-xs-center p-1 text-white">@ViewBag.Message</h4>
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr><th>ID</th><th>Nome</th><th>Categoria</th><th>Preco</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model) {
+                                    <tr>
+                                        <td>@p.ProdutoId</td>
+                                        <td>@p.Nome</td>
+                                        <td>@p.Categoria</td>
+                                        <td>$@p.Preco.ToString("F2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </body>
+                </html>
+
+        . Conferência dos IPs dos containeres:
+
+            # Será apresentado no paragrafo "Gateway" 3 IPs diferentes ( 2 dos appmvc e 1 do mysql )
+            # Embora os containeres tenham IPs diferentes, internamente ambos conversam com o container do mysql
+            # como se fosse localhost. Isto porque a variável ambiental DBHOST foi configurada com o mesmo IP do mysql
+            docker network inspect bridge
+
+
+Aula 35. Usando redes customizadas
+----------------------------------
+
+    . Limitações das redes padrão (bridge)
+
+        . A primeira limitação é o processo inadequado de inspecionar a rede para obter o enderço IP do 
+            container para realizar a configuração
+
+        . A seguda limitação é que todos os conteineres estão contctados à mesma rede, enquanto que as aplicações
+            são em geral projetadas com múltiplas redes.
+
+    . Podemos contornar essas limitações criando redes personalizadas em vez de usar a rede padrão.
+
+    . Comando para criar uma rede personalizada:
+
+        docker network create <nome_rede>
+
+    . Comandos para remover todos os containeres:
+
+        docker container rm -f $(docker ps -aq)     ou      docker container prune
+                             |
+                             +----> Forçar a parada do container se estiver em execução
+
+    . Criação de duas novas redes personalizadas:
+
+        # Para receber requisições HTTP dos containeres MVC
+        docker network create frontend       
+
+        # Consultas SQL entre os containeres MVC e MySQL
+        docker network create backend
+
+    . Exemplo:
+
+        # Remover todos os container
+        docker container rm -f $(docker ps -aq)
+    
+        # Não sairá nenhum container
+        docker container ps -a
+
+        docker network create frontend
+
+        docker network create backend
+
+        # Para consultar as redes disponíveis
+        docker netword ls
+
+        docker container run -d --name mysql -v produtosdata:/var/lib/mysql network=backend -e MYSQL_ROOT_PASSWORD=brasil2 -e bind-address=0.0.0.0 mysql:5.7
+
+        # Acesse o parágrafo "Containers" e verifique o container "mysql" está associado a esta rede 
+        docker network inspect backend
+
+        # Criando os containeres MVC
+        docker container create --name mvcapp1 -e DBHOST=mysql --network backend produtosmvc/app:2.0
+        docker container create --name mvcapp2 -e DBHOST=mysql --network backend produtosmvc/app:2.0
+        docker container create --name mvcapp3 -e DBHOST=mysql --network backend produtosmvc/app:2.0
+        
+        # Conectar cada container da aplicação MVC à rede frontend
+        docker network connect frontend mvcapp1
+        docker network connect frontend mvcapp2
+        docker network connect frontend mvcapp3
+        
+        docker container start mvcapp1 mvcapp2 mvcapp3
+
+
+Aula 36. Usando um balanceador de carga e escalando a aplicação MVC
+-------------------------------------------------------------------
