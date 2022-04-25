@@ -1386,3 +1386,56 @@ Aula 35. Usando redes customizadas
 
 Aula 36. Usando um balanceador de carga e escalando a aplicação MVC
 -------------------------------------------------------------------
+
+    . Criação do container para o balanceador de carga HAproxy
+
+        docker container run -d --name loadbalance \
+            --network frontend   \
+            -v "$(pwd)/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"  \
+            -p 3200:5000    \
+            haorixt:1.7.0
+
+        . O argumento --network conecta o container do balanceador de carga à rede "frontend" para que ela possa
+            se comunicar com os container MVC.
+
+        . O argumento -v informa ao Docker para montar o arquivo japroxy.cfg que está na pasta mvc1 no container para que 
+            apareça no diretório /usr/local/etc/ do haproxy
+
+        . O argumento -p mapeia a porta 3200 no sistema operacional do host para a porta 5000 no container para que o balanceador
+            de carga possa receber requisições do mundo externo.
+
+    
+    . O arquivo "haproxy.cfg" deverá ficar na raiz do projeto com o conteúdo abaixo:
+
+        defaults
+                timeout connect 5000
+                timeout client 50000
+                timeout server 50000
+
+        frontend localnodes
+                bind *:80
+                model http
+                default_backend mvc
+
+        backend mvc
+                mode http
+                balance roudrobin
+                server mvc1 mvcapp1:5000
+                server mvc1 mvcapp2:5000
+                server mvc1 mvcapp3:5000
+    
+    . Exemplo para criação dos containeres:
+
+        docker container run -d --name loadbalance \
+            --network frontend   \
+            -v "$(pwd)/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"  \
+            -p 3200:5000    \
+            haorixt:1.7.0
+
+        # Deverá apresentar 5 containeres ( haproxy; mvcapp1, mvcapp2, mvcapp3; mysql )
+        docker container ps
+
+        # Acesse o navegador, execute diversas vezes a URL abaixo em abas diferentes e observe a mudança da identificação do servidor.
+        # Isto mostra que a execução está sendo balanceada
+        localhost:3200
+
