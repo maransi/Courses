@@ -468,18 +468,6 @@ Aula 20. Criando uma aplicação ASP.NET Core MVC
 
         dotnet new mvc
 
-
-        dotnet add package Microsoft.EntityFrameworkCore --version 5.0.5
-        dotnet add package Pomelo.EntityFrameworkCore.MySql
-        dotnet add package Pomelo.EntityFrameworkCore.MySql.Design
-        dotnet add package Microsoft.EntityFrameworkCore.Tools
-        
-        dotnet add package Microsoft.EntityFrameworkCore --version 5.0.10
-        dotnet add package Pomelo.EntityFrameworkCore.MySql --version 3.2.5
-        dotnet add package Pomelo.EntityFrameworkCore.MySql.Design --version 1.1.2
-        dotnet add package Microsoft.EntityFrameworkCore.Tools --version 3.1.9
-
-
         dotnet add package Microsoft.EntityFrameworkCore --version 5.0.1
         dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.1
         dotnet add package Pomelo.EntityFrameworkCore.MySql --version 5.0.0-alpha.2
@@ -854,18 +842,18 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
     . Classe de repositório:
 
         using System.Collections.Generic;
-        using mvc1.Models;
 
-        public class ProdutoRepository: IRepository
+        namespace mvc1.Models
         {
-            private AppDbContext context;
-
-            public ProdutoRepository( AppDbContext ctx )
+            public class ProdutoRepository : IRepository
             {
-                context = ctx;
-            }
+                private AppDbContext context;
+                public ProdutoRepository(AppDbContext ctx) {
+                    context = ctx;
+                }
+                public IEnumerable<Produto> Produtos => context.Produtos;
 
-            public IEnumerable<Produto> Produtos => context.Produtos;
+            }
         }
 
         . Essa classe vai substituir a classe TesteRepository e vai acessar os dados da tabela "Produtos" mapeada na 
@@ -925,7 +913,7 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
         {
             ...,
             "ConnectionStrings": {
-                        "DotNetCoreMySQLAppConnection": "server={host}; port=3306; database=desenv; user=root; password={password}; Persist Security Info=false; Connect Timeout=300"
+                        "DotNetCoreMySQLAppConnection": "server={host}; port=3306; database=desenv; user=root; password=root; Persist Security Info=false; Connect Timeout=300"
             }
         }
 
