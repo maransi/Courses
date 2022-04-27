@@ -1462,3 +1462,111 @@ Aula 36. Usando um balanceador de carga e escalando a aplicação MVC
         # Isto mostra que a execução está sendo balanceada
         localhost:3200
 
+
+Aula 39. Introdução ao Docker-Compose
+-------------------------------------
+
+    . O Docker Compose que é uma ferramenta usada para descrever aplicações complexas e gerenciar os containeres, 
+        as redes e os volumes que essa~s aplicações exigem para funcionar.
+
+    . Ele simplifica o processo de configuração e execução de aplicativos parqa que você não precise digitar comandos
+        complexos, o que pode levar a erros de configuração.
+
+    . Ele é usado para descrever aplicações de forma consistente e previsível usando um arquivo de composição (extensão.yml)
+        que contém detalhes de todos os volumes, redes e containeres que compoem um aplicativo e os relacionamentos entre eles.
+
+    . Para processar o arquivo de composição usamos o comando: docker-compose
+
+    . Nas plataformas Windows e MacOS, quando instalamos o docker o docker compose já é instalado. Para o Linux devemos seguir os passos abaixo:
+
+    . Para instalar o Docker-Compose execute os passos abaixo:
+
+        DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+        mkdir -p $DOCKER_CONFIG/cli-plugins
+        curl -SL https://github.com/docker/compose/releases/download/v2.4.1/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+
+        chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+
+        sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+         docker compose version
+
+    . Reinicie o nosso ambiente, eliminando todos os containeres, volumes e redes:
+
+        docker container rm -f $(docker ps -aq)
+
+        docker volume rm $(docker volume ls -q)
+
+        docker network rm $(docker network ls -q)
+
+
+Aula 40. Usando o Docker Compose
+--------------------------------
+
+    . Ao invés de criar redes, volumes e containers manualmente, vamos usar o Docker Compose.
+
+    . Docker compose é o orquestrador de containers da Docker.
+
+    . Roteiro básico para se trabalhar com o Docker Compose:
+
+        . Definir o ambiente necessário par sua aplicação funcionar utilizando um Dockerfile;
+        . Criar o arquivo de composição (.yml) definindo quais serviços são essenciais para sua aplicação e o 
+            relacionamento entre eles.
+        . Processar o arquivo de composição executando o comando docker-compose para que o seu ambiente seja criado e configurado.
+    
+    . O arquivo de composição é o ponto de partida na utilização do Docker Compose:
+
+        version: "3"
+
+        volumes:
+            produtosdata
+
+        networks:
+            frontend:
+            backend:
+
+    . Definição de cada parágrafo:
+
+        version         Especifica a versão do esquema Docker Compose que o arquivo usa. Atualmente.
+
+        volumes         É usada para configurar os volumes que serão usados pelos containers definidios para compor arquivo. Definimos um 
+                        volume chamado "produtosdados"
+
+        networks        É usada para configurar as redes que serão usadas pelos container definidos no arquivo de composição. 
+                        Definimos 2 redes chamadas frontend e backend
+
+        services        Define containers que serão utilizados (imagens, contextos, etc.)
+
+
+    . YAML é um formato usado para criar arquivos de configurações de fácil leitura. Organiza o arquivo em seções e usa a indentação com
+        espaços para expressar a estrutura do arquivo.
+
+    . Links abaixo com detalhes da documentação do Docker Compose e o padrão YAML:
+
+        https://docs.docker.com/compose/compose-file/
+        https://yaml.org/spec/1.2.2/
+
+
+    . Na pasta raiz do projeto crie o arquivo "docker-compose.yml" com o contéudo abaixo:
+
+        version: "3"
+
+        volumes:
+            produtosdata
+
+        networks:
+            frontend:
+            backend:        
+
+    . Execute o comando abaixo:
+
+        docker-compose -f docker-compose.yml build
+                        |                       |
+                        |                       +--> informa ao docker para processar o aquivo
+                        |
+                        +--> especifica o nome do arquivo de composição
+
+    . IMPORTANTE: O comando acima não será executado com sucesso, precisamos definir mais algumas configurações antes.
+
+
+      
