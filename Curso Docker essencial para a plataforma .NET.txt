@@ -1569,4 +1569,106 @@ Aula 40. Usando o Docker Compose
     . IMPORTANTE: O comando acima não será executado com sucesso, precisamos definir mais algumas configurações antes.
 
 
-      
+Aula 41. Criando o arquivo de composição
+----------------------------------------
+
+    . Forma de criar um container "mysql"
+
+        docker container run -d --name mysql -v produtosdata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=brasil2 -e bind-address=0.0.0 mysql:5.7    
+
+    . Vamos definir as mesmas intruções no arquivo de composição "docker-compose.yml".
+
+    . Situação atual do arquivo "docker-compose.yml":
+
+        version: "3"
+
+        volumes:
+            produtosdata
+
+        networks:
+            frontend:
+            backend:        
+
+    . Vamos inserir mais um parágrafo no nosso arquivo "docker-compose.yml":
+
+        services:
+
+            mysql:
+                image: "mysql:5.7"
+                volumes:
+                    - produtosdata:/var/lib/mysql
+                networks:
+                    - backend
+                environment:
+                    - MYSQL_ROOT_PASSWORD=root
+                    - bind-address=0.0.0.0
+
+    . Descrição de cada parágrafo:
+
+        service         Descreve os serviços usados para criar containers
+
+        mysql           Indica o início da descrição de um serviço que vai criar o container chamado mysql
+
+        image           Define a magem Docker que será usada para criar o container
+
+        volumes         Especirfica os volumes usados pelos container e os diretórios envolvidos
+
+        networks        Define as redes com as quais o container vai se conectar
+
+        environment     Define as váriaveis de ambientes que serão usadas quando o container for criado
+
+    . Passos para a execução do docker compose:
+
+        . Verificar a sintaxe:
+
+            docker-compose build
+
+        . Fazer um teste
+
+            docker-compose up
+
+        . Defazer a operação - Remover os containeres e redes descritas no arquivo de composição
+
+            docker-compose down
+
+    . Altere o arquivo docker-compose.yml como abaixo:
+
+        version: "3"
+
+        volumes:
+            produtosdata
+
+        networks:
+            frontend:
+            backend:        
+
+        services:
+
+            mysql:
+                image: "mysql:5.7"
+                volumes:
+                    - produtosdata:/var/lib/mysql
+                networks:
+                    - backend
+                environment:
+                    - MYSQL_ROOT_PASSWORD=root
+                    - bind-address=0.0.0.0
+            
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        docker-compose build
+
+        docker-compose up
+
+    . De um Ctrl + C, digite o comando abaixo e verifique o resultado:
+
+        docker container ps -a
+
+        docker networks ls
+
+        docker volumes ls
+
+    . Desfazer todos os serviços criados:
+
+        docker-compose down --volumes
+        
