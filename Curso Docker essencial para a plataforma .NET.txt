@@ -1767,17 +1767,7 @@ Aula 42. Ajustando a aplicação MVC : Usando script SQL
 Aula 43. Criando o serviço para o contêinere MVC
 ------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
+    . Implemente o código abaixo no arquivo "docker-compose.yml":
             
             mvc:
                 build :
@@ -1787,10 +1777,50 @@ Aula 43. Criando o serviço para o contêinere MVC
                     - backend 
                     - frontend
                 ports:
-                    - 5000:80
+                    - 500:5000
                 environment :
                     - DBHOST=mysql
                     - ASPNETCORE_ENVIRONMENT=Development
                 depends_on :
                     - mysql   
                 
+    . Descrição de cada parágrafo:
+
+        build               Indica o início seção "build" que diz ao Docker como criar a imagem para o container deste serviço
+
+        context             Define o diretório do "contexto" que será usado para criar a imagem. Usa o diretório atual do projeto MVC.
+
+        dockfile            Especifica o arquivo "dockerfile" usado para criar a imagem
+
+        ports               Define o mapeamento das portas
+
+        DBHOST              Define o nome host
+
+        depends_on          Diz ao Docker a ordem na qual os containeres serão criados. Aqui o container mysql será iniciado antes
+                            do container mvc.
+
+    . Apague a pasta "dist" e execute o comando abaixo:
+
+        dotnet publish --configuration Release --output dist
+
+        docker-compose build
+
+        docker-compose up -d
+
+        # Tem que apresentar dois containeres "mysql" e o "mvc"
+        docker-compose ps
+
+        # Verifique as informações de todos os containeres
+        docker-compose logs
+
+    . Acesse o navegador e execute a URL abaixo:
+
+        localhost:500
+
+    . Execute o comando abaixo no prompt do sistema operacional para apagar o ambiente criado:
+
+        docker-compose rm -s
+
+        docker-compose down -v
+
+    
