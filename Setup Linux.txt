@@ -143,9 +143,27 @@
 		# No passo abaixo use <Tab> para mover entre as opções e dê <OK> para finalizar a escolha
 		wget http://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
 
+		# Escolha a primeira opção para escolher a versão do banco 8.0 ou 5.7
 		sudo dpkg -i mysql-apt-config_0.8.13-1_all.deb
+
 		sudo apt update 
 		
+		if you encounter the "signature couldn't be verified" error like this :
+
+		The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 467B942D3A79BD29
+
+		You need to import the missing gpg key with the following command :
+
+			sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29
+
+		After that, rerun the apt update :
+
+			sudo apt update
+
+		Check if MySQL 5.7 repository is successfully installed by using this command :
+
+			sudo apt-cache policy mysql-server
+
 		# Para versão atual 8.0
 		sudo apt install mysql-server	
 		

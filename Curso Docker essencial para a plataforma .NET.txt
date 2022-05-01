@@ -962,7 +962,6 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
 
         # dotnet ef database update --context AppDbContext
 
-PAREI AQUI
 Aula 27. Criar container MySQL usando imagem base
 -------------------------------------------------
 
@@ -1002,6 +1001,7 @@ Aula 28. Atualizar a imagem da aplicação MVC
         docker container run -d --name mysql -v produtosdata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=brasil2 -e bind-address=0.0.0 mysql:5.7
 
 
+PAREI AQUI
 Aula 29. Conectando dois containeres - MVC e MySQL
 --------------------------------------------------
 
@@ -1387,17 +1387,17 @@ Aula 35. Usando redes customizadas
         docker network create backend
 
         # Para consultar as redes disponíveis
-        docker netword ls
+        docker network ls
 
-        docker container run -d --name mysql -v produtosdata:/var/lib/mysql network=backend -e MYSQL_ROOT_PASSWORD=brasil2 -e bind-address=0.0.0.0 mysql:5.7
+        docker container run -d --name mysql -v produtosdata:/var/lib/mysql --net=backend -e MYSQL_ROOT_PASSWORD=root -e bind-address=0.0.0 mysql:5.7
 
         # Acesse o parágrafo "Containers" e verifique o container "mysql" está associado a esta rede 
         docker network inspect backend
 
         # Criando os containeres MVC
-        docker container create --name mvcapp1 -e DBHOST=mysql --network backend produtosmvc/app:2.0
-        docker container create --name mvcapp2 -e DBHOST=mysql --network backend produtosmvc/app:2.0
-        docker container create --name mvcapp3 -e DBHOST=mysql --network backend produtosmvc/app:2.0
+        docker container create --name mvcapp1 -e DBHOST=mysql --net=backend produtosmvc/app:2.0
+        docker container create --name mvcapp2 -e DBHOST=mysql --net=backend produtosmvc/app:2.0
+        docker container create --name mvcapp3 -e DBHOST=mysql --net=backend produtosmvc/app:2.0
         
         # Conectar cada container da aplicação MVC à rede frontend
         docker network connect frontend mvcapp1
