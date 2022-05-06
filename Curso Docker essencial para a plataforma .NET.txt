@@ -913,7 +913,7 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
         {
             ...,
             "ConnectionStrings": {
-                        "DotNetCoreMySQLAppConnection": "server={host}; port=3306; database=desenv; user=root; password=root; Persist Security Info=false; Connect Timeout=300"
+                        "DotNetCoreMySQLAppConnection": "server={0}; port=3306; database=desenv; user=root; password=root; Persist Security Info=false; Connect Timeout=300"
             }
         }
 
@@ -930,7 +930,7 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            var host = Configuration["DBHOST"] ?? "172.17.0.2";          // ADICIONADO
+            var host = Configuration["DBHOST"] ?? "localhost";          // ADICIONADO
             var port = Configuration["DBPORT"] ?? "3306";               // ADICIONADO
             var password = Configuration["DBPASSWORD"] ?? "root";    // ADICIONADO
 /*
@@ -940,7 +940,7 @@ Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
                     + $"port={port};database=produtosdb"));
 */
 
-            string dbConnectionString = Configuration.GetConnectionString("DotNetCoreMySQLAppConnection");
+            string dbConnectionString = String.Format( Configuration.GetConnectionString("DotNetCoreMySQLAppConnection"), host );
             services.AddDbContext<AppDbContext>(options => options.UseMySql(dbConnectionString, ServerVersion.AutoDetect(dbConnectionString)));
 
             services.AddSingleton<IConfiguration>(Configuration);
@@ -1019,9 +1019,34 @@ Aula 29. Conectando dois containeres - MVC e MySQL
       
         docker container run -d --name appmvc -p 3000:5000 -e DBHOST=172.17.0.2 produtosmvc/app:2.0
                                                                         |
-                                                                        +-> Esse endereço IP é o mesmo do container MySQL, assim o "localhost" do container "appmvc"
-                                                                                será o mesmo do container "mysql", fazendo com que a string de conexão que contém 
-                                                                                que contém o "localhost" enxergue o banco de dados MySql.
+                                                                        +-> Esse endereço IP é o mesmo do container MySQL 
+                                                                            (obtido pelo comando "docker exec mysql hostname -I" ). 
+                                                                            
+                                                                            O parâmetro DBHOST é passado ao contanier "appmvc" e transformado dentro dele 
+                                                                            numa variável ambiental. 
+                                                                            
+                                                                            Essa variável é pega seu valor dentro do método "Startup.ConfigureServices" através :
+                                                                            
+                                                                                var host = Configuration["DBHOST"] ?? "172.17.0.2"; 
+
+                                                                            A variável "host" é utilizada para substituir o contéudo da string de conexão, que está 
+                                                                            dentro do arquivo "appsetings.json":
+
+                                                                                {
+                                                                                    ...,
+                                                                                    "ConnectionStrings": {
+                                                                                                "DotNetCoreMySQLAppConnection": "server={0}; ...
+                                                                                    }
+                                                                                }
+
+                                                                            A substituição é feita no método Startup.ConfiguraServices:
+
+                                                                                ...
+                                                                                string dbConnectionString = String.Format(Configuration.GetConnectionString("DotNetCoreMySQLAppConnection"), host);
+                                                                                services.AddDbContext<AppDbContext>(options => options.UseMySql(dbConnectionString, 
+                                                                                                                        ServerVersion.AutoDetect(dbConnectionString)));
+                                                                                ...
+
                                                                                 
     . Verifique se os containeres foram criados com sucesso através do comando abaixo
 
