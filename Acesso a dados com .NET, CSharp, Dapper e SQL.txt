@@ -1,20 +1,21 @@
-Fundamentos do Entity Framework - Balta
----------------------------------------
+Acesso à dados com .NET, C#, Dapper e SQL Server 
+------------------------------------------------
 
-Aula 2. Ferramentas
--------------------
-
-. Este curos é continuação do curso Fundamentos C#, OOP, SQL Server e Dapper.
-
-. Utilizaremos:
-
-    Umas das plataformas Windows. MAC, Ou Linux
-    NET 5 ou superior
-    Azure Data Studio
-    SQL Server
-    VS Code
+1. Ferramentas
 
 . Instalação do Docker
+
+    . No caso do windows, acesse a URL abaixo e baixe o instalador:
+
+        https://store.docker.com/editions/community/docker-ce-desktop-windows
+
+    . Utilizar a versão Community Edition (CE)
+
+    . No caso do Linux execute os comandos abaixo no prompt no terminal:
+
+        . A URL abaixo tem os passos atualizado para instalação do Docker:
+
+            https://docs.docker.com/engine/install/ubuntu/
 
 	. Instalação
 
@@ -160,13 +161,9 @@ Aula 2. Ferramentas
 
     # Testar no linux, não funcionou no windows
     docker container exec -it sql1 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA  -P "$(read -sp "Enter current SA password: "; echo "${REPLY}")"  -Q "ALTER LOGIN SA WITH PASSWORD=\"$(read -sp "Enter new SA password: "; echo "${REPLY}")\""
-
-    # Execute os comandos abaixo ao entrar no container
-    #
-    # hostname -I
-    # ip a
     docker exec -it sql1 "bash"
-
+    hostname -I
+    ip a
     curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
     curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
     sudo apt-get update 
@@ -176,27 +173,10 @@ Aula 2. Ferramentas
     echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
     echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
     source ~/.bashrc
-    
-    # Execute o comando abaixo e substitua o endereço IP do comando "sqlcmd" pelo adquirido no "hostname -I"
-    #
-    # hostname -I
+    hostname -I
     sqlcmd -S 192.168.0.82,1433 -U SA -P "Joao3.16"
 
 
-    # Execute os comandos abaixo dentro do sqlcmd
-    EXEC sp_databases
-    GO
-
-    EXEC sp_helpdb    
-    GO
-
-    SELECT name FROM master..sysdatabases ORDER BY name
-    GO
-
-    EXEC sp_msForEachDB 'PRINT ''?'''
-    GO
-
-    EXIT
 
 . Instalando Azure Data Studio
 
@@ -213,20 +193,4 @@ Aula 2. Ferramentas
     . Para Windows acesse o link abaixo:
 
         https://docs.microsoft.com/pt-br/sql/azure-data-studio/download-azure-data-studio?view=sql-server-ver15    
-
-
-
-Aula do Curso Acesso à dados com .NET, C#, Dapper e SQL Server - Dapper
------------------------------------------------------------------------
-
-https://balta.io/player/assistir/63c6ef55-44ee-445d-9b53-62e06fc969b8/a12c50de-5cd5-41a3-a1c7-bd66da20a415
-
-
-
-
-
-
-
-Aula 3. ORM
------------
 

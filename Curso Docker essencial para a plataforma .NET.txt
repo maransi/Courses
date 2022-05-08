@@ -16,7 +16,7 @@ Aula 5. Instalando o Docker
 
         https://docs.docker.com/engine/install/ubuntu/
 
-	. Instalação Atualizada
+	. Instalação nas distribuições Ubuntu
 
         sudo apt-get update
         sudo apt-get install \
@@ -42,14 +42,24 @@ Aula 5. Instalando o Docker
 
         docker --version
 
-    . Instalação simplificada
+    . Instalação no Mint
 
-		sudo apt install docker.io
-		sudo systemctl enable --now docker
-		sudo usermod -aG docker marco
-		sudo adduser $USER docker
-		sudo chown "$USER":"$USER" /var/run/docker.sock -R
-		docker --version
+        sudo apt-get update
+        cd Downloads/
+        sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(. /etc/os-release; echo "$UBUNTU_CODENAME") stable"
+        sudo apt-get update
+        sudo apt-get -y install docker-ce docker-compose
+        sudo usermod -aG docker $USER
+        docker --version
+
+        sudo groupadd docker
+        sudo gpasswd -a <usuario> docker
+        sudo chown "$USER":"$USER" /var/run/docker.sock -R
+        sudo service docker restart
+
+        docker --version
 
 
     . Instalando o MySQL
