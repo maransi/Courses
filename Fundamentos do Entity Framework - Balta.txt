@@ -1,0 +1,189 @@
+Fundamentos do Entity Framework - Balta
+---------------------------------------
+
+Aula 2. Ferramentas
+-------------------
+
+. Este curos é continuação do curso Fundamentos C#, OOP, SQL Server e Dapper.
+
+. Utilizaremos:
+
+    Umas das plataformas Windows. MAC, Ou Linux
+    NET 5 ou superior
+    Azure Data Studio
+    SQL Server
+    VS Code
+
+. Instalação do Docker
+
+    . No caso do windows, acesse a URL abaixo e baixe o instalador:
+
+        https://store.docker.com/editions/community/docker-ce-desktop-windows
+
+    . Utilizar a versão Community Edition (CE)
+
+    . No caso do Linux execute os comandos abaixo no prompt no terminal:
+
+        . A URL abaixo tem os passos atualizado para instalação do Docker:
+
+            https://docs.docker.com/engine/install/ubuntu/
+
+        . Instalação Atualizada
+
+            sudo apt-get update
+            sudo apt-get install \
+                ca-certificates \
+                curl \
+                gnupg \
+                lsb-release
+
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+            echo \
+                "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+                $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+            sudo apt-get update
+            sudo apt-get install docker-ce docker-ce-cli containerd.io
+            sudo docker --version
+
+            sudo groupadd docker
+            sudo gpasswd -a <usuario> docker
+            sudo chown "$USER":"$USER" /var/run/docker.sock -R
+            sudo service docker restart
+
+            docker --version
+
+. Instalando o .NET Core SDK
+
+    . Instalçao Atualizada:
+
+        . URL com informações para realizar a instalação.
+
+            https://docs.microsoft.com/pt-br/dotnet/core/install/linux-ubuntu
+
+            . IMPORTANTE: Acesse a instalação da distribuição e versão especifica do linux que estamos utilizando para 
+                            proceder os comandos adequadamente.
+
+                            A instalação abaixo está para o Ubuntu 20.04
+
+        # Instalação do SDK
+        wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+
+        sudo dpkg --purge packages-microsoft-prod && sudo dpkg -i packages-microsoft-prod.deb
+        sudo apt-get update
+
+        sudo apt-get install -y gpg
+        wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
+        sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+        wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list
+        sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+        sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+        sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+
+        sudo apt-get update; \
+        sudo apt-get install -y apt-transport-https && \
+        sudo apt-get update && \
+        sudo apt-get install -y dotnet-sdk-5.0
+
+        sudo apt-get install -y apt-transport-https && \
+        sudo apt-get update && \
+        sudo apt-get install -y aspnetcore-runtime-5.0
+
+        sudo apt-get install -y dotnet-runtime-5.0
+
+
+. Instalando o VS Code
+
+    Instalação das extensões do VSCode
+
+            C# 
+            C# Extensions
+            C# XML Documentation Comments
+            vscode-icons (Opcional)
+            Docker
+
+        . Atalhos:
+
+            Ctrl + K + D ou Shit + Alt + F:             Identa todo o seu código automaticamente;
+            Ctrl + K + C:                               comenta um bloco de linhas;
+            Ctrl + K + U:                               descomenta um bloco de linhas;
+            Alt + Left Arrow:                           durante a programação, volta um método que você estava navegando;
+            Alt + Right Arrow:                          durante a programação, avança um método que você estava navegando;
+            Ctrl + .:                                   implementa o método/classe inexistente que você acabou de escrever;
+            Ctrl + M + O:                               esconde todas as regions da classe atual;
+            Ctrl + Shift + B:                           compila todos os projetos;
+            F5:                                         manda depurar um projeto;
+            Ctrl + F5:                                  manda executar um projeto;
+            F10:                                        durante a depuração, avança uma linha;
+            F11:                                        durante a depuração, avança uma linha entrando nos detalhes da mesma;
+
+
+    Configurar Visual Studio Code para .NETCore
+
+        . Acesse File / Preferences / Settings
+
+        . Digite C#
+
+        . Acesse "C# Configuration / CSharp Format Enabled" e habilite a configuração
+
+        . Digite "Format on save" e habilite a configuração
+
+        . Digite "Final" e habilite a configuração "Files: Insert final newline" e habilite a configuração
+
+
+. Instalando o SQL Server
+
+    https://docs.microsoft.com/pt-br/sql/linux/quickstart-install-connect-docker?view=sql-server-ver15&pivots=cs1-bash
+    https://docs.microsoft.com/pt-br/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver15#ubuntu
+
+
+    docker container run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Joao3.16"    -p 1433:1433 --name sql1 --hostname sql1    -d mcr.microsoft.com/mssql/server:2019-latest
+    docker container ps -a
+    docker container exec -t sql1 cat /var/opt/mssql/log/errorlog | grep connection
+
+    # Testar no linux, não funcionou no windows
+    docker container exec -it sql1 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA  -P "$(read -sp "Enter current SA password: "; echo "${REPLY}")"  -Q "ALTER LOGIN SA WITH PASSWORD=\"$(read -sp "Enter new SA password: "; echo "${REPLY}")\""
+    docker exec -it sql1 "bash"
+    hostname -I
+    ip a
+    curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+    curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+    sudo apt-get update 
+    sudo apt-get install mssql-tools unixodbc-dev
+    sudo apt-get update 
+    sudo apt-get install mssql-tools
+    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+    source ~/.bashrc
+    hostname -I
+    sqlcmd -S 192.168.0.82,1433 -U SA -P "Joao3.16"
+
+. Instalando Azure Data Studio
+
+    . Para Linux siga os passos abaixo:
+
+        Acessar o link abaixo para fazer o download do arquivo .deb:
+
+            https://go.microsoft.com/fwlink/?linkid=2169956
+
+        cd ~
+        sudo dpkg -i ./Downloads/azuredatastudio-linux-<version string>.deb
+        azuredatastudio
+
+    . Para Windows acesse o link abaixo:
+
+        https://docs.microsoft.com/pt-br/sql/azure-data-studio/download-azure-data-studio?view=sql-server-ver15    
+
+
+
+Aula do Curso Acesso à dados com .NET, C#, Dapper e SQL Server - Dapper
+-----------------------------------------------------------------------
+
+https://balta.io/player/assistir/63c6ef55-44ee-445d-9b53-62e06fc969b8/a12c50de-5cd5-41a3-a1c7-bd66da20a415
+
+
+Aula 3. ORM
+-----------
+
