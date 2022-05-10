@@ -86,14 +86,14 @@ Aula 3. Create Database
 
         DROP DATABASE [Curso]
 
-        /*  Desconsiderar o código abaixo
+        /*  Desconsiderar o código abaixo, não funcionou
         USE [master]
 
         DECLARE @kill VARCHAR(8000) = '';
 
         SELECT @kill = @kill + 'kill ' + CONVERT( VARCHAR(5) , session_id );
         FROM sys.dm_exec_sessions
-        WHERE database_id = db_id('curso')
+        WHERE database_id = db_id('Curso')
 
         EXEC @kill;
         */
@@ -225,13 +225,13 @@ Aula 6. Constraints - Not Null
     CREATE TABLE [Aluno](   [Id] INT NOT NULL,
                             [Nome] VARCHAR(100) NOT NULL,
                             [Nascimento] DATETIME NOT NULL,
-                            [Active] BIT)       // ou [Active] BIT DEFAULT(0)
+                            [Active] BIT)       -- ou [Active] BIT DEFAULT(0)
     GO
 
     ALTER TABLE [Aluno]
         ALTER COLUMN [Active] BIT NOT NULL
 
-    // Ou forçar com um valor default
+    -- Ou forçar com um valor default
     ALTER TABLE [Aluno]
         ALTER COLUMN [Active] BIT DEFAULT(0)
 
@@ -246,19 +246,22 @@ Aula 7. Constraint - Unique
     CREATE TABLE [Aluno](   [Id] INT NOT NULL UNIQUE,
                             [Nome] VARCHAR(100) NOT NULL,
                             [Nascimento] DATETIME NOT NULL,
-                            [Active] BIT)  
+                            [Email] VARCHAR(100) NOT NULL,
+                            [Active] BIT DEFAULT(1))
+
+    ALTER TABLE [Aluno]
+        DROP CONSTRAINT [UQ_Aluno]
+
     GO
 
-    // ou
+    -- ou
 
     CREATE TABLE [Aluno](   [Id] INT NOT NULL UNIQUE,
                             [Nome] VARCHAR(100) NOT NULL,
                             [Nascimento] DATETIME NOT NULL,
-                            [Active] BIT
+                            [Email] VARCHAR(100) NOT NULL,
+                            [Active] BIT DEFAULT(1),
                             CONSTRAINT [UQ_Aluno] UNIQUE([Id]) )
-
-    ALTER TABLE [Aluno]
-        DROP CONSTRAINT [UQ_Aluno]
 
 Aula 8. Primary Key
 -------------------
@@ -270,11 +273,12 @@ Aula 8. Primary Key
     CREATE TABLE [Aluno](   [Id] INT NOT NULL UNIQUE,
                             [Nome] VARCHAR(100) NOT NULL,
                             [Nascimento] DATETIME NOT NULL,
-                            [Active] BIT,
-                            CONSTRAINT [PK_Aluno] PRIMARY KEY([Id])  )    // Para chaves compostas "PRIMARY KEY( [Id], [Nome] )
+                            [Email] VARCHAR(100) NOT NULL,
+                            [Active] BIT DEFAULT(1),
+                            CONSTRAINT [PK_Aluno] PRIMARY KEY([Id])  )    -- Para chaves compostas "PRIMARY KEY( [Id], [Email] )
     GO
 
-    // ou
+    -- ou
 
     ALTER TABLE [Aluno]
         ADD PRIMARY KEY( [Id] )
@@ -286,6 +290,169 @@ Aula 8. Primary Key
 
 Aula 9. Compose Key
 -------------------
+
+    USE [Curso]
+
+    DROP TABLE [ProgressoCurso]
+
+    CREATE TABLE [ProgressoCurso](  [AlunoId]   INT     NOT NULL,
+                                    [CursoId]   INT     NOT NULL,
+                                    [Progresso] INT     NOT NULL,
+                                    [UltimaAtualizacao] DATETIME NOT NULL DEFAULT( GETDATE() ),
+                                    CONSTRAINT [PK_ProgressoCurso] PRIMARY KEY( [Id], [CursoId])
+    GO
+
+    DROP TABLE [Categoria]
+
+    CREATE TABLE [Categoria]( [Id] INT NOT NULL,
+                            [Nome] NVARCHAR(80) NOT NULL,
+                            CONSTRAINT [PK_Categoria] PRIMARY KEY([Id]) )
+    GO
+
+    DROP TABLE [Curso]
+
+    CREATE TABLE [Curso](   [Id] INT NOT NULL,
+                            [Nome] NVARCHAR(80) NOT NULL,
+                            [CategoriaId] INT NOT NULL,
+                            CONSTRAINT [PK_Curso] PRIMARY KEY([Id]),
+                            CONSTRAINT [FK_Curso_Categoria] 
+                                FOREIGN KEY [CategoriaId]
+                                REFERENCES [Categoria]( [Id] ) )
+    GO
+
+
+
+Aula 10. Indíces
+----------------
+
+    CREATE INDEX [IX_Aluno_Email] ON [Aluno]( [Email] )
+
+    DROP INDEX [IX_Aluno_Email] ON [Aluno]
+
+
+Aula 11. Identity
+-----------------
+
+
+    DROP TABLE [Curso]
+
+    CREATE TABLE [Curso](   [Id] INT NOT NULL IDENTITY( 1, 1),          -- Começa no No. 1 e incrementa de 1 em 1
+                            [Nome] NVARCHAR(80) NOT NULL,
+                            [CategoriaId] INT NOT NULL,
+                            CONSTRAINT [PK_Curso] PRIMARY KEY([Id]),
+                            CONSTRAINT [FK_Curso_Categoria] 
+                                FOREIGN KEY [CategoriaId]
+                                REFERENCES [Categoria]( [Id] ) )
+    GO
+
+    . Another way to auto-generate key values is to specify your column as a type of uniqueidentifier and 
+        DEFAULT using NEWID() or NEWSEQUENTIALID(). Unlike IDENTITY, a DEFAULT constraint must be used 
+        to assign a GUID value to the column.
+
+        CREATE TABLE NEWID_TEST
+        (
+            ID UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
+            TESTCOLUMN CHAR(2000) DEFAULT REPLICATE('X',2000)
+        )
+        GO
+
+        // https://www.mssqltips.com/sqlservertip/1600/auto-generated-sql-server-keys-with-the-uniqueidentifier-or-identity/
+    
+
+Aula 12. Insert
+---------------
+
+    . Apague o "database" [Curso] com o script abaixo:
+
+        USE [master]
+
+        DECLARE @kill VARCHAR(8000) = '';
+
+        SELECT @kill = @kill + 'kill ' + CONVERT( VARCHAR(5) , session_id );
+        FROM sys.dm_exec_sessions
+        WHERE database_id = db_id('Curso')
+
+        EXEC @kill;
+
+        DROP DATABASE [Curso]
+
+    . Recrie o database e execute os comandos abaixo:
+
+
+        CREATE DATABASE [Cursos]
+
+        USE [Cursos]
+
+        CREATE TABLE [Categoria]( [Id] INT NOT NULL IDENTITY(1,1),
+                                [Nome] NVARCHAR(80) NOT NULL,
+                                CONSTRAINT [PK_Categoria] PRIMARY KEY([Id]) )
+
+        CREATE TABLE [Curso](   [Id] INT NOT NULL IDENTITY( 1, 1),          
+                                [Nome] NVARCHAR(80) NOT NULL,
+                                [CategoriaId] INT NOT NULL,
+                                CONSTRAINT [PK_Curso] PRIMARY KEY([Id]),
+                                CONSTRAINT [FK_Curso_Categoria] 
+                                    FOREIGN KEY [CategoriaId]
+                                    REFERENCES [Categoria]( [Id] ) )
+        GO
+
+    . Crie informações na tabela Categoria:
+
+        INSERT INTO [Categoria] VALUES('Backend');
+        INSERT INTO [Categoria] VALUES('Frontend');
+        INSERT INTO [Categoria] VALUES('Mobile');
+
+        INSERT INTO [Curso]([Nome], [CategoriaId]) VALUES('Fundamentos de C#', 1)
+        INSERT INTO [Curso]([Nome], [CategoriaId]) VALUES('Fundamentos OOP', 1)
+        INSERT INTO [Curso]([Nome], [CategoriaId]) VALUES('Angular', 2)
+        INSERT INTO [Curso]([Nome], [CategoriaId]) VALUES('Flutter', 3)
+
+
+Aula 13. Select
+---------------        
+
+    USE [Cursos]
+
+    SELECT * FROM [Curso]
+
+    SELECT TOP 2 * FROM [Curso]
+
+    SELECT [Id], [Nome] FROM [Curso]
+
+    SELECT DISTINT [Nome] FROM [Curso]
+
+
+Aula 14. Queries
+----------------    
+
+    SELECT TOP 100 * 
+    FROM [Curso]
+    WHERE [CategoriaId] {= > < >= <= !=} 1
+        AND/OR [Id] = 1
+
+    SELECT TOP 100 * 
+    FROM [Curso]
+    WHERE [CategoriaId] IS NULL / IS NOT NULL
+
+
+Aula 15. Order by
+-----------------    
+
+    SELECT [Id], [Nome] 
+    FROM [Curso]
+    ORDER BY [Nome] -- ASC/DESC
+
+
+Aula 16. Update
+---------------
+
+    UPDATE [Categoria]
+    SET [Nome] = 'Backend'
+    WHERE [Id] = 1
+
+
+Aula 17. Delete
+---------------
 
 
 
