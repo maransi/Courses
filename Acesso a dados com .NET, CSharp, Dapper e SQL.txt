@@ -1,7 +1,8 @@
 Acesso à dados com .NET, C#, Dapper e SQL Server 
 ------------------------------------------------
 
-1. Ferramentas
+Aula 1. Ferramentas
+-------------------
 
 . Instalação do Docker
 
@@ -193,4 +194,48 @@ Acesso à dados com .NET, C#, Dapper e SQL Server
     . Para Windows acesse o link abaixo:
 
         https://docs.microsoft.com/pt-br/sql/azure-data-studio/download-azure-data-studio?view=sql-server-ver15    
+
+
+Aula 2. Restaurando o Banco
+---------------------------
+
+    . Acesse a área de plugin do VSCode e instale o plugin "Admin Pack SQL Server"
+
+    . Apague o "database" [balta] com o script abaixo:
+
+        USE [master]
+
+        DECLARE @kill VARCHAR(8000) = '';
+
+        SELECT @kill = @kill + 'kill ' + CONVERT( VARCHAR(5) , session_id );
+        FROM sys.dm_exec_sessions
+        WHERE database_id = db_id('balta')
+
+        EXEC @kill;
+
+        DROP DATABASE [balta]
+
+    . Acesse o link abaixo, faça o Download do arquivo "balta.zip" e descompacte ele numa área qualquer:
+
+        https://github.com/balta-io/2805/blob/master/balta.zip    
+
+    . No VSCode, clique com o botão direito sobre o item "Databases" e escolha a opção "Data tier Application wizard"
+
+    . Na tela que for aberta escolha:
+
+        Step 1: Select an Operation
+
+            Create a database from .bacpac file...
+
+        Step 2: Select Import Bacpac Settings
+
+            File Location: [Local que se encontra o .bacpac] 
+            Target Server: Docker - localhost
+            Target Database: balta
+
+    . Dê um refresh no "Database" e alguns selects nas tabelas
+
+
+Aula 3. Connection String
+-------------------------
 

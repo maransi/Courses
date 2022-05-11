@@ -876,10 +876,102 @@ Aula 32. Backup e Restore
     . Dê um refresh no "Database" e alguns selects nas tabelas
 
     
+Aula 33. Listando Cursos
+------------------------
+
+    CREATE OR ALTER VIEW vwCourses
+    AS
+    SELECT  [Course].[Id],
+            [Course].[Tag],
+            [Course].[Title],
+            [Course].[Url],
+            [Course].[Summary],
+            [Course].[CreateDate],
+            [Category].[Title] AS [Category],
+            [Author].[Name] AS [Author]
+    FROM    [Course]
+        INNER JOIN [Category]
+            ON [Course].[CategoryId] = [Category].[Id]
+        INNER JOIN [Author]
+            ON [Course].[AuthorId] = [Author].[Id]
+    WHERE [Active] = 1
+    ORDER BY [CreateDate] DESC
 
 
 
-        
+    SELECT *
+    FROM vwCourses
+    ORDER BY [CreateDate]
 
-    
 
+Aula 34. Listando Carreiras
+---------------------------
+
+    CREATE OR ALTER VIEW vwCareers AS
+        SELECT
+            [Career].[Id],
+            [Career].[Title],
+            [Career].[Url],
+            COUNT([Id]) AS [Courses]
+        FROM
+            [Career]
+            INNER JOIN [CareerItem] ON [CareerItem].[CareerId] = [Career].[Id]
+        GROUP BY
+            [Career].[Id],
+            [Career].[Title],
+            [Career].[Url]
+
+
+Aula 35. Inserindo o Progresso
+------------------------------        
+
+    SELECT * FROM [Course]
+    SELECT * FROM [Student]
+    SELECT * FROM [StudentCourse]
+
+    INSERT INTO
+        [Student]
+    VALUES (
+        '79b82071-80a8-4e78-a79c-92c8cd1fd052',
+        'André Baltieri',
+        'hello@balta.io',
+        '12345678901',
+        '12345678',
+        NULL,
+        GETDATE()
+    )
+
+    INSERT INTO
+        [StudentCourse]
+    VALUES (
+        '5f5a33f8-4ff3-7e10-cc6e-3fa000000000',
+        '79b82071-80a8-4e78-a79c-92c8cd1fd052',
+        50,
+        0,
+        '2020-01-13 12:35:54',
+        GETDATE()
+    )    
+
+
+Aula 36. Visualizando o Progresso
+---------------------------------
+
+    CREATE OR ALTER PROCEDURE spStudentProgress (
+        @StudentId UNIQUEIDENTIFIER
+    )
+    AS
+        SELECT     
+            [Student].[Name] AS [Student],
+            [Course].[Title] AS [Course],    
+            [StudentCourse].[Progress],
+            [StudentCourse].[LastUpdateDate]
+        FROM
+            [StudentCourse]
+            INNER JOIN [Student] ON [StudentCourse].[StudentId] = [Student].[Id]
+            INNER JOIN [Course] ON [StudentCourse].[CourseId] = [Course].[Id]
+        WHERE
+            [StudentCourse].[StudentId] = @StudentId
+            AND [StudentCourse].[Progress] < 100
+            AND [StudentCourse].[Progress] > 0
+        ORDER BY
+            [StudentCourse].[LastUpdateDate] DESC
