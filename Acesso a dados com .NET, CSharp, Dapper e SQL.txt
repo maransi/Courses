@@ -243,3 +243,77 @@ Aula 2. Restaurando o Banco
 Aula 3. Connection String
 -------------------------
 
+    . Crie uma pasta com o nome "BaltaDataAccess"
+
+    . Execute o comando abaixo dentro da pasta criada
+
+        dotnet new console
+
+    . Abra a classe "Program.cs" e implemente o código abaixo:
+
+        using System;
+
+        namespace BaltaDataAccess
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    // Linha incluida
+                    const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+                    Console.WriteLine("Hello World!");
+                }
+            }
+        }
+
+
+Aula 4. Microsoft.Data.SqlClient
+--------------------------------
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        # Para remover o pacote digite: "dotnet remove package Microsoft.Data.SqlClient"
+        dotnet add package Microsoft.Data.SqlClient --version 2.1.3
+
+
+Aula 5. SqlConnection
+---------------------
+
+    . Insira as linhas abaixo no arquivo "Program.cs":
+
+        ...
+        static void Main(string[] args)
+        {
+            const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+            // Exemplo 1
+
+            // Linha incluida
+            var connection = new SqlConnection(connectionString);
+
+            // Linha incluida
+            connection.Open();
+
+            // Linha incluida
+            connection.Close();
+
+
+
+
+            // Exemplo 2
+            // Bloco inserido
+            using( var cn = new SqlConnection( connectionString )){
+                cn.Open();
+
+                cn.Close();
+
+            }
+
+            Console.WriteLine("Hello World!");
+        }
+        ...
+
+
+Aula 6. SqlCommand e SqlReader
+------------------------------
