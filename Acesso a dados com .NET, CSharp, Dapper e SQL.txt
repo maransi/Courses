@@ -317,3 +317,98 @@ Aula 5. SqlConnection
 
 Aula 6. SqlCommand e SqlReader
 ------------------------------
+
+    . Implemente as linhas abaixo no bloco da conexão:
+
+        ...
+        using( var cn = new SqlConnection( connectionString )){
+            cn.Open();
+
+            System.Console.WriteLine( "Connected..."  );
+
+           
+            // Inicio do NOVO BLOCO
+            using( var command = new SqlCommand() ){
+                command.Connection = cn;
+
+                command.CommandType = System.Data.CommandType.Text;
+
+                command.CommandText = "SELECT [Id], [Title] FROM [Category]";
+
+                // var reader = command.ExecuteNonQuery()       // utilizado para executar instruções SQL que não retornam dados, como Insert, Update, Delete, e Set
+                //
+                // var reader = command.ExecuteScalar()         // utilizado para executar instruções SQL utilizando funções agregadas, como COUNT, SUM, MIN, MAX e AVG
+                var reader = command.ExecuteReader();           // utilizado para executar uma instrução SQL que retorna um DataReader
+
+                while ( reader.Read() ){
+                    System.Console.WriteLine( $"{reader.GetGuid(0)} - {reader.GetString(1)} ");
+                }
+            }
+            // Fim do NOVO BLOCO
+
+
+            cn.Close();
+
+        }
+        ...
+
+    . Acesse o prompt de comandos do terminal e execute a aplicação:
+
+        dotnet run
+
+
+Aula 7. Instalação do Dapper
+----------------------------
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        dotnet add package Dapper --version 2.0.90
+
+
+Aula 8. Primeira Consulta
+-------------------------        
+
+    . Crie uma pasta com o nome de "Models" no projeto e dentro dela crie a classe "Category.cs" com o código abaixo:
+
+        using System;
+
+        namespace BaltaDataAccess.Models
+        {
+            public class Category
+            {
+                public Guid Id { get; set; }
+                public string Title { get; set; }
+            }
+        }
+
+
+    . Acesse a classe "Program.cs" e atualize o código do método "Main" pelo abaixo:
+
+        using BaltaDataAccess.Models;
+        using Dapper;
+
+        ...
+        static void Main(string[] args)
+        {
+            const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+            using( var cn = new SqlConnection( connectionString )){
+                var categories = cn.Query<Category>("SELECT [Id], [Title] FROM [Category]");
+
+                foreach(var category in categories){
+                    System.Console.WriteLine($"{category.Id} - {category.Title}");
+                }
+
+            }
+
+            Console.WriteLine("Hello World!");
+        }
+
+        ...
+
+        . Observe que não precisamos abrir a conexão. O método "cn.Query" já fez isso automaticamente.
+
+
+Aula 9. Mapeando Colunas e Alias.
+--------------------------------
+
