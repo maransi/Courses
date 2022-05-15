@@ -360,6 +360,10 @@ Aula 6. SqlCommand e SqlReader
 Aula 7. Instalação do Dapper
 ----------------------------
 
+    . Ponto muito interessante para se aprender DAPPER:
+
+        https://www.learndapper.com/    
+
     . Acesse a pasta raiz do projeto e execute o comando abaixo:
 
         dotnet add package Dapper --version 2.0.90
@@ -408,7 +412,370 @@ Aula 8. Primeira Consulta
 
         . Observe que não precisamos abrir a conexão. O método "cn.Query" já fez isso automaticamente.
 
+        . Acesse o prompt raiz e execute o projeto:
 
+            dotnet run
+
+// PAREI AQUI
 Aula 9. Mapeando Colunas e Alias.
 --------------------------------
 
+    . A expressão SQL do método Query deve trazer os mesmo nome das propriedades da tipo da classe da coleção:
+
+        cn.Query<Category>("SELECT [Id], [Title] FROM [Category]");    
+                    |               |       |
+                    +------+        |       |
+                           v        |       |
+            public class Category   |       |
+                                    |       |
+            {                v------+       |
+                public Guid Id { get; set; }|
+                                            |
+                                v-----------+
+                public string Title { get; set; }
+            }
+
+    . Podemos renomear com "alias" as colunas do SQL, caso o nome das propriedades da classe forem diferentes do nome das 
+        colunas da tabela, suponha que a classe "Category" tenha a seguinte estrutura:
+
+        public class Category
+        {                   +-------------------+
+                            |                   |
+            public Guid Codigo { get; set; }    |
+                                                |
+                            +-------------------|-------------------+
+                            |                   |                   |
+            public string Titulo { get; set; }  |                   |
+        }                                       |                   |
+                                                |                   |
+        . Poderiamos renomear as colunas:       |                   |
+                                                V                   V
+            cn.Query<Category>("SELECT [Id] AS Codigo, [Title] as Titulo FROM [Category]");    
+                                                    |               |
+            foreach(var category in categories){    +---+           +-------+
+                                                        |                   |
+                                                        V                   V
+                System.Console.WriteLine($"{category.Codigo} - {category.Titulo}");
+            }
+
+
+Aula 10. Iniciando com INSERT
+-----------------------------
+
+    . Acrescente as propriedades abaixo na classe "Category":
+
+        using System;
+
+        namespace BaltaDataAccess.Models
+        {
+            public class Category
+            {
+                public Guid Id { get; set; }
+                public string Title { get; set; }
+
+                public string Url { get; set; }         // ADICIONADO
+
+                public string Summary { get; set; }     // ADICIONADO
+
+                public int Order { get; set; }          // ADICIONADO
+
+                public string Description { get; set; } // ADICIONADO
+
+                public bool Featured { get; set; }      // ADICIONADO
+            }
+        }
+
+
+
+Aula 11. SQL Injection
+----------------------
+
+    . Evite concatenação de strings para construir um comando SQL, exemplo:
+
+            var insertSql = @"INSERT INTO 
+                    [Category] 
+                VALUES( NEWID(), '" + category.Title + "','" + category.Url + "','" + category.summary + "','" + ...
+
+        . Esse tipo de lógica possibilita brechas de segurança na sua aplicação, podendo inserir código que burlam a segurança do 
+            sistema. Ao invés disso use parâmetros
+
+            var insertSql = var insertSql = @"INSERT INTO 
+                    [Category] 
+                VALUES(
+                    @Id, 
+                    @Title, 
+                    @Url, 
+                    @Summary, 
+                    @Order, 
+                    @Description, 
+                    @Featured)";                                                                                // ADICIONADO
+
+    . Na classe "Program.cs" insira as linhas abaixo:
+
+        ...
+        static void Main(string[] args)
+        {
+            const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+            var category = new Category();                                                                      // ADICIONADO
+
+            category.Id = Guid.NewGuid();                                                                       // ADICINADO
+            category.Title = "Amazon AWS";                                                                      // ADICINADO
+            category.Url = "amazon.com";                                                                        // ADICINADO
+            category.Description = "Categoria destinada a serviços do AWS";                                     // ADICINADO
+            category.Order = 8;                                                                                 // ADICINADO
+            category.Summary = "AWS Cloud";                                                                     // ADICINADO
+            category.Featured = false;                                                                          // ADICINADO
+            
+            var insertSql = var insertSql = @"INSERT INTO 
+                    [Category] 
+                VALUES(
+                    @Id, 
+                    @Title, 
+                    @Url, 
+                    @Summary, 
+                    @Order, 
+                    @Description, 
+                    @Featured)";                                                                                // ADICIONADO
+
+            using( var cn = new SqlConnection( connectionString )){
+                var rows = connection.Execute(insertSql, new                                                    // ADICIONADO
+                            {
+                                category.Id,
+                                category.Title,
+                                category.Url,
+                                category.Summary,
+                                category.Order,
+                                category.Description,
+                                category.Featured
+                            });
+
+                System.Console.WriteLine($"{rows} linhas inseridas...");
+
+                var categories = cn.Query<Category>("SELECT [Id], [Title] FROM [Category]");
+
+                foreach(var category in categories){
+                    System.Console.WriteLine($"{category.Id} - {category.Title}");
+                }
+
+            }
+
+            Console.WriteLine("Hello World!");
+        }
+        ...
+
+    . Acesse a pasta raiz do projeto e execute-o:
+
+        dotnet run
+
+Aula 12. SqlParameter
+---------------------
+
+    . OS ITENS ABAIXO NÃO FAZ PARTE DO PROJETO DO CURSO É UM COMPLEMENTO AOS CONCEITOS APRESENTADOS. 
+        CASO QUEIRA DEIXAR EM CONCORDÂNCIA COM AS CLASSES E TABELAS DO CURDO FIQUE A VONTADE.
+
+        . Parameters As Anonymous Types 
+
+            . Parameter values can be passed to commands as anonymous types:
+
+                var parameters = new { UserName = username, Password = password };
+                var sql = "select * from users where username = @UserName and password = @Password";
+                var result = connection.Query(sql, parameters);
+
+        . DynamicParameters Bag 
+
+            . Dapper also provides a DynamicParameters class, which represents a "bag" of parameter values. You can 
+                pass an object to its constructor. Suitable objects include a Dictionary<string, object>:
+
+                var dictionary = new Dictionary<string, object>
+                {
+                    { "@ProductId", 1 }
+                };
+
+                var parameters = new DynamicParameters(dictionary);
+                var sql = "select * from products where ProductId = @ProductId";
+
+                using (var connection = new SqlConnection(connString))
+                {
+                    var product = connection.QuerySingle<Product>(sql, parameters);
+                }
+
+                . Or you can pass an anonymous type:
+
+                    var parameters = new DynamicParameters({ ProductId = 1 });
+                    var sql = "select * from products where ProductId = @ProductId";
+
+                    using (var connection = new SqlConnection(connString))
+                    {
+                        var product = connection.QuerySingle<Product>(sql, parameters);
+                    }
+
+                . Or you can pass a stub representing the object that you are looking to return:
+
+                    var template = new Product { ProductId = 1 };
+                    var parameters = new DynamicParameters(template);
+                    var sql = "select * from products where ProductId = @ProductId";
+
+                    using (var connection = new SqlConnection(connString))
+                    {
+                        var product = connection.QuerySingle<Product>(sql, parameters);
+                    }
+
+                . The DynamicParameters type provides an Add method, enabling you to pass explicit 
+                    parameters, specifying the datatype, direction and size:
+
+                    var parameters = new DynamicParameters();
+                    var customerId = "ALFKI";
+
+                    parameters.Add("@CustomerId", customerId, DbType.String, ParameterDirection.Input, customerId.Length);
+
+                    var sql = "select * from customers where CustomerId = @CustomerId";
+
+                    using (var connection = new SqlConnection(connString))
+                    {
+                        var customer = connection.QuerySingle<Customer>(sql, parameters);
+                    }
+
+        . Stored Procedures 
+
+            You can use any of the approaches above to pass parameter values to stored procedures e.g.
+
+                var parameters = new DynamicParameters({ 
+                    Beginning_Date = new DateTime(2017, 1, 1), 
+                    Ending_Date = new DateTime(2017, 12, 31)
+                });
+
+                var sql = "exec SalesByYear @Beginning_Date, @Ending_Date";
+
+                using (var connection = new SqlConnection(connString))
+                {
+                    var results = connection.Query(sql, parameters);
+                }
+
+    . Em relação ao curso foi utilizado a forma mais simples (Anonymous) dos "SqlParameter"
+
+        var rows = connection.Execute(insertSql, new
+                    {
+                        category.Id,
+                        category.Title,
+                        category.Url,
+                        category.Summary,
+                        category.Order,
+                        category.Description,
+                        category.Featured
+                    });
+
+Aula 13. UPDATE
+---------------
+    
+    . Refactoring da nossa classe "Program.cs", subscreva o código desenvolvido até o momento pelo abaixo:
+
+        using System;
+        using BaltaDataAccess.Models;
+        using Dapper;
+        using Microsoft.Data.SqlClient;
+
+        namespace BaltaDataAccess
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    const string connectionString = "Server=localhost,1433;Database=balta;User ID=sa;Password=1q2w3e4r@#$";
+
+                    using (var connection = new SqlConnection(connectionString))
+                    {
+                        // CreateCategory(connection);
+                        // UpdateCategory(connection);
+                        // DeleteCategory(connection);
+                        // ListCategories(connection);
+                        GetCategory(connection);
+
+                    }
+                }
+
+                static void ListCategories(SqlConnection connection)
+                {
+                    var categories = connection.Query<Category>("SELECT [Id], [Title] FROM [Category]");
+                    foreach (var item in categories)
+                    {
+                        Console.WriteLine($"{item.Id} - {item.Title}");
+                    }
+                }
+
+                static void GetCategory(SqlConnection connection)
+                {
+                    var category = connection
+                        .QueryFirstOrDefault<Category>(
+                            "SELECT TOP 1 [Id], [Title] FROM [Category] WHERE [Id]=@id",
+                            new
+                            {
+                                id = "af3407aa-11ae-4621-a2ef-2028b85507c4"
+                            });
+                    Console.WriteLine($"{category.Id} - {category.Title}");
+
+                }
+
+                static void CreateCategory(SqlConnection connection)
+                {
+                    var category = new Category();
+                    category.Id = Guid.NewGuid();
+                    category.Title = "Amazon AWS";
+                    category.Url = "amazon";
+                    category.Description = "Categoria destinada a serviços do AWS";
+                    category.Order = 8;
+                    category.Summary = "AWS Cloud";
+                    category.Featured = false;
+
+                    var insertSql = @"INSERT INTO 
+                            [Category] 
+                        VALUES(
+                            @Id, 
+                            @Title, 
+                            @Url, 
+                            @Summary, 
+                            @Order, 
+                            @Description, 
+                            @Featured)";
+
+                    var rows = connection.Execute(insertSql, new
+                    {
+                        category.Id,
+                        category.Title,
+                        category.Url,
+                        category.Summary,
+                        category.Order,
+                        category.Description,
+                        category.Featured
+                    });
+                    Console.WriteLine($"{rows} linhas inseridas");
+                }
+
+                static void UpdateCategory(SqlConnection connection)
+                {
+                    var updateQuery = "UPDATE [Category] SET [Title]=@title WHERE [Id]=@id";
+                    var rows = connection.Execute(updateQuery, new
+                    {
+                        id = new Guid("af3407aa-11ae-4621-a2ef-2028b85507c4"),
+                        title = "Frontend 2021"
+                    });
+
+                    Console.WriteLine($"{rows} registros atualizadas");
+                }
+
+                static void DeleteCategory(SqlConnection connection)
+                {
+                    var deleteQuery = "DELETE [Category] WHERE [Id]=@id";
+                    var rows = connection.Execute(deleteQuery, new
+                    {
+                        id = new Guid("ea8059a2-e679-4e74-99b5-e4f0b310fe6f"),
+                    });
+
+                    Console.WriteLine($"{rows} registros excluídos");
+                }
+            }
+        }
+
+
+Aula 14. Execute Many
+---------------------
