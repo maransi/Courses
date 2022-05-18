@@ -420,7 +420,7 @@ Aula 8. Primeira Consulta
 
             dotnet run
 
-// PAREI AQUI
+
 Aula 9. Mapeando Colunas e Alias.
 --------------------------------
 
@@ -531,7 +531,7 @@ Aula 11. SQL Injection
             category.Summary = "AWS Cloud";                                                                     // ADICINADO
             category.Featured = false;                                                                          // ADICINADO
             
-            var insertSql = var insertSql = @"INSERT INTO 
+            var insertSql = @"INSERT INTO 
                     [Category] 
                 VALUES(
                     @Id, 
@@ -558,8 +558,8 @@ Aula 11. SQL Injection
 
                 var categories = cn.Query<Category>("SELECT [Id], [Title] FROM [Category]");
 
-                foreach(var category in categories){
-                    System.Console.WriteLine($"{category.Id} - {category.Title}");
+                foreach(var item in categories){
+                    System.Console.WriteLine($"{item.Id} - {item.Title}");
                 }
 
             }
@@ -669,6 +669,7 @@ Aula 12. SqlParameter
                         category.Featured
                     });
 
+// PAREI AQUI
 Aula 13. UPDATE
 ---------------
     
