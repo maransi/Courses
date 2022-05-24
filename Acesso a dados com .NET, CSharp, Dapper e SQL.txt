@@ -783,6 +783,240 @@ Aula 13. UPDATE
         }
 
 
+    . Tutorial CRUD
+
+        . Crie a pasta "Utils" e dentro dela crie a classe "GenericDal.cs" com o conteúdo abaixo:
+
+            using System.Collections;
+            using System.Collections.Generic;
+            using BaltaDataAccess.Models;
+            using Dapper;
+            using Microsoft.Data.SqlClient;
+
+            namespace BaltaDataAccess.Utils
+            {
+                abstract class GenericDal<T, K>
+                {
+                    const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";        
+
+                    private SqlConnection connection { get; set; }
+                    public SqlTransaction transaction { get; set; }
+
+                    public IDictionary<string, string> CrudParameter { get; set; }
+                    
+
+                    protected GenericDal()
+                    {
+                        this.CrudParameter = new Dictionary<string, string>();
+                    }
+
+                    protected GenericDal( SqlConnection cn, SqlTransaction trans ): base(){
+                        connection = cn;
+                        transaction = trans;
+
+                    }
+
+
+                    public virtual void insert(T model){
+
+                        // Criar um "else" levantando uma exception            
+                        if ( CrudParameter.ContainsKey("INSERT") ){
+                            if ( connection == null ){
+                                using( var connection = new SqlConnection( connectionString ) ){
+                                    var rows = connection.Execute( CrudParameter["INSERT"], model );
+                                }
+                            } else {
+                                var rows = connection.Execute( CrudParameter["INSERT"], model, transaction );
+                            }
+                        }
+
+                    }
+
+                    // var guidObject =  new { Id = new Guid("16d3246d-b8e6-438c-8c62-18d89c856510") };
+                    // public virtual void delete( params object[] keyValue){
+
+
+                    // var guidObject = new[]  {   new { Id  = new Guid("bb22a2df-6dc5-45aa-ad39-0933db0ff9f8") },
+                    //                             new { Id  = new Guid("284238f8-e0c7-43da-a1a3-2d58503db816") },
+                    //                         };
+                    // public virtual void delete( IEnumerable<dynamic> keyValue){
+
+
+                    // var guidDictionary = new Dictionary<string, object>
+                    // {
+                    //     { "@Id", "41283005-ce1d-4558-9818-00da9f949c38" }
+                    // };
+                    // var guidDinamicParameter = new DynamicParameters(guidDictionary);
+                    public virtual void delete( DynamicParameters keyValue){
+                        if ( CrudParameter.ContainsKey("DELETE") ){
+                            if ( connection == null ){
+                                using( var connection = new SqlConnection( connectionString )){
+                                    var rows = connection.Execute( CrudParameter["DELETE"], keyValue );
+                                }
+                            } else {
+                                var rows = connection.Execute( CrudParameter["DELETE"], keyValue, transaction );
+                            }
+                        }
+                    }
+                    public virtual void update(T model){
+                        if ( CrudParameter.ContainsKey("UPDATE") ){
+                            if ( connection == null ){
+                                using( var connection = new SqlConnection( connectionString )){
+                                    var rows = connection.Execute( CrudParameter["UPDATE"], model );
+                                }
+                            } else {
+                                var rows = connection.Execute( CrudParameter["UPDATE"], model, transaction );
+                            }
+                        }
+                    }
+
+                    public virtual List<T> findAll(){
+                        List<T> categories = null;
+
+
+                        if ( CrudParameter.ContainsKey("FIND-ALL") ){
+                            if ( connection == null ){
+                                using( var connection = new SqlConnection( connectionString )){
+                                    categories = (List<T>)connection.Query<T>(CrudParameter["FIND-ALL"]);
+                                }
+                            } else {
+                                categories = (List<T>)connection.Query<T>(CrudParameter["FIND-ALL"],null, transaction);
+                            }
+                        }
+
+                        return categories;
+                    }
+
+                    public virtual T findById( DynamicParameters keyValue )
+                    {
+
+                        T objectResult = (dynamic) null;
+
+                        if ( CrudParameter.ContainsKey("FIND-BY-ID") ){
+                            if ( connection == null ){
+                                using(var connection = new SqlConnection( connectionString )){
+                                    objectResult = connection.QuerySingle<T>(CrudParameter["FIND-BY-ID"], keyValue);
+                                    
+                                    return objectResult;
+                                }
+                            } else {
+                                objectResult = connection.QuerySingle<T>(CrudParameter["FIND-BY-ID"], keyValue, transaction);
+                            }
+                        }
+
+                        return objectResult;
+                    }
+
+                }
+            }
+
+        . Crie a pasta "Dals" e crie a classe "CategoryDal.cs" com o conteúdo abaixo:
+
+            using System;
+            using System.Collections.Generic;
+            using BaltaDataAccess.Models;
+            using BaltaDataAccess.Utils;
+            using Dapper;
+            using Microsoft.Data.SqlClient;
+
+            namespace BaltaDataAccess.Dals
+            {
+                class CategoryDal : GenericDal<Category, Guid>
+                {
+                    public IDictionary< string, string > CrudParam = new Dictionary< string, string >(){
+                                    {"INSERT",  @"INSERT INTO [Category] VALUES( @Id, @Title, @Url, @Summary, @Order, @Description, @Featured )"},
+                                    {"DELETE", @"DELETE FROM [Category] WHERE [Id] = @Id"},
+                                    {"UPDATE", @"UPDATE Category 
+                                                    SET Title = @Title,
+                                                        Url = @Url,
+                                                        Summary = @Summary,
+                                                        [Order] = @Order,
+                                                        Description = @Description,
+                                                        Featured = @Featured
+                                                    WHERE Id = @Id"},
+                                    {"FIND-ALL","SELECT Id, Title, Url, Summary, [Order], Description, Featured FROM Category ORDER BY Id"},
+                                    {"FIND-BY-ID","SELECT Id, Title, Url, Summary, [Order], Description, Featured FROM Category WHERE Id = @Id"},
+                                };
+
+                    public CategoryDal() {
+                        base.CrudParameter = CrudParam;
+                    }
+
+                    public CategoryDal( SqlConnection cn, SqlTransaction trans ): base( cn, trans ){
+                        base.CrudParameter = CrudParam;
+                    }
+                }
+
+            }
+
+        . Atualize a classe "Program.cs" com o conteúdo abaixo:
+
+            ...
+            static void Main(string[] args)
+            {
+                const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+                using( var cn = new SqlConnection( connectionString )){
+
+                    var category = new Category();
+
+                    category.Id = Guid.NewGuid();
+                    category.Title = "Amazon A W S < Generic >";
+                    category.Url = "amazon.com";
+                    category.Description = "Categoria destinada a serviços do AWS";
+                    category.Order = 8;
+                    category.Summary = "AWS Cloud";
+                    category.Featured = false;
+
+                    cn.Open();
+
+                    var trans = cn.BeginTransaction();
+
+                    try{
+                        var guidDictionary = new Dictionary<string, object>
+                        {
+                            { "@Id", "0a04c605-34f5-44d3-a68e-0f9f9888b489" }
+                        };
+
+                        var guidDinamicParameter = new DynamicParameters(guidDictionary);
+
+                        CategoryDal categoryDal = new CategoryDal( cn, trans );
+
+                        categoryDal.delete( guidDinamicParameter );
+
+                        categoryDal.insert( category );
+
+                        category.Title = "**** Amazon A W S *****";
+
+                        System.Console.WriteLine( category.Id );
+
+                        categoryDal.update( category );
+                            
+                        foreach( var c in categoryDal.findAll()){
+                            System.Console.WriteLine($"{c.Id} - {c.Description} - {c.Title}");
+                        }
+
+                        var dictionary = new Dictionary<string, object>
+                        {
+                            { "@Id", "e531345c-36bf-4479-bf6b-fdc688fa9869" }
+                        };
+
+                        var parameters = new DynamicParameters(dictionary);
+
+                        Category c1 = categoryDal.findById( parameters );
+
+                        System.Console.WriteLine($"{c1.Id} - {c1.Description} - {c1.Title}");
+
+                        trans.Commit();
+                    }catch( Exception ex){
+                        System.Console.WriteLine(ex.Message);
+
+                        trans.Rollback();
+                    }
+                }
+            }
+            ...
+
 Aula 14. Execute Many
 ---------------------
 
