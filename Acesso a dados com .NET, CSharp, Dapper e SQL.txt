@@ -670,7 +670,6 @@ Aula 12. SqlParameter
                         category.Featured
                     });
 
-// PAREI AQUI
 Aula 13. UPDATE
 ---------------
     
@@ -783,7 +782,7 @@ Aula 13. UPDATE
         }
 
 
-    . Tutorial CRUD
+    . Tutorial CRUD - Desenvolvimento pessoal
 
         . Crie a pasta "Utils" e dentro dela crie a classe "GenericDal.cs" com o conteúdo abaixo:
 
@@ -832,6 +831,9 @@ Aula 13. UPDATE
 
                     }
 
+
+                    // Diversas formas de enviar parâmetros para o método
+                    //
                     // var guidObject =  new { Id = new Guid("16d3246d-b8e6-438c-8c62-18d89c856510") };
                     // public virtual void delete( params object[] keyValue){
 
@@ -1016,6 +1018,227 @@ Aula 13. UPDATE
                 }
             }
             ...
+
+    // PAREI AQUI
+    . Retrieve Parent-Child Objects
+
+        . Criando a massa de dados:
+
+
+            CREATE DATABASE [BookStoreContext]
+            GO
+
+            USE [BookStoreContext]
+            GO
+
+            CREATE TABLE [dbo].[Authors](
+                [Id] [int] IDENTITY(1,1) NOT NULL,
+                [FirstName] [nvarchar](450) NULL,
+                [LastName] [nvarchar](450) NULL,
+                    CONSTRAINT [PK_Authors] 
+                        PRIMARY KEY CLUSTERED ( [Id] ASC )
+                            WITH (  PAD_INDEX = OFF, 
+                                    STATISTICS_NORECOMPUTE = OFF, 
+                                    IGNORE_DUP_KEY = OFF, 
+                                    ALLOW_ROW_LOCKS = ON, 
+                                    ALLOW_PAGE_LOCKS = ON) ON [PRIMARY] ) ON [PRIMARY]
+            GO
+
+            CREATE TABLE [dbo].[Books](
+                [Id] [int] IDENTITY(1,1) NOT NULL,
+                [Title] [nvarchar](450) NULL,
+                [Category] [nvarchar](max) NULL,
+                [AuthorId] [int] NOT NULL,
+            CONSTRAINT [PK_Books] 
+                PRIMARY KEY CLUSTERED ( [Id] ASC )
+                    WITH (  PAD_INDEX = OFF, 
+                            STATISTICS_NORECOMPUTE = OFF, 
+                            IGNORE_DUP_KEY = OFF, 
+                            ALLOW_ROW_LOCKS = ON, 
+                            ALLOW_PAGE_LOCKS = ON) ON [PRIMARY] ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+            GO
+
+            INSERT INTO Authors(FirstName, LastName) VALUES ('Cardinal','Tom B. Erichsen');
+            INSERT INTO Authors(FirstName, LastName) VALUES ('Meredith','Alonso');
+            INSERT INTO Authors(FirstName, LastName) VALUES ('Robert','T. Kiyosaki');
+
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Introduction to Machine Learning', 'Software', 1);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Introduction to Computing', 'Software', 1);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Calculus I', 'Math', 2);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Calculus II', 'Math', 2);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Trigonometry Basics', 'Math', 2);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Rich Dad, Poor Dad', 'Economics', 3);
+
+        . Dentro da pasta Model crie as classes abaixo:
+
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+
+            namespace Models
+            {
+                class Author
+                {
+                    public int Id { get; set; }
+                    public string FirstName { get; set; }
+                    public string LastName { get; set; }
+                    public List<Book> Books { get; set; }
+                }
+            }
+
+
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+
+            namespace Models
+            {
+                class Author
+                {
+                    public int Id { get; set; }
+                    public string FirstName { get; set; }
+                    public string LastName { get; set; }
+                    public List<Book> Books { get; set; }
+                }
+            }
+
+        . Dentro da classe "Program.cs" crie o método abaixo:
+
+            private static void GetAuthorAndTheirBooks(int id)
+            {
+                string sql = 
+                    "SELECT * FROM Authors WHERE Id = @Id;" +
+                    "SELECT * FROM Books WHERE AuthorId = @Id;";
+
+                using (IDbConnection db = new SqlConnection(ConnectionString))
+                {
+                    using (var results = db.QueryMultiple(sql, new { Id = id}))
+                    {
+                        var author = results.Read<Author>().SingleOrDefault();
+                        var books = results.Read<Book>().ToList();
+
+                        if (author != null && books != null)
+                        {
+                            author.Books = books;
+
+                            Console.WriteLine(author.FirstName + " " + author.LastName);
+                            
+                            foreach (var book in author.Books)
+                            {
+                                Console.WriteLine("\t Title: {0} \t  Category: {1}",  book.Title, book.Category);
+                            }
+                        }
+                    }
+                }
+            }
+
+        . Implemente a chamado do método acima dentro do método "main":
+
+            ...
+            static void Main(string[] args)
+            {
+                GetAuthorAndTheirBooks(1);
+                GetAuthorAndTheirBooks(2);
+            }
+            ...
+
+
+    . Stored Procedure
+
+        . Crie no Azure Data Studio a procedure abaixo:
+
+            CREATE PROCEDURE [dbo].[GetAuthor]
+                @Id int
+            AS
+            BEGIN
+                SELECT [Id]
+                    ,[FirstName]
+                    ,[LastName]
+                FROM [dbo].[Authors]
+                WHERE Id = @Id;
+
+                SELECT 
+                    Id,
+                    Title,
+                    Category,
+                    AuthorId
+                FROM [dbo].[Books] 
+                WHERE AuthorId = @Id;
+
+            END
+
+        . Crie o método abaixo dentro da classe "Program":
+
+            private static void GetAuthorAndTheirBooksSP(int id)
+            {
+                string sql = "GetAuthor";
+
+                using (IDbConnection db = new SqlConnection(ConnectionString))
+                {
+                    using (var results = db.QueryMultiple(sql, new { Id = id }, commandType: CommandType.StoredProcedure ))
+                    {
+                        var author = results.Read<Author>().SingleOrDefault();
+                        var books = results.Read<Book>().ToList();
+
+                        if (author != null && books != null)
+                        {
+                            author.Books = books;
+
+                            Console.WriteLine(author.FirstName + " " + author.LastName);
+
+                            foreach (var book in author.Books)
+                            {
+                                Console.WriteLine("\t Title: {0} \t  Category: {1}", book.Title, book.Category);
+                            }
+                        }
+                    }
+                }
+            }
+
+        . Implemente a chamado do método acima dentro do método "main":
+
+            ...
+            static void Main(string[] args)
+            {
+                GetAuthorAndTheirBooks(2);
+                GetAuthorAndTheirBooks(3);
+            }
+            ...
+
+    . IN Operator Support
+
+        . Crie o método abaixo dentro da classe "Program":
+
+            private static void GetAuthors(params int[] ids)
+            {
+                using (IDbConnection db = new SqlConnection(ConnectionString))
+                {
+                    List<Author> authors = 
+                        db.Query<Author>("SELECT * FROM Authors WHERE Id IN @Ids", new { Ids = ids })
+                        .ToList();
+
+                    foreach (var author in authors)
+                    {
+                        Console.WriteLine(author.FirstName + " " + author.LastName);
+                    }
+                }
+            }
+
+        . Implemente a chamado do método acima dentro do método "main":
+
+            ...
+            static void Main(string[] args)
+            {
+                GetAuthors(1, 3);
+            }
+            ...
+
+
+https://riptutorial.com/dapper/learn/100013/multi-mapping
 
 Aula 14. Execute Many
 ---------------------
