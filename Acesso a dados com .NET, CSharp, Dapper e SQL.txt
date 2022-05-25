@@ -1019,7 +1019,6 @@ Aula 13. UPDATE
             }
             ...
 
-    // PAREI AQUI
     . Retrieve Parent-Child Objects
 
         . Criando a massa de dados:
@@ -1095,45 +1094,48 @@ Aula 13. UPDATE
             using System.Text;
             using System.Threading.Tasks;
 
-            namespace Models
+            namespace DapperDemo
             {
-                class Author
+                class Book
                 {
                     public int Id { get; set; }
-                    public string FirstName { get; set; }
-                    public string LastName { get; set; }
-                    public List<Book> Books { get; set; }
+                    public string Title { get; set; }
+                    public string Category { get; set; }
+                    public int AuthorId { get; set; }
                 }
             }
 
         . Dentro da classe "Program.cs" crie o método abaixo:
 
-            private static void GetAuthorAndTheirBooks(int id)
-            {
-                string sql = 
-                    "SELECT * FROM Authors WHERE Id = @Id;" +
-                    "SELECT * FROM Books WHERE AuthorId = @Id;";
+            static void GetAuthroAndTheirBooks( int id ){
 
-                using (IDbConnection db = new SqlConnection(ConnectionString))
-                {
-                    using (var results = db.QueryMultiple(sql, new { Id = id}))
-                    {
-                        var author = results.Read<Author>().SingleOrDefault();
-                        var books = results.Read<Book>().ToList();
+                string sql =    @"SELECT * FROM Authors WHERE Id = @Id;
+                                    SELECT * FROM Books WHERE AuthorId = @Id;";
 
-                        if (author != null && books != null)
-                        {
+                using( IDbConnection db = new SqlConnection( @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16" ) ){
+                    using( var results = db.QueryMultiple( sql, new { Id = id })){
+                        var authors = results.Read<Author>().AsList();
+                        var books = results.Read<Book>().AsList();
+
+                        if ( authors != null && books != null){
+                            Author author = authors[0];
                             author.Books = books;
 
-                            Console.WriteLine(author.FirstName + " " + author.LastName);
-                            
-                            foreach (var book in author.Books)
-                            {
-                                Console.WriteLine("\t Title: {0} \t  Category: {1}",  book.Title, book.Category);
+                            System.Console.WriteLine($"{author.FirstName} - {author.LastName}");
+                            System.Console.WriteLine("-----------------------------------");
+                            System.Console.WriteLine("Categoria \t Titulo");
+                            System.Console.WriteLine("--------- \t ------");
+
+                            foreach( Book book in author.Books){
+                                System.Console.WriteLine($"{book.Category} \t {book.Title} ");
                             }
+
+                            System.Console.WriteLine("");
                         }
+
                     }
                 }
+
             }
 
         . Implemente a chamado do método acima dentro do método "main":
@@ -1147,6 +1149,7 @@ Aula 13. UPDATE
             ...
 
 
+    // PAREI AQUI
     . Stored Procedure
 
         . Crie no Azure Data Studio a procedure abaixo:
