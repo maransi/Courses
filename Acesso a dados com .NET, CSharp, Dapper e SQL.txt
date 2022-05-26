@@ -1149,7 +1149,6 @@ Aula 13. UPDATE
             ...
 
 
-    // PAREI AQUI
     . Stored Procedure
 
         . Crie no Azure Data Studio a procedure abaixo:
@@ -1176,29 +1175,31 @@ Aula 13. UPDATE
 
         . Crie o método abaixo dentro da classe "Program":
 
-            private static void GetAuthorAndTheirBooksSP(int id)
-            {
-                string sql = "GetAuthor";
+        static void GetAuthorAndTheirBooksSP( int id ){
 
-                using (IDbConnection db = new SqlConnection(ConnectionString))
-                {
-                    using (var results = db.QueryMultiple(sql, new { Id = id }, commandType: CommandType.StoredProcedure ))
-                    {
-                        var author = results.Read<Author>().SingleOrDefault();
-                        var books = results.Read<Book>().ToList();
+            string sql = "GetAuthor";
 
-                        if (author != null && books != null)
-                        {
-                            author.Books = books;
+            using( SqlConnection cn = new SqlConnection(  @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16")){
+                using( var rs = cn.QueryMultiple( sql, new { Id = id }, commandType: CommandType.StoredProcedure )){
+                    var author = (rs.Read<Author>().AsList())[0];
+                    var books = rs.Read<Book>().AsList();
 
-                            Console.WriteLine(author.FirstName + " " + author.LastName);
+                    author.Books = books;
 
-                            foreach (var book in author.Books)
-                            {
-                                Console.WriteLine("\t Title: {0} \t  Category: {1}", book.Title, book.Category);
-                            }
+                    if (author != null && books != null){
+                        System.Console.WriteLine($"{author.FirstName} - {author.LastName}");
+                        System.Console.WriteLine("-----------------------------------");
+                        System.Console.WriteLine("Categoria \t Titulo");
+                        System.Console.WriteLine("--------- \t ------");
+
+                        foreach( Book book in author.Books){
+                            System.Console.WriteLine($"{book.Category} \t {book.Title} ");
                         }
+
+                        System.Console.WriteLine("");
                     }
+
+
                 }
             }
 
@@ -1207,11 +1208,12 @@ Aula 13. UPDATE
             ...
             static void Main(string[] args)
             {
-                GetAuthorAndTheirBooks(2);
-                GetAuthorAndTheirBooks(3);
+                GetAuthorAndTheirBooksSP(2);
+                GetAuthorAndTheirBooksSP(3);
             }
             ...
 
+    // PAREI AQUI
     . IN Operator Support
 
         . Crie o método abaixo dentro da classe "Program":
