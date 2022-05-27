@@ -1214,21 +1214,23 @@ Aula 13. UPDATE
             ...
 
     // PAREI AQUI
-    . IN Operator Support
+    . IN Operator Support and Dynamic Objects
 
         . Crie o método abaixo dentro da classe "Program":
 
-            private static void GetAuthors(params int[] ids)
+            private static void GetDynamicAuthors(params int[] ids)
             {
-                using (IDbConnection db = new SqlConnection(ConnectionString))
+                using (IDbConnection db = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16"))
                 {
-                    List<Author> authors = 
-                        db.Query<Author>("SELECT * FROM Authors WHERE Id IN @Ids", new { Ids = ids })
-                        .ToList();
+                    // Dynamic Object
+                    List<dynamic> authors = db.Query<dynamic>( "SELECT * FROM Authors WHERE Id IN @Ids", new { Ids = ids }).AsList();
+
+                    // Podemos utilizar ao invés da coleção "List" a interface "IEnumerable"
+                    // IEnumerable<dynamic> authors = db.Query("SELECT Id, FirstName, LastName FROM Authors WHERE Id IN @Ids", new { Ids = ids }).AsList();   // IN Operator
 
                     foreach (var author in authors)
                     {
-                        Console.WriteLine(author.FirstName + " " + author.LastName);
+                        Console.WriteLine($"{author.Id} - {author.FirstName} - {author.LastName}");
                     }
                 }
             }
@@ -1238,9 +1240,70 @@ Aula 13. UPDATE
             ...
             static void Main(string[] args)
             {
-                GetAuthors(1, 3);
+                // Para acessar a relação de parâmetros na assinatura do método podemos usar "params"
+                GetDynamicAuthors(1, 3);
             }
             ...
+
+    . Async Operations
+
+        https://www.youtube.com/watch?v=sYBhpA-ZEHI
+
+        . await     Informa que o processamento 
+
+
+        . Altere o método "Main" observe "async" e "Task" como retorno:
+
+            static void Main(string[] args)
+            {
+                System.Console.WriteLine("Selecting");
+
+                var authors = GetAllAuthorsAsync();
+
+                System.Console.WriteLine("Inserting");
+
+                InsertSingleAuthorAsync();
+
+                Console.ReadLine();
+            }
+
+        . Adicione o método "GetAllAuthorsAsync" como abaixo:
+
+            private async static Task<List<Author>> GetAllAuthorsAsync()
+            {
+                using (IDbConnection db = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16"))
+                {
+                    IEnumerable<Author> results = await db.QueryAsync<Author>("SELECT * FROM Authors");
+
+                    await Task.Delay(5000);
+
+                    foreach (var author in results.AsList())
+                    {
+                        Console.WriteLine(author.FirstName + " " + author.LastName);
+                    }
+
+
+                    return results.AsList();
+                }
+            }
+
+        . Adicione o método "InsertSingleAuthorAsync" como abaixo:
+
+            private static async void InsertSingleAuthorAsync()
+            {
+                using (IDbConnection db = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16"))
+                {
+                    Author author = new Author()
+                    {
+                        FirstName = "William",
+                        LastName = "Shakespeare"
+                    };
+
+                    string sqlQuery = "INSERT INTO Authors (FirstName, LastName) VALUES(@FirstName, @LastName)";
+
+                    int rowsAffected = await db.ExecuteAsync(sqlQuery, author);
+                }
+            }
 
 
 https://riptutorial.com/dapper/learn/100013/multi-mapping
