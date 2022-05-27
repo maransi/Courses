@@ -1309,6 +1309,56 @@ Aula 13. UPDATE
             }
 
 
+    . Query with Dynamic Parameter
+
+        . Adicione um método "GetAuthorsDynamic":
+
+            private static void GetAuthorsDynamic(){
+                var firstName = "Marco";
+                var lastName = "Silva";
+
+                // IMPORTANTE: Observe se o parâmetro identificado com ":" funcionará como o "@"
+                var query = "Select * from Authors where FirstName = :FirstName and LastName = :LastName";  
+
+                var dynamicParameters = new DynamicParameters();
+
+                // Talvez aqui necessite colocar "@FirstName" e não somente "FirstName" no nome do parâmetro
+                dynamicParameters.Add("FistNae", firstName );
+                dynamicParameters.Add("LastName", lastName);
+
+                using (var connection = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16"))
+                {
+                    IEnumerable<dynamic> results = connection.Query(query, dynamicParameters);
+                }
+            }
+
+        . Faça a chamado no método Main do método acima:
+
+
+            static void Main(string[] args)
+            {
+                    GetAuthorsDynamic();
+            }
+
+
+
+
+// Testar
+var sql = @"SELECT 'Daniel Dennett' AS Name, 1942 AS Born, 'United States of America' AS Residence
+UNION ALL SELECT 'Sam Harris' AS Name, 1967 AS Born, 'United States of America' AS Residence
+UNION ALL SELECT 'Richard Dawkins' AS Name, 1941 AS Born, 'United Kingdom' AS Residence";
+
+var result = connection.Query<Person, Country, Person>(sql, (person, country) => {
+        if(country == null)
+        {
+            country = new Country { Residence = "" };
+        }
+        person.Residience = country;
+        return person;
+    }, 
+    splitOn: "Residence");
+    
+
 https://riptutorial.com/dapper/learn/100013/multi-mapping
 https://dotnettutorials.net/lesson/asynchronous-programming-in-csharp/#:~:text=A%20task%20in%20C%23%20is,main%20thread%20of%20the%20application.
 https://www.youtube.com/watch?v=NsQBhybMCQI
