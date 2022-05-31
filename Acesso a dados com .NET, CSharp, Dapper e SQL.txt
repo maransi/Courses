@@ -1340,23 +1340,45 @@ Aula 13. UPDATE
                     GetAuthorsDynamic();
             }
 
+    . Transaction
 
+        . Insira o método abaixo na classe "Program.cs":
 
+            ...
+            public static void InsertAuthors(IEnumerable<Author> authors)
+            {
+                using(var conn = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16")) {
+                    conn.Open();
 
-// Testar
-var sql = @"SELECT 'Daniel Dennett' AS Name, 1942 AS Born, 'United States of America' AS Residence
-UNION ALL SELECT 'Sam Harris' AS Name, 1967 AS Born, 'United States of America' AS Residence
-UNION ALL SELECT 'Richard Dawkins' AS Name, 1941 AS Born, 'United Kingdom' AS Residence";
+                    using(var tran = conn.BeginTransaction()) {
+                        try
+                        {
+                            var sql = "insert Authors(FirstName, LastName) VALUES(@FirstName, @LastName)";
+                            conn.Execute(sql, authors, tran);
+                            tran.Commit();
+                        }
+                        catch(Exception ex)
+                        {
+                            tran.Rollback();
+                            // handle the error however you need to.
+                            throw;
+                        }
+                    }
+                }   
+            }
+            ...
 
-var result = connection.Query<Person, Country, Person>(sql, (person, country) => {
-        if(country == null)
-        {
-            country = new Country { Residence = "" };
-        }
-        person.Residience = country;
-        return person;
-    }, 
-    splitOn: "Residence");
+        . Faça a chamada do método acima no método "Main":
+
+            static void Main(string[] args)
+            {
+                // IEnumerable<Author> authors  = new[] { new Author() { Id = 100, FirstName = "Jose", LastName = "Silva" },  
+                //                                         new Author() { Id = 101, FirstName = "João", LastName = "Silva" } };
+                var authors  = new[] { new Author() { FirstName = "Jose", LastName = "Silva" },  new Author() { FirstName = "João", LastName = "Silva" } };
+
+                InsertAuthors( authors )   ;
+            }
+
     
 
 https://riptutorial.com/dapper/learn/100013/multi-mapping
@@ -1364,6 +1386,11 @@ https://dotnettutorials.net/lesson/asynchronous-programming-in-csharp/#:~:text=A
 https://www.youtube.com/watch?v=NsQBhybMCQI
 
 
-Aula 14. Execute Many
----------------------
+Aula 14. Execute Scalar
+-----------------------
+
+https://makolyte.com/csharp-get-inserted-identity-value-with-dapper/
+https://www.devmedia.com.br/retornando-id-com-o-metodo-execute-scalar/23198
+https://www.davepaquette.com/archive/2019/02/04/basic-insert-update-delete-with-dapper.aspx
+
 

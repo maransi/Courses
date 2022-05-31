@@ -154,18 +154,18 @@ Aula 2. Ferramentas
     https://docs.microsoft.com/pt-br/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver15#ubuntu
 
 
-    docker container run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Joao3.16"    -p 1433:1433 --name sql1 --hostname sql1    -d mcr.microsoft.com/mssql/server:2019-latest
+    docker container run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Joao3.16"    -p 1433:1433 --name sqlserver --hostname sqlserver    -d mcr.microsoft.com/mssql/server:2019-latest
     docker container ps -a
-    docker container exec -t sql1 cat /var/opt/mssql/log/errorlog | grep connection
+    docker container exec -t sqlserver cat /var/opt/mssql/log/errorlog | grep connection
 
     # Testar no linux, não funcionou no windows
-    docker container exec -it sql1 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA  -P "$(read -sp "Enter current SA password: "; echo "${REPLY}")"  -Q "ALTER LOGIN SA WITH PASSWORD=\"$(read -sp "Enter new SA password: "; echo "${REPLY}")\""
+    docker container exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U SA  -P "$(read -sp "Enter current SA password: "; echo "${REPLY}")"  -Q "ALTER LOGIN SA WITH PASSWORD=\"$(read -sp "Enter new SA password: "; echo "${REPLY}")\""
 
     # Execute os comandos abaixo ao entrar no container
     #
     # hostname -I
     # ip a
-    docker exec -it sql1 "bash"
+    docker exec -it sqlserver "bash"
 
     curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
     curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
