@@ -1379,15 +1379,55 @@ Aula 13. UPDATE
                 InsertAuthors( authors )   ;
             }
 
-    
+
+Aula 14. Execute Scalar
+-----------------------
+
+    . Execute "Scalar" para retornar o código da chave primária criada:
+
+        . Acrescente o método abaixo na classe "Program.cs":
+
+            static int InsertAuthorsScalar( Author author ){
+                
+                using( IDbConnection cn = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16" )){
+                    var keyResult = cn.ExecuteScalar<int>( @"INSERT INTO Authors( FirstName, LastName ) 
+                                                        OUTPUT INSERTED.Id
+                                                        VALUES( @FirstName, @LastName )", author);
+
+                    return keyResult;
+                }
+            }
+
+        . Faça a chamado do método acima no método "Main":
+
+            int keyValue = InsertAuthorsScalar( new Author() { FirstName = "GUSTAVO", LastName = "SILVA" } );
+
+        . Outra maneira de retornar o código do campo chave gerado no INSERT é utilizar o SCOPE_IDENTITY ao invés do 
+            OUTPUT INSERTED.[key field]:
+
+            . Atualize o método "InsertAuthorsScalar" com o código abaixo:
+
+                static int InsertAuthorsScalar( Author author ){
+                    
+                    using( IDbConnection cn = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16" )){
+                        var keyResult = cn.ExecuteScalar<int>( @"INSERT INTO Authors( FirstName, LastName ) 
+                                                            VALUES( @FirstName, @LastName )
+                                                            SELECT SCOPE_IDENTITY()", author);
+
+                        return keyResult;
+                    }
+                }
+
+            . Faça a chamado do método acima no método "Main":
+
+                int keyValue = InsertAuthorsScalar( new Author() { FirstName = "GUSTAVO", LastName = "SILVA" } );
+
 
 https://riptutorial.com/dapper/learn/100013/multi-mapping
 https://dotnettutorials.net/lesson/asynchronous-programming-in-csharp/#:~:text=A%20task%20in%20C%23%20is,main%20thread%20of%20the%20application.
 https://www.youtube.com/watch?v=NsQBhybMCQI
 
 
-Aula 14. Execute Scalar
------------------------
 
 https://makolyte.com/csharp-get-inserted-identity-value-with-dapper/
 https://www.devmedia.com.br/retornando-id-com-o-metodo-execute-scalar/23198
