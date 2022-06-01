@@ -1455,13 +1455,85 @@ Aula 15. Multi Mapping
         GO
 
 
-        SELECT *
-        FROM Produto AS p
-            INNER JOIN Unidade AS u
-                ON p.UnitId = u.Id
-
 
     . One to One ( Relacionamento Um para um )
+
+        . Crie as classes abaixo na pasta "Models":
+
+            namespace BaltaDataAccess.Models
+            {
+                public class Unidade
+                {
+                    public int Id { get; set; }
+                    public string Description { get; set; }
+                }
+            }
+
+
+
+            namespace BaltaDataAccess.Models
+            {
+                public class Produto
+                {
+                    public int Id { get; set; }
+                    public string Name { get; set; }
+                    public Unidade Unidade { get; set; }
+                }
+            }
+
+        . Insira o método abaixo na classe "Program.cs":
+
+            static void GetMultiMappingOneToOne(){
+
+                string sql = @"SELECT *
+                                FROM Produto AS p
+                                    INNER JOIN Unidade AS u
+                                        ON p.UnitId = u.Id";
+
+                using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16")){
+
+                    var produtos = cn.Query<Produto, Unidade, Produto>( sql, 
+                                                                        map: (produto, unidade) => 
+                                                                        {
+                                                                            produto.Unidade = unidade;
+
+                                                                            return produto;
+                                                                        },
+                                                                        splitOn: "Id, UnitId" )
+                                        .AsList();
+                    
+                    foreach( var item in produtos ){
+                        System.Console.WriteLine($"{item.Id} - {item.Name} - {item.Unidade.Description}");
+                    }
+                }
+
+
+            }
+
+            . cn.Query<Produto, Unidade, Produto>(...)          No método "Query" especificamos as diferentes classes usadas para obter o resultado. 
+                                                                O último tipo refere-se à classe dos objetos retornados (O objeto com todo o conteúdo), 
+                                                                que nosso exemplo é o tipo "produto"
+
+            . map: (produto, unidade) =>                        O parâmetro map usa uma expressão lambda, para mapear os diferentes tipos de objetos 
+                                                                gerados e devolver a instância principal/todo (tipo Produto). Aqui os parâmetro seguem 
+                                                                a mesma ordem do método Query, onde o parâmetro "unidade" é associado à propriedade 
+                                                                "Unidade" do objeto "Produto"
+
+            . splitOn: "Id, UnitId"                             No parâmetro splitOn definimos os campos-chave dos objetos a serem gerados. Com essa 
+                                                                informação o Dapper realiza a separação dos dados em suas instâncias equivalentes
+
+
+
+        . Insira a linha abaixo no método "Main" da classe "Program" e execute o projeto:
+
+            ...
+            static void Main(string[] args)
+            {
+
+                GetMultiMappingOneToOne();        
+            }
+            ...
+
 
      https://riptutorial.com/dapper/learn/100013/multi-mapping
      https://www.macoratti.net/20/03/dap_relum1.htm
