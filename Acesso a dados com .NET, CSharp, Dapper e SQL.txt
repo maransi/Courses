@@ -1426,6 +1426,41 @@ Aula 14. Execute Scalar
 Aula 15. Multi Mapping
 ----------------------
 
+    . Execute os comandos DMLs abaixo no banco:
+
+        CREATE TABLE Unidade(   Id      CHAR(2) NOT NULL PRIMARY KEY,
+                                Description VARCHAR(50) NOT NULL)
+        GO
+
+        CREATE TABLE Produto(   Id      INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+                                Name    VARCHAR(50) NOT NULL,
+                                UnitId  CHAR(2) NOT NULL,
+                                CONSTRAINT fkProduto_Unidade FOREIGN KEY( UnitId )
+                                    REFERENCES Unidade(Id) )
+        GO
+
+        INSERT Unidade 
+        VALUES( 'MT', 'METRO'),
+                ('UN', 'UNIDADE'),
+                ('KG', 'KILO'),
+                ('LT', 'LITRO')
+        GO
+
+        INSERT INTO Produto( Name, UnitId ) 
+        VALUES('Prego', 'UN'),
+                ('Parafuso', 'UN'),
+                ('Cimento', 'KG'),
+                ('Tijolo', 'UN'),
+                ('Tubulação', 'MT')
+        GO
+
+
+        SELECT *
+        FROM Produto AS p
+            INNER JOIN Unidade AS u
+                ON p.UnitId = u.Id
+
+
     . One to One ( Relacionamento Um para um )
 
      https://riptutorial.com/dapper/learn/100013/multi-mapping
