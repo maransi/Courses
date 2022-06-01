@@ -1,7 +1,8 @@
 Acesso à dados com .NET, C#, Dapper e SQL Server 
 ------------------------------------------------
 
-1. Ferramentas
+Aula 1. Ferramentas
+-------------------
 
 . Instalação do Docker
 
@@ -194,3 +195,1275 @@ Acesso à dados com .NET, C#, Dapper e SQL Server
 
         https://docs.microsoft.com/pt-br/sql/azure-data-studio/download-azure-data-studio?view=sql-server-ver15    
 
+
+Aula 2. Restaurando o Banco
+---------------------------
+
+    . Inicie o docker do SQL Server:
+
+        docker start sql1
+
+    . Acesse a área de plugin do VSCode e instale o plugin "Admin Pack SQL Server"
+
+    . Apague o "database" [balta] com o script abaixo:
+
+        USE [master]
+
+        DECLARE @kill VARCHAR(8000) = '';
+
+        SELECT @kill = @kill + 'kill ' + CONVERT( VARCHAR(5) , session_id );
+        FROM sys.dm_exec_sessions
+        WHERE database_id = db_id('balta')
+
+        EXEC @kill;
+
+        DROP DATABASE [balta]
+
+    . Acesse o link abaixo, faça o Download do arquivo "balta.zip" e descompacte ele numa área qualquer:
+
+        https://github.com/balta-io/2805/blob/master/balta.zip    
+
+    . No VSCode, clique com o botão direito sobre o item "Databases" e escolha a opção "Data tier Application wizard"
+
+    . Na tela que for aberta escolha:
+
+        Step 1: Select an Operation
+
+            Create a database from .bacpac file...
+
+        Step 2: Select Import Bacpac Settings
+
+            File Location: [Local que se encontra o .bacpac] 
+            Target Server: Docker - localhost
+            Target Database: balta
+
+    . Dê um refresh no "Database" e alguns selects nas tabelas
+
+
+Aula 3. Connection String
+-------------------------
+
+    . Crie uma pasta com o nome "BaltaDataAccess"
+
+    . Execute o comando abaixo dentro da pasta criada
+
+        dotnet new console
+
+    . Abra a classe "Program.cs" e implemente o código abaixo:
+
+        using System;
+
+        namespace BaltaDataAccess
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    // Linha incluida
+                    const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+                    Console.WriteLine("Hello World!");
+                }
+            }
+        }
+
+
+Aula 4. Microsoft.Data.SqlClient
+--------------------------------
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        # Para remover o pacote digite: "dotnet remove package Microsoft.Data.SqlClient"
+        dotnet add package Microsoft.Data.SqlClient --version 2.1.3
+
+
+Aula 5. SqlConnection
+---------------------
+
+    . Insira as linhas abaixo no arquivo "Program.cs":
+
+        ...
+        static void Main(string[] args)
+        {
+            const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+            // Exemplo 1
+
+            // Linha incluida
+            var connection = new SqlConnection(connectionString);
+
+            // Linha incluida
+            connection.Open();
+
+            // Linha incluida
+            connection.Close();
+
+
+
+
+            // Exemplo 2
+            // Bloco inserido
+            using( var cn = new SqlConnection( connectionString )){
+                cn.Open();
+
+                cn.Close();
+
+            }
+
+            Console.WriteLine("Hello World!");
+        }
+        ...
+
+
+Aula 6. SqlCommand e SqlReader
+------------------------------
+
+    . Implemente as linhas abaixo no bloco da conexão:
+
+        ...
+        using( var cn = new SqlConnection( connectionString )){
+            cn.Open();
+
+            System.Console.WriteLine( "Connected..."  );
+
+           
+            // Inicio do NOVO BLOCO
+            using( var command = new SqlCommand() ){
+                command.Connection = cn;
+
+                command.CommandType = System.Data.CommandType.Text;
+
+                command.CommandText = "SELECT [Id], [Title] FROM [Category]";
+
+                // var reader = command.ExecuteNonQuery()       // utilizado para executar instruções SQL que não retornam dados, como Insert, Update, Delete, e Set
+                //
+                // var reader = command.ExecuteScalar()         // utilizado para executar instruções SQL utilizando funções agregadas, como COUNT, SUM, MIN, MAX e AVG
+                var reader = command.ExecuteReader();           // utilizado para executar uma instrução SQL que retorna um DataReader
+
+                while ( reader.Read() ){
+                    System.Console.WriteLine( $"{reader.GetGuid(0)} - {reader.GetString(1)} ");
+                }
+            }
+            // Fim do NOVO BLOCO
+
+
+            cn.Close();
+
+        }
+        ...
+
+    . Acesse o prompt de comandos do terminal e execute a aplicação:
+
+        dotnet run
+
+
+Aula 7. Instalação do Dapper
+----------------------------
+
+    . Ponto muito interessante para se aprender DAPPER:
+
+        https://riptutorial.com/dapper
+        https://www.learndapper.com/    
+        https://www.brunobrito.net.br/dapper-em-detalhes/
+        https://www.tutorialsteacher.com/core
+        https://dotnettutorials.net/course/asp-net-core-tutorials/
+        https://dotnettutorials.net/        
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        dotnet add package Dapper --version 2.0.90
+
+
+Aula 8. Primeira Consulta
+-------------------------        
+
+    . Crie uma pasta com o nome de "Models" no projeto e dentro dela crie a classe "Category.cs" com o código abaixo:
+
+        using System;
+
+        namespace BaltaDataAccess.Models
+        {
+            public class Category
+            {
+                public Guid Id { get; set; }
+                public string Title { get; set; }
+            }
+        }
+
+
+    . Acesse a classe "Program.cs" e atualize o código do método "Main" pelo abaixo:
+
+        using BaltaDataAccess.Models;
+        using Dapper;
+
+        ...
+        static void Main(string[] args)
+        {
+            const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+            using( var cn = new SqlConnection( connectionString )){
+                var categories = cn.Query<Category>("SELECT [Id], [Title] FROM [Category]");
+
+                foreach(var category in categories){
+                    System.Console.WriteLine($"{category.Id} - {category.Title}");
+                }
+
+            }
+
+            Console.WriteLine("Hello World!");
+        }
+
+        ...
+
+        . Observe que não precisamos abrir a conexão. O método "cn.Query" já fez isso automaticamente.
+
+        . Acesse o prompt raiz e execute o projeto:
+
+            dotnet run
+
+
+Aula 9. Mapeando Colunas e Alias.
+--------------------------------
+
+    . A expressão SQL do método Query deve trazer os mesmo nome das propriedades da tipo da classe da coleção:
+
+        cn.Query<Category>("SELECT [Id], [Title] FROM [Category]");    
+                    |               |       |
+                    +------+        |       |
+                           v        |       |
+            public class Category   |       |
+                                    |       |
+            {                v------+       |
+                public Guid Id { get; set; }|
+                                            |
+                                v-----------+
+                public string Title { get; set; }
+            }
+
+    . Podemos renomear com "alias" as colunas do SQL, caso o nome das propriedades da classe forem diferentes do nome das 
+        colunas da tabela, suponha que a classe "Category" tenha a seguinte estrutura:
+
+        public class Category
+        {                   +-------------------+
+                            |                   |
+            public Guid Codigo { get; set; }    |
+                                                |
+                            +-------------------|-------------------+
+                            |                   |                   |
+            public string Titulo { get; set; }  |                   |
+        }                                       |                   |
+                                                |                   |
+        . Poderiamos renomear as colunas:       |                   |
+                                                V                   V
+            cn.Query<Category>("SELECT [Id] AS Codigo, [Title] as Titulo FROM [Category]");    
+                                                    |               |
+            foreach(var category in categories){    +---+           +-------+
+                                                        |                   |
+                                                        V                   V
+                System.Console.WriteLine($"{category.Codigo} - {category.Titulo}");
+            }
+
+
+Aula 10. Iniciando com INSERT
+-----------------------------
+
+    . Acrescente as propriedades abaixo na classe "Category":
+
+        using System;
+
+        namespace BaltaDataAccess.Models
+        {
+            public class Category
+            {
+                public Guid Id { get; set; }
+                public string Title { get; set; }
+
+                public string Url { get; set; }         // ADICIONADO
+
+                public string Summary { get; set; }     // ADICIONADO
+
+                public int Order { get; set; }          // ADICIONADO
+
+                public string Description { get; set; } // ADICIONADO
+
+                public bool Featured { get; set; }      // ADICIONADO
+            }
+        }
+
+
+
+Aula 11. SQL Injection
+----------------------
+
+    . Evite concatenação de strings para construir um comando SQL, exemplo:
+
+            var insertSql = @"INSERT INTO 
+                    [Category] 
+                VALUES( NEWID(), '" + category.Title + "','" + category.Url + "','" + category.summary + "','" + ...
+
+        . Esse tipo de lógica possibilita brechas de segurança na sua aplicação, podendo inserir código que burlam a segurança do 
+            sistema. Ao invés disso use parâmetros
+
+            var insertSql = var insertSql = @"INSERT INTO 
+                    [Category] 
+                VALUES(
+                    @Id, 
+                    @Title, 
+                    @Url, 
+                    @Summary, 
+                    @Order, 
+                    @Description, 
+                    @Featured)";                                                                                // ADICIONADO
+
+    . Na classe "Program.cs" insira as linhas abaixo:
+
+        ...
+        static void Main(string[] args)
+        {
+            const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+            var category = new Category();                                                                      // ADICIONADO
+
+            category.Id = Guid.NewGuid();                                                                       // ADICINADO
+            category.Title = "Amazon AWS";                                                                      // ADICINADO
+            category.Url = "amazon.com";                                                                        // ADICINADO
+            category.Description = "Categoria destinada a serviços do AWS";                                     // ADICINADO
+            category.Order = 8;                                                                                 // ADICINADO
+            category.Summary = "AWS Cloud";                                                                     // ADICINADO
+            category.Featured = false;                                                                          // ADICINADO
+            
+            var insertSql = @"INSERT INTO 
+                    [Category] 
+                VALUES(
+                    @Id, 
+                    @Title, 
+                    @Url, 
+                    @Summary, 
+                    @Order, 
+                    @Description, 
+                    @Featured)";                                                                                // ADICIONADO
+
+            using( var cn = new SqlConnection( connectionString )){
+                var rows = connection.Execute(insertSql, new                                                    // ADICIONADO
+                            {
+                                category.Id,
+                                category.Title,
+                                category.Url,
+                                category.Summary,
+                                category.Order,
+                                category.Description,
+                                category.Featured
+                            });
+
+                System.Console.WriteLine($"{rows} linhas inseridas...");
+
+                var categories = cn.Query<Category>("SELECT [Id], [Title] FROM [Category]");
+
+                foreach(var item in categories){
+                    System.Console.WriteLine($"{item.Id} - {item.Title}");
+                }
+
+            }
+
+            Console.WriteLine("Hello World!");
+        }
+        ...
+
+    . Acesse a pasta raiz do projeto e execute-o:
+
+        dotnet run
+
+Aula 12. SqlParameter
+---------------------
+
+    . OS ITENS ABAIXO NÃO FAZ PARTE DO PROJETO DO CURSO É UM COMPLEMENTO AOS CONCEITOS APRESENTADOS. 
+        CASO QUEIRA DEIXAR EM CONCORDÂNCIA COM AS CLASSES E TABELAS DO CURDO FIQUE A VONTADE.
+
+        . Parameters As Anonymous Types 
+
+            . Parameter values can be passed to commands as anonymous types:
+
+                var parameters = new { UserName = username, Password = password };
+                var sql = "select * from users where username = @UserName and password = @Password";
+                var result = connection.Query(sql, parameters);
+
+        . DynamicParameters Bag 
+
+            . Dapper also provides a DynamicParameters class, which represents a "bag" of parameter values. You can 
+                pass an object to its constructor. Suitable objects include a Dictionary<string, object>:
+
+                var dictionary = new Dictionary<string, object>
+                {
+                    { "@ProductId", 1 }
+                };
+
+                var parameters = new DynamicParameters(dictionary);
+                var sql = "select * from products where ProductId = @ProductId";
+
+                using (var connection = new SqlConnection(connString))
+                {
+                    var product = connection.QuerySingle<Product>(sql, parameters);
+                }
+
+                . Or you can pass an anonymous type:
+
+                    var parameters = new DynamicParameters({ ProductId = 1 });
+                    var sql = "select * from products where ProductId = @ProductId";
+
+                    using (var connection = new SqlConnection(connString))
+                    {
+                        var product = connection.QuerySingle<Product>(sql, parameters);
+                    }
+
+                . Or you can pass a stub representing the object that you are looking to return:
+
+                    var template = new Product { ProductId = 1 };
+                    var parameters = new DynamicParameters(template);
+                    var sql = "select * from products where ProductId = @ProductId";
+
+                    using (var connection = new SqlConnection(connString))
+                    {
+                        var product = connection.QuerySingle<Product>(sql, parameters);
+                    }
+
+                . The DynamicParameters type provides an Add method, enabling you to pass explicit 
+                    parameters, specifying the datatype, direction and size:
+
+                    var parameters = new DynamicParameters();
+                    var customerId = "ALFKI";
+
+                    parameters.Add("@CustomerId", customerId, DbType.String, ParameterDirection.Input, customerId.Length);
+
+                    var sql = "select * from customers where CustomerId = @CustomerId";
+
+                    using (var connection = new SqlConnection(connString))
+                    {
+                        var customer = connection.QuerySingle<Customer>(sql, parameters);
+                    }
+
+        . Stored Procedures 
+
+            You can use any of the approaches above to pass parameter values to stored procedures e.g.
+
+                var parameters = new DynamicParameters({ 
+                    Beginning_Date = new DateTime(2017, 1, 1), 
+                    Ending_Date = new DateTime(2017, 12, 31)
+                });
+
+                var sql = "exec SalesByYear @Beginning_Date, @Ending_Date";
+
+                using (var connection = new SqlConnection(connString))
+                {
+                    var results = connection.Query(sql, parameters);
+                }
+
+    . Em relação ao curso foi utilizado a forma mais simples (Anonymous) dos "SqlParameter"
+
+        var rows = connection.Execute(insertSql, new
+                    {
+                        category.Id,
+                        category.Title,
+                        category.Url,
+                        category.Summary,
+                        category.Order,
+                        category.Description,
+                        category.Featured
+                    });
+
+Aula 13. UPDATE
+---------------
+    
+    . Refactoring da nossa classe "Program.cs", subscreva o código desenvolvido até o momento pelo abaixo:
+
+        using System;
+        using BaltaDataAccess.Models;
+        using Dapper;
+        using Microsoft.Data.SqlClient;
+
+        namespace BaltaDataAccess
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    const string connectionString = "Server=localhost,1433;Database=balta;User ID=sa;Password=1q2w3e4r@#$";
+
+                    using (var connection = new SqlConnection(connectionString))
+                    {
+                        // CreateCategory(connection);
+                        // UpdateCategory(connection);
+                        // DeleteCategory(connection);
+                        // ListCategories(connection);
+                        GetCategory(connection);
+
+                    }
+                }
+
+                static void ListCategories(SqlConnection connection)
+                {
+                    var categories = connection.Query<Category>("SELECT [Id], [Title] FROM [Category]");
+                    foreach (var item in categories)
+                    {
+                        Console.WriteLine($"{item.Id} - {item.Title}");
+                    }
+                }
+
+                static void GetCategory(SqlConnection connection)
+                {
+                    var category = connection
+                        .QueryFirstOrDefault<Category>(
+                            "SELECT TOP 1 [Id], [Title] FROM [Category] WHERE [Id]=@id",
+                            new
+                            {
+                                id = "af3407aa-11ae-4621-a2ef-2028b85507c4"
+                            });
+                    Console.WriteLine($"{category.Id} - {category.Title}");
+
+                }
+
+                static void CreateCategory(SqlConnection connection)
+                {
+                    var category = new Category();
+                    category.Id = Guid.NewGuid();
+                    category.Title = "Amazon AWS";
+                    category.Url = "amazon";
+                    category.Description = "Categoria destinada a serviços do AWS";
+                    category.Order = 8;
+                    category.Summary = "AWS Cloud";
+                    category.Featured = false;
+
+                    var insertSql = @"INSERT INTO 
+                            [Category] 
+                        VALUES(
+                            @Id, 
+                            @Title, 
+                            @Url, 
+                            @Summary, 
+                            @Order, 
+                            @Description, 
+                            @Featured)";
+
+                    var rows = connection.Execute(insertSql, new
+                    {
+                        category.Id,
+                        category.Title,
+                        category.Url,
+                        category.Summary,
+                        category.Order,
+                        category.Description,
+                        category.Featured
+                    });
+                    Console.WriteLine($"{rows} linhas inseridas");
+                }
+
+                static void UpdateCategory(SqlConnection connection)
+                {
+                    var updateQuery = "UPDATE [Category] SET [Title]=@title WHERE [Id]=@id";
+                    var rows = connection.Execute(updateQuery, new
+                    {
+                        id = new Guid("af3407aa-11ae-4621-a2ef-2028b85507c4"),
+                        title = "Frontend 2021"
+                    });
+
+                    Console.WriteLine($"{rows} registros atualizadas");
+                }
+
+                static void DeleteCategory(SqlConnection connection)
+                {
+                    var deleteQuery = "DELETE [Category] WHERE [Id]=@id";
+                    var rows = connection.Execute(deleteQuery, new
+                    {
+                        id = new Guid("ea8059a2-e679-4e74-99b5-e4f0b310fe6f"),
+                    });
+
+                    Console.WriteLine($"{rows} registros excluídos");
+                }
+            }
+        }
+
+
+    . Tutorial CRUD - Desenvolvimento pessoal
+
+        . Crie a pasta "Utils" e dentro dela crie a classe "GenericDal.cs" com o conteúdo abaixo:
+
+            using System.Collections;
+            using System.Collections.Generic;
+            using BaltaDataAccess.Models;
+            using Dapper;
+            using Microsoft.Data.SqlClient;
+
+            namespace BaltaDataAccess.Utils
+            {
+                abstract class GenericDal<T, K>
+                {
+                    const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";        
+
+                    private SqlConnection connection { get; set; }
+                    public SqlTransaction transaction { get; set; }
+
+                    public IDictionary<string, string> CrudParameter { get; set; }
+                    
+
+                    protected GenericDal()
+                    {
+                        this.CrudParameter = new Dictionary<string, string>();
+                    }
+
+                    protected GenericDal( SqlConnection cn, SqlTransaction trans ): base(){
+                        connection = cn;
+                        transaction = trans;
+
+                    }
+
+
+                    public virtual void insert(T model){
+
+                        // Criar um "else" levantando uma exception            
+                        if ( CrudParameter.ContainsKey("INSERT") ){
+                            if ( connection == null ){
+                                using( var connection = new SqlConnection( connectionString ) ){
+                                    var rows = connection.Execute( CrudParameter["INSERT"], model );
+                                }
+                            } else {
+                                var rows = connection.Execute( CrudParameter["INSERT"], model, transaction );
+                            }
+                        }
+
+                    }
+
+
+                    // Diversas formas de enviar parâmetros para o método
+                    //
+                    // var guidObject =  new { Id = new Guid("16d3246d-b8e6-438c-8c62-18d89c856510") };
+                    // public virtual void delete( params object[] keyValue){
+
+
+                    // var guidObject = new[]  {   new { Id  = new Guid("bb22a2df-6dc5-45aa-ad39-0933db0ff9f8") },
+                    //                             new { Id  = new Guid("284238f8-e0c7-43da-a1a3-2d58503db816") },
+                    //                         };
+                    // public virtual void delete( IEnumerable<dynamic> keyValue){
+
+
+                    // var guidDictionary = new Dictionary<string, object>
+                    // {
+                    //     { "@Id", "41283005-ce1d-4558-9818-00da9f949c38" }
+                    // };
+                    // var guidDinamicParameter = new DynamicParameters(guidDictionary);
+                    public virtual void delete( DynamicParameters keyValue){
+                        if ( CrudParameter.ContainsKey("DELETE") ){
+                            if ( connection == null ){
+                                using( var connection = new SqlConnection( connectionString )){
+                                    var rows = connection.Execute( CrudParameter["DELETE"], keyValue );
+                                }
+                            } else {
+                                var rows = connection.Execute( CrudParameter["DELETE"], keyValue, transaction );
+                            }
+                        }
+                    }
+                    public virtual void update(T model){
+                        if ( CrudParameter.ContainsKey("UPDATE") ){
+                            if ( connection == null ){
+                                using( var connection = new SqlConnection( connectionString )){
+                                    var rows = connection.Execute( CrudParameter["UPDATE"], model );
+                                }
+                            } else {
+                                var rows = connection.Execute( CrudParameter["UPDATE"], model, transaction );
+                            }
+                        }
+                    }
+
+                    public virtual List<T> findAll(){
+                        List<T> categories = null;
+
+
+                        if ( CrudParameter.ContainsKey("FIND-ALL") ){
+                            if ( connection == null ){
+                                using( var connection = new SqlConnection( connectionString )){
+                                    categories = (List<T>)connection.Query<T>(CrudParameter["FIND-ALL"]);
+                                }
+                            } else {
+                                categories = (List<T>)connection.Query<T>(CrudParameter["FIND-ALL"],null, transaction);
+                            }
+                        }
+
+                        return categories;
+                    }
+
+                    public virtual T findById( DynamicParameters keyValue )
+                    {
+
+                        T objectResult = (dynamic) null;
+
+                        if ( CrudParameter.ContainsKey("FIND-BY-ID") ){
+                            if ( connection == null ){
+                                using(var connection = new SqlConnection( connectionString )){
+                                    objectResult = connection.QuerySingle<T>(CrudParameter["FIND-BY-ID"], keyValue);
+                                    
+                                    return objectResult;
+                                }
+                            } else {
+                                objectResult = connection.QuerySingle<T>(CrudParameter["FIND-BY-ID"], keyValue, transaction);
+                            }
+                        }
+
+                        return objectResult;
+                    }
+
+                }
+            }
+
+        . Crie a pasta "Dals" e crie a classe "CategoryDal.cs" com o conteúdo abaixo:
+
+            using System;
+            using System.Collections.Generic;
+            using BaltaDataAccess.Models;
+            using BaltaDataAccess.Utils;
+            using Dapper;
+            using Microsoft.Data.SqlClient;
+
+            namespace BaltaDataAccess.Dals
+            {
+                class CategoryDal : GenericDal<Category, Guid>
+                {
+                    public IDictionary< string, string > CrudParam = new Dictionary< string, string >(){
+                                    {"INSERT",  @"INSERT INTO [Category] VALUES( @Id, @Title, @Url, @Summary, @Order, @Description, @Featured )"},
+                                    {"DELETE", @"DELETE FROM [Category] WHERE [Id] = @Id"},
+                                    {"UPDATE", @"UPDATE Category 
+                                                    SET Title = @Title,
+                                                        Url = @Url,
+                                                        Summary = @Summary,
+                                                        [Order] = @Order,
+                                                        Description = @Description,
+                                                        Featured = @Featured
+                                                    WHERE Id = @Id"},
+                                    {"FIND-ALL","SELECT Id, Title, Url, Summary, [Order], Description, Featured FROM Category ORDER BY Id"},
+                                    {"FIND-BY-ID","SELECT Id, Title, Url, Summary, [Order], Description, Featured FROM Category WHERE Id = @Id"},
+                                };
+
+                    public CategoryDal() {
+                        base.CrudParameter = CrudParam;
+                    }
+
+                    public CategoryDal( SqlConnection cn, SqlTransaction trans ): base( cn, trans ){
+                        base.CrudParameter = CrudParam;
+                    }
+                }
+
+            }
+
+        . Atualize a classe "Program.cs" com o conteúdo abaixo:
+
+            ...
+            static void Main(string[] args)
+            {
+                const string connectionString = @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16";
+
+                using( var cn = new SqlConnection( connectionString )){
+
+                    var category = new Category();
+
+                    category.Id = Guid.NewGuid();
+                    category.Title = "Amazon A W S < Generic >";
+                    category.Url = "amazon.com";
+                    category.Description = "Categoria destinada a serviços do AWS";
+                    category.Order = 8;
+                    category.Summary = "AWS Cloud";
+                    category.Featured = false;
+
+                    cn.Open();
+
+                    var trans = cn.BeginTransaction();
+
+                    try{
+                        var guidDictionary = new Dictionary<string, object>
+                        {
+                            { "@Id", "0a04c605-34f5-44d3-a68e-0f9f9888b489" }
+                        };
+
+                        var guidDinamicParameter = new DynamicParameters(guidDictionary);
+
+                        CategoryDal categoryDal = new CategoryDal( cn, trans );
+
+                        categoryDal.delete( guidDinamicParameter );
+
+                        categoryDal.insert( category );
+
+                        category.Title = "**** Amazon A W S *****";
+
+                        System.Console.WriteLine( category.Id );
+
+                        categoryDal.update( category );
+                            
+                        foreach( var c in categoryDal.findAll()){
+                            System.Console.WriteLine($"{c.Id} - {c.Description} - {c.Title}");
+                        }
+
+                        var dictionary = new Dictionary<string, object>
+                        {
+                            { "@Id", "e531345c-36bf-4479-bf6b-fdc688fa9869" }
+                        };
+
+                        var parameters = new DynamicParameters(dictionary);
+
+                        Category c1 = categoryDal.findById( parameters );
+
+                        System.Console.WriteLine($"{c1.Id} - {c1.Description} - {c1.Title}");
+
+                        trans.Commit();
+                    }catch( Exception ex){
+                        System.Console.WriteLine(ex.Message);
+
+                        trans.Rollback();
+                    }
+                }
+            }
+            ...
+
+    . Retrieve Parent-Child Objects
+
+        . Criando a massa de dados:
+
+
+            CREATE DATABASE [BookStoreContext]
+            GO
+
+            USE [BookStoreContext]
+            GO
+
+            CREATE TABLE [dbo].[Authors](
+                [Id] [int] IDENTITY(1,1) NOT NULL,
+                [FirstName] [nvarchar](450) NULL,
+                [LastName] [nvarchar](450) NULL,
+                    CONSTRAINT [PK_Authors] 
+                        PRIMARY KEY CLUSTERED ( [Id] ASC )
+                            WITH (  PAD_INDEX = OFF, 
+                                    STATISTICS_NORECOMPUTE = OFF, 
+                                    IGNORE_DUP_KEY = OFF, 
+                                    ALLOW_ROW_LOCKS = ON, 
+                                    ALLOW_PAGE_LOCKS = ON) ON [PRIMARY] ) ON [PRIMARY]
+            GO
+
+            CREATE TABLE [dbo].[Books](
+                [Id] [int] IDENTITY(1,1) NOT NULL,
+                [Title] [nvarchar](450) NULL,
+                [Category] [nvarchar](max) NULL,
+                [AuthorId] [int] NOT NULL,
+            CONSTRAINT [PK_Books] 
+                PRIMARY KEY CLUSTERED ( [Id] ASC )
+                    WITH (  PAD_INDEX = OFF, 
+                            STATISTICS_NORECOMPUTE = OFF, 
+                            IGNORE_DUP_KEY = OFF, 
+                            ALLOW_ROW_LOCKS = ON, 
+                            ALLOW_PAGE_LOCKS = ON) ON [PRIMARY] ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+            GO
+
+            INSERT INTO Authors(FirstName, LastName) VALUES ('Cardinal','Tom B. Erichsen');
+            INSERT INTO Authors(FirstName, LastName) VALUES ('Meredith','Alonso');
+            INSERT INTO Authors(FirstName, LastName) VALUES ('Robert','T. Kiyosaki');
+
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Introduction to Machine Learning', 'Software', 1);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Introduction to Computing', 'Software', 1);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Calculus I', 'Math', 2);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Calculus II', 'Math', 2);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Trigonometry Basics', 'Math', 2);
+            INSERT INTO Books(Title, Category, AuthorId) VALUES ('Rich Dad, Poor Dad', 'Economics', 3);
+
+        . Dentro da pasta Model crie as classes abaixo:
+
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+
+            namespace Models
+            {
+                class Author
+                {
+                    public int Id { get; set; }
+                    public string FirstName { get; set; }
+                    public string LastName { get; set; }
+                    public List<Book> Books { get; set; }
+                }
+            }
+
+
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+
+            namespace DapperDemo
+            {
+                class Book
+                {
+                    public int Id { get; set; }
+                    public string Title { get; set; }
+                    public string Category { get; set; }
+                    public int AuthorId { get; set; }
+                }
+            }
+
+        . Dentro da classe "Program.cs" crie o método abaixo:
+
+            static void GetAuthroAndTheirBooks( int id ){
+
+                string sql =    @"SELECT * FROM Authors WHERE Id = @Id;
+                                    SELECT * FROM Books WHERE AuthorId = @Id;";
+
+                using( IDbConnection db = new SqlConnection( @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16" ) ){
+                    using( var results = db.QueryMultiple( sql, new { Id = id })){
+                        var authors = results.Read<Author>().AsList();
+                        var books = results.Read<Book>().AsList();
+
+                        if ( authors != null && books != null){
+                            Author author = authors[0];
+                            author.Books = books;
+
+                            System.Console.WriteLine($"{author.FirstName} - {author.LastName}");
+                            System.Console.WriteLine("-----------------------------------");
+                            System.Console.WriteLine("Categoria \t Titulo");
+                            System.Console.WriteLine("--------- \t ------");
+
+                            foreach( Book book in author.Books){
+                                System.Console.WriteLine($"{book.Category} \t {book.Title} ");
+                            }
+
+                            System.Console.WriteLine("");
+                        }
+
+                    }
+                }
+
+            }
+
+        . Implemente a chamado do método acima dentro do método "main":
+
+            ...
+            static void Main(string[] args)
+            {
+                GetAuthorAndTheirBooks(1);
+                GetAuthorAndTheirBooks(2);
+            }
+            ...
+
+
+    . Stored Procedure
+
+        . Crie no Azure Data Studio a procedure abaixo:
+
+            CREATE PROCEDURE [dbo].[GetAuthor]
+                @Id int
+            AS
+            BEGIN
+                SELECT [Id]
+                    ,[FirstName]
+                    ,[LastName]
+                FROM [dbo].[Authors]
+                WHERE Id = @Id;
+
+                SELECT 
+                    Id,
+                    Title,
+                    Category,
+                    AuthorId
+                FROM [dbo].[Books] 
+                WHERE AuthorId = @Id;
+
+            END
+
+        . Crie o método abaixo dentro da classe "Program":
+
+        static void GetAuthorAndTheirBooksSP( int id ){
+
+            string sql = "GetAuthor";
+
+            using( SqlConnection cn = new SqlConnection(  @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16")){
+                using( var rs = cn.QueryMultiple( sql, new { Id = id }, commandType: CommandType.StoredProcedure )){
+                    var author = (rs.Read<Author>().AsList())[0];
+                    var books = rs.Read<Book>().AsList();
+
+                    author.Books = books;
+
+                    if (author != null && books != null){
+                        System.Console.WriteLine($"{author.FirstName} - {author.LastName}");
+                        System.Console.WriteLine("-----------------------------------");
+                        System.Console.WriteLine("Categoria \t Titulo");
+                        System.Console.WriteLine("--------- \t ------");
+
+                        foreach( Book book in author.Books){
+                            System.Console.WriteLine($"{book.Category} \t {book.Title} ");
+                        }
+
+                        System.Console.WriteLine("");
+                    }
+
+
+                }
+            }
+
+        . Implemente a chamado do método acima dentro do método "main":
+
+            ...
+            static void Main(string[] args)
+            {
+                GetAuthorAndTheirBooksSP(2);
+                GetAuthorAndTheirBooksSP(3);
+            }
+            ...
+
+    // PAREI AQUI
+    . IN Operator Support and Dynamic Objects
+
+        . Crie o método abaixo dentro da classe "Program":
+
+            private static void GetDynamicAuthors(params int[] ids)
+            {
+                using (IDbConnection db = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16"))
+                {
+                    // Dynamic Object
+                    List<dynamic> authors = db.Query<dynamic>( "SELECT * FROM Authors WHERE Id IN @Ids", new { Ids = ids }).AsList();
+
+                    // Podemos utilizar ao invés da coleção "List" a interface "IEnumerable"
+                    // IEnumerable<dynamic> authors = db.Query("SELECT Id, FirstName, LastName FROM Authors WHERE Id IN @Ids", new { Ids = ids }).AsList();   // IN Operator
+
+                    foreach (var author in authors)
+                    {
+                        Console.WriteLine($"{author.Id} - {author.FirstName} - {author.LastName}");
+                    }
+                }
+            }
+
+        . Implemente a chamado do método acima dentro do método "main":
+
+            ...
+            static void Main(string[] args)
+            {
+                // Para acessar a relação de parâmetros na assinatura do método podemos usar "params"
+                GetDynamicAuthors(1, 3);
+            }
+            ...
+
+    . Async Operations
+
+        https://www.youtube.com/watch?v=sYBhpA-ZEHI
+        https://www.youtube.com/watch?v=0gJriLMOsmo
+
+        . await     Informa que o processamento deve retornar ao chamador e retornar ao processamento corrente quando ele terminar
+
+        . async     Sempre que for necessário usar o "await" é obrigatório identificar no método que ele é assincrono "async"
+
+
+        . Altere o método "Main" observe "async" e "Task" como retorno:
+
+            static void Main(string[] args)
+            {
+                System.Console.WriteLine("Selecting");
+
+                var authors = GetAllAuthorsAsync();
+
+                System.Console.WriteLine("Inserting");
+
+                InsertSingleAuthorAsync();
+
+                Console.ReadLine();
+            }
+
+        . Adicione o método "GetAllAuthorsAsync" como abaixo:
+
+            private async static Task<List<Author>> GetAllAuthorsAsync()
+            {
+                using (IDbConnection db = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16"))
+                {
+                    IEnumerable<Author> results = await db.QueryAsync<Author>("SELECT * FROM Authors");
+
+                    await Task.Delay(5000);
+
+                    foreach (var author in results.AsList())
+                    {
+                        Console.WriteLine(author.FirstName + " " + author.LastName);
+                    }
+
+
+                    return results.AsList();
+                }
+            }
+
+        . Adicione o método "InsertSingleAuthorAsync" como abaixo:
+
+            private static async void InsertSingleAuthorAsync()
+            {
+                using (IDbConnection db = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16"))
+                {
+                    Author author = new Author()
+                    {
+                        FirstName = "William",
+                        LastName = "Shakespeare"
+                    };
+
+                    string sqlQuery = "INSERT INTO Authors (FirstName, LastName) VALUES(@FirstName, @LastName)";
+
+                    int rowsAffected = await db.ExecuteAsync(sqlQuery, author);
+                }
+            }
+
+
+    . Query with Dynamic Parameter
+
+        . Adicione um método "GetAuthorsDynamic":
+
+            private static void GetAuthorsDynamic(){
+                var firstName = "Marco";
+                var lastName = "Silva";
+
+                // IMPORTANTE: Observe se o parâmetro identificado com ":" funcionará como o "@"
+                var query = "Select * from Authors where FirstName = :FirstName and LastName = :LastName";  
+
+                var dynamicParameters = new DynamicParameters();
+
+                // Talvez aqui necessite colocar "@FirstName" e não somente "FirstName" no nome do parâmetro
+                dynamicParameters.Add("FistNae", firstName );
+                dynamicParameters.Add("LastName", lastName);
+
+                using (var connection = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16"))
+                {
+                    IEnumerable<dynamic> results = connection.Query(query, dynamicParameters);
+                }
+            }
+
+        . Faça a chamado no método Main do método acima:
+
+
+            static void Main(string[] args)
+            {
+                    GetAuthorsDynamic();
+            }
+
+    . Transaction
+
+        . Insira o método abaixo na classe "Program.cs":
+
+            ...
+            public static void InsertAuthors(IEnumerable<Author> authors)
+            {
+                using(var conn = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16")) {
+                    conn.Open();
+
+                    using(var tran = conn.BeginTransaction()) {
+                        try
+                        {
+                            var sql = "insert Authors(FirstName, LastName) VALUES(@FirstName, @LastName)";
+                            conn.Execute(sql, authors, tran);
+                            tran.Commit();
+                        }
+                        catch(Exception ex)
+                        {
+                            tran.Rollback();
+                            // handle the error however you need to.
+                            throw;
+                        }
+                    }
+                }   
+            }
+            ...
+
+        . Faça a chamada do método acima no método "Main":
+
+            static void Main(string[] args)
+            {
+                // IEnumerable<Author> authors  = new[] { new Author() { Id = 100, FirstName = "Jose", LastName = "Silva" },  
+                //                                         new Author() { Id = 101, FirstName = "João", LastName = "Silva" } };
+                var authors  = new[] { new Author() { FirstName = "Jose", LastName = "Silva" },  new Author() { FirstName = "João", LastName = "Silva" } };
+
+                InsertAuthors( authors )   ;
+            }
+
+
+Aula 14. Execute Scalar
+-----------------------
+
+    . Execute "Scalar" para retornar o código da chave primária criada:
+
+        . Acrescente o método abaixo na classe "Program.cs":
+
+            static int InsertAuthorsScalar( Author author ){
+                
+                using( IDbConnection cn = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16" )){
+                    var keyResult = cn.ExecuteScalar<int>( @"INSERT INTO Authors( FirstName, LastName ) 
+                                                        OUTPUT INSERTED.Id
+                                                        VALUES( @FirstName, @LastName )", author);
+
+                    return keyResult;
+                }
+            }
+
+        . Faça a chamado do método acima no método "Main":
+
+            int keyValue = InsertAuthorsScalar( new Author() { FirstName = "GUSTAVO", LastName = "SILVA" } );
+
+        . Outra maneira de retornar o código do campo chave gerado no INSERT é utilizar o SCOPE_IDENTITY ao invés do 
+            OUTPUT INSERTED.[key field]:
+
+            . Atualize o método "InsertAuthorsScalar" com o código abaixo:
+
+                static int InsertAuthorsScalar( Author author ){
+                    
+                    using( IDbConnection cn = new SqlConnection(@"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16" )){
+                        var keyResult = cn.ExecuteScalar<int>( @"INSERT INTO Authors( FirstName, LastName ) 
+                                                            VALUES( @FirstName, @LastName )
+                                                            SELECT SCOPE_IDENTITY()", author);
+
+                        return keyResult;
+                    }
+                }
+
+            . Faça a chamado do método acima no método "Main":
+
+                int keyValue = InsertAuthorsScalar( new Author() { FirstName = "GUSTAVO", LastName = "SILVA" } );
+
+
+Aula 15. Multi Mapping
+----------------------
+
+    . Execute os comandos DMLs abaixo no banco:
+
+        CREATE TABLE Unidade(   Id      CHAR(2) NOT NULL PRIMARY KEY,
+                                Description VARCHAR(50) NOT NULL)
+        GO
+
+        CREATE TABLE Produto(   Id      INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+                                Name    VARCHAR(50) NOT NULL,
+                                UnitId  CHAR(2) NOT NULL,
+                                CONSTRAINT fkProduto_Unidade FOREIGN KEY( UnitId )
+                                    REFERENCES Unidade(Id) )
+        GO
+
+        INSERT Unidade 
+        VALUES( 'MT', 'METRO'),
+                ('UN', 'UNIDADE'),
+                ('KG', 'KILO'),
+                ('LT', 'LITRO')
+        GO
+
+        INSERT INTO Produto( Name, UnitId ) 
+        VALUES('Prego', 'UN'),
+                ('Parafuso', 'UN'),
+                ('Cimento', 'KG'),
+                ('Tijolo', 'UN'),
+                ('Tubulação', 'MT')
+        GO
+
+
+        SELECT *
+        FROM Produto AS p
+            INNER JOIN Unidade AS u
+                ON p.UnitId = u.Id
+
+
+    . One to One ( Relacionamento Um para um )
+
+     https://riptutorial.com/dapper/learn/100013/multi-mapping
+     https://www.macoratti.net/20/03/dap_relum1.htm
+     https://makolyte.com/csharp-map-query-results-to-multiple-objects-with-dapper/
+     
