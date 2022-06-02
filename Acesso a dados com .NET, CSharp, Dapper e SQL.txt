@@ -252,6 +252,14 @@ Aula 3. Connection String
     . Abra a classe "Program.cs" e implemente o código abaixo:
 
         using System;
+        using System.Linq;
+        using Microsoft.Data.SqlClient;
+        using Dapper;
+        using BaltaDataAccess.Models;
+        using BaltaDataAccess.Dals;
+        using System.Collections.Generic;
+        using System.Data;
+        using System.Threading.Tasks;
 
         namespace BaltaDataAccess
         {
@@ -267,6 +275,8 @@ Aula 3. Connection String
             }
         }
 
+
+        . Importante: Muitos dos "using" acima acusarão que não estão sendo usado, não os elimine, pois serão usados mais a frente.
 
 Aula 4. Microsoft.Data.SqlClient
 --------------------------------
@@ -1455,6 +1465,8 @@ Aula 15. Multi Mapping
         GO
 
 
+    . Confira se nos "using" da classe "Program.cs" está sendo utilizado "using System.Linq;". Através
+        dessa biblioteca que é possível utilizar os métodos das "Collections" "ToList, Distinct, etc".
 
     . One to One ( Relacionamento Um para um )
 
@@ -1500,7 +1512,7 @@ Aula 15. Multi Mapping
                                                                             return produto;
                                                                         },
                                                                         splitOn: "Id, UnitId" )
-                                        .AsList();
+                                        .ToList();
                     
                     foreach( var item in produtos ){
                         System.Console.WriteLine($"{item.Id} - {item.Name} - {item.Unidade.Description}");
@@ -1533,6 +1545,86 @@ Aula 15. Multi Mapping
                 GetMultiMappingOneToOne();        
             }
             ...
+
+    . One to Many ( um para muitos )
+
+        . Insira o método abaixo na classe "Program.cs":
+
+            static void GetMultiMappingOneToMany(){
+
+                string sql = @"SELECT *
+                                FROM Unidade a
+                                    INNER JOIN Produto b
+                                        ON a.Id = b.UnitId
+                                ORDER BY a.Id, b.Id";
+
+                using( SqlConnection cn = new SqlConnection( @"Server=localhost,1433; Database=balta; User ID=SA; Password=Joao3.16" )){
+
+                    var unidadeDictionary = new Dictionary<string,Unidade>();
+
+                    var unidades = new List<Unidade>();
+
+                    var items = cn.Query< Unidade, Produto, Unidade>( sql,
+                                                                        map: ( unidade, produto ) =>
+                                                                        {
+                                                                            var unidadeEntry = unidades.Where( u => u.Id == unidade.Id ).FirstOrDefault();
+
+                                                                            if ( unidadeEntry == null ){
+                                                                                unidadeDictionary.Add( unidade.Id, unidade );
+                                                                                unidade.Produtos.Add( produto );
+                                                                                unidades.Add( unidade );
+                                                                            }else{
+                                                                                unidadeEntry.Produtos.Add( produto );
+                                                                            }
+
+                                                                            return unidade;
+                                                                        },
+                                                                        splitOn: "Id");
+
+
+                    // IMPORTANTE: O código comentado abaixo é outra forma de ensinar a classe "Unidade" como organizar as informações. Para que
+                    //              ela funcione certifique-se que está sendo importado a biblioteca "using System.Linq;"
+
+                    // var unidades = cn.Query<Unidade, Produto, Unidade>(sql,
+                    //                                                     map: (unidade, produto) =>
+                    //                                                     {
+                    //                                                         Unidade unidadeEntry;
+
+                    //                                                         if (!unidadeDictionary.TryGetValue( unidade.Id, out unidadeEntry)){
+                    //                                                             unidadeEntry = unidade;
+
+                    //                                                             unidadeDictionary.Add( unidadeEntry.Id, unidadeEntry );
+                    //                                                         }
+
+                    //                                                         unidadeEntry.Produtos.Add( produto );
+
+                    //                                                         return unidadeEntry;
+                    //                                                     },
+                    //                                                     splitOn: "Id")
+                    //                     .Distinct()
+                    //                     .ToList();
+
+                    foreach( var item in unidades){
+                        System.Console.WriteLine($"{item.Id} - {item.Description}");
+
+                        foreach( var produto in item.Produtos){
+                            System.Console.WriteLine($"\t{produto.Id} - {produto.Name}");
+                        }
+                    }
+                    
+                }
+
+        . Insira a linha abaixo no método "Main" da classe "Program" e execute o projeto:
+
+            ...
+            static void Main(string[] args)
+            {
+                GetMultiMappingOneToMany();
+            }
+            ...
+
+                
+                
 
 
      https://riptutorial.com/dapper/learn/100013/multi-mapping
