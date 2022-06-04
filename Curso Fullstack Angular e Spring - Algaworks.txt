@@ -14188,3 +14188,23 @@ sudo npm install -g @angular/cli@1.1.2
 sudo npm i primeng@4.3.0 --save
 sudo npm i @angular/animations@4.3.0 --save
 sudo npm i font-awesome@4.3.0 --save
+
+
+
+
+cd workspace-angular/
+cd algamoney-ui8
+code .
+cd ..
+cd workspace-java/
+cd algamoney-api
+cd target/
+docker start algamoney3
+java -jar algamoney-api-1.0.0-SNAPSHOT.jar --algamoney.origin-permitida=http://localhost:4200 --spring.profiles.active=oauth-security
+cd ~/workspace-angular/algamoney-ui8
+ng serve --open
+
+user: admin@algamoney.com
+pwd: admin
+
+
