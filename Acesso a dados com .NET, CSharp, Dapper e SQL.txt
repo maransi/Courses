@@ -1666,8 +1666,69 @@ Aula 16. Dapper.Contrib
         # Das próximas vezes execute o docker abaixo
         docker start sqlserver
 
+    . Acesse a "Aula 2. Restaurando o Banco" e execute os passos lá descrito
+
+    . Acesso banco "balta" via Azure Data Studio e execute os comandos abaixo:
+
+        CREATE DATABASE [BaltaDapperContribContext]
+        GO
+
+        USE [BaltaDapperContribContext]
+        GO
+
+        CREATE TABLE [dbo].[Event](
+            [Id] [int] IDENTITY(1,1) NOT NULL,
+            [EventName] VARCHAR(100) NOT NULL,
+            [EventDate] Date NOT NULL,
+            [DateCreated] DateTime NOT NULL DEFAULT( GETDATE() ),
+                CONSTRAINT [PK_Event] 
+                    PRIMARY KEY CLUSTERED ( [Id] ASC )
+                        WITH (  PAD_INDEX = OFF, 
+                                STATISTICS_NORECOMPUTE = OFF, 
+                                IGNORE_DUP_KEY = OFF, 
+                                ALLOW_ROW_LOCKS = ON, 
+                                ALLOW_PAGE_LOCKS = ON) ON [PRIMARY] ) ON [PRIMARY]
+        GO
+
+        INSERT INTO Event( EventName, EventDate )
+        VALUES('Debito', GETDATE() ),
+                ('Credito', GETDATE() )
+        GO
+
     . Crie a pasta "Models" no projeto.
     
+    . Dentro da pasta "Models" crie a classe abaixo:
+
+        [Table ("Event")]
+        class Event
+        {
+            [Key]
+            public int Id { get; set; }
+            public int EventLocationId { get; set; }
+            public string EventName { get; set; }
+            public DateTime EventDate { get; set; }
+            public DateTime DateCreated { get; set; }
+        }
+
+    . Acesse a classe "Program.cs" e inclua o método abaixo:
+
+        ...
+        static void InsertEvent( Event event ){
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                var newEvent = new Event
+                {
+                    EventLocationId = 1,
+                    EventName = "Contrib Inserted Event",
+                    EventDate = DateTime.Now.AddDays(1),
+                    DateCreated = DateTime.UtcNow
+                };
+                connection.Insert(newEvent);
+            }
+        }
+        ...
+
+        
 
 
 
