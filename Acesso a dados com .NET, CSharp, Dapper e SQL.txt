@@ -1644,6 +1644,18 @@ Aula 16. Dapper.Contrib
         enhancements to otherwise annoying Dapper hurdles. Most notably, updates and inserts become much simpler 
         with Dapper.Contrib. So let’s jump right in!
 
+    . Abaixo a lista de métodos que compoe o Dapper, todos esses métodos são acessados pelo objecto de conexão "SqlConnection":
+
+        T Get<T>(id);
+        IEnumerable<T> GetAll<T>();
+        int Insert<T>(T obj);
+        int Insert<T>(Enumerable<T> list);
+        bool Update<T>(T obj);
+        bool Update<T>(Enumerable<T> list);
+        bool Delete<T>(T obj);
+        bool Delete<T>(Enumerable<T> list);
+        bool DeleteAll<T>();
+
     . Acesse o prompt raiz da pasta de projeto e execute o comando abaixo:
 
         dotnet new console -o baltaDataDapperContrib  -n BaltaDataDapperContrib -f net5.0
@@ -1657,6 +1669,20 @@ Aula 16. Dapper.Contrib
         dotnet add package Dapper.Contrib --version 2.0.78
 
         dotnet restore
+
+    . Se estiver usando o Visual Studio acesse a área "Package Manager Console" e execute o comando abaixo:
+
+        Install-Package Dapper.Contrib
+
+    . Outra opção no caso do Visual Studio, seria:
+
+        . Right-click on the project in Solution Explorer, and select Manage NuGet Packages...    
+        . Select the Browse tab and search for Dapper.Contrib and install the latest version by 
+          pressing the Install button
+
+    . Maiores detalhes acesse o link abaixo:
+
+        https://riptutorial.com/dapper-contrib/learn/100001/environment-setup    
 
     . Levante o banco de dados:
 
@@ -1710,30 +1736,144 @@ Aula 16. Dapper.Contrib
             public DateTime DateCreated { get; set; }
         }
 
-    . Acesse a classe "Program.cs" e inclua o método abaixo:
+    . Método "Insert":
 
-        ...
-        static void InsertEvent( Event event ){
-            using (SqlConnection connection = new SqlConnection(connectionString))
+        . Acesse a classe "Program.cs" e inclua o código abaixo abaixo:
+
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+
+            using baltaDapperContrib.Models;
+            using Dapper.Contrib.Extensions;
+            using Microsoft.Data.SqlClient;
+
+
+            namespace BataDapperContrib
             {
-                var newEvent = new Event
+                class Program
                 {
-                    EventLocationId = 1,
-                    EventName = "Contrib Inserted Event",
-                    EventDate = DateTime.Now.AddDays(1),
-                    DateCreated = DateTime.UtcNow
-                };
-                connection.Insert(newEvent);
+                    static void Main(string[] args)
+                    {
+                        Console.WriteLine("Hello World!");
+
+                        Event evento = new Event(){
+                                EventName = "Contrib Inserted Event",
+                                EventDate = DateTime.Now.AddDays(1),
+                        };
+
+                        // InsertEvent( new Event(){   EventName = "Contrib Inserted Event",
+                        //                             EventDate = DateTime.Now.AddDays(1),
+                        //                         });
+
+                        InsertEvent( evento );
+
+                        System.Console.WriteLine( evento.Id );
+                    }
+
+                    static void InsertEvent( Event ev ){
+                        using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+                            cn.Insert( ev );
+                        }
+                    }
+                }
             }
-        }
-        ...
+            
+        . Execute o projeto e verifique se o método "InsertEvent" foi executado com sucesso.
 
+    . Método "Get" e "GetAll":
+
+        . Insira os métodos abaixo na classe "Program.cs":
+
+            ...
+            private static List<Event> GetEvents()
+            {
+                using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+                    
+                    // Observe o método "GetAll"
+                    return cn.GetAll<Event>().ToList(); 
+                }
+
+            }
+
+            static Event GetEvent( int id )
+            {
+                using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+
+                    // Observe o método "Get"
+                    return cn.Get<Event>( id );
+                }
+            }
+            ...
+
+        . Insira o código abaixo no método "Main":
+
+            ...
+            Event evento = GetEvent(1); 
+
+            List<Event> eventos = GetEvents();
+
+            System.Console.WriteLine( $"{evento.Id} - {evento.EventName} - {evento.EventDate}" );
+
+            System.Console.WriteLine("--------------------------------");
+
+            foreach( var item in eventos){
+                System.Console.WriteLine($"{item.Id} - {item.EventName} - {item.EventDate}");
+            }
+            ...
+
+        . Execute o projeto
+
+    . Método "Update":
+
+        . Insira os metodos abaixo na classe para "Program.cs":
+
+            ...
+            private static void UpdateEvents(List<Event> eventsChange)
+            {
+                using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+
+                    // Método "Update"
+                    cn.Update<List<Event>>( eventsChange );
+                }
+            }
+
+            static void UpdateEvent( Event evento ){
+                using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+
+                    // Método "Update"
+                    cn.Update<Event>( evento );
+                }
+            }
+            ...
         
+        . Insira o código abaixo no método "Main":
+
+            ...
+            Event evento = GetEvent(1); 
+
+            evento.EventName = "DEBITO";
+
+            UpdateEvent( evento );
+
+            List<Event> eventsChange = new List<Event>(){ new Event(){ Id = 3, EventName="ACERTO", EventDate = DateTime.Now.AddDays(2)},
+                                                          new Event(){ Id = 4, EventName="ARREDONDAMENTO", EventDate = DateTime.Now.AddDays(2)} };
+            UpdateEvents( eventsChange );
+
+            List<Event> eventos = GetEvents();
+
+            foreach( var item in eventos){
+                System.Console.WriteLine($"{item.Id} - {item.EventName} - {item.EventDate}");
+            }
+            ...
 
 
+https://riptutorial.com/dapper-contrib/learn/100006/delete-data
 
                 
-
+https://riptutorial.com/dapper-contrib/learn/100000/getting-started
 https://dotnetcoretutorials.com/2019/08/05/dapper-in-net-core-part-4-dapper-contrib/
 https://henriquemauri.net/utilizando-o-dapper-simplecrud-no-net-6-0/
 
