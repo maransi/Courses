@@ -224,20 +224,154 @@ Aula 2. Ferramentas
 
 
 
-Aula do Curso Acesso à dados com .NET, C#, Dapper e SQL Server - Dapper
------------------------------------------------------------------------
-
-https://balta.io/player/assistir/63c6ef55-44ee-445d-9b53-62e06fc969b8/a12c50de-5cd5-41a3-a1c7-bd66da20a415
-
 
 https://entityframework.net/ef-code-first
-
-
-
-
+https://www.entityframeworktutorial.net/code-first/simple-code-first-example.aspx
+https://www.tutorialspoint.com/entity_framework/entity_framework_environment_setup.htm#
 
 
 
 Aula 3. ORM
 -----------
+
+    . ORM - Object Relational Mapping
+
+    . Responsável por fazer o de-para das tabelas para os objetos de classes.
+
+    . Substitui o desenvolvimento de SQL pelo mapeamento das classes de forma que criem os objetos
+        automaticamente.
+
+
+Aula 4. Entity Framework
+------------------------
+
+    . O EF é um framework
+
+    . É um conjunto de bibliotecas, muito mais poderoso, complexo e pesado do que o Dapper.
+
+    . Permite trabalhar com CRUD, Migrações.
+
+
+    .NET Core Command-Line Interface (CLI)    
+    --------------------------------------
+
+        . Digite no terminal "dotnet --info" para apresentar informações variadas da instação do dotnet
+
+        . Digite no terminal "dotnet new" irá apresentar as várias possibilidades de criar diversos projetos, exemplo:
+
+            dotnet new mvc
+
+            dotnet run
+
+            #Acesse o navegador e digite a URL: https://localhost:5001/ para ver o resultado do projeto criado.
+
+        . Ctrl + C no terminal acaba com a execução do projeto:
+
+        https://www.infoq.com/br/articles/netcore-cli/    
+
+    . Instalar pacotes através do Nuget.org
+    ---------------------------------------
+
+        https://www.nuget.org/packages/Microsoft.EntityFrameworkCore/7.0.0-preview.4.22229.2#versions-body-tab
+
+        . Ao ser compilada, uma biblioteca gera um arquivo DLL. Será esta DLL que os outros projetos irão utilizar. 
+            O NuGet aproveita desta característica da plataforma para definir seus pacotes.
+
+        . Na prática, um pacote NuGet é um arquivo compactado com a extensão .nupkg que contém um código compilado (DLL), 
+            outros arquivos relacionados a este código (como imagens, etc.) e um arquivo de configuração que contém 
+            informações sobre o pacote, como: número de versão, criador, etc.
+
+        . Estes pacotes .nupkg podem ser publicados em repositórios públicos ou privados, onde os desenvolvedores podem 
+            consumi-los, adicionando-os em seus projetos e utilizando no código as funcionalidades que fornecerem.
+
+        . Em se tratando de projeto, como se fosse as dependências de bibliotecas.
+
+        . Acesse o site nuget.org, digite "Microsoft Entity Framework Core" e faça a pesquisa.
+
+        . Acesse o item Microsoft.EntityFrameworkCore.
+
+        . Acesse uma das versões, atualmente 5.0.5.
+        
+        . Acesse a aba .NetCli.
+
+        . Copie o comando sugerido por esse caminho:
+
+            dotnet add package Microsoft.EntityFrameworkCore --version 5.0.5
+
+        . Acesse o terminal, vá na pasta do projeto e execute o comando acima. Cuidado é necessário acessar a pasta do projeto
+            e não da solução, exemplo: ~/workspace-two/CSharpBasico/helloWorld.
+
+
+        . Após a execução, no terminal, execute um dos comandos abaixo:
+
+            dotnet restore
+
+            ou
+
+            dotnet build
+
+        . Acesse o Visual Studio Code "code ." para entrar no projeto e acesse o arquivo com extensão "*.csproj". Podemos verificar 
+            que agora temos o pacote dentro da aplicação:
+
+            <ItemGroup>
+                <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+            </ItemGroup>
+
+        . Retorne ao Home do site nuget.org e digite "Pomelo Entity Framework core" e acesse o link do MySQL.
+
+        . Acesse a aba "PackageReference" e copie o comando sugerido:
+
+        . Acesse novamente o arquivo com a extensão *.csproj e insira a dependência copiada dentro do nó "ItemGroup":
+
+            <ItemGroup>
+                <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+                <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />    
+            </ItemGroup>
+
+        . Salve o conteúdo do arquivo, o VsCode irá pedir para dar o "Restore", confirme o restore.
+
+        . Se quiser podemos dar o "dotnet restore", ou o "dotnet build", no terminal.
+
+        . Caso haja a necessidade de retirar alguma dependência do nó "ItemGroup", acesse o terminal, e execute os comandos abaixo:
+
+            dotnet clean
+            dotnet restore
+
+Aula 4. DataContext
+-------------------
+
+    . DB Context - Uma instância DbContext representa uma combinação da unidade de padrões de trabalho e de repositório, 
+                    de modo que ele possa ser usado para consultar de um banco de dados e agrupar alterações que serão 
+                    gravadas novamente no armazenamento como uma unidade. DbContext é conceitualmente semelhante a 
+                    ObjectContext.
+
+        . As classes de contexto derivam da "System.Data.e/ntity.DbContextDbContext".
+        . Uma instância de uma classe de contexto representa a unidade de trabalho e segue o "pattern" "Repository".
+        . Pode combinar várias transações numa simples transação.
+        . Usada para consultar e salvar dados
+        . Usada para configurar classes de domínio, mapeamento de relacionamento, cache, transação, etc.
+
+        . Exemplo:
+
+            using System.Data.Entity;
+
+            public class SchoolContext : DbContext
+            {
+                public SchoolContext()
+                {
+
+                }
+                // Entities        
+                public DbSet<Student> Students { get; set; }
+                public DbSet<StudentAddress> StudentAddresses { get; set; }
+                public DbSet<Grade> Grades { get; set; }
+            } 
+    
+    . DBSet - Um DbSet representa a coleção de todas as entidades no contexto ou que pode ser consultada a partir do 
+                banco de dados, de um determinado tipo. Os objetos DbSet são criados a partir de um DbContext usando 
+                o método DbContext.
+
+
+Aula 5. Restaurando o banco
+---------------------------
 
