@@ -1996,7 +1996,283 @@ Aula 16. Dapper.Contrib
                 public List<Book> Books { get; set; }
             }
 
+
+Projeto CRUD com o Dapper Contrib
+---------------------------------
+
+    . Caso for necessário criar um novo projeto, execute os passos da "Aula 16. Dapper.Contrib"
+
+    . Crie a pasta "Utils" e dentro dela crie a classe "Repository.cs" com o conteúdo abaixo:
+
+        using System.Collections.Generic;
+        using System.Linq;
+        using Dapper.Contrib.Extensions;
+        using Microsoft.Data.SqlClient;
+
+        namespace baltaDapperContrib.utils
+        {
+            public abstract class Repository<T, K> where T : class, new()   // class ( T tem que estender uma class ) 
+            {                                                               // new() ( A classe que for estender deverá ter métodos contrutores com parâmetros)
+
+                private readonly SqlConnection cn;
+                private readonly SqlTransaction tr = null;
+                public Repository(SqlConnection connection) => this.cn = connection; 
+
+                public Repository(SqlConnection connection, SqlTransaction transaction){
+                    this.cn = connection; 
+                    this.tr = transaction;  // Se não for passado a transação, não haverá problema ao passa-la assim para os métodos abaixo
+                }
+                public virtual List<T> FindAll() => cn.GetAll<T>(tr).ToList(); 
+                public virtual T FindById(K ObjectKey) => cn.Get<T>( ObjectKey, tr );
+
+                public virtual void insert(T ObjectModel) => cn.Insert( ObjectModel, tr );
+                public virtual void update(T ObjectModel) => cn.Update( ObjectModel, tr );
+                public virtual void delete(T ObjectModel) => cn.Delete<T>( ObjectModel, tr );
+            }
+        }
+
+    . Crie a pasta "Models", inclua a classe "Event.cs" com o código abaixo:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+        using Dapper.Contrib.Extensions;
+
+        namespace baltaDapperContrib.Models
+        {
+
+            [Table("Event")]
+            class Event
+            {
+                [Dapper.Contrib.Extensions.Key]
+                public int Id { get; set; }
+
+                [Write(true)]
+                [Computed]
+                public int EventLocationId { get; set; }
                 
+                public string EventName { get; set; }
+                public DateTime EventDate { get; set; }
+                public DateTime DateCreated { get; set; }
+
+                public Event()
+                {
+                    DateCreated = DateTime.UtcNow;
+                }
+            }
+
+        }
+
+
+    . Crie a pasta "Repositories", inclua a classe "RepositoryEvent.cs" de acordo com o código abaixo:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+        using baltaDapperContrib.Models;
+        using baltaDapperContrib.utils;
+        using Microsoft.Data.SqlClient;
+
+        namespace baltaDapperContrib.Repositories
+        {
+            class RepositoryEvent : Repository<Event, int>
+            {
+                public RepositoryEvent(SqlConnection connection) : base(connection)
+                {
+                    
+                }
+
+                public RepositoryEvent( SqlConnection connection, SqlTransaction transaction): base( connection, transaction ){
+                    
+                }
+            }
+        }
+
+    . Altere o arquivo "Program.cs" com o código abaixo:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Text;
+        using System.Threading.Tasks;
+
+        using baltaDapperContrib.Models;
+        using baltaDapperContrib.Repositories;
+        using Dapper.Contrib.Extensions;
+        using Microsoft.Data.SqlClient;
+
+
+        namespace BataDapperContrib
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+
+                    try{
+                        InsertEvent();
+
+                        UpdateEvent(4);
+
+                        DeleteEvent(4);
+
+                        GetEvents();
+
+                        GetEvent(5);
+                        
+                        ExecuteWithTransaction();
+                    } catch( Exception ex ){
+                        System.Console.WriteLine( ex.Message );
+                    }
+                }
+
+                private static void DeleteEvent(int id)
+                {
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("DeleteEvent");
+                    System.Console.WriteLine("");
+
+                    using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+                        RepositoryEvent repositoryEvent = new RepositoryEvent( cn );
+
+                        Event evento = repositoryEvent.FindById(id);
+
+                        repositoryEvent.delete( evento );
+
+                        System.Console.WriteLine("----------------------");
+
+                        foreach( var item in repositoryEvent.FindAll() ){
+                            System.Console.WriteLine($"{item.Id} {item.EventName}");
+                        }
+                    }
+                }
+
+                private static void UpdateEvent(int id)
+                {
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("UpdateEvent");
+                    System.Console.WriteLine("");
+
+                    using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+                        RepositoryEvent repositoryEvent = new RepositoryEvent( cn );
+
+                        Event evento = repositoryEvent.FindById(id);
+
+                        evento.EventName = "RECEBIMENTO";
+
+                        repositoryEvent.update( evento );
+
+                        foreach( var item in repositoryEvent.FindAll() ){
+                            System.Console.WriteLine($"{item.Id} - {item.EventName}");
+                        }
+                    }
+                }
+
+                private static void GetEvents()
+                {
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("GetEvents");
+                    System.Console.WriteLine("");
+
+                    using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+                        RepositoryEvent repositoryEvent = new RepositoryEvent( cn );
+
+                        foreach( var item in repositoryEvent.FindAll() ){
+                            System.Console.WriteLine($"{item.Id} - {item.EventName}");
+                        }
+
+                    }
+
+                }
+
+
+                static void InsertEvent(){
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("InsertEvent");
+                    System.Console.WriteLine("");
+
+                    using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16") ){
+                        RepositoryEvent repositoryEvent = new RepositoryEvent( cn );
+
+                        Event evento = new Event(){
+                                                    EventName = "RECEITA",
+                                                    EventDate = DateTime.Now.AddDays(1)
+                                                };
+
+
+                        repositoryEvent.insert( evento );
+
+                        List<Event> eventos = repositoryEvent.FindAll();
+
+                        foreach( var item in eventos ){
+                            System.Console.WriteLine($"{item.Id} - {item.EventName}");
+                        }
+                    }
+                }
+
+                static void GetEvent( int id )
+                {
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("GetEvent");
+                    System.Console.WriteLine("");
+
+                    using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+                        RepositoryEvent repositoryEvent = new RepositoryEvent( cn );
+                        
+                        Event evento = repositoryEvent.FindById( id );
+
+                        System.Console.WriteLine($"${evento.Id} - {evento.EventName}");
+                    }
+
+
+                }
+
+                static void ExecuteWithTransaction(){
+                    using( SqlConnection cn = new SqlConnection(@"Server=localhost,1433; Database=BaltaDapperContribContext; User ID=SA; Password=Joao3.16" ) ){
+                        cn.Open();
+
+                        // SqlTransaction tr = cn.BeginTransaction();
+
+                        try{
+                            RepositoryEvent repositoryEvent = new RepositoryEvent( cn );
+
+                            foreach( var item in repositoryEvent.FindAll() ){
+                                System.Console.WriteLine($"{item.Id} - {item.EventName}");
+                            }
+
+                            Event evento = repositoryEvent.FindById(14);
+
+                            evento.EventName = "Alterado";
+
+                            repositoryEvent.update( evento );
+
+                            System.Console.WriteLine("-------------------");
+
+                            foreach( var item in repositoryEvent.FindAll() ){
+                                System.Console.WriteLine($"{item.Id} - {item.EventName}");
+                            }
+
+                            repositoryEvent.delete( evento );
+
+                            Event evento14 = repositoryEvent.FindById(14);
+                            evento14.EventName = "Alterado";
+
+                            // tr.Commit();
+                        } catch( Exception ex){
+                            // tr.Rollback();
+
+                            throw ex;
+                        }
+
+
+                    }
+                }
+            }
+        }
+
+
 https://riptutorial.com/dapper-contrib/learn/100000/getting-started
 https://dotnetcoretutorials.com/2019/08/05/dapper-in-net-core-part-4-dapper-contrib/
 https://henriquemauri.net/utilizando-o-dapper-simplecrud-no-net-6-0/
