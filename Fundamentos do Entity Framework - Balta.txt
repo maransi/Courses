@@ -471,3 +471,164 @@ Aula 5. Restaurando o banco
             CONSTRAINT PK_PostTag PRIMARY KEY([PostId], [TagId])
         )
 
+
+Aula 6 e 7. Criando os modelo - Parte 1 e 2
+-------------------------------------------
+
+    . Acesse a pasta local de projetos e execute o comando:
+
+        dotnet new console -o Blog -n blog -f net5.0
+
+    . Abra o VsCode e abra a pasta do projeto criado anteriormente.
+
+    . Crie uma pasta no projeto com o nome "Models"
+
+    . Crie a classe "User" dentro da pasta "Models" conforme o código abaixo:
+
+        namespace Blog.Models
+        {
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+                public string PasswordHash { get; set; }
+                public string Image { get; set; }
+                public string Slug { get; set; }
+                public string Bio { get; set; }
+            }
+        }
+
+    . Crie a classe "Role" dentro da pasta "Models" conforme o código abaixo:
+
+        namespace Blog.Models
+        {
+            public class Role
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Slug { get; set; }
+            }
+        }
+
+    . Crie a classe "UserRole" dentro da pasta "Models" conforme o código abaixo:
+
+        namespace Blog.Models
+        {
+            public class UserRole
+            {
+                public int UserId { get; set; }
+                public int RoleId { get; set; }
+            }
+        }
+
+    . Crie a classe "Category" dentro da pasta "Models" conforme o código abaixo:
+
+        namespace Blog.Models
+        {
+            public class Category
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Slug { get; set; }
+            }
+        }
+
+    . Crie a classe "Tag" dentro da pasta "Models" conforme o código abaixo:
+
+        using System.ComponentModel.DataAnnotations;
+        using System.ComponentModel.DataAnnotations.Schema;
+
+        namespace Blog.Models
+        {
+            public class Tag
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Slug { get; set; }
+            }
+        }
+
+    . Crie a classe "Post" dentro da pasta "Models" conforme o código abaixo:
+
+        using System;
+
+        namespace Blog.Models
+        {
+            public class Post
+            {
+                public int Id { get; set; }
+                public int CategoryId { get; set; }
+                public int AuthorId { get; set; }
+                public string Title { get; set; }
+                public string Summary { get; set; }
+                public string Body { get; set; }
+                public string Slug { get; set; }
+                public DateTime CreateDate { get; set; }
+                public DateTime LastUpdateDate { get; set; }
+            }
+        }
+
+    . Crie a classe "PostTag" dentro da pasta "Models" conforme o código abaixo:
+
+        namespace Blog.Models
+        {
+            public class PostTag
+            {
+                public int PostId { get; set; }
+                public int TagId { get; set; }
+            }
+        }
+
+Aula 8 - DbSet
+--------------
+
+    . Acesse a pasta raiz do projeto e execute os comandos abaixo:
+
+        dotnet add package Microsoft.EntityFrameworkCore --version 5.0.9        
+        
+        dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 5.0.9
+
+    . Crie a pasta "Data" dentro do projeto e crie a classe "BlogDataContext.cs" com o código abaixo:
+
+        using Blog.Models;
+        using Microsoft.EntityFrameworkCore;
+
+        namespace Blog.Data
+        {
+            public class BlogDataContext : DbContext
+            {
+                public DbSet<Category> Categories { get; set; }
+                // public DbSet<Post> Posts { get; set; }
+                // public DbSet<PostTag> PostTags { get; set; }
+                // public DbSet<Role> Roles { get; set; }
+                // public DbSet<Tag> Tags { get; set; }
+                // public DbSet<User> Users { get; set; }
+                // public DbSet<UserRole> UserRoles { get; set; }
+
+                // protected override void OnConfiguring(DbContextOptionsBuilder options)
+                //    => options.UseSqlServer("Server=localhost,1433;Database=Blog;User ID=sa;Password=1q2w3e4r@#$");
+            }
+        }
+
+    . A partir deste momento se formos na classe "Program.cs", criarmos a classe de "context", já estará
+        visivel os "DbContext":
+
+        . Insira as linhas abaixo na classe "Program.cs":
+
+            ...
+            class Program
+            {
+                static void Main( string[] args)
+                {
+                    ...
+
+                    var ctx = new BlogDataContext();
+
+                    ctx.Categories();   // Já está visivel
+                }
+            }
+
+
+Aula 9 - Configurando o DAtaContext
+-----------------------------------
