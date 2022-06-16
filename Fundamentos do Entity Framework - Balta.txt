@@ -1,6 +1,11 @@
 Fundamentos do Entity Framework - Balta
 ---------------------------------------
 
+
+INTRODUÇÃO
+----------
+
+
 Aula 2. Ferramentas
 -------------------
 
@@ -598,16 +603,20 @@ Aula 8 - DbSet
         {
             public class BlogDataContext : DbContext
             {
+
+                // Devido a problema de chaves, as linhas comentadas referem-se a classes onde a chave primária são chaves composta
+                // Mais a frente iremos configurar esses tipos de classes
+
                 public DbSet<Category> Categories { get; set; }
-                // public DbSet<Post> Posts { get; set; }
+                public DbSet<Post> Posts { get; set; }
                 // public DbSet<PostTag> PostTags { get; set; }
-                // public DbSet<Role> Roles { get; set; }
-                // public DbSet<Tag> Tags { get; set; }
-                // public DbSet<User> Users { get; set; }
+                public DbSet<Role> Roles { get; set; }
+                public DbSet<Tag> Tags { get; set; }
+                public DbSet<User> Users { get; set; }
                 // public DbSet<UserRole> UserRoles { get; set; }
 
-                // protected override void OnConfiguring(DbContextOptionsBuilder options)
-                //    => options.UseSqlServer("Server=localhost,1433;Database=Blog;User ID=sa;Password=1q2w3e4r@#$");
+                protected override void OnConfiguring(DbContextOptionsBuilder options)
+                    => options.UseSqlServer("Server=localhost,1433;Database=Blog;User ID=sa;Password=Joao3.16");
             }
         }
 
@@ -632,3 +641,246 @@ Aula 8 - DbSet
 
 Aula 9 - Configurando o DAtaContext
 -----------------------------------
+
+    . O método "OnConfiguring" é o local onde faremos a conexão com o banco de dados.
+
+    . Altere o código do método "Main" da classe "Program.cs":
+
+        ...
+        static void Main( string[] args ){
+            using( var context = new BlogDataContext() ){
+
+            }
+        }
+        ...
+
+
+Aula 10. Create
+---------------
+
+    . Acesse a classe "Tag.cs" e inclua as linhas abaixo:
+
+        ...
+        using System.ComponentModel.DataAnnotations;            // Linha inserida
+        using System.ComponentModel.DataAnnotations.Schema;     // Linha inserida
+        namespace Blog.Models
+        {
+            [Table("Tag")]                                      // Linha inserida
+            public class Tag
+            {
+                [Key]                                           // Linha inserida
+                public int Id { get; set; }
+
+                ...
+            }
+        }
+
+    . Altere o código do método "Main" da classe "Program.cs":
+
+        ...
+        static void Main( string[] args ){
+            using( var context = new BlogDataContext() ){
+
+                var tag = new Tag { Name = "ASP.NET", Slug = "aspnet" };    // Linha inserida
+
+                context.Tags.Add( tag );                                    // Linha inserida
+
+            }
+        }
+        ...
+
+    . Execute o projeto e verifique no banco se a linha acima foi criada com sucesso na tabela "tag"
+
+        . IMPORTANTE: Ela não foi criada, porque o "context" é um banco em memória, para efetivar a inserção
+                        no banco é necessário usar o comando "context.SaveChanges()"
+
+    . Insira a linha abaixo no método "Main" da classe "Program.cs":
+
+
+        ...
+        static void Main( string[] args ){
+            using( var context = new BlogDataContext() ){
+
+                var tag = new Tag { Name = "ASP.NET", Slug = "aspnet" };    
+
+                context.Tags.Add( tag );                                    
+
+                context.SaveChanges();              // Linha inserida
+
+            }
+        }
+        ...
+
+    . Execute o projeto e verifique no banco se a linha acima foi criada com sucesso na tabela "tag"
+
+
+Aula 11. Update
+---------------
+
+    . Altere o método "Main" como abaixo:
+
+        ...
+        static void Main( string[] args ){
+            using( var context = new BlogDataContext() ){
+
+                // var tag = new Tag { Name = "ASP.NET", Slug = "aspnet" };    
+
+                // context.Tags.Add( tag );                                    
+
+                // context.SaveChanges();              
+
+                var tag = context.Tags.FirstOrDefault( x => x == 2 )    // Linha inserida
+
+                tag.Name = ".NET";                                      // Linha inserida
+
+                tag.Slug = "dotnet";                                    // Linha inserida
+
+                context.Update( tag );                                  // Linha inserida
+                context.SaveChanges();              // Linha inserida
+            }
+        }
+        ...
+
+    . Execute o projeto e verifique no banco se a linha acima foi criada com sucesso na tabela "tag"
+
+    . Quando fazemos a localização de uma ocorrência "context.Tags.FirstOrDefault" o EF traz diversas 
+        informações do banco conhecida como METADADOS (Última atualização, data da criação, versão atual e a
+        que está no banco ). Dessa forma que o EF consegue comparar as informações são alteradas dos DBSet.
+        Por isso precisamos trazer as informações do banco para que o EF possa realizar essas comparações.
+
+Aula 12. Delete
+---------------
+
+    . Altere o método "Main" como abaixo:
+
+        ...
+        static void Main( string[] args ){
+            using( var context = new BlogDataContext() ){
+
+                // var tag = new Tag { Name = "ASP.NET", Slug = "aspnet" };    
+
+                // context.Tags.Add( tag );                                    
+
+                // context.SaveChanges();              
+
+                var tag = context.Tags.FirstOrDefault( x => x == 2 )    
+
+                // tag.Name = ".NET";                                      
+
+                // tag.Slug = "dotnet";                              
+
+                // context.Update( tag )      
+
+                context.Remove( tag );              // Linha inserida
+                context.SaveChanges();              
+            }
+        }
+        ...
+
+    . Execute o projeto e verifique no banco se a linha acima foi criada com sucesso na tabela "tag"
+
+
+Aula 13. ToList
+---------------
+
+
+    . Altere o método "Main" como abaixo:
+
+        . Apague as linhas no interior do método "Main" e substitua pela abaixo:
+
+            ...
+            static void Main( string[] args ){
+                using( var context = new BlogDataContext() ){
+
+                    var tag1 = new Tag { Name = "ASP.NET", Slug = "aspnet" };    
+
+                    context.Tags.Add( tag1 );                                    
+
+                    var tag2 = new Tag { Name = ".NET", Slug = "aspnet" };    
+
+                    context.Tags.Add( tag2 );                                    
+
+                    context.SaveChanges();              
+                }
+            }
+            ...
+
+        . Execute o projeto.
+
+        . Altere o método "Main" novamente.
+
+            ...
+            static void Main( string[] args ){
+                using( var context = new BlogDataContext() ){
+
+                    // var tag1 = new Tag { Name = "ASP.NET", Slug = "aspnet" };    
+
+                    // context.Tags.Add( tag1 );                                    
+
+                    // var tag2 = new Tag { Name = ".NET", Slug = "aspnet" };    
+
+                    // context.Tags.Add( tag2 );                                    
+
+                    // context.SaveChanges();              
+
+                    // Execute o select internamente
+                    var tags = context.Tags.ToList();
+
+                    foreach( var tag in tags ){
+                        System.Console.Write($"{tag.Name}");
+                    }
+                }
+            }
+            ...
+
+        . Execute o projeto.
+
+    . Algumas formas de executar o ToList()
+
+        var tags = context
+                    .Tags
+                    .ToList()
+                    .Where( x => x.Name.Contains(".NET"));  // Neste caso o filtro será aplicado em memória
+                                                            // acarretando em lentidão
+
+        var tags = context
+                    .Tags
+                    .Where( x => x.Name.Contains(".NET"));  // Neste caso o filtro será aplicado no banco no SQL
+                    .ToList();
+
+        . IMPORTANTE: A segunda forma é a mais rápida, dê preferência sempre colocar o "Where(...)" antes do "ToList()".
+
+
+Aula 14. AsNoTracking
+---------------------
+
+    var tags = context
+                .Tags
+                .AsNoTracking()
+                .ToList();
+
+    . O "AsNoTracking" não traz as informações do METADADO. Deixando mais rápido as consultas ao usar "ToList".
+
+    . IMPORTANTE: Quando utilizar ".Update()" ".Remove()" não use "AsNoTracking", porque para essas operações
+                    é necessário que o EF saiba detalhes de chaves, alterações, etc. para efetivar a alteração
+                    no banco.
+
+                
+
+Aula 15. First, Single
+----------------------
+
+    . Diferença entre "FirstOrDefault", "First", "Single"
+
+        . FirtsOrDefaul         - Se tiver mais de um registro no banco o EF trará somente a primeira ocorrência
+        . First                 - Se tiver mais de um registro no banco o EF dará erro
+        . Single                - Idem, dará erro
+
+
+
+OPERAÇÕES BÁSICAS
+-----------------
+
+Aula 16. Introdução
+-------------------
+
