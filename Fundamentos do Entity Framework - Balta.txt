@@ -1,6 +1,9 @@
 Fundamentos do Entity Framework - Balta
 ---------------------------------------
 
+https://www.entityframeworktutorial.net/
+
+
 
 INTRODUÇÃO
 ----------
@@ -862,7 +865,7 @@ Aula 14. AsNoTracking
     . O "AsNoTracking" não traz as informações do METADADO. Deixando mais rápido as consultas ao usar "ToList".
 
     . IMPORTANTE: Quando utilizar ".Update()" ".Remove()" não use "AsNoTracking", porque para essas operações
-                    é necessário que o EF saiba detalhes de chaves, alterações, etc. para efetivar a alteração
+                    precisam saber detalhes de chaves, alterações, etc. para efetivar a alteração
                     no banco.
 
                 
@@ -881,6 +884,64 @@ Aula 15. First, Single
 OPERAÇÕES BÁSICAS
 -----------------
 
-Aula 16. Introdução
--------------------
+Aula 16. DataAnnotations
+------------------------
 
+    . Tipos:
+
+        . Fluent Mapping
+
+            . Mapeamento fluente
+            . Feito em uma classe externa
+            . Não "polui" a classe principal
+            . Não cria dependências na classe/projeto principal
+
+        . Data Annotations
+
+            . Feitos diretamente nas classes
+            . Mais simples e diretos
+            . Depende do System.ComponentModel.DataAnnotations
+                . Alguns dependem do Microsof.EntityFrameworkCore 
+
+
+    System.ComponentModel.DataAnnotations Attributes
+    ------------------------------------------------
+
+    Attribute	        Description
+    ---------           -----------
+    Key	                Can be applied to a property to specify a key property in an entity and make the 
+                        corresponding column a PrimaryKey column in the database.
+    Timestamp	        Can be applied to a property to specify the data type of a corresponding column 
+                        in the database as rowversion.
+    ConcurrencyCheck	Can be applied to a property to specify that the corresponding column should be 
+                        included in the optimistic concurrency check.
+    Required	        Can be applied to a property to specify that the corresponding column is a 
+                        NotNull column in the database.
+    MinLength	        Can be applied to a property to specify the minimum string length allowed in 
+                        the corresponding column in the database.
+    MaxLength	        Can be applied to a property to specify the maximum string length allowed in 
+                        the corresponding column in the database.
+    StringLength	    Can be applied to a property to specify the maximum string length allowed in the 
+                        corresponding column in the database.
+
+    System.ComponentModel.DataAnnotations.Schema Attributes
+    -------------------------------------------------------
+
+    Attribute	        Description
+    ---------           -----------
+    Table	            Can be applied to an entity class to configure the corresponding table name and 
+                        schema in the database.
+    Column	            Can be applied to a property to configure the corresponding column name, order 
+                        and data type in the database.
+    Index	            Can be applied to a property to configure that the corresponding column should 
+                        have an Index in the database. (EF 6.1 onwards only)
+    ForeignKey	        Can be applied to a property to mark it as a foreign key property.
+    NotMapped	        Can be applied to a property or entity class which should be excluded from the 
+                        model and should not generate a corresponding column or table in the database.
+    DatabaseGenerated	Can be applied to a property to configure how the underlying database should 
+                        generate the value for the corresponding column e.g. identity, computed or none.
+    InverseProperty	    Can be applied to a property to specify the inverse of a navigation property that 
+                        represents the other end of the same relationship.
+    ComplexType	        Marks the class as complex type in EF 6. EF Core 2.0 does not support this attribute.
+
+https://www.entityframeworktutorial.net/code-first/table-dataannotations-attribute-in-code-first.aspx
