@@ -910,39 +910,336 @@ Aula 16. DataAnnotations
 
     Attribute	        Description
     ---------           -----------
+
     Key	                Can be applied to a property to specify a key property in an entity and make the 
                         corresponding column a PrimaryKey column in the database.
+
+        using System.ComponentModel.DataAnnotations;
+
+        public class Student
+        {
+            [Key]
+            public int StudentKey { get; set; }
+            public string StudentName { get; set; }
+        }
+
     Timestamp	        Can be applied to a property to specify the data type of a corresponding column 
                         in the database as rowversion.
+
+        EF 6 and EF Core both include the Timestamp data annotation attribute. It can only be applied once 
+        in an entity class to a byte array type property. It creates a column with timestamp data type in 
+        the SQL Server database. Entity Framework API automatically uses this Timestamp column in 
+        concurrency check on the UPDATE statement in the database.
+
+            using System.ComponentModel.DataAnnotations;
+
+                public class Student
+                {
+                    public int StudentId { get; set; }
+                    public string StudentName { get; set; }
+                        
+                    [Timestamp]
+                    public byte[] RowVersion { get; set; }
+                }
+
     ConcurrencyCheck	Can be applied to a property to specify that the corresponding column should be 
                         included in the optimistic concurrency check.
+
+        The ConcurrencyCheck attribute can be applied to one or more properties in an entity class in EF 6 
+        and EF Core. When applied to a property, the corresponding column in the database table will be 
+        used in the optimistic concurrency check using the where clause.
+
+            using System.ComponentModel.DataAnnotations;
+
+            public class Student
+            {
+                public int StudentId { get; set; }
+                
+                [ConcurrencyCheck]
+                public string StudentName { get; set; }
+            }
+
+        In the above example, the ConcurrencyCheck attribute is applied to the StudentName property of the 
+        Student entity class. So, EF will include the StudentName column in the UPDATE statement to check 
+        for optimistic concurrency. Consider the following example.
+
+            using(var context = new SchoolContext()) 
+            {
+                var std = new Student()
+                {
+                    StudentName = "Bill"
+                };
+
+                context.Students.Add(std);
+                context.SaveChanges();
+
+                std.StudentName = "Steve";
+                context.SaveChanges();
+            }
+
+        The above example will execute the following UPDATE statement on SaveChanges(), where it includes 
+        StudentName in the where clause.
+
+            exec sp_executesql N'UPDATE [dbo].[Students]
+            SET [StudentName] = @0
+            WHERE (([StudentId] = @1) AND ([StudentName] = @2))
+            ',N'@0 nvarchar(max) ,@1 int,@2 nvarchar(max) ',@0=N'Steve',@1=1,@2=N'Bill'
+            go            
+
     Required	        Can be applied to a property to specify that the corresponding column is a 
                         NotNull column in the database.
+
+        The Required attribute can be applied to one or more properties in an entity class. EF will 
+        create a NOT NULL column in a database table for a property on which the Required attribute is 
+        applied.
+
+            using System.ComponentModel.DataAnnotations;
+                
+            public class Student
+            {
+                public int StudentID { get; set; }
+                [Required]
+                public string StudentName { get; set; }
+            }
+
+
     MinLength	        Can be applied to a property to specify the minimum string length allowed in 
                         the corresponding column in the database.
+
+        The MinLength attributes allow you to specify additional property validations. It is applied to a 
+        property to specify a minimum number of characters or bytes for the column that the property should map to.
+
+        The following example specifies that the Title column in the Books table must have a minimum length of 5 characters.
+
+            public class Book
+            {
+                public int BookId { get; set; }
+                [MinLength(5)]
+                public string Title { get; set; }
+            }
+
     MaxLength	        Can be applied to a property to specify the maximum string length allowed in 
                         the corresponding column in the database.
+
+        The MaxLength attribute specifies the maximum length of data value allowed for a property which in 
+        turn sets the size of a corresponding column in the database. It can be applied to the string or 
+        byte[] properties of an entity.
+
+            using System.ComponentModel.DataAnnotations;
+                
+            public class Student
+            {
+                public int StudentID { get; set; }
+                [MaxLength(50)]
+                public string StudentName { get; set; }
+                    
+            }
+
     StringLength	    Can be applied to a property to specify the maximum string length allowed in the 
                         corresponding column in the database.
+
+        The StringLength attribute can be applied to the string properties of an entity class. It specifies 
+        the maximum characters allowed for a string property which in turn sets the size of a corresponding 
+        column (nvarchar in SQL Server) in the database.
+
+        using System.ComponentModel.DataAnnotations;
+
+        public class Student
+        {
+            public int StudentID { get; set; }
+            [StringLength(50)]
+            public string StudentName { get; set; }
+        }
+
+
+
 
     System.ComponentModel.DataAnnotations.Schema Attributes
     -------------------------------------------------------
 
     Attribute	        Description
     ---------           -----------
+
     Table	            Can be applied to an entity class to configure the corresponding table name and 
                         schema in the database.
+
+        Table Attribute: [Table(string name, Properties:[Schema = string])
+
+        name: Name of the Db table.
+        Schema: Name of the Db Schema in which a specified table should be created. (Optional)
+        using System.ComponentModel.DataAnnotations.Schema;
+
+        [Table("StudentMaster")]
+        public class Student
+        {
+            public int StudentID { get; set; }
+            public string StudentName { get; set; }
+        }
+
     Column	            Can be applied to a property to configure the corresponding column name, order 
                         and data type in the database.
+
+        [Column (string name, Properties:[Order = int],[TypeName = string])
+
+        name: Name of a column in a db table.
+        Order: Order of a column, starting with zero index. (Optional)
+        TypeName: Data type of a column. (Optional)
+        The following example changes the name of a column.
+
+        using System.ComponentModel.DataAnnotations.Schema;
+
+        public class Student
+        {
+            public int StudentID { get; set; }
+            
+            [Column("Name")]
+            public string StudentName { get; set; }
+            public DateTime? DateOfBirth { get; set; }
+            public byte[] Photo { get; set; }
+            public decimal Height { get; set; }
+            public float Weight { get; set; }
+        }
+
     Index	            Can be applied to a property to configure that the corresponding column should 
                         have an Index in the database. (EF 6.1 onwards only)
+
+        Entity Framework 6 provides the [Index] attribute to create an index on a particular column in the database, 
+        as shown below:
+
+            class Student
+            {
+                public int Student_ID { get; set; }
+                public string StudentName { get; set; }
+                    
+                [Index]
+                public int RegistrationNumber { get; set; }
+            }
+
+        By default, the index name will be IX_{property name}. However, you can change the index name.
+
+        You can also make it a clustered index by specifying IsClustered = true or create a unique index by 
+        specifying IsUnique=true.
+
+            [Index( "INDEX_REGNUM", IsClustered=true, IsUnique=true )]
+            public int RegistrationNumber { get; set; }
+
     ForeignKey	        Can be applied to a property to mark it as a foreign key property.
+
+        The [ForeignKey(name)] attribute can be applied in three ways:
+
+        a. [ForeignKey] on the foreign key property in the dependent entity
+
+            The [ForeignKey] on the foreign key property in the dependent entity and the related navigation property 
+            name can be specified as a parameter as shown below.
+
+                using System.ComponentModel.DataAnnotations.Schema;
+
+                public class Student
+                {
+                    public int StudentID { get; set; }
+                    public string StudentName { get; set; }
+                        
+                    [ForeignKey("Standard")]
+                    public int StandardRefId { get; set; }
+                    public Standard Standard { get; set; }
+                }
+
+                public class Standard
+                {
+                    public int StandardId { get; set; }
+                    public string StandardName { get; set; }
+                    
+                    public ICollection<Student> Students { get; set; }
+                }
+
+            In the above example, the [ForeignKey] attribute is applied on the StandardRefId and specified in the name of 
+            the navigation property Standard. This will create the foreign key column named StandardRefId in the Students 
+            table, preventing the generation of a StandardId column in the database.
+
+        b. [ForeignKey] on the navigation property in the dependent entity
+
+            The [ForeignKey] attribute can be applied to the navigation property and the related foreign key 
+            property name can be specified as shown below.
+
+                using System.ComponentModel.DataAnnotations.Schema;
+
+                public class Student
+                {
+                    public int StudentID { get; set; }
+                    public string StudentName { get; set; }
+                        
+                    public int StandardRefId { get; set; }
+                    
+                    [ForeignKey("StandardRefId")]
+                    public Standard Standard { get; set; }
+                }
+
+                public class Standard
+                {
+                    public int StandardId { get; set; }
+                    public string StandardName { get; set; }
+                    
+                    public ICollection<Student> Students { get; set; }
+                }
+
+            In the above example, the [ForeignKey] attribute is applied on the Standard navigation property and the name 
+            of the foreign key property StandardRefId is specified. This will create the foreign key column named 
+            StandardRefId in the Students table, preventing the generation of a StandardId column in the database.
+
+        c. [ForeignKey] on the navigation property in the principal entity
+
+            The [ForeignKey] attribute can be applied to the navigation property in the principal entity and the related 
+            foreign key property name can be specified in the dependent entity, as shown below.
+
+            using System.ComponentModel.DataAnnotations.Schema;
+
+            public class Student
+            {
+                public int StudentID { get; set; }
+                public string StudentName { get; set; }
+                    
+                public int StandardRefId { get; set; }
+                public Standard Standard { get; set; }
+            }
+
+            public class Standard
+            {
+                public int StandardId { get; set; }
+                public string StandardName { get; set; }
+                
+                [ForeignKey("StandardRefId")]
+                public ICollection<Student> Students { get; set; }
+            }
+
+            In the above example, the [ForeignKey] attribute is applied on the Students navigation property in the principal 
+            entity Standard. This will create a foreign key column StandardRefId in the Students table in the database.
+
     NotMapped	        Can be applied to a property or entity class which should be excluded from the 
                         model and should not generate a corresponding column or table in the database.
+
+        NotMapped Attribute: [NotMapped()]
+
+        using System.ComponentModel.DataAnnotations.Schema;
+
+        public class Student
+        {
+            public int StudentId { get; set; }
+            public string StudentName { get; set; }
+                
+            [NotMapped]
+            public int Age { get; set; }
+        }
+
     DatabaseGenerated	Can be applied to a property to configure how the underlying database should 
                         generate the value for the corresponding column e.g. identity, computed or none.
+
+        https://www.entityframeworktutorial.net/code-first/databasegenerated-dataannotations-attribute.aspx    
+
     InverseProperty	    Can be applied to a property to specify the inverse of a navigation property that 
                         represents the other end of the same relationship.
+
+        https://www.entityframeworktutorial.net/code-first/inverseproperty-dataannotations-attribute-in-code-first.aspx
+
     ComplexType	        Marks the class as complex type in EF 6. EF Core 2.0 does not support this attribute.
 
 https://www.entityframeworktutorial.net/code-first/table-dataannotations-attribute-in-code-first.aspx
