@@ -642,6 +642,7 @@ Aula 8 - DbSet
                 }
             }
 
+        . O código acima é somente como exemplo, porque precisa de algumas configurações no "model"
 
 Aula 9 - Configurando o DAtaContext
 -----------------------------------
@@ -733,7 +734,7 @@ Aula 11. Update
 
                 // context.SaveChanges();              
 
-                var tag = context.Tags.FirstOrDefault( x => x == 2 )    // Linha inserida
+                var tag = context.Tags.FirstOrDefault( x => x.Id == 2 );    // Linha inserida
 
                 tag.Name = ".NET";                                      // Linha inserida
 
@@ -813,6 +814,7 @@ Aula 13. ToList
 
         . Altere o método "Main" novamente.
 
+            using System.Linq;
             ...
             static void Main( string[] args ){
                 using( var context = new BlogDataContext() ){
@@ -849,7 +851,7 @@ Aula 13. ToList
 
         var tags = context
                     .Tags
-                    .Where( x => x.Name.Contains(".NET"));  // Neste caso o filtro será aplicado no banco no SQL
+                    .Where( x => x.Name.Contains(".NET"))  // Neste caso o filtro será aplicado no banco no SQL
                     .ToList();
 
         . IMPORTANTE: A segunda forma é a mais rápida, dê preferência sempre colocar o "Where(...)" antes do "ToList()".
@@ -869,14 +871,18 @@ Aula 14. AsNoTracking
                     precisam saber detalhes de chaves, alterações, etc. para efetivar a alteração
                     no banco.
 
-                
+    . É necessário fazer o import abaixo:
+
+        using Microsoft.EntityFrameworkCore;                
+
+
 
 Aula 15. First, Single
 ----------------------
 
     . Diferença entre "FirstOrDefault", "First", "Single"
 
-        . FirtsOrDefaul         - Se tiver mais de um registro no banco o EF trará somente a primeira ocorrência
+        . FirtsOrDefault        - Se tiver mais de um registro no banco o EF trará somente a primeira ocorrência
         . First                 - Se tiver mais de um registro no banco o EF dará erro
         . Single                - Idem, dará erro
 
