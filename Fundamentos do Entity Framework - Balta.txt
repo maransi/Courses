@@ -856,6 +856,12 @@ Aula 13. ToList
 
         . IMPORTANTE: A segunda forma é a mais rápida, dê preferência sempre colocar o "Where(...)" antes do "ToList()".
 
+        var tags = context
+                    .Tags
+                    .FromSqlRaw($"Select Id, Name, Slug from Tag Where Slug = '{description}'")
+                    .ToList();
+
+
 
 Aula 14. AsNoTracking
 ---------------------
@@ -1238,7 +1244,8 @@ Aula 16. DataAnnotations
 
     DatabaseGenerated	Can be applied to a property to configure how the underlying database should 
                         generate the value for the corresponding column e.g. identity, computed or none.
-
+                        
+        https://www.learnentityframeworkcore.com/configuration/data-annotation-attributes/databasegenerated-attribute
         https://www.entityframeworktutorial.net/code-first/databasegenerated-dataannotations-attribute.aspx    
 
     InverseProperty	    Can be applied to a property to specify the inverse of a navigation property that 
@@ -1249,3 +1256,10 @@ Aula 16. DataAnnotations
     ComplexType	        Marks the class as complex type in EF 6. EF Core 2.0 does not support this attribute.
 
 https://www.entityframeworktutorial.net/code-first/table-dataannotations-attribute-in-code-first.aspx
+
+
+
+https://www.nuget.org/packages/dotnet-ef/#versions-body-tab
+dotnet tool install --global dotnet-ef --version 5.0.17
+
+dotnet add package Microsoft.EntityFrameworkCore.Design
