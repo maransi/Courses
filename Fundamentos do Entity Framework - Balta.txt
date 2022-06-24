@@ -1259,7 +1259,72 @@ https://www.entityframeworktutorial.net/code-first/table-dataannotations-attribu
 
 
 
+# Só pra não esquecer
 https://www.nuget.org/packages/dotnet-ef/#versions-body-tab
 dotnet tool install --global dotnet-ef --version 5.0.17
 
-dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.17
+
+
+Aula 17. Table, Key e Identity
+------------------------------
+
+    . Acesse a classe "Category.cs" e faça as alterações abaixo:
+
+        using System.ComponentModel.DataAnnotations;            // Linha inserida
+        using System.ComponentModel.DataAnnotations.Schema;     // Linha inserida
+
+        namespace Blog.Models
+        {
+            [Table("Category")]                                 // Linha inserida
+            public class Category
+            {
+                [Key]                                           // Linha inserida
+                [DataBaseGenerated(DatabaseGeneratedOption.Identity)]   // Linha inserida
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Slug { get; set; }
+            }
+        }
+
+
+Aula 18. Required, MaxLength e Column
+-------------------------------------
+
+    . Acesse a classe "Category.cs" e faça as alterações abaixo:
+
+        ...
+        namespace Blog.Models
+        {
+            [Table("Category")]                                 
+            public class Category
+            {
+                [Key]                                           
+                [DataBaseGenerated(DatabaseGeneratedOption.Identity)]   
+                public int Id { get; set; }
+
+                [Required]                              // Linha inserida
+                [MinLength(3)]                          // Linha inserida
+                [MaxLength(80)]                         // Linha inserida
+                [Column( "Name", TypeName= "NVARCHAR")] // Linha inserida
+                public string Name { get; set; }
+
+                [Required]                              // Linha inserida
+                [MinLength(3)]                          // Linha inserida
+                [MaxLength(80)]                         // Linha inserida
+                [Column( "Name", TypeName= "VARCHAR")] // Linha inserida
+                public string Slug { get; set; }
+            }
+        }
+
+
+Aula 19. Navigation Properties
+------------------------------
+
+    . Acesse as demais classes do projeto e implemente as "Annotation" conforme acima.
+
+        . User
+
+        . Post
+
+        
