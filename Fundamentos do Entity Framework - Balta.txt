@@ -171,7 +171,7 @@ Aula 2. Ferramentas
     https://docs.microsoft.com/pt-br/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver15#ubuntu
 
 
-    docker container run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Joao3.16"    -p 1433:1433 --name sqlserver --hostname sqlserver    -d mcr.microsoft.com/mssql/server:2019-latest
+    docker container run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=<password>"    -p 1433:1433 --name sqlserver --hostname sqlserver    -d mcr.microsoft.com/mssql/server:2019-latest
     docker container ps -a
     docker container exec -t sqlserver cat /var/opt/mssql/log/errorlog | grep connection
 
@@ -197,7 +197,7 @@ Aula 2. Ferramentas
     # Execute o comando abaixo e substitua o endereço IP do comando "sqlcmd" pelo adquirido no "hostname -I"
     #
     # hostname -I
-    sqlcmd -S 192.168.0.82,1433 -U SA -P "Joao3.16"
+    sqlcmd -S 192.168.0.82,1433 -U SA -P "<password>"
 
 
     # Execute os comandos abaixo dentro do sqlcmd
@@ -620,7 +620,7 @@ Aula 8 - DbSet
                 // public DbSet<UserRole> UserRoles { get; set; }
 
                 protected override void OnConfiguring(DbContextOptionsBuilder options)
-                    => options.UseSqlServer("Server=localhost,1433;Database=Blog;User ID=sa;Password=Joao3.16");
+                    => options.UseSqlServer("Server=localhost,1433;Database=Blog;User ID=sa;Password=<password>");
             }
         }
 

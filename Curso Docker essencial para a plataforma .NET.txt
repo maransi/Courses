@@ -80,7 +80,7 @@ Aula 5. Instalando o Docker
         https://docs.microsoft.com/pt-br/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver15#ubuntu
 
 
-        docker container run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Joao3.16"    -p 1433:1433 --name sql1 --hostname sql1    -d mcr.microsoft.com/mssql/server:2019-latest
+        docker container run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=<password>"    -p 1433:1433 --name sql1 --hostname sql1    -d mcr.microsoft.com/mssql/server:2019-latest
         docker container ps -a
         docker container exec -t sql1 cat /var/opt/mssql/log/errorlog | grep connection
 
@@ -99,7 +99,7 @@ Aula 5. Instalando o Docker
         echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
         source ~/.bashrc
         hostname -I
-        sqlcmd -S 192.168.0.82,1433 -U SA -P "Joao3.16"
+        sqlcmd -S 192.168.0.82,1433 -U SA -P "<password>"
 
 
 Aula 6. Instalando o .NET Core SDK
@@ -772,7 +772,7 @@ Aula 25. Criando Volums: Database MySQL.
 
     . Configuração do volume para o banco de dados SQL Server:
 
-        docker run -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=Joao3.16' -p 1433:1433 -v sqlvolume:/var/opt/mssql -d mcr.microsoft.com/mssql/server:2019-latest    
+        docker run -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=<password>' -p 1433:1433 -v sqlvolume:/var/opt/mssql -d mcr.microsoft.com/mssql/server:2019-latest    
 
 
 Aula 26. Ajustar aplicação MVC com EF Core e acessar MySQL
