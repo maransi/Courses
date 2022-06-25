@@ -1480,3 +1480,187 @@ Aula 19. Navigation Properties
                 }
             }
         
+        . Se quiser podemos anotar a "ForeignKey" diretamente nas propriedades que representa as classes, 
+            informando o nome do campo chave para fazer o relacionamento:
+
+            ...
+            public int CategoryId { get; set; }
+
+            [ForeignKey("CategoryId")]
+            public Category Category {get; set;}
+
+            public int AuthorId { get; set; }
+
+            [ForeignKey("AuthorId")]
+            public User Author {get; set;}
+            ...
+
+        . Nesse caso podemos comentar as propriedades "CategoryId" e "AuthorId", porém as DMLs fabricadas
+            terão "LEFT JOIN" e não "INNER JOIN" nos critérios de relacionamento:
+
+            ...
+            // public int CategoryId { get; set; }
+
+            [ForeignKey("CategoryId")]
+            public Category Category {get; set;}
+
+            // public int AuthorId { get; set; }
+
+            [ForeignKey("AuthorId")]
+            public User Author {get; set;}
+            ...
+
+    . Insira o método abaixo na classe "Program.cs":
+
+        ...
+        private static void InsertPost(){
+
+            using var context = new BlogDataContext();
+
+            var user = new User
+            {
+                Name = "André Baltieri",
+                Slug = "andrebaltieri",
+                Email = "andre@balta.io",
+                Bio = "9x Microsoft MVP",
+                Image = "https://balta.io",
+                PasswordHash = "123098457"
+            };
+            
+            var category = new Category {Name = "Backend", Slug = "backend"};
+            
+            var post = new Post
+            {
+                Author = user,
+                Category = category,
+                Body = "<p>Hello world</p>",
+                Slug = "comecando-com-ef-core",
+                Summary = "Neste artigo vamos aprender EF core",
+                Title = "Começando com EF Core",
+                CreateDate = DateTime.Now,
+                LastUpdateDate = DateTime.Now,
+            };
+            
+            context.Posts.Add(post); // Não adicionei autor nem categoria
+            context.SaveChanges();            
+        }
+        ...
+
+    . Insira a linha abaixo no método "Main" da classe "Program.cs", execute e veja o resultado
+
+        ...
+        class Program
+        {
+            static void Main(string[] args)
+            {
+                ...
+                InsertPost();
+                ...
+            }
+        }
+        ...
+
+
+Aula 20. Include
+----------------
+
+    . Insira o método abaixo na classe "Program.cs":
+
+        ...
+        private static void GetAllPost()
+        {
+            using( var context = new BlogDataContext() ){
+                // var posts = context
+                //             .Posts
+                //             .ToList();
+                var posts = context
+                    .Posts
+                    .AsNoTracking()
+                    .Include(x => x.Author)
+                    .Include(x => x.Category)
+                    .OrderBy(x => x.LastUpdateDate)
+                    .ToList();                                
+
+                foreach( Post post in posts ){
+                    System.Console.WriteLine($"{post.Id} - {post.Title} - {post.Author.Name} - {post.Category.Name} - {post.LastUpdateDate}");
+                }
+            }
+        }
+        ...
+
+        . Por padrão o Entity Framework utiliza o conceito LAZY LOAD (Carregar os objetos dependentes quando realmente 
+            for necessário), onde não carrega as informações dos objetos filho associado ao objeto pai.
+
+        . Para resgatar os valores desses objetos dependentes precisamos utilizar o método ".include( x => x.<class> )"
+
+        . Outra maneira de evitar erros durante a execução é colocar o caracter de interrogação "?" ao lado do nome da classe:
+
+            ...
+            foreach( Post post in posts ){
+                System.Console.WriteLine($"{post.Id} - {post.Title} - {post.Author?.Name} - {post.Category?.Name} - {post.LastUpdateDate}");
+            }                                                                     |                       |  
+            ...                                                                   +-----------------------+-----> Evita erro em tempo de compilação
+                                                                                                                  qdo tiver valor nulo
+
+    . Insira a linha abaixo no método "Main" da classe "Program.cs", execute e veja o resultado
+
+        ...
+        class Program
+        {
+            static void Main(string[] args)
+            {
+                ...
+                GetAllPost();
+                ...
+            }
+        }
+        ...
+
+
+Aula 21. Log
+------------
+
+    . Altere o método "onConfiguring" da classe "BlogDataContext.cs" como abaixo:
+
+        ...
+        protected override void OnConfiguring( DbContextOptionsBuilder options ){
+            options.UseSqlServer("Server=localhost,1433;Database=Blog;User ID=sa;Password=Joao3.16");            
+            options.LogTo( Console.WriteLine );
+        }
+        ...
+    
+    . Execute o projeto e verifique se as DML estão saindo no log do terminal.
+
+    . Existe a propriedade ".ThenInclude( x => x.<class> )" para pegar a propriedade de um objeto do filho
+   
+
+Aula 22. Alterando um subconjunto
+---------------------------------
+
+    . Crie o método "UpdatePostAuthorName" na classe "Program.cs":
+
+        ...
+        private static void UpdatePostAuthorName(){
+            var post = context
+                .Posts
+                .Include(x => x.Author)
+                .Include(x => x.Category)
+                .OrderBy(x => x.LastUpdateDate)
+                .FirstOrDefault(); // Pegando o primeiro item
+            
+            post.Author.Name = "Uncle Bob";
+            
+            context.Posts.Update(post);
+            context.SaveChanges();
+        }
+        ...
+
+    . Faça a chamada deste método no método "Main":
+
+        ...
+        UpdatePostAuthorName();
+        ...
+
+    . Execute o projeto e verifique se o conteúdo do campo "Name" do "Author" foi alterado com sucesso.
+
+    
