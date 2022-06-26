@@ -1164,13 +1164,6 @@ https://www.entityframeworktutorial.net/code-first/table-dataannotations-attribu
 
 
 
-# Só pra não esquecer
-https://www.nuget.org/packages/dotnet-ef/#versions-body-tab
-dotnet tool install --global dotnet-ef --version 5.0.17
-
-dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.17
-
-
 Aula 17. Table, Key e Identity
 ------------------------------
 
@@ -1663,4 +1656,111 @@ Aula 22. Alterando um subconjunto
 
     . Execute o projeto e verifique se o conteúdo do campo "Name" do "Author" foi alterado com sucesso.
 
-    
+
+Aula 23. Introdução
+-------------------    
+
+    . Acesse todos as classes models e retire todas as "annotations"
+
+
+Aula 24. Iniciando o Mapeamento
+-------------------------------
+
+    . Pesquisar mais sobre "Fluent Mapping":
+
+        https://www.entityframeworktutorial.net/efcore/fluent-api-in-entity-framework-core.aspx
+        https://www.learnentityframeworkcore.com/configuration/fluent-api
+
+    . Crie a pasta "Mappings" na pasta "Data" do projeto.
+
+    . Crie a classe "CategoryMap.cs" dentro da pasta "Mapping" com o código abaixo:
+
+        namespace Blog.Data.Mappings{
+
+            public class CategoryMap{
+                public void Configuration( EntityTypeBuilder<Category> builder){
+                    builder.ToTable("Category");
+                }
+            }
+        }
+
+
+Aula 25. Chave Primária e Identity
+----------------------------------
+
+    . Altere a classe "CategoryMap.cs" com o código abaixo:
+
+        namespace Blog.Data.Mappings{
+
+            public class CategoryMap{
+                public void Configuration( EntityTypeBuilder<Category> builder){
+                    builder.ToTable("Category");
+
+                    // Chave Primária
+                    builder.HasKey( x => x.Id );        // Linha inserida
+
+                    // Identity
+                    builder.Property( x => x.Id )
+                            .ValueGeneratedOnAdd()
+                            .UseIdentityColumn();
+                }
+            }
+        }
+
+
+Aula 26. Mapeando Propriedades
+------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Aula . Iniciando o Mapeamento
+-------------------------------
+
+    . Apague o database "balta" do banco de dados com os comandos abaixo:
+
+        USE [master]
+        GO
+
+        ALTER DATABASE [Blog] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+        GO
+
+        DROP DATABASE [Blog]
+        GO
+
+    . Acesse a classe "Program.cs", apague todo o conteúdo do corpo do método "Main" e todos os métodos dela.
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        # https://www.nuget.org/packages/dotnet-ef/#versions-body-tab
+        dotnet tool install --global dotnet-ef --version 5.0.17
+
+        # dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.17
+
+
+Aula 25. Criando uma Migração
+-----------------------------
+
