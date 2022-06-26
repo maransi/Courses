@@ -1668,8 +1668,11 @@ Aula 24. Iniciando o Mapeamento
 
     . Pesquisar mais sobre "Fluent Mapping":
 
+        https://www.tektutorialshub.com/entity-framework-core/ef-core-fluent-api/
         https://www.entityframeworktutorial.net/efcore/fluent-api-in-entity-framework-core.aspx
         https://www.learnentityframeworkcore.com/configuration/fluent-api
+        https://geeksarray.com/blog/using-fluent-api-in-efcore-code-first
+        https://www.c-sharpcorner.com/article/entity-framework-core-code-first-approach-with-fluent-api/
 
     . Crie a pasta "Mappings" na pasta "Data" do projeto.
 
@@ -1677,8 +1680,8 @@ Aula 24. Iniciando o Mapeamento
 
         namespace Blog.Data.Mappings{
 
-            public class CategoryMap{
-                public void Configuration( EntityTypeBuilder<Category> builder){
+            public class CategoryMap: IEntityTypeConfiguration<Category>{
+                public void Configure( EntityTypeBuilder<Category> builder){
                     builder.ToTable("Category");
                 }
             }
@@ -1692,15 +1695,15 @@ Aula 25. Chave Primária e Identity
 
         namespace Blog.Data.Mappings{
 
-            public class CategoryMap{
-                public void Configuration( EntityTypeBuilder<Category> builder){
-                    builder.ToTable("Category");
-
+            public class CategoryMap: IEntityTypeConfiguration<Category>{
+                public void Configure( EntityTypeBuilder<Category> builder){
+                    ...
+                    
                     // Chave Primária
                     builder.HasKey( x => x.Id );        // Linha inserida
 
                     // Identity
-                    builder.Property( x => x.Id )
+                    builder.Property( x => x.Id )       // Linha inserida
                             .ValueGeneratedOnAdd()
                             .UseIdentityColumn();
                 }
@@ -1711,12 +1714,55 @@ Aula 25. Chave Primária e Identity
 Aula 26. Mapeando Propriedades
 ------------------------------
 
+    . Acesse a classe "CategoryMap.cs" e insira as linhas abaixo:
 
 
 
+        namespace Blog.Data.Mappings: IEntityTypeConfiguration<Category>{
+
+            public class CategoryMap{
+                public void Configure( EntityTypeBuilder<Category> builder){
+                    ...
+    
+                    // Propriedades
+                    builder.Property(x => x.Name)       // Linha inserida
+                        .IsRequired()
+                        .HasColumnName("Name")
+                        .HasColumnType("NVARCHAR")
+                        .HasMaxLength(80);
+
+                    builder.Property(x => x.Slug)       // Linha inserida
+                        .IsRequired()
+                        .HasColumnName("Slug")
+                        .HasColumnType("VARCHAR")
+                        .HasMaxLength(80);    
+                }
+            }
+        }
 
 
+Aula 27. Indíces
+----------------
 
+    . Acesse a classe "CategoryMap.cs" e insira as linhas abaixo:
+
+        namespace Blog.Data.Mappings: IEntityTypeConfiguration<Category>{
+
+            public class CategoryMap{
+                public void Configure( EntityTypeBuilder<Category> builder){
+                    ...
+                    // Índices
+                    builder                             // Linha inserida
+                        .HasIndex(x => x.Slug, "IX_Category_Slug")
+                        .IsUnique();
+                    ...
+                    }
+                }
+            }
+
+
+Aula 28. Iniciando o mapeamento do User
+---------------------------------------
 
 
 
