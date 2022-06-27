@@ -1764,27 +1764,371 @@ Aula 27. Indíces
 Aula 28. Iniciando o mapeamento do User
 ---------------------------------------
 
+    . Acesse a classe "User.cs" e implemente os métodos abaixo:
+
+        namespace Blog.Models
+        {
+            public class User
+            {
+                ...
+                public IList<Post> Posts {get; set; }       // Linha Inserida
+
+                public IList<Role> Roles {get; set;}        // Linha Inserida
+            }
+        }
+
+    . Acesse a classe "Post" e implemente os métodos abaixo:
+
+        namespace Blog.Models
+        {
+            public class Post
+            {
+                ...
+                public IList<Tag> Tags { get; set; }        // Linha inserida
+            }
+        }
+
+    . Acesse a classe "Tag" e implemente os métodos abaixo:
+
+        namespace Blog.Models
+        {
+            public class Tag
+            {
+                ...
+
+                public IList<Post> Posts { get; set; }      // Linha inserida
+            }
+        }
+
+    . Acesse a classe "Role" e implemente o código abaixo:
+
+        namespace Blog.Models
+        {
+            public class Role
+            {
+                ...
+
+                public IList<User> Users {get; set;}        // Linha Inserida
+            }
+        }
+
+    . Crie a classe "UserMap.cs" na pasta "Data.Mappings":
+
+        using System.Collections.Generic;
+        using Blog.Models;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+        namespace Blog.Data.Mappings
+        {
+            public class UserMap : IEntityTypeConfiguration<User>
+            {
+                public void Configure(EntityTypeBuilder<User> builder)
+                {
+                    // Tabela
+                    builder.ToTable("User");
+
+                    // Chave Primária
+                    builder.HasKey(x => x.Id);
+
+                    // Identity
+                    builder.Property(x => x.Id)
+                        .ValueGeneratedOnAdd()
+                        .UseIdentityColumn();
+
+                    // Propriedades
+                    builder.Property(x => x.Name)
+                        .IsRequired()
+                        .HasColumnName("Name")
+                        .HasColumnType("NVARCHAR")
+                        .HasMaxLength(80);
+
+                    builder.Property(x => x.Bio);
+                    builder.Property(x => x.Email);
+                    builder.Property(x => x.Image);
+                    builder.Property(x => x.PasswordHash);
+
+                    builder.Property(x => x.Slug)
+                        .IsRequired()
+                        .HasColumnName("Slug")
+                        .HasColumnType("VARCHAR")
+                        .HasMaxLength(80);
+
+                    // Índices
+                    builder
+                        .HasIndex(x => x.Slug, "IX_User_Slug")
+                        .IsUnique();
+                }
+            }
+        }    
+
+
+Aula 29. Default Values
+-----------------------
+
+    . Crie a classe "PostMap.cs" com o código abaixo na pasta "Data.Mapping":
+
+        using System;
+        using System.Collections.Generic;
+        using Blog.Models;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+        namespace Blog.Data.Mappings
+        {
+            public class PostMap : IEntityTypeConfiguration<Post>
+            {
+                public void Configure(EntityTypeBuilder<Post> builder)
+                {
+                    // Tabela
+                    builder.ToTable("Post");
+
+                    // Chave Primária
+                    builder.HasKey(x => x.Id);
+
+                    // Identity
+                    builder.Property(x => x.Id)
+                        .ValueGeneratedOnAdd()
+                        .UseIdentityColumn();
+
+                    // Propriedades
+                    builder.Property(x => x.LastUpdateDate)
+                        .IsRequired()
+                        .HasColumnName("LastUpdateDate")
+                        .HasColumnType("SMALLDATETIME")
+                        .HasMaxLength(60)
+                        .HasDefaultValueSql("GETDATE()");           // <--- Valor Default
+                    // .HasDefaultValue(DateTime.Now.ToUniversalTime());    // <-- Valor Default
+
+                    // Índices
+                    builder
+                        .HasIndex(x => x.Slug, "IX_Post_Slug")
+                        .IsUnique();
+
+                }
+            }
+        }
+
+        . Abaixo as linhas utilizadas para criar um valor padrão/default, foi dado preferência
+            a função nativa do banco "GETDATE()" ao invés da função C#
+        
+            .HasDefaultValueSql("GETDATE()");           // <--- Valor Default
+            // .HasDefaultValue(DateTime.Now.ToUniversalTime());    // <-- Valor Default
+
+
+Aula 30. Relacionamento Um para Muitos
+--------------------------------------
+
+    . Acesse a classe "PostMap.cs" e insira as linhas abaixo:
+
+        namespace Blog.Data.Mappings
+        {
+            public class PostMap : IEntityTypeConfiguration<Post>
+            {
+                public void Configure(EntityTypeBuilder<Post> builder)
+                {
+                    ...
+
+                    // Relacionamentos                              // Linhas inseridas
+                    builder
+                        .HasOne(x => x.Author)
+                        .WithMany(x => x.Posts)
+                        .HasConstraintName("FK_Post_Author")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    builder
+                        .HasOne(x => x.Category)
+                        .WithMany(x => x.Posts)
+                        .HasConstraintName("FK_Post_Category")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                }
+            }
+        }
+
+
+Aula 31. Relacionamento Muitos para Muitos
+------------------------------------------
+
+    . Acesse a classe "PostMap.cs" e insira as linhas abaixo:
+
+        namespace Blog.Data.Mappings
+        {
+            public class PostMap : IEntityTypeConfiguration<Post>
+            {
+                public void Configure(EntityTypeBuilder<Post> builder)
+                {
+                    ...
+                    // Relacionamentos                              // Linhas Inseridas
+                    builder
+                        .HasMany(x => x.Tags)
+                        .WithMany(x => x.Posts)
+                        .UsingEntity<Dictionary<string, object>>(       // Representação do relacionamento muitos para muitos
+                            "PostTag",
+                            post => post
+                                .HasOne<Tag>()
+                                .WithMany()
+                                .HasForeignKey("PostId")
+                                .HasConstraintName("FK_PostRole_PostId")
+                                .OnDelete(DeleteBehavior.Cascade),
+                            tag => tag
+                                .HasOne<Post>()
+                                .WithMany()
+                                .HasForeignKey("TagId")
+                                .HasConstraintName("FK_PostTag_TagId")
+                                .OnDelete(DeleteBehavior.Cascade));
+                }
+            }
+        }
+    
+
+        . Para representar a classe de relacionamento "muitos para muitos" utilizamos o código 
+            abaixo:
+
+            .UsingEntity<Dictionary<string, object>>(
+                "PostTag",
+                post => post
+                    .HasOne<Tag>()
+                    .WithMany()
+                    .HasForeignKey("PostId")
+                    .HasConstraintName("FK_PostRole_PostId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                tag => tag
+                    .HasOne<Post>()
+                    .WithMany()
+                    .HasForeignKey("TagId")
+                    .HasConstraintName("FK_PostTag_TagId")
+                    .OnDelete(DeleteBehavior.Cascade));
+
+        . Para se ter acesso ao Objeto "Dictionary" fazemos a seguinte importação:
+
+            using System.Collections.Generic;
+
+
+Aula 32. Utilizando os Mapeamentos Criados
+------------------------------------------
+
+    . Acesse a classe "UserMap.cs" e implemente o código abaixo:
+
+        namespace Blog.Data.Mappings
+        {
+            public class UserMap : IEntityTypeConfiguration<User>
+            {
+                public void Configure(EntityTypeBuilder<User> builder)
+                {
+                    ...
+                    // Relacionamentos
+                    builder
+                        .HasMany(x => x.Roles)
+                        .WithMany(x => x.Users)
+                        .UsingEntity<Dictionary<string, object>>(
+                            "UserRole",
+                            role => role
+                                .HasOne<Role>()
+                                .WithMany()
+                                .HasForeignKey("RoleId")
+                                .HasConstraintName("FK_UserRole_RoleId")
+                                .OnDelete(DeleteBehavior.Cascade),
+                            user => user
+                                .HasOne<User>()
+                                .WithMany()
+                                .HasForeignKey("UserId")
+                                .HasConstraintName("FK_UserRole_UserId")
+                                .OnDelete(DeleteBehavior.Cascade));
+                }
+            }
+        }
+
+    . Acesse a classe "BlogDataContext.cs" e verifique se a declaração dos "DbSet" estão conforme abaixo:
+
+        using Blog.Data.Mappings;               // Linha inserida
+        using Blog.Models;                      // Linha Inserida
+        using Microsoft.EntityFrameworkCore;
+
+        namespace Blog.Data
+        {
+            public class BlogDataContext : DbContext
+            {
+                public DbSet<Category> Categories { get; set; }
+
+                public DbSet<Post> Posts { get; set; }
+
+                public DbSet<User> Users { get; set; }
+
+
+                ...
+
+                protected override void OnModelCreating(ModelBuilder modelBuilder)      // Método inserido
+                {
+                    modelBuilder.ApplyConfiguration(new CategoryMap());
+                    modelBuilder.ApplyConfiguration(new UserMap());
+                    modelBuilder.ApplyConfiguration(new PostMap());
+                }                
+            }
+        }
+
+
+Aula 33. Testando os relacionamentos
+------------------------------------
+
+    . Acesse a classe "Program.cs" e implemente o código abaixo no método "Main":
+
+        using Blog.Data;
+
+        namespace Blog
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    using var context = new BlogDataContext();
+
+                    context.Users.Add( new User{
+                                                Name = "André Baltieri",
+                                                Slug = "andrebaltieri",
+                                                Email = "andre.baltieri@balta.io",
+                                                Bio = "9x Microsoft MVP",
+                                                Image = "https://balta.io",
+                                                PasswordHash = "123098456"
+                                            });
+                    
+                    context.SaveChanges();
+                }
+            }
+        }
+
+    . Execute o projeto e verifique se o "User" acima foi criado no banco
+
+    . Comente o insert do "User" acima e implemente as linhas abaixo no método "Main":
+
+        ...
+        var user = context.Users.FindOrDefault();
+
+        var post = new Post{
+            Author = user,
+            Body = "Meu Artigo",
+            Catgory = new Category{ Name = "Backend",
+                                    Slug = "backend"
+                            },
+            CreateDate = System.DateTime.Now,
+            Slug = "meu-artigo",
+            Summary = "Neste artigo vamos conferir...",
+            Title = "Meu Artigo"
+        }
+
+        context.Posts.add( post );
+        context.SaveChanges();
+
+        . As propriedades "LastUpdateDate" e "Tags" não foram informadas para testar os valores "DEfault".
+
+
+    . Execute o projeto e verifique se o "User", "Category" e "Post" foram criadas no banco
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Aula . Iniciando o Mapeamento
--------------------------------
+Aula 34. Introdução a Relacionamentos
+-------------------------------------
 
     . Apague o database "balta" do banco de dados com os comandos abaixo:
 
@@ -1807,6 +2151,6 @@ Aula . Iniciando o Mapeamento
         # dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.17
 
 
-Aula 25. Criando uma Migração
+Aula 35. Criando uma Migração
 -----------------------------
 
