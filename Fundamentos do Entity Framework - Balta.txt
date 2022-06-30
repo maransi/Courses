@@ -1991,6 +1991,11 @@ Aula 31. Relacionamento Muitos para Muitos
 
     . Acesse a classe "PostMap.cs" e insira as linhas abaixo:
 
+https://www.learnentityframeworkcore.com/configuration/many-to-many-relationship-configuration
+https://www.thereformedprogrammer.net/updating-many-to-many-relationships-in-ef-core-5-and-above/
+https://dev.to/ruben_j/many-to-many-relations-in-entity-framework-core-3-1-and-5-59ei
+
+
         namespace Blog.Data.Mappings
         {
             public class PostMap : IEntityTypeConfiguration<Post>
@@ -2141,7 +2146,7 @@ Aula 33. Testando os relacionamentos
     . Comente o insert do "User" acima e implemente as linhas abaixo no método "Main":
 
         ...
-        var user = context.Users.FindOrDefault();
+        var user = context.Users.FindOrDefault<User>();
 
         var post = new Post{
             Author = user,
@@ -2153,7 +2158,7 @@ Aula 33. Testando os relacionamentos
             Slug = "meu-artigo",
             Summary = "Neste artigo vamos conferir...",
             Title = "Meu Artigo"
-        }
+        };
 
         context.Posts.add( post );
         context.SaveChanges();
