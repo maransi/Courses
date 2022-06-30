@@ -2192,9 +2192,89 @@ Aula 34. Introdução a Relacionamentos
         # https://www.nuget.org/packages/dotnet-ef/#versions-body-tab
         dotnet tool install --global dotnet-ef --version 5.0.17
 
-        # dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.17
+        dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.9
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo para testar a instação do "dotnet-ef":
+
+        dotnet ef
 
 
 Aula 35. Criando uma Migração
 -----------------------------
 
+    . Acesse a pasta raiz do projeto e execute as linhas abaixo:
+
+        dotnet clean
+
+        dotnet build
+
+        dotnet ef migrations add InitialCreation
+
+
+Aula 36. Atualizando o banco
+----------------------------
+
+    . Acesse a pasta raiz do projeto e execute as linhas abaixo:
+
+        dotnet ef database update
+
+    . Acesse o banco de dados pelo Azure Studio e verifique se o database foi criado com 
+        sucesso, juntamente com as tabelas.
+
+    . A medida que nossas classes de entidades vão sendo alteradas podemos criar um novo script
+        de alteração de banco com o comando abaixo:
+
+        dotnet ef migrations add <nome do script>
+
+    . Para apagar um script utilize o comando abaixo:
+
+        # O comanda abaixo irá remover a última migração
+        dotnet ef migrations remove  
+
+
+Aula 37. Gerando uma nova versão do banco
+-----------------------------------------
+
+    . Acesse a classe "User" e inclua a propriedade abaixo:
+
+        ...
+        public string GitHub { get; set; }
+        ...
+
+    . Acesse a classe "UserMap" e inclua a propriedade abaixo:
+
+        ...
+        builder.Property(x => x.Bio);
+        builder.Property(x => x.Email);
+        builder.Property(x => x.Image);
+        builder.Property(x => x.PasswordHash);
+
+        builder.Property( x => x.GitHub );          // Linha inserida
+
+        builder.Property(x => x.Slug)
+            .IsRequired()
+            .HasColumnName("Slug")
+            .HasColumnType("VARCHAR")
+            .HasMaxLength(80);
+        ...
+
+    . Acesse a pasta raiz do projeto e execute as linhas abaixo:
+
+        dotnet clean
+
+        dotnet build
+
+        dotnet ef migrations add AdicionadoCampoGitHub
+
+        dotnet ef database update 
+
+    . Acesse o banco de dados e verifique se o campo "GitHub" foi criado com sucesso
+
+
+Aula 38. Gerando o script do banco
+----------------------------------
+
+
+
+
+    
