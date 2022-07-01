@@ -2274,7 +2274,201 @@ Aula 37. Gerando uma nova versão do banco
 Aula 38. Gerando o script do banco
 ----------------------------------
 
-
-
-
+    . Para desabilitar a migração, basta:
     
+        . Apagar a pasta "Migrations".
+        
+        . Apagar a tabela "__EFMigrationsHistory"
+        
+        . Apagar a biblioteca "Design":
+
+            dotnet add package Microsoft.EntityFrameworkCore.Design    
+
+    . Apague o database "balta" do banco de dados com os comandos abaixo:
+
+        USE [master]
+        GO
+
+        ALTER DATABASE [Blog] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+        GO
+
+        DROP DATABASE [Blog]
+        GO
+
+    . Acesse a pasta raiz do projeto e execute as linhas abaixo:
+
+        dotnet clean
+
+        dotnet build
+
+        dotnet ef migrations add InitialCreation
+
+    . Execute o comando abaixo para gerar o script:
+
+        dotnet ef migrations script -o ./script.sql
+
+        . O comando acima irá criar na pasta raiz do projeto o arquivo "script.sql"
+
+    . Acesse o "Azure Data Studio" digite as linhas abaixo, copie o conteúdo do "script.sql" abaixo das
+        linhas e execute os comandos:
+
+        CREATE DATABASE Blog
+        GO
+
+        USE Blog
+        GO
+
+        # Copie o script daqui em diante
+
+    . Acesse o database "Blog" e verifique se todas as tabelas foram criadas com sucesso:
+
+
+Aula 39. AsNoTracking
+---------------------
+
+    . Toda vez que o sistema requisita informações do banco de dados via Entity Framework, o ORM mantém na 
+        memória objetos adicionais a fim de manter a rastreabilidade (tracking) de mudanças nos objetos 
+        resgatados da base de dados, a fim de saber se um comando “UPDATE” precisa realmente ser executado 
+        caso o método “SaveChanges” seja chamado.
+
+    . Caso em rotinas do sistema que você está desenvolvendo existam operações apenas “readonly”, recomendo 
+        que utilize o método AsNoTracking.
+
+
+Aula 40. Async e Await - Processamento em paralelo
+--------------------------------------------------
+
+    . await     Informa que o processamento deve retornar ao chamador e retornar ao processamento corrente 
+                quando ele terminar
+
+    . async     Sempre que for necessário usar o "await" é obrigatório identificar no método que ele é 
+                assincrono "async"
+
+    . .<metodo>Async  Para fazer uso do processamento assincrono é necessário executar um método que 
+                        termine com "Async", por exemplo: "ToLisAsync()", ".FirstOrDefaultAsync()", etc. 
+
+    . Material complementar:
+
+        https://www.youtube.com/watch?v=sYBhpA-ZEHI
+        https://www.youtube.com/watch?v=LdkoxF_2k8Y
+
+    . Acesse o banco de dados e dê carga na tabela "Category" caso não tenho registros:
+
+        INSERT INTO Category( Name, Slug )
+        VALUES('FICCAO', 'ficcao'),
+                ('ACAO', 'acao'),
+                ('COMEDIA', 'comedia'),
+                ('SUSPENSE', 'suspense'),
+                ('POLICIAL', 'policial'),
+                ('RELIGIOSO', 'religioso'),
+                ('FANTASIA','fantasia'),
+                ('FAROESTE', 'faroeste')
+
+    . Acesse a classe "Program.cs" e insira o método abaixo:
+
+        ...
+        private static void GetAllCategory()
+        {
+            using( var context = new BlogDataContext()){
+                var categories = context
+                                .Categories
+                                .ToList();
+
+
+                categories.ForEach( item => { 
+                    System.Console.WriteLine($"{item.Id} - {item.Name} - {item.Slug}");
+                } );
+            }
+        }
+
+        ...
+
+    . Acesse o método "Main" e insira a chamada do método acima:
+
+        ...
+        GetAllCategory()
+
+        System.Console.Write("Aguardando...");
+
+        System.Console.ReadLine();
+
+        ...
+
+    . Execute o projeto:
+
+        . Perceba que a execução foi sincrona, que a mensagem "Aguardando..." só veio após a conclusão
+            do método "GetAllCategory".
+
+        . O resultado da saida foi:
+
+            Entity Framework In Action
+
+            19 - FICCAO - ficcao
+            20 - ACAO - acao
+            21 - COMEDIA - comedia
+            22 - SUSPENSE - suspense
+            23 - POLICIAL - policial
+            24 - RELIGIOSO - religioso
+            25 - FANTASIA - fantasia
+            26 - FAROESTE - faroeste
+
+            Aguardando...    
+
+    . Transformando um método sincrono para assíncrono:
+
+        . Acrescente ao método "GetAllCategory" a palavra "async", sempre que acrescentamos a palavra
+            "async" na declaração do método somos obrigado colocar a palavra "await" em alguma chamada
+            dentro do método como veremos no próximo ponto:
+
+            ...
+            private async static void GetAllCategory(){
+                ...
+            }        
+
+        . Acrescente a chamada da lista de categoria a palavra "await" e altere o método
+            ".ToList()" por ".ToListAsync()"
+
+            ...
+            var categories = await context
+                                    .Categories
+                                    .ToListAsync();
+
+        . O método "GetAllCategory()" deverá ficar como abaixo:
+
+            private async static void GetAllCategory()
+            {
+                using( var context = new BlogDataContext()){
+                    var categories = await context
+                                        .Categories
+                                        .ToListAsync();
+
+
+                    categories.ForEach( item => { 
+                        System.Console.WriteLine($"{item.Id} - {item.Name} - {item.Slug}");
+                    } );
+                }
+            }
+
+        . Execute o projeto e verifique o resultado da saída:
+
+            Entity Framework In Action
+            Aguardando...
+            19 - FICCAO - ficcao
+            20 - ACAO - acao
+            21 - COMEDIA - comedia
+            22 - SUSPENSE - suspense
+            23 - POLICIAL - policial
+            24 - RELIGIOSO - religioso
+            25 - FANTASIA - fantasia
+            26 - FAROESTE - faroeste
+
+        . Perceba que a mensagem "Aguardando..." agora veio antes da lista exibida de categorias. Isto 
+            ocorreu porque assim que foi executado o método assincrono abaixo, o fluxo do programa
+            retorno para o método chamador "Main", que exibiu a mensagem "Aguardando..." e ficou 
+            aguardando algum pressionar de teclas. Assim que o método abaixo retornou o resultado
+            o fluxo retornou a esse ponto e deu continuidade ao fluxo do programa deste ponto em diante.
+
+            var categories = await context
+                                .Categories
+                                .ToListAsync();
+
