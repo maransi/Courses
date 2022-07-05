@@ -1901,7 +1901,7 @@ Aula 28. Iniciando o mapeamento do User
             }
         }    
 
-// PAREI AQUI
+
 Aula 29. Default Values
 -----------------------
 
@@ -2472,3 +2472,53 @@ Aula 40. Async e Await - Processamento em paralelo
                                 .Categories
                                 .ToListAsync();
 
+
+Aula 41.  Eager Loading vs Lazy Loading
+---------------------------------------
+
+    . Retorne ao resumo da aula (Aula 20. Include) e faça uma recapitulação.
+
+    . Lazy Loading      Carregamento é feito apenas no momento em que o método que disponibiliza o dado 
+                        associativo é chamado
+
+    . Eager Loading     Carregamento imediato quando o objeto principal é carregado
+
+    . No exemplo da aula anterior se não fazermos nenhuma menção a lista de "Posts" o EF deixará a carga
+        dos "Posts" como "LAZY":
+
+        var categories = await context
+                                .Categories
+                                .ToListAsync();
+
+        . O SQL derivado da linha de código acima será:
+
+            SELECT [c].[Id], [c].[Name], [c].[Slug]
+            FROM [Category] AS [c]        
+
+    . Para que o "join" seja feito é necessário realizar o "Include" na chamada:
+
+        var categories = await context
+                        .Categories
+                        .Include( x => x.Posts )     // <-- Include
+                        .ToListAsync();
+
+        . Desta forma o SQL fabricado será:
+
+            SELECT [c].[Id], [c].[Name], [c].[Slug], [p].[Id], [p].[AuthorId], [p].[Body], 
+                    [p].[CategoryId], [p].[CreateDate], [p].[LastUpdateDate], [p].[Slug], 
+                    [p].[Summary], [p].[Title]
+            FROM [Category] AS [c]
+            LEFT JOIN [Post] AS [p] ON [c].[Id] = [p].[CategoryId]
+            ORDER BY [c].[Id], [p].[Id]        
+
+    . Ao invés de colocarmos a expressão "x => x.Posts" dentro do método "Include", podemos
+        colocar a expressão/nome da propriedade da classe que representa o objeto externo:
+
+        var categories = await context
+                        .Categories
+                        .Include( "Posts" )     // <-- Include
+                        .ToListAsync();
+
+    
+// TODO: Pegar o exemplo abaixo (One To Many) e fazer no projeto
+https://www.learnentityframeworkcore.com/configuration/one-to-many-relationship-configuration
