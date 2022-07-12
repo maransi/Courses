@@ -2111,6 +2111,320 @@ Aula 32. Utilizando os Mapeamentos Criados
             }
         }
 
+Aula 32.1 - Um pouco mais sobre relacionamentos
+-----------------------------------------------
+
+    . Insira as classes abaixo na pasta "Models" no projeto:
+
+        // Classe Investidor
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+
+        namespace Blog.Models
+        {
+            public class Investidor
+            {
+                public int  Id { get; set; }
+                public string Nome { get; set; }
+
+                public IList<Aplicacao> Aplicacoes { get; set; }
+                
+            }
+        }
+
+
+        // Classe Instituicao
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+
+        namespace Blog.Models
+        {
+            public class Instituicao
+            {
+                public int Id { get; set; }
+                public string Nome { get; set; }
+                public string Rating { get; set; }
+
+                public IList<Aplicacao> Aplicacoes { get; set; }
+            }
+        }
+
+
+        // Classe Aplicacao
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+
+        namespace Blog.Models
+        {
+            public class Aplicacao
+            {
+                public int Id { get; set; }
+                public string Titulo { get; set; }
+                public DateTime DataAplicacao { get; set; }
+                public string Indice { get; set; }
+                public decimal PercentualRemuneracao { get; set; }
+                public decimal  ValorInvestido { get; set; }
+                public decimal ValorAtualizado { get; set; }
+                public DateTime? DataFechamento { get; set; }
+                public DateTime Vencimento { get; set; }
+                public int? InstituicaoId { get; set; }
+                public Instituicao Instituicao { get; set; }
+
+                public int? InvestidorId { get; set; }
+                public Investidor Investidor { get; set; }
+            }
+        }
+
+    . Insira as classes abaixo na pasta "Data.Mapping":
+
+        // Classe InvestidorMap
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+        using Blog.Models;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+        namespace Blog.Data.Mapping
+        {
+            public class InvestidorMap : IEntityTypeConfiguration<Investidor>
+            {
+                public void Configure(EntityTypeBuilder<Investidor> builder)
+                {
+                    builder.ToTable("Investidor");
+
+                    builder.HasKey( x => x.Id );
+
+                    builder.Property( x => x.Id )
+                            .ValueGeneratedOnAdd()
+                            .UseIdentityColumn();
+
+                    builder.Property( x => x.Nome )
+                            .IsRequired()
+                            .HasColumnName("Nome")
+                            .HasColumnType("VARCHAR")
+                            .HasMaxLength(50);
+        
+                    builder.HasMany( x => x.Aplicacoes )
+                            .WithOne( i => i.Investidor )
+                            .IsRequired();
+                }
+            }
+        }
+
+        // Classe InstituicaoMap
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+        using Blog.Models;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+        namespace Blog.Data.Mapping
+        {
+            public class InstituicaoMap : IEntityTypeConfiguration<Instituicao>
+            {
+                public void Configure(EntityTypeBuilder<Instituicao> builder)
+                {
+                    builder.ToTable("Instituicao");
+
+                    builder.HasKey( x => x.Id );
+
+                    builder.Property( x => x.Id )
+                            .ValueGeneratedOnAdd()
+                            .UseIdentityColumn();
+
+                    builder.Property( x => x.Nome )
+                            .IsRequired()
+                            .HasColumnName("Nome")
+                            .HasColumnType("VARCHAR")
+                            .HasMaxLength(50);
+
+                    builder.Property( x => x.Rating )
+                            .HasColumnName( "Rating")
+                            .HasColumnType("VARCHAR")
+                            .HasMaxLength(5);
+                }
+            }
+        }
+
+
+        // Classe AplicacaoMap
+
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+        using Blog.Models;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+        namespace Blog.Data.Mapping
+        {
+            public class AplicacaoMap : IEntityTypeConfiguration<Aplicacao>
+            {
+                public void Configure(EntityTypeBuilder<Aplicacao> builder)
+                {
+                    builder.ToTable("Aplicacao");
+
+                    builder.HasKey( x => x.Id );
+
+                    builder.Property( x => x.Titulo)
+                            .IsRequired()
+                            .HasColumnName("Titulo")
+                            .HasColumnType("VARCHAR")
+                            .HasMaxLength(50);
+
+                    builder.Property( x => x.DataAplicacao )
+                            .HasColumnName("DataAplicacao")
+                            .HasColumnType("DATE")
+                            .IsRequired()
+                            .HasDefaultValueSql("GETDATE()");
+
+                    builder.Property( x => x.Indice)
+                            .IsRequired()
+                            .HasColumnName("Indice")
+                            .HasColumnType("VARCHAR")
+                            .HasMaxLength(15);
+
+                    builder.Property( x => x.PercentualRemuneracao )
+                            .IsRequired()
+                            .HasColumnName("PercentualRemuneracao")
+                            .HasColumnType("DECIMAL(5,2)");
+
+                    builder.Property( x => x.ValorInvestido )
+                            .IsRequired()
+                            .HasColumnName("ValorInvestido")
+                            .HasColumnType("MONEY");
+
+                    builder.Property( x => x.ValorAtualizado )
+                            .IsRequired()
+                            .HasColumnName("ValorAtualizado")
+                            .HasColumnType("MONEY");
+                    
+                    builder.Property( x => x.DataFechamento )
+                            .HasColumnName("DataFechamento")
+                            .HasColumnType("DATE")
+                            .HasDefaultValueSql("GETDATE()");
+
+                    builder.Property( x => x.Vencimento )
+                            .HasColumnName("Vencimento")
+                            .HasColumnType("DATETIME");
+
+                    builder.Property( x => x.InvestidorId )
+                            .IsRequired(false)
+                            .HasColumnName("InvestidorId")
+                            .HasColumnType("INT");
+
+                    builder.HasOne( x => x.Investidor )
+                            .WithMany( i => i.Aplicacoes )
+                            .IsRequired();
+
+                    builder.HasIndex( x => x.InvestidorId );
+                    
+                    builder.Property( x => x.InstituicaoId )
+                            .IsRequired(false)                      // Força a coluna da tabela ficar "NULL"
+                            .HasColumnName("InstituicaoId")
+                            .HasColumnType("INT");
+
+                    builder.HasOne( x => x.Instituicao )
+                            .WithMany( a => a.Aplicacoes )
+                            .IsRequired();                          // Força as DMLs de SELECT ficar como "INNER JOIN"
+
+                    builder.HasIndex( x => x.InstituicaoId );
+                }
+            }
+        }
+
+    . Dentro da Classe "BlogDataContext.cs" e no método "OnModelCreating" insira as linhas abaixo:
+
+            ...
+            modelBuilder.ApplyConfiguration(new InvestidorMap());
+            modelBuilder.ApplyConfiguration(new InstituicaoMap());
+            modelBuilder.ApplyConfiguration(new AplicacaoMap());
+            ...
+
+    . Relacionamento 1:1
+
+        . Na classe             
+
+
+
+    . Relacionamento 1:N
+
+        . Na classe "Investidor" temos uma lista de "Aplicacao":
+
+            ...
+            public IList<Aplicacao> Aplicacoes { get; set; }
+            ...
+        
+        . Para configurar essa lista num relacionamento 1:N teremos que configurar
+            na classe de mapeamento "InvestidorMap" a seguinte configuração:
+
+
+                public void Configure(EntityTypeBuilder<Investidor> builder)
+                {
+                    builder.ToTable("Investidor");
+
+                    ...
+                    builder.HasMany( x => x.Aplicacoes )        // Nome da lista Investidor.Aplicacoes
+                            .WithOne( i => i.Investidor )       // Objeto que representa o "Investidor" na classe "Aplicacao"
+                            .IsRequired();                                                                            |
+                }                                                                                                     |
+                                                                                                                      |
+        . Para que o relacionamento 1:N execute com sucesso é obrigatorio que a classe da lista "Aplicacao",          |
+            tenha um método getter/setter apontando para a classe pai "Investidor"                                    |
+                                                                                                                      |
+                ...                                                                                                   |
+                public Investidor Investidor { get; set; }     <------------------------------------------------------+                                     
+                ...
+
+            . Não é obrigatório fornecer o parâmetro de identificação do objeto pai ".WithOne( i => i.Investidor )"
+                como foi feito. Podemos omiti-lo:
+
+                .WithOne()          // A execução continua a mesma
+
+        . .IsRequired()     Era para funcionar e permitir que a lista "Aplicacoes" da classe "Investidor" fosse opcional
+                            e assim deixar a DML de SELECT como INNER JOIN, porém no relacionamento 1:N não funcionou;
+                            já no relacionamento 1:1 funcionou corretamente.
+
+            . O ".IsRequired()" trabalha de formas diferentes dependendo de onde for colocado:
+
+                . Se for colocado nas configurações de relacionamento ele definirá se haverá "INNER", ou "LEFT" JOIN
+
+                    builder.HasOne( x => x.Instituicao )
+                            .WithMany( a => a.Aplicacoes )
+                            .IsRequired();                          // Força as DMLs de SELECT ficar como "INNER JOIN"
+
+                . Se for colocado nas configurações da propriedade do campo em si "InvestidorId" ela definirá se 
+                    o campo receberá "Null/Not Null":
+
+                    builder.Property( x => x.InstituicaoId )
+                            .IsRequired(false)                      // Força a coluna da tabela ficar "NULL"
+                            .HasColumnName("InstituicaoId")
+                            .HasColumnType("INT");
+
+        . Na classe da lista (N) coloque a propriedade do "Id" do objeto pai se realmente for necessário ter uma perfomance
+            durante a obtenção das informações, caso contrário não é obrigatório ter essa propriedade como apresentado na
+            classe "Aplicacao.InvestidorId". Se colocar será para:
+            
+            . Criar um indice; 
+            . Ou fazer uma pesquisa performática na classe destino pelo "Id" da classe pai; 
+            . Ou para identificá-lo como um campo que poderá receber nulo, como foi o caso da propriedade 
+                "public int? InstituicaoId { get; set; }" nesta classe, onde foi utilizado o caracter "?"
+                ao lado do tipo "int". No final a estrutura no banco ficará como "null".
+
+
 
 Aula 33. Testando os relacionamentos
 ------------------------------------
@@ -2282,7 +2596,7 @@ Aula 38. Gerando o script do banco
         
         . Apagar a biblioteca "Design":
 
-            dotnet add package Microsoft.EntityFrameworkCore.Design    
+            dotnet add package Microsoft.EntityFrameworkCore.Design  -v 5.0.9   
 
     . Apague o database "balta" do banco de dados com os comandos abaixo:
 
@@ -2486,21 +2800,21 @@ Aula 41.  Eager Loading vs Lazy Loading
     . No exemplo da aula anterior se não fazermos nenhuma menção a lista de "Posts" o EF deixará a carga
         dos "Posts" como "LAZY":
 
-        var categories = await context
-                                .Categories
-                                .ToListAsync();
+        var categories = context
+                            .Categories
+                            .ToList();
 
         . O SQL derivado da linha de código acima será:
 
             SELECT [c].[Id], [c].[Name], [c].[Slug]
             FROM [Category] AS [c]        
 
-    . Para que o "join" seja feito é necessário realizar o "Include" na chamada:
+    . Para que o "join" seja feito é necessário realizar o "Include" na chamada e o Loading se torna EAGER:
 
-        var categories = await context
+        var categories = context
                         .Categories
                         .Include( x => x.Posts )     // <-- Include
-                        .ToListAsync();
+                        .ToList();
 
         . Desta forma o SQL fabricado será:
 
@@ -2514,12 +2828,250 @@ Aula 41.  Eager Loading vs Lazy Loading
     . Ao invés de colocarmos a expressão "x => x.Posts" dentro do método "Include", podemos
         colocar a expressão/nome da propriedade da classe que representa o objeto externo:
 
-        var categories = await context
+        var categories = context
                         .Categories
                         .Include( "Posts" )     // <-- Include
-                        .ToListAsync();
+                        .ToList();
 
-    
+    . Trabalhando com LAZY Loading:
+
+        . Acesse a pasta raiz do projeto e instale a package/library abaixo:
+
+            dotnet add package Microsoft.EntityFrameworkCore.Proxies -v 5.0.9        
+
+        . Acesse a classe "BlogDataContext.cs" e insira a linha abaixo:
+
+            ...
+            namespace Blog.Data
+            {
+                public class BlogDataContext: DbContext
+                {
+                    ...
+                    protected override void OnConfiguring( DbContextOptionsBuilder options ){
+                        ...
+                        options.UseLazyLoadingProxies();    // Linha inserida
+                    }
+                    ...
+                }
+            }
+
+        . Acesse as classes "Investidor.cs" e "Aplicacao.cs" e inclua nas propriedades pertinentes ao
+            relacionamento entre elas a identificação "virtual":
+
+            ...
+            namespace Blog.Models
+            {
+                public class Investidor
+                {
+                    ...
+                    public virtual ICollection<Aplicacao> Aplicacoes { get; set; } // Linha alterada, foi inserido a instrução "virtual"
+                }
+            }
+
+            ...
+            namespace Blog.Models
+            {
+                public class Aplicacao
+                {
+                    ...
+                    public virtual Investidor Investidor { get; set; }                  // Linha alterada, foi inserido a instrução "virtual"
+                }
+            }
+
+
+            . Talvez seja necessário acrescentar "virtual" nas demais propriedades que faz
+                referência a outras classes, não somente entre "Investidor" e "Aplicacao"
+
+        . No método "Program.GetAllInvestidor" deixe-o como abaixo:
+
+            private static void GetAllInvestidor()
+            {
+                using( var context = new BlogDataContext()){
+                    var investidores = context.Investidores
+                                                // .Include( x => x.Aplicacoes )
+                                                // .Where( x => x.Nome.Contains("GUSTAVO") )
+                                                .ToList();
+                                                
+                    investidores.ForEach( item => {
+                        Console.WriteLine($"{item.Nome} ");
+                        Console.WriteLine("---------------------");
+
+                        foreach( var aplicacao in item.Aplicacoes){
+                            Console.WriteLine($"{aplicacao.Titulo} {aplicacao.ValorAtualizado}");
+                        }
+                    });
+
+                }
+            }
+
+        . No método "Main" da classe "Program" faça a chamada do método acima e execute o projeto.
+
+        . Verifique que a chamada da coleção de "investidores" não carregou num primeiro momento a 
+            coleção de "aplicacoes", somente na iteração da coleção "Aplicacoes", ficando "LAZY Loading".
+
+    . Trabalhando com "LAZY Loading", colocando uma terceira classe relacionada:
+
+        . Este exemplo trabalharemos com 3 classes nessa ordem: 
+
+            . Instituicao ------+ 
+                                |
+                                | <-- Contêm
+                                |
+            . Aplicacao   <-----+
+                  |
+                  | Tem 
+                  |
+                  V
+            . Investidor
+
+        . Quando relacionamos as três classes acima, o máximo que podemos fazer EAGER Loading será entre as classes: 
+            Instituicao e Aplicacao
+
+        . Vamos acessar a classe "BlogDataContext.cs" para desabilitar o "Lazy loading". Comente a linha do comando
+            "UseLazyLoadingProxies()".
+
+            ...
+            namespace Blog.Data
+            {
+                public class BlogDataContext: DbContext
+                {
+                    ...
+                    protected override void OnConfiguring( DbContextOptionsBuilder options ){
+                        ...
+                        // options.UseLazyLoadingProxies();    // Linha comentada
+                    }
+                    ...
+                }
+            }
+
+        . Insira o método abaixo na classe "Program":
+
+            ...
+            private static void GetAllInstituicao()
+            {
+
+                using( var context = new BlogDataContext()){
+                    var instituicoes = context.Instituicoes
+                                                .Include( x => x.Aplicacoes )   
+                                                .ToList();
+
+                    instituicoes.ForEach( item => {
+
+                            System.Console.WriteLine($"{item.Nome} - {item.Rating}");
+
+                            System.Console.WriteLine("-----------------------------");
+
+                            item.Aplicacoes
+                                .ToList()
+                                .ForEach( aplicacao => {
+                                                System.Console.WriteLine($"{aplicacao.Titulo} - {aplicacao.PercentualRemuneracao} - {aplicacao.InvestidorId} - {aplicacao.Investidor.Nome}");
+                                        });
+
+                            System.Console.WriteLine("-----------------------------");
+                    });
+                }
+            }                                                                                                                                                                       ^
+            ...                                                                                                                                                                     |
+                                                                                                                                                                                    |
+        . Execute o projeto. Ocorrerá um erro, pois as propriedades do método "instituicao.aplicacao.Investidor" não estará disponível ---------------------------------------------+
+
+        . Não conseguiremos fazer o "loading" de primeira da classe "Investidor", para fazer isso com sucesso temos 3 opções:
+
+            . ThenInclude
+
+                . Insira o método "ThenInclude" como abaixo na carga do objeto "instituicoes":
+
+                    ...
+                    var instituicoes = context.Instituicoes
+                                                .Include( x => x.Aplicacoes )   
+                                                    .ThenInclude( inv => inv.Investidor)    // Linha inserida
+                                                .ToList();
+                    ...
+                
+                . Execute o projeto e verifique que agora foi sem erro. A linha que apresentava {aplicacao.Investidor.Nome} 
+                    conseguiu executar sem erro.
+
+            . Include
+
+                . Insira o método "Include" como abaixo na carga do objeto "instituicoes" e apague o "ThenInclude"
+
+                    ...
+                    var instituicoes = context.Instituicoes
+                                                .Include( x => x.Aplicacoes )   
+                                                .Include( "Aplicacoes.Investidor")      // Linha inserida
+                                                .ToList();
+                    ...
+
+                . Execute o projeto e verifique que também foi possivel executar o projeto sem erro
+
+            .  Reference
+
+                . Apague o ".Include( "Aplicacoes.Investidor")" do passo anterior
+
+                    ...
+                    var instituicoes = context.Instituicoes
+                                                .Include( x => x.Aplicacoes )   
+                                                .ToList();
+                    ...
+
+                . Na iteração da coleção "Aplicacoes" insira a linha "context.Entry( aplicacao )...."
+                    como abaixo:
+
+                        ...
+                        item.Aplicacoes
+                            .ToList()
+                            .ForEach( aplicacao => {
+                                            context.Entry( aplicacao ).Reference( x => x.Investidor ).Load();
+
+                                            System.Console.WriteLine($"{aplicacao.Titulo} - {aplicacao.PercentualRemuneracao} - {aplicacao.InvestidorId} - {aplicacao.Investidor.Nome}");
+
+                                    });
+                        ...
+
+                . Execute o projeto e verifique que também foi possivel executar o projeto sem erro
+
+    . Trabalhando com LINQ para melhorar a performance:
+
+        // Explicar o método 
+        private static void GetAllInstituicao2()
+        {
+            using var context = new BlogDataContext();
+
+            var consulta = from a in context.Instituicoes
+                                   from c in a.Aplicacoes
+                                   where a.Id == 1
+                                   select new
+                                   {
+                                       a.Nome , a.Rating, c.Indice, c.Investidor
+                                   };
+
+                // var resultado = consulta.ToList(); 
+
+                System.Console.WriteLine("");
+
+                consulta.ToList().ForEach( item => {
+                    System.Console.WriteLine($"{item.Nome} - {item.Rating} - {item.Indice} - {item.Investidor.Nome}");
+                    System.Console.WriteLine("------------------");
+                });
+
+                System.Console.WriteLine("");
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+// TODO: DOcumenetar Lazy Loading com a marcação da propriedade como "virtual"
+https://www.learnentityframeworkcore.com/lazy-loading
+
+
 // TODO: Pegar o exemplo abaixo (One To Many) e fazer no projeto
 https://www.learnentityframeworkcore.com/configuration/one-to-many-relationship-configuration
 
