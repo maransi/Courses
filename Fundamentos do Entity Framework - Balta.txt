@@ -3032,36 +3032,169 @@ Aula 41.  Eager Loading vs Lazy Loading
 
     . Trabalhando com LINQ para melhorar a performance:
 
-        // Explicar o método 
-        private static void GetAllInstituicao2()
-        {
-            using var context = new BlogDataContext();
+        . Quando analisamos as DMLs de "Select" criadas pelo EF notamos que é criado instruções pouco eficientes
+            na produção, com "LEFT JOIN", subqueries, etc. Para amenizar essa situação uma boa saída seria usar
+            a biblioteca LINQ. Abaixo um exemplo de como usar essa biblioteca em conjunto com o EF.
 
-            var consulta = from a in context.Instituicoes
-                                   from c in a.Aplicacoes
+        . Na classe "Program.cs" insira o método abaixo:
+
+            // Explicar o método 
+            private static void GetAllInstituicao2()
+            {
+                using var context = new BlogDataContext();
+
+                var consulta = from a in context.Instituicoes
+                                    from c in a.Aplicacoes
+                                    where a.Id == 1
+                                    select new
+                                    {
+                                        a.Nome , a.Rating, c.Indice, c.Investidor
+                                    };
+
+                    // var resultado = consulta.ToList(); 
+
+                    System.Console.WriteLine("");
+
+                    consulta.ToList().ForEach( item => {
+                        System.Console.WriteLine($"{item.Nome} - {item.Rating} - {item.Indice} - {item.Investidor.Nome}");
+                        System.Console.WriteLine("------------------");
+                    });
+
+                    System.Console.WriteLine("");
+
+            }
+
+            . O LINQ trabalha com coleções de objetos, em nosso exemplo a fonte dessas coleções
+                viria pelo Entity Framework, como por exemplo:
+
+                ...
+                var consulta = from a in context.Instituicoes       // <--- uso do context do EF para resgatar a coleção Instituicoes
+                                    from c in a.Aplicacoes
+                                    where a.Id == 1
+                                    select new
+                                    {
+                                        a.Nome , a.Rating, c.Indice, c.Investidor
+                                    };
+                ...
+
+                . Insira o código acima no lugar forma apresentada anteriormente e execute o projeto.
+
+            . Observe que podemos modelar a saída das informações com a opção "select new...", criando uma coleção anônima.
+
+                . Podemos renomear uma propriedade da coleção gerada em tempo de execução como abaixo:
+
+                    ...
+                    select new
+                    {
+                        // a.Nome , a.Rating, c.Indice, c.Investidor                                    
+                        a.Nome , a.Rating, c.Indice, NomeInvestidor = c.Investidor.Nome 
+                    };
+
+                    consulta.ToList().ForEach( item => {
+                        System.Console.WriteLine($"{item.Nome} - {item.Rating} - {item.Indice} - {NomeInvestidor}");
+                        System.Console.WriteLine("------------------");
+                    });
+
+                    . Ao invés de trazer todo o objeto "Investidor", podemos trazer somente o que nos interessa, 
+                        no caso o "Investidor.Nome", mais a frente quando formos usar a coleção de ojetos podemos
+                        referenciar a informação pelo que nós definimos "NomeInvestidor".
+
+        . O exemplo anterior constroi os "JOINs" de forma automatica, porém podemos definir os "JOINs" da maneira que desejamos
+            como abaixo:
+
+            ...
+            var consulta = (from a in context.Instituicoes
+                                   join c in context.Aplicacoes
+                                        on a.Id equals c.InstituicaoId
                                    where a.Id == 1
                                    select new
                                    {
-                                       a.Nome , a.Rating, c.Indice, c.Investidor
-                                   };
+                                        // a.Nome , a.Rating, c.Indice, c.Investidor                                    
+                                       a.Nome , a.Rating, c.Indice, NomeInvestidor = c.Investidor.Nome
+                                   }).ToList();
+            ...
 
-                // var resultado = consulta.ToList(); 
+            ou
 
-                System.Console.WriteLine("");
+            ...
+            var consulta = context.Instituicoes
+                            .Join( context.Aplicacoes,
+                                    a => a.Id,
+                                    b => b.InstituicaoId,
+                                    (a ,b) => new {  a.Nome , a.Rating, b.Indice, NomeInvestidor = b.Investidor.Nome }
+                            ).ToList();
+            ...
 
-                consulta.ToList().ForEach( item => {
-                    System.Console.WriteLine($"{item.Nome} - {item.Rating} - {item.Indice} - {item.Investidor.Nome}");
-                    System.Console.WriteLine("------------------");
-                });
+            . Faça testes com as possibilidades acima substituindo esses códigos, que resgata a coleção, pelo que foi definido anteriormente.
 
-                System.Console.WriteLine("");
+            . O JOIN com a classe "Investidor" é feito automaticamente porque resgatamos informações desse classe quando nos referenciamos
+                a uma das suas propriedades " NomeInvestidor = b.Investidor.Nome " dentro do "new". Abaixo veremos de forma mais correta
+                como realizar "JOINs" com várias tabelas de acordo com um "SELECT".
 
-        }
+        . JOINs com várias tabelas:
+
+            ...
+            var consulta = context.Instituicoes
+                            .Join( context.Aplicacoes,
+                                    a => a.Id,
+                                    b => b.InstituicaoId,
+                                    (a ,b) => new { a.Id,  a.Nome , a.Rating, b.Indice, b.InvestidorId  }
+                            )
+                            .Join( context.Investidores,
+                                o => o.InvestidorId,
+                                i => i.Id,
+                                (o, i) => new{
+                                    o.Id,  o.Nome , o.Rating, o.Indice, o.InvestidorId, NomeInvestidor = i.Nome    
+                                }
+                            
+                            )
+                            .ToList();
+            ...
 
 
+        . LEFT JOIN
 
+            . Inclua a Instituição abaixo no banco de dados:
 
+                INSERT INTO Instituicao( Nome, Rating )
+                VALUES( 'BANCO ABC', 'A+')
 
+            . Insira o código abaixo no lugar forma apresentada anteriormente e execute o projeto.
+
+                ...
+                var consulta = (from a in context.Instituicoes
+                                    join c in context.Aplicacoes
+                                            on a.Id equals c.InstituicaoId into j1      // 
+                                        from r in j1.DefaultIfEmpty()                   // 
+                                    where r.Investidor.Nome == "MARCO ANTONIO SILVA"
+                                    select new
+                                    {
+                                        Nome = a.Nome , Rating = a.Rating , Indice = r.Indice, NomeInvestidor = r.Investidor.Nome
+                                    }).ToList();
+                ...
+
+            . To convert it into Left join use the into clause to create variable to hold the result and use 
+                the DefaultIfEmpty method as shown below
+
+                ...
+                on a.Id equals c.InstituicaoId into j1 
+                ...
+            
+            . And start a new query from the j1 and add DefaultIfEmpty. If you omit this SQL will perform an inner join
+
+                ...
+                from r in j1.DefaultIfEmpty()                   
+                ....
+            
+            . SQL construido:
+
+                SELECT [i].[Id] AS [InstituicaoId], [i].[Nome], [i].[Rating], [a].[Indice], [i0].[Nome] AS [NomeInvestidor]
+                FROM [Instituicao] AS [i]
+                    LEFT JOIN [Aplicacao] AS [a] 
+                        ON [i].[Id] = [a].[InstituicaoId]
+                    LEFT JOIN [Investidor] AS [i0] 
+                        ON [a].[InvestidorId] = [i0].[Id]
+                WHERE [i].[Id] = 2
 
 
 
