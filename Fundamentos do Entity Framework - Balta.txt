@@ -3198,6 +3198,8 @@ Aula 41.  Eager Loading vs Lazy Loading
 
 
 
+
+
 // JOIN
 https://www.tektutorialshub.com/entity-framework/join-query-entity-framework/
 https://entityframework.net/joining
@@ -3210,6 +3212,50 @@ https://www.learnentityframeworkcore.com/lazy-loading
 https://www.learnentityframeworkcore.com/configuration/one-to-many-relationship-configuration
 
 
+
+
+Aula 42. Skip, Take e Paginação de Dados
+-------------------------------------- 
+
+https://www.codingame.com/playgrounds/5363/paging-with-entity-framework-core
+
+    . Crie o método abaixo na classe "Program.cs":
+
+        private static void GetAllPosts(int skip, int take)
+        {
+            using( var context = new BlogDataContext() ){
+                List<Post> posts = context.Posts
+                                            .AsNoTracking()
+                                            .Skip(skip)         // No. de linhas
+                                            .Take( take )       // No. da página
+                                            .ToList();
+
+                posts.ForEach( item => {
+                    System.Console.WriteLine($"{item.Id} - {item.Title}");
+                });
+
+                System.Console.WriteLine("----------------------");
+            }
+        }
+
+    . Crie a chamada abaixo no método "Main":
+
+        GetAllPosts( 0, 25 );
+        GetAllPosts( 25, 25 );
+        GetAllPosts( 50, 25 );
+        GetAllPosts( 75, 25 );
+
+
+
+
+
+
+
 // TODO: Documentar os comando CLI do "dotnet ef ..."
 https://www.entityframeworktutorial.net/efcore/cli-commands-for-ef-core-migration.aspx
 https://www.entityframeworktutorial.net/efcore/entity-framework-core-migration.aspx
+
+
+// TODO: SelectMany para trazer coleções de objetos
+https://www.tektutorialshub.com/entity-framework-core/selectmany-in-entity-framework-core/
+https://dotnettutorials.net/lesson/selectmany-in-linq/
