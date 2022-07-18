@@ -3246,7 +3246,137 @@ https://www.codingame.com/playgrounds/5363/paging-with-entity-framework-core
         GetAllPosts( 75, 25 );
 
 
+Aula 43. Mapeamento de Queries Puras 
+------------------------------------ 
 
+    . Acesse a classe "Program.cs" e insira o método abaixo:
+
+        // https://www.learnentityframeworkcore.com/raw-sql
+        private static void GetAllPostsWithQuery()
+        {
+            using( var context = new BlogDataContext() ){
+
+                var title = new SqlParameter("Title","SONIC");
+                context.Database.ExecuteSqlRaw("INSERT INTO Post( Title, CreateDate, LastUpdateDate, AuthorId ) " +
+                                                "VALUES(@Title, GETDATE(), GETDATE(), 1)", title);
+
+                var posts = context.Posts
+                                //    .FromSqlRaw("SELECT Title FROM Post")
+                                    .GroupBy( x => x.Title )
+                                    .Select( p => new {
+                                        Title = p.Key,
+                                        Count = p.Count()
+                                    })
+                                    .ToList();
+
+                posts.ForEach( item => {
+                    System.Console.WriteLine($"{item.Title} {item.Count}");
+                });
+
+                System.Console.WriteLine("-------------------");
+
+                var id = new SqlParameter("Id", 5);
+                var posts1 = context.Posts
+                                        .FromSqlRaw("SELECT * FROM Post WHERE Id < @Id", id )
+                                        .AsNoTracking()
+                                        .Select( p => new {
+                                            Id = p.Id,
+                                            Title = p.Title
+                                        })
+                                        .OrderBy( p => p.Title )
+                                        .ToList();
+
+                posts1.ForEach( item => {
+                    System.Console.WriteLine($"{item.Id} - {item.Title}");
+                });
+            }
+        }
+
+    . Através do método ".FromSqlRaw" é possível fazer chamada de DMLs nativas ao banco:
+
+        var posts1 = context.Posts
+                                .FromSqlRaw("SELECT * FROM Post")
+                                .AsNoTracking()
+                                .Select( p => new {
+                                    Id = p.Id,
+                                    Title = p.Title
+                                })
+                                .OrderBy( p => p.Title )
+                                .ToList();
+
+        . Importante: as colunas da tabela tem que ter o mesmo nome da propriedade da classe, caso 
+                        contrário no método "Select" devemos fazer o "Mapper" da coluna da tabela 
+                        para a propriedade da classe.
+
+                    Muitos dos métodos utilizados no comando acima vem do "Linq", portante é preciso 
+                    fazer o import da biblioteca "using System.Linq;"
+
+
+        . Para adicionar um parâmetro a query acima podemos utilizar a classe "SqlParameter"
+
+            // Configurando um parâmetro 
+            var id = new SqlParameter("Id", 5);
+
+            // Chamada da query com o parâmetro configurado, utilizando "@Id"
+            var posts1 = context.Posts
+                                    .FromSqlRaw("SELECT * FROM Post WHERE Id < @Id", id )
+                                    .AsNoTracking()
+                                    .Select( p => new {
+                                        Id = p.Id,
+                                        Title = p.Title
+                                    })
+                                    .OrderBy( p => p.Title )
+                                    .ToList();
+
+            . Para usar a classe "SqlParameter" é necessário fazer o import abaixo:
+
+                using Microsoft.Data.SqlClient;
+
+            . Uma variação para utilizar parâmetros seria:
+
+                var id = 1;
+                var posts1 = context.Posts
+                                        .FromSqlRaw("SELECT * FROM Post WHERE Id < {0}", id )
+
+                . Haverá uma subsitutição dos parâmetros.
+
+
+        . Chamando um "INSERT" com o método "ExecuteSqlRaw":
+
+            // Configurando um parâmetro 
+            var title = new SqlParameter("Title","SONIC");
+
+            // Usando o parâmetro configurado acima.
+            context.Database.ExecuteSqlRaw("INSERT INTO Post( Title, CreateDate, LastUpdateDate, AuthorId ) " +
+                                            "VALUES(@Title, GETDATE(), GETDATE(), 1)", title);
+
+            . Para executar assincronamente os comandos de INSERT, UPDATE e DELETE podemos utilizar o método "ExecuteSqlRawAsync"
+
+
+Aula 44. "Scaffolding"
+
+    You use the DbContext Scaffold command to generate the model. The command has two required arguments - a 
+    connection string and a provider. The connection string will depend on your environment and database provider. The provider 
+    argument is the Entity Framework provider for your chosen database. This example uses the AdventureWorks sample database for 
+    SQL server provided by Microsoft.
+
+        dotnet ef dbcontext scaffold "Server=.\;Database=AdventureWorksLT2012;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer 
+                -o Model
+
+    The -o option (or alternatively --output-dir) specifies the directory where the class files will be generated. If it is omitted, 
+    the class files will be generated in the project directory (where the .csproj file is located).
+
+
+    The DbContext class will take the name of the database plus "Context", You can override this using the -c or --context option e.g.
+
+        dotnet ef dbcontext scaffold "Server=.\;Database=AdventureWorksLT2012;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer 
+                -o Model 
+                -c "AdventureContext"
+
+
+    If you need to re-scaffold the model after database schema changes have been made, you can do so by specifying the -f or --force option e.g.:
+
+        dotnet ef dbcontext scaffold "Server=.\;Database=AdventureWorksLT2012;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer --force
 
 
 
