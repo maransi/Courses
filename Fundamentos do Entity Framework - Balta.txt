@@ -3649,11 +3649,580 @@ Aula 45. Comando CLI "dotnet ef"
 
         ./UpdateDatabase.sh
 
-
-
-
-
-
 // TODO: SelectMany para trazer coleções de objetos
 https://www.tektutorialshub.com/entity-framework-core/selectmany-in-entity-framework-core/
 https://dotnettutorials.net/lesson/selectmany-in-linq/
+
+
+
+Aula 46. Fonte do projeto com o código testado durante o curso
+--------------------------------------------------------------
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Blog.Data;
+using Blog.Models;
+using Microsoft.EntityFrameworkCore;
+
+
+using Microsoft.Data.SqlClient;
+
+namespace blog
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Entity Framework In Action");
+
+            // GetAll();
+
+            // Create();
+
+            // Update(4);
+
+            // Delete(3);
+
+            // GetAll();
+
+            // GetById(6);
+
+            // GetByName("asp");
+
+            // GetByAnyThing("build");
+
+            // GetAllCategory();
+
+            // System.Console.WriteLine("Aguardando...");
+
+            // System.Console.ReadLine();
+
+
+            // GetAllPost();
+
+            // InsertPost();
+
+            // InsertUserEF();
+
+            // InsertPostEF();
+
+            // GetAllAplicacao();
+
+            // GetAllInvestidor();
+
+            // GetAllInstituicao();
+
+            // GetAllInstituicao2();
+
+            // GetAllPosts( 0, 25);
+            // GetAllPosts( 25, 25);
+            // GetAllPosts( 50, 25);
+            // GetAllPosts( 75, 25);
+
+            GetAllPostsWithQuery();
+
+// https://entityframework.net/knowledge-base/47354564/entity-framework-nesting-classes-inside-class
+            
+
+        }
+
+        private static void GetAllPostsWithQuery()
+        {
+            using( var context = new BlogDataContext() ){
+/*
+                var title = new SqlParameter("Title","SONIC");
+                context.Database.ExecuteSqlRaw("INSERT INTO Post( Title, CreateDate, LastUpdateDate, AuthorId ) " +
+                                                "VALUES(@Title, GETDATE(), GETDATE(), 1)", title);
+
+// https://www.learnentityframeworkcore.com/raw-sql
+                var posts = context.Posts
+                                //    .FromSqlRaw("SELECT Title FROM Post")
+                                    .GroupBy( x => x.Title )
+                                    .Select( p => new {
+                                        Title = p.Key,
+                                        Count = p.Count()
+                                    })
+                                    .ToList();
+
+                posts.ForEach( item => {
+                    System.Console.WriteLine($"{item.Title} {item.Count}");
+                });
+
+                System.Console.WriteLine("-------------------");
+
+                var id = new SqlParameter("Id", 5);
+                var posts1 = context.Posts
+                                        .FromSqlRaw("SELECT * FROM Post WHERE Id < @Id", id )
+                                        .AsNoTracking()
+                                        .Select( p => new {
+                                            Id = p.Id,
+                                            Title = p.Title
+                                        })
+                                        .OrderBy( p => p.Title )
+                                        .ToList();
+
+                posts1.ForEach( item => {
+                    System.Console.WriteLine($"{item.Id} - {item.Title}");
+                });
+*/
+                var inst = context.Instituicoes
+                        .SelectMany( i => i.Aplicacoes , (i, a ) =>
+                            new {
+                                Id = i.Id,
+                                Nome = i.Nome,
+                                TituloAplicacao = a.Titulo,
+                                Investidor = a.Investidor,
+                                NomeInvestidor = a.Investidor.Nome
+                            }
+                         )
+                         .ToList();
+
+
+                inst.ForEach( item => {
+                    System.Console.WriteLine($"{item.Id} - {item.Nome} - {item.TituloAplicacao} - {item.NomeInvestidor}");
+                });
+
+            }
+
+
+        }
+
+        private static void GetAllPosts(int skip, int take)
+        {
+            using( var context = new BlogDataContext() ){
+                List<Post> posts = context.Posts
+                                            .AsNoTracking()
+                                            .Skip(skip)
+                                            .Take( take )
+                                            .ToList();
+
+                posts.ForEach( item => {
+                    System.Console.WriteLine($"{item.Id} - {item.Title}");
+                });
+
+                System.Console.WriteLine("----------------------");
+            }
+
+
+        }
+
+        private static void GetAllInstituicao2()
+        {
+            using var context = new BlogDataContext();
+/*
+
+            var consulta = from a in context.Instituicoes
+                                   from c in a.Aplicacoes
+                                   where a.Id == 1
+                                   select new
+                                   {
+                                        // a.Nome , a.Rating, c.Indice, c.Investidor                                    
+                                       a.Nome , a.Rating, c.Indice, NomeInvestidor = c.Investidor.Nome
+                                   };
+*/
+/* 
+            var consulta = (from a in context.Instituicoes
+                                   join c in context.Aplicacoes
+                                        on a.Id equals c.InstituicaoId
+                                   where c.Investidor.Nome == "MARCO ANTONIO SILVA"
+                                   select new
+                                   {
+                                        // a.Nome , a.Rating, c.Indice, c.Investidor                                    
+                                       a.Nome , a.Rating, c.Indice, NomeInvestidor = c.Investidor.Nome
+                                   }).ToList();
+*/
+                // var resultado = consulta.ToList(); 
+/*
+            var consulta = context.Instituicoes
+                            .Join( context.Aplicacoes,
+                                    a => a.Id,
+                                    b => b.InstituicaoId,
+                                    (a ,b) => new { a.Id,  a.Nome , a.Rating, b.Indice, b.InvestidorId  }
+                            )
+                            .Join( context.Investidores,
+                                o => o.InvestidorId,
+                                i => i.Id,
+                                (o, i) => new{
+                                    o.Id,  o.Nome , o.Rating, o.Indice, o.InvestidorId, NomeInvestidor = i.Nome    
+                                }
+                            
+                            )
+                            .AsNoTracking()
+                            .ToList();
+*/
+/*
+            var consulta = (from a in context.Instituicoes
+                                join c in context.Aplicacoes
+                                    on a.Id equals c.InstituicaoId
+                            where a.Id == 1
+                            select new {
+                                        a.Nome , a.Rating,   NomeInvestidor = c.Investidor.Nome
+                                   }).ToList();                                
+*/
+
+            var consulta = (from a in context.Instituicoes
+                                   join c in context.Aplicacoes
+                                        on a.Id equals c.InstituicaoId into j1
+                                    from r in j1.DefaultIfEmpty()
+                                //    where r.Investidor.Nome == "MARCO ANTONIO SILVA"
+                                    where a.Id == 2
+                                   select new
+                                   {
+                                      InstituicaoId = a.Id, Nome = a.Nome , Rating = a.Rating , Indice = r.Indice, NomeInvestidor = r.Investidor.Nome
+                                   }).ToList();
+
+
+                System.Console.WriteLine("");
+
+                consulta.ToList().ForEach( item => {
+                    System.Console.WriteLine($"{item.InstituicaoId} - {item.Nome} - {item.Rating} - {item.Indice} - {item.NomeInvestidor}");
+                    System.Console.WriteLine("------------------");
+/*
+                        item.Aplicacoes
+                            .ToList()
+                            .ForEach( aplicacao => {
+                                            // context.Entry( aplicacao ).Reference( x => x.Investidor ).Load();
+
+                                            System.Console.WriteLine($"{aplicacao.Titulo} - {aplicacao.PercentualRemuneracao} - {aplicacao.InvestidorId} - {NomeInvestidor}");
+
+                                    });
+*/                                    
+                });
+
+                System.Console.WriteLine("");
+
+        }
+
+        private static void GetAllInstituicao()
+        {
+
+            using( var context = new BlogDataContext()){
+
+
+
+                var instituicoes = context.Instituicoes
+                                            .Include( x => x.Aplicacoes )   
+                                                .ThenInclude( inv => inv.Investidor)
+                                            // .Include( "Aplicacoes.Investidor")
+                                            .ToList();
+
+                instituicoes.ForEach( item => {
+
+                        System.Console.WriteLine($"{item.Nome} - {item.Rating}");
+
+                        System.Console.WriteLine("-----------------------------");
+
+                        item.Aplicacoes
+                            .ToList()
+                            .ForEach( aplicacao => {
+                                            // context.Entry( aplicacao ).Reference( x => x.Investidor ).Load();
+
+                                            System.Console.WriteLine($"{aplicacao.Titulo} - {aplicacao.PercentualRemuneracao} - {aplicacao.InvestidorId} - {aplicacao.Investidor.Nome}");
+
+                                    });
+
+                        System.Console.WriteLine("-----------------------------");
+                });
+            }
+
+        }
+
+        private static void GetAllInvestidor()
+        {
+            using( var context = new BlogDataContext()){
+                var investidores = context.Investidores
+                                            // .Include( x => x.Aplicacoes )
+                                            // .Where( x => x.Nome.Contains("GUSTAVO") )
+                                            .ToList();
+/*
+                investidores.ForEach( item => {
+                    // if ( item.Aplicacoes.Count() > 0 ){
+                        System.Console.WriteLine($"{item.Nome}");
+                        System.Console.WriteLine("---------");
+
+                        item.Aplicacoes.ToList()
+                                        .ForEach ( aplicacao => {
+                                            System.Console.WriteLine($"{aplicacao.Titulo} - {aplicacao.Indice} - {aplicacao.ValorInvestido}");
+                                        });
+                        System.Console.WriteLine("");
+                    // }
+                });
+*/
+                investidores.ForEach( item => {
+                    Console.WriteLine($"{item.Nome} ");
+                    Console.WriteLine("---------------------");
+
+                    foreach( var aplicacao in item.Aplicacoes){
+                        Console.WriteLine($"{aplicacao.Titulo} {aplicacao.ValorAtualizado}");
+                    }
+                });
+/*  
+                foreach( var item in investidores ){
+                    Console.WriteLine($"{item.Nome} ");
+                    Console.WriteLine("---------------------");
+
+                    foreach( var aplicacao in item.Aplicacoes ){
+                        Console.WriteLine($"{aplicacao.Titulo} {aplicacao.ValorAtualizado}");
+                    }
+
+                    Console.WriteLine("");
+                }
+*/
+            }
+        }
+
+        private static void GetAllAplicacao()
+        {
+            using( var context = new BlogDataContext()){
+                var aplicacoes = context.Aplicacoes
+                                        .Include( x => x.Investidor )
+                                        .Include( x => x.Instituicao )
+                                        .Where( x => x.Investidor.Nome.Equals("MARCO ANTONIO SILVA"))
+                                        .ToList();
+
+                System.Console.WriteLine("");
+
+                aplicacoes.ForEach( item => {
+                    System.Console.WriteLine($"{item.Instituicao.Nome} - {item.Titulo} - {item.Investidor.Nome}");
+                });
+
+                System.Console.WriteLine("");
+            }
+        }
+
+        private static void InsertPostEF()
+        {
+            using var context = new BlogDataContext();
+
+            var user = context.Users.FirstOrDefault();
+
+            Post post = new Post{
+                Author = user,
+                Body = "Meu Artigo",
+                Category = new Category{
+                    Name = "Backend3",
+                    Slug = "backend3"
+                },
+                CreateDate = System.DateTime.Now,
+                Slug = "meu-artigo",
+                Summary = "Neste artigo vamos conferir...",
+                Title = "Meu Artigo"
+
+            };
+
+            context.Posts.Add( post );
+            context.SaveChanges();
+
+        }
+
+        private static void InsertUserEF()
+        {
+            using var context = new BlogDataContext();
+
+            context.Users.Add( new User{    Name = "Gustavo Rocha Silva",
+                                            Slug = "gustavosilva",
+                                            Email = "gustavospj.silva@gmail.com.br",
+                                            Bio = "Hadoop Certified",
+                                            Image = "https://balta.io",
+                                            PasswordHash = "123456489"});
+
+            context.SaveChanges();
+        }
+        /*
+       private static void GetAllPost()
+       {
+           using( var context = new BlogDataContext() ){
+               // var posts = context
+               //             .Posts
+               //             .ToList();
+               var posts = context
+                   .Posts
+                   .AsNoTracking()
+                   .Include(x => x.Author)
+                   .Include(x => x.Category)
+                   .OrderBy(x => x.LastUpdateDate)
+                   .ToList();                                
+
+               foreach( var post in posts ){
+                   System.Console.WriteLine($"{post.Id} - {post.Title} - {post.Author.Name} - {post.Category.Name} - {post.LastUpdateDate}");
+               }
+           }
+       }
+
+       private static void InsertPost(){
+
+           using var context = new BlogDataContext();
+
+           var user = new User
+           {
+               Name = "André Baltieri",
+               Slug = "marcoSilva",
+               Email = "maransi@gmail.com",
+               Bio = "9x Microsoft MVP",
+               Image = "https://balta.io",
+               PasswordHash = "123098457"
+           };
+
+           var category = new Category {Name = "Backend2", Slug = "backend2"};
+
+           var post = new Post
+           {
+               Author = user,
+               Category = category,
+               Body = "<p>Hello world</p>",
+               Slug = "testando-ef-core",
+               Summary = "Neste artigo vamos aprender EF core",
+               Title = "Começando com EF Core",
+               CreateDate = DateTime.Now,
+               LastUpdateDate = DateTime.Now,
+           };
+
+           context.Posts.Add(post); // Não adicionei autor nem categoria
+           context.SaveChanges();            
+
+
+       }
+*/
+       private async static void GetAllCategory()
+       {
+           using( var context = new BlogDataContext()){
+                var categories = await context
+                                .Categories
+                                .Include( x => x.Posts )
+                                .Where( x => x.Id.Equals(5))
+                                .ToListAsync();
+
+                categories.ForEach( item => { 
+                    System.Console.WriteLine($"{item.Id} - {item.Name} - {item.Slug}");
+
+                    // item.Posts.ToList().ForEach( itemP => {
+                    //     System.Console.WriteLine($"{itemP.Id} - {itemP.Title}");
+                    // } );
+
+
+                } );
+
+/*
+                var posts = await context.Posts
+                                    .Include( x => x.Category)
+                                    .ToListAsync();
+
+                posts.ForEach( item => {
+                    System.Console.WriteLine($"{item.Id} - {item.Title} - {item.Category.Name}");
+                });
+*/
+
+/*
+                foreach( Category item in categories ){
+                   System.Console.WriteLine($"{item.Id} - {item.Name} - {item.Slug}");
+                }
+*/                
+           }
+       }
+/*
+       private static void GetByAnyThing(string description)
+       {
+           using( var context = new BlogDataContext()){
+               var tags = context
+                           .Tags
+                           .FromSqlRaw($"Select * from Tag Where Slug = '{description}'")
+                           .ToList();
+
+               foreach (var item in tags)
+               {
+                   System.Console.WriteLine( $"{item.Id} - {item.Name} - {item.Slug}" );
+               }
+           }
+       }
+
+       private static void GetByName(string name)
+       {
+
+           System.Console.WriteLine("-------------------------");
+
+           using( var context = new BlogDataContext() ){
+               var tags = context
+                           .Tags
+                           .Where( x => x.Name.Contains(name))
+                           .AsNoTracking()
+                           .ToList();
+
+               foreach (var item in tags)
+               {
+                   System.Console.WriteLine($"{item.Id} - {item.Name} - {item.Slug}");
+               }
+           }
+
+       }
+
+       private static void GetById(int id)
+       {
+           System.Console.WriteLine("--------------------------");
+           using( var context = new BlogDataContext()){
+               var tag = context.Tags.FirstOrDefault( x => x.Id == id );
+
+               System.Console.WriteLine($"{tag.Id} - {tag.Name}");
+           }
+       }
+
+       private static void Delete(int id)
+       {
+           using( var context = new BlogDataContext() ){
+               var tag = context.Tags.FirstOrDefault( x => x.Id == id );
+
+               context.Remove( tag );
+               context.SaveChanges();
+           }
+       }
+
+       private static void Update( int id )
+       {
+           using( var context = new BlogDataContext() ){
+               var tag = context.Tags.FirstOrDefault( x => x.Id == id);
+
+               if ( tag != null ){
+                   tag.Name = ".NET";
+                   tag.Slug = "build";
+
+                   context.Update( tag );
+                   context.SaveChanges();
+               }
+
+           }
+
+
+       }
+
+       static void GetAll(){
+           using( var context = new BlogDataContext() ){
+               var tags = context.Tags.ToList();
+
+               foreach (var item in tags)
+               {
+                   System.Console.WriteLine($"{item.Id} - {item.Name} - {item.Slug}");
+               }
+           }
+       }
+
+       static void Create(){
+           using( var context = new BlogDataContext() ){
+               var tag = new Tag{ Name= "ASP.NET", Slug= "aspnet4"};
+
+               context.Tags.Add( tag );
+
+               context.SaveChanges();
+
+               var tags = context.Tags.ToList();
+
+               foreach( var item in tags){
+                   System.Console.WriteLine($"{item.Id} - {item.Name}");
+               }
+           }
+
+       }
+*/
+    }
+}
