@@ -1,0 +1,89 @@
+Fundamentos LINQ - Language Integrated Query
+--------------------------------------------
+
+Aula 1 - C# - Introdução ao LINQ
+--------------------------------
+
+    . O que é o LINQ?
+
+        . Conjunto de tecnologias com base na integração de recursos de consulta diretamente na 
+            linguagem C#.
+
+        . Como as consulta são feitas? Geralmente são expressas como cadeias de caracteres, sem 
+            verificação de tipos no tempode compilação ou suporte ao InteliSense.
+
+        . Tem a necessidae de se aprender uma linguagem de consulta, exemplo: SQL.
+
+    . Vantagens:
+
+        . Sintaxe unificada. Independente da fonte de dados que estiver utilizando.
+
+        . Verificação de tipo no tempo de compilação.Suporte ao IntelliSense.
+
+        . Sintaxe unificada. Independente da fonte de dados que esitver utilizando.
+
+    
+    . Operações LINQ consistem em 3 operações:
+
+        . Obter a fonte de dados:
+
+            . Banco de Dados
+            . XML
+            . JSON
+
+        . Criar a consulta
+
+        . Executar a consulta:
+
+            . Execução adiada:
+
+                . A variável armazena apensa os comandos da consulta.
+
+                . A execução real da consulta é adiada até que você itere sobre a variável.
+
+            . Execução imediata:
+
+                . Funções de agregação (Firs, Max, Sum)
+
+                . Para forçar a execução imediata e armazedo na memória, basta utilizar:
+
+                    . ToList()
+                    . ToArray()
+
+    . Como sei que posso executar uma consulta LINQ?
+
+        . Implementar a interface genérica IEnumerable<T> ou uma interface derivada. São chamados 
+            de "Tipos passiveis de consulta".
+                
+        
+            Baseados em métodos            Sintaxe de expressão de 
+                de extensão                  de consulta c#
+            --------------------           -----------------------
+
+            Where-------------->+           +<----------from
+                                |           |
+            First-------------->|           |<----------Where
+                                |           |
+            Last--------------->|-> LINQ <--|<----------select
+                                |           |
+            GroupBy------------>|           |<----------group
+                                |           |
+            OrderBy------------>+           |            | join
+                                            |            | in
+                                            |<-----------| on
+                                            |            | equals  
+                                            |
+                                            +<----------- order by / descending                                       
+
+Aula 2 - C# LINQ - Criando a primeira consulta
+----------------------------------------------
+
+    . Acesse a pasta raiz de projetos e execute a linha abaixo:
+
+        dotnet new console -o FundamentoLINQ -n FundamentoLINQ -f net5.0
+
+    . Acesse a pasta do projeto criado e altere o conteúdo da classe "Program.cs" pelas linhas abaixo:
+
+
+
+
