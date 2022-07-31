@@ -1,6 +1,8 @@
 Fundamentos LINQ - Language Integrated Query
 --------------------------------------------
 
+https://dotnettutorials.net/lesson/introduction-to-linq/
+
 Aula 1 - C# - Introdução ao LINQ
 --------------------------------
 
@@ -30,6 +32,9 @@ Aula 1 - C# - Introdução ao LINQ
             . Banco de Dados
             . XML
             . JSON
+            . Objetos em Memória
+            . ADO.NET Data Set
+            . Entity Framework
 
         . Criar a consulta
 
@@ -87,7 +92,7 @@ Aula 2 - C# LINQ - Criando a primeira consulta
         ...
         static void Main(string[] args)
         {
-            // Fonte de Dados
+            // Fonte de Dados (Datasource)
             var listaProdutos = new List<Produto>()
             {
                 new Produto {Id = 9, CategoriaId = 2, Nome = "Geladeira", Status = true, Valor = 10},
@@ -107,11 +112,11 @@ Aula 2 - C# LINQ - Criando a primeira consulta
                 new Categoria(){ Id = 3, Status = true, Nome = "Vestuario"}
             };
 
-            // Criar Consulta LINQ
+            // Criar Consulta LINQ  (Query)
             var resultado = from produto in listaProdutos
                             select produto;
 
-            // Executar a consulta
+            // Executar a consulta  (Execution)
             resultado.ToList().ForEach( item => {
                 System.Console.WriteLine($"{item.Id} | {item.Nome} | {item.Valor} | {item.CategoriaId}");
             });
@@ -165,30 +170,68 @@ Aula 2 - C# LINQ - Criando a primeira consulta
 
     . Execute o projeto e veja se saiu o resultado da lista de produtos com valores superiores a 50.
 
-    . Importante: Somente é possível executar uma expressão LINQ se o objeto Implementar a interface genérica IEnumerable<T> 
-                    ou uma interface derivada. No nosso exemplo fomos obrigado chamar o método ".ToList()" para podermos iterá-lo
-                    com o método ".ForEach(...)":
+    . Importante: Se tivermos somente uma expressão LINQ, conseguiremos itera-la somente com o comando "foreach( var item in resultado){ ... }".
+                    Caso queiramos utilizar funções Lambda, como ".ForEach(...)" precisamos fazer com que o resultado seja um List, ou Array. O
+                    mais fácil para isso seria acrescenter parenteses na expressão LINQ e fazermos a chamada do método "ToList()".
 
-        ...
-        // Executar a consulta
-        resultado.ToList().ForEach( item => {
-            System.Console.WriteLine($"{item.Id} | {item.Nome} | {item.Valor} | {item.CategoriaId}");
-        });
-        ...
+                ...
+                var resultado = (   from produto in listaProdutos
+                                    select produto
+                                }).ToList();
 
-    . Sintaxe das expressões de consulta LINQ
+                resultado.ForEach( item => {
+                    System.Console.WriteLine($"{item.Id} | {item.Nome} | {item.Valor} | {item.CategoriaId}");
+                });
+                ...
 
-        from id in fonteDados
-        { from id in fonteDados |
-        join id in fonteDados on expressão equals expressão [ into id ] |
-        let id = expressão |
-        where condição |
-        orderby id1, id2, … [ascending | descending] }
-        select expressão | group expressão by chave
-        [ into id ]
+            ou, podemos deixar a expressão LINQ intacta e chamar o "ToList()" no momento da iteração:
 
-        . As expressões de consulta devem iniciar com from, depois podem ter um ou mais from, join, let, where ou orderby e 
-            deve terminar com select ou group by.
+                ...
+                var resultado = from produto in listaProdutos
+                                select produto;
+
+                // Executar a consulta
+                resultado.ToList().ForEach( item => {
+                    System.Console.WriteLine($"{item.Id} | {item.Nome} | {item.Valor} | {item.CategoriaId}");
+                });
+                ...
+
+
+        . Caso não queira trabalhar com Lambda, podemos iterar o resultado diretamente num "foreach( var item in resultado){ ... }"
+
+                ...
+                var resultado = from produto in listaProdutos
+                                where produto.Valor > 50            
+                                select produto;
+
+                foreach( var item in resultado ){
+                    System.Console.WriteLine($"{item.Id} | {item.Nome} | {item.Valor} | {item.CategoriaId}");
+                }
+
+
+    . Sintaxe LINQ Query:
+
+
+        from <object> in <datasource>       <--- Initialization     
+
+        where <condition>                   <--- Condition
+
+        select <object>                     <--- Selection
+
+
+        . Exemplo:
+
+            from id in fonteDados
+            { from id in fonteDados |
+            join id in fonteDados on expressão equals expressão [ into id ] |
+            let id = expressão |
+            where condição |
+            orderby id1, id2, … [ascending | descending] }
+            select expressão | group expressão by chave
+            [ into id ]
+
+            . As expressões de consulta devem iniciar com from, depois podem ter um ou mais from, join, let, where ou orderby e 
+                deve terminar com select ou group by.
 
     . Palavras-chaves (cláusulas) de C# para consultas LINQ
 
@@ -231,6 +274,72 @@ Aula 2 - C# LINQ - Criando a primeira consulta
 https://www.devmedia.com.br/expressoes-de-consulta-linq-net-magazine-78/18217
 https://www.devmedia.com.br/linq-e-csharp-efetuando-consultas-com-lambda-expressions/38863
 
+
+
+// PAREI AQUI
 Aula 3 - C# - LINQ - Where e OrderBy
 ------------------------------------
 
+    . Altere a expressão LINQ como abaixo:
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Nome == "arroz"   // Linha Alterada
+                        select produto;
+        ...
+
+    . Ao executar o projeto veremos que não trouxe nenhum registro, porque na coleção não existe "arroz"
+        e sim "Arroz". Para que possamos considerar ambas, vamos utilizar a expressão "ToLower()".
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Nome.ToLower() == "arroz"   // Linha Alterada
+                        select produto;
+        ...
+
+    . Para selecionar somente os itens que iniciam com a letra "a" o código ficaria:
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Nome.ToLower().Substring(0,1) == "a"   // Linha Alterada
+                        select produto;
+        ...
+
+    . Para selecionar itens de uma coluna "Boolean":
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Nome.ToLower().Substring(0,1) == "a" 
+                            && produto.Status == true                              // Linha Alterada
+                        select produto;
+        ...
+
+    . Para ordenar a saída:
+
+        ...
+        var resultado = from produto in listaProdutos
+                        orderby produto.Id                          // Linha Alterada
+                        select produto;
+        ...
+
+        ou 
+
+        ...
+        var resultado = from produto in listaProdutos
+                        orderby produto.Id descending                // Linha Alterada
+                        select produto;
+        ...
+
+    . Ordenando e filtrando:
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Id > 1 && produto.Id < 6      // Linha Alterada
+                        orderby produto.Id descending                // Linha Alterada
+                        select produto;
+        ...
+
+Aula 4 - C# - LINQ - Projetando dados com Select
+------------------------------------------------
+
+https://www.youtube.com/watch?v=DlsUG2YRa6g&list=PLelKrgw43Tu2A2hCLMtrrS_Ox6ds-p7jw&index=4
