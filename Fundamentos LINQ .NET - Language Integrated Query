@@ -84,6 +84,153 @@ Aula 2 - C# LINQ - Criando a primeira consulta
 
     . Acesse a pasta do projeto criado e altere o conteúdo da classe "Program.cs" pelas linhas abaixo:
 
+        ...
+        static void Main(string[] args)
+        {
+            // Fonte de Dados
+            var listaProdutos = new List<Produto>()
+            {
+                new Produto {Id = 9, CategoriaId = 2, Nome = "Geladeira", Status = true, Valor = 10},
+                new Produto {Id = 2, CategoriaId = 3, Nome = "Short", Status = true, Valor = 1},
+                new Produto {Id = 4, CategoriaId = 1, Nome = "Maquina de lavar", Status = false, Valor = 32},
+                new Produto {Id = 3, CategoriaId = 1, Nome = "Video Game", Status = true, Valor = 99},
+                new Produto {Id = 6, CategoriaId = 2, Nome = "Arroz", Status = true, Valor = 55},
+                new Produto {Id = 8, CategoriaId = 1, Nome = "TV", Status = true, Valor = 45},
+                new Produto {Id = 1, CategoriaId = 3, Nome = "Camiseta", Status = true, Valor = 100},
+                new Produto {Id = 5, CategoriaId = 1, Nome = "Microondas", Status = true, Valor = 90},
+                new Produto {Id = 7, CategoriaId = 2, Nome = "Feijão", Status = true, Valor = 12},
+            };
+
+            var listaCategorias = new List<Categoria>(){
+                new Categoria(){ Id = 1, Status = true, Nome = "Eletronicos"},
+                new Categoria(){ Id = 2, Status = true, Nome = "Alimentos"},
+                new Categoria(){ Id = 3, Status = true, Nome = "Vestuario"}
+            };
+
+            // Criar Consulta LINQ
+            var resultado = from produto in listaProdutos
+                            select produto;
+
+            // Executar a consulta
+            resultado.ToList().ForEach( item => {
+                System.Console.WriteLine($"{item.Id} | {item.Nome} | {item.Valor} | {item.CategoriaId}");
+            });
+
+        }
+        ...
+
+    . Crie a pasta "Model" e as classes abaixo dentro dela:
+
+        namespace FundamentoLINQ.Model
+        {
+
+            public class Categoria
+            {
+                
+                public int Id { get; set; }
+                public string Nome { get; set; }
+                public bool Status { get; set; }
+                    
+
+            }
+        }    
 
 
+
+
+        namespace FundamentoLINQ.Model
+        {
+
+            public class Produto
+            {
+                public int Id { get; set; }
+                public string Nome { get; set; }
+                public bool Status { get; set; }
+                public decimal Valor { get; set; }
+                public int CategoriaId { get; set; }
+
+            }
+
+        }
+
+    . Execute o projeto e veja se saiu o resultado da lista de produtos corretamente.
+
+    . Altere na classe "Program.cs" a chamada LINQ como abaixo:
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Valor > 50            // Linha inserida
+                        select produto;
+        ...
+
+    . Execute o projeto e veja se saiu o resultado da lista de produtos com valores superiores a 50.
+
+    . Importante: Somente é possível executar uma expressão LINQ se o objeto Implementar a interface genérica IEnumerable<T> 
+                    ou uma interface derivada. No nosso exemplo fomos obrigado chamar o método ".ToList()" para podermos iterá-lo
+                    com o método ".ForEach(...)":
+
+        ...
+        // Executar a consulta
+        resultado.ToList().ForEach( item => {
+            System.Console.WriteLine($"{item.Id} | {item.Nome} | {item.Valor} | {item.CategoriaId}");
+        });
+        ...
+
+    . Sintaxe das expressões de consulta LINQ
+
+        from id in fonteDados
+        { from id in fonteDados |
+        join id in fonteDados on expressão equals expressão [ into id ] |
+        let id = expressão |
+        where condição |
+        orderby id1, id2, … [ascending | descending] }
+        select expressão | group expressão by chave
+        [ into id ]
+
+        . As expressões de consulta devem iniciar com from, depois podem ter um ou mais from, join, let, where ou orderby e 
+            deve terminar com select ou group by.
+
+    . Palavras-chaves (cláusulas) de C# para consultas LINQ
+
+        Cláusula	    Descrição
+        --------        ---------
+        from	        Especifica a fonte de dados e uma variável de série (similar a uma variável de iteração num laço).
+
+        where	        Filtra elementos da fonte de dados baseada em uma ou mais expressões booleanas.
+
+        select	        Faz projeções, permitindo especificar o tipo e o formato dos elementos do resultado da consulta. 
+                        Frequentemente usada em conjunto com o recurso de tipos anônimos.
+
+        join	        Junta duas fontes de dados baseado em comparações de igualdade entre dois elementos de comparação 
+                        especificados.
+
+        in              Palavra-chave contextual usada numa cláusula join.
+
+        on	            Palavra-chave contextual usada numa cláusula join.
+
+        equals	        Palavra-chave contextual usada numa cláusula join. Observe que se deve usar a palavra-chave equals 
+                        ao invés do operador == na comparação da cláusula join.
+
+        group	        Agrupa os resultados de uma consulta de acordo com valores específicos de uma chave.
+
+        by	            Palavra-chave contextual usada numa cláusula group.
+
+        into	        Fornece um identificador para servir de referência para os resultados de uma cláusula de junção (join), 
+                        agrupamento (group) ou projeção (select).
+
+        orderby	        Classifica os resultados em ordem ascendente ou descendente.
+
+        ascending	    Palavra-chave contextual usada numa cláusula orderby para determinar a classificação em ordem ascendente, 
+                        que é a classificação padrão em caso de omissão.
+
+        descending	    Palavra-chave contextual usada numa cláusula orderby para determinar a classificação em ordem descendente.
+
+        let	            Introduz uma variável para armazenar resultados de expressões intermediárias numa expressão de consulta. 
+                        Deste modo, o resultado armazenado na variável pode ser reutilizado na consulta.
+
+https://www.devmedia.com.br/expressoes-de-consulta-linq-net-magazine-78/18217
+https://www.devmedia.com.br/linq-e-csharp-efetuando-consultas-com-lambda-expressions/38863
+
+Aula 3 - C# - LINQ - Where e OrderBy
+------------------------------------
 
