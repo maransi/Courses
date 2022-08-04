@@ -21,7 +21,7 @@
 
         {
                 "sdk" : {
-                "version" : "3.1.408"
+                "version" : "5.0.17"
                 }     
 
         }
@@ -31,7 +31,7 @@
 
         cd cursoApiNetcore/src
 
-        dotnet new webapi -n application -o Api.Application --no-https
+        dotnet new webapi -n application -o Api.Application --no-https -f net5.0
 
         dotnet sln add Api.Application
 
@@ -56,7 +56,7 @@
 
 . Digite o comando abaixo para criar a classlib:
 
-        dotnet new classlib -n Domain -o Api.Domain -f netcoreapp3.1
+        dotnet new classlib -n Domain -o Api.Domain -f net5.0
 
 . Dentro da pasta "src" digite o comando abaixo para adicionar a pasta "Api.Domain" a solution:
 
@@ -73,13 +73,11 @@
 . Opções para o comando abaixo "Ctrl+Shift+B", ou acesse a opção "Terminal / Run Build Task"
 
 
-
-
 . Acesse a pasta source e digite o comando abaixo:
 
         cd src
 
-        dotnet new classlib -n CrossCutting -f netcoreapp3.1 -o Api.CrossCutting
+        dotnet new classlib -n CrossCutting -f net5.0 -o Api.CrossCutting
 
 . Dentro da pasta "src" adicone a pasta CrossCutting a solution:
 
@@ -90,14 +88,11 @@
 
         dotnet build
 
-
-
-
 . Acessar a pasta src e digitar o comando abaixo:
 
         cd src
 
-        dotnet new classlib -n Data -f netcoreapp3.1 -o Api.Data
+        dotnet new classlib -n Data -f net5.0 -o Api.Data
 
 . Dentro da pasta "src" adicone a pasta CrossCutting a solution:
 
@@ -113,7 +108,7 @@
 
 . Acessar a pasta src e digitar o comando abaixo:
 
-        dotnet new classlib -n Service -f netcoreapp3.1 -o Api.Service
+        dotnet new classlib -n Service -f net5.0 -o Api.Service
 
 . Dentro da pasta "src" adicone a pasta CrossCutting a solution:
 
@@ -124,9 +119,6 @@
 . Digite o comando abaixo:
 
         dotnet build
-
-
-
 
 . No VSCode, clique com o botão direito sobre a pasta Api.Domain e crie as folder abaixo:
 
@@ -164,29 +156,36 @@
 
         namespace Api.Domain.Entities
         {
-            public class UserEntity : BaseEntity
-            {
+                [Table("User")]
+                public class UserEntity : BaseEntity
+                {
+                        public string Nome { get; set; }
 
-                public string Nome { get; set; }
-
-                public string Email { get; set; }
-                
-            }
+                        public string Email { get; set; }
+                }
         }
 
-. Inclua a tag abaixo no arquivo Api.Data.Data.csproj:
+. Acesse a pasta ./Api.Data e execute as linhas abaixo no prompt do sistema operacional:
+
+        dotnet add package Microsoft.EntityFrameworkCore --version 5.0.10
+        dotnet add package Microsoft.EntityFrameworkCore.Tools --version 5.0.5
+        dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.5
+        dotnet add package Pomelo.EntityFrameworkCore.MySql --version 5.0.4
+
+. Verifique se as tags abaixo estão no arquivo Api.Data.Data.csproj:
+
 
         <ItemGroup>
-                <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.14" />
+                <!-- <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.5" /> -->
 
-                <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.2" />
+                <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version=5.0.4" />
 
-                <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.14">
+                <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.5">
                         <PrivateAssets>all</PrivateAssets>
                         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
                 </PackageReference>
         
-                <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.14">
+                <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5">
                         <PrivateAssets>all</PrivateAssets>
                         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
                 </PackageReference>
@@ -194,20 +193,18 @@
         </ItemGroup>
 
 
-
 . Acesse a pasta /src/Api.Data e execute os comandos abaixo:
+
+        dotnet ef  # Verificação se a ferramenta foi instalada com sucesso
 
         dotnet restore
 
+        # Caso não exista a ferramenta "dotnet-ef" execute a linha abaixo
         dotnet tool install --global dotnet-ef
-
-        dotnet ef  # Verificação se a ferramenta foi instalada com sucesso
 
         dotnet build
 
 . Verifique se depois do "build" a aplicação compilou com zero erro.
-
-
 
 . Dentro da pasta Api.Data crie as pastas abaixo:
 
@@ -224,47 +221,21 @@
 . Crie a classe MyContext.cs dentro da pasta ./Api.Data/Context como abaixo. O contexto que fará a conexão
         com o banco de dados.
 
+        using System;
         using Api.Domain.Entities;
         using Microsoft.EntityFrameworkCore;
 
         namespace Api.Data.Content
         {
-            public class MyContext : DbContext
-            {
+                public class MyContext : DbContext
+                {
+                        public DbSet<UserEntity> Users { get; set; }
 
-            public DbSet<UserEntity> Users { get; set; }
-
-                public MyContext(DbContextOptions<MyContext> options) : base(options){  }
-
-                protected override void OnModelCreating(ModelBuilder modelBuilder){
-                    base.OnModelCreating(modelBuilder);
+                        protected override void OnConfiguring(DbContextOptionsBuilder options)
+                                => options.UseMySql("Server=localhost;Port=3306;Database=testdb;Uid=root;Pwd=root",
+                                                        ServerVersion.AutoDetect("Server=localhost;Port=3306;Database=testdb;Uid=root;Pwd=root"));
                 }
-            }
         }
-
-. Criar a classe ContextFactory como abaixo:
-
-    using Microsoft.EntityFrameworkCore.Design;
-    using Microsoft.EntityFrameworkCore;
-
-    namespace Api.Data.Content
-    {
-        public class ContextFactory : IDesignTimeDbContextFactory<MyContext>
-        {
-            
-            public MyContext CreateDbContext( string[] args ){
-                var connectionString = "Server=localhost;Port=3306;Database=desenv;Uid=marco;Pwd=brasil2";
-                var optionBuilder = new DbContextOptionsBuilder<MyContext>();
-
-                optionBuilder.UseMySql( connectionString );
-
-
-                return new MyContext(optionBuilder.Options);
-            }
-
-
-        }
-    }
 
 
 . Crie na pasta "mapping" a classe "UserMap" como abaixo:
@@ -279,23 +250,48 @@
                 {
                         public void Configure(EntityTypeBuilder<UserEntity> builder)
                         {
+                        builder.ToTable("User");
 
-                                builder.ToTable("User");
+                        builder.HasKey( u => u.Id );
 
-                                builder.HasKey( u => u.Id );
+                        builder.HasIndex( u => u.Email );
 
-                                builder.HasIndex( u => u.Email )
-                                .IsUnique();
+                        builder.Property( u => u.Nome )
+                                .HasColumnName("Nome")
+                                .HasColumnType("VARCHAR")
+                                .HasMaxLength(60)
+                                .IsRequired();
 
-                                builder.Property( u => u.Name )
-                                        .IsRequered()
-                                        .HasMaxLength(60);
+                        builder.Property( u => u.Email )
+                                .HasColumnName("Email")
+                                .HasColumnType("VARCHAR")
+                                .HasMaxLength(100)
+                                .IsRequired();
 
-                                builder.Property( u => u.Email )
-                                        .HasMaxLength(100);
+                        builder.Property( u => u.CreatedAt )
+                                .HasColumnName("CreatedAt")
+                                .HasColumnType("TIMESTAMP")
+                                .HasDefaultValueSql("CURRENT_TIMESTAMP");
                         }
                 }
         }
+
+
+        . Observações: O Engine EF do MySQL não se mostrou eficiente para criar a base. Nesse caso compensa mais criar
+                        o script manualmente e executá-lo no banco:
+
+                CREATE DATABASE testdb;
+
+                USE testdb;
+
+                CREATE TABLE `User` (
+                `Id` int NOT NULL AUTO_INCREMENT,
+                `Nome` VARCHAR(100) CHARACTER SET utf8mb4 NULL,
+                `Email` VARCHAR(100) CHARACTER SET utf8mb4 NULL,
+                `CreatedAt` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                `UpdateAt` datetime(6) NULL,
+                CONSTRAINT `PK_Users` PRIMARY KEY (`Id`)
+                ) CHARACTER SET utf8mb4;
 
 
 . Acesse a classe Api.Data.Content.MyContext.cs e altere o método "OnModelCreating" como abaixo:
@@ -337,18 +333,14 @@
 
         namespace Api.Domain.Interfaces
         {
-                public interface IRepository<T> where T : BaseEntity
+                public interface IRepository<T,K> where T: BaseEntity
                 {
                         Task<T> InsertAsync( T item);
-
-                        Task<T> UpdateAsync( T item);
-
-                        Task<bool> DeleteAsync(Guid id);
-
-                        Task<T> SelectAsync( Guid id);
-
+                        Task<T> UpdateAsync( T item );
+                        Task<bool> DeleteAsync(K id );
+                        Task<T> SelectAsync( K id );
                         Task<IEnumerable<T>> SelectAsync();
-                        
+                        Task<bool> ExistAsync( K id );
                 }
         }
 
@@ -364,68 +356,121 @@
 
         namespace Api.Data.Repository
         {
-            public class BaseRepository<T> : IRepository<T> where T : BaseEntity
-            {
-                protected readonly MyContext _context;
-
-                private DbSet<T> _dataSet;
-
-                public BaseRepository(MyContext context)
+                public class BaseRepository<T, K> : IRepository<T, K> where T : BaseEntity
                 {
-                    _context = context;
-                    _dataSet = _context.Set<T>();
+                        protected readonly MyContext _context;
 
-                }
+                        private DbSet<T> _dataSet;
 
-
-
-                public Task<bool> DeleteAsync(Guid id)
-                {
-                    throw new NotImplementedException();
-                }
-
-                public async Task<T> InsertAsync(T item)
-                {
-                    try
-                    {
-                        if (item.Id == Guid.Empty)
+                        public BaseRepository(MyContext context)
                         {
-                            item.Id = Guid.NewGuid();
+                        _context = context;
+                        _dataSet = _context.Set<T>();
+
                         }
 
-                        item.CreateAt = DateTime.UtcNow;
 
-                        _dataSet.Add( item );
+                        public async Task<bool> DeleteAsync(K id)
+                        {
+                        try
+                        {
+                                var result = await _dataSet.SingleOrDefaultAsync( p => p.Id.Equals(id));
 
-                        await _context.SaveChangesAsync();
+                                if (result == null)
+                                return false;
 
-                    }
-                    catch (Exception ex)
-                    {
-                        
-                        throw ex;
-                    }
+                                _dataSet.Remove(result);
 
-                    return item;
+                                await _context.SaveChangesAsync();
 
+                                return true;
+                        }
+                        catch( Exception ex)
+                        {
+                                throw ex;
+                        }
+                        }
+
+                        public async Task<T> InsertAsync(T item)
+                        {
+                        try
+                        {
+                                item.CreatedAt = DateTime.UtcNow;
+
+                                _dataSet.Add(item);
+
+                                await _context.SaveChangesAsync();
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                                throw ex;
+                        }
+
+                        return item;
+
+                        }
+
+                        public async Task<IEnumerable<T>> SelectAsync()
+                        {
+                        try
+                        {
+                                return await _dataSet.ToListAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                                
+                                throw ex;
+                        }
+
+                        }
+
+                        public async Task<T> SelectAsync(K id)
+                        {
+                        try
+                        {
+                                return await _dataSet.SingleOrDefaultAsync( p=> p.Id.Equals(id));
+                        }catch( Exception ex )
+                        {
+                                throw ex;
+                        }
+
+                        }
+
+                        public async Task<T> UpdateAsync(T item)
+                        {
+                        try
+                        {
+                                var result = await _dataSet.SingleOrDefaultAsync(p => p.Id.Equals(item.Id));
+
+                                if (result == null)
+                                return null;
+
+                                item.UpdateAt = DateTime.UtcNow;
+                                item.CreatedAt = result.CreatedAt;
+
+                                _context.Entry(result).CurrentValues.SetValues(item);
+
+                                await _context.SaveChangesAsync();
+
+                        }
+                        catch (Exception ex)
+                        {
+                                throw ex;
+                        }
+
+                        return item;
+                        }
+
+                        public  async Task<bool> ExistAsync( K id){
+                        return await _dataSet.AnyAsync( p => p.Id.Equals(id));
+                        }
                 }
-
-                public Task<T> SelectAsync(Guid id)
-                {
-                    throw new NotImplementedException();
-                }
-
-                public Task<IEnumerable<T>> SelectAsync()
-                {
-                    throw new NotImplementedException();
-                }
-
-                public Task<T> UpdateAsync(T item)
-                {
-                    throw new NotImplementedException();
-                }
-            }
         }
+
+
+
 
 
 
