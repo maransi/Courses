@@ -348,7 +348,63 @@ Aula 3 - C# - LINQ - Where e OrderBy
                         select produto;
         ...
 
+
 Aula 4 - C# - LINQ - Projetando dados com Select
 ------------------------------------------------
 
-https://www.youtube.com/watch?v=DlsUG2YRa6g&list=PLelKrgw43Tu2A2hCLMtrrS_Ox6ds-p7jw&index=4
+    . Altere a expressão LINQ como abaixo para criarmos uma lista anonima e execute o projeto:
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Id > 1 && produto.Id < 6      
+                        select new { produto.Nome, produto.Valor }    
+
+        foreach( var item in resultado ){
+            System.Console.WriteLine($"{item.Nome} | {item.Valor} | {item.CategoriaId}");
+        }
+
+        ...
+
+    . Se quisermos dar um nome para cada coluna do "select" faça como abaixo, execute o projeto:
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Id > 1 && produto.Id < 6      
+                        select new { NomeProduto = produto.Nome, ValorProduto = produto.Valor }    
+
+        foreach( var item in resultado ){
+            System.Console.WriteLine($"{item.NomeProduto} | {item.ValorProduto}");
+        }
+        ...
+
+    . Crie a classe abaixo:
+
+        namespace FundamentoLINQ.Model
+        {
+
+            public class ProdutoDto
+            {
+                public string Nome { get; set; }
+                public bool Status { get; set; }
+                public decimal Valor { get; set; }
+            }
+
+        }
+
+    . Altere a expressão LINQ como abaixo para criarmos uma lista anonima e execute o projeto:
+
+        ...
+        var resultado = from produto in listaProdutos
+                        where produto.Id > 1 && produto.Id < 6      
+                        select new ProdutoDto { Nome = produto.Nome, Valor = produto.Valor, Status = produto.Status }    
+        ...
+
+        . No exemplo acima o lista "resultado" deixou de ser anônima
+
+        . É possível fazermos mudança dos dados no "select", como por exemplo:
+
+            ...
+            select new ProdutoDto { Nome = produto.Nome.ToUpper(), Valor = produto.Valor * 1.10, Status = produto.Status }    
+            ...
+
+https://www.youtube.com/watch?v=EDBANjXhIh4&list=PLelKrgw43Tu2A2hCLMtrrS_Ox6ds-p7jw&index=5
