@@ -407,4 +407,71 @@ Aula 4 - C# - LINQ - Projetando dados com Select
             select new ProdutoDto { Nome = produto.Nome.ToUpper(), Valor = produto.Valor * 1.10, Status = produto.Status }    
             ...
 
-https://www.youtube.com/watch?v=EDBANjXhIh4&list=PLelKrgw43Tu2A2hCLMtrrS_Ox6ds-p7jw&index=5
+
+Aula 5 - C# - LINQ - Trabalhando com join e group by
+----------------------------------------------------
+
+    . Altere a expressão LINQ como abaixo para criarmos uma lista agrupada e execute o projeto:
+
+        ...
+        var resultado = from prod in listaProdutos
+                        group prod by prod.CategoriaId into produtosAgrupado
+                        select produtosAgrupados;
+
+        foreach( var item in resultados){
+            Console.Write({item.key});
+        });
+        ...
+
+    . Acrescente as linhas abaixo no corpo do código acima e execute o projeto:
+
+        ...
+        var resultado = from prod in listaProdutos
+                        group prod by prod.CategoriaId into produtosAgrupado
+                        select produtosAgrupados;
+
+        foreach( var item in resultados){
+            Console.Write({item.key});
+
+            // Loop Incluido
+            foreach( var prod in item ){
+                Console.Write($"Produto: {prod.Nome} | Categoria: {prod.CategoriaId}");
+            }
+        });
+        ...
+
+    . Refaça o código da expressão LINQ como abaixo para criarmos uma lista com Join e execute o projeto
+
+        ...
+        var resultados = from prod in listaProdutos
+                         join cat in listaCategorias
+                            on prod.CategoriaId equals cat.Id
+                         select new {
+                            Produto = prod,
+                            Categoria = cat
+                         }
+
+        foreach( var item in resultados){
+                Console.Write($"Produto: {item.Produto.Nome} | Categoria: {item.Categoria.Nome}");
+        });
+    
+    . Altere o código da categoria de algum produto para um código inexistente e execute o projeto.
+
+        . Neste caso, não veio a ocorrência com a categoria inválida.
+    
+    . Refaça o código da expressão LINQ como abaixo para criarmos uma lista com Join e execute o projeto
+
+        ...
+        var resultados = from prod in listaProdutos
+                         join cat in listaCategorias
+                            on prod.CategoriaId equals cat.Id   into catFinal
+                         from catEncontrada in catEncontrada.DefaultIfEmpty()
+                         select new {
+                            ProdutoNome = Produto.Nome,
+                            CategoriaNome = catEncontrada?.Nome
+                         }
+
+        foreach( var item in resultados){
+                Console.Write($"Produto: {item.ProdutoNome} | Categoria: {item.CategoriaNome}");
+        });
+    
