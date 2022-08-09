@@ -372,41 +372,26 @@
 
                         public async Task<bool> DeleteAsync(K id)
                         {
-                        try
-                        {
-                                var result = await _dataSet.SingleOrDefaultAsync( p => p.Id.Equals(id));
+                        var result = await _dataSet.SingleOrDefaultAsync(p => p.Id.Equals(id));
 
-                                if (result == null)
+                        if (result == null)
                                 return false;
 
-                                _dataSet.Remove(result);
+                        _dataSet.Remove(result);
 
-                                await _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync();
 
-                                return true;
-                        }
-                        catch( Exception ex)
-                        {
-                                throw ex;
-                        }
+                        return true;
                         }
 
                         public async Task<T> InsertAsync(T item)
                         {
-                        try
-                        {
-                                item.CreatedAt = DateTime.UtcNow;
+                        item.CreatedAt = DateTime.UtcNow;
 
-                                _dataSet.Add(item);
+                        _dataSet.Add(item);
 
-                                await _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync();
 
-                        }
-                        catch (Exception ex)
-                        {
-
-                                throw ex;
-                        }
 
                         return item;
 
@@ -414,63 +399,274 @@
 
                         public async Task<IEnumerable<T>> SelectAsync()
                         {
-                        try
-                        {
-                                return await _dataSet.ToListAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                                
-                                throw ex;
-                        }
+                        return await _dataSet.ToListAsync();
 
                         }
 
                         public async Task<T> SelectAsync(K id)
                         {
-                        try
-                        {
-                                return await _dataSet.SingleOrDefaultAsync( p=> p.Id.Equals(id));
-                        }catch( Exception ex )
-                        {
-                                throw ex;
-                        }
+                        return await _dataSet.SingleOrDefaultAsync(p => p.Id.Equals(id));
 
                         }
 
                         public async Task<T> UpdateAsync(T item)
                         {
-                        try
-                        {
-                                var result = await _dataSet.SingleOrDefaultAsync(p => p.Id.Equals(item.Id));
+                        var result = await _dataSet.SingleOrDefaultAsync(p => p.Id.Equals(item.Id));
 
-                                if (result == null)
+                        if (result == null)
                                 return null;
 
-                                item.UpdateAt = DateTime.UtcNow;
-                                item.CreatedAt = result.CreatedAt;
+                        item.UpdateAt = DateTime.UtcNow;
+                        item.CreatedAt = result.CreatedAt;
 
-                                _context.Entry(result).CurrentValues.SetValues(item);
+                        _context.Entry(result).CurrentValues.SetValues(item);
 
-                                await _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync();
 
-                        }
-                        catch (Exception ex)
-                        {
-                                throw ex;
-                        }
 
                         return item;
                         }
 
-                        public  async Task<bool> ExistAsync( K id){
-                        return await _dataSet.AnyAsync( p => p.Id.Equals(id));
+                        public async Task<bool> ExistAsync(K id)
+                        {
+                        return await _dataSet.AnyAsync(p => p.Id.Equals(id));
                         }
                 }
         }
 
+. Dentro da pasta Api.Domain/Interface crie a pasta "Services".
+
+. Dentro da nova pasta "Services" crie a pasta "User".
+
+. No VSCode, clique com o botão direito sobre a pasta "User", escolha a opção "New C# Interface" e
+        dê o nome da interface de "IUserService".
+
+. Copie o código abaixo para a interface IUserService:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Threading.Tasks;
+        using Api.Domain.Entities;
+
+        namespace Api.Domain.Interfaces.Services.User
+        {
+                public interface IUserService
+                {
+                        Task<UserEntity> Get(int id);
+                        Task<IEnumerable<UserEntity>> GetAll();
+                        Task<UserEntity> Post(UserEntity user);
+                        Task<UserEntity> Put(UserEntity user);
+                        Task<bool> Delete(int id);
+                }
+        }
+
+. Vá ao terminal, na pasta "src" e execute o comando abaixo:
+
+        dotnet add ./Api.Service/ reference ./Api.Domain/
+
+        dotnet add ./Api.Service/ reference ./Api.Data/
+
+        dotnet add ./Api.Service/ reference ./Api.CrossCutting/
+
+. Acesse o arquivo src/Api.Service/Service.cproj e verifique se as referências acima foram
+        inseridas corretamente neste arquivo.
+
+. Na pasta "src" digite o comando abaixo no prompt do sistema operacional:
+
+        dotnet build
+
+. Dentro da pasta Api.Service crie a pasta "Services" com clique direito no VSCode.
+
+. No VSCode, clique com o botão direito sobre a nova pasta "Services", escolha a opção "New C# Class" e
+        dê o nome da interface de "UserService".
+
+. Digite o código abaixo na classe UserService:
+
+        using System;
+        using System.Collections.Generic;
+        using System.Threading.Tasks;
+        using Api.Domain.Entities;
+        using Api.Domain.Interfaces;
+        using Api.Domain.Interfaces.Services.User;
+
+        namespace Api.Service.Services
+        {
+                public class UserService : IUserService     // 1.   2.
+                {
+                        private IRepository<UserEntity, int> _repository;         // 3.
+
+                        public UserService(IRepository<UserEntity, int> repository)  // 4. 
+                        {
+                                _repository = repository;
+                        }
 
 
+                        public Task<bool> Delete(int id)
+                        {
+                                throw new NotImplementedException();
+                        }
 
+                        public Task<UserEntity> Get(int id)
+                        {
+                                throw new NotImplementedException();
+                        }
 
+                        public async Task<IEnumerable<UserEntity>> GetAll()
+                        {
+                                return await _repository.SelectAsync();
+                        }
+
+                        public async Task<UserEntity> Post(UserEntity user)
+                        {
+                                return await _repository.InsertAsync(user);
+                        }
+
+                        public async Task<UserEntity> Put(UserEntity user)
+                        {
+                                return await _repository.UpdateAsync(user);
+                        }
+                }
+        }
+
+. Acesse a pasta src e digite o comando abaixo no prompt do sistema operacional:
+
+        dotnet add Api.Application reference Api.Domain
+
+        dotnet add Api.Application reference Api.Service
+
+        dotnet add Api.Application reference Api.CrossCutting
+
+. Acesse a classe Api.Application.Application.csproj e verifique se as dependências foram incluidas com sucesso.
+
+. O padrão de nomenclatura para se criar uma classe controller seria [nome do objeto] + Controller. Sem esse padrão
+        de nomenclatura o .Net não reconhece a classe como um controller.
+
+. Crie a classe Api.Application.Controllers.UsersController com o código abaixo:
+
+        using System;
+        using System.Net;
+        using System.Threading.Tasks;
+        using Api.Domain.Entities;
+        using Api.Domain.Interfaces.Services.User;
+        using Microsoft.AspNetCore.Mvc;
+
+        namespace Api.Application.Controllers
+        {
+                //http://localhost:5000/api/users   
+                [Route("api/[controller]")]             // 2. O [controller] indica ao MVC que para ser chamado é necessário informar "users" que será associado a classe UserController
+                [ApiController]
+                public class UsersController : ControllerBase       // 1. Interface ControllerBase contém todos os métodos de uma API
+                {
+                        public IUserService _service { get; set; }
+        
+                        public UsersController(IUserService service)
+                        {
+                                _service = service;
+                        }
+
+                        [HttpGet]
+                        public async Task<ActionResult> GetAll()
+                        {
+                                if (!ModelState.IsValid)
+                                {
+                                        return BadRequest(ModelState);  // 400 Bad Request - Solicitação Inválida
+                                }
+
+                                try
+                                {
+                                        return Ok(await _service.GetAll());
+                                }
+                                catch (ArgumentException e)
+                                {
+                                        return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+                                }
+                        }
+
+                        [HttpGet]
+                        [Route("{id}", Name = "GetWithId")]
+                        public async Task<ActionResult> Get(int id)
+                        {
+                                if (!ModelState.IsValid)
+                                {
+                                        return BadRequest(ModelState);
+                                }
+                                try
+                                {
+                                        return Ok(await _service.Get(id));
+                                }
+                                catch (ArgumentException e)
+                                {
+                                        return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+                                }
+                        }
+
+                        [HttpPost]
+                        public async Task<ActionResult> Post([FromBody] UserEntity user)
+                        {
+                                if (!ModelState.IsValid)
+                                {
+                                        return BadRequest(ModelState);
+                                }
+                                try
+                                {
+                                        var result = await _service.Post(user);
+                                        if (result != null)
+                                        {
+                                        return Created(new Uri(Url.Link("GetWithId", new { id = result.Id })), result);
+                                        }
+                                        else
+                                        {
+                                        return BadRequest();
+                                        }
+                                }
+                                catch (ArgumentException e)
+                                {
+                                        return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+                                }
+                        }
+
+                        [HttpPut]
+                        public async Task<ActionResult> Put([FromBody] UserEntity user)
+                        {
+                                if (!ModelState.IsValid)
+                                {
+                                        return BadRequest(ModelState);
+                                }
+                                try
+                                {
+                                        var result = await _service.Put(user);
+                                        if (result != null)
+                                        {
+                                                return Ok(result);
+                                        }
+                                        else
+                                        {
+                                                return BadRequest();
+                                        }
+                                }
+                        catch (ArgumentException e)
+                        {
+                                return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+                        }
+                        }
+
+                        [HttpDelete("{id}")]
+                        public async Task<ActionResult> Delete(int id)
+                        {
+                                if (!ModelState.IsValid)
+                                {
+                                        return BadRequest(ModelState);
+                                }
+
+                                try
+                                {
+                                        return Ok(await _service.Delete(id));
+                                }
+                        catch (ArgumentException e)
+                        {
+                                return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+                        }
+                        }
+                }
+        }
 
