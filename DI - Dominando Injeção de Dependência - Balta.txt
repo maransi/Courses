@@ -22,4 +22,326 @@ Aula 1. O que é injeção de dependência
 Aula 2 - Baixo acoplamento
 --------------------------
 
-    . Imagina 
+    . Imagina um sistema grande
+    
+    . Cada pedacinho tem que focar em uma coisa
+        . Não dá pra abraçar o mundo 
+
+    . Tem que funcionar de forma independente
+
+        . Fácil de entender
+        . Fácil de dar manuteção
+        . Se precisar jogar fora e criar outro é fácil
+
+Aula 3. Mau exemplo
+-------------------
+
+    . Vamos tomar como base um pedido
+
+    . Receber os parâmetros
+
+    . Processa o pedido
+
+Aula 4. Entendento o problema
+-----------------------------
+
+    . O problema
+
+        . Dificil de ler
+
+        . Dificil de mudar
+
+        . Código não é reusável
+
+        . Alto acoplamento
+
+        . Teste? pra quê?
+
+Aula 5. Resolvendo o problema com OOP
+-------------------------------------
+
+    . OO
+
+        . Abstração, encapsulamento 
+            . Simpels e direto
+
+        . Pedaços pequenos
+
+        . Reusáveis
+
+        . Testáveis
+
+        . Legiveis
+
+        . Fácil manutenção
+
+Aula 6. Cobre o pé, descobre a cabeça
+-------------------------------------
+
+    . Está bem melhor, mas...
+
+    . A dependência ainda existe 
+
+        . Só mudou de lugar
+
+    . Depende da implementação 
+
+        . Depender da abastração.
+
+    . Exemplo:
+
+        . Sem injeção de dependência:
+
+            public class OrderController: Controller{
+
+                [Route("v1/orders")]
+                [HttpPost]
+                public async Task<string> Place(    string cutomerId,
+                                                    string zipCode,
+                                                    string promoCode,
+                                                    int[] products){
+                    ...
+                    var deliveryService = new DeliveryService();
+
+                    decimal deliveryFee = deliveryService.GetDeliveryFee( zipCode );
+                    ...
+                }
+            }
+
+        . Com injeção de dependência:
+
+            public class OrderController: Controller{
+
+                private readonly DeliveryService _deliveryService;
+
+                OrderController( DeliveryService deliveryService){
+                    _deliveryService = deliveryService;
+                }
+
+                [Route("v1/orders")]
+                [HttpPost]
+                public async Task<string> Place(    string cutomerId,
+                                                    string zipCode,
+                                                    string promoCode,
+                                                    int[] products){
+                    ...
+                    decimal deliveryFee = _deliveryService.GetDeliveryFee( zipCode );
+                    ...
+                }
+            }
+
+Aula 7. Inversão de controle
+-----------------------------
+
+    .Inversão de controle
+
+    . Externiliza as responsabilidades
+
+        . Delega
+
+    . Cria uma dependêcia externa
+
+        . O controller não é mais responsável pelo cálculo do frete,
+            aogra ele depende de um serviço.
+
+    . Exemplo:
+
+        public class OrderController: Controller{
+
+            private readonly DeliveryService _deliveryService;
+
+            OrderController( DeliveryService deliveryService){
+                _deliveryService = deliveryService;
+            }
+
+            [Route("v1/orders")]
+            [HttpPost]
+            public async Task<string> Place(    string cutomerId,
+                                                string zipCode,
+                                                string promoCode,
+                                                int[] products){
+                ...
+                decimal deliveryFee = _deliberyService.GetDeliveryFee( zipCode );
+            }
+        }
+
+Aula 8. Abstração e implementação
+---------------------------------
+
+    . Impelmentalçao
+
+        . Concreto
+
+        . Materialização
+
+        . É o "Como"
+
+    . Abstração 
+
+        . Contrato
+
+        . Só as definições
+
+        . é o "O que"
+
+    . Nem tudo precisa abstrair, ou criar uma interface para utilizar injeção de dependência
+
+Aula 9. Porque abastrair?
+------------------------
+
+    . Facilita as mudanças
+
+        . Imagina um cenário crítico como a troca de um banco de dados
+
+    . Testes de Unidade
+
+        . Não podem depender de banco, rede ou qq outra coisa externa
+
+    . Se vc depende da abastração, a implementação não importa...
+
+    . Exemplo:
+
+        public class OrderController: Controller{
+
+            private readonly DeliveryService _deliveryService;
+
+            OrderController( DeliveryService deliveryService){
+                _deliveryService = deliveryService;
+            }
+
+            [Route("v1/orders")]
+            [HttpPost]
+            public async Task<string> Place(    string cutomerId,
+                                                string zipCode,
+                                                string promoCode,
+                                                int[] products
+                                                [FromServices] DeliveryService deliveryService){
+                ...
+                decimal deliveryFee = deliberyService.GetDeliveryFee( zipCode );
+            }
+        }
+
+Aula 10. Princípio da Inversão de Dependência
+---------------------------------------------
+
+    . Princípio da inversão de dependênci
+
+    . Depender de abstrações e não de implemnetações
+
+    . Exemplo
+
+        public interface IDeliveryService{
+            decimal GetDeliveryFee( string zipCode);
+        }
+
+    . Usando a interface
+
+        public class DeliverService: IDeliveryService{
+            public decimal GetDeliveryFee( string zipCode){
+                ...
+            }
+        }
+
+    . Utilização no Controller:
+
+        public class OrderController: Controller{
+
+            private readonly IDeliveryService _deliveryService;
+
+            OrderController( IDeliveryService deliveryService){
+                _deliveryService = deliveryService;
+            }
+
+            ...
+        }
+
+    . Utilização da abstração nos testes:
+
+        public FakeDeliveryService: IDeliveryService{
+            public decimal GetDeliveryFee( string zipCode ){
+                return 10;
+            }
+        }
+
+        ...
+
+        [TestMethod]
+        public void ShouldPlaceAndOrder(){
+            IDeliveryService service = new FackeDeliveryService();
+            var controller = new OrderController( service );
+        }
+
+        . Para fazer testes automatizados, posso criar uma uma classe "Fake" sem a necessidade de depender de 
+            outras classes, banco de dados, etc.
+
+    . Muito sugerido pelos princípios SOLID
+
+Aula 11. Service Locator
+------------------------
+
+    . SL diz como resolver as depências criadas 
+
+        . Funciona como um dê-para
+
+    . Já temos um pronto no ASP.NET (build in the box)
+
+        . Podemos utilizar outros 
+
+            // Assim
+            builder.Services.AddTransient<IDeliveryFeeService,, DeliveryFeeService>();
+
+            // ou
+            builder.Services.AddScoped<IDeliveryFeeService,, DeliveryFeeService>();
+
+            // ou
+            builder.Services.AddSingleton<IDeliveryFeeService,, DeliveryFeeService>();
+
+Aula 12. AddTransient, AddScoped, AddSingleton
+----------------------------------------------
+
+    . AddTransient
+
+        builder.Services.AddTransient<IDeliveryFeeService,, DeliveryFeeService>();
+
+            . Sempre cira uma nova instância do objeto
+
+            . Ideal para cenários onde queremos sempre um novo objeto.
+
+    . AddScoped
+
+        builder.Services.AddScoped<IDeliveryFeeService,, DeliveryFeeService>();
+
+            . Cria um objeto por transação
+
+            . Se você chamar 2 ou mais serviços que dendem do mesmo objeto, a mesma instância será utilizada
+
+            . Ideal para cenários onde queremos apenas um objeto por requisição (banco).
+
+    . AddSingleton
+
+        . Cria um objeto quando a aplicação inicia e apaga da sessão quando a aplicação termina.
+
+            builder.Services.AddSingleton<IDeliveryFeeService,, DeliveryFeeService>();
+
+        . Mantém este objeto na memória até a aplicação para ou reiniciar 
+
+        . Sempre devolve a mesma instância deste objeto, com os mesmos valores.
+
+        . Padrão que visa garantir apenas um instância de um objeto para aplicão toda
+
+        . Um bom exemplo são as configurações
+
+            . Uma vez carregadas, ficam até a aplicação reiniciar.
+
+        . Cuidado.
+
+Aula 13. AddDbContext
+---------------------
+
+    . Item especial do tipo Scoped
+
+        builder.Services.AddDbContext< BlogDataContext>( x => useSqlServer( connStr ));
+
+    . Utilizado exclusivamente com o EF
+
+    . Garante que a conexão só dura até o fim da requisição
