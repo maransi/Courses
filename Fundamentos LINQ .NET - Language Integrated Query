@@ -477,3 +477,204 @@ Aula 5 - C# - LINQ - Trabalhando com join e group by
                 Console.Write($"Produto: {item.ProdutoNome} | Categoria: {item.CategoriaNome}");
         });
     
+Aula 6. C# - LINQ - First, FirstOrDefault, Last, LastOrDefault, Single, SingleOrDefault
+---------------------------------------------------------------------------------------
+
+    . First - Traz o primeiro item da lista, caso não exista é levantado uma "exception".
+
+        . Altere o código da expressão LINQ como abaixo para trazermos a primeira ocorrência da lista:
+
+            ...
+            static void Main(string[] args)
+            {
+                // Fonte de Dados (Datasource)
+                var listaProdutos = new List<Produto>()
+                {
+                    ...
+                };
+
+                var listaCategorias = new List<Categoria>(){
+                    ...
+                };
+
+                // Resgasta somente a primeira ocorrência da lista
+                var resultado = listaProdutos.First();                  // Linha Inserida
+
+                Console.WriteLine($"Nome: {resultado.Nome} | ID: {resultado.Id}" ); // Linha inserida
+
+                Console.ReadLine();     // Linha Inserida
+
+            }
+            ...
+
+    . FirstOrDefault - Traz o valor padrão da lista, no nosso caso se não houver nenhum item na lista, o retorno será um
+                        objeto nulo do tipo "Produto".
+
+        . Altere o código da expressão LINQ, substituindo o "First" pelo "FirstOrDefault" como abaixo para 
+            trazermos a primeira ocorrência da lista, independente se a lista tem conteúdo ou não.
+
+                ...
+                // Resgasta somente a primeira ocorrência da lista
+                var resultado = listaProdutos.FirstOrDefault();                  // Linha Alterada
+                ...
+
+    . Tanto "First" como "FirstOrDefault" podem receber parâmetros do tipo "Lambda":
+
+        .First( x => x.Id == 70 );
+
+        .FirstOrDefault( x => x.Id == 70 );
+
+        . Em ambos os casos o LINQ tentará trazer o primeiro item com o "Id == 70". No "First" senão encontrar levantará uma
+            "Exception", no "FirstOrDefault" trará um objeto nulo.
+
+    . "Last" e "LastOrDefault" funcionam de forma semelhante ao "First" e o "FirstOrDefault". Porém, traz a última 
+        ocorrência da lista.
+
+    . Tanto as funções "First"s quanto as "Last"s, caso exista mais de uma ocorrência com o código solicitado "...( x => x.Id == 70 )"
+        ele trará a primeira, ou a última ocorrência da lista respectivamente.
+
+    . "Single" ou "SingleOrDefault" funcionam semelhantemente aos "First"s e "Last"s, porém ele levantará uma "Exception" caso
+        exista na lista mais de uma ocorrência com a mesma chave pesquisada.
+
+        . Suponha que exista dois produtos com o mesmo "Id", seu usarmos o "Single" ou o "SingleOrDefault" haverá um erro e uma "exception"
+            será levantada.
+
+Aula 7. C# - LINQ - .Where() .OrderBy() .OrderByDescending() - Sintaxe de método
+-------------------------------------------------------------------------------------------
+
+    . Where - Função para filtrar os itens da coleção.
+
+        . Altere o código da expressão LINQ como abaixo para trazermos a primeira ocorrência da lista:
+
+            ...
+            static void Main(string[] args)
+            {
+                // Fonte de Dados (Datasource)
+                var listaProdutos = new List<Produto>()
+                {
+                    ...
+                };
+
+                var listaCategorias = new List<Categoria>(){
+                    ...
+                };
+
+                // Resgasta os produtos com "Id" >= 2 e <= 5
+                var resultado = listaProdutos.Where( prod => prod.Id >=2 && prod.Id <= 5);                  // Linha Inserida
+
+                foreach( var item in resultado ){
+                    Console.WriteLine($"Nome: {item.Nome} | ID: {item.Id}" ); // Linha inserida
+                }
+
+                Console.ReadLine();     // Linha Inserida
+
+            }
+            ...
+
+        . Os operadores condicionais que podem ser utilizado && ou ||
+    
+        . Métodos auxiliares para facilitar a filtragem:
+
+            . Crie o método abaixo na classe "Program.cs":
+
+                ...
+                static bool FiltraProdutoPorValor( Produto produto ){
+                    return produto.Valor > 50;
+                }
+                ..
+
+            . Altere a expressão LINQ como abaixo:
+
+                ...
+                static void Main(string[] args)
+                {
+                    // Fonte de Dados (Datasource)
+                    var listaProdutos = new List<Produto>()
+                    {
+                        ...
+                    };
+
+                    var listaCategorias = new List<Categoria>(){
+                        ...
+                    };
+
+                    var resultado = listaProdutos.Where( prod => prod.FiltrProdutoPorValor( prod ));                  // Linha Alterada
+
+                    foreach( var item in resultado ){
+                        Console.WriteLine($"Nome: {item.Nome} | ID: {item.Id}" ); 
+                    }
+
+                    Console.ReadLine();     
+
+                }
+                ...
+
+    . OrderBy
+
+        . Altere o código da expressão LINQ como abaixo para trazermos a primeira ocorrência da lista:
+
+            ...
+            static void Main(string[] args)
+            {
+                ...
+                var resultado = listaProdutos.OrderBy( x => x.Id );
+
+                foreach( var item in resultado ){
+                    Console.WriteLine($"Nome: {item.Nome} | ID: {item.Id}" ); // Linha inserida
+                }
+
+                Console.ReadLine();     // Linha Inserida
+
+            }
+            ...
+
+    . OrderByDescending
+
+        . Altere o código da expressão LINQ como abaixo para trazermos a primeira ocorrência da lista:
+
+            ...
+            var resultado = listaProdutos.OrderByDescending( x => x.Id );
+            ...
+
+Aula 8. C# - LINQ - Select e SelectMany
+---------------------------------------
+
+    . Select
+
+        . Forma simples de trabalhar com "Select":
+
+            ...
+            var resultado = listaProdutos.Select( prod => prod.Nome );
+
+            foreach( var produto in resultado ){
+                Console.WriteLine($"Nome: {produto}" ); // Linha alterada
+            }
+
+            Console.ReadLine();     
+            ...
+
+        . Gerando objetos anônimos:
+
+            ...
+            var resultado = listaProdutos.Select( prod => new { 
+                                                                prod.Id,
+                                                                prod.Nome,
+                                                                prod.Valor
+                                                            });
+
+            foreach( var produto in resultado ){
+                Console.WriteLine($"Nome: {produto.Id} {produto.Nome} {Produto.Valor}"); // Linha alterada
+            }
+
+            Console.ReadLine();     
+            ...
+
+    . SelectMany
+
+        . Acrescente na classe "Produto" a propriedade abaixo:
+
+            ...
+            public List<Categoria> Categorias { get; set; }
+            ...
+
+            10.36
