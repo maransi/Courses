@@ -656,4 +656,19 @@ Aula 18. DIP na prática
 
     . Dentro da pasta criada crie a interface abaixo:
 
-    
+        using DependecyStore.Models;
+
+        namespace DependencyStore.Repositories.Contracts;
+
+        public interace ICustomerRepository{
+            Task<Customer> GetByIdAsync( string customerId );
+        }
+
+    . Faça a implementação da interface acima na classe "CustomerRepository":
+
+        namespace DependencyStore.Repositories;
+
+        public class CustomerRepository: ICustomerRepository{       // Linha alterada
+            ...
+        }
+
