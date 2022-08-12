@@ -627,18 +627,33 @@ Aula 17. Criando Dependência
 
         public class CustomerRepository{
 
-            private SqlConnection _connection;
-            
+            // Padrão de nomenclatura para propriedades privadas é iniciar com o caracter "_"
+            //
+            // O "readonly" só permite atribuir um valor a propriedade somente dentro do construtor
+            private readonly SqlConnection _connection;
+
+            // Poderiamos criar o método construtor com um "Expression Body" por termos somente uma linha
+            //public CustomerRepository( SqlConnection connection ) => _connection = connection;
+
             public CustomerRepository( SqlConnection connection ){
-                
+                _connection = connection;
             }
             
             public async Task<Customer?> GetByIdAsync( string customerId){
 
                 const string query = "SELECT [Id], [Name], [Email] FROM CUSTOMER WHERE ID=@id";
-                customer = await _connection.QueryFirstAsync<Customer>(query, new  { 
-                                                                                id = customerId 
-                                                                            });
-
+                
+                return await _connection.QueryFirstOrDefaultAsync<Customer>(query, new  { 
+                                                                                            id = customerId 
+                                                                                        });
             }
         }
+
+Aula 18. DIP na prática 
+-----------------------
+
+    . Crie a pasta "Repositories/Contracts/Repositories".
+
+    . Dentro da pasta criada crie a interface abaixo:
+
+    
