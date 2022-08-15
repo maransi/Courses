@@ -652,7 +652,7 @@ Aula 17. Criando Dependência
 Aula 18. DIP na prática 
 -----------------------
 
-    . Crie a pasta "Repositories/Contracts/Repositories".
+    . Crie a pasta "Repositories/Contracts/" dentro da pasta "DependencyStore".
 
     . Dentro da pasta criada crie a interface abaixo:
 
@@ -661,7 +661,7 @@ Aula 18. DIP na prática
         namespace DependencyStore.Repositories.Contracts;
 
         public interace ICustomerRepository{
-            Task<Customer> GetByIdAsync( string customerId );
+            Task<Customer?> GetByIdAsync( string customerId );
         }
 
     . Faça a implementação da interface acima na classe "CustomerRepository":
@@ -672,3 +672,81 @@ Aula 18. DIP na prática
             ...
         }
 
+    . Acesse a classe "OrderController" e crie a propriedade "CustomerRepository" que será utilizada na injeção de dependência:
+
+        public class OrderController: ControllerBase{
+            private readonly ICursotmreRepository _customerRepository;              // Linha Inserida
+
+            public OrderController( ICustormerRepository customerRepository ){      // Construtor Inserido
+                _customerRepository = customerRepository;
+            }
+
+            ....
+
+            [Route("v1/orders")]
+            [HttpPost]
+            public async Task<IActionResult> Place(string customerId, string zipCode, string promoCode, int[] products)
+            {
+                // #1 - Recupera o cliente
+                // Customer customer = null;
+                // await using (var conn = new SqlConnection("CONN_STRING"))
+                // {
+                //     const string query = "SELECT [Id], [Name], [Email] FROM CUSTOMER WHERE ID=@id";
+                //     customer = await conn.QueryFirstAsync<Customer>(query, new { id = customerId });
+                // }
+
+                var customer = await customerRepository.GetByIdAsync( customerId );     // Linha Inserida
+
+                if ( customer == null ){                                                // if inserida
+                    return NotFound();
+                }
+
+                ....
+            }
+
+
+        }
+
+
+Aula 19. Utilizando serviços
+----------------------------
+
+    . Adicionar as packages "Dapper", "Microsoft.Data.SqlClient" e "RestSharp". Ver no projeto "01. Final" no arquivo .csproj a versões
+
+
+    . Crie a pasta "Contracts/DeliveryFeeService".
+
+    . Dentro da pasta recém criada crie a interface abaixo:
+
+        namespace DependencyStore.Services.Contracts;
+
+        public interface IDeliveryFeeService
+        {
+            Task<decimal> GetDeliveryFeeAsync(string zipCode);
+        }
+
+    . Crie a classe "DeliveryFeeService" na pasta "Services":
+
+        using DependencyStore.Services.Contracts;
+        using RestSharp;
+
+        namespace DependencyStore.Services;
+
+        public class DeliveryFeeService : IDeliveryFeeService
+        {
+            public async Task<decimal> GetDeliveryFeeAsync(string zipCode)
+            {
+                var client = new RestClient("https://api.myorg.com");
+                var request = new RestRequest()
+                    .AddJsonBody(new
+                    {
+                        ZipCode = zipCode
+                    });
+                var response = await client.PostAsync<decimal>(request);
+
+                // Caso não consiga obter a taxa de entrega o valor padrão é 5
+                return response == 0 ? 5 : response;
+            }
+        }
+
+3.51
