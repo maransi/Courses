@@ -749,4 +749,180 @@ Aula 19. Utilizando serviços
             }
         }
 
-3.51
+    . Acesse a classe "OrderController" e crie a propriedade "_deliveryFeeService" que será utilizada na injeção de dependência:
+
+        public class OrderController: ControllerBase{
+            private readonly ICursotmerRepository _customerRepository;              
+
+            private readonly IDeliveryFeeService _deliveryFeeService;               // Linha Inserida
+
+            public OrderController( ICustormerRepository customerRepository,
+                                    IDeliveryFeeService deliverFeeService ){      // Linha Inserida
+                _customerRepository = customerRepository;
+                _deliverFeeService = deliveryFeeService;                         // Linha Inserida
+            }
+
+            [Route("v1/orders")]
+            [HttpPost]
+            public async Task<IActionResult> Place(string customerId, string zipCode, string promoCode, int[] products)
+            {
+
+                ...
+
+                // Comente as linhas abaixo
+
+                // #2 - Calcula o frete
+                // decimal deliveryFee = 0;
+                // var client = new RestClient("https://consultafrete.io/cep/");
+                // var request = new RestRequest()
+                //     .AddJsonBody(new
+                //     {
+                //         zipCode
+                //     });
+                // deliveryFee = await client.PostAsync<decimal>(request, new CancellationToken());
+                // Nunca é menos que R$ 5,00
+                // if (deliveryFee < 5)
+                //     deliveryFee = 5;
+
+                decimal deliveryFee = await _deliveryFeeService.GetDeliveryFeeAsync( zipCode );     // Linha inserida
+
+                ....
+            }
+        }
+
+Aula 20. PromoCode Repository
+-----------------------------
+
+    . Dentro da pasta "Repositories/Contracts" crie a interface abaixo:
+
+        using DependencyStore.Models;
+
+        namespace DependencyStore.Repositories.Contracts;
+
+        public interface IPromoCodeRepository
+        {
+            Task<PromoCode?> GetPromoCodeAsync(string promoCode);
+        }
+
+    . Dentro da pasta "Repositories" crie a classe "PromoCodeRepository":
+
+        using Dapper;
+        using DependencyStore.Models;
+        using DependencyStore.Repositories.Contracts;
+        using Microsoft.Data.SqlClient;
+
+        namespace DependencyStore.Repositories;
+
+        public class PromoCodeRepository : IPromoCodeRepository
+        {
+            private readonly SqlConnection _connection;
+
+            public PromoCodeRepository(SqlConnection connection)
+                => _connection = connection;
+
+            public async Task<PromoCode?> GetPromoCodeAsync(string promoCode)
+            {
+                var query = $"SELECT * FROM PROMO_CODES WHERE CODE={promoCode}";
+                return await _connection.QueryFirstOrDefaultAsync<PromoCode>(query);
+            }
+        }
+
+    . Acesse a classe "OrderController" e crie a propriedade "_promoCodeRepository" que será utilizada na injeção de dependência:
+
+        public class OrderController: ControllerBase{
+            private readonly ICursotmerRepository _customerRepository;              
+
+            private readonly IDeliveryFeeService _deliveryFeeService;               
+
+            private readonly IPromoCodeRepository _promoCodeRepository;         // Linha Inserida
+
+            public OrderController( ICustormerRepository customerRepository,
+                                    IDeliveryFeeService deliverFeeService,
+                                    IPromoCodeRepository promoCodeRepository ){         // Linha Inserida
+                _customerRepository = customerRepository;
+                _deliverFeeService = deliveryFeeService;                         
+                _promoCodeRepository = promoCodeRepository;             // Linha Inserida
+            }
+
+            [Route("v1/orders")]
+            [HttpPost]
+            public async Task<IActionResult> Place(string customerId, string zipCode, string promoCode, int[] products)
+            {
+
+                ...
+
+                decimal deliveryFee = await _deliveryFeeService.GetDeliveryFeeAsync( zipCode );     
+
+                var cupon PromoCode? = await _promoCodeRepository( promoCode );     // Linha inserida
+
+                ....
+            }
+        }
+
+
+Aula 21. Removendo as regras de negócios do controlador
+-------------------------------------------------------
+
+    . Acesse a classe "OrderController" e crie a propriedade "_promoCodeRepository" que será utilizada na injeção de dependência:
+
+        public class OrderController: ControllerBase{
+
+            ...
+
+            [Route("v1/orders")]
+            [HttpPost]
+            public async Task<IActionResult> Place(string customerId, string zipCode, string promoCode, int[] products)
+            {
+
+                ...
+
+                var cupon PromoCode? = await _promoCodeRepository( promoCode );     
+
+                var discount decimal = cupon?.Value ?? 0M;
+
+                /*      Comente
+                    // #3 - Calcula o total dos produtos
+                    decimal subTotal = 0;
+                    const string getProductQuery = "SELECT [Id], [Name], [Price] FROM PRODUCT WHERE ID=@id";
+                    for (var p = 0; p < products.Length; p++)
+                    {
+                        Product product;
+                        await using (var conn = new SqlConnection("CONN_STRING"))
+                            product = await conn.QueryFirstAsync<Product>(getProductQuery, new { Id = p });
+
+                        subTotal += product.Price;
+                    }
+
+                    // #4 - Aplica o cupom de desconto
+                    decimal discount = 0;
+                    await using (var conn = new SqlConnection("CONN_STRING"))
+                    {
+                        const string query = "SELECT * FROM PROMO_CODES WHERE CODE=@code";
+                        var promo = await conn.QueryFirstAsync<PromoCode>(query, new { code = promoCode });
+                        if (promo.ExpireDate > DateTime.Now)
+                            discount = promo.Value;
+                    }
+
+                    // #5 - Gera o pedido
+                    var order = new Order();
+                    order.Code = Guid.NewGuid().ToString().ToUpper().Substring(0, 8);
+                    order.Date = DateTime.Now;
+                    order.DeliveryFee = deliveryFee;
+                    order.Discount = discount;
+                    order.Products = products;
+                    order.SubTotal = subTotal;
+
+                    // #6 - Calcula o total
+                    order.Total = subTotal - discount + deliveryFee;
+
+                    // #7 - Retorna
+                    return Ok(new
+                    {
+                        Message = $"Pedido {order.Code} gerado com sucesso!"
+                    });
+                */
+
+                ....
+            }
+        }
+ 0.40
