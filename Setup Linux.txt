@@ -1326,3 +1326,20 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 	sudo dkms build -m rtl88x2bu -v ${VER}
 	sudo dkms install -m rtl88x2bu -v ${VER}
 	sudo modprobe 88x2bu
+
+39. Instalação "dotnet"
+
+	https://www.how2shout.com/linux/how-to-install-net-core-dotnet-on-ubuntu-22-04-lts/
+
+
+	wget https://dot.net/v1/dotnet-install.sh
+	chmod +x dotnet-install.sh
+	./dotnet-install.sh -c 5.0
+	./dotnet-install.sh -c 6.0
+	dotnet --version
+	echo 'export PATH="/home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"' >> ~/.bashrc
+	source ~/.bashrc
+	dotnet --version
+	dotnet --list-runtimes
+	dotnet --list-sdks
+

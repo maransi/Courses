@@ -27,49 +27,47 @@ Aula 2. Ferramentas
 
 	. Instalação
 
-		. Instalação nas distribuições baseadas no Ubuntu:
+        . A URL abaixo tem os passos atualizado para instalação do Docker:
 
-			. A URL abaixo tem os passos atualizado para instalação do Docker:
+            https://docs.docker.com/engine/install/ubuntu/
 
-				https://docs.docker.com/engine/install/ubuntu/
+        . Instalação Atualizada
 
-			. Instalação Atualizada
+            sudo apt-get update
+            sudo apt-get install \
+                ca-certificates \
+                curl \
+                gnupg \
+                lsb-release
 
-				sudo apt-get update
-				sudo apt-get install \
-					ca-certificates \
-					curl \
-					gnupg \
-					lsb-release
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-				curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+            echo \
+                "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+                $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-				echo \
-					"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-					$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install docker-ce docker-ce-cli containerd.io
+            sudo docker --version
 
-				sudo apt-get update
-				sudo apt-get install docker-ce docker-ce-cli containerd.io
-				sudo docker --version
+            sudo groupadd docker
+            sudo gpasswd -a <usuario> docker
+            sudo chown "$USER":"$USER" /var/run/docker.sock -R
+            sudo service docker restart
 
-				sudo groupadd docker
-				sudo gpasswd -a <usuario> docker
-				sudo chown "$USER":"$USER" /var/run/docker.sock -R
-				sudo service docker restart
+            docker --version
 
-				docker --version
+        . Instalação no Mint
 
-		. Instalação no Mint
-
-			sudo apt-get update
-			cd Downloads/
-			sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
-			curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-			sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(. /etc/os-release; echo "$UBUNTU_CODENAME") stable"
-			sudo apt-get update
-			sudo apt-get -y install docker-ce docker-compose
-			sudo usermod -aG docker $USER
-			docker --version
+            sudo apt-get update
+            cd Downloads/
+            sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(. /etc/os-release; echo "$UBUNTU_CODENAME") stable"
+            sudo apt-get update
+            sudo apt-get -y install docker-ce docker-compose
+            sudo usermod -aG docker $USER
+            docker --version
 
             sudo groupadd docker
             sudo gpasswd -a <usuario> docker
@@ -80,51 +78,69 @@ Aula 2. Ferramentas
 
 . Instalando o .NET Core SDK
 
-    . Instalçao Atualizada:
+        . Instalçao até a versão do Ubuntu 20.04:
 
-        . URL com informações para realizar a instalação.
+            . URL com informações para realizar a instalação.
 
-            https://docs.microsoft.com/pt-br/dotnet/core/install/linux-ubuntu
+                https://docs.microsoft.com/pt-br/dotnet/core/install/linux-ubuntu
 
-            . IMPORTANTE: Acesse a instalação da distribuição e versão especifica do linux que estamos utilizando para 
-                            proceder os comandos adequadamente.
+                . IMPORTANTE: Acesse a instalação da distribuição e versão especifica do linux que estamos utilizando para 
+                                proceder os comandos adequadamente.
 
-                            A instalação abaixo está para o Ubuntu 20.04
+                                A instalação abaixo está para o Ubuntu 20.04
 
-        # Comando para o Ubuntu 22.04 em diante
-        # wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-        # sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+            # Comando para o Ubuntu 22.04 em diante
+            # wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+            # sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
 
-        # Instalação do SDK
-        wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-        sudo dpkg -i packages-microsoft-prod.deb
+            # Instalação do SDK
+            wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
 
-        sudo dpkg --purge packages-microsoft-prod && sudo dpkg -i packages-microsoft-prod.deb
-        sudo apt-get update
+            sudo dpkg --purge packages-microsoft-prod && sudo dpkg -i packages-microsoft-prod.deb
+            sudo apt-get update
 
-        sudo apt-get install -y gpg
-        wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
-        sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
-        wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list
-        sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
-        sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
-        sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+            sudo apt-get install -y gpg
+            wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
+            sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+            wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list
+            sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+            sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+            sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
 
-        # Comando para o Ubuntu 22.04 em diante
-        # wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-        # sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+            # Comando para o Ubuntu 22.04 em diante
+            # wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+            # sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
 
-        sudo apt-get update; \
-        sudo apt-get install -y apt-transport-https && \
-        sudo apt-get update && \
-        sudo apt-get install -y dotnet-sdk-5.0
+            sudo apt-get update; \
+            sudo apt-get install -y apt-transport-https && \
+            sudo apt-get update && \
+            sudo apt-get install -y dotnet-sdk-5.0
 
-        sudo apt-get install -y apt-transport-https && \
-        sudo apt-get update && \
-        sudo apt-get install -y aspnetcore-runtime-5.0
+            sudo apt-get install -y apt-transport-https && \
+            sudo apt-get update && \
+            sudo apt-get install -y aspnetcore-runtime-5.0
 
-        sudo apt-get install -y dotnet-runtime-5.0
+            sudo apt-get install -y dotnet-runtime-5.0
 
+    . Instalação para as versões acima do Ubuntu 22.04
+
+        https://www.how2shout.com/linux/how-to-install-net-core-dotnet-on-ubuntu-22-04-lts/
+
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+        
+        cd ~/Downloads
+        wget https://dot.net/v1/dotnet-install.sh
+        chmod +x dotnet-install.sh
+        ./dotnet-install.sh -c 5.0
+        ./dotnet-install.sh -c 6.0
+        dotnet --version
+        echo 'export PATH="/home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"' >> ~/.bashrc
+        source ~/.bashrc
+        dotnet --version
+        dotnet --list-runtimes
+        dotnet --list-sdks
 
 . Instalando o VS Code
 
@@ -135,6 +151,13 @@ Aula 2. Ferramentas
             C# XML Documentation Comments
             vscode-icons (Opcional)
             Docker
+            NuGet Gallery
+            VZ Dotnet File Template
+            Dotnet Project References
+            Auto-Using for C#
+            Bracket Pair Colorization Toggler
+            Error Lens
+            RapidApi
 
         . Atalhos:
 
