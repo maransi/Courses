@@ -863,6 +863,8 @@ Aula 20. PromoCode Repository
 Aula 21. Removendo as regras de negócios do controlador
 -------------------------------------------------------
 
+    . O objetivo é tirar o máximo de código do "Controller".
+
     . Acesse a classe "OrderController" e crie a propriedade "_promoCodeRepository" que será utilizada na injeção de dependência:
 
         public class OrderController: ControllerBase{
@@ -876,9 +878,16 @@ Aula 21. Removendo as regras de negócios do controlador
 
                 ...
 
-                var cupon PromoCode? = await _promoCodeRepository( promoCode );     
+                var customer = await _customerRepository.GetCustomerAsync(customerId);
 
-                var discount decimal = cupon?.Value ?? 0M;
+                if (customer == null )
+                    return NotFound();
+
+                var deliveryFee = await _deliveryFeeService.GetDeliveryFeeAsync(zipCode);
+                var cupon = await _promoCodeRepository.GetPromoCodeAsync(promoCode);
+                var discount = cupon?.Value ?? 0M;
+                var order = new Order(deliveryFee, discount, new List<Product>());
+                return $"Pedido {order.Code} gerado com sucesso!";
 
                 /*      Comente
                 
@@ -926,5 +935,90 @@ Aula 21. Removendo as regras de negócios do controlador
                 ....
             }
         }
- 0.40
- 
+
+    . Acesse a classe "Order.cs" e inclua os métodos abaixo:
+
+        namespace DependencyStore.Models;
+
+        public class Order
+        {
+            public Order(                                                       // Método inserido
+                decimal deliveryFee,
+                decimal discount,
+                List<Product> products)
+            {
+                Code = Guid.NewGuid().ToString().ToUpper().Substring(0, 8);
+                Date = DateTime.Now;
+                DeliveryFee = deliveryFee;
+                Discount = discount;
+            }
+            
+            ...
+
+            public List<Product> Products { get; set; }                     // Propriedade inserida
+            public decimal SubTotal => Products.Sum(x => x.Price);          // Propriedade inserida
+            public decimal Total => SubTotal - Discount + DeliveryFee;      // Propriedade inserida
+
+
+        }
+
+Aula 22.  Resolvendo as dependências - AddTransient 
+---------------------------------------------------
+
+    . Acesse a classe "Program.cs" e acrescente as linhas abaixo:
+
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();       // Na linha inserida 
+        builder.Services.AddTransient<IPromoCodeRepository, PromoCodeRepository>();     // Na linha inserida 
+        builder.Services.AddTransient<IDeliveryFeeService, DeliveryFeeService>();       // Na linha inserida 
+
+        builder.Services.AddControllers();
+
+        var app = builder.Build();
+
+        app.MapControllers();
+
+        app.Run();
+
+
+        . Se quisessemos fazer a Injeção de Dependência para outros tipos de objetos poderiamos utilizar:
+
+            builder.Services.AddTransient<CustomerRepository>();       // Para injetar diretamente a classe "CustomerRepository"
+            
+            ou
+
+            builder.Services.AddTransient( new CustomerRepository() );       // Para injetar diretamente a classe "CustomerRepository"
+
+        . O ".AddTransient" dará sempre uma instância nova para o objeto.
+
+
+Aula 23. Resolvendo as dependências - AddScoped 
+-----------------------------------------------
+
+    . Acesse a classe "Program.cs" e acrescente as linhas abaixo:
+
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddScoped( new SqlConnection("CONN_STRING") );             // Linha inserida                            // Linha inserida
+        builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();       
+        builder.Services.AddTransient<IPromoCodeRepository, PromoCodeRepository>();     
+        builder.Services.AddTransient<IDeliveryFeeService, DeliveryFeeService>();       
+
+        builder.Services.AddControllers();
+
+        var app = builder.Build();
+
+        app.MapControllers();
+
+        app.Run();
+
+
+        . ".AddScoped" cria um objeto por requisição
+
+    
+Aula 24. Resolvendo as dependências - AddSingleton 
+--------------------------------------------------
+
