@@ -375,6 +375,33 @@ Web API Routing
 
             . Observe a configuração da rota especifica "myschool", ela será tratada pelo controller "SchoolController".
 
+            . Note que apenas adicionamos um parâmetro a mais (new { id = @"\d+" }), que possui um regular expression, 
+                e este diz que podemos ter infinitos caracteres, desde que sejam numéricos.
+
+            . A expressão regular \d+ roteia URLs cujo parâmetro tenha 1 ou mais inteiros, o que implica no roteamento das seguintes URLs:
+
+                · /ap/myschool/7
+
+                · /ap/myschool/2010
+
+            . Mas NÃO no roteamento das URLs:
+
+                · /ap/myschool/learnmvc
+
+                · /ap/myschool/test
+
+                · /ap/myschool
+
+
+            . Desta mesma forma, podemos utilizar regular expressions para validar E-mails
+
+                config.Routes.MapHttpRoute(
+                    name: "School",
+                    routeTemplate: "api/myschool/{email}",
+                    defaults: new { controller="school", id = RouteParameter.Optional }
+                    constraints: new { email = @"^[\w\.=-]+@[\w\.-]+\.[\w]{2,3}$" }
+                );
+
         Attribute Routing - Utiliza a tipificação "[Route()]"
 
             . Devemos habilitar no WebConfig através da chamada "config.MapHttpAttributeRoutes()".
@@ -393,6 +420,9 @@ Web API Routing
             . Neste caso a request poderá ser chamada pela URL http://localhost:1234/api/student/names
 
 
+https://www.tektutorialshub.com/asp-net-core/asp-net-core-convention-based-routing/
+https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
+https://www.tektutorialshub.com/asp-net-core/asp-net-core-startup-class/
 
 
 Parameter Binding in ASP.NET Web API
