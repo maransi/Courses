@@ -541,13 +541,13 @@ Aula 13. Service Locator
         . Podemos utilizar outros 
 
             // Assim
-            builder.Services.AddTransient<IDeliveryFeeService,, DeliveryFeeService>();
+            builder.Services.AddTransient<IDeliveryFeeService, DeliveryFeeService>();
 
             // ou
-            builder.Services.AddScoped<IDeliveryFeeService,, DeliveryFeeService>();
+            builder.Services.AddScoped<IDeliveryFeeService, DeliveryFeeService>();
 
             // ou
-            builder.Services.AddSingleton<IDeliveryFeeService,, DeliveryFeeService>();
+            builder.Services.AddSingleton<IDeliveryFeeService, DeliveryFeeService>();
 
 Aula 14. AddTransient, AddScoped, AddSingleton
 ----------------------------------------------
@@ -564,7 +564,7 @@ Aula 14. AddTransient, AddScoped, AddSingleton
 
         builder.Services.AddScoped<IDeliveryFeeService,, DeliveryFeeService>();
 
-            . Cria um objeto por transação
+            . Cria um objeto por transação/requisição
 
             . Se você chamar 2 ou mais serviços que dendem do mesmo objeto, a mesma instância será utilizada
 
@@ -574,7 +574,7 @@ Aula 14. AddTransient, AddScoped, AddSingleton
 
         . Cria um objeto quando a aplicação inicia e apaga da sessão quando a aplicação termina.
 
-            builder.Services.AddSingleton<IDeliveryFeeService,, DeliveryFeeService>();
+            builder.Services.AddSingleton<IDeliveryFeeService, DeliveryFeeService>();
 
         . Mantém este objeto na memória até a aplicação para ou reiniciar 
 
@@ -1021,4 +1021,120 @@ Aula 23. Resolvendo as dependências - AddScoped
     
 Aula 24. Resolvendo as dependências - AddSingleton 
 --------------------------------------------------
+
+    .".AddSingleton" cria um objeto uma única vez na aplicação
+
+Aula 25.  Extension Methods
+---------------------------
+
+    . Permitem adicionar comportamentos as classes "built-in" do .NET
+
+    . Como por exemplo o "WebApplicationBuilder.cs"
+
+
+Aula 26. Implementando Extension Methods
+----------------------------------------
+
+    . Toda classe de extensão precisa ser estática
+
+        ...
+        public static Utils{
+            ...
+        }
+
+    . Dentro da classe estática devemos criar os métodos de extensão, que também devem ser estáticos:
+
+        ...
+        public static Utils{
+
+            public static bool EhMaior(...){...}
+        }
+
+    . A assinatura do método deve conter como primeiros parâmetro do tipo "this" e em seguida a classe que pretendemos 
+        fazer a extensão "EhMaior( this int <nome parâmetro>, ...)". Podemos utilizar tipos primitivos, ou classes.
+
+                 +------------> Obbrigatório ser estática
+        ...      |
+        public static Utils{                 +--------> Classe/Tipo Primitivo que receberá a extensão
+                                             |
+            public static bool EhMaior(this int param, int secondParam ){ return param > secondParam }
+                      |                 |
+                      |                 +---> Identifica que este método é de extensão
+        }             +---> Obrigatório ser estático
+
+
+    . A partir do momento que definimos a classe acima os objetos que derivam de "int" terá disponível o método "EhMaior":
+
+        ...
+        int numero = 10;
+
+        if (numero.EhMaior( 20 ) ){
+            ...
+        }
+
+    . Voltando ao projeto, crie a pasta "Extensions" dentro da pasta raiz do projeto e crie a classe de extensão abaixo:
+
+        using DependencyStore.Repositories;
+        using DependencyStore.Repositories.Contracts;
+        using DependencyStore.Services;
+        using DependencyStore.Services.Contracts;
+        using Microsoft.Data.SqlClient;
+        using Microsoft.Extensions.DependencyInjection.Extensions;
+
+        namespace DependencyStore.Extensions;
+
+        public static class DependenciesExtension
+        {
+            public static void AddSqlConnection(
+                this IServiceCollection services, 
+                string connectionString)
+            {
+                services.AddScoped<SqlConnection>(x 
+                    => new SqlConnection(connectionString));
+            }
+            public static void AddRepositories(this IServiceCollection services)
+            {
+                services.TryAddTransient<ICustomerRepository, CustomerRepository>();
+                services.AddTransient<IPromoCodeRepository, PromoCodeRepository>();
+            }
+            
+            public static void AddServices(this IServiceCollection services)
+            {
+                services.AddTransient<IDeliveryFeeService, DeliveryFeeService>();
+            }
+        }
+
+    . Acesse a classe "Program.cs", apague e insira as linhas abaixo:
+
+
+        using DependencyStore.Extensions;
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+        builder.Services.AddControllers();
+
+        /* Linhas Eliminadas
+
+            builder.Services.AddScoped( new SqlConnection("CONN_STRING") );
+            builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();       
+            builder.Services.AddTransient<IPromoCodeRepository, PromoCodeRepository>();     
+            builder.Services.AddTransient<IDeliveryFeeService, DeliveryFeeService>();       
+
+        */
+                                                    +------> Este método não existe, criar um método de extensão
+                                                    |
+        var connStr = builder.Configuration.GetConnectionString("DefaultConnection");       // Linha inserida
+        builder.Services.AddSqlConnection(connStr);                                         // Linha inserida
+        builder.Services.AddRepositories();                                                 // Linha inserida
+        builder.Services.AddServices();                                                     // Linha inserida
+
+        var app = builder.Build();
+
+        app.UseAuthorization();
+        app.MapControllers();
+
+        app.Run();
 
