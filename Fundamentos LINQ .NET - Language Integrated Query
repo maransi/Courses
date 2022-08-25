@@ -845,3 +845,46 @@ Aula 9. C# - LINQ - .Skip() e .Take()
 -------------------------------------
 
 https://www.youtube.com/watch?v=gEan2v0ehCw&list=PLelKrgw43Tu2A2hCLMtrrS_Ox6ds-p7jw&index=9
+
+    . Skip e Take
+
+        . Take - O operador Take é usado para selecionar os primeiros n objetos de uma coleção
+
+            ...
+            var tresPrimeiros = listaProdutos.Take(3);
+
+            Console.WriteLine(" --------------- Três Primeiros ------------------");
+
+            foreach( var prod in tresPrimeiros ){
+                Console.WriteLine($"ID: {prod.Id} NOME: {prod.Nome}")
+            }
+
+        . Skip - O operador Skip ignora o(s) primeiro(s) n objetos de uma coleção.
+
+            ..
+            var ignorarTresPrimeiros = listaProdutos.Skip(3);
+
+            Console.WriteLine(" --------------- A partir do 4o. Item ------------------");
+
+            foreach( var prod in ignorarTresPrimeiros ){
+                Console.WriteLine($"ID: {prod.Id} NOME: {prod.Nome}")
+            }
+
+        . Podemos utilizar ambas funções em conjunto. Suponha que eu queira pegar a segunda página de registro,
+            sendo que cada página tem 3 itens:
+
+            ... 
+            var pagina = 2;
+            var itensPorPagina = 3;
+
+            var resultado = listaProdutos.Skip( itensPorPagina * (pagina - 1) ).take( itensPorPagina );
+
+            Console.WriteLine(" --------------- Registros da 2a. Página ------------------");
+
+            foreach( var prod in resultado ){
+                Console.WriteLine($"ID: {prod.Id} NOME: {prod.Nome}")
+            }
+
+Aula 10. C# - LINQ - Sum, Average, Count, Range e Repeat
+--------------------------------------------------------
+https://www.youtube.com/watch?v=JXoSZpR9_aw&list=PLelKrgw43Tu2A2hCLMtrrS_Ox6ds-p7jw&index=10
