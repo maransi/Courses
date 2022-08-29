@@ -1138,3 +1138,136 @@ Aula 26. Implementando Extension Methods
 
         app.Run();
 
+
+Aula 27. Registrando mais de uma implementação
+----------------------------------------------
+
+    . O que acontece com a implementação abaixo? onde temos mais de uma 
+        implementação para a mesma interface.
+
+        ...
+        public interface IService{
+
+        }
+
+        public class ServiceOne: IService{
+
+        }
+
+        public classe ServiceTwo: IService{
+
+        }
+        ...
+
+    . Program.cs
+
+        ...
+        builder.Services.AddTransient<IService, ServiceOne>();
+        builder.Services.AddTransient<IService. ServiceTwo>();
+        ...
+
+    . No caso acima, o .NET retornará sempre a última classe registrada, assim a "ServiceTwo".
+
+        ...
+        private readonly IService _service;
+
+        public OrderController( IService service) 
+            => _service = service;
+
+        [Route("/")]
+        [HttpGet]
+        public IActionResult Get(){
+            return Ok( new {
+                            _service.GetType.Name
+                        });
+        }
+
+    . Embora o .NET retorne sempre a última classe registrada, não significa que ele deixou de 
+        registrar as demais classes:
+
+        builder.Service.AddTransient<IService, ServiceOne>();
+        builder.Service.AddTransient<IService, ServiceOne>();
+        builder.Service.AddTransient<IService, ServiceOne>();
+        builder.Service.AddTransient<IService, ServiceTwo>();
+        
+    . Se formos verificar as classes registradas, todas estarão lá, mas sempre retornará a última 
+        registrada:
+
+        ...
+        private readonly IEnumerable<IService> _service;
+
+        public OrderController(IEnumerable<IService> service)
+            => _service = service;
+
+        [Route("/")]
+        [HttpGet]
+        public IActionResult Get(){
+            return Ok( x => n.GetType().Name  });
+        }
+
+
+        // Saída
+        [
+            "ServiceOne",
+            "ServiceOne",
+            "ServiceOne",
+            "ServiceTwo"            
+        ]
+
+
+Aula 28.  Service Descriptor
+----------------------------
+
+    . Descreve como resolver uma dependência
+
+    . Determina o tipo e tempo de vida dela
+
+    . AddTransient, AddScoped e AddSingleton são "wrapers" deste item.
+
+    . Como conseguir o objeto da classe desejada:
+
+        ...
+        va descriptor = new ServiceDescriptor(
+            typeof(IService),   // Abstração
+            typeof( ServiceOne ),   // Implementação
+            ServiceLifetime.Singleton   // Tempo de vida
+        );
+
+        builder.Services.Add( descriptor );
+
+    
+https://medium.com/volosoft/asp-net-core-dependency-injection-58bc78c5d369
+https://jinalkumarpatel.hashnode.dev/dependency-injection-in-net-core
+
+
+Aula 29.  TryAdd e TryAddEnumerable
+-----------------------------------
+
+    . TryAdd    - Só registra um item por interface:
+
+        ...
+        builder.Services.TryAddTransiente<IService, ServiceOne>();
+        builder.Services.TryAddTransiente<IService, ServiceOne>();
+        ...
+
+   . Se formos verificar as classes registradas, só estarão uma lá:
+
+        ...
+        private readonly IEnumerable<IService> _service;
+
+        public OrderController(IEnumerable<IService> service)
+            => _service = service;
+
+        [Route("/")]
+        [HttpGet]
+        public IActionResult Get(){
+            return Ok( x => n.GetType().Name  });
+        }
+
+
+        // Saída
+        [
+            "ServiceOne"
+        ]
+
+        
