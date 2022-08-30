@@ -1270,4 +1270,48 @@ Aula 29.  TryAdd e TryAddEnumerable
             "ServiceOne"
         ]
 
-        
+Aula 30. [FromService]
+----------------------
+
+    . You can directly inject a dependency into an action method by passing it as a parameter 
+        to the method and using the [FromServices] attribute. During model binding,
+        the framework will resolve the parameter from the DI container, instead of from the
+        request values. This listing shows how you could rewrite listing to use [FromServices] 
+        instead of constructor injection.
+
+        public class UserController : ControllerBase
+        {
+            // The [FromServices] attribute ensures IMessageSender is
+            // resolved from the DI container. IMessageSender is
+            // only available in RegisterUser.
+
+            [HttpPost("register")]
+            public IActionResult RegisterUser( [FromServices] IMessageSender messageSender,
+                                                string username)
+            {
+                messageSender.SendMessage(username);        // IMessageSender is
+                                                            // only available in RegisterUser.
+                return Ok();
+            }
+
+            [HttpPost("promote")]
+            public IActionResult PromoteUser( [FromServices] IPromotionService promoService,
+                                                string username, int level)
+            {
+                promoService.PromoteUser(username, level);
+                return Ok();
+            }
+        }
+
+
+    . You might be tempted to use the [FromServices] attribute in all your action methods, 
+        but I’d encourage you to use standard constructor injection most of the time.
+        Having the constructor as a single location that declares all the dependencies of a
+        class can be useful, so I only use [FromServices] in the rare cases where creating an
+        instance of a dependency is expensive and is only used in a single action method.
+
+
+Aula 31. Hora da Entrevista
+---------------------------
+
+    [Pegar as perguntas dessa aula e responder ]
