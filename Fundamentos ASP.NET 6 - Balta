@@ -35,118 +35,129 @@ Aula 2. HTTP Status Code
                     seguido por dois pontos ':' e pelo seu valor (sem quebras de linha). 
                     Espaços em branco antes do valor serão ignorados.
 
-        . Body
+            Accept-Charset:     O cabeçalho de requisição HTTP Accept-Charset anuncia quais character encodings o 
+                                cliente entende.
 
+                                Por exemplo:    Accept-Charset: iso-8859-1
+                                                Accept-Charset: utf-8, iso-8859-1;q=0.5
+                                                Accept-Charset: utf-8, iso-8859-1;q=0.5, *;q=0.1
 
-    . Headers
+            Accept-Encoding:    indica qual codificação de conteúdo, usualmente um algoritmo de compressão, o cliente 
+                                está apto a entender.
 
-        Accept-Charset
+                                Por exemplo:    Accept-Encoding: gzip
+                                                Accept-Encoding: compress
+                                                Accept-Encoding: deflate
+                                                Accept-Encoding: br
+                                                Accept-Encoding: identity
+                                                Accept-Encoding: *
 
-        Accept-Encoding
+                                                // Múltiplos algoritmos, com pesos baseados na sintaxe de quality value (en-US):
+                                                Accept-Encoding: deflate, gzip;q=1.0, *;q=0.5
 
-        Accept-Language:    Determina qual linguagem é entendida pelo cliente e qual a sua região de preferência.
-                            
-                            Por exemplo, Accept-Language: pt-br, en;q=0.9,*;q=0.8 diz que preferimos que o conteúdo 
-                            esteja em português do Brasil ou inglês, caso a primeira opção não esteja disponível.
+            Accept-Language:    Determina qual linguagem é entendida pelo cliente e qual a sua região de preferência.
+                                
+                                Por exemplo, Accept-Language: pt-br, en;q=0.9,*;q=0.8 diz que preferimos que o conteúdo 
+                                esteja em português do Brasil ou inglês, caso a primeira opção não esteja disponível.
 
-        Allow:              Lista quais métodos HTTP são aceitos pelo servidor para o recurso acessado.
-                            
-                            Essa lista pode variar de acordo com a página que estamos acessando.
+            Allow:              Lista quais métodos HTTP são aceitos pelo servidor para o recurso acessado.
+                                
+                                Essa lista pode variar de acordo com a página que estamos acessando.
 
-                            Por exemplo, Allow: GET, POST, HEAD diz que a página acessada aceita apenas esses métodos.
+                                Por exemplo, Allow: GET, POST, HEAD diz que a página acessada aceita apenas esses métodos.
 
-        Authorization
+            Authorization
 
-        Content-Language:   É a forma do servidor dizer ao cliente quais linguagens estão disponíveis para o recurso atual.
-        
-                            Por exemplo, Content-Language: pt-br determina que apenas a linguagem português do 
-                            Brasil está disponível.
+            Content-Language:   É a forma do servidor dizer ao cliente quais linguagens estão disponíveis para o recurso atual.
+            
+                                Por exemplo, Content-Language: pt-br determina que apenas a linguagem português do 
+                                Brasil está disponível.
 
-                            A partir de Content-Language o cliente sabe como escolher o valor para Accept-Language.
+                                A partir de Content-Language o cliente sabe como escolher o valor para Accept-Language.
 
-        Cookie:             Contém o valor de um Cookie HTTP e é a forma do navegador enviar esse dado de volta 
-                            ao servidor a cada requisição.
+            Cookie:             Contém o valor de um Cookie HTTP e é a forma do navegador enviar esse dado de volta 
+                                ao servidor a cada requisição.
 
-                            Uma vez que o HTTP é stateless, algumas vezes precisamos recorrer a esse mecanismo 
-                            para saber se um usuário permanece logado ou tem sessão ativa, por exemplo.
+                                Uma vez que o HTTP é stateless, algumas vezes precisamos recorrer a esse mecanismo 
+                                para saber se um usuário permanece logado ou tem sessão ativa, por exemplo.
 
-                            Por exemplo, Cookie: PHPSESSID=298zf09hf012fh2; é o id da sessão criada pelo PHP. 
-                            Através dela, o PHP pode determinar, no servidor, se duas requisições partiram de um mesmo computador.
+                                Por exemplo, Cookie: PHPSESSID=298zf09hf012fh2; é o id da sessão criada pelo PHP. 
+                                Através dela, o PHP pode determinar, no servidor, se duas requisições partiram de um mesmo computador.
 
-        Content-Type:       Indica qual o tipo de mídia de um recurso.
+            Content-Type:       Indica qual o tipo de mídia de um recurso.
 
-                            A partir dele o navegador pode determinar se o conteúdo recebido na resposta é uma 
-                            página HTML, imagem, áudio, vídeo, etc.
+                                A partir dele o navegador pode determinar se o conteúdo recebido na resposta é uma 
+                                página HTML, imagem, áudio, vídeo, etc.
 
-                            Por exemplo, Content-Type: text/html; charset=utf-8 indica que receberemos uma página em 
-                            HTML na codificação de caracteres UTF-8.
+                                Por exemplo, Content-Type: text/html; charset=utf-8 indica que receberemos uma página em 
+                                HTML na codificação de caracteres UTF-8.
 
-        Expect
+            Expect
 
-        From
+            From
 
-        Host
+            Host
 
-        If-Match
+            If-Match
 
-        If-Modified-Since
+            If-Modified-Since
 
-        If-None-Match
+            If-None-Match
 
-        If-Range
+            If-Range
 
-        If-Unmodified-Since
+            If-Unmodified-Since
 
-        Max-Forwards
+            Max-Forwards
 
-        Proxy-Authorization
+            Proxy-Authorization
 
-        Range
+            Range
 
-        Referer
+            Referer
 
-        TE
+            TE
 
-        User-Agent:         Contém uma string de identificação da aplicação, sistema operacional e distribuidor 
-                            do software que fez a requisição.
+            User-Agent:         Contém uma string de identificação da aplicação, sistema operacional e distribuidor 
+                                do software que fez a requisição.
 
-                            Por exemplo, User-Agent: Googlebot/2.1 (+http://www.google.com/bot.html) diz que o Google quem 
-                            disparou a requisição a fim de coletar dados para o seu mecanismo de busca.    
+                                Por exemplo, User-Agent: Googlebot/2.1 (+http://www.google.com/bot.html) diz que o Google quem 
+                                disparou a requisição a fim de coletar dados para o seu mecanismo de busca.    
 
-        . Exemplos de Headers de requisição:
+            . Exemplos de Headers de requisição:
 
-            GET /hello.htm HTTP/1.1
-            User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)
-            Host: www.tutorialspoint.com
-            Accept-Language: en-us
-            Accept-Encoding: gzip, deflate
-            Connection: Keep-Alive
+                GET /hello.htm HTTP/1.1
+                User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)
+                Host: www.tutorialspoint.com
+                Accept-Language: en-us
+                Accept-Encoding: gzip, deflate
+                Connection: Keep-Alive
 
-            ------------------------------------------------------------------
+                ------------------------------------------------------------------
 
-            POST /cgi-bin/process.cgi HTTP/1.1
-            User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)
-            Host: www.tutorialspoint.com
-            Content-Type: application/x-www-form-urlencoded
-            Content-Length: length
-            Accept-Language: en-us
-            Accept-Encoding: gzip, deflate
+                POST /cgi-bin/process.cgi HTTP/1.1
+                User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)
+                Host: www.tutorialspoint.com
+                Content-Type: application/x-www-form-urlencoded
+                Content-Length: length
+                Accept-Language: en-us
+                Accept-Encoding: gzip, deflate
 
-            Connection: Keep-Alive
-            licenseID=string&content=string&/paramsXML=string
+                Connection: Keep-Alive
+                licenseID=string&content=string&/paramsXML=string
 
-            ------------------------------------------------------------------
+                ------------------------------------------------------------------
 
-            POST /cgi-bin/process.cgi HTTP/1.1
-            User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)
-            Host: www.tutorialspoint.com
-            Content-Type: text/xml; charset=utf-8
-            Content-Length: length
-            Accept-Language: en-us
-            Accept-Encoding: gzip, deflate
-            Connection: Keep-Alive
+                POST /cgi-bin/process.cgi HTTP/1.1
+                User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)
+                Host: www.tutorialspoint.com
+                Content-Type: text/xml; charset=utf-8
+                Content-Length: length
+                Accept-Language: en-us
+                Accept-Encoding: gzip, deflate
+                Connection: Keep-Alive
 
-            <?xml version="1.0" encoding="utf-8"?>
-            <string xmlns="http://clearforest.com/">string</string>
+                <?xml version="1.0" encoding="utf-8"?>
+                <string xmlns="http://clearforest.com/">string</string>
 
 
