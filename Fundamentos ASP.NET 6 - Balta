@@ -66,7 +66,15 @@ Aula 2. HTTP Status Code
 
                                 Por exemplo, Allow: GET, POST, HEAD diz que a página acessada aceita apenas esses métodos.
 
-            Authorization
+            Authorization       O cabeçalho de requisição HTTP Authorization contém as credenciais para autenticar o agente de 
+                                usuário com o servidor, geralmente o servidor responderá com um status 401 Unauthorized se não 
+                                for possível fazer a autenticação, e com o cabeçalho WWW-Authenticate.
+
+                                Sintaxe:
+
+                                Authorization: <tipo> <credenciais>
+
+                                Por exemplo:    Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l
 
             Content-Language:   É a forma do servidor dizer ao cliente quais linguagens estão disponíveis para o recurso atual.
             
