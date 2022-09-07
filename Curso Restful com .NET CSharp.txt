@@ -14,6 +14,8 @@ https://www.sharepointcafe.net/2021/03/create-dotnet-5-api-in-visual-studio-code
 https://www.syncfusion.com/blogs/post/how-to-develop-an-asp-net-core-application-using-visual-studio-code.aspx
 https://www.c-sharpcorner.com/article/create-asp-net-core-web-application-with-visual-studio-code/
 
+https://code-maze.com/net-core-series/
+
 Curso Restful com .NET CSharp
 -----------------------------
 
@@ -417,7 +419,74 @@ Web API Routing
                     }
                 }
 
-            . Neste caso a request poderá ser chamada pela URL http://localhost:1234/api/student/names
+                . Neste caso a request poderá ser chamada pela URL http://localhost:1234/api/student/names
+
+            . Podemos colocar o "Route(..)" na classe e neste caso todos os contexto declarados nos métodos
+                serão acrescidos pelo primeiro pelo da classe e depois pelo do método:
+
+                ...
+                [ApiController]
+                [Route("v1/clientes")]
+                public class ClienteController : ControllerBase
+                {
+                    [HttpGet]
+                    [Route("{cpf:regex(^\\d{{3}}.\\d{{3}}.\\d{{3}}-\\d{{2}}$)}")]
+                    public async Task<ActionResult<Cliente>> Get([FromServices] DataContext context, string cpf){
+
+                        var cliente = await context.Clientes
+                                                .AsNoTracking()
+                                                .FirstOrDefaultAsync(x => x.cpf ==  cpf );
+
+                        if (cliente == null){
+                            return NotFound();
+                        }
+
+                            return Ok(cliente);
+                    }
+                }
+                ...
+
+                . Neste caso a request poderá ser chamada pela URL http://localhost:[porta]/v1/clientes/106.523.608-58
+
+                . Observe que no "Route" do método foi utilizado como parâmetro "{cpf:regex(...)}". Isto força com que 
+                    exista uma URL com um parâmetro e restringe mais ainda com uma expressão "regex" que valida o parâmetro
+                    com a mascara de CPF. Caso for chamado essa url, porém com um parâmetro que não se enquadre num CPF 
+                    o próprio container .NET nem entra no método. Caso a chamada foi feita com sucesso o valor será passado
+                    automaticamente para o parâmetro da assinatura do método "Get([FromServices] DataContext context, string cpf)"
+
+                . [FromServices] - Usando para injetar o objeto. Neste caso, a injeção age sobre uma classe de contexto, que foi 
+                    construida e declarado na classe "Startup.cs" para que pudesse ser visivel aqui:
+
+                    // DataContext.cs
+                    using System;
+                    using contrato.Models;
+                    using Microsoft.EntityFrameworkCore;
+
+                    namespace contrato.Data
+                    {
+                        public class DataContext: DbContext
+                        {
+                            protected override void OnConfiguring( DbContextOptionsBuilder options ){
+                                options.UseSqlServer("Server=localhost,1433;Database=desenv;User ID=sa;Password=Joao3.16");            
+                                options.LogTo( Console.WriteLine );
+                            }
+
+                            public DbSet<Cliente> Clientes { get; set; }
+                        }
+                    }
+
+
+                    // Startup.cs
+                    ...
+                    public void ConfigureServices(IServiceCollection services)
+                    {
+
+                        services.AddScoped<DataContext, DataContext>();     // Linha inserida
+                        ...
+                    }
+
+
+
 
 
 https://www.tektutorialshub.com/asp-net-core/asp-net-core-convention-based-routing/
@@ -500,13 +569,6 @@ Parameter Binding in ASP.NET Web API
             }
         }
 
-        . A chamada será "http://localhost/api/student?age=25" método POST:
-
-            . Body : row : JSON 
-
-            .   { id: 1,
-                    name: "steve"
-                }
 
     . [FromUri] e [FromBody]
 
@@ -519,6 +581,9 @@ Parameter Binding in ASP.NET Web API
 
                 }
             }
+
+
+
 
         [FromBody]  - Obtém as informações do corpo da request 
 
