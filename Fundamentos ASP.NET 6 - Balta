@@ -354,3 +354,121 @@ Aula 4. HTTP Status Code
 Aula 5.  Como funciona um App ASP.NET
 -------------------------------------
 
+    . No .Net 6 a execução começa pela classe "Program.cs"
+
+        // Construi a aplicação
+        var builder = WebAppication.CreateBuilder(args);
+        var app = builder.Build();
+
+        // Mapea a rota para ser chamada na linha debaixo
+        app.MapGet("/", () => "Hello World!");
+
+        // Executa a aplicação e fica escutando e respondendo alguma chamada na porta do projeto
+        app.Run();  
+
+    . No .Net 6 a classe "Startup.cs" foi suprimida
+
+    . No .Net 6 a estrutura da classe "Program.cs" foi alterada deixando equivalente ao apresentado acima.
+
+
+
+Aula 6. Mapeando uma Requisição
+-------------------------------
+
+    . Na classe "Program.cs" temos a rota abaixo:
+
+        app.MapGet("/", () => "Hello World!");
+                         |
+                         +----> Função anônima
+
+    . A chamada acima resultará na URL:
+
+        https://localhost:[porta]/
+
+Aula 7. Funções Anônimas
+------------------------
+
+    . Na classe "Program.cs" temos a rota abaixo:
+
+        app.MapGet("/", () => "Hello World!");
+                         |
+                         +----> Função anônima
+    
+    . Poderiamos construir a mesma função da seguinte forma:
+
+        app.MapGet( "/", () => {
+            return "Hello World!";
+        });
+
+
+Aula 8. Parâmetros
+------------------
+
+    . Na classe "Program.cs" altere a rota colocando o "StatusCode" com o objeto "Results"
+
+        ..
+        app.MapGet( "/", () => {
+            return Results.Ok("Hello World");           // Linha alterada
+        });
+        ...
+
+    . Inclua nova rota abaixo:
+
+        ...
+        app.MapGet( "/{nome}", (string nome) => {       // Linha alterada
+            return Results.Ok($"Hello World {nome}");   // Linha alterada
+        });
+        ...
+
+        ...
+        app.MapGet( "/nome/{nome}", (string nome) => {  // Linha alterada
+            return Results.Ok($"Hello World {nome}");   // Linha alterada
+        });
+        ...
+
+    . Acesse o Postman e execute as URLs abaixo:
+
+        https://localhost:[porta]/
+
+        https://localhost:[porta]/Marco
+
+        https://localhost:[porta]/nome/Marco
+
+
+Aula 9. Serialização JSON
+------------------------- 
+
+    . Inclua as linhas abaixo na classe "Program.cs":
+
+        ...
+        // Linha inserida abaixo
+        app.MapPost("/", (User user) => { 
+            return Results.Ok( user );
+        });    
+
+        app.Run();
+
+        // Classe inserida
+        public class User{
+            public int Id { get; set; }
+
+            public string Username { get; set; }
+        }
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        Method: POST
+        Url: https:localhost:[porta]/
+        Body.raw: 
+                    {
+                        "id": 1,
+                        "username": "MARCO"
+                    }
+        Type: JSON
+
+        . Observe: Se o valor inteiro 1 chegará com sucesso ao backend.
+                    Se os nomes propriedade minisculos serão convertidos automaticamente para dentro da classe.
+
+Aula 10. Iniciando o Projeto
+----------------------------
+
