@@ -472,3 +472,232 @@ Aula 9. Serialização JSON
 Aula 10. Iniciando o Projeto
 ----------------------------
 
+    . Acesse a pasta de projetos e execute o comando abaixo:
+
+        dotnet new web -o Todo -f net6
+
+    . Acesse o VSCode na pasta do projeto criado.
+
+    . Cria a classe abaixo dentro da pasta "Model":
+
+        namespace Todo.Models
+        {
+            public class TodoModel
+            {
+                public int Id { get; set; }
+                public string Title { get; set; }
+                public bool Done { get; set; }
+                public DateTime CreatedAt { get; set; }
+            }
+        }
+
+Aula 11. Configurando o EF
+--------------------------
+
+    . ACesse a pasta raiz do projeto e execute os comandos abaixo:
+
+        dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 6.0.8
+
+        dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.8
+
+    . Crie a pasta "Data" e dentro dela crie a classe abaixo:
+
+        using Microsoft.EntityFrameworkCore;
+        using Todo.Models;
+
+        namespace Todo.Data
+        {
+            public class AppDbContext : DbContext
+            {
+                public DbSet<TodoModel> Todos { get; set; }
+
+                protected override void OnConfiguring(DbContextOptionsBuilder options)
+                    => options.UseSqlite("DataSource=app.db;Cache=Shared");
+            }
+        }
+
+Aula 12. Gerando o banco de dados 
+---------------------------------
+
+    . Verifique se o "ef" está instalado:
+
+        dotnet ef
+
+        . Caso não estiver execute o comando abaixo:
+
+            dotnet tool install --global dotnet-ef --version 6.0.8   
+
+    . Execute o comando abaixo dentro da pasta raiz do projeto:
+
+        dotnet clean
+
+        dotnet build
+
+        dotnet ef migrations add CreationDatabase
+
+        dotnet ef update database
+
+    . Verifique se foi criado a pasta "Migrations" dentro do projeto com as devidas classes.
+
+    . Verifique se foi criado dentro do projeto um arquivo com o nome "app.db" que é o nosso BD SqLite.
+
+Aula 13. Entendendo os Controllers
+----------------------------------
+
+    . Crie a pasta "Controllers" e dentro dela a classe abaixo:
+
+        using Microsoft.AspNetCore.Mvc;
+        using Todo.Data;
+        using Todo.Models;
+
+        namespace Todo.Controllers
+        {
+            [ApiController]
+            public class HomeController : ControllerBase
+            {
+                [HttpGet]
+                public String Get()
+                {
+                    return "Hello World";
+                }
+            }
+        }
+
+
+    . Diferença entre "Controller" e "ControllerBase":
+
+        ...
+        public class HomeController : ControllerBase
+        ...
+
+        . "ControllerBase" é a classe que representa toda a base do padrão MVC Controller. Já a "Controller" estende
+            a "ControllerBase" e acrescenta alguns métodos destinados ao uso de páginas web:
+
+                public abstract class Controller : ControllerBase
+                {
+                    public dynamic ViewBag { get; }
+                    public virtual ViewResult View(object model) { }
+                    // more View support stuff
+                }
+
+        . Quando for desenvolver APIs que retornam JSONs, estenda a classe "ControllerBase". Caso contrário, se
+            a API for para retornar além de JSONs, como páginas web, estenda a classe "Controller",
+            pois essa última tem  métodos a mais do que a "ControllerBase".
+
+    . O que é a annotation "[ApiController]?
+
+        https://wakeupandcode.com/api-controllers-in-asp-net-core/
+
+    . Os nomes dos métodos se começarem com Get, Post, Put, Delete, Patch, etc, serão chamados automaticamente de acordo com o verbo http 
+        solicitado pelo "client". Porém, é possível adicionar sufixos aos nomes dos métodos, desde que eles iniciem com o nome do verbo 
+        HTTP (Get, Post, ...)
+
+        HTTP Method 	Possible Web API Action Method Name 	                Usage
+        -----------     -----------------------------------                     -----
+        GET 	        Get()                                                   *any name starting with Get * 	Retrieves data.
+                        get()
+                        GET()
+                        GetAllStudent()
+
+        POST 	        Post()                                                  *any name starting with Post* 	Inserts new record.
+                        post()
+                        POST()
+                        PostNewStudent()
+
+        PUT 	        Put()                                                   *any name starting with Put* 	Updates existing record.
+                        put()
+                        PUT()
+                        PutStudent()
+
+        PATCH 	        Patch()                                                 *any name starting with Patch* 	Updates record partially.
+                        patch()
+                        PATCH()
+                        PatchStudent()
+
+        DELETE 	        Delete()                                                *any name starting with Delete* 	Deletes record. 
+                        delete()
+                        DELETE()
+                        DeleteStudent()
+
+    . Outra maneira de desenvolver os métodos das APIs sem a necessidade dos nomes dos métodos da classe serem os mesmos dos verbos HTTP, 
+        seria tipificar os métodos com [HttpGet], [HttpPost], etc.
+
+
+Aula 14. Rotas e Controllers
+----------------------------
+
+    . Acesse a classe "Program.cs" e comente a linha com o conteúdo "app.Map("/", () => "Hello World");"
+
+    . Acrescente no método "Get" a annotation "Router":
+
+        ...
+        [ApiController]
+        public class HomeController : ControllerBase
+        {
+            [HttpGet]
+            [Route("/")]
+            public String Get()
+            {
+                return "Hello World";
+            }
+        }
+        ...
+
+        . Neste caso a request poderá ser chamada pela URL http://localhost:[porta]/
+
+        . Podemos colocar o "Route(..)" na classe e neste caso todos os contexto declarados nos métodos
+            serão acrescidos pelo primeiro pelo da classe e depois pelo do método:
+
+        ; Attribute Routing - Utiliza a tipificação "[Route()]"
+
+            . Devemos habilitar no WebConfig através da chamada "config.MapHttpAttributeRoutes()".
+
+    . Acesse o Postman e crie uma chamada GET com a URL http://localhost:[porta]/
+
+    . Acrescente na classe a annotation "Router":
+
+        ...
+        [ApiController]
+        [Route("home")]
+        public class HomeController : ControllerBase
+        {
+            [HttpGet]
+            [Route("/")]
+            public String Get()
+            {
+                return "Hello World";
+            }
+        }
+        ...
+
+    . No Postman e altere a chamada GET com a URL http://localhost:[porta]/home
+
+Aula 15.  Adicionando suporte a Controllers
+-------------------------------------------
+
+    . Adicione as linhas abaixo na classe "Program.cs":
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddControllers();   // Linha inserida
+
+        var app = builder.Build();
+
+        app.MapControllers();               // Linha inserida
+
+    . As linhas inseridas servem para publicar as rotas quando o projeto for levantado.
+
+    . Verificar como está configurado o padrão de rotas dentro dos arquivos de configuração. Verificar se o projeto
+        está obedecendo o padrão associado ao nome "[classe]Controller" na hora da chamada.
+
+        . Confrontar com a "Aula 3 - Entendendo as URL amigáveis." do curso "Uma visão completa do ASP.NET MVC"
+
+        
+
+
+
+
+
+
+
+
