@@ -868,4 +868,201 @@ Aula 18. Atualizando e excluindo um registro
 
     . No Postman, execute a chamada GET com a URL http://localhost:[porta]/home/1
 
-2.15    
+    . Inclua os métodos abaixo na classe "HomeController.cs":
+
+        ...
+        [HttpPut("/{id:int}")]
+        public TodoModel Put([FromServices] AppDbContext context, [FromRoute] int id, [FromBody] TodoModel todo )
+        {
+
+            var model = context.Todos.FirstOrDefault( x => x.Id == id );
+
+            if ( model == null ){
+                return model;
+            }
+
+            model.Title = todo.Title;
+            model.Done = todo.Done;
+
+            context.Todos.Update( model );
+
+            context.SaveChanges();
+
+            return model;
+        }
+
+        [HttpDelete("/")]
+        public TodoModel Delete( [FromServices] AppDbContext context, [FromRoute] int id )
+        {
+            var model = context.Todos.FirstOrDefault( x => x == id );
+
+            context.Todos.Remove( model );
+
+            context.SaveChanges();
+
+            return model;
+        }
+
+Aula 19. Testando a API
+-----------------------
+
+    . Reinicie a aplicação 
+
+    . No Postman crie uma chamada com os parâmetros abaixo:
+
+        Method: PUT
+        URL: https://localhost:[porta]/1
+        Body.Json: true
+        Body.raw:   {
+                        "Title": "Ir a Acadêmia",
+                        "Done": false
+                    }
+
+    . No Postman, execute a chamada GET com a URL http://localhost:[porta]/1
+
+    . No Postman crie uma chamada com os parâmetros abaixo:
+
+        Method: DELETE
+        URL: https://localhost:[porta]/1
+
+    . No Postman, execute a chamada GET com a URL http://localhost:[porta]/1
+
+Aula 20. Melhorando a API
+-------------------------
+
+    . Altere o retorno do método abaixo, para adicionar recursos de "StatusCode":
+
+        ...
+        [ApiController]
+        public class HomeController : ControllerBase
+        {
+            [HttpGet("/")]
+            public IActionResult Get([FromService] AppDbContext context)       // Linha alterada
+            {
+                return Ok(context.Todos.ToList());              // Linha alterada
+            }
+        }
+        ...
+
+    . 3 formas mais comuns de retornar dados a partir de uma Web API:
+
+        . Retornando um tipo específico
+
+            . A forma mais simples e direta de retornar valores de uma API é retornar um tipo específico
+
+                ...
+                [HttpGet("/")]
+                public List<TodoModel> Get([FromService] AppDbContext context)       // Retorno simples sem StatusCode
+                {
+                    return context.Todos.ToList();              // Retorno simples sem StatusCode
+                }
+
+            . Neste exemplo, a Action Get() retorna um tipo conhecido, ou seja, uma lista de objetos Produto.
+
+            . Essa abordagem é adequada se você simplesmente deseja retornar dados para o cliente sem considerar 
+                condições inesperadas, como exceções e códigos HTTP, como 404 e 200.
+
+        . Retornando IActionResult
+
+            . Agora quando o seu valor de retorno for uma mistura de dados e códigos HTTP, você não pode usar a 
+                abordagem anterior. Assim se  você deseja retornar NotFoundResult ou OkResult ou ObjectResult, 
+                não poderá usar a abordagem anterior.
+
+            . Nesse caso, você pode retornar os valores como IActionResult. Considere o seguinte exemplo:
+
+                public IActionResult Get([FromService] AppDbContext context)       // Retorno de dados com o StatusCode
+                {
+                    return Ok(context.Todos.ToList());              // Retorno de dados com o StatusCode
+                }
+
+        . Retornando ActionResult<T>
+
+            . O tipo chamado ActionResult<T>, permite que você retorne o tipo do response ou qualquer resultado da Action, 
+                enquanto ainda indica o tipo do response.
+
+            . Assim, o ActionResult<T> permite combinar as duas abordagens discutidas anteriormente. Você pode retornar 
+                um tipo derivado de ActionResult ou um tipo específico. Considere o exemplo a seguir usando a Action Get():
+
+                [HttpGet("{id}")]
+                public ActionResult<Produto> Get(string id)
+                {	
+                    Produto prod = _context.Produtos.Find(id);
+                
+                    if (prod == null)
+                    {
+                        return NotFound();
+                    }		
+                    
+                    return prod;
+                }
+
+            . Como você pode ver, não é necessário envolver o objeto prod em Ok() ou ObjectResult. Você pode retornar 
+                NotFoundResult ou ActionResult<Produto>.
+
+    . Altere o método "GetById" como abaixo:
+
+        [HttpGet("id:{int}")]
+        public IActionResult GetById( [FromServices] AppDbContext context, [FromRoute] int id)
+        {
+            TodoModel todo = context.Todos.FirstOrDefault( x => x.Id == id );
+
+            if ( todo == null )
+            {
+                return NotFound();
+            }
+
+            return Ok(todo);
+        }
+
+    . Altere o método "Post" como abaixo:
+
+        [HttpPost("/")]
+        public IActionResult Post( [FromServices] AppDbContext context, [FromBody] TodoModel model){
+            context.Todos.Add(model);
+
+            context.SaveChanges();
+
+            return Created($"/{todo.Id}", model);
+        }
+
+    . Altere o método "Put" como abaixo:
+
+        ...
+        [HttpPut("/{id:int}")]
+        public IActionResult Put([FromServices] AppDbContext context, [FromRoute] int id, [FromBody] TodoModel todo )   // Linha alterada
+        {
+
+            var model = context.Todos.FirstOrDefault( x => x.Id == id );
+
+            if ( model == null ){
+                return NotFound();  // Linha alterada
+            }
+
+            model.Title = todo.Title;
+            model.Done = todo.Done;
+
+            context.Todos.Update( model );
+
+            context.SaveChanges();
+
+            return Ok(model);
+        }
+
+    . Altere o método "Delete" como abaixo:
+
+        [HttpDelete("/")]
+        public IActionResult Delete( [FromServices] AppDbContext context, [FromRoute] int id )
+        {
+            var model = context.Todos.FirstOrDefault( x => x == id );
+
+            if ( model == null ){
+                return NotFound();
+            }
+
+            context.Todos.Remove( model );
+
+            context.SaveChanges();
+
+            return Ok(model);
+        }
+
