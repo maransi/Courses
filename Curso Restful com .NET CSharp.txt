@@ -454,6 +454,9 @@ Web API Routing
                     o próprio container .NET nem entra no método. Caso a chamada foi feita com sucesso o valor será passado
                     automaticamente para o parâmetro da assinatura do método "Get([FromServices] DataContext context, string cpf)"
 
+                    . Poderiamos realizar a mesma configuração do parâmetro na annotation "Route("{cpf:regex..."})" na annotation
+                        "HttpGet("{cpf:regex..."})".
+
                 . [FromServices] - Usando para injetar o objeto. Neste caso, a injeção age sobre uma classe de contexto, que foi 
                     construida e declarado na classe "Startup.cs" para que pudesse ser visivel aqui:
 

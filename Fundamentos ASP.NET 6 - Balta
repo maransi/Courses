@@ -693,14 +693,179 @@ Aula 15.  Adicionando suporte a Controllers
     . Verificar como está configurado o padrão de rotas dentro dos arquivos de configuração. Verificar se o projeto
         está obedecendo o padrão associado ao nome "[classe]Controller" na hora da chamada.
 
+https://gutfrau.medium.com/how-to-bind-fromroute-and-frombody-into-one-model-in-net-5-be0730a77852
+Testar -> [Route("api/[controller]")]
+
         . Confrontar com a "Aula 3 - Entendendo as URL amigáveis." do curso "Uma visão completa do ASP.NET MVC"
+
+
+
 
 Aula 16.  Lendo itens do banco de dados
 ---------------------------------------
 
+    . Adicione as linhas abaixo na classe "Program.cs":
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddControllers();   
+
+        builder.Services.AddDbContext<AppDbContext>();      // Linha inserida
+
+        var app = builder.Build();
+
+        app.MapControllers();               
 
 
+        . A linha inserida servirá para fazermos injeção de dependência do objeto de conexão.
 
+    . Acrescente no método "Get" da classe "HomeController" a injeção da nossa classe de conexão:
 
+        ...
+        [ApiController]
+        [Route("home")]
+        public class HomeController : ControllerBase
+        {
+            [HttpGet]
+            [Route("/")]
+            public List<TodoModel> Get([FromService] AppDbContext context)       // Linha alterada
+            {
+                return context.Todos.ToList();              // Linha alterada
+            }
+        }
+        ...
 
+    . No Postman e altere a chamada GET com a URL http://localhost:[porta]/home/
 
+        . O resultado será uma lista vazia.
+
+Aula 17. Criando um registro
+----------------------------
+
+    . Crie o método abaixo na classe "HomeController":
+
+        [HttpPost("/")]
+        public TodoModel Post( [FromServices] AppDbContext context, [FromBody] TodoModel model){
+            context.Todos.Add(model);
+
+            context.SaveChanges();
+
+            return model;
+        }
+    
+    . No Postman crie uma chamada com os parâmetros abaixo:
+
+        Method: POST
+        URL: https://localhost:[porta]/home/
+        Body.Json: true
+        Body.raw:   {
+                        "id": "1",
+                        "Title": "Ir ao Supermercado",
+                        "Done": True,
+                        "CreatedAt": "2022-09-01T14:00:00"
+                    }
+
+    . No Postman, execute a chamada GET com a URL http://localhost:[porta]/home/
+
+Aula 18. Atualizando e excluindo um registro
+--------------------------------------------
+
+    . Crie o método abaixo na classe "HomeController":
+
+        [HttpGet("id:{int}")]
+        public Todo GetById( [FromServices] AppDbContext context, [FromRoute] int id)
+        {
+            TodoModel todo = context.Todos.FirstOrDefault( x => x.Id == id );
+
+            return todo;
+        }
+
+        . Observe que na annotation "HttpGet" do método foi utilizado como parâmetro "id:{int}". Isto força com que 
+            exista uma URL com um parâmetro e restringe mais ainda com um tipo "int" que valida o parâmetro
+            com um número inteiro. Caso for chamado essa url, porém com um parâmetro que não se enquadre num no. válido
+            o próprio container .NET nem entra no método. Caso a chamada foi feita com sucesso o valor será passado
+            automaticamente para o parâmetro da assinatura do método "Get([FromServices] AppDbContext context, [FromRoute] int id)"
+
+            . Repare que o parâmetro da assinatura "id" está anotado com a annotation [FromRoute]. Este atributo faz com que o 
+                Model Binder apenas vincule dados que são oriundos da rota de dados.
+
+            . Poderiamos realizar a mesma configuração do parâmetro na annotation "HttpGet("id:{int}")" na annotation
+                "Route("id:{int}")".
+
+    . A lista de annotation possíveis na assinatura dos métodos são:
+
+        . FromForm
+
+            Este atributo faz com que o Model Binder utilize somente os dados recebidos do formulário enviado.
+
+                public IActionResult Detail([FromForm] ProdutoViewModel produtoViewModel) => View(produtoViewModel);
+
+        . FromRoute
+
+            Este atributo faz com que o Model Binder apenas vincule dados que são oriundos da rota de dados
+
+                public IActionResult Detail([FromRoute] int id) => View();
+
+        . FromQuery
+
+            Este atributo diz ao Model Binder para receber apenas os dados da cadeia de consulta (querystring).
+
+                public IActionResult Detail([FromQuery] int id) => View();
+
+                . Se fizermos uma solicitação com a URL:  Produto/Detalhe/2?Id=4 . O valor 4 será vinculado e não o 
+                    valor 2 conforme seria previsto no comportamento padrão.
+
+        . FromHeader
+
+            Este atributo diz ao Model Binder para vincular os valores que vêm no cabeçalho da requisição HTTP.
+
+        . FromBody
+
+            Este atributo diz ao Model Binder para vincular dados a partir do Body do request.
+
+                public IActionResult Detail([FromBody] ProdutoViewModel produtoViewModel) => View(produtoViewModel);
+
+        . FromServices
+
+            Este atributo vincula o valor especificado à implementação que foi configurada no seu container de injeção de dependência.
+
+            public IActionResult Detail([FromServices] IPrintable printer) => View();
+
+        . Bind e BindNever    
+
+            Este atributo vincula o valor especificado à implementação que foi configurada no seu container de injeção de dependência.
+
+            O atributo BindNever diz ao model binder que não deve vincular o atributo especificado.
+
+            Como você pode ver no trecho de código abaixo, IsAdminUser nunca será vinculado.
+
+            Esta abordagem pode ser chamada de propriedades de lista negra, o que não é uma boa prática de segurança.
+
+            É melhor listar os atributos que queremos vincular usando o atributo Bind, deixando de fora os que não queremos, 
+            como você pode ver no exemplo:
+            
+                BindNever
+                ---------
+                public class ProdutoViewModel
+                {
+                    [FromQuery]
+                    public int ProdutoId { get; set; }
+                    public string ProdutoName { get; set; }
+                    [BindNever]
+                    public string IsAdminUser { get; set; }
+                }	
+
+                Bind
+                ----
+                [Bind(nameof(ProdutoId), nameof(ProdutoNome))]
+                public class ProdutoViewModel
+                {
+                    [FromQuery]
+                    public int ProdutoId { get; set; }
+                    public string ProdutoNome { get; set; }
+                    public string IsAdminUser { get; set; }
+                }
+
+    . No Postman, execute a chamada GET com a URL http://localhost:[porta]/home/1
+
+2.15    
