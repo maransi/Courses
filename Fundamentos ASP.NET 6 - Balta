@@ -521,9 +521,9 @@ Aula 11. Configurando o EF
         {
             public class AppDbContext : DbContext
             {
-                // public DbSet<TodoModel>? Todos { get; set; }
+                public DbSet<TodoModel> Todos { get; set; }
                 
-                public DbSet<TodoModel> Todos => Set<TodoModel>();
+                // public DbSet<TodoModel> Todos => Set<TodoModel>();
 
                 protected override void OnConfiguring(DbContextOptionsBuilder options)
                     => options.UseSqlite("DataSource=app.db;Cache=Shared");
@@ -539,7 +539,7 @@ Aula 11. Configurando o EF
         valor nulo. Para resolver essa situação, temos que declarar de uma das duas formas os "DBSets" como abaixo:
 
         // Até .NET 5
-        public DbSet<TodoModel>? Todos { get; set; }
+        public DbSet<TodoModel> Todos { get; set; }
 
         ou 
 
@@ -600,7 +600,9 @@ Aula 11. Configurando o EF
                 }
             }
 
-
+    . IMPORTANTE: se quisermos continuar da forma como era antes no .NET5 sem nenhuma mudança, basta acessar o 
+        arquivo "appsettings.cs" e alterar o parâmetro "<null>enable</null>" para "<null>disable<null>".
+        Dessa forma a compilação ocorrerá no .NET 6 como era no 5, desconsiderando as msgs de warning.
 
 
 Aula 12. Gerando o banco de dados 
@@ -1177,5 +1179,41 @@ Aula 21. Criando o projeto
 
 Aula 22. Adicionando suporte ao Entity Framework
 ------------------------------------------------
+
+    . Acesse o projeto do link abaixo e faça o download dele:
+
+        https://github.com/balta-io/2808
+
+    . Abra o projeto que está em zip, acesse a pasta "src/Modulo3" e copia as pastas "Data" e "Models" 
+        para dentro do projeto "Blog".
+
+    
+    . Acesse a raiz do projeto "Blog" e execute os comandos abaixo:
+
+        dotnet add package Microsoft.EntityFramework.SqlServer
+
+        dotnet add package Microsoft.EntityFramework.Design
+
+    . Acesse a classe "BlogDataContext.cs" e altere a string de conexão apontando para o "Database=Blog".
+
+    . Acesse a pasta raiz do projeto e digite os comandos abaixo:
+
+        dotnet clean
+
+        dotnet build
+
+        . Dará alguns erros de "warning", mas pode desconsiderá-los por enquanto.
+
+Aula 23. Criando o banco de dados
+---------------------------------
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        dotnet ef migrations add CreationDatabase
+
+        dotnet ef database update
+
+Aula 24. Iniciando os Controllers
+---------------------------------  
 
 
