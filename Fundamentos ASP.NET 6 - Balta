@@ -495,7 +495,7 @@ Aula 10. Iniciando o Projeto
             public class TodoModel
             {
                 public int Id { get; set; }
-                public string Title { get; set; }
+                public string? Title { get; set; }
                 public bool Done { get; set; }
                 public DateTime CreatedAt { get; set; }
             }
@@ -510,6 +510,8 @@ Aula 11. Configurando o EF
 
         dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.8
 
+    . 
+
     . Crie a pasta "Data" e dentro dela crie a classe abaixo:
 
         using Microsoft.EntityFrameworkCore;
@@ -519,12 +521,87 @@ Aula 11. Configurando o EF
         {
             public class AppDbContext : DbContext
             {
-                public DbSet<TodoModel> Todos { get; set; }
+                // public DbSet<TodoModel>? Todos { get; set; }
+                
+                public DbSet<TodoModel> Todos => Set<TodoModel>();
 
                 protected override void OnConfiguring(DbContextOptionsBuilder options)
                     => options.UseSqlite("DataSource=app.db;Cache=Shared");
             }
         }
+
+    . A forma como vinhamos trabalhando até o .NET 5, permitia a declaração dos contextos "public DbSet<TodoModel> ..." 
+        na classe de contexto (AppDbContext) da forma abaixo:
+
+        public DbSet<TodoModel> Todos { get; set; }
+
+    . Já da versão .NET 6 em diante, ao fazer da forma acima, o compilador reclama/avisa "Que o objeto poderá ficar com um 
+        valor nulo. Para resolver essa situação, temos que declarar de uma das duas formas os "DBSets" como abaixo:
+
+        // Até .NET 5
+        public DbSet<TodoModel>? Todos { get; set; }
+
+        ou 
+
+        // A partir do .NET 6
+        public DbSet<TodoModel> Todos => Set<TodoModel>();
+
+    . Declarando DbSets no .NET 6 com a sintaxe do .NET 5, teremos muito trabalho para adaptar todo os códigos das classes que for utilizar o DBSet. 
+        Devemos prepará-los para receber valores nulos:
+
+        public DbSet<TodoModel>? Todos { get; set; }
+
+        . Observe que devemos utilizar o operador (?) para informar ao compilador que o objeto poderá ser nulo. Resolve num primeiro 
+            momento para a classe de Contexto (AppDbContext), porém nas classes seguintes que forem utilizar o contexto ocorrerá
+            o mesmo problema de aviso de possível objeto nulo.
+
+        . Nesse caso podemos declarar operadores de perdão nulo (!) para informar ao compilador que um valor nulo real. Por exemplo:
+
+            return context.Todos!.ToList(); 
+
+        . E também em outros lugares avisar ao compilar que o objeto poderá ser nulo:
+
+            TodoModel? todo = context.Todos!.FirstOrDefault( x => x.Id == id );
+
+            return todo!;
+
+        . Um exemplo de um controller com a declaração nos moldes .NET 5 no .NET 6:
+
+            namespace Todo.Controllers
+            {
+                [ApiController]
+                [Route("[controller]/")]
+                public class HomeController : ControllerBase
+                {
+                    [HttpGet]
+                    public List<TodoModel> Get([FromServices] AppDbContext context )
+                    {
+                        return context.Todos!.ToList(); 
+                    }
+
+                    [HttpGet("{id:int}")]
+                    public TodoModel GetById( [FromServices] AppDbContext context, [FromRoute] int id)
+                    {
+                        TodoModel? todo = context.Todos!.FirstOrDefault( x => x.Id == id );
+
+                        return todo!;
+                    }
+
+
+                    [HttpPost]
+                    public TodoModel Post( [FromServices] AppDbContext context, [FromBody] TodoModel model){
+                        context.Todos!.Add(model);
+
+                        context.SaveChanges();
+
+                        return model;
+                    }
+
+                }
+            }
+
+
+
 
 Aula 12. Gerando o banco de dados 
 ---------------------------------
@@ -545,7 +622,7 @@ Aula 12. Gerando o banco de dados
 
         dotnet ef migrations add CreationDatabase
 
-        dotnet ef update database
+        dotnet ef  database update
 
     . Verifique se foi criado a pasta "Migrations" dentro do projeto com as devidas classes.
 
@@ -638,7 +715,21 @@ Aula 14. Rotas e Controllers
 
     . Acesse a classe "Program.cs" e comente a linha com o conteúdo "app.Map("/", () => "Hello World");"
 
-    . Acrescente no método "Get" a annotation "Router":
+    . Adicionando suporte a Controllers:
+
+        . Adicione as linhas abaixo na classe "Program.cs":
+
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddControllers();   // Linha inserida
+
+            var app = builder.Build();
+
+            app.MapControllers();               // Linha inserida
+
+        . As linhas inseridas servem para publicar as rotas quando o projeto for levantado.
+
+    . Acrescente no método "Get" a annotation "Route":
 
         ...
         [ApiController]
@@ -653,18 +744,9 @@ Aula 14. Rotas e Controllers
         }
         ...
 
-        . Neste caso a request poderá ser chamada pela URL http://localhost:[porta]/
+    . No Postman e altere a chamada GET com a URL http://localhost:[porta]/
 
-        . Podemos colocar o "Route(..)" na classe e neste caso todos os contexto declarados nos métodos
-            serão acrescidos pelo primeiro pelo da classe e depois pelo do método:
-
-        ; Attribute Routing - Utiliza a tipificação "[Route()]"
-
-            . Devemos habilitar no WebConfig através da chamada "config.MapHttpAttributeRoutes()".
-
-    . Acesse o Postman e crie uma chamada GET com a URL http://localhost:[porta]/
-
-    . Acrescente na classe a annotation "Router":
+    . Acrescente a expressão "home" na classe a annotation "Route":
 
         ...
         [ApiController]
@@ -680,32 +762,38 @@ Aula 14. Rotas e Controllers
         }
         ...
 
-    . No Postman e altere a chamada GET com a URL http://localhost:[porta]/home
+    . No Postman e altere a chamada GET com a URL http://localhost:[porta]/home/
 
-Aula 15.  Adicionando suporte a Controllers
--------------------------------------------
+        . Neste caso a request poderá ser chamada pela URL http://localhost:[porta]/home/
 
-    . Adicione as linhas abaixo na classe "Program.cs":
-
-        var builder = WebApplication.CreateBuilder(args);
-
-        builder.Services.AddControllers();   // Linha inserida
-
-        var app = builder.Build();
-
-        app.MapControllers();               // Linha inserida
-
-    . As linhas inseridas servem para publicar as rotas quando o projeto for levantado.
-
-    . Verificar como está configurado o padrão de rotas dentro dos arquivos de configuração. Verificar se o projeto
-        está obedecendo o padrão associado ao nome "[classe]Controller" na hora da chamada.
-
-https://gutfrau.medium.com/how-to-bind-fromroute-and-frombody-into-one-model-in-net-5-be0730a77852
-Testar -> [Route("api/[controller]")]
+        . Podemos colocar o "Route(..)" na classe e neste caso todos os contexto declarados nos métodos
+            serão acrescidos pelo primeiro pelo da classe e depois pelo do método:
 
         . Confrontar com a "Aula 3 - Entendendo as URL amigáveis." do curso "Uma visão completa do ASP.NET MVC"
 
+    . Podemos compor o nome rota com o prefixo do nome da classe controller acrescente a expressão "[controller]" nas
+        annotation "[Http...()]" ou "[Route()]":
 
+        ...
+        [ApiController]
+        public class HomeController : ControllerBase
+        {
+            [HttpGet("[controller]/")]
+            // ou [Route("[controller]/")]
+            public String Get()
+            ...
+
+        . Em resumo, podemos definir a rota padrão deste controller seria:
+                                                
+                            [HttpGet("[controller]/")]
+                                        ^
+                                        | 
+                                        |
+            https://localhost:[porta]/home/
+                                        |
+                                        +---> [Home]Controller 
+
+    . Acesse o Postman e crie uma chamada GET com a URL http://localhost:[porta]/home/
 
 
 Aula 16.  Lendo itens do banco de dados
@@ -728,13 +816,14 @@ Aula 16.  Lendo itens do banco de dados
 
     . Acrescente no método "Get" da classe "HomeController" a injeção da nossa classe de conexão:
 
+        // https://gutfrau.medium.com/how-to-bind-fromroute-and-frombody-into-one-model-in-net-5-be0730a77852
+
         ...
         [ApiController]
-        [Route("home")]
+        [Route("[controller]/")]                         // Linha alterada
         public class HomeController : ControllerBase
         {
-            [HttpGet]
-            [Route("/")]
+            [HttpGet]                              // Linha alterada
             public List<TodoModel> Get([FromService] AppDbContext context)       // Linha alterada
             {
                 return context.Todos.ToList();              // Linha alterada
@@ -746,12 +835,14 @@ Aula 16.  Lendo itens do banco de dados
 
         . O resultado será uma lista vazia.
 
+            []
+
 Aula 17. Criando um registro
 ----------------------------
 
     . Crie o método abaixo na classe "HomeController":
 
-        [HttpPost("/")]
+        [HttpPost]
         public TodoModel Post( [FromServices] AppDbContext context, [FromBody] TodoModel model){
             context.Todos.Add(model);
 
