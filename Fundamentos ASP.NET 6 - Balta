@@ -1216,4 +1216,48 @@ Aula 23. Criando o banco de dados
 Aula 24. Iniciando os Controllers
 ---------------------------------  
 
+    . Acesse a classe "Program.cs" e comente a linha com o conteúdo "app.Map("/", () => "Hello World");"
+
+    . Adicionando suporte a Controllers:
+
+        . Adicione as linhas abaixo na classe "Program.cs":
+
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddControllers();   // Linha inserida
+
+            builder.Services.AddDbContext<BlogDataContext>();  // Linha inserida
+
+            var app = builder.Build();
+
+            app.MapControllers();               // Linha inserida
+
+            // app.Map("/", () => "Hello World");   // Linha comentada
+
+        . As linhas inseridas servem para publicar as rotas quando o projeto for levantado.
+
+    . Crie a pasta "Controllers" dentro da raiz do projeto e cria a classe "HomeController" dentro dela:
+
+        using Microsoft.AspNetCore.Mvc;
+
+        namespace Blog.Controllers
+        {
+            [ApiController]
+            [Route("")]
+            public class HomeController : ControllerBase
+            {
+                // Poderia adotar o padrão [HttpGet("health-check")]
+                [HttpGet("")]   
+                public IActionResult Get()
+                {
+                    return Ok();
+                }
+            }
+        }
+
+    . Existe uma técnica para verificar se a API está ativa. Sempre deixamos uma rota para essa finalidade, conhecida como
+        "health-check" quer retornará somente um StatusCode 201 "Ok()":
+
+
+
 
