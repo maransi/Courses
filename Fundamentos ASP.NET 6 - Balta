@@ -601,7 +601,7 @@ Aula 11. Configurando o EF
             }
 
     . IMPORTANTE: se quisermos continuar da forma como era antes no .NET5 sem nenhuma mudança, basta acessar o 
-        arquivo "appsettings.cs" e alterar o parâmetro "<null>enable</null>" para "<null>disable<null>".
+        arquivo "Todo.csproj" e alterar o parâmetro "<Nullable>enable</Nullable>" para "<Nullable>disable</Nullable>".
         Dessa forma a compilação ocorrerá no .NET 6 como era no 5, desconsiderando as msgs de warning.
 
 
@@ -971,7 +971,7 @@ Aula 18. Atualizando e excluindo um registro
     . Inclua os métodos abaixo na classe "HomeController.cs":
 
         ...
-        [HttpPut("/{id:int}")]
+        [HttpPut("{id:int}")]
         public TodoModel Put([FromServices] AppDbContext context, [FromRoute] int id, [FromBody] TodoModel todo )
         {
 
@@ -991,10 +991,10 @@ Aula 18. Atualizando e excluindo um registro
             return model;
         }
 
-        [HttpDelete("/")]
+        [HttpDelete("{id:int}")]
         public TodoModel Delete( [FromServices] AppDbContext context, [FromRoute] int id )
         {
-            var model = context.Todos.FirstOrDefault( x => x == id );
+            var model = context.Todos.FirstOrDefault( x => x.Id == id );
 
             context.Todos.Remove( model );
 
@@ -1113,6 +1113,8 @@ Aula 20. Melhorando a API
 
             return Ok(todo);
         }
+
+// PAREI AQUI
 
     . Altere o método "Post" como abaixo:
 
