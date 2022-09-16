@@ -1114,11 +1114,9 @@ Aula 20. Melhorando a API
             return Ok(todo);
         }
 
-// PAREI AQUI
-
     . Altere o método "Post" como abaixo:
 
-        [HttpPost("/")]
+        [HttpPost]
         public IActionResult Post( [FromServices] AppDbContext context, [FromBody] TodoModel model){
             context.Todos.Add(model);
 
@@ -1126,6 +1124,16 @@ Aula 20. Melhorando a API
 
             return Created($"/{todo.Id}", model);
         }
+
+        . O "ActionResult" "Created" pode retornar dois parâmetros para a resposta HTTP:
+
+            . Um link contendo uma URL que retorne o objeto trabalhado, por exemplo:
+
+                return Created($"http://localhost:7054/home/{model.Id}", model);
+
+                . O link fará parte da Header.Localion da resposta HTTP
+
+            . Um objeto model, onde as informações dele aparecerá no Body da resposta.
 
     . Altere o método "Put" como abaixo:
 
@@ -1168,7 +1176,7 @@ Aula 20. Melhorando a API
             return Ok(model);
         }
 
-
+// PAREI AQUI
 CRUD e Entity Framework
 -----------------------
 
