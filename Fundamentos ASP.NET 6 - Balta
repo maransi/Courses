@@ -1030,6 +1030,25 @@ Aula 19. Testando a API
 Aula 20. Melhorando a API
 -------------------------
 
+    . Tipos de Retornos de StatusCode:
+
+        ApiController Method    Description
+        --------------------    -----------
+
+        BadRequest() 	        Creates a BadRequestResult object with status code 400.
+        Conflict() 	            Creates a ConflictResult object with status code 409.
+        Content() 	            Creates a NegotiatedContentResult with the specified status code and data.
+        Created() 	            Creates a CreatedNegotiatedContentResult with status code 201 Created.
+        CreatedAtRoute() 	    Creates a CreatedAtRouteNegotiatedContentResult with status code 201 created.
+        InternalServerError()   Creates an InternalServerErrorResult with status code 500 Internal server error.
+        NotFound() 	            Creates a NotFoundResult with status code404.
+        Ok() 	                Creates an OkResult with status code 200.
+        Redirect() 	            Creates a RedirectResult with status code 302.
+        RedirectToRoute() 	    Creates a RedirectToRouteResult with status code 302.
+        ResponseMessage() 	    Creates a ResponseMessageResult with the specified HttpResponseMessage.
+        StatusCode()         	Creates a StatusCodeResult with the specified http status code.
+        Unauthorized() 	        Creates an UnauthorizedResult with status code 401. 
+
     . Altere o retorno do método abaixo, para adicionar recursos de "StatusCode":
 
         ...
@@ -1269,5 +1288,131 @@ Aula 24. Iniciando os Controllers
         "health-check" quer retornará somente um StatusCode 201 "Ok()":
 
 
+Aula 25. Nomeando um Endpoint
+-----------------------------
 
+    . Crie a classe "CategoryController" na pasta "Controllers" com o código abaixo:
 
+        using Microsoft.AspNetCore.Mvc;
+
+        namespace Blog.Controllers{
+
+            [ApiController]
+            public class CategoryController: ControllerBase{
+
+                [HttpGet("[controller]")]
+                public IActionResult Get([FromServices] BlogDataContext context){
+
+                    var categories = context.Categories.ToList();
+
+                    return Ok( categories );
+
+                }
+
+            }
+        }    
+
+Aula 26. Versionamento
+----------------------
+
+    . Devemos sempre criar uma versão da sua API para garantir que os desenvolvedores tenham uma maneira clara e concisa de 
+        se comunicar com uma API em constante mudança e atualizada.
+
+    . Como fazer a versão:
+
+        . Existem três maneiras possíveis de criar uma versão adequada de uma API:
+
+            . URL, também conhecido como versão de path (URI).
+                
+                Exemplo: /v2/products/product-name)
+
+                . Muito mais claro e simples para o usuário qual API ele está acessando, permitindo que o usuário consulte 
+                    a documentação correta
+
+            . Controle de versão por meio de um header customizado.
+
+                Exemplo: Accept-Version: v2.
+
+            . Parâmetro por Query string.
+
+                Exemplo /products/product-name?version=v2.    
+
+    . A opção mais indicada a ser usada é a URL. Neste caso, existem pelo menos dois códigos de status HTTP de redirecionamento 
+        apropriados para cenários de controle de versão de API:
+
+        . 301 Moved permanently
+
+            . Indicando que o recurso com um URI solicitado é movido permanentemente para outro URI (que deve ser um link 
+                permanente de instância de recurso que não contém informações de versão da API). Este código de status 
+                pode ser usado para indicar uma versão de API obsoleta / sem suporte, informando ao cliente de API que 
+                um URI de recurso com versão foi substituído.
+
+            . Requisição do cliente
+
+                GET /index.php HTTP/1.1
+                Host: www.example.org
+
+            . Resposta do servidor
+
+                HTTP/1.1 301 Moved Permanently
+                Location: http://www.example.org/index.asp
+
+        . 302 not found
+
+            . Indicando que o recurso solicitado está temporariamente localizado em outro local, enquanto o URI 
+                solicitado ainda pode ser suportado. Este código de status pode ser útil quando os URIs sem 
+                versão estão temporariamente indisponíveis e uma solicitação deve ser repetida usando o endereço 
+                de redirecionamento.
+
+            . Requisição do cliente
+
+                GET /index.php HTTP/1.1
+                Host: www.example.org
+
+            . Resposta do servidor
+
+                HTTP/1.1 302 Found
+                Location: http://www.example.org/domains/example/
+
+    . Se precisarmos construir uma nova versão de uma rota, podemos implementar a nova rota de várias maneiras:
+
+        . Acrescentar uma codificação na rota "v1, v2, v3,..."
+
+            . No "Route" da API:
+
+                ...
+                [ApiController]
+                [Route("v1")]
+                public class CategoryController: ControllerBase{
+
+                [HttpGet("[controller]")]
+                public IActionResult Get([FromServices] BlogDataContext context){
+                ...
+
+            . No "Get" do método:
+
+                ...
+                [ApiController]
+                public class CategoryController: ControllerBase{
+
+                [HttpGet("v1/[controller]")]
+                // [Route("v1/[controller]")]
+                public IActionResult Get([FromServices] BlogDataContext context){
+                ...
+
+    . Altere o método "Get" e crie o método "Get2" como abaixo na classe "HomeController":
+
+        [HttpGet("v1/[controller]")]
+        public IActionResult Get([FromServices] BlogDataContext context){
+            return  Redirect();
+        }
+    
+        [HttpGet("v2/[controller]")]
+        public IActionResult Get([FromServices] BlogDataContext context){
+            return  Ok();
+        }
+            
+    . Acesse o Postman e execute as rotas acima.
+
+Aula 27.  Async e Await
+-----------------------
