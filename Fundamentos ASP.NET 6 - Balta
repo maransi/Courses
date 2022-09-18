@@ -1416,3 +1416,68 @@ Aula 26. Versionamento
 
 Aula 27.  Async e Await
 -----------------------
+
+    . async     - Significa que o método será executado assincronamente.
+
+    . await     - Significa que irá aguardar a execução do método especificado como "await" para sair do método pai/chamador
+
+    . A maioria dos métodos existe a versão assíncrona:
+
+        // Versão síncrona
+        var categories = context.Categories.ToList();
+
+        // Versão assíncrona
+        var categories = context.Categories.ToListAsync();
+
+    . No caso dos métodos assíncronos o retorno será uma tarefa "Task"
+
+        // Retorna um Task<List<Models.Category>>
+        var categories = context.Categories.ToListAsync();
+
+        . Task são tarefas a serem executadas em paralelo. Se houvesse várias chamadas assíncronas
+            em cada uma delas não aguardaria a finalização do método para ir ao próximo, colocaria 
+            todos para executar em paralelo.
+
+            // As 4 chamadas serão executadas de uma vez
+            var categories1 = context.Categories.ToListAsync();
+            var categories2 = context.Categories.ToListAsync();
+            var categories3 = context.Categories.ToListAsync();
+            var categories4 = context.Categories.ToListAsync();
+    
+    . Para transformar um método em assíncrono precisamos:
+
+        . Configurar o método chamador com o tipo "async" e nesse caso ele se torna assíncrono também.
+
+            [HttpGet("[controller]")]
+            public async IActionResult GetAsync([FromServices] BlogDataContext context){
+                     |                    -----
+                     |                      |
+                     +--> Configuração      +----> Por convenção, qdo utilizamos "async" no método, o nome 
+                          do método como           dele também é batizado como "Async"
+                          "async"
+                  
+        . O método deve ser configurado como "Task<T>.
+
+            [HttpGet("[controller]")]
+            public async Task<IActionResult> GetAsync([FromServices] BlogDataContext context){
+                            |
+                            +---> Substituição de "IActionResult" para "Task<IActionResult>"
+
+        . Configurar as chamadas internas do método como "await":
+
+            [HttpGet("[controller]")]
+            public async IActionResult GetAsync([FromServices] BlogDataContext context){
+
+                var categories = await context.Categories.ToList();
+                                   |
+                                   +--> Informa ao .NET para aguardar o fim da execução do método assincrono 
+                                        para dar o retorno abaixo. Caso tivemos outras chamadas assincronas,
+                                        todas serão chamadas em paralela, mas só dará o "return Ok()" quando 
+                                        a última chamada com "await" terminar.
+
+                return Ok( categories );
+            }
+
+Aula 28. CRUD de Categorias
+---------------------------
+
