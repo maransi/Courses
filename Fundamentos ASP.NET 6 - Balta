@@ -844,7 +844,7 @@ Aula 17. Criando um registro
 
     . Crie o método abaixo na classe "HomeController":
 
-        [HttpPost]
+        []
         public TodoModel Post( [FromServices] AppDbContext context, [FromBody] TodoModel model){
             context.Todos.Add(model);
 
@@ -1179,7 +1179,7 @@ Aula 20. Melhorando a API
 
     . Altere o método "Delete" como abaixo:
 
-        [HttpDelete("/")]
+        [HttpDelete("/{id:int}")]
         public IActionResult Delete( [FromServices] AppDbContext context, [FromRoute] int id )
         {
             var model = context.Todos.FirstOrDefault( x => x == id );
@@ -1465,19 +1465,161 @@ Aula 27.  Async e Await
 
         . Configurar as chamadas internas do método como "await":
 
-            [HttpGet("[controller]")]
-            public async IActionResult GetAsync([FromServices] BlogDataContext context){
+            . Implemente o método abaixo na classe "HomeController":
 
-                var categories = await context.Categories.ToList();
-                                   |
-                                   +--> Informa ao .NET para aguardar o fim da execução do método assincrono 
-                                        para dar o retorno abaixo. Caso tivemos outras chamadas assincronas,
-                                        todas serão chamadas em paralela, mas só dará o "return Ok()" quando 
-                                        a última chamada com "await" terminar.
+                [HttpGet("v1/[controller]")]
+                public async Task<IActionResult> GetAsync([FromServices] BlogDataContext context){
 
-                return Ok( categories );
-            }
+                    var categories = await context.Categories.ToList();
+                                    |
+                                    +--> Informa ao .NET para aguardar o fim da execução do método assincrono 
+                                            para dar o retorno abaixo. Caso tivemos outras chamadas assincronas,
+                                            todas serão chamadas em paralela, mas só dará o "return Ok()" quando 
+                                            a última chamada com "await" terminar.
+
+                    return Ok( categories );
+                }
+
+            . Acesse o Postman e faça o teste da rota acima.
 
 Aula 28. CRUD de Categorias
 ---------------------------
+
+    . Implemente o método abaixo na classe "HomeController":
+
+        [HttpGet("v1/[controller]/{id:int}")]
+        public async Task<IActionResult> GetByIdAsync([FromServices] BlogDataContext context,
+                                                        [FromRoute] int id){
+
+            var category = await context.Categories.
+                                        .FirstOrDefaultAsync( x => x.Id == id );
+
+            if ( category == null ) {
+                return NotFound();
+            }
+
+            return Ok( category );
+        }
+
+
+        [HttpPost("v1/[controller]")]
+        public async Task<IActionResult> PostAsync( [FromServices] BlogDataContext context,
+                                                    [FromBody] Category model )
+        {
+            await context.Categories.AddAsync( model );
+
+            await context.SaveChangesAsync();
+
+            return Created( $"v1/[controller]/{model.id}", model );
+        }
+
+        [HtttPut("v1/[controller]/{id:int}")]
+        public async Task<IActionResult> PutAsync( [FromServices] BlogDataContext,
+                                                    [FromRoute] id int,
+                                                    [FromBody] Category model)
+        {
+
+            var category = context.Categories
+                                    .FirstOrDefaultAsync( x => x == id);
+
+            category.Name = model.Name;
+            category.Slug = model.Slug;
+
+            // IMPORTANTE: O método "Update" não tem "Async"
+            context.Categories
+                    .Update( category );
+
+            await context.SaveChangesAsync();
+
+            return Created($"v1/[controller]/{category.id}", category);     // Verificar se funciona o Created para método "Put"
+        }
+
+        [HttpDelete("v1/[controller]/{id:int})]
+        public async Task<IActionResult> DeleteAsync( [FromServices] BlogDataContext context, 
+                                                        [FromRoute] id int)
+        {
+            var category = await context.Categories
+                                    .FirstOrDefaultAsync( x => x.Id == id );
+
+            if ( category == null )
+            {
+                return NotFound();
+            }
+
+            // Importante: O método "Remove" não tem "Async"
+            context.Categories
+                    .Remove( category );
+
+            return Ok();
+        }
+
+    . Acesse o Postman e faça o teste da rota acima.
+
+    . Procure mais informações sobre "CreatedAtAction" e "CreatedAtRoute"
+
+Aula 29. Testando API
+---------------------
+
+    . Acesse a raiz do projeto, no prompt do SO, digite os comandos abaixo:
+
+        dotnet clean
+
+        dotnet build
+
+        dotnet watch run
+
+    . Acesse o Postman e execute as URLs abaixo:
+
+        // Este teste dará erro que será tratado na proxima aula
+
+        url: https://localhost:[porta]/categories
+        method: POST
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Id": 1,
+                    "Name": "Backend",
+                    "Slug": "backend",
+                    "Posts": []
+                }
+
+        url: https://localhost:[porta]/categories
+        method: GET
+
+Aula 30. Tratando Erros
+-----------------------
+
+    . Altere o método Post como abaixo, colocando o try/catch:
+
+        [HttpPost("v1/[controller]")]
+        public async Task<IActionResult> PostAsync( [FromServices] BlogDataContext context,
+                                                    [FromBody] Category model )
+        {
+
+            try
+            {
+                await context.Categories.AddAsync( model );
+
+                await context.SaveChangesAsync();
+
+                return Created( $"v1/[controller]/{model.id}", model );
+            }catch( DbUpdateException ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
+            }
+            }catch( Exception ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
+            }
+        }
+
+    . Execute novamente os testes da aula anterior.
+
+    . Tente replicar o código da URL abaixo no projeto:
+
+        https://www.macoratti.net/19/11/aspnc_traterr2.htm    
+
+
+Aula 31. Finalizando o CRUD de categorias
+-----------------------------------------
 
