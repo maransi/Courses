@@ -1470,14 +1470,20 @@ Aula 27.  Async e Await
                 [HttpGet("v1/[controller]")]
                 public async Task<IActionResult> GetAsync([FromServices] BlogDataContext context){
 
-                    var categories = await context.Categories.ToList();
-                                    |
-                                    +--> Informa ao .NET para aguardar o fim da execução do método assincrono 
-                                            para dar o retorno abaixo. Caso tivemos outras chamadas assincronas,
-                                            todas serão chamadas em paralela, mas só dará o "return Ok()" quando 
-                                            a última chamada com "await" terminar.
+                    try
+                    {
+                        var categories = await context.Categories.ToList();
+                                        |
+                                        +--> Informa ao .NET para aguardar o fim da execução do método assincrono 
+                                                para dar o retorno abaixo. Caso tivemos outras chamadas assincronas,
+                                                todas serão chamadas em paralela, mas só dará o "return Ok()" quando 
+                                                a última chamada com "await" terminar.
 
-                    return Ok( categories );
+                        return Ok( categories );
+                    }catch( Exception ex )
+                    {
+                        return StatusCode(500, "Falha interna do servidor");
+                    }
                 }
 
             . Acesse o Postman e faça o teste da rota acima.
@@ -1490,15 +1496,20 @@ Aula 28. CRUD de Categorias
         [HttpGet("v1/[controller]/{id:int}")]
         public async Task<IActionResult> GetByIdAsync([FromServices] BlogDataContext context,
                                                         [FromRoute] int id){
+            try
+            {
+                var category = await context.Categories.
+                                            .FirstOrDefaultAsync( x => x.Id == id );
 
-            var category = await context.Categories.
-                                        .FirstOrDefaultAsync( x => x.Id == id );
+                if ( category == null ) {
+                    return NotFound();
+                }
 
-            if ( category == null ) {
-                return NotFound();
+                return Ok( category );
+            }catch( Exception ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
             }
-
-            return Ok( category );
         }
 
 
@@ -1506,11 +1517,22 @@ Aula 28. CRUD de Categorias
         public async Task<IActionResult> PostAsync( [FromServices] BlogDataContext context,
                                                     [FromBody] Category model )
         {
-            await context.Categories.AddAsync( model );
+            try
+            {
+                await context.Categories.AddAsync( model );
 
-            await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
-            return Created( $"v1/[controller]/{model.id}", model );
+                return Created( $"v1/[controller]/{model.id}", model );
+            }catch( DbUpdateException ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
+            }
+            }catch( Exception ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
+            }
+
         }
 
         [HtttPut("v1/[controller]/{id:int}")]
@@ -1519,38 +1541,58 @@ Aula 28. CRUD de Categorias
                                                     [FromBody] Category model)
         {
 
-            var category = context.Categories
-                                    .FirstOrDefaultAsync( x => x == id);
+            try
+            {
+                var category = context.Categories
+                                        .FirstOrDefaultAsync( x => x == id);
 
-            category.Name = model.Name;
-            category.Slug = model.Slug;
+                category.Name = model.Name;
+                category.Slug = model.Slug;
 
-            // IMPORTANTE: O método "Update" não tem "Async"
-            context.Categories
-                    .Update( category );
+                // IMPORTANTE: O método "Update" não tem "Async"
+                context.Categories
+                        .Update( category );
 
-            await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
-            return Created($"v1/[controller]/{category.id}", category);     // Verificar se funciona o Created para método "Put"
+                return Created($"v1/[controller]/{category.id}", category);     // Verificar se funciona o Created para método "Put"
+            }catch( DbUpdateException ex )
+            {
+                return StatusCode(500, "Não foi possível alterar a categoria");
+            }
+            }catch( Exception ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
+            }
         }
 
         [HttpDelete("v1/[controller]/{id:int})]
         public async Task<IActionResult> DeleteAsync( [FromServices] BlogDataContext context, 
                                                         [FromRoute] id int)
         {
-            var category = await context.Categories
-                                    .FirstOrDefaultAsync( x => x.Id == id );
-
-            if ( category == null )
+            try
             {
-                return NotFound();
+                var category = await context.Categories
+                                        .FirstOrDefaultAsync( x => x.Id == id );
+
+                if ( category == null )
+                {
+                    return NotFound();
+                }
+
+                // Importante: O método "Remove" não tem "Async"
+                context.Categories
+                        .Remove( category );
+
+                return Ok();
+            }catch( DbUpdateException ex )
+            {
+                return StatusCode(500, "Não foi possível apagar a categoria");
             }
-
-            // Importante: O método "Remove" não tem "Async"
-            context.Categories
-                    .Remove( category );
-
-            return Ok();
+            }catch( Exception ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
+            }
         }
 
     . Acesse o Postman e faça o teste da rota acima.
@@ -1622,4 +1664,134 @@ Aula 30. Tratando Erros
 
 Aula 31. Finalizando o CRUD de categorias
 -----------------------------------------
+
+    . Coloque um BreakPoint na primeira linha de cada método da classe "CategoryController.cs"
+
+    . Crie e execute as chamadas URLs abaixo no Postman. Acompanhe a execução das API pra ver se tudo ocorreu conforme esperado.
+
+        url: https://localhost:[porta]/category
+        method: GET
+        Body.raw.text: true
+
+        url: https://localhost:[porta]/category/1
+        method: GET
+        Body.raw.text: true
+
+        url: https://localhost:[porta]/category
+        method: POST
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Name": "Backend",
+                    "Slug": "backend",
+                    "Posts": []
+                }
+
+        url: https://localhost:[porta]/category/1
+        method: PUT
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Name": "Frontend",
+                    "Slug": "frontend",
+                    "Posts": []
+                }
+
+        url: https://localhost:[porta]/category/1
+        method: DELETE
+        Body.raw.text: true
+
+Aula 32.  ViewModels
+--------------------
+
+    . ViewModels são modelos adaptados para as entradas de dados.
+
+    . Crie a pasta "ViewModel" na raiz do projeto e dentro dela inclua a classe abaixo:
+
+        namespace Blog.ViewModel
+        {
+            public class CreateCategoryViewModel
+            {
+                public string Name { get; set; }
+
+                public string Slug { get; set; }
+            }
+        }
+
+
+    . Altere a assinatura do método "PostAsync" da classe "CategoryController" como abaixo:
+
+        ...
+        [HttpPost("v1/[controller]")]
+        public async Task<IActionResult> PostAsync( [FromServices] BlogDataContext context,
+                                                    [FromBody] CreateCategoryViewModel model )
+                                                                    |
+                                                                    +--> Sai    CategoryModel
+                                                                         Entra  CreateCategoryViewModel
+        {
+
+            try
+            {
+                var category = new Category{            // Linha inserida
+                    Id = 0,
+                    Posts = null,
+                    Name = model.Name,
+                    Slug = model.Slug.ToLower()
+                }
+
+                await context.Categories.AddAsync( category );  // Linha alterada
+
+                await context.SaveChangesAsync();
+
+                return Created( $"v1/[controller]/{category.id}", model );  // Linha alterada
+            }catch( DbUpdateException ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
+            }
+            }catch( Exception ex )
+            {
+                return StatusCode(500, "Falha interna do servidor");
+            }
+        }
+
+    . Coloque um "BreakPoint" na primeira linha do método "PostAsync", faça a chamada da URL abaixo 
+        no Postman e acompanhe a execução do projeto
+
+
+        url: https://localhost:[porta]/category
+        method: POST
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Name": "Backend",
+                    "Slug": "backend",
+                    "Posts": []
+                }
+
+Aula 33. EditorViewModel
+------------------------
+
+    . Renomeie a classe "CreateCategoryViewModel" para "EditorCategoryViewModel".
+
+    . Altere os locais que fazem menção a classe "CreateCategoryViewModel" para "EditorCategoryViewModel"
+        dentro da classe "CategoryController".
+
+    
+    . No Postman altere a chamada abaixo (foi apagado a propriedade "Posts" e alterado para id 2 na URL) e execute-a:
+
+        url: https://localhost:[porta]/category/2
+        method: PUT
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Name": "Frontend",
+                    "Slug": "frontend"
+                }
+
+
+    . Faça o mesmo acerto e testes no métoso "POST"
+
+Aula 34. Validações
+-------------------
+
 
