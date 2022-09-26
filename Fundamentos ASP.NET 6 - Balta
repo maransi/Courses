@@ -2017,3 +2017,181 @@ Aula 37.  Padronizando o GetById
 Aula 38.  Padronizando o BadRequest
 -----------------------------------
 
+    . Faça o seguinte teste:
+
+        ...
+        HttpPost("v1/categories")]
+        public async Task<IActionResult> PostAsync(
+            [FromBody] EditorCategoryViewModel model,
+            [FromServices] BlogDataContext context)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();    
+            ...
+
+    . Acesse o Postman, execute a URL acima e verifique o erro retornado:
+
+        url: https://localhost:[porta]/category
+        method: POST
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Name": "",
+                    "Slug": "",
+                    "Posts": []
+                }
+
+    . O retorno ocorrido após a execução da URL acima, foi somente o "StatusCode" 400 de "BadRequest"
+
+    . Altere o retorno do "BadRequest" do controller como abaixo:
+
+        ...
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState.Values);   // Adicionado o "ModelState.Values
+        ...
+
+    . Execute a URL no Postman e verifique o resultado com o BadRequest e os erros apresentados.
+
+    . Na raiz do projeto crie a pasta "Extensions":
+
+    . Dentro da pasta criada crie a classe abaixo:
+
+        using Microsoft.AspNetCore.Mvc.ModelBinding;
+
+        namespace Blog.Extensions
+        {
+            public static class ModelStateExtension
+            {
+                public static List<string> GetErrors(this ModelStateDictionary modelState)
+                {
+                    var result = new List<string>();
+                    foreach (var item in modelState.Values)
+                        result.AddRange(item.Errors.Select(error => error.ErrorMessage));
+
+                    return result;
+                }
+            }
+        }
+
+        . IMPORTANTE: Para entender melhor o conceito de Extensão de métodos acesse a "Aula 26. Implementando Extension Methods"
+                        do curso "DI - Dominando Injeção de Depdência"
+
+    . ALtere o método "PostAsync" como abaixo:
+
+        ...
+        [HttpPost("v1/categories")]
+        public async Task<IActionResult> PostAsync(
+            [FromBody] EditorCategoryViewModel model,
+            [FromServices] BlogDataContext context)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ResultViewModel<Category>(ModelState.GetErrors()));   // Linha alterada
+
+            try
+            {
+                var category = new Category
+                {
+                    Id = 0,
+                    Name = model.Name,
+                    Slug = model.Slug.ToLower(),
+                };
+                await context.Categories.AddAsync(category);
+                await context.SaveChangesAsync();
+
+                return Created($"v1/categories/{category.Id}", new ResultViewModel<Category>(category));    // Linha alterada
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, new ResultViewModel<Category>("05XE9 - Não foi possível incluir a categoria"));  // Linha alterada
+            }
+            catch                                               // Linha alterada
+            {
+                return StatusCode(500, new ResultViewModel<Category>("05X10 - Falha interna no servidor"));     // Linha alterada
+            }
+        }
+        ...
+
+    . Execute a URL de "POST" do inicio da aula no Postman e verifique o resultado.
+
+
+Aula 39.  Conclusão do módulo
+-----------------------------
+
+    . Altere o método "PutAsync":
+
+        ...
+        [HttpPut("v1/categories/{id:int}")]
+        public async Task<IActionResult> PutAsync(
+            [FromRoute] int id,
+            [FromBody] EditorCategoryViewModel model,
+            [FromServices] BlogDataContext context)
+        {
+            try
+            {
+                var category = await context
+                    .Categories
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (category == null)
+                    return NotFound(new ResultViewModel<Category>("Conteúdo não encontrado"));      // Linha alterada
+
+                category.Name = model.Name;
+                category.Slug = model.Slug;
+
+                context.Categories.Update(category);
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<Category>(category));             // Linha alterada
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, new ResultViewModel<Category>("05XE8 - Não foi possível alterar a categoria"));  // Linha alterada
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResultViewModel<Category>("05X11 - Falha interna no servidor"));     // Linha alterada
+            }
+        }            
+
+    . Altere o método "DeleteAsync":
+
+        ...
+        [HttpDelete("v1/categories/{id:int}")]
+        public async Task<IActionResult> DeleteAsync(
+            [FromRoute] int id,
+            [FromServices] BlogDataContext context)
+        {
+            try
+            {
+                var category = await context
+                    .Categories
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (category == null)
+                    return NotFound(new ResultViewModel<Category>("Conteúdo não encontrado"));      // Linha alterada
+
+                context.Categories.Remove(category);
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<Category>(category));         // Linha alterada
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, new ResultViewModel<Category>("05XE7 - Não foi possível excluir a categoria"));  // Linha alterada
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResultViewModel<Category>("05X12 - Falha interna no servidor"));     // Linha alterada
+            }
+        }
+        ...
+
+    . Acesse o Postman e teste todas as rotas alteradas.
+
+
+Autenticação e Autorização
+--------------------------
+
+Aula 40. Introdução
+------------------- 
+
