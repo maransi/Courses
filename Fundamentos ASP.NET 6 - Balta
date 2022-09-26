@@ -1794,4 +1794,226 @@ Aula 33. EditorViewModel
 Aula 34. Validações
 -------------------
 
+    . Implemente as validações abaixo na classe "EditorCategoryViewModel":
+
+        ...
+        [Required(ErrorMessage = "O nome é obrigatório")]
+        [StringLength(40, MinimumLength = 3, ErrorMessage = "Este campo deve conter entre 3 e 40 caracteres")]
+        public string Name { get; set; }
+
+        [Required(ErrorMessage = "O slug é obrigatório")]
+        public string Slug { get; set; }
+        ...
+            
+    . No Postman altere a chamada abaixo (foi apagado a propriedade "Posts" e alterado para id 2 na URL) e execute-a:
+
+        url: https://localhost:[porta]/category/2
+        method: PUT
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Name": "",
+                    "Slug": ""
+                }
+
+    . Implemente o objeto de validação conforme linhas abaixo na classe "CategoryController"
+
+        ...
+        [HttpPost("v1/categories")]
+        public async Task<IActionResult> PostAsync(
+            [FromBody] EditorCategoryViewModel model,
+            [FromServices] BlogDataContext context)
+        {
+            if (!ModelState.IsValid)                        // IF inserido
+                return BadRequest();
+
+            try
+            {    
+                ...
+            }
+        }
+        ...
+
+Aula 35. Padronizações
+----------------------
+
+    . Dentro da pasta "ViewModels" crie a classe abaixo:
+
+        namespace Blog.ViewModels
+        {
+            public class ResultViewModel<T>
+            {
+                public ResultViewModel(T data, List<string> errors)
+                {
+                    Data = data;
+                    Errors = errors;
+                }
+
+                public ResultViewModel(T data)
+                {
+                    Data = data;
+                }
+
+                public ResultViewModel(List<string> errors)
+                {
+                    Errors = errors;
+                }
+
+                public ResultViewModel(string error)
+                {
+                    Errors.Add(error);
+                }
+
+                public T Data { get; private set; }
+                public List<string> Errors { get; private set; } = new();
+            }
+        }
+
+
+Aula 36.  Padronizando erros
+----------------------------
+
+    . APIController attribute which performs automatic model state validation and in case of an invalid model state, 
+        responds with a 400 bad request error. When the controller is decorated with APIController attribute, the 
+        framework would automatically register a ModelStateInvalidFilter which runs on the OnActionExecuting event. 
+        This checks for the model state validity and returns the response accordingly. This is a great feature, 
+        but sometimes you want to return the custom error instead of the 400 bad request error
+
+    . You can remove the APIController attribute to disable the automatic model validation. But, then you will lose 
+        the other benefits of this attribute like disabling conventional routing and allowing model binding without 
+        adding [FromBody] parameter attributes.
+
+    . The better approach to disable the default behavior by setting SuppressModelStateInvalidFilter option to true
+
+    . Acesse a classe "Program.cs" e insira a linha abaixo:
+
+        using Blog.Data;
+        using Microsoft.AspNetCore.Mvc;
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder
+            .Services
+            .AddControllers()
+            .ConfigureApiBehaviorOptions(options =>                 // Linha inserida
+            {                                                       // Linha inserida
+                options.SuppressModelStateInvalidFilter = true;     // Linha inserida
+            });
+        builder.Services.AddDbContext<BlogDataContext>();
+
+        var app = builder.Build();
+        app.MapControllers();
+
+        app.Run();
+
+    . Ao fazer a configuração acima, somos obrigados validar manualmente dentro dos controllers os models através 
+        do método "ModelState.IsValid":
+
+        [HttpPost("v1/categories")]
+        public async Task<IActionResult> PostAsync(
+            [FromBody] EditorCategoryViewModel model,
+            [FromServices] BlogDataContext context)
+        {
+            if (!ModelState.IsValid)                        
+                return BadRequest();
+
+            ...
+        }
+        ...
+
+    . Acesse o método "GetAsync" da classe "CategoryController" e altere o retorno dele como abaixo:
+
+        ...
+        [HttpGet("v1/categories")]
+        public async Task<IActionResult> GetAsync(
+                                                    [FromServices] BlogDataContext context)
+        {
+            try
+            {
+                var categories = await context.Categories.ToListAsync();
+                return Ok(new ResultViewModel<List<Category>>(categories));     // Linha alterada
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<List<Category>>("05X04 - Falha interna no servidor"));   // Linha alterada
+            }
+        }    
+        ...
+
+    . Pare a execução do banco de dados em docker e no Postman execute a URL abaixo:
+
+        url: https://localhost:[porta]/category
+        method: GET
+        Body.raw.text: true
+
+    . O retorno da URL acima será:
+
+        {
+            "data": [],
+            "errors": [
+                "05X04 - Falha interna no servidor"
+            ]
+        }
+
+
+    . Observe a mensagem de erro como veio padronizada.
+
+    . Ative novamente o banco de dados e execute a URL acima
+
+    . Observe o resultado da consulta que veio a lista de categorias e no final uma lista vazia de "errors: []" ja numa estrutura:
+
+        {
+            "data": [
+                        {
+                            categorias...
+                        }
+            ], 
+            "errors": []
+        }
+
+Aula 37.  Padronizando o GetById
+--------------------------------
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: https://localhost:[porta]/category/999
+        method: GET
+        Body.raw.text: true    
+
+    . Observe que o retorno da API veio totalmente fora do padrão.
+
+    . Altere o método "GetByIdAsync" como abaixo:
+
+        [HttpGet("v1/categories/{id:int}")]
+        public async Task<IActionResult> GetByIdAsync(
+            [FromRoute] int id,
+            [FromServices] BlogDataContext context)
+        {
+            try
+            {
+                var category = await context
+                    .Categories
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (category == null)
+                    return NotFound(new ResultViewModel<Category>("Conteúdo não encontrado"));  // LInha alterada
+
+                return Ok(new ResultViewModel<Category>(category));     // Linha alterada
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<Category>("Falha interna no servidor")); // Linha alterada.
+            }
+        }    
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: https://localhost:[porta]/category/999
+        method: GET
+        Body.raw.text: true    
+
+    . Observe que o retorno da API veio totalmente fora do padrão.
+
+Aula 38.  Padronizando o BadRequest
+-----------------------------------
 
