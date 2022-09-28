@@ -1195,7 +1195,7 @@ Aula 20. Melhorando a API
             return Ok(model);
         }
 
-// PAREI AQUI
+
 CRUD e Entity Framework
 -----------------------
 
@@ -1219,11 +1219,19 @@ Aula 22. Adicionando suporte ao Entity Framework
     
     . Acesse a raiz do projeto "Blog" e execute os comandos abaixo:
 
-        dotnet add package Microsoft.EntityFramework.SqlServer
+        dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.2
 
-        dotnet add package Microsoft.EntityFramework.Design
+        dotnet add package Microsoft.EntityFrameworkCore --version 6.0.2
+
+        dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.2
 
     . Acesse a classe "BlogDataContext.cs" e altere a string de conexão apontando para o "Database=Blog".
+
+    . Acesse a classe "Blog.csproj" e faça a alteração abaixo:
+
+        <Nullable>disable</Nullable>
+
+        . IMPORTANTE: Essa diretiva desabilita a mensagem de "warning" de valore nulos dentro do projeto.
 
     . Acesse a pasta raiz do projeto e digite os comandos abaixo:
 
@@ -1231,7 +1239,7 @@ Aula 22. Adicionando suporte ao Entity Framework
 
         dotnet build
 
-        . Dará alguns erros de "warning", mas pode desconsiderá-los por enquanto.
+        . Pode ser que dê alguns erros de "warning", mas pode desconsiderá-los por enquanto.
 
 Aula 23. Criando o banco de dados
 ---------------------------------
@@ -1250,6 +1258,8 @@ Aula 24. Iniciando os Controllers
     . Adicionando suporte a Controllers:
 
         . Adicione as linhas abaixo na classe "Program.cs":
+
+            using Blog.Data;            // Linha inserida
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -1279,7 +1289,7 @@ Aula 24. Iniciando os Controllers
                 [HttpGet("")]   
                 public IActionResult Get()
                 {
-                    return Ok();
+                    return Ok("Hello");
                 }
             }
         }
@@ -1287,6 +1297,10 @@ Aula 24. Iniciando os Controllers
     . Existe uma técnica para verificar se a API está ativa. Sempre deixamos uma rota para essa finalidade, conhecida como
         "health-check" quer retornará somente um StatusCode 201 "Ok()":
 
+    . Acesse o Postman e execute a URL abaixo:
+
+        Method: GET
+        URL: https://localhost:[porta]/
 
 Aula 25. Nomeando um Endpoint
 -----------------------------
@@ -1399,21 +1413,23 @@ Aula 26. Versionamento
                 // [Route("v1/[controller]")]
                 public IActionResult Get([FromServices] BlogDataContext context){
                 ...
-
     . Altere o método "Get" e crie o método "Get2" como abaixo na classe "HomeController":
 
         [HttpGet("v1/[controller]")]
         public IActionResult Get([FromServices] BlogDataContext context){
-            return  Redirect();
+            return  Redirect(~/v2/home");
         }
     
         [HttpGet("v2/[controller]")]
         public IActionResult Get([FromServices] BlogDataContext context){
-            return  Ok();
+            return  Ok("Hello");
         }
             
     . Acesse o Postman e execute as rotas acima.
 
+https://procodeguide.com/programming/redirect-a-request-in-aspnet-core/#:~:text=The%20redirect%20method%20is%20used,a%20string%20in%20the%20input.
+
+// PAREI AQUI
 Aula 27.  Async e Await
 -----------------------
 
