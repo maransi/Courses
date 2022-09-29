@@ -2405,9 +2405,25 @@ Aula 44. AddScoped, AddTransient, AddSingleton
         . Garante que a conexão só dura até o fim da requisição
 
 
+    . Acesse a classe "Program.cs" e insira a linha abaixo:
 
+        ...
+        builder
+            .Services
+            .AddController()
+            .ConfigureApiBehaviorOptions( options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
+        builder.Services.AddDbContext<BlogDataContext>();
 
+        builder.Services.AddTransient<TokenService>();  // Linha inserida
+
+        ...
+
+Aula 45. Inspecionando o Token
+------------------------------
 
 
 
