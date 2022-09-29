@@ -2282,6 +2282,85 @@ Aula 41. Token e JWT
 Aula 42. Token Service
 ----------------------
 
+    . Adicione as packages abaixo no projeto:
+
+        dotnet add package Microsoft.AspNetCore.Authentication
+
+        dotnet add package Microsoft.AspNetCore.Authentication.Bearer
+
+    . Crie a pasta "Services" na raiz do projeto e crie a classe abaixo:
+
+        using System.IdentityModel.Token.Jwt;
+        using Blog.Models;
+
+        namespace Blog.Services;
+
+        public class TokenService
+        {
+            public string GenerateToken( User user )
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Expires = DateTime.UtcNow.AddHours(8),
+                    SigningCredentials = new SigningCredentials( new SymetricSecurityKey( key ),
+                                                                    SecurityAlgorithms.HmaShaSignature )
+                }
+                var token = tokenHandler.CreateToken( tokenDescriptor );
+
+                return tokenHandler.WriteToken( token );
+
+            }
+        }
+
+Aula 43. Injeção de Depedência
+------------------------------
+
+    . Crie a classe abaixo dentro da pasta "Controllers":
+
+        using Blog.Services;
+        using Microsoft.AspNetCore.Mvc;
+
+        namespace Blog.Controllers;
+
+        [ApiController]
+        public class AccountController: ControllerBase
+        {
+            private readonly TokenService _tokenService;
+
+                                            +---> Aqui é feito a injeção de dependência
+                                            |
+            public AccountController( TokenService tokenService )
+            {
+                _tokenService = tokenService;   // Aqui é passado o objeto para dentro da classe
+            }
+
+
+            [HttpPost("v1/login")]
+            public IActionResult Login()
+            {
+                var token = _tokenService.GenerateToken( null );
+
+                return Ok( token );
+            }
+        } 
+
+        . Ao invés de fazer a injeção de dependência pelo método construtor poderiamos fazê-lo pelo método login 
+            como abaixo:
+
+            [HttpPost("v1/login")]
+            public IActionResult Login( [FromService] TokenService tokenService)    // DI pelo método e annotation [FromService]
+            {
+                var token = tokenService.GenerateToken( null );
+
+                return Ok( token );
+            }
+
+Aula 44. AddScoped, AddTransient, AddSingleton
+----------------------------------------------
+
+
 
 
 
@@ -2329,6 +2408,7 @@ Aula 42. Testando a autenticação e autorização
 
 
         } 
+
 
     . Acesse o Postman e execute a URL abaixo:
 
