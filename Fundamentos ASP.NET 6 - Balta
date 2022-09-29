@@ -2360,6 +2360,52 @@ Aula 43. Injeção de Depedência
 Aula 44. AddScoped, AddTransient, AddSingleton
 ----------------------------------------------
 
+    . AddTransient
+
+        builder.Services.AddTransient<IDeliveryFeeService, DeliveryFeeService>();
+
+            . Sempre cira uma nova instância do objeto
+
+            . Ideal para cenários onde queremos sempre um novo objeto.
+
+    . AddScoped
+
+        builder.Services.AddScoped<IDeliveryFeeService, DeliveryFeeService>();
+
+            . Cria um objeto por transação/requisição
+
+            . Se você chamar 2 ou mais serviços que dendem do mesmo objeto, a mesma instância será utilizada
+
+            . Ideal para cenários onde queremos apenas um objeto por requisição (banco).
+
+    . AddSingleton
+
+        . Cria um objeto quando a aplicação inicia e apaga da sessão quando a aplicação termina.
+
+            builder.Services.AddSingleton<IDeliveryFeeService, DeliveryFeeService>();
+
+        . Mantém este objeto na memória até a aplicação para ou reiniciar 
+
+        . Sempre devolve a mesma instância deste objeto, com os mesmos valores.
+
+        . Padrão que visa garantir apenas um instância de um objeto para aplicão toda
+
+        . Um bom exemplo são as configurações
+
+            . Uma vez carregadas, ficam até a aplicação reiniciar.
+
+    . AddDbContext
+
+        . Item especial do tipo Scoped
+
+            builder.Services.AddDbContext<BlogDataContext>( x => useSqlServer( connStr ));
+
+        . Utilizado exclusivamente com o EF
+
+        . Garante que a conexão só dura até o fim da requisição
+
+
+
 
 
 
