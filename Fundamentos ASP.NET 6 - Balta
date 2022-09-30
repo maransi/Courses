@@ -2210,6 +2210,8 @@ Autenticação e Autorização
 
 https://www.udemy.com/course/net-6-web-api-do-zero-ao-avancado/learn/lecture/29034104?start=0#overview
 
+https://www.brunobrito.net.br/jwt-cookies-oauth-bearer/
+
 Aula 40. Introdução
 ------------------- 
 
@@ -2425,40 +2427,150 @@ Aula 44. AddScoped, AddTransient, AddSingleton
 Aula 45. Inspecionando o Token
 ------------------------------
 
+    . Execute o projeto.
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: http://localhost:[porta]/v1/login
+        method: POST
+
+    . Acesse o site jwt.io, acesse a área "Encoded" e copie o token gerado no item anterior para analisar
+        os detalhes do token
 
 
 
 
+Aula 46.  JWT Claims
+--------------------
+
+    . Acesse a classe "TokenService.cs" e implemente as alterações abaixo:
+
+        using System.IdentityModel.Token.Jwt;
+        using Blog.Models;
+
+        namespace Blog.Services;
+
+        public class TokenService
+        {
+            public string GenerateToken( User user )
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = ClaimsIdentity( new Claim[]           // Linha inserida
+                    {
+                        new Claim("fruta","banana")
+                    }),
+                    Expires = DateTime.UtcNow.AddHours(8),
+                    SigningCredentials = new SigningCredentials( new SymetricSecurityKey( key ),
+                                                                    SecurityAlgorithms.HmaShaSignature )
+                }
+                var token = tokenHandler.CreateToken( tokenDescriptor );
+
+                return tokenHandler.WriteToken( token );
+
+            }
+        }
+
+    . Execute o projeto.
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: http://localhost:[porta]/v1/login
+        method: POST
+
+    . Acesse o site jwt.io, acesse a área "Encoded" e copie o token gerado no item anterior para analisar
+        os detalhes do token
+
+        . Observe no "Payload" que agora temos o item "fruta": "banana"
+
+    . Retorne a classe "TokenService" e implemente as linhas abaixo:
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = ClaimsIdentity( new Claim[]  
+            {
+                new Claim( ClaimTypes.Name, "marco.antonio"),          // Linha inserida
+                new Claim( ClaimTypes.Role, "admin"),         // Linha inserida
+                new Claim("fruta","banana")
+            }),
+            Expires = DateTime.UtcNow.AddHours(8),
+            SigningCredentials = new SigningCredentials( new SymetricSecurityKey( key ),
+                                                            SecurityAlgorithms.HmaShaSignature )
+        }
+
+    . Mais a frente utilizaremos os Claims inseridos nos controllers com a seguinte identificação:
+
+        new Claim( ClaimTypes.Name, "marco.antonio"),          // User.Identity.Name
+        new Claim( ClaimTypes.Roles, "admin"),         // User.IsInRole
+
+
+    . Execute o projeto.
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: http://localhost:[porta]/v1/login
+        method: POST
+
+    . Acesse o site jwt.io, acesse a área "Encoded" e copie o token gerado no item anterior para analisar
+        os detalhes do token
+
+        . Observe no "Payload" que agora temos os itens:
+            
+            "unique_name": "marco.antonio",
+            "role": "admin"
+
+
+Aula 47. Configurando Autenticação e Autorização
+------------------------------------------------
+
+    . Acesse a classe "Programs.cs" e insira as linhas abaixo para habilitar a autenticação e a autorização 
+        no nosso projeto, obrigatório ser nessa ordem:
+
+        ...
+        var builder - WebApplication.CreateBuilder( args );
+
+        var byte[] = Encoding.ASCII.GetBytes( Configuration.JwtKey );   // Linha inserida
 
 
 
 
+        // Linha abaixo inserida
+
+        builder.Services.AddAuthentication( x =>
+        {
+            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultChallengeScheme = JwtBearerDefaults.AthenticationScheme.
+        }).AddJwtBearer( JwtBearerOptions =>
+        {
+            x.TokenValidationParameters = new TokenValidateionParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    UssuerSigninigKey = new SymmtricSecurityKey( key ),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+        });                 // Linha inserida
 
 
+        ...
+        var app = builder.Build();
 
+        app.UseAuthentication();    // Linha inserida   "Nessa ordem"
+        app.UseAuthorization();     // Linha inserida   "Nessa ordem"
+        ...
 
-Aula 42. Testando a autenticação e autorização
+Aula 48. Testando a autenticação e autorização  (Revisar)
 ----------------------------------------------
 
-    . Crie a classe abaixo dentro da pasta "Controllers":
+    . Dentro da classe AccountController crie os métodos abaixo:
 
-        using Blog.Services;
-        using Microsoft.AspNetCore.Mvc;
-
-        namespace Blog.Controllers;
-
-        [Authorize]
+        [Authorize]             // Linha inserida
         [ApiController]
         public class AccountController: ControllerBase
         {
-            [HttpPost("v1/login")]
-            public IActionResult Login( [FromServices] TokenService tokenService )
-            {
-                var token = tokenService.GenerateToken( null );
-
-                return Ok( token );
-            }
-
+            ...                     // Métodos abaixo inseridos
             [HttpGet("v1/user")]
             public IActionResult GetUser() => Ok( User.Identity.Name )
 
@@ -2467,10 +2579,8 @@ Aula 42. Testando a autenticação e autorização
 
             [HttpGet("v1/admin")]
             public IActionResult GetAdmin() => Ok( User.Identity.Name )
-
-
-        } 
-
+            ...
+        }
 
     . Acesse o Postman e execute a URL abaixo:
 
@@ -2521,5 +2631,78 @@ Aula 42. Testando a autenticação e autorização
         [HttpGet("v1/admin")]
         public IActionResult GetAdmin() => Ok( User.Identity.Name )
         ...
+
+    . Execute o projeto.
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: https://localhost:[porta]/v1/login
+        method: POST
+
+    . Agora deverá vir um Token
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: https://localhost:[porta]/v1/user
+        method: GET
+        Authorization.Type: Bearer Token
+        Authorization.Token: [token obtido no item anterior]
+
+        . Este dará erro "403. Forbidden" porque não existe o claim de admin disponivel    
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: https://localhost:[porta]/v1/admin
+        method: GET
+        Authorization.Type: Bearer Token
+        Authorization.Token: [token obtido no item anterior]
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: https://localhost:[porta]/v1/author
+        method: GET
+        Authorization.Type: Bearer Token
+        Authorization.Token: [token obtido no item anterior]
+
+        . Este dará erro "403. Forbidden" porque não existe o claim de admin disponivel    
+
+    . Acesse a classe "TokenService.cs" e inclua a linha abaixo:
+
+        ...
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = ClaimsIdentity( new Claim[]  
+            {
+                new Claim( ClaimTypes.Name, "marco.antonio"),  
+                new Claim( ClaimTypes.Role, "admin"),         
+                new Claim( ClaimTypes.Role, "user"),
+                new Claim("fruta","banana")
+            }),
+            Expires = DateTime.UtcNow.AddHours(8),
+            SigningCredentials = new SigningCredentials( new SymetricSecurityKey( key ),
+                                                            SecurityAlgorithms.HmaShaSignature )
+        }
+        ...
+
+    . Execute o projeto.
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: https://localhost:[porta]/v1/login
+        method: POST
+
+    . Agora deverá vir um Token
+
+    . Acesse o Postman e execute a URL abaixo:
+
+        url: https://localhost:[porta]/v1/user
+        method: GET
+        Authorization.Type: Bearer Token
+        Authorization.Token: [token obtido no item anterior]
+
+        . Agora a rota "user" estará disponível.
+
+Aula 49.  Iniciando o cadastro de usuários
+------------------------------------------
 
 
