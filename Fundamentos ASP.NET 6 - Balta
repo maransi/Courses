@@ -2864,6 +2864,155 @@ Aula 49.  Iniciando o cadastro de usuários
         dotnet ef migrations add [Nome da Migration]
         dotnet ef database update
 
-Aula 50. Salvando senhas no banco de dados
-------------------------------------------
+Aula 50.  Registrando um novo usuário
+-------------------------------------
+
+    . Execute o comando abaixo na pasta raiz do projeto:
+
+        donet add package SecureIdentity
+
+    
+    . Altere a classe "AccountController" como abaixo:
+
+        using Blog.Services;
+        using Microsoft.AspNetCore.Mvc;
+        using SecureIdentity.Password;          // Linha inserida
+
+        namespace Blog.Controllers;
+
+        [ApiController]
+        public class AccountController: ControllerBase
+        {
+            [HttpPost("v1/accounts")]                                                  
+            public async Task<IActionResult> Post( [FromBody] RegisterViewModel model,
+                                                    [FromServices] BlogDataContext context )
+            {
+                if (!ModelState.IsInvalid)
+                    return BadRequest( new ResultVideModel<string>( ModelState.GetErrors()));
+
+                var user = new User
+                {
+                    Name = model.Name,
+                    Email = model.Email,
+                    Slug = model.Email.Replace( "@", "-").Replace( ".","-")
+                };
+
+                var password = PasswordGenerator.Generate(25);          // Linha inserida
+                user.PasswordHash = PasswordHasher.Hash(password);      // Linha inserida
+
+                try                                                     // Try inserido
+                {
+                    await context.Users.AddAsync(user);
+                    await context.SaveChangesAsync();
+
+                    return Ok(new ResultViewModel<dynamic>(new
+                    {
+                        user = user.Email, password
+                    }));
+                }
+                catch (DbUpdateException)
+                {
+                    return StatusCode(400, new ResultViewModel<string>("05X99 - Este E-mail já está cadastrado"));
+                }
+                catch
+                {
+                    return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+                }
+
+            }
+
+            ...
+        }
+
+    . Execute o projeto em modo debug
+
+    . No Postman execute a URL abaixo:
+
+        url:    http://localhost:[porta]/account
+        method: POST
+        body.json:  true
+        body.raw:   { "email": "batman@balta.io",
+                        "name": "Bruce Wayne"
+                    }
+
+    . Durante o debug do projeto verifique o conteúdo da variavel "password".
+
+        ...
+        var password = PasswordGenerator.Generate(25);          // Verifique o conteúdo "password". Guarde essa password para realizar o teste na próx aula       
+        user.PasswordHash = PasswordHasher.Hash(password);      // Verifique o conteúdo "user.PasswordHash"
+        ...
+
+    . Durante o debug, na linha do "user.PassworHash", verifique se consegue executar diversas vezes o comando:
+
+        PasswordHasher.Hash(password);
+
+Aula 51.  Autenticando
+----------------------
+
+    . Crie a classe abaixo dentro da pasta "ViewModel":
+
+        using System.ComponentModel.DataAnnotations;
+
+        namespace Blog.ViewModels;
+
+        public class LoginViewModel
+        {
+            [Required(ErrorMessage = "Informe o E-mail")]
+            [EmailAddress(ErrorMessage = "E-mail inválido")]
+            public string Email { get; set; }
+            
+            [Required(ErrorMessage = "Informe a senha")]
+            public string Password { get; set; }
+        }
+
+
+    . Atualize todo o método "Login" da classe "AccountController" como abaixo:
+
+        ...
+        [HttpPost("v1/accounts/login")]
+        public async Task<IActionResult> Login(
+            [FromBody]LoginViewModel model,
+            [FromServices] BlogDataContext context,
+            [FromServices] TokenService tokenService)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
+
+            var user = await context
+                .Users
+                .AsNoTracking()
+                .Include(x => x.Roles)
+                .FirstOrDefaultAsync(x => x.Email == model.Email);
+
+            if (user == null)
+                return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválidos"));
+
+            if (!PasswordHasher.Verify(user.PasswordHash, model.Password))
+                return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválidos"));
+            
+            try
+            {
+                var token = tokenService.GenerateToken(user);
+                return Ok(new ResultViewModel<string>(token, null));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+            }
+        }
+        ...
+
+    . No Postman crie a URL abaixo:
+
+        url:    http://localhost:[porta]/login
+        method: POST
+        body.json:  true
+        body.raw:   {   
+                        "email":    "batman@balta.io",
+                        "password": "[password criado no penultimo passo da aula anterior]"
+                    }
+
+
+Aula 52.  Gerando Tokens com Claims
+-----------------------------------
 
