@@ -1429,13 +1429,16 @@ Aula 26. Versionamento
 
 https://procodeguide.com/programming/redirect-a-request-in-aspnet-core/#:~:text=The%20redirect%20method%20is%20used,a%20string%20in%20the%20input.
 
-// PAREI AQUI
 Aula 27.  Async e Await
 -----------------------
 
     . async     - Significa que o método será executado assincronamente.
 
     . await     - Significa que irá aguardar a execução do método especificado como "await" para sair do método pai/chamador
+
+    . Para ativar os métodos "ToListAsync()", "FirstOrDefaultAsync", e todos que terminam com "...Async" é necessário importar a biblioteca abaixo:
+
+        using Microsoft.EntityFrameworkCore;
 
     . A maioria dos métodos existe a versão assíncrona:
 
@@ -1481,7 +1484,7 @@ Aula 27.  Async e Await
 
         . Configurar as chamadas internas do método como "await":
 
-            . Implemente o método abaixo na classe "HomeController":
+            . Implemente o método abaixo na classe "CategoryController":
 
                 [HttpGet("v1/[controller]")]
                 public async Task<IActionResult> GetAsync([FromServices] BlogDataContext context){
@@ -1504,10 +1507,13 @@ Aula 27.  Async e Await
 
             . Acesse o Postman e faça o teste da rota acima.
 
+                url: https://localhost:7122/v1/category
+                method: GET
+
 Aula 28. CRUD de Categorias
 ---------------------------
 
-    . Implemente o método abaixo na classe "HomeController":
+    . Implemente o método abaixo na classe "CategoryController":
 
         [HttpGet("v1/[controller]/{id:int}")]
         public async Task<IActionResult> GetByIdAsync([FromServices] BlogDataContext context,
@@ -1600,6 +1606,8 @@ Aula 28. CRUD de Categorias
                 context.Categories
                         .Remove( category );
 
+                await context.SaveChangesAsync();
+
                 return Ok();
             }catch( DbUpdateException ex )
             {
@@ -1610,8 +1618,6 @@ Aula 28. CRUD de Categorias
                 return StatusCode(500, "Falha interna do servidor");
             }
         }
-
-    . Acesse o Postman e faça o teste da rota acima.
 
     . Procure mais informações sobre "CreatedAtAction" e "CreatedAtRoute"
 
@@ -1635,7 +1641,6 @@ Aula 29. Testando API
         Body.raw: true
         Body.raw.json: true
         Body:   {
-                    "Id": 1,
                     "Name": "Backend",
                     "Slug": "backend",
                     "Posts": []
@@ -1643,6 +1648,19 @@ Aula 29. Testando API
 
         url: https://localhost:[porta]/categories
         method: GET
+
+        url: https://localhost:[porta]/categories/1
+        method: PUT
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Name": "Forehand",
+                    "Slug": "forehand",
+                    "Posts": []
+                }
+
+        url: https://localhost:[porta]/categories/1
+        method: DELETE
 
 Aula 30. Tratando Erros
 -----------------------
@@ -1717,6 +1735,7 @@ Aula 31. Finalizando o CRUD de categorias
         method: DELETE
         Body.raw.text: true
 
+// PAREI AQUI
 Aula 32.  ViewModels
 --------------------
 
