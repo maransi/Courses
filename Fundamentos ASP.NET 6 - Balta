@@ -1873,7 +1873,6 @@ Aula 34. Validações
                     veremos como desabilitar a validação automática para tratarmos manualmente utilizando
                     o "Model.IsValid"
 
-// PAREI AQUI
 Aula 35. Padronizações
 ----------------------
 
@@ -1945,6 +1944,29 @@ Aula 36.  Padronizando erros
         app.MapControllers();
 
         app.Run();
+
+    . Crie a pasta "Blog.Extensions" e inclua a classe abaixo:
+
+        using Microsoft.AspNetCore.Mvc.ModelBinding;
+
+        namespace Blog.Extensions
+        {
+            public static class ModelStateExtension
+            {
+                public static List<string> GetErrors(this ModelStateDictionary modelState)
+                {
+                    var result = new List<string>();
+                    foreach (var item in modelState.Values)
+                        result.AddRange(item.Errors.Select(error => error.ErrorMessage));
+
+                    return result;
+                }
+            }
+        }
+
+        . IMPORTANTE: Para entender melhor o conceito de Extensão de métodos acesse a "Aula 26. Implementando Extension Methods"
+                        do curso "DI - Dominando Injeção de Depdência"
+
 
     . Ao fazer a configuração acima, somos obrigados validar manualmente dentro dos controllers os models através 
         do método "ModelState.IsValid":
@@ -2092,29 +2114,22 @@ Aula 38.  Padronizando o BadRequest
 
     . Execute a URL no Postman e verifique o resultado com o BadRequest e os erros apresentados.
 
-    . Na raiz do projeto crie a pasta "Extensions":
-
-    . Dentro da pasta criada crie a classe abaixo:
-
-        using Microsoft.AspNetCore.Mvc.ModelBinding;
-
-        namespace Blog.Extensions
-        {
-            public static class ModelStateExtension
+        [
             {
-                public static List<string> GetErrors(this ModelStateDictionary modelState)
-                {
-                    var result = new List<string>();
-                    foreach (var item in modelState.Values)
-                        result.AddRange(item.Errors.Select(error => error.ErrorMessage));
-
-                    return result;
-                }
+                "rawValue": null,
+                "attemptedValue": null,
+                "errors": [
+                    {
+                        "exception": null,
+                        "errorMessage": "O slug é obrigaório"
+                    }
+                ],
+                "validationState": 1,
+                "isContainerNode": false,
+                "children": null
             }
-        }
+        ]
 
-        . IMPORTANTE: Para entender melhor o conceito de Extensão de métodos acesse a "Aula 26. Implementando Extension Methods"
-                        do curso "DI - Dominando Injeção de Depdência"
 
     . ALtere o método "PostAsync" como abaixo:
 
@@ -2160,28 +2175,28 @@ Aula 39.  Conclusão do módulo
     . Altere o método "PutAsync":
 
         ...
-        [HttpPut("v1/categories/{id:int}")]
-        public async Task<IActionResult> PutAsync(
-            [FromRoute] int id,
-            [FromBody] EditorCategoryViewModel model,
-            [FromServices] BlogDataContext context)
+        [HttpPut("[controller]/{id:int}")]
+        public async Task<IActionResult> PutAsync( [FromServices] BlogDataContext context,
+                                                    [FromRoute] int id,
+                                                    [FromBody] EditorCategoryViewModel model )
         {
             try
             {
-                var category = await context
-                    .Categories
-                    .FirstOrDefaultAsync(x => x.Id == id);
+                var category = await context.Categories.FirstOrDefaultAsync( x => x.Id == id );
 
-                if (category == null)
-                    return NotFound(new ResultViewModel<Category>("Conteúdo não encontrado"));      // Linha alterada
+                if ( category == null )
+                {
+                    return NotFound( new ResultViewModel<Category>("Conteúdo não encontrado"));
+                }
 
                 category.Name = model.Name;
                 category.Slug = model.Slug;
 
-                context.Categories.Update(category);
+                context.Categories.Update( category );
+
                 await context.SaveChangesAsync();
 
-                return Ok(new ResultViewModel<Category>(category));             // Linha alterada
+                return Created($"v1/category/{category.Id}", new ResultViewModel<Category>(category) );
             }
             catch (DbUpdateException ex)
             {
@@ -2191,7 +2206,7 @@ Aula 39.  Conclusão do módulo
             {
                 return StatusCode(500, new ResultViewModel<Category>("05X11 - Falha interna no servidor"));     // Linha alterada
             }
-        }            
+        }
 
     . Altere o método "DeleteAsync":
 
@@ -2229,6 +2244,7 @@ Aula 39.  Conclusão do módulo
     . Acesse o Postman e teste todas as rotas alteradas.
 
 
+// PAREI AQUI
 Autenticação e Autorização
 --------------------------
 
