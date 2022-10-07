@@ -1735,7 +1735,6 @@ Aula 31. Finalizando o CRUD de categorias
         method: DELETE
         Body.raw.text: true
 
-// PAREI AQUI
 Aula 32.  ViewModels
 --------------------
 
@@ -1767,12 +1766,12 @@ Aula 32.  ViewModels
 
             try
             {
-                var category = new Category{            // Linha inserida
+                var category = new Category(){            // Linha inserida
                     Id = 0,
                     Posts = null,
                     Name = model.Name,
                     Slug = model.Slug.ToLower()
-                }
+                };
 
                 await context.Categories.AddAsync( category );  // Linha alterada
 
@@ -1869,6 +1868,12 @@ Aula 34. Validações
         }
         ...
 
+        . ATENÇÃO: A entrada do IF acima não mudará o comportamento da execução da rota, continuará
+                    fazendo a validação automática pelas annotations. Na (Aula 36.  Padronizando erros)
+                    veremos como desabilitar a validação automática para tratarmos manualmente utilizando
+                    o "Model.IsValid"
+
+// PAREI AQUI
 Aula 35. Padronizações
 ----------------------
 
@@ -1950,7 +1955,7 @@ Aula 36.  Padronizando erros
             [FromServices] BlogDataContext context)
         {
             if (!ModelState.IsValid)                        
-                return BadRequest();
+                return BadRequest(new ResultViewModel<Category>(ModelState.GetErrors()));
 
             ...
         }
