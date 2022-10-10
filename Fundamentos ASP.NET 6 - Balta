@@ -2244,10 +2244,11 @@ Aula 39.  Conclusão do módulo
     . Acesse o Postman e teste todas as rotas alteradas.
 
 
-// PAREI AQUI
+
 Autenticação e Autorização
 --------------------------
 
+https://jasonwatmore.com/post/2022/02/18/net-6-role-based-authorization-tutorial-with-example-api
 https://www.udemy.com/course/net-6-web-api-do-zero-ao-avancado/learn/lecture/29034104?start=0#overview
 
 https://www.brunobrito.net.br/jwt-cookies-oauth-bearer/
@@ -2302,7 +2303,6 @@ Aula 40. Introdução
         INSERT INTO [UserRole] VALUES(3, 1)
         INSERT INTO [UserRole] VALUES(3, 2)
 
-
 Aula 41. Token e JWT
 --------------------
 
@@ -2312,7 +2312,7 @@ Aula 41. Token e JWT
 
     . Na raiz do projeto crie a classe abaixo:
 
-        namespace Blog
+        namespace Blog;
 
         public static class Configuration
         {
@@ -2328,30 +2328,35 @@ Aula 42. Token Service
 
         dotnet add package Microsoft.AspNetCore.Authentication
 
-        dotnet add package Microsoft.AspNetCore.Authentication.Bearer
+        dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 
     . Crie a pasta "Services" na raiz do projeto e crie a classe abaixo:
 
-        using System.IdentityModel.Token.Jwt;
+        using System.IdentityModel.Tokens.Jwt;
+        using System.Security.Claims;
+        using System.Text;
+        using Blog.Extensions;
         using Blog.Models;
+        using Microsoft.IdentityModel.Tokens;
 
         namespace Blog.Services;
 
         public class TokenService
         {
-            public string GenerateToken( User user )
+            public string GenerateToken(User user)
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );
-                var tokenDescriptor = new SecurityTokenDescriptor
+                var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);
+                var tokenDescriptor = new SecurityTokenDescriptor()
                 {
                     Expires = DateTime.UtcNow.AddHours(8),
-                    SigningCredentials = new SigningCredentials( new SymetricSecurityKey( key ),
-                                                                    SecurityAlgorithms.HmaShaSignature )
-                }
-                var token = tokenHandler.CreateToken( tokenDescriptor );
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                                                                    SecurityAlgorithms.HmacSha256Signature)
+                };
 
-                return tokenHandler.WriteToken( token );
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                return tokenHandler.WriteToken(token);
 
             }
         }
@@ -2367,26 +2372,24 @@ Aula 43. Injeção de Depedência
         namespace Blog.Controllers;
 
         [ApiController]
-        public class AccountController: ControllerBase
+        [Route("v1")]
+        public class AccountController : ControllerBase
         {
             private readonly TokenService _tokenService;
-
-                                            +---> Aqui é feito a injeção de dependência
-                                            |
-            public AccountController( TokenService tokenService )
+            public AccountController(TokenService tokenService)
             {
                 _tokenService = tokenService;   // Aqui é passado o objeto para dentro da classe
             }
 
 
-            [HttpPost("v1/login")]
+            [HttpPost("[controller]/login")]
             public IActionResult Login()
             {
-                var token = _tokenService.GenerateToken( null );
+                var token = _tokenService.GenerateToken(null);
 
-                return Ok( token );
+                return Ok(token);
             }
-        } 
+        }
 
         . Ao invés de fazer a injeção de dependência pelo método construtor poderiamos fazê-lo pelo método login 
             como abaixo:
@@ -2471,7 +2474,7 @@ Aula 45. Inspecionando o Token
 
     . Acesse o Postman e execute a URL abaixo:
 
-        url: http://localhost:[porta]/v1/login
+        url: http://localhost:[porta]/v1/account/login
         method: POST
 
     . Acesse o site jwt.io, acesse a área "Encoded" e copie o token gerado no item anterior para analisar
@@ -2482,6 +2485,10 @@ Aula 45. Inspecionando o Token
 
 Aula 46.  JWT Claims
 --------------------
+
+https://balta.io/artigos/aspnetcore-3-autenticacao-autorizacao-bearer-jwt
+https://www.youtube.com/watch?v=jayEWBUDkGI
+https://dev.to/eduardstefanescu/jwt-token-claims-in-asp-net-core-1kk8
 
     . Acesse a classe "TokenService.cs" e implemente as alterações abaixo:
 
@@ -2498,7 +2505,7 @@ Aula 46.  JWT Claims
                 var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = ClaimsIdentity( new Claim[]           // Linha inserida
+                    Subject = new ClaimsIdentity( new Claim[]           // Linha inserida
                     {
                         new Claim("fruta","banana")
                     }),
@@ -2558,9 +2565,8 @@ Aula 46.  JWT Claims
 
         . Observe no "Payload" que agora temos os itens:
             
-            "unique_name": "marco.antonio",
+            "name": "marco.antonio",
             "role": "admin"
-
 
 Aula 47. Configurando Autenticação e Autorização
 ------------------------------------------------
@@ -2571,27 +2577,27 @@ Aula 47. Configurando Autenticação e Autorização
         ...
         var builder - WebApplication.CreateBuilder( args );
 
-        var byte[] = Encoding.ASCII.GetBytes( Configuration.JwtKey );   // Linha inserida
+        var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );   // Linha inserida
 
 
 
 
-        // Linha abaixo inserida
+        // Linha abaixo inserida, não é para alterar
 
-        builder.Services.AddAuthentication( x =>
+        builder.Services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            x.DefaultChallengeScheme = JwtBearerDefaults.AthenticationScheme.
-        }).AddJwtBearer( JwtBearerOptions =>
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(x =>
         {
-            x.TokenValidationParameters = new TokenValidateionParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    UssuerSigninigKey = new SymmtricSecurityKey( key ),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-        });                 // Linha inserida
+            x.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        });
 
 
         ...
@@ -2649,6 +2655,11 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
 
     . Agora deverá vir um Token
 
+    . Insira o método abaixo na classe "AccountController":
+
+        [HttpGet("v1/user")]
+        public IActionResult GetUser() => Ok( User.Identity.Name );
+
     . Acesse o Postman e execute a URL abaixo:
 
         url: https://localhost:[porta]/v1/user
@@ -2659,17 +2670,17 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
     . Retire a annotation "[Authorize]" e "[Anonymous]" e faça as alterações abaixo na classe "AccountController":
 
         ...
-        [Authorize( Roles = "user")]                     // Linha inserida
+        [Authorize( Roles = "user")]                     // Linha alterada
         [HttpGet("v1/user")]
-        public IActionResult GetUser() => Ok( User.Identity.Name )
+        public IActionResult GetUser() => Ok( User.Identity.Name );
 
         [Authorize( Roles = "author" )]                     // Linha inserida
         [HttpGet("v1/author")]
-        public IActionResult GetAuthor() => Ok( User.Identity.Name )
+        public IActionResult GetAuthor() => Ok( User.Identity.Name );
 
         [Authorize( Roles = "admin" )]                     // Linha inserida
         [HttpGet("v1/admin")]
-        public IActionResult GetAdmin() => Ok( User.Identity.Name )
+        public IActionResult GetAdmin() => Ok( User.Identity.Name );
         ...
 
     . Execute o projeto.
@@ -2696,6 +2707,14 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
         method: GET
         Authorization.Type: Bearer Token
         Authorization.Token: [token obtido no item anterior]
+
+        ou
+
+        url: https://localhost:[porta]/v1/admin
+        method: GET
+        Headers.Authorization: Bearer [Token obtido no item anterior]
+
+        . Este NÃO DARÁ erro, retornando o "User.Identity.Name"
 
     . Acesse o Postman e execute a URL abaixo:
 
@@ -2742,6 +2761,15 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
 
         . Agora a rota "user" estará disponível.
 
+    . Caso haja necessidade de colocar mais de uma "Role" no "[Authorize]" faça como abaixo:
+
+        ...
+        [Authorize( Roles = "user,admin")]                     // Linha alterada com mais de uma role
+        [HttpGet("v1/user")]
+        public IActionResult GetUser() => Ok( User.Identity.Name );
+        ...
+
+// PAREI AQUI
 Aula 49.  Iniciando o cadastro de usuários
 ------------------------------------------
 
@@ -2893,6 +2921,10 @@ Aula 49.  Iniciando o cadastro de usuários
             }
         }
 
+
+        . O método POST dará erro, porque ele ainda não está completo. Na proxima aula
+            terminaremos o código dele.
+
     . Levante o banco:
 
         docker start sqlserver
@@ -2906,4 +2938,38 @@ Aula 49.  Iniciando o cadastro de usuários
 
 Aula 50. Salvando senhas no banco de dados
 ------------------------------------------
+
+    . Insira as linhas abaixo na classe e metodo "AccountController.Post":
+
+        [HttpPost("v1/accounts/")]
+        public async Task<IActionResult> Post(
+            [FromBody] RegisterViewModel model,
+            [FromServices] BlogDataContext context)
+        {
+
+            ...
+
+            // Insira as linhas abaixo
+            var password = PasswordGenerator.Generate(25);
+            user.PasswordHash = PasswordHasher.Hash(password);
+
+            try
+            {
+                await context.Users.AddAsync(user);
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<dynamic>(new
+                {
+                    user = user.Email, password
+                }));
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(400, new ResultViewModel<string>("05X99 - Este E-mail já está cadastrado"));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+            }
+        }
 
