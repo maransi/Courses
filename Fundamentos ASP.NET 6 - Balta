@@ -2317,7 +2317,7 @@ Aula 41. Token e JWT
         public static class Configuration
         {
             // TOKEN - JWT - Json Web Token
-            public static string JwtKey { get; set; } = "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=";
+            public static string JwtKey = "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=";
 
         }
 
@@ -2769,7 +2769,7 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
         public IActionResult GetUser() => Ok( User.Identity.Name );
         ...
 
-// PAREI AQUI
+
 Aula 49.  Iniciando o cadastro de usuários
 ------------------------------------------
 
@@ -2936,10 +2936,23 @@ Aula 49.  Iniciando o cadastro de usuários
         dotnet ef migrations add [Nome da Migration]
         dotnet ef database update
 
-Aula 50. Salvando senhas no banco de dados
-------------------------------------------
+    . Execute as DMLs de criação de registro nas tabelas da aula 40.
 
-    . Insira as linhas abaixo na classe e metodo "AccountController.Post":
+// PAREI AQUI
+Aula 50. Registrando um novo Usuário
+------------------------------------
+
+    . Execute o comando abaixo na raiz do projeto:
+
+        dotnet add package SecureIdentity
+
+
+    . Insira as linhas abaixo na classe e metodo "AccountController.Post", coloque as linhas inseridas no lugar
+        do "return Ok( user );"
+
+        ...
+        using SecureIdentity.Password;
+        ...
 
         [HttpPost("v1/accounts/")]
         public async Task<IActionResult> Post(
@@ -2973,3 +2986,188 @@ Aula 50. Salvando senhas no banco de dados
             }
         }
 
+    . Levante o projeto em modo "Debug", acompanhando desde a primeira linha do método "Post":
+
+    . Execute a URL abaixo no Postman:
+
+        method: POST
+        url: http://localhost:[porta]/v1/accounts
+        body.json: true
+        body.raw: 
+                    {
+                        "email": "batman@balta.io",
+                        "name": "Bruce Wayne"
+                    }
+
+    . Guarde o retorno da rota acima, principalmente a "password" para utilizar na aula seguinte.
+
+{
+    "data": {
+        "user": "batman@balta.io",
+        "password": "32Xu@MuCCPy4Y)4!F5v5zIBY&"
+    },
+    "errors": []
+}
+
+
+Aula 51. Autenticando
+---------------------
+
+    . Dentro da pasta "ViewModels" crie a classe abaixo:
+
+        using System.ComponentModel.DataAnnotations;
+
+        namespace Blog.ViewModels;
+
+        public class LoginViewModel
+        {
+            [Required(ErrorMessage = "Informe o E-mail")]
+            [EmailAddress(ErrorMessage = "E-mail inválido")]
+            public string Email { get; set; }
+            
+            [Required(ErrorMessage = "Informe a senha")]
+            public string Password { get; set; }
+        }
+
+    . Altere o método "Login" da classe "AccountController" como abaixo:
+
+        [HttpPost("v1/accounts/login")]
+        public async Task<IActionResult> Login(
+            [FromBody]LoginViewModel model,
+            [FromServices] BlogDataContext context,
+            [FromServices] TokenService tokenService)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
+
+            var user = await context
+                .Users
+                .AsNoTracking()
+                .Include(x => x.Roles)
+                .FirstOrDefaultAsync(x => x.Email == model.Email);
+
+            if (user == null)
+                return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválidos"));
+
+            if (!PasswordHasher.Verify(user.PasswordHash, model.Password))
+                return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválidos"));
+            
+            try
+            {
+                var token = tokenService.GenerateToken(user);
+                return Ok(new ResultViewModel<string>(token, null));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+            }
+        }
+
+    . Execute a URL abaixo no Postman:
+
+        method: POST
+        url: http://localhost:[porta]/v1/accounts/login
+        body.raw:   
+            {
+                "email": "batman@balta.io",
+                "password": "[Senha gerada na aula anterior]"
+            }
+        body.json: true
+
+    . Haverá um token, porém inválido porque não tem as informações do usuário ainda.
+
+
+Aula 52. Gerando Tokens com Claims
+----------------------------------
+
+    . Dentro da pasta "Extensions" crie a classe abaixo:
+
+        using System.Security.Claims;
+        using Blog.Models;
+
+        namespace Blog.Extensions;
+
+        public static class RoleClaimsExtension
+        {
+            public static IEnumerable<Claim> GetClaims(this User user)
+            {
+                var result = new List<Claim>
+                {
+                    new(ClaimTypes.Name, user.Email)
+                };
+                result.AddRange(
+                    user.Roles.Select(role => new Claim(ClaimTypes.Role, role.Slug))
+                );
+                return result;
+            }
+        }
+
+    . Acesse a classe "TokenService" e faça as alterações abaixo:
+
+        using System.IdentityModel.Tokens.Jwt;
+        using System.Security.Claims;
+        using System.Text;
+        using Blog.Extensions;
+        using Blog.Models;
+        using Microsoft.IdentityModel.Tokens;
+
+        namespace Blog.Services;
+
+        public class TokenService
+        {
+            public string GenerateToken(User user)
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);
+
+                var claims = user.GetClaims();              // Linha inserida
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(claims),       // Linha alterada
+                    Expires = DateTime.UtcNow.AddHours(8),
+                    SigningCredentials = new SigningCredentials(
+                        new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return tokenHandler.WriteToken(token);
+            }
+        }
+
+    . Acesse o video no ponto 5:05 e atualize as informações do script conforme foi feito lá.
+
+        INSERT INTO [UserRole] VALUES(1, 4)
+        INSERT INTO [UserRole] VALUES(2, 4)
+        INSERT INTO [UserRole] VALUES(3, 4)
+
+
+    . Execute a URL abaixo no Postman:
+
+        method: POST
+        url: htt://localhost:[porta]/v1/accounts/login
+        body.raw:   
+                    {
+                        email: "batman@balta.io",
+                        password: "[senha gerada na aula anterior]
+                    }
+        body.json: true
+
+    . Acesse o site "jwt.io" e decodifique o token criado no item anterior
+
+{
+    "email": "maransi@gmail.com",
+    "password": "Jvvg0JRPE9Vsgfˆ3c5CUGy8Ck"
+}
+
+Aula 53. Implementando um ApiKey
+--------------------------------
+
+
+
+
+
+
+
+Aula 54. Entendendo o AppSettings
+---------------------------------
