@@ -3171,3 +3171,75 @@ Aula 53. Implementando um ApiKey
 
 Aula 54. Entendendo o AppSettings
 ---------------------------------
+
+    . Mudaremos o conteúdo das senhas existentes na classe "Configuration.cs" para um lugar mais seguro.
+
+    . O local mais indicado seria para o arquivo "appsetting.json", que pode ser configurado nos ambientes
+        de desenvolvimento, produção, ou qualquer outro que precisar. Mantendo dessa forma as informações 
+        reservadas, principalmente em produção, onde ficará disponível o conteúdo do arquivo somente para
+        a equipe de administração do servidor e não para outras como o desenvolvimento.
+
+Aula 55. Lendo o AppSettings
+----------------------------
+
+    . Adapte o arquivo "appsettings.json" como abaixo:
+
+        {
+        "JwtKey": "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=",
+        "ApiKeyName": "api_key",
+        "ApiKey": "curso_api_IlTevUM/z0ey3NwCV/unWg==",
+        "SmtpConfiguration": {
+            "Host": "smtp.sendgrid.net",
+            "Port": "587",
+            "UserName": "apikey",
+            "Password": "suasenha"
+        },
+        "Logging": {
+            "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+            }
+        },
+        "AllowedHosts": "*"
+        }
+
+    . Adapte o arquivo "Configuration.cs" como abaixo:
+
+        namespace Blog;
+
+        public static class Configuration
+        {
+            public static string JwtKey = "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=";
+            public static string ApiKeyName = "api_key";
+            public static string ApiKey = "curso_api_IlTevUM/z0ey3NwCV/unWg==";
+            public static SmtpConfiguration Smtp = new();
+
+            public class SmtpConfiguration
+            {
+                public string Host { get; set; }
+                public int Port { get; set; } = 25;
+                public string UserName { get; set; }
+                public string Password { get; set; }
+            }
+        }
+
+    . Inclua as linhas abaixo no arquivo "Program.cs"
+
+        ...
+        builder.Services.AddTransient<TokenService>();
+
+        Configuration.JwtKey = app.Configuration.GetValue<string>( "JwtKey" );              // Linha Inserida
+        Configuration.ApiKeyName = app.Configuration.GetValue<string>( "ApiKeyName" );      // Linha Inserida
+        Configuration.ApiKey =app.Configuration.GetValue<string>( "ApiKey" );               // Linha Inserida
+
+        var smtp = new Configuration.SmtpConfiguration();                                   // Linha Inserida
+        app.Configuration.GetSection( "Smtp" ).bind( smtp );                                // Linha Inserida
+        Configuration.Smtp = smtp;                                                          // Linha Inserida
+        ...
+
+        . ATENÇÃO: Ao implementar e testar o código acima verifique se o conteúdo das linhas
+                    adicionadas no "Programs.cs" virá do arquivo "json", ou da classe "Configuration.cs"
+
+Aula 56. Organizando o Program
+------------------------------
+
