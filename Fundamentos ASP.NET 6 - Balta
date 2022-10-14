@@ -1429,13 +1429,16 @@ Aula 26. Versionamento
 
 https://procodeguide.com/programming/redirect-a-request-in-aspnet-core/#:~:text=The%20redirect%20method%20is%20used,a%20string%20in%20the%20input.
 
-// PAREI AQUI
 Aula 27.  Async e Await
 -----------------------
 
     . async     - Significa que o método será executado assincronamente.
 
     . await     - Significa que irá aguardar a execução do método especificado como "await" para sair do método pai/chamador
+
+    . Para ativar os métodos "ToListAsync()", "FirstOrDefaultAsync", e todos que terminam com "...Async" é necessário importar a biblioteca abaixo:
+
+        using Microsoft.EntityFrameworkCore;
 
     . A maioria dos métodos existe a versão assíncrona:
 
@@ -1481,7 +1484,7 @@ Aula 27.  Async e Await
 
         . Configurar as chamadas internas do método como "await":
 
-            . Implemente o método abaixo na classe "HomeController":
+            . Implemente o método abaixo na classe "CategoryController":
 
                 [HttpGet("v1/[controller]")]
                 public async Task<IActionResult> GetAsync([FromServices] BlogDataContext context){
@@ -1504,10 +1507,13 @@ Aula 27.  Async e Await
 
             . Acesse o Postman e faça o teste da rota acima.
 
+                url: https://localhost:7122/v1/category
+                method: GET
+
 Aula 28. CRUD de Categorias
 ---------------------------
 
-    . Implemente o método abaixo na classe "HomeController":
+    . Implemente o método abaixo na classe "CategoryController":
 
         [HttpGet("v1/[controller]/{id:int}")]
         public async Task<IActionResult> GetByIdAsync([FromServices] BlogDataContext context,
@@ -1600,6 +1606,8 @@ Aula 28. CRUD de Categorias
                 context.Categories
                         .Remove( category );
 
+                await context.SaveChangesAsync();
+
                 return Ok();
             }catch( DbUpdateException ex )
             {
@@ -1610,8 +1618,6 @@ Aula 28. CRUD de Categorias
                 return StatusCode(500, "Falha interna do servidor");
             }
         }
-
-    . Acesse o Postman e faça o teste da rota acima.
 
     . Procure mais informações sobre "CreatedAtAction" e "CreatedAtRoute"
 
@@ -1635,7 +1641,6 @@ Aula 29. Testando API
         Body.raw: true
         Body.raw.json: true
         Body:   {
-                    "Id": 1,
                     "Name": "Backend",
                     "Slug": "backend",
                     "Posts": []
@@ -1643,6 +1648,19 @@ Aula 29. Testando API
 
         url: https://localhost:[porta]/categories
         method: GET
+
+        url: https://localhost:[porta]/categories/1
+        method: PUT
+        Body.raw: true
+        Body.raw.json: true
+        Body:   {
+                    "Name": "Forehand",
+                    "Slug": "forehand",
+                    "Posts": []
+                }
+
+        url: https://localhost:[porta]/categories/1
+        method: DELETE
 
 Aula 30. Tratando Erros
 -----------------------
@@ -1748,12 +1766,12 @@ Aula 32.  ViewModels
 
             try
             {
-                var category = new Category{            // Linha inserida
+                var category = new Category(){            // Linha inserida
                     Id = 0,
                     Posts = null,
                     Name = model.Name,
                     Slug = model.Slug.ToLower()
-                }
+                };
 
                 await context.Categories.AddAsync( category );  // Linha alterada
 
@@ -1850,6 +1868,11 @@ Aula 34. Validações
         }
         ...
 
+        . ATENÇÃO: A entrada do IF acima não mudará o comportamento da execução da rota, continuará
+                    fazendo a validação automática pelas annotations. Na (Aula 36.  Padronizando erros)
+                    veremos como desabilitar a validação automática para tratarmos manualmente utilizando
+                    o "Model.IsValid"
+
 Aula 35. Padronizações
 ----------------------
 
@@ -1922,6 +1945,29 @@ Aula 36.  Padronizando erros
 
         app.Run();
 
+    . Crie a pasta "Blog.Extensions" e inclua a classe abaixo:
+
+        using Microsoft.AspNetCore.Mvc.ModelBinding;
+
+        namespace Blog.Extensions
+        {
+            public static class ModelStateExtension
+            {
+                public static List<string> GetErrors(this ModelStateDictionary modelState)
+                {
+                    var result = new List<string>();
+                    foreach (var item in modelState.Values)
+                        result.AddRange(item.Errors.Select(error => error.ErrorMessage));
+
+                    return result;
+                }
+            }
+        }
+
+        . IMPORTANTE: Para entender melhor o conceito de Extensão de métodos acesse a "Aula 26. Implementando Extension Methods"
+                        do curso "DI - Dominando Injeção de Depdência"
+
+
     . Ao fazer a configuração acima, somos obrigados validar manualmente dentro dos controllers os models através 
         do método "ModelState.IsValid":
 
@@ -1931,7 +1977,7 @@ Aula 36.  Padronizando erros
             [FromServices] BlogDataContext context)
         {
             if (!ModelState.IsValid)                        
-                return BadRequest();
+                return BadRequest(new ResultViewModel<Category>(ModelState.GetErrors()));
 
             ...
         }
@@ -2068,29 +2114,22 @@ Aula 38.  Padronizando o BadRequest
 
     . Execute a URL no Postman e verifique o resultado com o BadRequest e os erros apresentados.
 
-    . Na raiz do projeto crie a pasta "Extensions":
-
-    . Dentro da pasta criada crie a classe abaixo:
-
-        using Microsoft.AspNetCore.Mvc.ModelBinding;
-
-        namespace Blog.Extensions
-        {
-            public static class ModelStateExtension
+        [
             {
-                public static List<string> GetErrors(this ModelStateDictionary modelState)
-                {
-                    var result = new List<string>();
-                    foreach (var item in modelState.Values)
-                        result.AddRange(item.Errors.Select(error => error.ErrorMessage));
-
-                    return result;
-                }
+                "rawValue": null,
+                "attemptedValue": null,
+                "errors": [
+                    {
+                        "exception": null,
+                        "errorMessage": "O slug é obrigaório"
+                    }
+                ],
+                "validationState": 1,
+                "isContainerNode": false,
+                "children": null
             }
-        }
+        ]
 
-        . IMPORTANTE: Para entender melhor o conceito de Extensão de métodos acesse a "Aula 26. Implementando Extension Methods"
-                        do curso "DI - Dominando Injeção de Depdência"
 
     . ALtere o método "PostAsync" como abaixo:
 
@@ -2136,28 +2175,28 @@ Aula 39.  Conclusão do módulo
     . Altere o método "PutAsync":
 
         ...
-        [HttpPut("v1/categories/{id:int}")]
-        public async Task<IActionResult> PutAsync(
-            [FromRoute] int id,
-            [FromBody] EditorCategoryViewModel model,
-            [FromServices] BlogDataContext context)
+        [HttpPut("[controller]/{id:int}")]
+        public async Task<IActionResult> PutAsync( [FromServices] BlogDataContext context,
+                                                    [FromRoute] int id,
+                                                    [FromBody] EditorCategoryViewModel model )
         {
             try
             {
-                var category = await context
-                    .Categories
-                    .FirstOrDefaultAsync(x => x.Id == id);
+                var category = await context.Categories.FirstOrDefaultAsync( x => x.Id == id );
 
-                if (category == null)
-                    return NotFound(new ResultViewModel<Category>("Conteúdo não encontrado"));      // Linha alterada
+                if ( category == null )
+                {
+                    return NotFound( new ResultViewModel<Category>("Conteúdo não encontrado"));
+                }
 
                 category.Name = model.Name;
                 category.Slug = model.Slug;
 
-                context.Categories.Update(category);
+                context.Categories.Update( category );
+
                 await context.SaveChangesAsync();
 
-                return Ok(new ResultViewModel<Category>(category));             // Linha alterada
+                return Created($"v1/category/{category.Id}", new ResultViewModel<Category>(category) );
             }
             catch (DbUpdateException ex)
             {
@@ -2167,7 +2206,7 @@ Aula 39.  Conclusão do módulo
             {
                 return StatusCode(500, new ResultViewModel<Category>("05X11 - Falha interna no servidor"));     // Linha alterada
             }
-        }            
+        }
 
     . Altere o método "DeleteAsync":
 
@@ -2205,9 +2244,11 @@ Aula 39.  Conclusão do módulo
     . Acesse o Postman e teste todas as rotas alteradas.
 
 
+
 Autenticação e Autorização
 --------------------------
 
+https://jasonwatmore.com/post/2022/02/18/net-6-role-based-authorization-tutorial-with-example-api
 https://www.udemy.com/course/net-6-web-api-do-zero-ao-avancado/learn/lecture/29034104?start=0#overview
 
 https://www.brunobrito.net.br/jwt-cookies-oauth-bearer/
@@ -2262,7 +2303,6 @@ Aula 40. Introdução
         INSERT INTO [UserRole] VALUES(3, 1)
         INSERT INTO [UserRole] VALUES(3, 2)
 
-
 Aula 41. Token e JWT
 --------------------
 
@@ -2272,12 +2312,12 @@ Aula 41. Token e JWT
 
     . Na raiz do projeto crie a classe abaixo:
 
-        namespace Blog
+        namespace Blog;
 
         public static class Configuration
         {
             // TOKEN - JWT - Json Web Token
-            public static string JwtKey { get; set; } = "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=";
+            public static string JwtKey = "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=";
 
         }
 
@@ -2288,30 +2328,35 @@ Aula 42. Token Service
 
         dotnet add package Microsoft.AspNetCore.Authentication
 
-        dotnet add package Microsoft.AspNetCore.Authentication.Bearer
+        dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 
     . Crie a pasta "Services" na raiz do projeto e crie a classe abaixo:
 
-        using System.IdentityModel.Token.Jwt;
+        using System.IdentityModel.Tokens.Jwt;
+        using System.Security.Claims;
+        using System.Text;
+        using Blog.Extensions;
         using Blog.Models;
+        using Microsoft.IdentityModel.Tokens;
 
         namespace Blog.Services;
 
         public class TokenService
         {
-            public string GenerateToken( User user )
+            public string GenerateToken(User user)
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );
-                var tokenDescriptor = new SecurityTokenDescriptor
+                var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);
+                var tokenDescriptor = new SecurityTokenDescriptor()
                 {
                     Expires = DateTime.UtcNow.AddHours(8),
-                    SigningCredentials = new SigningCredentials( new SymetricSecurityKey( key ),
-                                                                    SecurityAlgorithms.HmaShaSignature )
-                }
-                var token = tokenHandler.CreateToken( tokenDescriptor );
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                                                                    SecurityAlgorithms.HmacSha256Signature)
+                };
 
-                return tokenHandler.WriteToken( token );
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                return tokenHandler.WriteToken(token);
 
             }
         }
@@ -2327,26 +2372,24 @@ Aula 43. Injeção de Depedência
         namespace Blog.Controllers;
 
         [ApiController]
-        public class AccountController: ControllerBase
+        [Route("v1")]
+        public class AccountController : ControllerBase
         {
             private readonly TokenService _tokenService;
-
-                                            +---> Aqui é feito a injeção de dependência
-                                            |
-            public AccountController( TokenService tokenService )
+            public AccountController(TokenService tokenService)
             {
                 _tokenService = tokenService;   // Aqui é passado o objeto para dentro da classe
             }
 
 
-            [HttpPost("v1/login")]
+            [HttpPost("[controller]/login")]
             public IActionResult Login()
             {
-                var token = _tokenService.GenerateToken( null );
+                var token = _tokenService.GenerateToken(null);
 
-                return Ok( token );
+                return Ok(token);
             }
-        } 
+        }
 
         . Ao invés de fazer a injeção de dependência pelo método construtor poderiamos fazê-lo pelo método login 
             como abaixo:
@@ -2431,7 +2474,7 @@ Aula 45. Inspecionando o Token
 
     . Acesse o Postman e execute a URL abaixo:
 
-        url: http://localhost:[porta]/v1/login
+        url: http://localhost:[porta]/v1/account/login
         method: POST
 
     . Acesse o site jwt.io, acesse a área "Encoded" e copie o token gerado no item anterior para analisar
@@ -2442,6 +2485,10 @@ Aula 45. Inspecionando o Token
 
 Aula 46.  JWT Claims
 --------------------
+
+https://balta.io/artigos/aspnetcore-3-autenticacao-autorizacao-bearer-jwt
+https://www.youtube.com/watch?v=jayEWBUDkGI
+https://dev.to/eduardstefanescu/jwt-token-claims-in-asp-net-core-1kk8
 
     . Acesse a classe "TokenService.cs" e implemente as alterações abaixo:
 
@@ -2458,7 +2505,7 @@ Aula 46.  JWT Claims
                 var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = ClaimsIdentity( new Claim[]           // Linha inserida
+                    Subject = new ClaimsIdentity( new Claim[]           // Linha inserida
                     {
                         new Claim("fruta","banana")
                     }),
@@ -2518,9 +2565,8 @@ Aula 46.  JWT Claims
 
         . Observe no "Payload" que agora temos os itens:
             
-            "unique_name": "marco.antonio",
+            "name": "marco.antonio",
             "role": "admin"
-
 
 Aula 47. Configurando Autenticação e Autorização
 ------------------------------------------------
@@ -2531,27 +2577,27 @@ Aula 47. Configurando Autenticação e Autorização
         ...
         var builder - WebApplication.CreateBuilder( args );
 
-        var byte[] = Encoding.ASCII.GetBytes( Configuration.JwtKey );   // Linha inserida
+        var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );   // Linha inserida
 
 
 
 
-        // Linha abaixo inserida
+        // Linha abaixo inserida, não é para alterar
 
-        builder.Services.AddAuthentication( x =>
+        builder.Services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            x.DefaultChallengeScheme = JwtBearerDefaults.AthenticationScheme.
-        }).AddJwtBearer( JwtBearerOptions =>
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(x =>
         {
-            x.TokenValidationParameters = new TokenValidateionParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    UssuerSigninigKey = new SymmtricSecurityKey( key ),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-        });                 // Linha inserida
+            x.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        });
 
 
         ...
@@ -2609,6 +2655,11 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
 
     . Agora deverá vir um Token
 
+    . Insira o método abaixo na classe "AccountController":
+
+        [HttpGet("v1/user")]
+        public IActionResult GetUser() => Ok( User.Identity.Name );
+
     . Acesse o Postman e execute a URL abaixo:
 
         url: https://localhost:[porta]/v1/user
@@ -2619,17 +2670,17 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
     . Retire a annotation "[Authorize]" e "[Anonymous]" e faça as alterações abaixo na classe "AccountController":
 
         ...
-        [Authorize( Roles = "user")]                     // Linha inserida
+        [Authorize( Roles = "user")]                     // Linha alterada
         [HttpGet("v1/user")]
-        public IActionResult GetUser() => Ok( User.Identity.Name )
+        public IActionResult GetUser() => Ok( User.Identity.Name );
 
         [Authorize( Roles = "author" )]                     // Linha inserida
         [HttpGet("v1/author")]
-        public IActionResult GetAuthor() => Ok( User.Identity.Name )
+        public IActionResult GetAuthor() => Ok( User.Identity.Name );
 
         [Authorize( Roles = "admin" )]                     // Linha inserida
         [HttpGet("v1/admin")]
-        public IActionResult GetAdmin() => Ok( User.Identity.Name )
+        public IActionResult GetAdmin() => Ok( User.Identity.Name );
         ...
 
     . Execute o projeto.
@@ -2656,6 +2707,14 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
         method: GET
         Authorization.Type: Bearer Token
         Authorization.Token: [token obtido no item anterior]
+
+        ou
+
+        url: https://localhost:[porta]/v1/admin
+        method: GET
+        Headers.Authorization: Bearer [Token obtido no item anterior]
+
+        . Este NÃO DARÁ erro, retornando o "User.Identity.Name"
 
     . Acesse o Postman e execute a URL abaixo:
 
@@ -2701,6 +2760,15 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
         Authorization.Token: [token obtido no item anterior]
 
         . Agora a rota "user" estará disponível.
+
+    . Caso haja necessidade de colocar mais de uma "Role" no "[Authorize]" faça como abaixo:
+
+        ...
+        [Authorize( Roles = "user,admin")]                     // Linha alterada com mais de uma role
+        [HttpGet("v1/user")]
+        public IActionResult GetUser() => Ok( User.Identity.Name );
+        ...
+
 
 Aula 49.  Iniciando o cadastro de usuários
 ------------------------------------------
@@ -2853,6 +2921,10 @@ Aula 49.  Iniciando o cadastro de usuários
             }
         }
 
+
+        . O método POST dará erro, porque ele ainda não está completo. Na proxima aula
+            terminaremos o código dele.
+
     . Levante o banco:
 
         docker start sqlserver
@@ -2864,92 +2936,84 @@ Aula 49.  Iniciando o cadastro de usuários
         dotnet ef migrations add [Nome da Migration]
         dotnet ef database update
 
-Aula 50.  Registrando um novo usuário
--------------------------------------
+    . Execute as DMLs de criação de registro nas tabelas da aula 40.
 
-    . Execute o comando abaixo na pasta raiz do projeto:
+// PAREI AQUI
+Aula 50. Registrando um novo Usuário
+------------------------------------
 
-        donet add package SecureIdentity
+    . Execute o comando abaixo na raiz do projeto:
 
-    
-    . Altere a classe "AccountController" como abaixo:
+        dotnet add package SecureIdentity
 
-        using Blog.Services;
-        using Microsoft.AspNetCore.Mvc;
-        using SecureIdentity.Password;          // Linha inserida
 
-        namespace Blog.Controllers;
+    . Insira as linhas abaixo na classe e metodo "AccountController.Post", coloque as linhas inseridas no lugar
+        do "return Ok( user );"
 
-        [ApiController]
-        public class AccountController: ControllerBase
+        ...
+        using SecureIdentity.Password;
+        ...
+
+        [HttpPost("v1/accounts/")]
+        public async Task<IActionResult> Post(
+            [FromBody] RegisterViewModel model,
+            [FromServices] BlogDataContext context)
         {
-            [HttpPost("v1/accounts")]                                                  
-            public async Task<IActionResult> Post( [FromBody] RegisterViewModel model,
-                                                    [FromServices] BlogDataContext context )
-            {
-                if (!ModelState.IsInvalid)
-                    return BadRequest( new ResultVideModel<string>( ModelState.GetErrors()));
-
-                var user = new User
-                {
-                    Name = model.Name,
-                    Email = model.Email,
-                    Slug = model.Email.Replace( "@", "-").Replace( ".","-")
-                };
-
-                var password = PasswordGenerator.Generate(25);          // Linha inserida
-                user.PasswordHash = PasswordHasher.Hash(password);      // Linha inserida
-
-                try                                                     // Try inserido
-                {
-                    await context.Users.AddAsync(user);
-                    await context.SaveChangesAsync();
-
-                    return Ok(new ResultViewModel<dynamic>(new
-                    {
-                        user = user.Email, password
-                    }));
-                }
-                catch (DbUpdateException)
-                {
-                    return StatusCode(400, new ResultViewModel<string>("05X99 - Este E-mail já está cadastrado"));
-                }
-                catch
-                {
-                    return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
-                }
-
-            }
 
             ...
+
+            // Insira as linhas abaixo
+            var password = PasswordGenerator.Generate(25);
+            user.PasswordHash = PasswordHasher.Hash(password);
+
+            try
+            {
+                await context.Users.AddAsync(user);
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<dynamic>(new
+                {
+                    user = user.Email, password
+                }));
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(400, new ResultViewModel<string>("05X99 - Este E-mail já está cadastrado"));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+            }
         }
 
-    . Execute o projeto em modo debug
+    . Levante o projeto em modo "Debug", acompanhando desde a primeira linha do método "Post":
 
-    . No Postman execute a URL abaixo:
+    . Execute a URL abaixo no Postman:
 
-        url:    http://localhost:[porta]/account
         method: POST
-        body.json:  true
-        body.raw:   { "email": "batman@balta.io",
+        url: http://localhost:[porta]/v1/accounts
+        body.json: true
+        body.raw: 
+                    {
+                        "email": "batman@balta.io",
                         "name": "Bruce Wayne"
                     }
 
-    . Durante o debug do projeto verifique o conteúdo da variavel "password".
+    . Guarde o retorno da rota acima, principalmente a "password" para utilizar na aula seguinte.
 
-        ...
-        var password = PasswordGenerator.Generate(25);          // Verifique o conteúdo "password". Guarde essa password para realizar o teste na próx aula       
-        user.PasswordHash = PasswordHasher.Hash(password);      // Verifique o conteúdo "user.PasswordHash"
-        ...
+{
+    "data": {
+        "user": "batman@balta.io",
+        "password": "32Xu@MuCCPy4Y)4!F5v5zIBY&"
+    },
+    "errors": []
+}
 
-    . Durante o debug, na linha do "user.PassworHash", verifique se consegue executar diversas vezes o comando:
 
-        PasswordHasher.Hash(password);
+Aula 51. Autenticando
+---------------------
 
-Aula 51.  Autenticando
-----------------------
-
-    . Crie a classe abaixo dentro da pasta "ViewModel":
+    . Dentro da pasta "ViewModels" crie a classe abaixo:
 
         using System.ComponentModel.DataAnnotations;
 
@@ -2965,10 +3029,8 @@ Aula 51.  Autenticando
             public string Password { get; set; }
         }
 
+    . Altere o método "Login" da classe "AccountController" como abaixo:
 
-    . Atualize todo o método "Login" da classe "AccountController" como abaixo:
-
-        ...
         [HttpPost("v1/accounts/login")]
         public async Task<IActionResult> Login(
             [FromBody]LoginViewModel model,
@@ -3000,19 +3062,266 @@ Aula 51.  Autenticando
                 return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
             }
         }
+
+    . Execute a URL abaixo no Postman:
+
+        method: POST
+        url: http://localhost:[porta]/v1/accounts/login
+        body.raw:   
+            {
+                "email": "batman@balta.io",
+                "password": "[Senha gerada na aula anterior]"
+            }
+        body.json: true
+
+    . Haverá um token, porém inválido porque não tem as informações do usuário ainda.
+
+
+Aula 52. Gerando Tokens com Claims
+----------------------------------
+
+    . Dentro da pasta "Extensions" crie a classe abaixo:
+
+        using System.Security.Claims;
+        using Blog.Models;
+
+        namespace Blog.Extensions;
+
+        public static class RoleClaimsExtension
+        {
+            public static IEnumerable<Claim> GetClaims(this User user)
+            {
+                var result = new List<Claim>
+                {
+                    new(ClaimTypes.Name, user.Email)
+                };
+                result.AddRange(
+                    user.Roles.Select(role => new Claim(ClaimTypes.Role, role.Slug))
+                );
+                return result;
+            }
+        }
+
+    . Acesse a classe "TokenService" e faça as alterações abaixo:
+
+        using System.IdentityModel.Tokens.Jwt;
+        using System.Security.Claims;
+        using System.Text;
+        using Blog.Extensions;
+        using Blog.Models;
+        using Microsoft.IdentityModel.Tokens;
+
+        namespace Blog.Services;
+
+        public class TokenService
+        {
+            public string GenerateToken(User user)
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);
+
+                var claims = user.GetClaims();              // Linha inserida
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(claims),       // Linha alterada
+                    Expires = DateTime.UtcNow.AddHours(8),
+                    SigningCredentials = new SigningCredentials(
+                        new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return tokenHandler.WriteToken(token);
+            }
+        }
+
+    . Acesse o video no ponto 5:05 e atualize as informações do script conforme foi feito lá.
+
+        INSERT INTO [UserRole] VALUES(1, 4)
+        INSERT INTO [UserRole] VALUES(2, 4)
+        INSERT INTO [UserRole] VALUES(3, 4)
+
+
+    . Execute a URL abaixo no Postman:
+
+        method: POST
+        url: htt://localhost:[porta]/v1/accounts/login
+        body.raw:   
+                    {
+                        email: "batman@balta.io",
+                        password: "[senha gerada na aula anterior]
+                    }
+        body.json: true
+
+    . Acesse o site "jwt.io" e decodifique o token criado no item anterior
+
+{
+    "email": "maransi@gmail.com",
+    "password": "Jvvg0JRPE9Vsgfˆ3c5CUGy8Ck"
+}
+
+Aula 53. Implementando um ApiKey
+--------------------------------
+
+
+
+
+
+
+
+Aula 54. Entendendo o AppSettings
+---------------------------------
+
+    . Mudaremos o conteúdo das senhas existentes na classe "Configuration.cs" para um lugar mais seguro.
+
+    . O local mais indicado seria para o arquivo "appsetting.json", que pode ser configurado nos ambientes
+        de desenvolvimento, produção, ou qualquer outro que precisar. Mantendo dessa forma as informações 
+        reservadas, principalmente em produção, onde ficará disponível o conteúdo do arquivo somente para
+        a equipe de administração do servidor e não para outras como o desenvolvimento.
+
+Aula 55. Lendo o AppSettings
+----------------------------
+
+    . Adapte o arquivo "appsettings.json" como abaixo:
+
+        {
+        "JwtKey": "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=",
+        "ApiKeyName": "api_key",
+        "ApiKey": "curso_api_IlTevUM/z0ey3NwCV/unWg==",
+        "SmtpConfiguration": {
+            "Host": "smtp.sendgrid.net",
+            "Port": "587",
+            "UserName": "apikey",
+            "Password": "suasenha"
+        },
+        "Logging": {
+            "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+            }
+        },
+        "AllowedHosts": "*"
+        }
+
+    . Adapte o arquivo "Configuration.cs" como abaixo:
+
+        namespace Blog;
+
+        public static class Configuration
+        {
+            public static string JwtKey = "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=";
+            public static string ApiKeyName = "api_key";
+            public static string ApiKey = "curso_api_IlTevUM/z0ey3NwCV/unWg==";
+            public static SmtpConfiguration Smtp = new();
+
+            public class SmtpConfiguration
+            {
+                public string Host { get; set; }
+                public int Port { get; set; } = 25;
+                public string UserName { get; set; }
+                public string Password { get; set; }
+            }
+        }
+
+    . Inclua as linhas abaixo no arquivo "Program.cs"
+
+        ...
+        builder.Services.AddTransient<TokenService>();
+
+        Configuration.JwtKey = app.Configuration.GetValue<string>( "JwtKey" );              // Linha Inserida
+        Configuration.ApiKeyName = app.Configuration.GetValue<string>( "ApiKeyName" );      // Linha Inserida
+        Configuration.ApiKey =app.Configuration.GetValue<string>( "ApiKey" );               // Linha Inserida
+
+        var smtp = new Configuration.SmtpConfiguration();                                   // Linha Inserida
+        app.Configuration.GetSection( "Smtp" ).bind( smtp );                                // Linha Inserida
+        Configuration.Smtp = smtp;                                                          // Linha Inserida
         ...
 
-    . No Postman crie a URL abaixo:
+        . ATENÇÃO: Ao implementar e testar o código acima verifique se o conteúdo das linhas
+                    adicionadas no "Programs.cs" virá do arquivo "json", ou da classe "Configuration.cs"
 
-        url:    http://localhost:[porta]/login
-        method: POST
-        body.json:  true
-        body.raw:   {   
-                        "email":    "batman@balta.io",
-                        "password": "[password criado no penultimo passo da aula anterior]"
-                    }
+Aula 56. Organizando o Program
+------------------------------
+
+    . Adapte a classe "Program.cs" como abaixo, pode sobrescrever ela com o conteúdo abaixo. 
+        O acerto é para deixá-la mais organizada:
+
+        using System.Text;
+        using Blog;
+        using Blog.Data;
+        using Blog.Services;
+        using Microsoft.AspNetCore.Authentication.JwtBearer;
+        using Microsoft.IdentityModel.Tokens;
+
+        var builder = WebApplication.CreateBuilder(args);
+        ConfigureAuthentication(builder);
+        ConfigureMvc(builder);
+        ConfigureServices(builder);
+
+        var app = builder.Build();
+        LoadConfiguration(app);
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.UseStaticFiles();
+        app.Run();
+
+        void LoadConfiguration(WebApplication app)
+        {
+            Configuration.JwtKey = app.Configuration.GetValue<string>("JwtKey");
+            Configuration.ApiKeyName = app.Configuration.GetValue<string>("ApiKeyName");
+            Configuration.ApiKey = app.Configuration.GetValue<string>("ApiKey");
+
+            var smtp = new Configuration.SmtpConfiguration();
+            app.Configuration.GetSection("SmtpConfiguration").Bind(smtp);
+            Configuration.Smtp = smtp;
+        }
+
+        void ConfigureAuthentication(WebApplicationBuilder builder)
+        {
+            var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+        }
+
+        void ConfigureMvc(WebApplicationBuilder builder)
+        {
+            builder
+                .Services
+                .AddControllers()
+                .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; });
+        }
+
+        void ConfigureServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddDbContext<BlogDataContext>();
+            builder.Services.AddTransient<TokenService>();
+            builder.Services.AddTransient<EmailService>();
+        }
+
+    . Faça um rebuild da aplicação para ver se ficou algum erro:
+
+        dotnet clean
+
+        dotnet build
 
 
-Aula 52.  Gerando Tokens com Claims
------------------------------------
+Aula 57.   Como funciona o envio de E-mails
+-------------------------------------------
+
+
+
 
