@@ -2345,11 +2345,18 @@ Aula 42. Token Service
         {
             public string GenerateToken(User user)
             {
+                // Classe responsável por gerar o token
                 var tokenHandler = new JwtSecurityTokenHandler();
+
+                // Nossa chave de validação do token
                 var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);
+
+                // Informações contidas no nosso token
                 var tokenDescriptor = new SecurityTokenDescriptor()
                 {
+                    // Tempo de expiração do nosso token
                     Expires = DateTime.UtcNow.AddHours(8),
+                    // Credenciais para incriptar e desincriptar nosso token
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                                                                     SecurityAlgorithms.HmacSha256Signature)
                 };
@@ -2505,6 +2512,7 @@ https://dev.to/eduardstefanescu/jwt-token-claims-in-asp-net-core-1kk8
                 var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
+                    // Perfis dos usuários
                     Subject = new ClaimsIdentity( new Claim[]           // Linha inserida
                     {
                         new Claim("fruta","banana")
