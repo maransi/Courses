@@ -2509,8 +2509,13 @@ https://dev.to/eduardstefanescu/jwt-token-claims-in-asp-net-core-1kk8
         {
             public string GenerateToken( User user )
             {
+                // Classe responsável por gerar o token
                 var tokenHandler = new JwtSecurityTokenHandler();
+
+                // Nossa chave de validação do token
                 var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );
+
+                // Informações contidas no nosso token
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     // Perfis dos usuários
@@ -2518,10 +2523,14 @@ https://dev.to/eduardstefanescu/jwt-token-claims-in-asp-net-core-1kk8
                     {
                         new Claim("fruta","banana")
                     }),
+                    // Tempo de expiração do nosso token
                     Expires = DateTime.UtcNow.AddHours(8),
+                    // Credenciais para incriptar e desincriptar nosso token
                     SigningCredentials = new SigningCredentials( new SymetricSecurityKey( key ),
                                                                     SecurityAlgorithms.HmaShaSignature )
-                }
+                };
+
+                // Faz a criação do token
                 var token = tokenHandler.CreateToken( tokenDescriptor );
 
                 return tokenHandler.WriteToken( token );
@@ -2615,6 +2624,19 @@ Aula 47. Configurando Autenticação e Autorização
         app.UseAuthentication();    // Linha inserida   "Nessa ordem"
         app.UseAuthorization();     // Linha inserida   "Nessa ordem"
         ...
+
+    . Precisamos agora informar para aplicação que queremos trabalhar com autenticação, autorização e que 
+        o formato do Token é o JWT. Deste modo ela será capaz de descriptografar nosso Token a cada 
+        requisição, e conseguiremos definir quais perfis tem acesso a determinadas ações dos controladores.
+
+    . O primeiro passo é informar para o ASP.NET que estamos utilizando autenticação, e para isto utilizamos 
+        o recurso "AddAuthentication".
+
+    . Ao informar sobre a autenticação, já informamos também o tipo dela, neste caso JwtBearer e seu modelo 
+        de autenticação (Challenge). Neste caso, ambos ficam como padrão do "JwtBearer".
+
+    . Depois de dizer que vamos utilizar JwtBearer, precisamos configurá-lo, e isto é feito no método 
+        "AddJwtBearer".
 
 Aula 48. Testando a autenticação e autorização  (Revisar)
 ----------------------------------------------
