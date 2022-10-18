@@ -1,6 +1,9 @@
 Fundamentos ASP.NET 6 - Balta
 -----------------------------
 
+# Pasta de projetos do curso
+https://github.com/balta-io/2811
+
 https://dotnettutorials.net/course/asp-net-core-web-api-tutorials/
 
 
@@ -3339,7 +3342,6 @@ Aula 56. Organizando o Program
         {
             builder.Services.AddDbContext<BlogDataContext>();
             builder.Services.AddTransient<TokenService>();
-            builder.Services.AddTransient<EmailService>();
         }
 
     . Faça um rebuild da aplicação para ver se ficou algum erro:
@@ -3349,9 +3351,265 @@ Aula 56. Organizando o Program
         dotnet build
 
 
-Aula 57.   Como funciona o envio de E-mails
--------------------------------------------
+Aula 57.   Criando um serviço de envio de E-mails
+-------------------------------------------------
+
+    . Crie a classe "EmailService.cs" dentro da pasta "Services":
+
+        using System.Net;
+        using System.Net.Mail;
+
+        namespace Blog.Services;
+
+        public class EmailService
+        {
+            public bool Send(
+                string toName,
+                string toEmail,
+                string subject,
+                string body,
+                string fromName = "Equipe .Net",
+                string fromEmail = "maransi@gmail.com")
+            {
+                var smtpClient = new SmtpClient(Configuration.Smtp.Host, Configuration.Smtp.Port);
+
+                smtpClient.Credentials = new NetworkCredential(Configuration.Smtp.UserName, Configuration.Smtp.Password);
+                smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtpClient.EnableSsl = true;
+                var mail = new MailMessage();
+
+                mail.From = new MailAddress(fromEmail, fromName);
+                mail.To.Add(new MailAddress(toEmail, toName));
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
+
+                try
+                {
+                    smtpClient.Send(mail);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+        }
+
+    . Acesse o arquivo "Program.cs" e insira a linha abaixo:
+
+        ...
+        void ConfigureServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddDbContext<BlogDataContext>();
+            builder.Services.AddTransient<TokenService>();
+            builder.Services.AddTransient<EmailService>();      // Linha inserida
+        }
+        ...
+
+    . No arquivo "settings.json" temos o seguinte parâgrafo:
+
+        ...
+        "SmtpConfiguration": {
+            "Host": "smtp.sendgrid.net",
+            "Port": "587",
+            "UserName": "apikey",
+            "Password": "suasenha"
+        },
+        ...
+
+        . São os parâmetros necessários para o envio do email.
+
+Aula 58.  Enviando E-mail
+-------------------------
+
+    . Acesse a classe "AccountController" e insira as linhas abaixo:
+
+        [ApiController]
+        public class AccountController : ControllerBase
+        {
+            [HttpPost("v1/accounts/")]
+            public async Task<IActionResult> Post(
+                [FromBody] RegisterViewModel model,
+                [FromServices] BlogDataContext context,
+                [FromServices] EmailService emailService)       // Linha inserida
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
+
+                var user = new User
+                {
+                    Name = model.Name,
+                    Email = model.Email,
+                    Slug = model.Email.Replace("@", "-").Replace(".", "-")
+                };
+
+                var password = PasswordGenerator.Generate(25);
+                user.PasswordHash = PasswordHasher.Hash(password);
+
+                try
+                {
+                    await context.Users.AddAsync(user);
+                    await context.SaveChangesAsync();
+
+                    emailService.Send(user.Name, user.Email, "Bem vindo ao blog!", $"Sua senha é {password}");      // Linha inserida   Breakpoint
+
+                    return Ok(new ResultViewModel<dynamic>(new
+                    {
+                        user = user.Email, password
+                    }));
+                }
+                catch (DbUpdateException)
+                {
+                    return StatusCode(400, new ResultViewModel<string>("05X99 - Este E-mail já está cadastrado"));
+                }
+                catch
+                {
+                    return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+                }
+            }
+            ...
+        }
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: https://localhost:[porta]/v1/accounts
+        method: POST
+        Body.raw.json: true
+        Body.raw: { "email": "andre@balta.io",
+                    "name": "Andre Baltieri"
+                  }
+
+    . Execute o projeto e debug a aplicação na segunda linha inserida.
+
+    . Verifique se no email se chegou uma mensagem com a senha
+
+Aula 59.  Arquivos estáticos
+----------------------------
+
+    . Insira a linha abaixo no arquivo "Program.cs":
+
+        ...
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseStaticFiles();        // Linha inserida
+        app.MapControllers();
+        app.UseStaticFiles();
+        ...
+
+        . "app.UseStaticFiles" informa a aplicação que iremos renderizar arquivos estáticos, como: css, js, etc.
+
+    . Crie as pastas "wwwroot" e "wwwroot/images" na raiz do projeto
+
+        . A pasta "wwwroot" é o local onde a aplicação irá procurar os arquivos estáticos (js, css, etc)
+
+        . Não é aconselhável ter uma quantidade excessiva de arquivos estáticos (pdf, jpeg, etc) nessa pasta o ideal, ou
+            dentro da nossa aplicação, o ideal é ter um local especifico para isso no "Azure Storage". Acesse o link abaixo
+            com detalhes como fazer:
+
+            https://balta.io/blog/upload-imagem-azure-storage-csharp
+            https://www.youtube.com/watch?v=61r7A8drcN8
 
 
+Aula 60.  Upload de imagem
+--------------------------
+
+    . Crie dentro da pasta "ViewModels" a classe abaixo:
+
+        using System.ComponentModel.DataAnnotations;
+
+        namespace Blog.ViewModels;
+
+        public class UploadImageViewModel
+        {
+            [Required(ErrorMessage = "Imagem inválida")]
+            public string Base64Image { get; set; }
+        }
+
+    . Insira o método abaixo dentro da classe "AccountController":
+
+        ...
+        [Authorize]
+        [HttpPost("v1/accounts/upload-image")]
+        public async Task<IActionResult> UploadImage(
+            [FromBody] UploadImageViewModel model,
+            [FromServices] BlogDataContext context)
+        {
+            var fileName = $"{Guid.NewGuid().ToString()}.jpg";
+            var data = new Regex(@"^data:image\/[a-z]+;base64,").Replace(model.Base64Image, "");
+            var bytes = Convert.FromBase64String(data);
+
+            try
+            {
+                await System.IO.File.WriteAllBytesAsync($"wwwroot/images/{fileName}", bytes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+            }
+
+            var user = await context
+                .Users
+                .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if (user == null)
+                return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+
+            user.Image = $"https://localhost:0000/images/{fileName}";
+            try
+            {
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+            }
+
+            return Ok(new ResultViewModel<string>("Imagem alterada com sucesso!", null));
+        }
+        ...
+
+Aula 61.  Conclusão do Módulo
+-----------------------------
+
+    . Acesse a url abaixo:
+
+        https://elmah.io/tools/base64-image-encoder/    
+
+    . Clique no link "Choose a file or drag it here". Escolha uma imagem, abaixo verifique o conteúdo do campo "Base64 equivalent".
+
+    . Copie o conteúdo deste campo.
+
+    . Levante o projeto em modo debug e coloque um breakpoint na execução do método "AccountController.UploadImage"
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        method: POST
+        url: htt://localhost:[porta]/v1/accounts/login
+        body.raw:   
+                    {
+                        email: "batman@balta.io",
+                        password: "[senha gerada na aula anterior]
+                    }
+        body.json: true
+
+        . Retorne a aula "Aula 52. Gerando Tokens com Claims" para rever a geração do token
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/accounts/upload-image
+        method: POST
+        body.raw.json: true
+        body.raw: [Copia do conteúdo do campo "Base64 equivalent"]
+        header.Authorization: Bearer "token"
+
+    . Acesse a pasta "images" do nosso projeto e verifique se o arquivo foi copiado com sucesso.
+
+    . Acesse o navegador e execute a URL "http://localhost:[porta]/images/[nome do arquivo do item anterior]
 
 
+Performance
+-----------
+
+Aula 62. 
