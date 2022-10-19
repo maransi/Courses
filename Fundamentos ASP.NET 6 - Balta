@@ -3639,3 +3639,190 @@ Aula 62. Introdução
 Aula 63.  Impacto da utilização dos ViewModels
 ----------------------------------------------
 
+    . Crie a classe "PostController":
+
+        using Blog.Data;
+        using Blog.Models;
+        using Blog.ViewModels;
+        using Blog.ViewModels.Posts;
+        using Microsoft.AspNetCore.Mvc;
+        using Microsoft.EntityFrameworkCore;
+
+        namespace Blog.Controllers;
+
+        [ApiController]
+        public class PostController : ControllerBase
+        {
+            [HttpGet("v1/posts")]
+            public async Task<IActionResult> GetAsync(
+                [FromServices] BlogDataContext context,
+                [FromQuery] int page = 0,
+                [FromQuery] int pageSize = 25)
+            {
+                try
+                {
+                    var posts = await context
+                        .Posts
+                        .AsNoTracking()
+                        .Include(x => x.Author)
+                        .Include(x => x.Category)
+                        .Select(x => new ListPostsViewModel     
+                        {
+                            Id = x.Id,
+                            Title = x.Title,
+                            Slug = x.Slug,
+                            LastUpdateDate = x.LastUpdateDate,
+                            Category = x.Category.Name,
+                            Author = $"{x.Author.Name} ({x.Author.Email})"
+                        })
+                        .ToListAsync();
+                    return Ok(Posts);
+                }
+                catch
+                {
+                    return StatusCode(500, new ResultViewModel<List<Category>>("05X04 - Falha interna no servidor"));
+                }
+            }
+        }
+
+        . Podemos filtrar as infs que queremos através do método "Select" gerando o resultado final com objetos anônimo:
+            
+            ...
+            .Select( x => new {
+                x.Id,
+                x.Title
+            })
+            ...
+
+        . Ou, podemos usar o método "Select", utilizando um "ViewModel" como resultado:
+
+            ...
+            .Select(x => new ListPostsViewModel     
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Slug = x.Slug,
+                LastUpdateDate = x.LastUpdateDate,
+                Category = x.Category.Name,
+                Author = $"{x.Author.Name} ({x.Author.Email})"
+            })
+            ...
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts
+        method: GET
+
+
+Aula 64. Alterando a serialização padrão do ASP.NET
+---------------------------------------------------
+
+    . Comente o trecho de código como abaixo:
+
+        ...
+        try
+        {
+            var posts = await context
+                .Posts
+                .AsNoTracking()
+                .Include(x => x.Author)
+                .Include(x => x.Category)
+        //        .Select(x => new ListPostsViewModel     
+        //        {
+        //            Id = x.Id,
+        //            Title = x.Title,
+        //            Slug = x.Slug,
+        //            LastUpdateDate = x.LastUpdateDate,
+        //            Category = x.Category.Name,
+        //            Author = $"{x.Author.Name} ({x.Author.Email})"
+        //        })
+                .ToListAsync();
+            return Ok(Posts);
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("05X04 - Falha interna no servidor"));
+        }
+        ...
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts
+        method: GET
+
+        . Ocorrerá o seguinte erro:
+
+            System.Text.Json.JsonException - Devido ao objeto "Post" ser uma propriedade das listas "Author" e "Category"
+                                            acarretando em um loop de referência.
+
+    . Para resolver o erro acima, acesse a classe "Program.cs" e insira as linhas abaixo:
+
+        ...
+        void ConfigureMvc(WebApplicationBuilder builder)
+        {
+            builder.Services.AddMemoryCache();
+            builder.Services.AddResponseCompression(options =>
+            {
+                // options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+                // options.Providers.Add<CustomCompressionProvider>();
+            });
+            builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+            builder
+                .Services
+                .AddControllers()
+                .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; })
+                .AddJsonOptions(x =>                                                                            // Linha inserida
+                {                                                                                               // Linha inserida
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;                   // Linha inserida
+                    x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;    // Linha inserida
+                });                                                                                             // Linha inserida
+        }
+        ...
+
+        . x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; - Diretiva que impedi de ocorrer "loop" de objetos em json.
+
+        . x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault; - Suprime renderização de objetos nulos 
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts
+        method: GET
+
+        . Não dará mais erro
+
+    . Ao invés de utilizar a configuração acima para inativar o loop de objetos podemos utilizar a annotation
+        [JsonIgnore] como abaixo:
+
+        namespace Blog.Models
+        {
+            public class User
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public string Email { get; set; }
+
+                [JsonIgnore]
+                public string PasswordHash { get; set; }
+                public string Image { get; set; }
+                public string Slug { get; set; }
+                public string Bio { get; set; }
+
+                public IList<Post> Posts { get; set; }
+                public IList<Role> Roles { get; set; }
+            }
+        }
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts
+        method: GET
+
+        . Verifique que no nó "Author" não veio a propriedade "PasswordHash"
+
+Aula 65. Paginação de dados
+---------------------------
+
