@@ -3655,9 +3655,7 @@ Aula 63.  Impacto da utilização dos ViewModels
         {
             [HttpGet("v1/posts")]
             public async Task<IActionResult> GetAsync(
-                [FromServices] BlogDataContext context,
-                [FromQuery] int page = 0,
-                [FromQuery] int pageSize = 25)
+                [FromServices] BlogDataContext context)
             {
                 try
                 {
@@ -3826,3 +3824,102 @@ Aula 64. Alterando a serialização padrão do ASP.NET
 Aula 65. Paginação de dados
 ---------------------------
 
+    . Descomente o trecho de código como abaixo da classe "PostController":
+
+        ...
+        try
+        {
+            var posts = await context
+                .Posts
+                .AsNoTracking()
+                .Include(x => x.Author)
+                .Include(x => x.Category)
+        //        .Select(x => new ListPostsViewModel     
+        //        {
+        //            Id = x.Id,
+        //            Title = x.Title,
+        //            Slug = x.Slug,
+        //            LastUpdateDate = x.LastUpdateDate,
+        //            Category = x.Category.Name,
+        //            Author = $"{x.Author.Name} ({x.Author.Email})"
+        //        })
+                .ToListAsync();
+            return Ok(Posts);
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("05X04 - Falha interna no servidor"));
+        }
+        ...
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts
+        method: GET
+
+    . Insira as linhas abaixo no método "GetAsync":
+
+        ...
+        [HttpGet("v1/posts")]
+        public async Task<IActionResult> GetAsync(
+            [FromServices] BlogDataContext context,
+            [FromQuery] int page = 0,                   // Linha inserida
+            [FromQuery] int pageSize = 25)              // Linha inserida 
+        {
+            try
+            {
+                var count = await context.Posts.AsNoTracking().CountAsync();    // Linha inserida
+
+                var posts = await context
+                    .Posts
+                    .AsNoTracking()
+                    .Include(x => x.Author)
+                    .Include(x => x.Category)
+                    .Select(x => new ListPostsViewModel     
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        Slug = x.Slug,
+                        LastUpdateDate = x.LastUpdateDate,
+                        Category = x.Category.Name,
+                        Author = $"{x.Author.Name} ({x.Author.Email})"
+                    })
+                    .Skip( page * pageSize )                    // Linha inserida
+                    .Take( pageSize )                           // Linha inserida
+                    .OrderByDescending( x => x.LastUpdateDate ) // Linha inserida
+                    .ToListAsync();
+                
+                return Ok( new ResultViewModel<dynamic>( new        // Linha Alterada
+                    {
+                        total = count,
+                        page,
+                        pageSize,
+                        posts
+                    }
+                ));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<List<Category>>("05X04 - Falha interna no servidor"));
+            }
+        }
+        ...
+
+        . Testar [FromUri] no lugar do [FromQuery]
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts
+        method: GET
+
+        . Vira 25 registros por página, que é o default do "pageSize"
+
+    . Acesse o Postman e execute a rota abaixo e vá executando modificando o número da página ( page = 1,2,3,4,5,...):
+
+        url: http://localhost:[porta]/v1/posts?page=1&pageSize=2
+        method: GET
+
+        . Vira somente os registros da primeira página com 2 registros
+
+Aula 66. Filtrando dados
+------------------------
