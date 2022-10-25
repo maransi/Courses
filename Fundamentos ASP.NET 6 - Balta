@@ -4066,3 +4066,290 @@ Aula 67. Cache
 
 Aula 68. Compressão
 -------------------
+
+    . Através do "Header" da resposta é possível descobrir várias informações como:
+
+        Content-Type: aplication/json
+        Date: 
+
+    . Uma delas é o tipo 
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts?page=0&pageSize=1000
+        method: GET
+
+    . No "Body" da resposta verifique o tamanho da resposta "Size"
+
+    . Acesse a classe "Program.cs" e insira as linhas abaixo:
+
+        ...
+        using Microsoft.AspNetCore.ResponseCompression;                                 // Linha inserida
+        ...
+        var builder = WebApplication.CreateBuilder(args);
+        ConfigureAuthentication(builder);
+        ConfigureMvc(builder);
+        ConfigureServices(builder);
+
+        var app = builder.Build();
+        LoadConfiguration(app);
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.UseStaticFiles();
+        app.UseResponseCompression();                                                   // Linha inserida
+        app.Run();
+        ...
+        void ConfigureMvc(WebApplicationBuilder builder)
+        {
+            builder.Services.AddMemoryCache();
+
+            builder.Services.AddResponseCompression(options =>                          // Linha inserida
+            {
+                // options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+                // options.Providers.Add<CustomCompressionProvider>();
+            });
+            
+            builder.Services.Configure<GzipCompressionProviderOptions>(options =>       // Linha inserida
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+
+            builder
+                .Services
+                .AddControllers()
+                .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; })
+                .AddJsonOptions(x =>
+                {
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                });
+        }
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts?page=0&pageSize=1000
+        method: GET
+
+    . Verifique no "Body" da resposta se diminuiu o "Size" e se veio no "Header" a informação "Content-Encoding": "gzip".
+
+
+
+
+ASP.NET 5 (MIgração)
+--------------------
+
+Aula 69. Criando um projeto
+---------------------------
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        dotnet new webapi Blog2 -o Blog2 -f net5.0
+
+
+Aula 70. Estrutura do projeto
+-----------------------------
+
+    . A principal diferença entre um projeto net5.0 e net6.0 estão nos arquivos:
+
+        Program.cs
+        Startup.cs
+
+    . A classe "Program.cs" no "ne5.0" tem um par de chaves que abraça a estrutura de código do "public class ...":
+
+        namespace Blog2
+        {                               // Chave que amarra o corpo da classe
+            public class Program
+            {
+                ...
+            }
+        }
+
+    . Atualizando a referência do arquivo "csproj":
+
+        // Old
+        <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        </PropertyGroup>
+
+        // New
+        <PropertyGroup>
+            <TargetFramework>net6.0</TargetFramework>
+            <Nullable>enable</Nullable>                 <!-- Aula 11 -->
+            <ImplicitUsings>enable</ImplicitUsings>
+        </PropertyGroup>
+
+    . Atualizando as "Packages", dentro do "csproj":
+
+        // Old
+        <ItemGroup>
+            <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />
+            <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.11" />
+            <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+            <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.11">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            </PackageReference>
+            <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+        </ItemGroup>
+
+        // New
+        <ItemGroup>
+            <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+            <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.0" />
+            <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+            <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            </PackageReference>
+            <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        </ItemGroup>
+
+    . Atualizando o "namespace", foi retirado as chaves que abraça o corpo da classe:
+
+        // Old
+        namespace CoolApplication
+        {
+            public class User
+            {
+                public int Id { get; set; }
+
+                public string FirstName { get; set; }
+
+                public string LastName { get; set; }
+
+                public string Email { get; set; }
+        }
+        }
+
+        // New
+        namespace CoolApplication;
+
+        public class User
+        {
+            public int Id { get; set; }
+
+            public string FirstName { get; set; }
+
+            public string LastName { get; set; }
+
+            public string Email { get; set; }
+        }
+
+    . Migrar o conteúdo da classe "Startup.cs" para dentro do "Program.cs":
+
+        .Net 5 Startup Class
+
+            using Microsoft.AspNetCore.Builder;
+            using Microsoft.AspNetCore.Hosting;
+            using Microsoft.Extensions.Configuration;
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.Hosting;
+
+            namespace CoolApplication
+            {
+                public class Startup
+                {
+                    public Startup(IConfiguration configuration)
+                    {
+                        Configuration = configuration;
+                    }
+
+                    public IConfiguration Configuration { get; }
+
+                    // This method gets called by the runtime. Use this method to add services to the container.
+                    public void ConfigureServices(IServiceCollection services)
+                    {
+                        services.AddRazorPages();
+                    }
+
+                    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+                    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+                    {
+                        if (env.IsDevelopment())
+                        {
+                            app.UseDeveloperExceptionPage();
+                        }
+                        else
+                        {
+                            app.UseExceptionHandler("/Error");
+                            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                            app.UseHsts();
+                        }
+
+                        app.UseHttpsRedirection();
+                        app.UseStaticFiles();
+
+                        app.UseRouting();
+
+                        app.UseAuthorization();
+
+                        app.UseEndpoints(endpoints =>
+                        {
+                            endpoints.MapRazorPages();
+                        });
+                    }
+                }
+            }
+
+    .Net 5 Program.cs
+
+        using Microsoft.AspNetCore.Hosting;
+        using Microsoft.Extensions.Hosting;
+
+        namespace CoolApplication
+        {
+            public class Program
+            {
+                public static void Main(string[] args)
+                {
+                    CreateHostBuilder(args).Build().Run();
+                }
+
+                public static IHostBuilder CreateHostBuilder(string[] args) =>
+                    Host.CreateDefaultBuilder(args)
+                        .ConfigureWebHostDefaults(webBuilder =>
+                        {
+                            webBuilder.UseStartup<Startup>();
+                        });
+            }
+        }
+
+    . To .Net 6 Program.cs which contains everything
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+        builder.Services.AddRazorPages();
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Error");
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
+        }
+
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.MapRazorPages();
+
+        app.Run();
+
+
+
+Ambientes e Documentação
+------------------------
+
+Aula 71. Introdução
+-------------------
+
