@@ -3212,6 +3212,8 @@ Aula 54. Entendendo o AppSettings
         reservadas, principalmente em produção, onde ficará disponível o conteúdo do arquivo somente para
         a equipe de administração do servidor e não para outras como o desenvolvimento.
 
+    . Acesse o conteúdo das aulas 71 em diante para entender melhor o funcionamento do "AppSettings"
+
 Aula 55. Lendo o AppSettings
 ----------------------------
 
@@ -4066,3 +4068,428 @@ Aula 67. Cache
 
 Aula 68. Compressão
 -------------------
+
+    . Através do "Header" da resposta é possível descobrir várias informações como:
+
+        Content-Type: aplication/json
+        Date: 
+
+    . Uma delas é o tipo 
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts?page=0&pageSize=1000
+        method: GET
+
+    . No "Body" da resposta verifique o tamanho da resposta "Size"
+
+    . Acesse a classe "Program.cs" e insira as linhas abaixo:
+
+        ...
+        using Microsoft.AspNetCore.ResponseCompression;                                 // Linha inserida
+        ...
+        var builder = WebApplication.CreateBuilder(args);
+        ConfigureAuthentication(builder);
+        ConfigureMvc(builder);
+        ConfigureServices(builder);
+
+        var app = builder.Build();
+        LoadConfiguration(app);
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.UseStaticFiles();
+        app.UseResponseCompression();                                                   // Linha inserida
+        app.Run();
+        ...
+        void ConfigureMvc(WebApplicationBuilder builder)
+        {
+            builder.Services.AddMemoryCache();
+
+            builder.Services.AddResponseCompression(options =>                          // Linha inserida
+            {
+                // options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+                // options.Providers.Add<CustomCompressionProvider>();
+            });
+            
+            builder.Services.Configure<GzipCompressionProviderOptions>(options =>       // Linha inserida
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+
+            builder
+                .Services
+                .AddControllers()
+                .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; })
+                .AddJsonOptions(x =>
+                {
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                });
+        }
+
+    . Acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]/v1/posts?page=0&pageSize=1000
+        method: GET
+
+    . Verifique no "Body" da resposta se diminuiu o "Size" e se veio no "Header" a informação "Content-Encoding": "gzip".
+
+
+
+
+ASP.NET 5 (MIgração)
+--------------------
+
+Aula 69. Criando um projeto
+---------------------------
+
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        dotnet new webapi Blog2 -o Blog2 -f net5.0
+
+
+Aula 70. Estrutura do projeto
+-----------------------------
+
+    . A principal diferença entre um projeto net5.0 e net6.0 estão nos arquivos:
+
+        Program.cs
+        Startup.cs
+
+    . A classe "Program.cs" no "ne5.0" tem um par de chaves que abraça a estrutura de código do "public class ...":
+
+        namespace Blog2
+        {                               // Chave que amarra o corpo da classe
+            public class Program
+            {
+                ...
+            }
+        }
+
+    . Atualizando a referência do arquivo "csproj":
+
+        // Old
+        <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        </PropertyGroup>
+
+        // New
+        <PropertyGroup>
+            <TargetFramework>net6.0</TargetFramework>
+            <Nullable>enable</Nullable>                 <!-- Aula 11 -->
+            <ImplicitUsings>enable</ImplicitUsings>
+        </PropertyGroup>
+
+    . Atualizando as "Packages", dentro do "csproj":
+
+        // Old
+        <ItemGroup>
+            <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />
+            <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.11" />
+            <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+            <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.11">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            </PackageReference>
+            <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+        </ItemGroup>
+
+        // New
+        <ItemGroup>
+            <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+            <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.0" />
+            <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+            <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            </PackageReference>
+            <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        </ItemGroup>
+
+    . Atualizando o "namespace", foi retirado as chaves que abraça o corpo da classe:
+
+        // Old
+        namespace CoolApplication
+        {
+            public class User
+            {
+                public int Id { get; set; }
+
+                public string FirstName { get; set; }
+
+                public string LastName { get; set; }
+
+                public string Email { get; set; }
+        }
+        }
+
+        // New
+        namespace CoolApplication;
+
+        public class User
+        {
+            public int Id { get; set; }
+
+            public string FirstName { get; set; }
+
+            public string LastName { get; set; }
+
+            public string Email { get; set; }
+        }
+
+    . Migrar o conteúdo da classe "Startup.cs" para dentro do "Program.cs":
+
+        .Net 5 Startup Class
+
+            using Microsoft.AspNetCore.Builder;
+            using Microsoft.AspNetCore.Hosting;
+            using Microsoft.Extensions.Configuration;
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.Hosting;
+
+            namespace CoolApplication
+            {
+                public class Startup
+                {
+                    public Startup(IConfiguration configuration)
+                    {
+                        Configuration = configuration;
+                    }
+
+                    public IConfiguration Configuration { get; }
+
+                    // This method gets called by the runtime. Use this method to add services to the container.
+                    public void ConfigureServices(IServiceCollection services)
+                    {
+                        services.AddRazorPages();
+                    }
+
+                    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+                    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+                    {
+                        if (env.IsDevelopment())
+                        {
+                            app.UseDeveloperExceptionPage();
+                        }
+                        else
+                        {
+                            app.UseExceptionHandler("/Error");
+                            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                            app.UseHsts();
+                        }
+
+                        app.UseHttpsRedirection();
+                        app.UseStaticFiles();
+
+                        app.UseRouting();
+
+                        app.UseAuthorization();
+
+                        app.UseEndpoints(endpoints =>
+                        {
+                            endpoints.MapRazorPages();
+                        });
+                    }
+                }
+            }
+
+    .Net 5 Program.cs
+
+        using Microsoft.AspNetCore.Hosting;
+        using Microsoft.Extensions.Hosting;
+
+        namespace CoolApplication
+        {
+            public class Program
+            {
+                public static void Main(string[] args)
+                {
+                    CreateHostBuilder(args).Build().Run();
+                }
+
+                public static IHostBuilder CreateHostBuilder(string[] args) =>
+                    Host.CreateDefaultBuilder(args)
+                        .ConfigureWebHostDefaults(webBuilder =>
+                        {
+                            webBuilder.UseStartup<Startup>();
+                        });
+            }
+        }
+
+    . To .Net 6 Program.cs which contains everything
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+        builder.Services.AddRazorPages();
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Error");
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
+        }
+
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.MapRazorPages();
+
+        app.Run();
+
+    . Nas primeiras versões do ASP.NET Core a configuração era feita no arquivo Startup.cs. A partir da versão 6 a configuração está embutida 
+        no método "WebApplication.CreateBuilder(args);" no "Progam.cs"
+
+
+
+Ambientes e Documentação
+------------------------
+
+Aula 71. Configurações de Debug
+-------------------------------
+
+    . Ao criar um site ASP.NET Core é criado um arquivo chamado appsettings.json, que contém informações do projeto.
+
+    . Podemos ter versões desse arquivo de acordo com o ambiente que o projeto atuará
+
+        appsetings.json
+        appsettings.Development.json
+
+    . O .Net tenta encontrar as informações inicialmente no "appsettings.Development.json", senão conseguir procura no "appsettings.json".
+
+    . Em versões anteriores do .Net as informações desses arquivos ficavam nos arquivos:
+
+        web.config 
+        app.config
+
+    . A variável env.EnvironmentName vai conter o valor que foi setado na EnvironmentVariable ASPNETCORE_ENVIRONMENT. Essa pode ser alterado 
+        no arquivo launchSettings.json na pasta Properties. Ou no próprio ambiente:
+
+        $ export ASPNETCORE_ENVIRONMENT=Development
+    
+
+        . O ASP.NET Core usa uma variável de ambiente chamada ASPNETCORE_ENVIRONMENT para indicar o ambiente. O valor pode ser qualquer coisa. 
+            Por default seu valor é Development, Staging ou Production.
+
+        . O valor não diferencia maiúsculas de minúsculas no Windows e Mac OS, mas diferencia maiúsculas de minúsculas no Linux. 
+
+        . Dentro do Visual Studio, é possível alterar o valor das variáveis de ambiente. Em propriedades do projeto > Debug.
+
+    . O AppSettings é construido em Layers. Geralmente segue esta sequencia, pois é auto-configurado no WebHost.
+
+        . A arquivo appsettings.json que está na pasta raiz do projeto.
+        . O arquivo na raiz concatenado com .{Variável ambiental ASPNETCORE_ENVIRONMENT}.json, por exemplo appsettings.Development.json
+        . User Secrets (Um arquivo de configuração que é criado pelo Visual Studio e que fica apenas na maquina de desenvolvedor)
+        . Váriaveis de ambiente
+        . Váriaveis dos argumentos passados na inicialização via linha de comando.
+
+    . O User Secrets permite guardar informações sensíveis sem a necessidade de colocar no projeto. Dessa forma o arquivo fica fora do 
+        controle de versões. Apenas na máquina do desenvolvedor.
+
+    . Configurando o User Secrets
+
+        . Se você estiver usando o Visual Studio para adicionar o User Secrets basta clicar com o botão direito do mouse no projeto e 
+            selecionar a opção Manage User Secrets.
+
+        . O arquivo será salvo na máquina local. O caminho será %USERPROFILE%\AppData\Roaming\Microsoft\UserSecrets\. Além disso, será 
+            adicionado uma chave no arquivo csproj.    
+
+            <PropertyGroup>
+                <TargetFramework>net6.0</TargetFramework>
+                <Nullable>enable</Nullable>                 
+                <ImplicitUsings>enable</ImplicitUsings>
+                <UserSecretsId>aspnet-jpproject-04c</UserSecretsId>         <!-- Configuração salva -->
+            </PropertyGroup>
+
+    . Acesse o arquivo "appsettings.json" e insira a linha abaixo:
+
+        { 
+            "Env": "prod",                   // Linha inserida
+            "JwtKey": "Zlasdjçlasjlasj",
+            ...
+        }
+
+    . Acesse o arquivo "appsettings.Development.json" e insira a linha abaixo:
+
+        { 
+            "Env": "dev",                   // Linha inserida
+            ...
+        }
+
+    . Acesse a classe "HomeController.cs" e faça as alterações abaixo:
+
+        namespace Blog.Controllers
+        {
+            [ApiController]
+            [Route("")]
+            public class HomeController: ControllerBase
+            {
+                [HttpGet("")]
+                public IActionResult Get( [FromServices] IConfiguration config)        // Linha alterada
+                {
+                    vr env = config.GetValue<string>( "Env" );                         // Linha inserida
+
+                    return Ok( new                                                      // Linha alterada
+                                {
+                                    enviroment: env
+                                });
+                }
+            }
+        }
+
+    . Levante o projeto, acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]
+        method: GET
+
+        . O resultado apontará para o valor "dev"
+
+Aula 72. Compilando em modo release
+-----------------------------------
+
+    .A geração dos arquivos pelo compilador, em modo Debug, é gerar o máximo de informações possível para facilitar o trabalho de depuração:
+
+        $ dotnet build
+
+        . Em função disso, poucas otimizações são implementadas tanto no processo de compilação do código-fonte em Intermediate 
+            Language, quanto no processo que compila o código em Intermediate Language em binário (pelo JIT).
+
+        . Ao executar o comando acima o compilador cria uma seria de arquivos na pasta:
+
+            /{pasta do projeto}/bin/Debug
+
+
+    . A informação de stack trace gerada em modo Debug é mais rica. Afinal, os arquivos PDB (Program Database files) são muito mais ricos.
+
+    . No modo Release, o código é submetido a otimização pelo JIT e muito deste código pode deixar de existir ou pode ser reescrito pelo 
+        processo de otimização, consumindo também menos memória em runtime:
+
+        $ dotnet build -c Release
+
+        . Ao executar o comando acima o compilador cria uma seria de arquivos na pasta:
+
+            /{pasta do projeto}/bin/Net6.0/Release
+
+    . Execute o arquivo "/{pasta do projeto}/bin/Net6.0/Release/Blog.exe
+
+    . Levante o projeto, acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]
+        method: GET
+
+        . O resultado apontará para o valor "prod"
+
+
+Aula 73.  Entendendo o LaunchSettings
+-------------------------------------
+
