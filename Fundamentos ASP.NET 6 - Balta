@@ -3212,6 +3212,8 @@ Aula 54. Entendendo o AppSettings
         reservadas, principalmente em produção, onde ficará disponível o conteúdo do arquivo somente para
         a equipe de administração do servidor e não para outras como o desenvolvimento.
 
+    . Acesse o conteúdo das aulas 71 em diante para entender melhor o funcionamento do "AppSettings"
+
 Aula 55. Lendo o AppSettings
 ----------------------------
 
@@ -4345,11 +4347,149 @@ Aula 70. Estrutura do projeto
 
         app.Run();
 
+    . Nas primeiras versões do ASP.NET Core a configuração era feita no arquivo Startup.cs. A partir da versão 6 a configuração está embutida 
+        no método "WebApplication.CreateBuilder(args);" no "Progam.cs"
+
 
 
 Ambientes e Documentação
 ------------------------
 
-Aula 71. Introdução
--------------------
+Aula 71. Configurações de Debug
+-------------------------------
+
+    . Ao criar um site ASP.NET Core é criado um arquivo chamado appsettings.json, que contém informações do projeto.
+
+    . Podemos ter versões desse arquivo de acordo com o ambiente que o projeto atuará
+
+        appsetings.json
+        appsettings.Development.json
+
+    . O .Net tenta encontrar as informações inicialmente no "appsettings.Development.json", senão conseguir procura no "appsettings.json".
+
+    . Em versões anteriores do .Net as informações desses arquivos ficavam nos arquivos:
+
+        web.config 
+        app.config
+
+    . A variável env.EnvironmentName vai conter o valor que foi setado na EnvironmentVariable ASPNETCORE_ENVIRONMENT. Essa pode ser alterado 
+        no arquivo launchSettings.json na pasta Properties. Ou no próprio ambiente:
+
+        $ export ASPNETCORE_ENVIRONMENT=Development
+    
+
+        . O ASP.NET Core usa uma variável de ambiente chamada ASPNETCORE_ENVIRONMENT para indicar o ambiente. O valor pode ser qualquer coisa. 
+            Por default seu valor é Development, Staging ou Production.
+
+        . O valor não diferencia maiúsculas de minúsculas no Windows e Mac OS, mas diferencia maiúsculas de minúsculas no Linux. 
+
+        . Dentro do Visual Studio, é possível alterar o valor das variáveis de ambiente. Em propriedades do projeto > Debug.
+
+    . O AppSettings é construido em Layers. Geralmente segue esta sequencia, pois é auto-configurado no WebHost.
+
+        . A arquivo appsettings.json que está na pasta raiz do projeto.
+        . O arquivo na raiz concatenado com .{Variável ambiental ASPNETCORE_ENVIRONMENT}.json, por exemplo appsettings.Development.json
+        . User Secrets (Um arquivo de configuração que é criado pelo Visual Studio e que fica apenas na maquina de desenvolvedor)
+        . Váriaveis de ambiente
+        . Váriaveis dos argumentos passados na inicialização via linha de comando.
+
+    . O User Secrets permite guardar informações sensíveis sem a necessidade de colocar no projeto. Dessa forma o arquivo fica fora do 
+        controle de versões. Apenas na máquina do desenvolvedor.
+
+    . Configurando o User Secrets
+
+        . Se você estiver usando o Visual Studio para adicionar o User Secrets basta clicar com o botão direito do mouse no projeto e 
+            selecionar a opção Manage User Secrets.
+
+        . O arquivo será salvo na máquina local. O caminho será %USERPROFILE%\AppData\Roaming\Microsoft\UserSecrets\. Além disso, será 
+            adicionado uma chave no arquivo csproj.    
+
+            <PropertyGroup>
+                <TargetFramework>net6.0</TargetFramework>
+                <Nullable>enable</Nullable>                 
+                <ImplicitUsings>enable</ImplicitUsings>
+                <UserSecretsId>aspnet-jpproject-04c</UserSecretsId>         <!-- Configuração salva -->
+            </PropertyGroup>
+
+    . Acesse o arquivo "appsettings.json" e insira a linha abaixo:
+
+        { 
+            "Env": "prod",                   // Linha inserida
+            "JwtKey": "Zlasdjçlasjlasj",
+            ...
+        }
+
+    . Acesse o arquivo "appsettings.Development.json" e insira a linha abaixo:
+
+        { 
+            "Env": "dev",                   // Linha inserida
+            ...
+        }
+
+    . Acesse a classe "HomeController.cs" e faça as alterações abaixo:
+
+        namespace Blog.Controllers
+        {
+            [ApiController]
+            [Route("")]
+            public class HomeController: ControllerBase
+            {
+                [HttpGet("")]
+                public IActionResult Get( [FromServices] IConfiguration config)        // Linha alterada
+                {
+                    vr env = config.GetValue<string>( "Env" );                         // Linha inserida
+
+                    return Ok( new                                                      // Linha alterada
+                                {
+                                    enviroment: env
+                                });
+                }
+            }
+        }
+
+    . Levante o projeto, acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]
+        method: GET
+
+        . O resultado apontará para o valor "dev"
+
+Aula 72. Compilando em modo release
+-----------------------------------
+
+    .A geração dos arquivos pelo compilador, em modo Debug, é gerar o máximo de informações possível para facilitar o trabalho de depuração:
+
+        $ dotnet build
+
+        . Em função disso, poucas otimizações são implementadas tanto no processo de compilação do código-fonte em Intermediate 
+            Language, quanto no processo que compila o código em Intermediate Language em binário (pelo JIT).
+
+        . Ao executar o comando acima o compilador cria uma seria de arquivos na pasta:
+
+            /{pasta do projeto}/bin/Debug
+
+
+    . A informação de stack trace gerada em modo Debug é mais rica. Afinal, os arquivos PDB (Program Database files) são muito mais ricos.
+
+    . No modo Release, o código é submetido a otimização pelo JIT e muito deste código pode deixar de existir ou pode ser reescrito pelo 
+        processo de otimização, consumindo também menos memória em runtime:
+
+        $ dotnet build -c Release
+
+        . Ao executar o comando acima o compilador cria uma seria de arquivos na pasta:
+
+            /{pasta do projeto}/bin/Net6.0/Release
+
+    . Execute o arquivo "/{pasta do projeto}/bin/Net6.0/Release/Blog.exe
+
+    . Levante o projeto, acesse o Postman e execute a rota abaixo:
+
+        url: http://localhost:[porta]
+        method: GET
+
+        . O resultado apontará para o valor "prod"
+
+
+Aula 73.  Entendendo o LaunchSettings
+-------------------------------------
 
