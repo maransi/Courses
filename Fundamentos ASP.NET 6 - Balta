@@ -4385,6 +4385,8 @@ Aula 71. Configurações de Debug
 
         . Dentro do Visual Studio, é possível alterar o valor das variáveis de ambiente. Em propriedades do projeto > Debug.
 
+        . TESTAR: https://www.tektutorialshub.com/asp-net-core/aspnetcore_environment-variable-in-asp-net-core/
+
     . O AppSettings é construido em Layers. Geralmente segue esta sequencia, pois é auto-configurado no WebHost.
 
         . A arquivo appsettings.json que está na pasta raiz do projeto.
@@ -4487,9 +4489,51 @@ Aula 72. Compilando em modo release
         url: http://localhost:[porta]
         method: GET
 
-        . O resultado apontará para o valor "prod"
+        . O resultado apontará para o valor "prod". Por ser uma versão de Release, as informações a ser consultadas será o arquivo 
+            "appsettings.json"
 
 
 Aula 73.  Entendendo o LaunchSettings
 -------------------------------------
+
+    . O arquivo "launchSettings.json" é usado para armazenar configurações das informações do projeto, como porta, ambiente, etc.
+        Contém configurações necessárias para executar a aplicação.
+
+    . Para mudar a porta da aplicação, podemos fazer essas alterações no arquivo "Properties/launchSettings.json"
+
+
+        // Alterar o json abaixo pelo da aplicação
+        {
+            "iisSettings": {
+                "windowsAuthentication": false,
+                "anonymousAuthentication": true,
+                "iisExpress": {
+                "applicationUrl": "http://localhost:57367",
+                "sslPort": 44331
+                }
+            },
+            "profiles": {
+                "IIS Express": {
+                "commandName": "IISExpress",
+                "launchBrowser": true,
+                "environmentVariables": {
+                    "ASPNETCORE_ENVIRONMENT": "Development"
+                }
+                },
+                "LaunchSettingsExample": {
+                "commandName": "Project",
+                "launchBrowser": true,
+                "applicationUrl": "https://localhost:5001;http://localhost:5000",       // Testar a mudança da porta nesta propriedade
+                "environmentVariables": {
+                    "ASPNETCORE_ENVIRONMENT": "Development"
+                }
+                }
+            }
+        }
+
+    . Observe que podemos configurar a variável ambiental "ASPNETCORE_ENVIRONMENT" dentro do "launchSettings.json".
+
+
+Aula 74. IsDevelopment
+----------------------
 
