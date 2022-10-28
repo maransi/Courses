@@ -4537,3 +4537,264 @@ Aula 73.  Entendendo o LaunchSettings
 Aula 74. IsDevelopment
 ----------------------
 
+    . O método "IsDeveloment()" está relacionado a variável ambiental "ASPNETCORE_ENVIROMENT".
+
+    . Além do "IsDevelopment()" existem:
+
+        IsDevelopment()
+        IsStating()
+        IsEnvironment() 
+        IsProduction()
+
+    . Acesse o arquivo "Program.cs" e insira a linha abaixo:
+
+       ...
+       app.UseResponseCompression();
+
+       if ( app.Enviroment.IsDevelopment() )                                // IF Inserido
+       {
+            Console.WriteLine("Estou no ambiente de desenvolvimento");
+       }
+
+       app.Run();
+
+    . Levante o projeto e verifique se a mensagem "Estou em ambiente de desenvolvimento" foi exibida.
+
+    . Faça a alteração abaixo no arquivo "Program.cs":
+
+       ...
+       app.UseResponseCompression();
+
+       if ( app.Enviroment.IsProduction() )                                // Linha Alterado
+       {
+            Console.WriteLine("Estou no ambiente de produção");
+       }
+
+       app.Run();
+
+    . Levante novamente o projeto e verifique se a mensagem "Estou em ambiente de produção" foi exibida.
+
+    . Esse recurso é interessante para deixar o Swagger somente disponível para o ambiente de desenvolvimento.
+
+    . Exemplos:
+
+        if (app.Enviroment.IsEnvironment("Development"))
+            {
+                // code to be executed in development environment 
+
+            }
+
+            if (app.Enviroment.IsDevelopment())
+            {
+                // code to be executed in development environment 
+
+            }
+
+            if (app.Enviroment.IsStaging())
+            {
+                // code to be executed in staging environment 
+
+            }
+
+            if (app.Enviroment.IsProduction())
+            {
+                // code to be executed in production environment 
+
+            }
+        } 
+
+
+Aula 75. Forçando HTTPS
+-----------------------
+
+    . As várias configurações possíveis dentro do "Program.cs"
+
+        if (app.Enviroment.IsDevelopment())
+        {
+            // Quando executado em desenvolvimento:
+            //   Utiliza Developer Exception Page para reportar erros.
+            //   Utiliza Database Error Page para reportar erros do banco.
+            app.UseDeveloperExceptionPage();
+            app.UseDatabaseErrorPage();
+        }
+        else
+        {
+            // Quando não estiver em produção:
+            //   Habilita o middleware Exception Handler Middleware para pegar os erros.
+            //   Utiliza o middleware que habilita o 
+            //       HTTP Strict Transport Security Protocol (HSTS)
+            app.UseExceptionHandler("/Error");
+            app.UseHsts();
+        }
+
+        // Utiliza o middleware HTTPS Redirection que redireciona solicitações HTTP para HTTPS.
+        // -----------------------------------------------------------------------------------
+        app.UseHttpsRedirection();
+
+        // Retorna arquivos estáticos e interrompe o pipeline.
+        app.UseStaticFiles();
+
+        // Utiliza o middleware Cookie Policy, que está em conformidade com 
+        // as regras do GDPR (General Data Protection Regulation).
+        app.UseCookiePolicy();
+
+        // Autentica antes de utilizar os recursos.
+        app.UseAuthentication();
+
+        // Se o aplicativo utiliza sessão, chama o middleware Session depois do middleware 
+        // Cookie Policy e antes do middleware MVC.
+        app.UseSession();
+
+        // Adiciona MVC ao pipeline da solicitação
+        app.UseMvc();
+
+    . app.UseHttpsRedirection() - Habilita o desvio das chamadas http para https
+
+
+Aula 76. Connection strings
+---------------------------
+
+    . Acesse o arquivo "appsettings.json" e insira a linha abaixo:
+
+        {
+            "Env": "prod",
+            "ConnectionStrings": {              // Nô incluido
+                "DefaultConnection": ""Server=localhost,1433;Database=Blog;User ID=sa;Password=<password>""
+            },
+            ...
+        }
+
+
+    . Acesse o arquivo "Program.cs" e faça as alterações abaixo:
+
+        ...
+        void ConfigureServices(WebApplicationBuilder builder)
+        {
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");      // Linha inserida
+            builder.Services.AddDbContext<BlogDataContext>(
+                options => options.UseSqlServer(connectionString));    // Linha alterada
+            builder.Services.AddTransient<TokenService>();
+            builder.Services.AddTransient<EmailService>();
+        }
+        ...
+
+    . Acesse a classe "BlogDataContext.cs" e faça as alterações abaixo:
+
+
+        using Blog.Data.Mappings;
+        using Blog.Models;
+        using Microsoft.EntityFrameworkCore;
+
+        namespace Blog.Data
+        {
+            public class BlogDataContext : DbContext
+            {
+
+                public BlogDataContext(DbContextOptions<BlogDataContext> options)               // Construtor inserido
+                            : base(options)
+                {
+
+                }
+
+                public DbSet<Category> Categories { get; set; }
+                public DbSet<Post> Posts { get; set; }
+                public DbSet<User> Users { get; set; }
+
+                /*                                                                                   Elimine essas linhas
+                protected override void OnConfiguring(DbContextOptionsBuilder options)
+                    => options.UseSqlServer("Server=localhost,1433;Database=Blog;User ID=sa;Password=1q2w3e4r@#$");
+                */
+
+                protected override void OnModelCreating(ModelBuilder modelBuilder)
+                {
+                    modelBuilder.ApplyConfiguration(new CategoryMap());
+                    modelBuilder.ApplyConfiguration(new UserMap());
+                    modelBuilder.ApplyConfiguration(new PostMap());
+                }
+            }
+        }
+
+    . Levante o projeto e execute a rota abaixo no Postman:
+
+        url: localhost:[porta]/v1/categories
+        method: GET
+
+
+Aula 77. Open API
+-----------------
+
+    . Open API, ou API Aberta, é uma API de código aberto disponível para outras empresas e desenvolvedores.
+
+    . Um dos principais benefícios de usar o OpenAPI é a documentação; Quando você tem um documento da OpenAPI que descreve a API, 
+        é fácil gerar documentação de referência para a API
+
+    . OpenAPI é a especificação
+
+    . Swagger é a ferramenta que implementa a especificação. Ela inclui:   
+
+        Swagger Editor:                     Swagger Editor lets you edit OpenAPI specifications in YAML inside your browser and to preview 
+                                            documentations in real time.
+        Swagger UI:                         Swagger UI is a collection of HTML, Javascript, and CSS assets that dynamically generate beautiful 
+                                            documentation from an OAS-compliant API.
+        Swagger Codegen:                    Allows generation of API client libraries (SDK generation), server stubs and documentation 
+                                            automatically given an OpenAPI Spec.
+        Swagger Parser:                     Standalone library for parsing OpenAPI definitions from Java
+        Swagger Core:                       Java-related libraries for creating, consuming, and working with OpenAPI definitions
+        Swagger Inspector (free):           API testing tool that lets you validate your APIs & generate OpenAPI definitions from an existing API
+        SwaggerHub (free and commercial):   API design and documentation, built for teams working with OpenAPI.
+
+    . Sites interessantes para pesquisa:
+
+        https://www.openapis.org
+
+        https://www.swagger.io
+
+    . Acesse o terminal e execute o comando abaixo:
+
+        dotnet add package Swashbuckle.AspNetCore    
+
+    . Acesse o arquivo "Program.cs" e implemente as linhas abaixo:
+
+        ...
+        var builder = WebApplication.CreateBuilder(args);
+        ConfigureAuthentication(builder);
+        ConfigureMvc(builder);
+        ConfigureServices(builder);
+
+        builder.Services.AddEndpointsApiExplorer();         // Linha inserida
+        builder.Services.AddSwaggerGen();                   // Linha inserida
+
+        var app = builder.Build();
+        LoadConfiguration(app);
+
+        app.UseHttpsRedirection();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.UseStaticFiles();
+        app.UseResponseCompression();
+
+        if (app.Environment.IsDevelopment())
+        {
+            // Console.WriteLine("Estou no ambiente de desenvolvimento");       // Linha apagada
+            app.UseSwagger();                               // Linha inserida
+            app.UseSwaggerUI();                             // Linha inserida
+        }
+
+        app.Run();
+        ...
+
+    . Levante o projeto e execute a URL abaixo no navegador:
+
+        http://localhost:[porta]/swagger/index.html
+
+    . Expanda o item "v1/accounts", clique em "Try it out" e altere os parâmetro como abaixo:
+
+        {
+            "name": "Bruce Wayne",
+            "email": "batman@balta.io"
+        }
+
+    . Acione o botão "Execute"
+
+    
