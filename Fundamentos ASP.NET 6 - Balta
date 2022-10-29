@@ -3201,7 +3201,6 @@ Aula 53. Implementando um ApiKey
 
 
 
-// PAREI AQUI
 Aula 54. Entendendo o AppSettings
 ---------------------------------
 
@@ -3263,18 +3262,21 @@ Aula 55. Lendo o AppSettings
         ...
         builder.Services.AddTransient<TokenService>();
 
+        var app = builder.Build();
+
         Configuration.JwtKey = app.Configuration.GetValue<string>( "JwtKey" );              // Linha Inserida
         Configuration.ApiKeyName = app.Configuration.GetValue<string>( "ApiKeyName" );      // Linha Inserida
         Configuration.ApiKey =app.Configuration.GetValue<string>( "ApiKey" );               // Linha Inserida
 
         var smtp = new Configuration.SmtpConfiguration();                                   // Linha Inserida
-        app.Configuration.GetSection( "Smtp" ).bind( smtp );                                // Linha Inserida
+        app.Configuration.GetSection( "Smtp" ).Bind( smtp );                                // Linha Inserida
         Configuration.Smtp = smtp;                                                          // Linha Inserida
         ...
 
-        . ATENÇÃO: Ao implementar e testar o código acima verifique se o conteúdo das linhas
-                    adicionadas no "Programs.cs" virá do arquivo "json", ou da classe "Configuration.cs"
+        . app.Configuration.GetValue<string>( "JwtKey" ) - Busca o conteúdo do nô de dentro de "appsettings.json"
 
+
+// PAREI AQUI
 Aula 56. Organizando o Program
 ------------------------------
 
@@ -4367,7 +4369,7 @@ Aula 71. Configurações de Debug
 
     . O .Net tenta encontrar as informações inicialmente no "appsettings.Development.json", senão conseguir procura no "appsettings.json".
 
-    . Em versões anteriores do .Net as informações desses arquivos ficavam nos arquivos:
+    . Em versões anteriores do .Net as informações desse arquivo ficava nos arquivos:
 
         web.config 
         app.config
