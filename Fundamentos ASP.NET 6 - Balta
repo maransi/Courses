@@ -3276,7 +3276,6 @@ Aula 55. Lendo o AppSettings
         . app.Configuration.GetValue<string>( "JwtKey" ) - Busca o conteúdo do nô de dentro de "appsettings.json"
 
 
-// PAREI AQUI
 Aula 56. Organizando o Program
 ------------------------------
 
@@ -3358,6 +3357,10 @@ Aula 56. Organizando o Program
 Aula 57.   Criando um serviço de envio de E-mails
 -------------------------------------------------
 
+    . Acesse a pasta raiz do projeto e execute o comando abaixo:
+
+        $ dotnet add package SendGrid
+
     . Crie a classe "EmailService.cs" dentro da pasta "Services":
 
         using System.Net;
@@ -3411,7 +3414,7 @@ Aula 57.   Criando um serviço de envio de E-mails
         }
         ...
 
-    . No arquivo "settings.json" temos o seguinte parâgrafo:
+    . No arquivo "appSettings.json" temos o seguinte parâgrafo:
 
         ...
         "SmtpConfiguration": {
@@ -3488,6 +3491,7 @@ Aula 58.  Enviando E-mail
 
     . Verifique se no email se chegou uma mensagem com a senha
 
+// PAREI AQUI
 Aula 59.  Arquivos estáticos
 ----------------------------
 
