@@ -3619,7 +3619,6 @@ Aula 61.  Conclusão do Módulo
     . Acesse o navegador e execute a URL "http://localhost:[porta]/images/[nome do arquivo do item anterior]
 
 
-// PAREI AQUI
 Performance
 -----------
 
@@ -3629,6 +3628,9 @@ Aula 62. Introdução
     . Acesse o link abaixo e baixe os arquivos existentes lá: *.bacpac e o json
 
         https://github.com/balta-io/2811/tree/main/Modulo%206/Scripts
+
+    . No Azure Data Studio, verifique se está instalado  a extensão "Admin Pack for SQL Server". Instale para ter acesso ao 
+        "Data Tier Application Wizard".
 
     . No Azure Data Studio, clique com o botão direito sobre o item "Databases" e escolha a opção "Data tier Application wizard"
 
@@ -3649,6 +3651,21 @@ Aula 62. Introdução
 
 Aula 63.  Impacto da utilização dos ViewModels
 ----------------------------------------------
+
+    . Insira a classe abaixo na pasta "ViewModels":
+
+        namespace Blog.ViewModels.Posts;
+
+        public class ListPostsViewModel
+        {
+            public int Id { get; set; }
+            public string Title { get; set; }
+            public string Slug { get; set; }
+            public DateTime LastUpdateDate { get; set; }
+            public string Category { get; set; }
+            public string Author { get; set; }
+        }
+
 
     . Crie a classe "PostController":
 
@@ -3685,7 +3702,7 @@ Aula 63.  Impacto da utilização dos ViewModels
                             Author = $"{x.Author.Name} ({x.Author.Email})"
                         })
                         .ToListAsync();
-                    return Ok(Posts);
+                    return Ok(posts);
                 }
                 catch
                 {
@@ -3766,6 +3783,10 @@ Aula 64. Alterando a serialização padrão do ASP.NET
 
     . Para resolver o erro acima, acesse a classe "Program.cs" e insira as linhas abaixo:
 
+        using Microsoft.AspNetCore.ResponseCompression;
+        using System.IO.Compression;
+        using System.Text.Json.Serialization;
+
         ...
         void ConfigureMvc(WebApplicationBuilder builder)
         {
@@ -3803,8 +3824,10 @@ Aula 64. Alterando a serialização padrão do ASP.NET
 
         . Não dará mais erro
 
-    . Ao invés de utilizar a configuração acima para inativar o loop de objetos podemos utilizar a annotation
-        [JsonIgnore] como abaixo:
+    . Podemos retirar alguma informação, ou propriedade, do json criado, como por exemplo a proprieade "PasswordHash"
+        com a annotation [JsonIgnore]
+
+        using System.Text.Json.Serialization;     // Linha inserida
 
         namespace Blog.Models
         {
@@ -3814,7 +3837,7 @@ Aula 64. Alterando a serialização padrão do ASP.NET
                 public string Name { get; set; }
                 public string Email { get; set; }
 
-                [JsonIgnore]
+                [JsonIgnore]                                // Linha inserida
                 public string PasswordHash { get; set; }
                 public string Image { get; set; }
                 public string Slug { get; set; }
@@ -3832,6 +3855,8 @@ Aula 64. Alterando a serialização padrão do ASP.NET
 
         . Verifique que no nó "Author" não veio a propriedade "PasswordHash"
 
+
+// PAREI AQUI
 Aula 65. Paginação de dados
 ---------------------------
 
