@@ -3491,7 +3491,6 @@ Aula 58.  Enviando E-mail
 
     . Verifique se no email se chegou uma mensagem com a senha
 
-// PAREI AQUI
 Aula 59.  Arquivos estáticos
 ----------------------------
 
@@ -3511,8 +3510,8 @@ Aula 59.  Arquivos estáticos
 
         . A pasta "wwwroot" é o local onde a aplicação irá procurar os arquivos estáticos (js, css, etc)
 
-        . Não é aconselhável ter uma quantidade excessiva de arquivos estáticos (pdf, jpeg, etc) nessa pasta o ideal, ou
-            dentro da nossa aplicação, o ideal é ter um local especifico para isso no "Azure Storage". Acesse o link abaixo
+        . Não é aconselhável ter uma quantidade excessiva de arquivos estáticos (pdf, jpeg, etc) nessa pasta, ou
+            dentro da nossa aplicação, o ideal é ter um local especifico para isso no "Azure Storage" por exemplo. Acesse o link abaixo
             com detalhes como fazer:
 
             https://balta.io/blog/upload-imagem-azure-storage-csharp
@@ -3594,12 +3593,12 @@ Aula 61.  Conclusão do Módulo
     . Acesse o Postman e execute a rota abaixo:
 
         method: POST
-        url: htt://localhost:[porta]/v1/accounts/login
+        url: http://localhost:[porta]/v1/accounts/login
         body.raw:   
-                    {
-                        email: "batman@balta.io",
-                        password: "[senha gerada na aula anterior]
-                    }
+        {
+            "email": "batman@balta.io",
+            "password": "32Xu@MuCCPy4Y)4!F5v5zIBY&"    
+        }
         body.json: true
 
         . Retorne a aula "Aula 52. Gerando Tokens com Claims" para rever a geração do token
@@ -3609,7 +3608,10 @@ Aula 61.  Conclusão do Módulo
         url: http://localhost:[porta]/v1/accounts/upload-image
         method: POST
         body.raw.json: true
-        body.raw: [Copia do conteúdo do campo "Base64 equivalent"]
+        body.raw: 
+        {
+            "base64Image":   [Copia do conteúdo do campo "Base64 equivalent"]
+        }
         header.Authorization: Bearer "token"
 
     . Acesse a pasta "images" do nosso projeto e verifique se o arquivo foi copiado com sucesso.
@@ -3617,6 +3619,7 @@ Aula 61.  Conclusão do Módulo
     . Acesse o navegador e execute a URL "http://localhost:[porta]/images/[nome do arquivo do item anterior]
 
 
+// PAREI AQUI
 Performance
 -----------
 
