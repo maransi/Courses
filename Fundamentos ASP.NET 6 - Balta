@@ -3856,7 +3856,6 @@ Aula 64. Alterando a serialização padrão do ASP.NET
         . Verifique que no nó "Author" não veio a propriedade "PasswordHash"
 
 
-// PAREI AQUI
 Aula 65. Paginação de dados
 ---------------------------
 
@@ -4010,7 +4009,7 @@ Aula 66. Filtrando dados
                     .AsNoTracking()
                     .Include(x => x.Author)
                     .Include(x => x.Category)
-                    .Where(x => x.Category.Slug == category)
+                    .Where(x => x.Slug == category)
                     .Select(x => new ListPostsViewModel
                     {
                         Id = x.Id,
@@ -4041,8 +4040,13 @@ Aula 66. Filtrando dados
 
     . Execute a rota abaixo dentro do Postman:
 
-        url: http://localhost:[porta]/v1/posts/category/backend
+        url: http://localhost:[porta]/v1/posts/category/orientacao-a-objetos
         method: GET
+
+
+        url: http://localhost:[porta]/v1/posts/category/orientacao-a-objetos?page=0,pageSize=25
+        method: GET
+
 
 Aula 67. Cache
 --------------
@@ -4100,6 +4104,7 @@ Aula 67. Cache
     . Na segunda vez em diante o fluxo de execução não passa pelo método "GetCategories"
 
 
+//PAREI AQUI
 Aula 68. Compressão
 -------------------
 
