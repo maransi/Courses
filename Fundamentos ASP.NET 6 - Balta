@@ -4388,12 +4388,21 @@ Aula 70. Estrutura do projeto
         no método "WebApplication.CreateBuilder(args);" no "Progam.cs"
 
 
-//PAREI AQUI
+
 Ambientes e Documentação
 ------------------------
 
 Aula 71. Configurações de Debug
 -------------------------------
+
+    . O ASP.NET Core usa uma variável de ambiente chamada ASPNETCORE_ENVIRONMENT para indicar o ambiente. O valor pode ser qualquer coisa. 
+        Por default seu valor é Development, Staging ou Production.
+
+    . O valor não diferencia maiúsculas de minúsculas no Windows e Mac OS, mas diferencia maiúsculas de minúsculas no Linux. 
+
+    . Dentro do Visual Studio, é possível alterar o valor das variáveis de ambiente. Em propriedades do projeto > Debug.
+
+    . TESTAR: https://www.tektutorialshub.com/asp-net-core/aspnetcore_environment-variable-in-asp-net-core/
 
     . Ao criar um site ASP.NET Core é criado um arquivo chamado appsettings.json, que contém informações do projeto.
 
@@ -4409,20 +4418,95 @@ Aula 71. Configurações de Debug
         web.config 
         app.config
 
-    . A variável env.EnvironmentName vai conter o valor que foi setado na EnvironmentVariable ASPNETCORE_ENVIRONMENT. Essa pode ser alterado 
-        no arquivo launchSettings.json na pasta Properties. Ou no próprio ambiente:
+    . Se estivermos executando o projeto diretamente pelo compilador "dotnet run" vale a explicação abaixo:
 
-        $ export ASPNETCORE_ENVIRONMENT=Development
+        . Inicialmente podemos configurar o valor da variável ASPNETCORE_ENVIRONMENT no arquivo "Propoerties/launchSettings.json"
+            
+            {
+                "iisSettings": {
+                    "windowsAuthentication": false,
+                    "anonymousAuthentication": true,
+                    "iisExpress": {
+                    "applicationUrl": "http://localhost:28655",
+                    "sslPort": 44390
+                    }
+                },
+                "profiles": {
+                    "Blog": {
+                        "commandName": "Project",
+                        "dotnetRunMessages": true,
+                        "launchBrowser": true,
+                        "applicationUrl": "https://localhost:7122;http://localhost:5010",
+                        "environmentVariables": {
+                            "ASPNETCORE_ENVIRONMENT": "Production"
+                        }
+                    },
+                    "IIS Express": {
+                        "commandName": "IISExpress",
+                        "launchBrowser": true,
+                        "environmentVariables": {
+                            "ASPNETCORE_ENVIRONMENT": "Production"
+                        }
+                    }
+                }
+            }
+            
+            . IMPORTANTE: A configuração do ASPNETCORE_ENVIROMENT quando utilizada no launchSetting.json, sobreporá qualquer configuração feita nas variáveis ambientais.
+                Se houver menção dessa variável neste arquivo, qualquer alteração feita por variável ambintal no sistema operacional não suritrá efeito.
+            
+        . Caso queira configurar no ambiente do sistema operacional, basta fazer como abaixo, porém certifique-se que não haverá nenhuma configuração do
+            ASPNETCORE_ENVIRONMENT no arquivo "launchSettings.json"
+
+            $ export ASPNETCORE_ENVIRONMENT=Development
     
+            . No Linux, podemos colocar essa variável para carregar automaticamente num destes arquivos:
 
-        . O ASP.NET Core usa uma variável de ambiente chamada ASPNETCORE_ENVIRONMENT para indicar o ambiente. O valor pode ser qualquer coisa. 
-            Por default seu valor é Development, Staging ou Production.
+                /etc/profile, 
+                ~/.bash_profile, 
+                ~/.bash_login, 
+                ~/.profile
 
-        . O valor não diferencia maiúsculas de minúsculas no Windows e Mac OS, mas diferencia maiúsculas de minúsculas no Linux. 
+    . Se fazermos uso do "Debugger" do VSCode, o conteúdo do ASPNETCORE_ENVIROMENT dentro do arquivo "[projeto]/.vscode/launch.json é o que prevalecerá,
+        desconsiderando o que estiver no arquivo "Propoerties/launchSettings.json", ou variável ambiente do sistema operacional:
 
-        . Dentro do Visual Studio, é possível alterar o valor das variáveis de ambiente. Em propriedades do projeto > Debug.
+        {
+            "version": "0.2.0",
+            "configurations": [
+                {
+                    // Use IntelliSense to find out which attributes exist for C# debugging
+                    // Use hover for the description of the existing attributes
+                    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+                    "name": ".NET Core Launch (web)",
+                    "type": "coreclr",
+                    "request": "launch",
+                    "preLaunchTask": "build",
+                    // If you have changed target frameworks, make sure to update the program path.
+                    "program": "${workspaceFolder}/bin/Debug/net6.0/Blog.dll",
+                    "args": [],
+                    "cwd": "${workspaceFolder}",
+                    "stopAtEntry": false,
+                    // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+                    "serverReadyAction": {
+                        "action": "openExternally",
+                        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+                    },
+                    "env": {
+                        "ASPNETCORE_ENVIRONMENT": "Staging"
+                    },
+                    "sourceFileMap": {
+                        "/Views": "${workspaceFolder}/Views"
+                    }
+                },
+                {
+                    "name": ".NET Core Attach",
+                    "type": "coreclr",
+                    "request": "attach"
+                }
+            ]
+        }
 
-        . TESTAR: https://www.tektutorialshub.com/asp-net-core/aspnetcore_environment-variable-in-asp-net-core/
+        . IMPORTANTE: Neste caso, se a execução for pelo Debugger do VSCode, o conteúdo do ASPNETCORE_ENVIRONMENT será "Staging" e o arquivo de configuração do projeto
+                        será "appsettings.Staging.json".
 
     . O AppSettings é construido em Layers. Geralmente segue esta sequencia, pois é auto-configurado no WebHost.
 
@@ -4476,11 +4560,11 @@ Aula 71. Configurações de Debug
                 [HttpGet("")]
                 public IActionResult Get( [FromServices] IConfiguration config)        // Linha alterada
                 {
-                    vr env = config.GetValue<string>( "Env" );                         // Linha inserida
+                    var env = config.GetValue<string>( "Env" );                         // Linha inserida
 
                     return Ok( new                                                      // Linha alterada
                                 {
-                                    enviroment: env
+                                    enviroment = env
                                 });
                 }
             }
@@ -4493,6 +4577,7 @@ Aula 71. Configurações de Debug
 
         . O resultado apontará para o valor "dev"
 
+//PAREI AQUI
 Aula 72. Compilando em modo release
 -----------------------------------
 
