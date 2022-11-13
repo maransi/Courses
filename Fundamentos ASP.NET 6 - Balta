@@ -4577,7 +4577,6 @@ Aula 71. Configurações de Debug
 
         . O resultado apontará para o valor "dev"
 
-//PAREI AQUI
 Aula 72. Compilando em modo release
 -----------------------------------
 
@@ -4602,7 +4601,7 @@ Aula 72. Compilando em modo release
 
         . Ao executar o comando acima o compilador cria uma seria de arquivos na pasta:
 
-            /{pasta do projeto}/bin/Net6.0/Release
+            /{pasta do projeto}/bin/Release/net6.0
 
     . Execute o arquivo "/{pasta do projeto}/bin/Net6.0/Release/Blog.exe
 
@@ -4659,7 +4658,7 @@ Aula 73.  Entendendo o LaunchSettings
 Aula 74. IsDevelopment
 ----------------------
 
-    . O método "IsDeveloment()" está relacionado a variável ambiental "ASPNETCORE_ENVIROMENT".
+    . O método "IsDevelopment()" está relacionado a variável ambiental "ASPNETCORE_ENVIROMENT".
 
     . Além do "IsDevelopment()" existem:
 
@@ -4673,7 +4672,7 @@ Aula 74. IsDevelopment
        ...
        app.UseResponseCompression();
 
-       if ( app.Enviroment.IsDevelopment() )                                // IF Inserido
+       if ( app.Environment.IsDevelopment() )                                // IF Inserido
        {
             Console.WriteLine("Estou no ambiente de desenvolvimento");
        }
@@ -4681,6 +4680,11 @@ Aula 74. IsDevelopment
        app.Run();
 
     . Levante o projeto e verifique se a mensagem "Estou em ambiente de desenvolvimento" foi exibida.
+
+
+    . Altere o valor da variável ASPNETCORE_ENVIRONMENT como abaixo:
+
+        "ASPNETCORE_ENVIRONMENT": "Production"
 
     . Faça a alteração abaixo no arquivo "Program.cs":
 
@@ -4697,6 +4701,13 @@ Aula 74. IsDevelopment
     . Levante novamente o projeto e verifique se a mensagem "Estou em ambiente de produção" foi exibida.
 
     . Esse recurso é interessante para deixar o Swagger somente disponível para o ambiente de desenvolvimento.
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
 
     . Exemplos:
 
@@ -4773,6 +4784,7 @@ Aula 75. Forçando HTTPS
     . app.UseHttpsRedirection() - Habilita o desvio das chamadas http para https
 
 
+//PAREI AQUI
 Aula 76. Connection strings
 ---------------------------
 
@@ -4906,17 +4918,100 @@ Aula 77. Open API
         app.Run();
         ...
 
+    . Certifique-se que as configurações apontam para "Development":
+
+        . Verifique no arquivo "launchSettings.json" o valor da variável "ASPNETCORE_ENVIRONMENT".
+        . Verifique o conteúdo da variável ambiental "ASPNETCORE_ENVIRONMENT".
+        . Se estiver executando o Debug do VSCode, verifique o conteúdo da variável "ASPNETCORE_ENVIRONMENT" na arquivo "[projeto]/.vscode/launch.json"
+
     . Levante o projeto e execute a URL abaixo no navegador:
 
         http://localhost:[porta]/swagger/index.html
 
-    . Expanda o item "v1/accounts", clique em "Try it out" e altere os parâmetro como abaixo:
-
-        {
-            "name": "Bruce Wayne",
-            "email": "batman@balta.io"
-        }
-
     . Acione o botão "Execute"
 
-    
+    . Expanda o item "v1/account", clique em "Try it out" e altere os parâmetro como abaixo:
+
+        {
+            "name": "Marco Silva",
+            "email": "maransi@gmail.com"
+        }
+
+        . Copie e guarde o conteúdo do password gerado
+
+            {
+                "data": {
+                    "user": "maransi@gmail.com",
+                    "password": ")IFjwO{QXCCa;RmahgNeCp%eb"
+                },
+                "errors": []
+            }
+
+    . Configurando o Swagger para trabalhar com JWT:
+
+        . Comente a linha abaixo e altere com as novas configurações para o Swagger:
+
+            // builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSwaggerGen(c =>
+                                {
+                                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Teste01", Version = "v1"});
+
+                                    c.AddSecurityDefinition( "Bearer", new OpenApiSecurityScheme()
+                                                                            { 
+                                                                                Name = "Authorization",
+                                                                                Type = SecuritySchemeType.ApiKey,
+                                                                                Scheme = "Bearer",
+                                                                                BearerFormat = "Jwt",
+                                                                                In = ParameterLocation.Header,
+                                                                                Description = "JWT Authorization header using the Bearer Scheme."
+                                                                            }
+                                    
+                                    
+                                    );
+
+                                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                                    {
+                                        {
+                                            new OpenApiSecurityScheme
+                                            {
+                                                Reference = new OpenApiReference
+                                                                    {
+                                                                        Type = ReferenceType.SecurityScheme,
+                                                                        Id = "Bearer"
+                                                                    }
+                                            },
+                                            new string[] {}
+                                        }
+                                    });
+                                });
+
+        . Levante o projeto e execute a URL abaixo no navegador:
+
+            http://localhost:[porta]/swagger/index.html
+
+
+        . Acesse a rota "/v1/Account/login", acione o botão "Try it all" no campo "Request Body" coloque a identificação abaixo:
+
+            {
+                "email": "maransi@gmail.com"
+                "password": ")IFjwO{QXCCa;RmahgNeCp%eb",
+            }
+
+        . Copie o conteúdo da resposta, o token gerado:
+
+            {
+                "data": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoibWFyYW5zaUBnbWFpbC5jb20iLCJuYmYiOjE2Njc2NzUyMDcsImV4cCI6MTY2NzcwNDAwNywiaWF0IjoxNjY3Njc1MjA3fQ.g_icRjFVNvsuz2zhwlECFYP9e8ehtb-Nm6OyA4dg40Q"
+            }
+
+        . Acesse o botão "Authorize" no inicio da página e digite:
+
+            "Bearer " + [token gerado]
+
+        . Acesse a rota "/v1/Account/user", acione o "Try it out" e execute.
+
+            https://www.youtube.com/watch?v=y-xxfvhEqEU     5.33
+            https://medium.com/geekculture/swagger-with-bearer-token-net6-b4ca5a8274b1
+
+            // Relação de vídeos interessantes sobre segurança em .net
+            https://www.youtube.com/c/CsharpSpace/videos
