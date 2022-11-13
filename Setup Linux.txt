@@ -1285,6 +1285,62 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 34. Atualização ou Correção dos drivers da placa de vídeo:
 
 	https://phoenixnap.com/kb/install-nvidia-drivers-ubuntu
+
+
+		Install Nvidia Driver via Command Line
+		--------------------------------------
+
+			# Step 1: Search for Nvidia Drivers
+			apt search nvidia-driver
+
+			# Step 2: Update the System Package Repository
+			sudo apt update && sudo apt upgrade
+
+			# Step 3: Install the Right Driver for Your GPU
+			sudo apt install nvidia-390
+
+			sudo reboot
+
+		Install Nvidia Beta Drivers via PPA Repository
+		----------------------------------------------
+
+			# Step 1: Add PPA GPU Drivers Repository to the System
+			sudo add-apt-repository ppa:graphics-drivers/ppa
+
+			# Step 2: Identify GPU Model and Available Drivers
+			ubuntu-drivers devices
+
+			# Step 3: Install Nvidia Driver
+			sudo apt install nvidia-390
+
+			sudo reboot
+
+		Install the last version
+		------------------------
+
+			sudo apt-add-repository ppa:graphics-drivers/ppa && sudo apt update
+
+			sudo ubuntu-drivers autoinstall
+
+			# Verify existing versions
+			apt search nvidia-* 
+
+		How to Uninstall Nvidia Driver
+		------------------------------
+
+			# Step 1: See Installed Packages
+			dpkg -l | grep -i nvidia
+
+			# Step 2: Purge Nvidia Packages
+			sudo apt-get remove --purge '^nvidia-.*'
+
+			# If the ubuntu-desktop package is removed, reinstall it with the following command:
+			sudo apt-get install ubuntu-desktop
+
+			sudo reboot
+
+
+
 	https://www.vivaolinux.com.br/dica/Instalando-Drivers-NVIDIA-no-Ubuntu-2004
 	https://diolinux.com.br/sistemas-operacionais/como-instalar-drivers-nvidia-ubuntu-tutorial.html
 
@@ -1345,4 +1401,15 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 	dotnet --version
 	dotnet --list-runtimes
 	dotnet --list-sdks
+
+40. Corrigir Erro na atualização do Snap Store
+
+	sudo pkill snap-store && sudo snap refresh snap-store
+	sudo snap remove snap-store
+	rm -rf ~/snap/snap-store
+	sudo snap install snap-store
+
+41. Instalar o controlador de ventuinha da placa de vídeo AMD
+
+	sudo add-apt-repository ppa:ernstp/mesarc && sudo apt update && sudo apt install corectrl
 
