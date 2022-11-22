@@ -2596,7 +2596,7 @@ Aula 47. Configurando Autenticação e Autorização
         no nosso projeto, obrigatório ser nessa ordem:
 
         ...
-        var builder - WebApplication.CreateBuilder( args );
+        var builder = WebApplication.CreateBuilder( args );
 
         var key = Encoding.ASCII.GetBytes( Configuration.JwtKey );   // Linha inserida
 
@@ -2652,13 +2652,13 @@ Aula 48. Testando a autenticação e autorização  (Revisar)
         {
             ...                     // Métodos abaixo inseridos
             [HttpGet("v1/user")]
-            public IActionResult GetUser() => Ok( User.Identity.Name )
+            public IActionResult GetUser() => Ok( User.Identity.Name );
 
             [HttpGet("v1/author")]
-            public IActionResult GetAuthor() => Ok( User.Identity.Name )
+            public IActionResult GetAuthor() => Ok( User.Identity.Name );
 
             [HttpGet("v1/admin")]
-            public IActionResult GetAdmin() => Ok( User.Identity.Name )
+            public IActionResult GetAdmin() => Ok( User.Identity.Name );
             ...
         }
 
@@ -3115,6 +3115,8 @@ Aula 52. Gerando Tokens com Claims
 
     . Dentro da pasta "Extensions" crie a classe abaixo:
 
+        using System.Collections.Generic;
+        using System.Linq;
         using System.Security.Claims;
         using Blog.Models;
 
