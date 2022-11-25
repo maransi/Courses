@@ -1,0 +1,120 @@
+Curso ASP.NET Core 6 Fundamentals
+---------------------------------
+
+Entendendo o ASP.NET Core 6 e ASP.NET Core 6 MVC
+------------------------------------------------
+
+. Objetivos deste módulo:
+
+    . Explicar o que é o ASP.NET Core?
+
+    . O que será aprendido neste curso?
+
+    . Quais ferramentas necessárias para o trabalho com o ASP.NET?
+
+        . ASP.NET Core 6
+
+        . Net 6
+
+        . Visual Studio 2022
+
+. O que é o ASP.NET Core?
+
+    . É um framework open-source, criado pela Microsoft para a comunidade, para construir
+        modernas aplicações web e serviços com .Net.
+
+. O que podemos construir com ASP.NET Core?
+
+    . Podemos desenvolver solução nas três camadas:
+
+        . Server-side rendered applications
+
+                            Http Request
+              +--------------------------------------+
+              |                                      |
+              |                                      V
+            Client                          Server ASP.NET Core
+              ^                                      |
+              |                                      |
+              +--------------------------------------+
+                    Dynmically generated HTML
+
+        . Services
+
+                                Http Request
+                +-------------------------------------------------------+
+                |                                                       |
+                |                                                       V
+            Consumer (Html, Angular, React, microservices, etc)     Server ASP.NET Core
+                ^                                                       |
+                |                                                       |
+                +-------------------------------------------------------+
+                                JSON
+
+        . Client-side rendered applications
+
+                    Initial Http Request via JQuery
+              +--------------------------------------+
+              |                                      |
+              |                                      V
+            Client                          Server ASP.NET Core
+              ^                                      |  |
+              |                                      |  |
+              +--------------------------------------+  |
+              ^     Application                         |
+              |                                         |
+              +-----------------------------------------+
+                        JSON
+
+. A principais caracteristicas do .NET Core é:
+
+    . Ser "Cross-plataform framework", podendo ser usado
+        no Windows, Linux e Mac, mantendo a compatibilidade em todas as plataformas.
+
+    . Open Source
+
+    . FAster development cycle - Continuas atualizações de versões do framework
+
+    . Modular - Contém diversas bibliotecas que podem ser adicionadas ao projeto, 
+                o repositório NUGET disponibiliza todas essas bibliotecas facilmente.
+
+. Arquitetura do ASP.NET Core:
+
+    +--------- ASP.NET Core Application Plataforms -------------+   +------- Other -----------------+
+    |                                                           |   |                               |
+    |   ASP.NET Core        ASP.NET Core        ASP.NET Core    |   |   Entity      ASP.NET Core    |
+    |       MVC             Razor Pages             Blazor      |   |   Framework   Identity        |
+    |                                                           |   |                               |
+    +-----------------------------------------------------------+   +-------------------------------+
+
+    +------------------------------------ ASP.NET Core Plataform -----------------------------------+
+    |                                                                                               |
+    |   Kestrel                         Middleware                                  Razor           |
+    |                                                                                               |
+    |   Model binding                   Dependency                                  Logging         |
+    |                                   Injection                                                   |
+    |                                                                                               |
+    +-----------------------------------------------------------------------------------------------+
+
+. ASP.NET Core Application Framework
+
+            MVC                                         Razor Page                                    Blazor
+            |                                               |                                           |
+            V                                               V                                           V
+    O ASP.NET Core MVC é uma                Recurso do ASP.NET Core MVC que torna a             O Blazor é uma estrutura/framework SPA 
+    estrutura avançada para                 codificação de cenários focados em páginas          (Single Page Application) criada no .NET 
+    a criação de aplicativos                mais fácil e mais produtiva. Responsável pela       que é executada no navegador com o WebAssembly
+    Web e APIs usando o padrão              renderização das páginas Web Html
+    de design Model-View-Controller
+
+. Hisória do ASP.NET Core:
+
+          2002                2016                  2019                    2021
+    ASP.NET WebForms    ASP.NET Core 1.0    ASP.NET Core 3.0 e 3.1      ASP.NET Core 6
+              \         /            \      /                    \        /  
+                  2008              2017-2018                       2020
+              ASP.NET MVC       ASP.NET Core2.0                 ASP.NET Core 5
+                                ASP.NET Core 2.1 e 2.2
+
+. LTS e Versões Atuais
+17.36
