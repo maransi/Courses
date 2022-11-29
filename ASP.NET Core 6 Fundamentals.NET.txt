@@ -185,4 +185,50 @@ Criando um novo projeto
 Explorando os arquivos gerados
 ------------------------------
 
-03. Setting up an ASP.NET Core 6 MVC Application (7.53)
+    . Analisando a estrutura temos:
+
+        wwwroot:            Diretório que contem arquivos estativos como imagens, javascripts, css, e outros;
+
+        Areas:              Diretório que permite organizar nossa aplicação de forma que facilite a manutenção. 
+                            No  nosso projeto por exemplo, teremos uma área especifica para o nosso painel de 
+                            controle e ainda poderia ter uma área para acesso de cliente ou até com divisões 
+                            relacionados a negócio.
+
+        Controllers:        Como o próprio nome diz, é o diretório que contem os controllers utilizados no projeto;
+
+        Models:             Diretório dos arquivos de models utilizados pelas Views e pelas Controllers;
+
+        Views:              Diretorio que irá conter outros subdiretorios. Esses subdiretorios estarão 
+                            relacionados diretamente com os controllers, ou seja, teremos as views de 
+                            cada controller alem de views, partial views e layout utilizados;
+
+        .csproj:            Contém os pacotes e referências do projeto.
+
+        Program.cs:         Arquivo principal responsavel por inicializar a aplicação;
+
+        Startup.cs:         Possui configurações de nosso projeto, tais como, definição de rotas, ativação de 
+                            recursos relacionados ao ASP.NET Core ou ao projeto. A partir do .NET 6 em diante ele
+                            não é mais criado no projeto.
+
+        appsettings.json    Contém informações do projeto.
+                            Podemos ter versões desse arquivo de acordo com o ambiente que o projeto atuará:
+
+                            appsetings.json
+                            appsettings.Development.json
+
+                            O .Net tenta encontrar as informações inicialmente no "appsettings.Development.json", 
+                            senão conseguir procura no "appsettings.json".
+
+                            Local ideal para armazenar a string de conexão do bando de dados.
+
+        Properties/launchSettings.json  Usado para armazenar configurações das informações do projeto, como porta, 
+                                        ambiente, etc.
+                                        Contém configurações necessárias para executar a aplicação
+
+
+
+https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
+
+
+
+03. Setting up an ASP.NET Core 6 MVC Application (13.30)
