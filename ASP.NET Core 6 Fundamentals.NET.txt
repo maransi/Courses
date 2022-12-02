@@ -250,12 +250,63 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
             Docker OS: Null
             Do not use top level statements: Null
 
+        . Run
+
     . Dotnet core
         
         . Na pasta raiz do projeto execute o comando abaixo:
 
-            dotnet new webapp -o 
+            dotnet new webapp -o bhetanyPieShop -n bhetanyPieShop -f net6.0
 
+            dotnet clean
+
+            dotnet restore
+
+            dotnet build
+
+            dotnet run
+
+. No .Net 6 a execução começa pela classe "Program.cs"
+
+        // Construi a aplicação
+        var builder = WebAppication.CreateBuilder(args);
+        var app = builder.Build();
+
+        // Mapea a rota para ser chamada na linha debaixo
+        app.MapGet("/", () => "Hello World!");
+
+        // Executa a aplicação e fica escutando e respondendo alguma chamada na porta do projeto
+        app.Run();  
+
+    . No .Net 6 a classe "Startup.cs" foi suprimida
+
+    . No .Net 6 a estrutura da classe "Program.cs" foi alterada deixando equivalente ao apresentado acima.
+
+. Mapeando uma Requisição
+
+    . Na classe "Program.cs" temos a rota abaixo:
+
+        app.MapGet("/", () => "Hello World!");
+                         |
+                         +----> Função anônima
+
+    . A chamada acima resultará na URL:
+
+        https://localhost:[porta]/
+
+. Acesse a classe "Program.cs" e acrescente a linha abaixo:
+
+        var builder = WebAppication.CreateBuilder(args);
+
+        builder.Services.AddControllerWithViews();              // Linha inserida
+
+        var app = builder.Build();
+
+        app.MapGet("/", () => "Hello World!");
+
+        app.Run();  
+
+https://www.treinaweb.com.br/blog/asp-net-core-compreendendo-addmvc-addmvccore-addcontrollers-addcontrollerswithviews-e-addrazorpages
 
 
 
