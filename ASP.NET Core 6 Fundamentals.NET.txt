@@ -256,7 +256,7 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
         
         . Na pasta raiz do projeto execute o comando abaixo:
 
-            dotnet new webapp -o bhetanyPieShop -n bhetanyPieShop -f net6.0
+            dotnet new web -o bhetanyPieShop -n bhetanyPieShop -f net6.0
 
             dotnet clean
 
@@ -302,13 +302,49 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
 
         var app = builder.Build();
 
+        app.UseStaticFiles();                                   // Linha inserida
+
+        if ( app.Environment.IsDevelopment() )                  // If inserido
+        {
+            app.UseDeveloperExceptionPage();                        
+        }
+
+        app.MapDefaultControllerRoute();                        // Linha inserida
+
         app.MapGet("/", () => "Hello World!");
 
         app.Run();  
 
 https://www.treinaweb.com.br/blog/asp-net-core-compreendendo-addmvc-addmvccore-addcontrollers-addcontrollerswithviews-e-addrazorpages
 
+. "AddControllerWithViews()" carrega os recursos:
+
+    . MvcCore;
+    . ApiExplorer;
+    . Authorization;
+    . FormatterMappings;
+    . Views;
+    . RazorViewEngine;
+    . TagHelper;
+    . Data Annotations;
+    . Json Formatters;
+    . CORS.
+
+    . O único que foi removido é o Razor Pages. Desta forma, uma aplicação ASP.NET MVC que não faça 
+        uso do Razor Pages deve optar por este método.
 
 
+https://rodolfofadino.com.br/configurando-o-middleware-de-staticfiles-com-net-6-a6f61bdfdfc7
 
-03. Setting up an ASP.NET Core 6 MVC Application (35.00)
+. "UseStaticFiles()" para utilizarmos arquivos estáticos "css, jpeg, js" precisamos incluir este método 
+    no "Program.cs". A partir dai podemos criar a pasta "wwwroot" na raiz do nosso projeto e adicionar
+    qualquer arquivo estático nele e começar trabalhar com eles.
+
+. "app.Environment.IsDevelopment()" para entender melhor o funcionamento do método "IsDevelopment()" revise as
+    aulas "Aula 71. Configurações de Debug" e "Aula 73.  Entendendo o LaunchSettings" do curso 
+    "Fundamentos ASP.NET 6 - Balta"; que fala sobre o uso da variável ambiental "ASPNETCORE_ENVIRONMENT"
+
+. "MapDefaultControllerRoute()" 
+
+
+03. Setting up an ASP.NET Core 6 MVC Application (38.46)
