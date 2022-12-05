@@ -275,7 +275,7 @@ http://www.binaryintellect.net/articles/c131fc47-0c9d-496b-998a-ed65a2486896.asp
 
 . No .Net 6 a execução começa pela classe "Program.cs"
 
-https://www.c-sharpcorner.com/article/how-to-add-startup-cs-class-in-asp-net-core-6-project/
+    https://www.c-sharpcorner.com/article/how-to-add-startup-cs-class-in-asp-net-core-6-project/
 
 
         // Construi a aplicação
@@ -292,19 +292,21 @@ https://www.c-sharpcorner.com/article/how-to-add-startup-cs-class-in-asp-net-cor
 
     . No .Net 6 a estrutura da classe "Program.cs" foi alterada deixando equivalente ao apresentado acima.
 
-. Mapeando uma Requisição
+    . Mapeando uma Requisição
 
-    . Na classe "Program.cs" temos a rota abaixo:
+        . Na classe "Program.cs" temos a rota abaixo:
 
-        app.MapGet("/", () => "Hello World!");
-                         |
-                         +----> Função anônima
+            app.MapGet("/", () => "Hello World!");
+                            |
+                            +----> Função anônima
 
-    . A chamada acima resultará na URL:
+        . A chamada acima resultará na URL:
 
-        https://localhost:[porta]/
+            https://localhost:[porta]/
 
-. Acesse a classe "Program.cs" e acrescente a linha abaixo:
+
+
+. Acesse a classe "Program.cs" do seu projeto e acrescente as linhas abaixo:
 
         var builder = WebAppication.CreateBuilder(args);
 
@@ -325,36 +327,430 @@ https://www.c-sharpcorner.com/article/how-to-add-startup-cs-class-in-asp-net-cor
 
         app.Run();  
 
-https://www.treinaweb.com.br/blog/asp-net-core-compreendendo-addmvc-addmvccore-addcontrollers-addcontrollerswithviews-e-addrazorpages
-
-. "AddControllerWithViews()" carrega os recursos:
-
-    . MvcCore;
-    . ApiExplorer;
-    . Authorization;
-    . FormatterMappings;
-    . Views;
-    . RazorViewEngine;
-    . TagHelper;
-    . Data Annotations;
-    . Json Formatters;
-    . CORS.
-
-    . O único que foi removido é o Razor Pages. Desta forma, uma aplicação ASP.NET MVC que não faça 
-        uso do Razor Pages deve optar por este método.
 
 
-https://rodolfofadino.com.br/configurando-o-middleware-de-staticfiles-com-net-6-a6f61bdfdfc7
 
-. "UseStaticFiles()" para utilizarmos arquivos estáticos "css, jpeg, js" precisamos incluir este método 
-    no "Program.cs". A partir dai podemos criar a pasta "wwwroot" na raiz do nosso projeto e adicionar
-    qualquer arquivo estático nele e começar trabalhar com eles.
+. Middlewares 
 
-. "app.Environment.IsDevelopment()" para entender melhor o funcionamento do método "IsDevelopment()" revise as
-    aulas "Aula 71. Configurações de Debug" e "Aula 73.  Entendendo o LaunchSettings" do curso 
-    "Fundamentos ASP.NET 6 - Balta"; que fala sobre o uso da variável ambiental "ASPNETCORE_ENVIRONMENT"
+    . Desde a sua primeira versão, o ASP.NET faz uso dos middlewares. Eles foram implementados como uma 
+        forma de modularizar uma aplicação ASP.NET facilmente.
 
-. "MapDefaultControllerRoute()" 
+    . Em termos práticos, middleware seria um trecho de código que pode ser executado no fluxo de execução 
+        da aplicação. No ASP.NET os middleware são organizados em um pipeline e são executados conforme 
+        uma solicitação é recebida e uma resposta enviada. A imagem abaixo ilustra este pipeline:
 
 
-03. Setting up an ASP.NET Core 6 MVC Application (38.46)
+                    Middleware 1            Middleware 2            Middleware 3
+
+        Request --> // Logic                
+        
+                        next() -----------> // Logic
+                        
+                                                next() -----------> // Logic
+
+                                                                    // More logic
+                                                                        |
+                                            // More logic <-------------+
+                                                    |
+                    // More logic <-----------------+
+                        |
+        Response <------+
+
+    . Cada middleware pode executar uma ação no recebimento da solicitação, chamar o próximo middleware, 
+        utilizando o método next(), e executar outra ação durante o retorno da resposta. Só não é possível 
+        modificar a resposta no seu retorno.
+
+    . Dependendo da funcionalidade, o middleware pode decidir não chamar o próximo no pipeline, não invocando 
+        o método next(). Por exemple, o middleware de arquivos estáticos pode retornar uma solicitação para um 
+        arquivo estático e interromper o fluxo restante.
+
+    . É possível definir middleware de diversas funcionalidades, por exemplo, no trecho de código abaixo, 
+        temos oito middlewares:
+
+        . Exception/error handling
+        . HTTP Strict Transport Security Protocol
+        . HTTPS redirection
+        . Static file server
+        . Cookie policy enforcement
+        . Authentication
+        . Session
+        . MVC
+
+    . Exemplo de um "Program.cs"
+
+        public void Configure(IApplicationBuilder app)
+        {
+            if (env.IsDevelopment())
+            {
+                // Quando executado em desenvolvimento:
+                //   Utiliza Developer Exception Page para reportar erros.
+                //   Utiliza Database Error Page para reportar erros do banco.
+                app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+            }
+            else
+            {
+                // Quando não estiver em produção:
+                //   Habilita o middleware Exception Handler Middleware para pegar os erros.
+                //   Utiliza o middleware que habilita o 
+                //       HTTP Strict Transport Security Protocol (HSTS)
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
+
+            // Utiliza o middleware HTTPS Redirection que redireciona solicitações HTTP para HTTPS.
+            app.UseHttpsRedirection();
+
+            // Retorna arquivos estáticos e interrompe o pipeline.
+            app.UseStaticFiles();
+
+            // Utiliza o middleware Cookie Policy, que está em conformidade com 
+            // as regras do GDPR (General Data Protection Regulation).
+            app.UseCookiePolicy();
+
+            // Autentica antes de utilizar os recursos.
+            app.UseAuthentication();
+
+            // Se o aplicativo utiliza sessão, chama o middleware Session depois do middleware 
+            // Cookie Policy e antes do middleware MVC.
+            app.UseSession();
+
+            // Adiciona MVC ao pipeline da solicitação
+            app.UseMvc();
+        }
+
+
+    https://www.treinaweb.com.br/blog/asp-net-core-compreendendo-addmvc-addmvccore-addcontrollers-addcontrollerswithviews-e-addrazorpages
+
+    . "AddControllerWithViews()" carrega os recursos:
+
+        . MvcCore;
+        . ApiExplorer;
+        . Authorization;
+        . FormatterMappings;
+        . Views;
+        . RazorViewEngine;
+        . TagHelper;
+        . Data Annotations;
+        . Json Formatters;
+        . CORS.
+
+        . O único que foi removido é o Razor Pages. Desta forma, uma aplicação ASP.NET MVC que não faça 
+            uso do Razor Pages deve optar por este método.
+
+
+    https://rodolfofadino.com.br/configurando-o-middleware-de-staticfiles-com-net-6-a6f61bdfdfc7
+
+    . "UseStaticFiles()" para utilizarmos arquivos estáticos "css, jpeg, js" precisamos incluir este método 
+        no "Program.cs". A partir dai podemos criar a pasta "wwwroot" na raiz do nosso projeto e adicionar
+        qualquer arquivo estático nele e começar trabalhar com eles.
+
+    . "app.Environment.IsDevelopment()" para entender melhor o funcionamento do método "IsDevelopment()" revise as
+        aulas "Aula 71. Configurações de Debug" e "Aula 73.  Entendendo o LaunchSettings" do curso 
+        "Fundamentos ASP.NET 6 - Balta"; que fala sobre o uso da variável ambiental "ASPNETCORE_ENVIRONMENT"
+
+    . "MapDefaultControllerRoute()" 
+
+
+    . Como é possível notar, no ASP.NET todos os middlewares são definidos no método Configure no padrão Use* 
+        seguindo do nome do middleware. Neste método também é possível adicionar middlewares customizados, 
+        utilizando os métodos Use ou Run. A diferença entres eles é que os middlewares definidos com Run 
+        são middlewares “finais”, após eles, nenhum outro middleware é chamado.
+
+    . Para compreender a ordem de execução dos middlewares no pipeline, vamos definir alguns middlewares simples:
+
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            app.Use(async (context, next) =>
+            {
+                await context.Response.WriteAsync("Primeiro middleware (antes)");
+                await next();
+                await context.Response.WriteAsync("Primeiro middleware (depois)");
+            });
+
+            app.Use(async (context, next) =>
+            {
+                await context.Response.WriteAsync("Segundo middleware (antes)");
+                await next();
+                await context.Response.WriteAsync("Segundo middleware (depois)");
+            });
+
+            app.Run(async (context) =>
+            {
+                await context.Response.WriteAsync("Middleware final");
+            });
+        }
+
+        . No exemplo acima os middlewares estão sendo definidos como métodos anônimos, em um artigo futuro mostrarei 
+            as formas de declará-los.
+
+        . Neste ponto o importante é que sabia que os middlewares definidos com Use recebem dois parâmetros: 
+            a instância de um objeto HttpContext e a instância do delegate RequestDelegate, que aponta para o 
+            próximo middleware no pipeline.
+
+        . O resultado do código acima será algo assim:
+
+            Primeiro middleware (antes)
+            Segundo middleware (antes)
+            Middleware final
+            Segundo middleware (depois)
+            Primeiro middleware (depois)
+
+    . Criando novo fluxo final/Condicional
+
+        . Com os métodos "Map" ou "MapWhen" é possível definir um novo fluxo final para o pipeline. O método Map permite 
+            especificar um middleware que será invocado de acordo com o caminho da solicitação. Já o MapWhen possui 
+            mais poder porque o padrão pode ser definido utilizando o objeto HttpContext:
+
+        . Exemplo:
+
+            public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+            {
+                app.Use(async (context, next) =>
+                {
+                    await context.Response.WriteAsync("Primeiro middleware (antes)");
+                    await next();
+                    await context.Response.WriteAsync("Primeiro middleware (depois)");
+                });
+
+                app.Use(async (context, next) =>
+                {
+                    await context.Response.WriteAsync("Segundo middleware (antes)");
+                    await next();
+                    await context.Response.WriteAsync("Segundo middleware (depois)");
+                });
+
+                app.Map("/foo",
+                    (a) => {
+                        a.Use(async (context, next) => {
+                            await context.Response.WriteAsync("Middleware para o caminho /foo (antes) ");
+                            await next();
+                            await context.Response.WriteAsync("Middleware para o caminho /foo (depois) ");
+                        });
+                });
+
+                app.MapWhen(context => context.Request.Path.StartsWithSegments("/bar"), 
+                    (a) => {
+                        a.Use(async (context, next) => {
+                            await context.Response.WriteAsync("Middleware para o caminho /bar (antes) ");
+                            await next();
+                            await context.Response.WriteAsync("Middleware para o caminho /bar (depois) ");
+                        });
+                });
+
+                app.Run(async (context) =>
+                {
+                    await context.Response.WriteAsync("Middleware final");
+                });
+            }
+
+        . Para evitar o problema do uso do next() nos middlewares definidos em Map e MapWhen, é possível 
+            utilizar o método UseWhen, que funciona da mesma forma que o MapWhen, com a diferença que após 
+            executá-lo o fluxo do pipeline retorna ao caminho padrão:
+
+            public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+            {
+                app.Use(async (context, next) =>
+                {
+                    await context.Response.WriteAsync("Primeiro middleware (antes)");
+                    await next();
+                    await context.Response.WriteAsync("Primeiro middleware (depois)");
+                });
+
+                app.Use(async (context, next) =>
+                {
+                    await context.Response.WriteAsync("Segundo middleware (antes)");
+                    await next();
+                    await context.Response.WriteAsync("Segundo middleware (depois)");
+                });
+
+                app.Map("/foo",
+                    (a) => {
+                        a.Use(async (context, next) => {
+                            await context.Response.WriteAsync("Middleware para o caminho /foo (antes) ");
+                            await next();
+                            await context.Response.WriteAsync("Middleware para o caminho /foo (depois) ");
+                        });
+                });
+
+                app.UseWhen(context => context.Request.Path.StartsWithSegments("/bar"), 
+                    (a) => {
+                        a.Use(async (context, next) => {
+                            await context.Response.WriteAsync("Middleware para o caminho /bar (antes) ");
+                            await next();
+                            await context.Response.WriteAsync("Middleware para o caminho /bar (depois) ");
+                        });
+                });
+
+                app.Run(async (context) =>
+                {
+                    await context.Response.WriteAsync("Middleware final");
+                });
+            }
+
+    . Definindo uma classe “Middleware”
+
+        . No dia a dia você irá definir middlewares mais complexos, então o ideal é defini-los em uma classe a parte:
+
+            public class MyMiddleware
+            {
+                private readonly RequestDelegate _next;
+
+                public MyMiddleware(RequestDelegate next)
+                {
+                    _next = next;
+                }
+
+                public async Task Invoke(HttpContext httpContext)
+                {
+                    await httpContext.Response.WriteAsync("Chamou nosso middleware (antes)");
+                    await _next(httpContext);
+                    await httpContext.Response.WriteAsync("Chamou nosso middleware (depois)");
+                }
+            }
+
+        . A classe “Middleware” obrigatoriamente precisa ter a estrutura acima. Receber no construtor um 
+            objeto RequestDelegate e definir um método Invoke que recebe por parâmetro um objeto HttpContext.
+
+        . Esta classe pode ser definida no pipeline utilizando o método UseMiddleware:
+
+            public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+            {
+                app.UseMiddleware<MyMiddleware>();
+            }
+
+
+        . Mas o recomendado é definir um método de extensão para a interface IApplicationBuilder:
+
+            public static class MyMiddlewareExtensions
+            {
+                public static IApplicationBuilder UseMyMiddleware(this IApplicationBuilder builder)
+                {
+                    return builder.UseMiddleware<MyMiddleware>();
+                }
+            }
+
+        . E utilizá-lo no Configure:
+
+            public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+            {
+                app.UseMyMiddleware();
+            
+                app.Run(async (context) =>
+                {
+                    await context.Response.WriteAsync("Olá Mundo!");
+                });
+            }
+
+        . Mais detalhes podem ser observados no link abaixo:
+
+            https://www.treinaweb.com.br/blog/criando-um-middleware-customizado-para-asp-net-core
+            https://exceptionnotfound.net/middleware-in-asp-dotnet-6-intro-and-basics/
+
+
+    . Desenvolva o tutorial abaixo :
+
+        https://macoratti.net/21/08/aspnc_authmid1.htm
+
+
+Criando a primeira página
+=========================
+
+
+. O que aprenderemos nesse módulo:
+
+    . Introdução ao padrão MVC
+
+    . Criação de um model e um repository
+
+    . Criação de um controller
+
+    . Adicionar uma view
+
+    . Estilizar a view
+
+. Como funciona o MVC C#?
+
+    . O MVC é um padrão de arquitetura de software. O MVC sugere uma maneira para você pensar na divisão de responsabilidades, 
+        principalmente dentro de um software web.
+
+    . O princípio básico do MVC é a divisão da aplicação em três camadas: a camada de interação do usuário (view), a camada de 
+        manipulação dos dados (model) e a camada de controle (controller).
+
+    . Com o MVC, é possível separar o código relativo à interface do usuário das regras de negócio, o que sem dúvida traz muitas 
+        vantagens que veremos mais à frente.
+
+    . Quando falamos sobre o MVC, cada uma das camadas apresenta geralmente as seguintes responsabilidades:
+
+        . Model: A responsabilidade dos models é representar o negócio. Também é responsável pelo acesso e manipulação dos dados 
+            na sua aplicação.
+
+        . View: A view é responsável pela interface que será apresentada, mostrando as informações do model para o usuário.
+
+        . Controller: É a camada de controle, responsável por ligar o model e a view, fazendo com que os models possam ser 
+            repassados para as views e vice-versa.
+
+    . MVC Pattern
+
+
+
+                                 Request
+                                    |
+                                    | Levanta uma classe Controller "https://localhost:[porta]/clientes
+                                    |
+                                    V
+                                controller  (Tem um metodo de ação publico)
+                                ----------
+                                  |     |  
+                      +-----------+     +-----------------+
+                      |                                   |  
+                      |                                   |  
+               Update |                                   | Dispara 
+                      |                                   |  
+                      |                                   |  
+                      |                                   |  
+                      V                                   V
+                    View <----------------------------- Model
+                    ----      Obtem dados do Model      -----
+                      |       (EF, Dapper, ADO.NET)
+                      |
+                      |
+                      | (Razor Page)
+                      v
+                    Response
+
+. Criando o Model e o Repository
+
+    . Ao criar um projeto MVC são criadas as pastas na estrutura do projeto:
+
+        Controllers:        Como o próprio nome diz, é o diretório que contem os controllers utilizados no projeto;
+
+        Models:             Diretório dos arquivos de models utilizados pelas Views e pelas Controllers;
+                            Representa os objetos de domínio de dados e a lógica de acesso aos dados (DTOs, BOs, DAOs)
+
+        Views:              Diretorio que irá conter outros subdiretorios. Esses subdiretorios estarão 
+                            relacionados diretamente com os controllers, ou seja, teremos as views de 
+                            cada controller alem de views, partial views e layout utilizados;
+
+    . Exemplo de uma classe Model
+
+        public class Pie
+        {
+            public int PieId { get; set; }
+
+            public string Name { get, set; }
+
+            pulbic string? ShorDescription { get, set; }
+
+            public bool IStock { get, set; }
+
+            public Category Category { get, set; }
+        }
+
+    . Os repositorios permite aos nosso codígos usar objetos sem saber com são persistidos. Criamos uma interface e e suas
+        implementações com a persistência desses objetos.
+
+
+04. Creating the First Page (8.28)
+
+
