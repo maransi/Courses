@@ -1,6 +1,10 @@
 Curso ASP.NET Core 6 Fundamentals
 ---------------------------------
 
+Observação: Todo parágrafo com o titulo "DEMO" diz respeito a parte prática do projeto, onde devemos
+            desenvolver como uma espécie de exercício.
+
+
 Entendendo o ASP.NET Core 6 e ASP.NET Core 6 MVC
 ================================================
 
@@ -232,44 +236,48 @@ https://www.c-sharpcorner.com/article/folder-structure-of-asp-net-core-mvc-6-0-p
 
 https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
 
-. Demo - Configurando a aplicação
 
-http://www.binaryintellect.net/articles/c131fc47-0c9d-496b-998a-ed65a2486896.aspx
 
-    . Visual Studio
+. DEMO
+    
+    . Configurando a aplicação
 
-        . Create a New project
+        http://www.binaryintellect.net/articles/c131fc47-0c9d-496b-998a-ed65a2486896.aspx
 
-        . Escolha ASP.NET Core Empty
+        . Visual Studio
 
-            Project Name: BhetanyPieShop
-            Location: [Pasta do projeto]
-            Solution Name: BhetanyPieShop
-            Place Solution and Project in the same Directory: False
+            . Create a New project
 
-        . Additional Information
+            . Escolha ASP.NET Core Empty
 
-            Framework: .NET 6.0
-            Configure for HTTPS: true
-            Enable Docker: False
-            Docker OS: Null
-            Do not use top level statements: Null
+                Project Name: BhetanyPieShop
+                Location: [Pasta do projeto]
+                Solution Name: BhetanyPieShop
+                Place Solution and Project in the same Directory: False
 
-        . Run
+            . Additional Information
 
-    . Dotnet core
-        
-        . Na pasta raiz do projeto execute o comando abaixo:
+                Framework: .NET 6.0
+                Configure for HTTPS: true
+                Enable Docker: False
+                Docker OS: Null
+                Do not use top level statements: Null
 
-            dotnet new web -o bhetanyPieShop -n bhetanyPieShop -f net6.0
+            . Run
 
-            dotnet clean
+        . Dotnet core
+            
+            . Na pasta raiz do projeto execute o comando abaixo:
 
-            dotnet restore
+                dotnet new web -o bhetanyPieShop -n bhetanyPieShop -f net6.0
 
-            dotnet build
+                dotnet clean
 
-            dotnet run
+                dotnet restore
+
+                dotnet build
+
+                dotnet run
 
 
 
@@ -303,30 +311,6 @@ http://www.binaryintellect.net/articles/c131fc47-0c9d-496b-998a-ed65a2486896.asp
         . A chamada acima resultará na URL:
 
             https://localhost:[porta]/
-
-
-
-. Acesse a classe "Program.cs" do seu projeto e acrescente as linhas abaixo:
-
-        var builder = WebAppication.CreateBuilder(args);
-
-        builder.Services.AddControllerWithViews();              // Linha inserida
-
-        var app = builder.Build();
-
-        app.UseStaticFiles();                                   // Linha inserida
-
-        if ( app.Environment.IsDevelopment() )                  // If inserido
-        {
-            app.UseDeveloperExceptionPage();                        
-        }
-
-        app.MapDefaultControllerRoute();                        // Linha inserida
-
-        app.MapGet("/", () => "Hello World!");
-
-        app.Run();  
-
 
 
 
@@ -648,6 +632,29 @@ http://www.binaryintellect.net/articles/c131fc47-0c9d-496b-998a-ed65a2486896.asp
             https://exceptionnotfound.net/middleware-in-asp-dotnet-6-intro-and-basics/
 
 
+. DEMO
+
+    . Acesse a classe "Program.cs" do seu projeto e acrescente as linhas abaixo:
+
+            var builder = WebAppication.CreateBuilder(args);
+
+            builder.Services.AddControllerWithViews();              // Linha inserida
+
+            var app = builder.Build();
+
+            app.UseStaticFiles();                                   // Linha inserida
+
+            if ( app.Environment.IsDevelopment() )                  // If inserido
+            {
+                app.UseDeveloperExceptionPage();                        
+            }
+
+            app.MapDefaultControllerRoute();                        // Linha inserida
+
+            app.MapGet("/", () => "Hello World!");
+
+            app.Run();  
+
     . Desenvolva o tutorial abaixo :
 
         https://macoratti.net/21/08/aspnc_authmid1.htm
@@ -732,6 +739,12 @@ Criando a primeira página
                             relacionados diretamente com os controllers, ou seja, teremos as views de 
                             cada controller alem de views, partial views e layout utilizados;
 
+    . Haverá um conjunto padrão de classes para persistir as informações das requisições:
+
+        . Model
+
+        . Repository
+
     . Exemplo de uma classe Model
 
         public class Pie
@@ -747,10 +760,369 @@ Criando a primeira página
             public Category Category { get, set; }
         }
 
-    . Os repositorios permite aos nosso codígos usar objetos sem saber com são persistidos. Criamos uma interface e e suas
-        implementações com a persistência desses objetos.
+    . Os repositorios permitem aos nosso codígos utilizem objetos sem saber com são persistidos. Criamos uma interface (contrato) 
+        e e suas implementações com a persistência desses objetos.
+
+        . Exemplo de uma interface para Repository:
+
+            public interface IPieRepository
+            {
+                IEnumerable<Pie> AllPies { get; }
+
+                Pie GetPieById( int pieId );
+            }
+
+        . Exemplo da implementação da classe Repository:
+
+            public class MockPeiRepository: IPieRepository
+            {
+                public IEnumerable<Pie> AllPies
+                {
+                    get { ... }
+                }
+
+                public Pie GetPieById( in pieId )
+                {
+                    ...
+                }
+            }
+    
+    . Registrando o Repository
+
+        Program.cs
+
+            var builder = WebApplication.CreateBuilder( args );
+
+            builder.Services.AddScoped<IPieRepository, MockPieRepository>();
+
+            var app = builder.Build();
+        
+    . Service Locator
+
+        . SL diz como resolver as depências criadas 
+
+            . Funciona como um dê-para
+
+        . Já temos um pronto no ASP.NET (build in the box)
+
+            . Podemos utilizar outros 
+
+                // Assim
+                builder.Services.AddTransient<IPieRepository, MockPieRepository>();
+
+                // ou
+                builder.Services.AddScoped<IPieRepository, MockPieRepository>();
+
+                // ou
+                builder.Services.AddSingleton<IPieRepository, MockPieRepository>();
+
+    . AddTransient, AddScoped, AddSingleton
+
+        . AddTransient
+
+            builder.Services.AddTransient<IPieRepository, MockPieRepository>();
+
+                . Sempre cira uma nova instância do objeto
+
+                . Ideal para cenários onde queremos sempre um novo objeto.
+
+        . AddScoped
+
+            builder.Services.AddScoped<IPieRepository, MockPieRepository>();
+
+                . Cria um objeto por transação/requisição
+
+                . Se você chamar 2 ou mais serviços que dendem do mesmo objeto, a mesma instância será utilizada
+
+                . Ideal para cenários onde queremos apenas um objeto por requisição (banco).
+
+        . AddSingleton
+
+            . Cria um objeto quando a aplicação inicia e apaga da sessão quando a aplicação termina.
+
+                builder.Services.AddSingleton<IPieRepository, MockPieRepository>();
+
+            . Mantém este objeto na memória até a aplicação para ou reiniciar 
+
+            . Sempre devolve a mesma instância deste objeto, com os mesmos valores.
+
+            . Padrão que visa garantir apenas um instância de um objeto para aplicão toda
+
+            . Um bom exemplo são as configurações
+
+                . Uma vez carregadas, ficam até a aplicação reiniciar.
+
+            . Cuidado.
+
+        . Quadro comparativo
+
+            Tipo	    Mesma requisição	Requisições diferentes
+            ----        ----------------    ----------------------
+            Singleton	Mesma instância	    Mesma instância
+            Scoped	    Mesma instância	    Nova instância
+            Transient	Nova instância	    Nova instância
 
 
-04. Creating the First Page (8.28)
+        . AddDbContext
+
+            . Item especial do tipo Scoped
+
+                builder.Services.AddDbContext< BlogDataContext>( x => useSqlServer( connStr ));
+
+            . Utilizado exclusivamente com o EF
+
+            . Garante que a conexão só dura até o fim da requisição
+
+    . DEMO
+
+        . Crie na estrutura raiz do projeto a pasta "Models" e crie as classes abaixo:
+
+            namespace BethanysPieShop.Models;
+
+            public class Pie
+            {
+                public int PieId { get; set; }
+
+                public string Name { get, set; } = string.Empty;
+
+                public string? ShortDescription { get, set; }
+
+                public string? LongDescription { get, set; }
+
+                public AllergyInformation { get; set; }
+
+                public decimal Price { get; set; }
+
+                public string? ImageUrl { get; set; }
+
+                public string? ImageThumbmailUrl { get; set; }
+
+                public bool IsPieOfTheWeek { get; set; }
+
+                public int CategoryId { get; set; }
+
+                public Category Category { get; set; }
+
+                public bool IStock { get, set; }
+
+                public Category Category { get, set; } = default!;
+            }
+
+
+
+
+            namespace BethanysPieShop.Models;
+
+            public class Category
+            {
+                public int CategoryId { get; set; }
+
+                public string CategoryName { get; set; } = string.Empty;
+
+                public string? Description { get; set }
+
+                public List<Pie>? Pies { get; set; }
+            }
+
+        . Crie as classes e interfaces abaixo na mesma pasta "Models":
+
+            namespace BethanysPieShop.Models;
+
+            public interface IPieRepository
+            {
+                IEnumerable<Pie> AllPies { get; }
+
+                IEnumerable<Pie> PiesOfTheWeek{ get; }
+
+                Pie? GetPieById( int pieId );
+            }
+
+
+
+
+            namespace BethanysPieShop.Models;
+
+            public interface ICategoryRepository
+            {
+                IEnumerable<Category> AllCategories{ get; }
+            }
+
+        . Crie a classe de implementação "MockCategoryRepository" dentro da pasta Models:
+
+            namespace BethanysPieShop.Models;
+
+            public class MockCategoryRepository: ICategoryRepository
+            {
+                public IEnumerable<Category> allCategories => new List<Category>{
+                    new Category{ CategoruId = 1, CategoryName = "Fruit pies", Description = "All fruity pies"},
+                    new Category{ CategoruId = 2, CategoryName = "Cheese cakes", Description = "Cheesy all the way"},
+                    new Category{ CategoruId = 3, CategoryName = "Seasonal pies", Description = "Get in the mood for a seasonal pie"}
+                };
+            }
+
+
+
+            namespace BethanysPieShop.Models;
+
+            public class MockPieRepository: IPieRepository
+            {
+
+                private readonly ICategoryRepository _categoryRepository = new MockCategoryRepository();
+
+                public IEnumerable<Pie> AllPies => new List<Pie>{
+                    new Pie{ PiedId = 1, Name = "Stramberry Pie", Price=15.95M, ShortDescription="Lorem Ipsum",
+                                LongDescription=@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
+                                                    do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                                                    Ut enim ad minim veniam, quis nostrud exercitation ullamco 
+                                                    laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
+                                                    irure dolor in reprehenderit in voluptate velit esse cillum 
+                                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat 
+                                                    cupidatat non proident, sunt in culpa qui officia deserunt 
+                                                    mollit anim id est laborum.",
+                                Category = _categoryRepository.AllCategories.ToList()[0],
+                                ImageUrl="https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/",
+                                InStock = true, IsPieOfTheWeek=false, ImageThumbmailUrl="https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/"},
+                    new Pie{ PiedId = 2, Name = "Cheese cake", Price=18.95M, ShortDescription="Lorem Ipsum",
+                                LongDescription=@"Mussum Ipsum, cacilds vidis litro abertis. Aenean aliquam molestie leo, 
+                                                    vitae iaculis nisl.Pra lá , depois divoltis porris, paradis.Nec orci 
+                                                    ornare consequat. Praesent lacinia ultrices consectetur. Sed non ipsum 
+                                                    felis.A ordem dos tratores não altera o pão duris.",
+                                Category = _categoryRepository.AllCategories.ToList()[1],
+                                ImageUrl="https://www.pexels.com/photo/orange-fruit-161559/",
+                                InStock = true, IsPieOfTheWeek=false, ImageThumbmailUrl="https://www.pexels.com/photo/orange-fruit-161559/"}
+                            }
+                }
+
+                public IEnumerable<Pie> PiesOfTheWeek
+                {
+                    get
+                    {
+                        return AllPies.Where( p => p.IsPieOfTheWeek );
+                    }
+                }
+
+                public Pie? GetPieById( int pieId ) => AllPies.FirstOrDefault( p => p.PieId = pieId );
+
+                public IEnumerable<Pie> SerachPies( string searchQuery )
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+        . Acrescente as linhas abaixo na classe "Program.cs":
+
+            using BethanysPieShop.Models;           // Linha inserida
+
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddScoped<ICategoryRepository, MockCategoryRepository>();      // Linha inserida
+            builder.Services.AddScoped<IPieRepository, MockPieRepository>();                // Linha inserida
+            ...            
+
+
+    . Criando o Controller
+
+        . Um controlador determina qual resposta enviar de volta para um usuário quando um usuário faz uma solicitação de navegador. 
+            Um controlador é apenas uma classe (por exemplo, uma classe Visual Basic ou C#). O exemplo ASP.NET aplicativo MVC inclui 
+            um controlador chamado HomeController.cs localizado na pasta "Controllers".
+
+        . Exemplo básico de um "Controller":
+
+
+                                +----> Tem o padrão "Controller" no nome da classe
+                                |
+                            ----------
+            public class PieController: Controller          // Normalmente armazenadas na pasta "Controllers"
+            {                               |
+                                            +---> Extende a class "Controller
+                public ViewResult Index()
+                {           |
+                            +-------------> ViewResult é um subtipo de ActionResult, neste caso o único retorno possível seria uma "View()".
+                                            Se fosse a classe genérica "ActionResult" o retorno poderia ser além de uma "ViewResult" também:
+
+                                            PartialViewResult, ContentResult, etc.
+
+                    return View();      // Executará o objeto "Index.cshtml" da pasta "Views/Pie"
+                }
+            }
+
+        . "ActionResult" é uma classe abstrata, que é extendida pela classe "ViewResult", uma sub-classe:
+
+                                    ActionResult
+                                         ^
+                                         v
+                                         |      <<extend>>
+                                         |
+                                    ViewResult
+
+
+
+                            ActionResult                    public ActionResult DynamicView(bool IsHtmlView)
+                            ------------                    {
+                                ^                               if (IsHtmlView)
+                                |   <<deriva>>                      return View(); // returns simple ViewResult
+                +---------------+---------------+                else
+                |               |               |                   return Json(); // returns JsonResult view
+            ViewResult      PartialView     Content          }
+                              Result        Result
+
+
+        . A classe "ActionResult" é uma classe abstrata que possui diversos sub tipos e temos uma classe apropriada para
+            cada tipo de retorno que é derivada dessa classe. Abaixo vemos os principais tipos de retorno:
+            
+            Classe derivada         Descrição                                           Exemplo
+            de ActionResult         ---------                                           -------
+            ---------------
+
+            ViewResult              Retorna uma View                                    return View();
+                                                                                        return View("Nome da View", object-model);
+
+            PartialViewResult       Retorna uma partial View, que pode ser inserida     return PartialView();
+                                    em outra View. (UserControl)                        return PartialView("Nome da PartialView", objeto-model);
+
+            RedirectResult          Redireciona para uma Url especifica                 return Redirect("http://www.site.com");
+
+            RedirectToRoutResult    Redireciona para uma outra Action                   return RedirectToAcion"("Outra_Action", "Outro_Controller");
+                                                                                        return RedirectTo-Route("Nome_da_rota");
+
+            ContentResult           Retorno texto puro                                  return Context("Texto","textoPlano");
+
+            JsonResult              Retorna um objecto no format JSON                   return Json(objeto);
+
+            JavaScriptResult        Retorna código Javascript que pode ser executado    return Javascript("$('#divTxt').html('Javascript teste');");
+                                    no cliente
+
+            FileResult              Retorna dados binários (arquivo em disco, por ex)   return File(@"/dados/teste.pdf","applicationn/pdf");
+
+            EmptyResult             Não retorn nada, igual a void                       return EmptyResult();
+
+            HttpNotFoundResult      Retorna uma página não encontrada                   - x -
+
+            HttpStatusCodeResult    HTTP definido pelo desenvolvedor                    Retorna um código de estado
+
+            FileStreamResult        Envia um objeto Stream para o Navegador             - x -
+
+            HttpUnauthorizedResult  Envia código de resposta HTTP 401 para o navegador  - x -
+
+        . "PieController" reformulado:
+
+            public class PieController: Controller
+            {
+                private readonly IPieRepository _pieRepository;
+
+                public PieController( IPieRepository pieRepository )
+                {
+                    _pieRepository = pieRepository;
+                }
+
+                public ViewResult List()
+                {
+                    return View( _pieRepository.Pies );
+                }
+            }
+
+    . DEMO
+
+04. Creating the First Page (24.27)
 
 
