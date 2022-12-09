@@ -1123,6 +1123,302 @@ Criando a primeira página
 
     . DEMO
 
-04. Creating the First Page (24.27)
+        . Crie a pasta "Controllers" e dentro dela a classe abaixo:
+
+
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace BethanysPieShop.Controllers;
+
+            public class PieController: Controller
+            {
+
+                private readonly IPieRepository _pieRepository;
+                private readonly ICategoryRepository _categoryRepository;
+
+                public PieController( IPieRepository pieRepository,
+                                        ICategoryRepository categoryRepository )
+                {
+                    _pieRepository = pieRepository;
+                    _categoryRepository = categoryRepository;
+                }
+
+
+                public IActionResult List()
+                {
+                    return View( _pieRepository.AllPies );
+                }
+            }
+
+    . Criando a View
+
+        . O que é uma View:
+
+            . Uma view é um template com a extensão *.cshtml que contém marcações HTML.
+
+            . Usa Razor code, mix de C# com HTML.
+
+            . Recebe um pouco de lógica ( condições, loop, tag helpers e view components ).
+            
+            . São HTML, CSS e Javascript.
+
+            . Podem executar funções do C# com Razor (View Engine).
+
+            . Podem interagir com objetos enviados a ela.
+
+            . São processadas no servidor e enviadas para o cliente.
+
+            . As Views podem receber parâmetros como variáveis ou tipos complexos.
+
+            . Estes parâmetros são recebidos através da sintaxe @Model
+
+            . Se um parâmetro diferente do esperado for enviado a view, causará um erro.
+
+                . Este erro só ocorrerá em tempo de execução.
+
+            . Além dados fisos, a view pode receber dados de outras formas.
+
+        . Na estrutura do projeto, cada controller terá uma respectiva pasta dentro da pasta "Views", onde armazenamos os templates "*.cshtml". 
+
+            Controllers/PieController   =>  Views/Pie
+                        ---                       ---
+                         |                         ^
+                         |                         |
+                         +-------------------------+
+
+            . Por exemplo:
+
+                public class PieController: Controller
+                {
+
+                    public ViewResult Index()   // Action
+                    {
+                        return View();          // View to show: Views/Pie/Index.cshtml
+                    }
+                }
+
+            . O template "Views/Pie/Index.cshtml" poderia ser representado pelo código abaixo:
+
+                <!DOCTYPE html>
+
+                <html>
+                    <head>
+                        <title>Index</head>
+                    </head>
+
+                    <body>
+                        <div>Welcome to Bethany´s Pie Shop<</div>
+                    </body>
+                </html>
+
+            . Utilizando "ViewBag" do Controller
+
+                public class PieController: Controller
+                {
+
+                    public ViewResult Index()   
+                    {
+                        ViewBag.Message = "Welcome to Bethany´s Pie Shop";          // Linha inserida       --------------------------------+
+                                                                                                                                            |
+                        return View();                                                                                                      |
+                    }                                                                                                                       |
+                }                                                                                                                           |
+                                                                                                                                            |
+                                                                                                                                            |
+                . ViewBag é um objeto dinâmico que podemos colocar dados do controller                                                      |
+                                                                                                                                            |
+                . Dessa forma podemos fazer algumas mudança no nosso templace "cshtml" deixando-o mais dinâmico:                            |
+                                                                                                                                            |
+                    <!-- De -->                                                                                                             |
+                    <body>                                                                                                                  |
+                        <div>Welcome to Bethany´s Pie Shop<</div>                                                                           |
+                    </body>                                                                                                                 |
+                                                                                                                                            |
+                                                                                                                                            |
+                    <!-- Para -->                                                                                                           |
+                    <body>                                                                                                                  |
+                        <div>                                                                                                               |
+                            @ViewBag.Message    <-------------------------------------------------------------------------------------------+
+                        <</div>
+                    </body>
+
+
+                . Mesclando ViewBag com Razor
+
+        . Razor Page
+
+            . O Razor nada mais é do que a linguagem C#, ou VB.NET, trabalhando em conjunto com código HTML, para a construção das suas páginas ASP.NET.
+
+            . Exemplo:
+
+                @ViewBg.Message           ------------> Usando ViewBag in Razor
+
+                <p>@DateTime.Now</p>      ------------> Apresentado a data no código Razor
+
+                @{
+                    var message = "Welcome to Bethany´s Pie Shp";   -----> Usando um bloco de códigos
+                }
+
+                <h3>@message</h3>
+
+            . Chamando uma View fortemente tipada
+
+                // PieController
+                public class PieController: Controller
+                {
+                    public ViewResult List()
+                    {
+                        return View( _pieRepository.AllPies );
+                    }
+                }
+
+
+                // Views/Pie/List.cshtml
+                @model IEnumerable<Pie>
+
+                <!DOCTYPE html>
+
+                <html>
+                    <body>
+                        <div>
+                        
+                            @foreach( var pie in Model )
+                            {
+                                <div>
+                                    <h2>@pie.Name </h2>
+                                    <h3>@pie.Price.ToString("c") </h3>
+                                    <h4>@pie.Category.CategoryName </h4>
+                                </div>
+                            }
+                        </div>
+                    </body>
+                </html>
+
+    . DEMO
+
+        . Crie a pasta "Views/Pie" e dentro dela a view abaixo com a extensão "cshtml" com o nome "List.cshtml":
+
+            @model IEnumerable<BethanysPieShop.Models.Pie>
+
+            <!DOCTYPE html>
+
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width" />
+                <title>Bethany´s Pie Shop</head>
+            </head>
+
+            <body>
+                <h1>@ViewBag.CurrentCategory</h1>
+
+                        
+                @foreach( var pie in Model )
+                {
+                    <div>
+                        <h2>@pie.Name </h2>
+                        <h3>@pie.Price.ToString("c") </h3>
+                        <h4>@pie.Category.CategoryName </h4>
+                    </div>
+                  }
+
+            </body>
+            </html>
+
+        . Acrescente as linhas abaixo na classe "PieController":
+
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace BethanysPieShop.Controllers;
+
+            public class PieController: Controller
+            {
+
+                ...
+
+                public IActionResult List()
+                {
+                    ViewBag.CurrentCategory = "Cheese cakes";       // Linha inserida
+
+                    return View( _pieRepository.AllPies );
+                }
+            }
+
+
+        . Levante o projeto e execute a rota abaixo no navegador:
+
+            https://localhost:[porta]/pie/list
+
+
+        . Crie a pasta "ViewModels" e dentro dela a classe "PieListViewModel.cs" como abaixo:
+
+            namespace BetahnysPieShop./viewmodels
+
+            public class PieListViewModel
+            {
+                public IEnumerable<Pie> Pies { get; }
+
+                public string? CurrentCategory { get; }
+
+                public PieListViewModel( IEnumerable<Pie> pies, string? currentCategory )
+                {
+                    Pies = pies;
+
+                    CurrentCategory = currentCategory;
+                }
+            }
+
+        . Altere o código do método "PieController.List" como abaixo:
+
+            ...
+            public IActionResult List()
+            {
+                // ViewBag.CurrentCategory = "Cheese cakes";       // Linha inserida
+
+                // return View( _pieRepository.AllPies );
+
+                PieListViewModel piesListViewModel = new PieListViewModel( _pieRepository.AllPies, "Cheese cakes");     // Linha inserida
+
+                return View( piesListViewModel );           // Linha inserida
+            }
+            ...
+
+        . Altere a view "Views/Pie/List.cshml" como abaixo:
+
+            @model BethanysPieShop.ViewModels.PieList/viewModel             <!-- Linha alterada -->
+
+            <!DOCTYPE html>
+
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width" />
+                <title>Bethany´s Pie Shop</head>
+            </head>
+
+            <body>
+                <h1>@Model.CurrentCategory</h1>                             <!-- Linha alterada -->
+
+                        
+                @foreach( var pie in Model )
+                {
+                    <div>
+                        <h2>@pie.Name </h2>
+                        <h3>@pie.Price.ToString("c") </h3>
+                        <h4>@pie.Category.CategoryName </h4>
+                    </div>
+                  }
+
+            </body>
+            </html>
+
+        . Levante o projeto e execute a rota abaixo no navegador:
+
+            https://localhost:[porta]/pie/list
+
+
+    . Usando o _Layout.cshtml
+
+    
+
+04. Creating the First Page (47.00)
 
 
