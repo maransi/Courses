@@ -1384,7 +1384,7 @@ Criando a primeira página
 
         . Altere a view "Views/Pie/List.cshml" como abaixo:
 
-            @model BethanysPieShop.ViewModels.PieList/viewModel             <!-- Linha alterada -->
+            @model BethanysPieShop.ViewModels.PieListViewModel             <!-- Linha alterada -->
 
             <!DOCTYPE html>
 
@@ -1417,8 +1417,221 @@ Criando a primeira página
 
     . Usando o _Layout.cshtml
 
-    
+        . Funciona como o slide mestre do power point
 
-04. Creating the First Page (47.00)
+        . Você define um padrão que será utilizado por toda a aplicação.
+
+        . Toda a página permance, mudando apensas o "miolo"
+
+        . A regição que irá mudar é identificada pelo @Renderbody()
+
+        . Podemos ter vários layouts
+
+            . Um para login
+
+            . Um para setor administrativo
+
+            . Um para a loja.
+
+        . Acessando a pasta "Views/Shared" encontramos o arquivo _Layout.cshtml.
+
+        . Exemplo de _Layout.cshtml
+
+            <!DOCTYPE html>
+
+            <html>
+                <head>
+                    <title>Index</head>
+                </head>
+
+                <body>
+                    <div>
+                        @RenderBody()
+                    </div>
+                </body>
+            </html>
+
+        . O @RenderBody() é o responsável pela montagem da página.
+
+        . Especificando um layout para a View:
+
+            @{
+                Layout = "_Layout";                                 <!-- Local para associar o arquivo _Layout.cshtml -->
+            }
+
+            @model BethanysPieShop.ViewModels.PieListViewModel             
+
+            <!DOCTYPE html>
+
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width" />
+                <title>Bethany´s Pie Shop</head>
+            </head>
+
+            <body>
+                <h1>@Model.CurrentCategory</h1>                             
+
+                        
+                @foreach( var pie in Model )
+                {
+                    <div>
+                        <h2>@pie.Name </h2>
+                        <h3>@pie.Price.ToString("c") </h3>
+                        <h4>@pie.Category.CategoryName </h4>
+                    </div>
+                    }
+
+            </body>
+            </html>
+
+    . DEMO
+
+        . Atividades:
+
+            . Adicionaremos um template layout
+
+            . Criaremos o arquivo "ViewStart"
+
+            . Adicionaremos o arquivo "ViewImports"
+
+        . Crie a pasta "Shared" dentro da pasta Views 
+
+        . Crie o arquivo "_Layout.cshtml" como abaixo na pasta "Views/Shared". 
+            IMPORTANTE: No Visual Studio dê um clique direito sobre a pasta "Shared" / Add New Item / Installed / C# / ASP.NET Core / Web / Razor Layout
+
+            <!DOCTYPE html>
+
+            <html>
+                <head>
+                    <meta name="viewport" content="width=device-width" />
+                    <title>@ViewBag.Title</title>
+                </head>
+
+                <body>
+                    <div>
+                        @RenderBody()           --------------------------------------------------------------------------------------------------------------------+
+                    </div>                                                                                                                                          |
+                </body>                                                                                                                                             |
+            </html>                                                                                                                                                 |   Substituirá por esse
+                                                                                                                                                                    |   código
+        . Altere a view "Views/Pie/List.cshml" como abaixo, retirando todo código de responsabilidade do _Layout.cshtml deixando somente o miolo:                   |
+                                                                                                                                                                    |
+            @model BethanysPieShop.ViewModels.PieListViewModel              <---------------------------------------------------------------------------------------+
+
+            @{
+                Layout = "_Layout"
+            }
+            <h1>@Model.CurrentCategory</h1>                             
+
+                    
+            @foreach( var pie in Model )
+            {
+                <div>
+                    <h2>@pie.Name </h2>
+                    <h3>@pie.Price.ToString("c") </h3>
+                    <h4>@pie.Category.CategoryName </h4>
+                </div>
+            }
+            
+        . Levante o projeto e execute a rota abaixo no navegador:
+
+            https://localhost:[porta]/pie/list
+
+
+        . Trabalhando com _ViewStart:
+
+            . Retire o trecho de código abaixo da view "Views/Pie/List.cshml":
+
+                @model BethanysPieShop.ViewModels.PieListViewModel    
+
+                <!--                                                    |
+                                                                        |
+                @{                                                      |
+                    Layout = "_Layout"                                  +-----------------------------------------------------------------------------------------------+
+                }                                                       |                                                                                               |
+                <h1>@Model.CurrentCategory</h1>                         |                                                                                               |
+                                                                        |                                                                                               |
+                -->                                                                                                                                                     |                                                                                           
+                                                                                                                                                                        |
+                @foreach( var pie in Model )                                                                                                                            |
+                {                                                                                                                                                       |
+                    <div>                                                                                                                                               |
+                        <h2>@pie.Name </h2>                                                                                                                             |
+                        <h3>@pie.Price.ToString("c") </h3>                                                                                                              |   Transportado 
+                        <h4>@pie.Category.CategoryName </h4>                                                                                                            |   para o arquivo
+                    </div>                                                                                                                                              |   "Views/_ViewStart.cshtml
+                }                                                                                                                                                       |
+                                                                                                                                                                        |
+            . Crie o arquivo "_ViewStart.cshtml" como abaixo na pasta "Views".                                                                                          |
+                IMPORTANTE: No Visual Studio dê um clique direito sobre a pasta "Views" / Add New Item / Installed / C# / ASP.NET Core / Web / Razor View Start         |   
+                                                                                                                                                                        |
+                                                                                                                                                                        |
+                @{                                                                                                                                                      |
+                    Layout = "_Layout";         <-----------------------------------------------------------------------------------------------------------------------+
+                }
+
+            . Levante o projeto e execute a rota abaixo no navegador:
+
+                https://localhost:[porta]/pie/list
+
+            . No navegador acesse o "Código fonte" da página e verifique o trecho HTML se está parecido com a do template "_Layout.cshtml"
+
+        . Trabalhnado com "ViewImports":
+
+            . Crie o arquivo "_ViewImports.cshtml" como abaixo na pasta "Views".                                                                 
+                IMPORTANTE: No Visual Studio dê um clique direito sobre a pasta "Views" / Add New Item / Installed / C# / ASP.NET Core / Web / Razor View Imports
+
+
+                @using BethanysPieShop.Models                   --------------------------------------------+
+                @using BethanysPieShop.ViewModels                                                           |
+                                                                                                            |   Retirada dos pacotes, colocando-os
+            . Altere o arquivo "Views/Pie/List.cshtml" eliminando o nome do pacote do Model                 |   dentro do arquivo "_ViewImports.cshtml"
+                                                                                                            |
+                @model PieListViewModel                     // Linha alterada       <-----------------------+
+
+                @{
+                    Layout = "_Layout"
+                }
+                <h1>@Model.CurrentCategory</h1>                             
+
+                        
+                @foreach( var pie in Model )
+                {
+                    <div>
+                        <h2>@pie.Name </h2>
+                        <h3>@pie.Price.ToString("c") </h3>
+                        <h4>@pie.Category.CategoryName </h4>
+                    </div>
+                }
+
+    . Styling the View
+
+        . ASP.NET é baseado em bootstrap
+
+        . Site de templates para o Bootstrap https://bootswatch.com/help/
+
+
+
+    . DEMO
+
+        https://marketplace.visualstudio.com/items?itemName=adrianwilczynski.libman
+        https://khalidabuhakmeh.com/using-libman-to-manage-client-side-dependencies
+
+        . Instale o plugin "Libman Tools" no VSCode
+
+        . Instale a ferramenta "Libman":
+
+            dotnet tool install -g Microsoft.Web.LibraryManager.Cli
+
+            libman --version
+
+            libman init
+
+
+
+
+
+04. Creating the First Page (56.13)
 
 
