@@ -638,7 +638,7 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
 
             var builder = WebAppication.CreateBuilder(args);
 
-            builder.Services.AddControllerWithViews();              // Linha inserida
+            builder.Services.AddControllersWithViews();              // Linha inserida
 
             var app = builder.Build();
 
@@ -877,19 +877,25 @@ Criando a primeira página
 
         . Crie na estrutura raiz do projeto a pasta "Models" e crie as classes abaixo:
 
-            namespace BethanysPieShop.Models;
+            namespace bethanysPieShop.Models;
 
             public class Pie
             {
                 public int PieId { get; set; }
 
-                public string Name { get, set; } = string.Empty;
+                public string Name { get; set; } = string.Empty;
 
-                public string? ShortDescription { get, set; }
+                public string? ShortDescription
+                {
+                    get; set;
+                }
 
-                public string? LongDescription { get, set; }
+                public string? LongDescription
+                {
+                    get; set;
+                }
 
-                public AllergyInformation { get; set; }
+                public string? AllergyInformation { get; set; }
 
                 public decimal Price { get; set; }
 
@@ -901,17 +907,23 @@ Criando a primeira página
 
                 public int CategoryId { get; set; }
 
-                public Category Category { get; set; }
+                // public Category Category { get; set; }
 
-                public bool IStock { get, set; }
+                public bool InStock
+                {
+                    get; set;
+                }
 
-                public Category Category { get, set; } = default!;
+                public Category Category
+                {
+                    get; set;
+                } = default!;
             }
 
 
 
 
-            namespace BethanysPieShop.Models;
+            namespace bethanysPieShop.Models;
 
             public class Category
             {
@@ -919,14 +931,14 @@ Criando a primeira página
 
                 public string CategoryName { get; set; } = string.Empty;
 
-                public string? Description { get; set }
+                public string? Description { get; set; }
 
                 public List<Pie>? Pies { get; set; }
             }
 
         . Crie as classes e interfaces abaixo na mesma pasta "Models":
 
-            namespace BethanysPieShop.Models;
+            namespace bethanysPieShop.Models;
 
             public interface IPieRepository
             {
@@ -940,7 +952,7 @@ Criando a primeira página
 
 
 
-            namespace BethanysPieShop.Models;
+            namespace bethanysPieShop.Models;
 
             public interface ICategoryRepository
             {
@@ -949,69 +961,69 @@ Criando a primeira página
 
         . Crie a classe de implementação "MockCategoryRepository" dentro da pasta Models:
 
-            namespace BethanysPieShop.Models;
+            namespace bethanysPieShop.Models;
 
-            public class MockCategoryRepository: ICategoryRepository
+            public class MockCategoryRepository : ICategoryRepository
             {
-                public IEnumerable<Category> allCategories => new List<Category>{
-                    new Category{ CategoruId = 1, CategoryName = "Fruit pies", Description = "All fruity pies"},
-                    new Category{ CategoruId = 2, CategoryName = "Cheese cakes", Description = "Cheesy all the way"},
-                    new Category{ CategoruId = 3, CategoryName = "Seasonal pies", Description = "Get in the mood for a seasonal pie"}
-                };
+                public IEnumerable<Category> AllCategories => new List<Category>{
+                                new Category{ CategoryId = 1, CategoryName = "Fruit pies", Description = "All fruity pies"},
+                                new Category{ CategoryId = 2, CategoryName = "Cheese cakes", Description = "Cheesy all the way"},
+                                new Category{ CategoryId = 3, CategoryName = "Seasonal pies", Description = "Get in the mood for a seasonal pie"}
+                            };
             }
 
 
 
-            namespace BethanysPieShop.Models;
+            namespace bethanysPieShop.Models;
 
-            public class MockPieRepository: IPieRepository
+            public class MockPieRepository : IPieRepository
             {
 
                 private readonly ICategoryRepository _categoryRepository = new MockCategoryRepository();
 
                 public IEnumerable<Pie> AllPies => new List<Pie>{
-                    new Pie{ PiedId = 1, Name = "Stramberry Pie", Price=15.95M, ShortDescription="Lorem Ipsum",
-                                LongDescription=@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
-                                                    do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                                                    Ut enim ad minim veniam, quis nostrud exercitation ullamco 
-                                                    laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
-                                                    irure dolor in reprehenderit in voluptate velit esse cillum 
-                                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat 
-                                                    cupidatat non proident, sunt in culpa qui officia deserunt 
-                                                    mollit anim id est laborum.",
-                                Category = _categoryRepository.AllCategories.ToList()[0],
-                                ImageUrl="https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/",
-                                InStock = true, IsPieOfTheWeek=false, ImageThumbmailUrl="https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/"},
-                    new Pie{ PiedId = 2, Name = "Cheese cake", Price=18.95M, ShortDescription="Lorem Ipsum",
-                                LongDescription=@"Mussum Ipsum, cacilds vidis litro abertis. Aenean aliquam molestie leo, 
-                                                    vitae iaculis nisl.Pra lá , depois divoltis porris, paradis.Nec orci 
-                                                    ornare consequat. Praesent lacinia ultrices consectetur. Sed non ipsum 
-                                                    felis.A ordem dos tratores não altera o pão duris.",
-                                Category = _categoryRepository.AllCategories.ToList()[1],
-                                ImageUrl="https://www.pexels.com/photo/orange-fruit-161559/",
-                                InStock = true, IsPieOfTheWeek=false, ImageThumbmailUrl="https://www.pexels.com/photo/orange-fruit-161559/"}
-                            }
-                }
+                                new Pie{ PieId = 1, Name = "Stramberry Pie", Price=15.95M, ShortDescription="Lorem Ipsum",
+                                            LongDescription=@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
+                                                                do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                                                                Ut enim ad minim veniam, quis nostrud exercitation ullamco 
+                                                                laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
+                                                                irure dolor in reprehenderit in voluptate velit esse cillum 
+                                                                dolore eu fugiat nulla pariatur. Excepteur sint occaecat 
+                                                                cupidatat non proident, sunt in culpa qui officia deserunt 
+                                                                mollit anim id est laborum.",
+                                            Category = _categoryRepository.AllCategories.ToList()[0],
+                                            ImageUrl="https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/",
+                                            InStock = true, IsPieOfTheWeek=false, ImageThumbmailUrl="https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/"},
+                                new Pie{ PieId = 2, Name = "Cheese cake", Price=18.95M, ShortDescription="Lorem Ipsum",
+                                            LongDescription=@"Mussum Ipsum, cacilds vidis litro abertis. Aenean aliquam molestie leo, 
+                                                                vitae iaculis nisl.Pra lá , depois divoltis porris, paradis.Nec orci 
+                                                                ornare consequat. Praesent lacinia ultrices consectetur. Sed non ipsum 
+                                                                felis.A ordem dos tratores não altera o pão duris.",
+                                            Category = _categoryRepository.AllCategories.ToList()[1],
+                                            ImageUrl="https://www.pexels.com/photo/orange-fruit-161559/",
+                                            InStock = true, IsPieOfTheWeek=false, ImageThumbmailUrl="https://www.pexels.com/photo/orange-fruit-161559/"}
+                                        };
 
                 public IEnumerable<Pie> PiesOfTheWeek
                 {
                     get
                     {
-                        return AllPies.Where( p => p.IsPieOfTheWeek );
+                        return AllPies.Where(p => p.IsPieOfTheWeek);
                     }
                 }
 
-                public Pie? GetPieById( int pieId ) => AllPies.FirstOrDefault( p => p.PieId = pieId );
+                public Pie? GetPieById(int pieId) => AllPies.FirstOrDefault(p => p.PieId == pieId);
 
-                public IEnumerable<Pie> SerachPies( string searchQuery )
+                public IEnumerable<Pie> SerachPies(string searchQuery)
                 {
                     throw new NotImplementedException();
                 }
             }
 
+
         . Acrescente as linhas abaixo na classe "Program.cs":
 
-            using BethanysPieShop.Models;           // Linha inserida
+            using bethanysPieShop.Models;           // Linha inserida
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -1125,19 +1137,19 @@ Criando a primeira página
 
         . Crie a pasta "Controllers" e dentro dela a classe abaixo:
 
-
+            using bethanysPieShop.Models;
             using Microsoft.AspNetCore.Mvc;
 
-            namespace BethanysPieShop.Controllers;
+            namespace bethanysPieShop.Controllers;
 
-            public class PieController: Controller
+            public class PieController : Controller
             {
 
                 private readonly IPieRepository _pieRepository;
                 private readonly ICategoryRepository _categoryRepository;
 
-                public PieController( IPieRepository pieRepository,
-                                        ICategoryRepository categoryRepository )
+                public PieController(IPieRepository pieRepository,
+                                        ICategoryRepository categoryRepository)
                 {
                     _pieRepository = pieRepository;
                     _categoryRepository = categoryRepository;
@@ -1146,7 +1158,7 @@ Criando a primeira página
 
                 public IActionResult List()
                 {
-                    return View( _pieRepository.AllPies );
+                    return View(_pieRepository.AllPies);
                 }
             }
 
@@ -1298,37 +1310,39 @@ Criando a primeira página
 
         . Crie a pasta "Views/Pie" e dentro dela a view abaixo com a extensão "cshtml" com o nome "List.cshtml":
 
-            @model IEnumerable<BethanysPieShop.Models.Pie>
+            @model IEnumerable<bethanysPieShop.Models.Pie>
 
             <!DOCTYPE html>
 
             <html>
+
             <head>
                 <meta name="viewport" content="width=device-width" />
-                <title>Bethany´s Pie Shop</head>
+                <title>Bethany´s Pie Shop</title>
             </head>
 
             <body>
                 <h1>@ViewBag.CurrentCategory</h1>
 
-                        
+
                 @foreach( var pie in Model )
                 {
-                    <div>
-                        <h2>@pie.Name </h2>
-                        <h3>@pie.Price.ToString("c") </h3>
-                        <h4>@pie.Category.CategoryName </h4>
-                    </div>
-                  }
+                <div>
+                    <h2>@pie.Name </h2>
+                    <h3>@pie.Price.ToString("c") </h3>
+                    <h4>@pie.Category.CategoryName </h4>
+                </div>
+                }
 
             </body>
+
             </html>
 
         . Acrescente as linhas abaixo na classe "PieController":
 
             using Microsoft.AspNetCore.Mvc;
 
-            namespace BethanysPieShop.Controllers;
+            namespace bethanysPieShop.Controllers;
 
             public class PieController: Controller
             {
@@ -1351,7 +1365,9 @@ Criando a primeira página
 
         . Crie a pasta "ViewModels" e dentro dela a classe "PieListViewModel.cs" como abaixo:
 
-            namespace BetahnysPieShop./viewmodels
+            using bethanysPieShop.Models;
+
+            namespace bethanysPieShop.ViewModels;
 
             public class PieListViewModel
             {
@@ -1359,7 +1375,7 @@ Criando a primeira página
 
                 public string? CurrentCategory { get; }
 
-                public PieListViewModel( IEnumerable<Pie> pies, string? currentCategory )
+                public PieListViewModel(IEnumerable<Pie> pies, string? currentCategory)
                 {
                     Pies = pies;
 
@@ -1369,6 +1385,7 @@ Criando a primeira página
 
         . Altere o código do método "PieController.List" como abaixo:
 
+            using betahnysPieShop.ViewModels;   // Linha inserida
             ...
             public IActionResult List()
             {
@@ -1384,7 +1401,35 @@ Criando a primeira página
 
         . Altere a view "Views/Pie/List.cshml" como abaixo:
 
-            @model BethanysPieShop.ViewModels.PieListViewModel             <!-- Linha alterada -->
+            @model bethanysPieShop.ViewModels.PieListViewModel      <!-- Linha alterada -->
+
+            <!DOCTYPE html>
+
+            <html>
+
+            <head>
+                <meta name="viewport" content="width=device-width" />
+                <title>Bethany´s Pie Shop</title>
+            </head>
+
+            <body>
+                <h1>@Model.CurrentCategory</h1>         <!-- Linha alterada -->
+
+
+                @foreach( var pie in Model.Pies )       <!-- Linha alterada -->
+                {
+                <div>
+                    <h2>@pie.Name </h2>
+                    <h3>@pie.Price.ToString("c") </h3>
+                    <h4>@pie.Category.CategoryName </h4>
+                </div>
+                }
+
+            </body>
+
+            </html>
+
+            @model bethanysPieShop.ViewModels.PieListViewModel             <!-- Linha alterada -->
 
             <!DOCTYPE html>
 
@@ -1484,7 +1529,8 @@ Criando a primeira página
 
             </body>
             </html>
-
+            
+// PAREI AQUI
     . DEMO
 
         . Atividades:
