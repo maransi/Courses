@@ -4,6 +4,60 @@ Curso ASP.NET Core 6 Fundamentals
 Observação: Todo parágrafo com o titulo "DEMO" diz respeito a parte prática do projeto, onde devemos
             desenvolver como uma espécie de exercício.
 
+Instalações
+===========
+
+    . Instalação para as versões acima do Ubuntu 22.04
+
+        wget https://dot.net/v1/dotnet-install.sh
+        chmod +x dotnet-install.sh
+        ./dotnet-install.sh -c 3.1
+        ./dotnet-install.sh -c 5.0
+        ./dotnet-install.sh -c 6.0
+        ./dotnet-install.sh -c 7.0
+
+        dotnet --version
+
+        # insira as linhas abaixo no arquivo ".bashrc"
+        export PATH="home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"
+        export DOTNET_ROOT=/home/marco/.dotnet/
+
+        source ~/.bashrc
+
+        sudo ln -s /home/marco/.dotnet/dotnet /usr/bin/dotnet
+
+        dotnet --version
+        dotnet --list-runtimes
+        dotnet --list-sdks
+
+    Instalação das extensões do VSCode
+    ----------------------------------
+
+            C# 
+            C# Extensions
+            C# XML Documentation Comments
+            Docker
+            vscode-icons (Opcional)
+            NuGet Gallery
+            VZ Dotnet File Template
+            Dotnet Project References
+            Auto-Using for C#
+            Bracket Pair Colorization Toggler
+            Error Lens
+            RapidApi
+
+
+        Testar
+            Dotnet Solution Explorer
+            Dotnet New Extension
+            Net Core Extension Pack
+            C# Utilities
+            Nuget Package Manager
+            Visual Nuget
+            C# Developer Extension Package
+            Auto closet tag
+            C# Snippets
+
 
 Entendendo o ASP.NET Core 6 e ASP.NET Core 6 MVC
 ================================================
@@ -1530,7 +1584,6 @@ Criando a primeira página
             </body>
             </html>
             
-// PAREI AQUI
     . DEMO
 
         . Atividades:
@@ -1563,15 +1616,15 @@ Criando a primeira página
                                                                                                                                                                     |   código
         . Altere a view "Views/Pie/List.cshml" como abaixo, retirando todo código de responsabilidade do _Layout.cshtml deixando somente o miolo:                   |
                                                                                                                                                                     |
-            @model BethanysPieShop.ViewModels.PieListViewModel              <---------------------------------------------------------------------------------------+
+            @model bethanysPieShop.ViewModels.PieListViewModel              <---------------------------------------------------------------------------------------+
 
             @{
-                Layout = "_Layout"
+                Layout = "_Layout";
             }
             <h1>@Model.CurrentCategory</h1>                             
 
                     
-            @foreach( var pie in Model )
+            @foreach( var pie in Model.Pies )
             {
                 <div>
                     <h2>@pie.Name </h2>
@@ -1596,9 +1649,10 @@ Criando a primeira página
                 @{                                                      |
                     Layout = "_Layout"                                  +-----------------------------------------------------------------------------------------------+
                 }                                                       |                                                                                               |
-                <h1>@Model.CurrentCategory</h1>                         |                                                                                               |
-                                                                        |                                                                                               |
-                -->                                                                                                                                                     |                                                                                           
+                -->                                                     |                                                                                               |                                                                                           
+                                                                                                                                                                        |
+                <h1>@Model.CurrentCategory</h1>                                                                                                                         |
+                                                                                                                                                                        |
                                                                                                                                                                         |
                 @foreach( var pie in Model )                                                                                                                            |
                 {                                                                                                                                                       |
@@ -1629,8 +1683,8 @@ Criando a primeira página
                 IMPORTANTE: No Visual Studio dê um clique direito sobre a pasta "Views" / Add New Item / Installed / C# / ASP.NET Core / Web / Razor View Imports
 
 
-                @using BethanysPieShop.Models                   --------------------------------------------+
-                @using BethanysPieShop.ViewModels                                                           |
+                @using bethanysPieShop.Models                   --------------------------------------------+
+                @using bethanysPieShop.ViewModels                                                           |
                                                                                                             |   Retirada dos pacotes, colocando-os
             . Altere o arquivo "Views/Pie/List.cshtml" eliminando o nome do pacote do Model                 |   dentro do arquivo "_ViewImports.cshtml"
                                                                                                             |
@@ -1664,7 +1718,9 @@ Criando a primeira página
         https://marketplace.visualstudio.com/items?itemName=adrianwilczynski.libman
         https://khalidabuhakmeh.com/using-libman-to-manage-client-side-dependencies
 
-        . Instale o plugin "Libman Tools" no VSCode
+
+        . Importante: Certifique-se que a variável ambiental DOTNET_ROOT está configurada corretamente apontando para a pasta de 
+                        instalação do dotnet. Sem essa configuração o "libman" não irá executar.
 
         . Instale a ferramenta "Libman":
 
@@ -1672,7 +1728,10 @@ Criando a primeira página
 
             libman --version
 
+            # Na pasta do projeto
             libman init
+
+        . Instale o plugin "Libman Tools" no VSCode
 
 
 
