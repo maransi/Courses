@@ -20,15 +20,21 @@ Instalações
 
         # insira as linhas abaixo no arquivo ".bashrc"
         export PATH="home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"
-        export DOTNET_ROOT=/home/marco/.dotnet/
+        export DOTNET_ROOT=/home/$USER/.dotnet/
 
         source ~/.bashrc
 
-        sudo ln -s /home/marco/.dotnet/dotnet /usr/bin/dotnet
+        sudo ln -s /home/$USER/.dotnet/dotnet /usr/bin/dotnet
 
         dotnet --version
         dotnet --list-runtimes
         dotnet --list-sdks
+
+        cd /home/$USER/Download
+
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+
 
     Instalação das extensões do VSCode
     ----------------------------------
@@ -36,6 +42,7 @@ Instalações
             C# 
             C# Extensions
             C# XML Documentation Comments
+            Libman
             Docker
             vscode-icons (Opcional)
             NuGet Gallery
@@ -57,6 +64,21 @@ Instalações
             C# Developer Extension Package
             Auto closet tag
             C# Snippets
+
+    Instalação do Nodejs
+    --------------------
+
+        sudo apt-get install nodejs
+        sudo apt-get install npm
+
+        ou
+
+        sudo apt-get install curl python-software-properties
+        curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+        sudo apt-get install -y nodejs
+        
+        node -v
+        npm -v
 
 
 Entendendo o ASP.NET Core 6 e ASP.NET Core 6 MVC
@@ -955,7 +977,7 @@ Criando a primeira página
 
                 public string? ImageUrl { get; set; }
 
-                public string? ImageThumbmailUrl { get; set; }
+                public string? ImageThumbnailUrl { get; set; }
 
                 public bool IsPieOfTheWeek { get; set; }
 
@@ -1035,28 +1057,14 @@ Criando a primeira página
 
                 private readonly ICategoryRepository _categoryRepository = new MockCategoryRepository();
 
-                public IEnumerable<Pie> AllPies => new List<Pie>{
-                                new Pie{ PieId = 1, Name = "Stramberry Pie", Price=15.95M, ShortDescription="Lorem Ipsum",
-                                            LongDescription=@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
-                                                                do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                                                                Ut enim ad minim veniam, quis nostrud exercitation ullamco 
-                                                                laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
-                                                                irure dolor in reprehenderit in voluptate velit esse cillum 
-                                                                dolore eu fugiat nulla pariatur. Excepteur sint occaecat 
-                                                                cupidatat non proident, sunt in culpa qui officia deserunt 
-                                                                mollit anim id est laborum.",
-                                            Category = _categoryRepository.AllCategories.ToList()[0],
-                                            ImageUrl="https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/",
-                                            InStock = true, IsPieOfTheWeek=false, ImageThumbmailUrl="https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/"},
-                                new Pie{ PieId = 2, Name = "Cheese cake", Price=18.95M, ShortDescription="Lorem Ipsum",
-                                            LongDescription=@"Mussum Ipsum, cacilds vidis litro abertis. Aenean aliquam molestie leo, 
-                                                                vitae iaculis nisl.Pra lá , depois divoltis porris, paradis.Nec orci 
-                                                                ornare consequat. Praesent lacinia ultrices consectetur. Sed non ipsum 
-                                                                felis.A ordem dos tratores não altera o pão duris.",
-                                            Category = _categoryRepository.AllCategories.ToList()[1],
-                                            ImageUrl="https://www.pexels.com/photo/orange-fruit-161559/",
-                                            InStock = true, IsPieOfTheWeek=false, ImageThumbmailUrl="https://www.pexels.com/photo/orange-fruit-161559/"}
-                                        };
+                public IEnumerable<Pie> AllPies =>
+                    new List<Pie>
+                    {
+                        new Pie {PieId = 1, Name="Strawberry Pie", Price=15.95M, ShortDescription="Lorem Ipsum", LongDescription="Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = _categoryRepository.AllCategories.ToList()[0],ImageUrl="https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/fruitpies/strawberrypie.jpg", InStock=true, IsPieOfTheWeek=false, ImageThumbnailUrl="https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/fruitpies/strawberrypiesmall.jpg"},
+                        new Pie {PieId = 2, Name="Cheese cake", Price=18.95M, ShortDescription="Lorem Ipsum", LongDescription="Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = _categoryRepository.AllCategories.ToList()[1],ImageUrl="https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/cheesecake.jpg", InStock=true, IsPieOfTheWeek=false, ImageThumbnailUrl="https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/cheesecakesmall.jpg"},
+                        new Pie {PieId = 3, Name="Rhubarb Pie", Price=15.95M, ShortDescription="Lorem Ipsum", LongDescription="Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = _categoryRepository.AllCategories.ToList()[0],ImageUrl="https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/fruitpies/rhubarbpie.jpg", InStock=true, IsPieOfTheWeek=true, ImageThumbnailUrl="https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/fruitpies/rhubarbpiesmall.jpg"},
+                        new Pie {PieId = 4, Name="Pumpkin Pie", Price=12.95M, ShortDescription="Lorem Ipsum", LongDescription="Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = _categoryRepository.AllCategories.ToList()[2],ImageUrl="https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/seasonal/pumpkinpie.jpg", InStock=true, IsPieOfTheWeek=true, ImageThumbnailUrl="https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/seasonal/pumpkinpiesmall.jpg"}
+                    };
 
                 public IEnumerable<Pie> PiesOfTheWeek
                 {
@@ -1711,9 +1719,7 @@ Criando a primeira página
 
         . Site de templates para o Bootstrap https://bootswatch.com/help/
 
-
-
-    . DEMO
+    . Instalando ferramenta Libman:
 
         https://marketplace.visualstudio.com/items?itemName=adrianwilczynski.libman
         https://khalidabuhakmeh.com/using-libman-to-manage-client-side-dependencies
@@ -1735,16 +1741,126 @@ Criando a primeira página
             # Na pasta raiz do projeto
             libman init
 
+            . Verifique o conteúdo do arquivo "libman.json"
+
+        . Execute o comando abaixo na pasta raiz do projeto:
+
             libman install bootstrap@5.1.3
 
-        . Verifique o conteúdo do arquivo "libman.json"
+            . Verifique se foi criado a pasta "wwwroot/lib/bootstrap" com os arquivo da bibliote "bootstrap"
 
-        . Verifique se foi criado a pasta "wwwroot/lib/bootstrap" com os arquivo da bibliote "bootstrap"
+        . No comando de instalação acima não foi possível a execução, dando erro, embora toda a instalação tenha ocorrido com sucesso.
+            Vamos substituir o "libman" pelo "npm" para fazer o downloading das bibliotecas javascript.
+
+    . Instalando o npm
+
+        . Verifique se o npm está instalado no ambiente, caso não esteja, proceda a instalação no inicio do documento:
+
+            npm -v
+
+    . DEMO
+
+        . Execute os comandos abaixo na pasta raiz do projeto:
+
+            npm install bootstrat@5.1.3
+
+            npm install jquery@3.6.0
+
+        . Crie a pasta "wwwroot/lib" dentro da raiz do projeto.
+
+        . Copie as pastas bootstrap e jquery para dentro da pasta "wwwroot/lib"
+
+        . Acesse o arquivo de material do curso "asp-dot-net-core-6-fundamentals" para pegar o conteúdo abaixo:
+
+            . Atualize o conteúdo do arquivo "Shared/_Layout.cshtml" com o código abaixo:
+
+                <!DOCTYPE html>
+
+                <html>
+                <head>
+                    <meta name="viewport" content="width=device-width" />
+                    <title>Bethany's Pie Shop</title>
+                    <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
+                    <script src="~/lib/jquery/src/jquery.js"></script>
+                    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+                    <link href="~/css/site.css" rel="stylesheet" />
+                    <base href="/" />
+                </head>
+                <body>
+                    <div class="container">
+                        <header>
+                            <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary"
+                                aria-label="Bethany's Pie Shop navigation header">
+                                <div class="container-xl">
+                                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                                        <img src="images/bethanys-pie-shop-logo_horiz-white.png" width="151" height="47" class="d-inline-block align-top mb-2 mt-1"
+                                            alt="Bethany's Pie Shop Logo">
+                                    </a>
+
+                                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                                            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                                        <span class="navbar-toggler-icon"></span>
+                                    </button>
+
+                                    <div class="collapse navbar-collapse" id="navbarCollapse">
+                                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </nav>
+                        </header>
+
+                        @RenderBody()
+                    </div>
+                </body>
+                </html>
+
+            . Atualize o conteúdo do arquivo "Views/Pie/List.cshtml" com o conteúdo abaixo:
+
+                @model PieListViewModel
+
+                <h1>@Model.CurrentCategory</h1>
+
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+
+                    @foreach (var pie in Model.Pies)
+                    {
+                        <div class="col">
+                            <div class="card pie-card">
+                                <img src="@pie.ImageThumbnailUrl" class="card-img-top" alt="@pie.Name">
+                                <div class="card-body pie-button">
+                                    <h4 class="d-grid">
+                                    </h4>
+
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <h2 class="text-start">
+                                            <a class="pie-link">@pie.Name</a>
+                                        </h2>
+                                        <h5 class="text-nowrap">
+                                            @pie.Price.ToString("c")
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+
+            . Copie a pasta "wwwroot/images" do material do curso para a pasta do projeto "wwwroot/images"
+
+            . Copie a pasta "wwwroot/css" do material do curso para a pasta do projeto "wwwroot/css"
+
+        . Execute os comandos abaixo para levantar o projeto:
+
+            dotnet clean
+
+            dotnet build
+
+            dotnet run
 
 
 
-
-
-04. Creating the First Page (56.13)
+05 Working with Real Data Using Entity Framework Core 6 (7.27)
 
 
