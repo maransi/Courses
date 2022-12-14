@@ -1859,6 +1859,373 @@ Criando a primeira página
 
             dotnet run
 
+            . Levante o projeto e execute a rota abaixo no navegador:
+
+                https://localhost:[porta]/pie/list
+
+
+Working with Real Data Using Entity Framework Core 6
+====================================================
+
+    . DEMO
+
+        . Objetivos deste módulo:
+
+            . Adicionar os pacotes necessários para trabalhar com EF
+
+            . Criação do DbContext
+
+            . Alterando as configurações da aplicação
+
+        . Na pasta raiz do projeto execute os comandos abaixo:
+
+            dotnet add package Microsoft.EntityFrameworkCore --version 6.0.12
+
+            dotnet add package Microsoft.EntityFrameworkCore.Tools --version 6.0.12
+
+            dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 6.0.12
+
+            # Se for usar o banco de dados SQL Server execute a linha abaixo
+            #
+            # dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
+
+            dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.12
+
+
+            # Execute a linha abaixo caso o "dotnet-ef" não existir no ambiente
+            dotnet tool install --global dotnet-ef --version 6.0.12
+
+        . Instale o "DB Browser for SQLite" para realizar as consultas no banco de dados
+
+        . Acesse os arquivos "appsettings.json" e "appsettings.Development.json" e insira a linha abaixo:
+
+            {
+                "ConnectionStrings": {              
+                    "DefaultConnection": "DataSource=app.db;Cache=Shared"
+                },
+                ...
+            }
+
+            . IMPORTANTE: As configurações de "Development" existentes nos "Properties/launchSetting.json" não está apontando
+                            para o arquivo "appsetings.Development.json", talvez isto ocorra devido ao comando "dotnet ef migrations..."
+                            enxergar somente o arquivo "appsetings.json"
+
+
+        . Crie a pasta "Data" dentro da raiz do projeto e dentro dela crie a classe abaixo:
+
+            using System;
+            using contrato.Models;
+            using Microsoft.EntityFrameworkCore;
+
+            namespace contrato.Data
+            {
+                public class AppDbContext: DbContext
+                {
+                    public DbSet<Category> Categories { get; set; }
+                    public DbSet<Pie> Pies { get; set; }
+
+                    public AppDbContext(DbContextOptions<AppDbContext> options ) : base(options)
+                    {
+                    }
+
+        //            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+        //                        => optionsBuilder.UseSqlite();
+                    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+                    {
+                        optionsBuilder.UseSqlite();
+                        optionsBuilder.LogTo( Console.WriteLine );
+                    }
+
+
+                }
+            }
+
+
+        . Adicione as linhas abaixo na classe "Program.cs":
+
+            ...
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddScoped<ICategoryRepository, MockCategoryRepository>();      
+            builder.Services.AddScoped<IPieRepository, MockPieRepository>();                
+
+            var connectionStrings = Configuration.GetConnectionString("DefaultConnection");     // Linha inserida
+
+            // builder.Services.AddDbContext<AppDbContext>(options =>                           // Linha inserida
+            //    options.UseSqlite(connectionStrings));
+            builder.Services.AddDbContext<AppDbContext>( options => {                           // Linha inserida
+                options.UseSqLite( 
+                    builder.Configuration["ConnectionStrings:DefaultConnection]);
+            });
+
+        . Crie as classes repository abaixo dentro da pasta "Models":
+
+            using Microsoft.EntityFrameworkCore;
+
+            namespace BethanysPieShop.Models
+            {
+                public class PieRepository : IPieRepository
+                {
+                    private readonly BethanysPieShopDbContext _bethanysPieShopDbContext;
+
+                    public PieRepository(BethanysPieShopDbContext bethanysPieShopDbContext)
+                    {
+                        _bethanysPieShopDbContext = bethanysPieShopDbContext;
+                    }
+
+                    public IEnumerable<Pie> AllPies
+                    {
+                        get
+                        {
+                            return _bethanysPieShopDbContext.Pies.Include(c => c.Category);
+                        }
+                    }
+
+                    public IEnumerable<Pie> PiesOfTheWeek
+                    {
+                        get
+                        {
+                            return _bethanysPieShopDbContext.Pies.Include(c => c.Category).Where(p => p.IsPieOfTheWeek);
+                        }
+                    }
+
+                    public Pie? GetPieById(int pieId)
+                    {
+                        return _bethanysPieShopDbContext.Pies.FirstOrDefault(p => p.PieId == pieId);
+                    }
+
+                    public IEnumerable<Pie> SearchPies(string searchQuery)
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+            }
+
+
+            namespace BethanysPieShop.Models
+            {
+                public class CategoryRepository: ICategoryRepository
+                {
+                    private readonly BethanysPieShopDbContext _bethanysPieShopDbContext;
+
+                    public CategoryRepository(BethanysPieShopDbContext bethanysPieShopDbContext)
+                    {
+                        _bethanysPieShopDbContext = bethanysPieShopDbContext;
+                    }
+
+                    public IEnumerable<Category> AllCategories => _bethanysPieShopDbContext.Categories.OrderBy(p => p.CategoryName);
+                }
+            }
+
+        . Altere a classe "Model" "Pie.cs" como abaixo:
+
+            namespace bethanysPieShop.Models;
+
+            [Table("Pie")]
+            public class Pie
+            {
+                [Key]
+                [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+                [Column("PieId")]
+                public int PieId { get; set; }
+
+                [Required(ErrorMessage = "Este campo é obrigatorio")]
+                [MaxLength(150, ErrorMessage = "Este campo deve ter entre 5 a 100 caracateres")]
+                [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 100 caracateres")]
+                [Column("Name", TypeName ="VARCHAR(100)")]
+                public string Name { get; set; } = string.Empty;
+
+
+                [MaxLength(50, ErrorMessage = "Este campo deve ter entre 5 a 50 caracateres")]
+                [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 50 caracateres")]
+                [Column("ShortDescription", TypeName ="VARCHAR(50)")]
+                public string? ShortDescription
+                {
+                    get; set;
+                }
+
+                [MaxLength(100, ErrorMessage = "Este campo deve ter entre 5 a 100 caracateres")]
+                [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 100 caracateres")]
+                [Column("LongDescription", TypeName ="VARCHAR(100)")]
+                public string? LongDescription
+                {
+                    get; set;
+                }
+
+                [MaxLength(150, ErrorMessage = "Este campo deve ter entre 5 a 150 caracateres")]
+                [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 150 caracateres")]
+                [Column("AllergyInformation", TypeName ="VARCHAR(150)")]
+                public string? AllergyInformation { get; set; }
+
+                [Precision(15,2)]
+                [Column("Price", TypeName ="DECIMAL(15,2)")]
+                public decimal Price { get; set; }
+
+
+                [Column("ImageUrl", TypeName ="VARCHAR(255)")]
+                public string? ImageUrl { get; set; }
+
+
+                [Column("ImageThumbnailUrl", TypeName ="VARCHAR(255)")]
+                public string? ImageThumbnailUrl { get; set; }
+
+                public bool IsPieOfTheWeek { get; set; }
+
+
+                [Column("CategoryId", TypeName ="INTEGER")]
+                public int CategoryId { get; set; }
+
+
+                public bool InStock
+                {
+                    get; set;
+                }
+
+                ForeignKey("CategoryId")]
+                public Category Category
+                {
+                    get; set;
+                } = default!;
+            }
+
+        . Altere a classe "Model" "Cattegory.cs" como abaixo:
+
+            namespace bethanysPieShop.Models;
+
+            [Table("Category")]
+            public class Category
+            {
+
+                [Key]
+                [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+                [Column("CategoryId")]
+                public int CategoryId { get; set; }
+
+                [Required(ErrorMessage = "Este campo é obrigatorio")]
+                [MaxLength(100, ErrorMessage = "Este campo deve ter entre 5 a 100 caracateres")]
+                [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 100 caracateres")]
+                [Column("Name", TypeName ="VARCHAR(100)")]
+                public string CategoryName { get; set; } = string.Empty;
+
+                [Required(ErrorMessage = "Este campo é obrigatorio")]
+                [MaxLength(150, ErrorMessage = "Este campo deve ter entre 5 a 150 caracateres")]
+                [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 150 caracateres")]
+                [Column("Description", TypeName ="VARCHAR(100)")]
+                public string? Description { get; set; }
+
+                [ForeignKey("PieId")]
+                public List<Pie>? Pies { get; set; }
+            }
+
+        . Acesse a classe "Program.cs" e faça as alterações abaixo:
+
+            using bethanysPieShop.Models;           
+
+            var builder = WebApplication.CreateBuilder(args);
+
+                                                                +---> de MockCategoryRepository -> para CategoryRepository
+                                                                |
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();      // Linha alterada
+            builder.Services.AddScoped<IPieRepository, PieRepository>();                // Linha alterada
+            ...
+
+        . Na raiz do projeto execute os comandos abaixo:
+
+            dotnet clean
+
+            dotnet build
+
+            dotnet ef migrations add InitialCreation
+
+            dotnet ef database update
+
+        . Crie a classe abaixo na pasta "Models":
+
+            namespace BethanysPieShop.Models
+            {
+                public static class DbInitializer
+                {
+                    public static void Seed(IApplicationBuilder applicationBuilder)
+                    {
+                        BethanysPieShopDbContext context = applicationBuilder.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<BethanysPieShopDbContext>();
+
+                        if (!context.Categories.Any())
+                        {
+                            context.Categories.AddRange(Categories.Select(c => c.Value));
+                        }
+
+                        if (!context.Pies.Any())
+                        {
+                            context.AddRange
+                            (
+                                new Pie { Name = "Caramel Popcorn Cheese Cake", Price = 22.95M, ShortDescription = "The ultimate cheese cake", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Cheese cakes"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/caramelpopcorncheesecake.jpg", InStock = true, IsPieOfTheWeek = true, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/caramelpopcorncheesecakesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Chocolate Cheese Cake", Price = 19.95M, ShortDescription = "The chocolate lover's dream", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Cheese cakes"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/chocolatecheesecake.jpg", InStock = true, IsPieOfTheWeek = true, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/chocolatecheesecakesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Pistache Cheese Cake", Price = 21.95M, ShortDescription = "We're going nuts over this one", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Cheese cakes"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/pistachecheesecake.jpg", InStock = true, IsPieOfTheWeek = true, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/pistachecheesecakesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Pecan Pie", Price = 21.95M, ShortDescription = "More pecan than you can handle!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Fruit pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/fruitpies/pecanpie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/fruitpies/pecanpiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Birthday Pie", Price = 29.95M, ShortDescription = "A Happy Birthday with this pie!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Seasonal pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/seasonal/birthdaypie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/seasonal/birthdaypiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Apple Pie", Price = 12.95M, ShortDescription = "Our famous apple pies!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Fruit pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/applepie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/applepiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Blueberry Cheese Cake", Price = 18.95M, ShortDescription = "You'll love it!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Cheese cakes"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/blueberrycheesecake.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/blueberrycheesecakesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Cheese Cake", Price = 18.95M, ShortDescription = "Plain cheese cake. Plain pleasure.", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Cheese cakes"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/cheesecake.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/bethanyspieshop/cheesecakes/cheesecakesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Cherry Pie", Price = 15.95M, ShortDescription = "A summer classic!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Fruit pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cherrypie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cherrypiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Christmas Apple Pie", Price = 13.95M, ShortDescription = "Happy holidays with this pie!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Seasonal pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/christmasapplepie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/christmasapplepiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Cranberry Pie", Price = 17.95M, ShortDescription = "A Christmas favorite", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Seasonal pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cranberrypie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cranberrypiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Peach Pie", Price = 15.95M, ShortDescription = "Sweet as peach", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Fruit pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/peachpie.jpg", InStock = false, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/peachpiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Pumpkin Pie", Price = 12.95M, ShortDescription = "Our Halloween favorite", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Seasonal pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/pumpkinpie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/pumpkinpiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Rhubarb Pie", Price = 15.95M, ShortDescription = "My God, so sweet!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Fruit pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/rhubarbpie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/rhubarbpiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Strawberry Pie", Price = 15.95M, ShortDescription = "Our delicious strawberry pie!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Fruit pies"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/strawberrypie.jpg", InStock = true, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/strawberrypiesmall.jpg", AllergyInformation = "" },
+                                new Pie { Name = "Strawberry Cheese Cake", Price = 18.95M, ShortDescription = "You'll love it!", LongDescription = "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.", Category = Categories["Cheese cakes"], ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/strawberrycheesecake.jpg", InStock = false, IsPieOfTheWeek = false, ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/strawberrycheesecakesmall.jpg", AllergyInformation = "" }
+                            );
+                        }
+
+                        context.SaveChanges();
+                    }
+
+                    private static Dictionary<string, Category>? categories;
+
+                    public static Dictionary<string, Category> Categories
+                    {
+                        get
+                        {
+                            if (categories == null)
+                            {
+                                var genresList = new Category[]
+                                {
+                                    new Category { CategoryName = "Fruit pies" },
+                                    new Category { CategoryName = "Cheese cakes" },
+                                    new Category { CategoryName = "Seasonal pies" }
+                                };
+
+                                categories = new Dictionary<string, Category>();
+
+                                foreach (Category genre in genresList)
+                                {
+                                    categories.Add(genre.CategoryName, genre);
+                                }
+                            }
+
+                            return categories;
+                        }
+                    }
+                }
+            }
+
+        . Insira a linha abaixo dentro da classe "Programs.cs":
+
+            ...
+            app.MapDefaultControllerRoute();
+
+            app.MapGet("/", () => "Hello World!");
+
+            DbInitializer.Seed( app );        // Linha inserida
+
+            app.Run();
+
+
+
+        . Levante o projeto e execute a rota abaixo no navegador:
+
+            https://localhost:[porta]/pie/list
+
 
 
 05 Working with Real Data Using Entity Framework Core 6 (7.27)
