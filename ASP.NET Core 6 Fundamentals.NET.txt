@@ -1793,7 +1793,7 @@ Criando a primeira página
                                 aria-label="Bethany's Pie Shop navigation header">
                                 <div class="container-xl">
                                     <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                                        <img src="images/bethanys-pie-shop-logo_horiz-white.png" width="151" height="47" class="d-inline-block align-top mb-2 mt-1"
+                                        <img src="~/images/bethanys-pie-shop-logo_horiz-white.png" width="151" height="47" class="d-inline-block align-top mb-2 mt-1"
                                             alt="Bethany's Pie Shop Logo">
                                     </a>
 
@@ -1913,27 +1913,26 @@ Working with Real Data Using Entity Framework Core 6
 
         . Crie a pasta "Data" dentro da raiz do projeto e dentro dela crie a classe abaixo:
 
-            using System;
-            using contrato.Models;
+            using bethanysPieShop.Models;
             using Microsoft.EntityFrameworkCore;
 
-            namespace contrato.Data
+            namespace bethanysPieShop.Data
             {
-                public class AppDbContext: DbContext
+                public class AppDbContext : DbContext
                 {
-                    public DbSet<Category> Categories { get; set; }
-                    public DbSet<Pie> Pies { get; set; }
+                    public DbSet<Category>? Categories { get; set; }
+                    public DbSet<Pie>? Pies { get; set; }
 
-                    public AppDbContext(DbContextOptions<AppDbContext> options ) : base(options)
+                    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
                     {
                     }
 
-        //            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
-        //                        => optionsBuilder.UseSqlite();
+                    //            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+                    //                        => optionsBuilder.UseSqlite();
                     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                     {
                         optionsBuilder.UseSqlite();
-                        optionsBuilder.LogTo( Console.WriteLine );
+                        optionsBuilder.LogTo(Console.WriteLine);
                     }
 
 
@@ -1949,13 +1948,9 @@ Working with Real Data Using Entity Framework Core 6
             builder.Services.AddScoped<ICategoryRepository, MockCategoryRepository>();      
             builder.Services.AddScoped<IPieRepository, MockPieRepository>();                
 
-            var connectionStrings = Configuration.GetConnectionString("DefaultConnection");     // Linha inserida
-
-            // builder.Services.AddDbContext<AppDbContext>(options =>                           // Linha inserida
-            //    options.UseSqlite(connectionStrings));
             builder.Services.AddDbContext<AppDbContext>( options => {                           // Linha inserida
-                options.UseSqLite( 
-                    builder.Configuration["ConnectionStrings:DefaultConnection]);
+                options.UseSqlite( 
+                    builder.Configuration["ConnectionStrings:DefaultConnection"]);
             });
 
         . Crie as classes repository abaixo dentro da pasta "Models":
@@ -2002,13 +1997,15 @@ Working with Real Data Using Entity Framework Core 6
             }
 
 
-            namespace BethanysPieShop.Models
-            {
-                public class CategoryRepository: ICategoryRepository
-                {
-                    private readonly BethanysPieShopDbContext _bethanysPieShopDbContext;
+            using bethanysPieShop.Data;
 
-                    public CategoryRepository(BethanysPieShopDbContext bethanysPieShopDbContext)
+            namespace bethanysPieShop.Models
+            {
+                public class CategoryRepository : ICategoryRepository
+                {
+                    private readonly AppDbContext _bethanysPieShopDbContext;
+
+                    public CategoryRepository(AppDbContext bethanysPieShopDbContext)
                     {
                         _bethanysPieShopDbContext = bethanysPieShopDbContext;
                     }
@@ -2018,6 +2015,10 @@ Working with Real Data Using Entity Framework Core 6
             }
 
         . Altere a classe "Model" "Pie.cs" como abaixo:
+
+            using System.ComponentModel.DataAnnotations;
+            using System.ComponentModel.DataAnnotations.Schema;
+            using Microsoft.EntityFrameworkCore;
 
             namespace bethanysPieShop.Models;
 
@@ -2032,13 +2033,13 @@ Working with Real Data Using Entity Framework Core 6
                 [Required(ErrorMessage = "Este campo é obrigatorio")]
                 [MaxLength(150, ErrorMessage = "Este campo deve ter entre 5 a 100 caracateres")]
                 [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 100 caracateres")]
-                [Column("Name", TypeName ="VARCHAR(100)")]
+                [Column("Name", TypeName = "VARCHAR(100)")]
                 public string Name { get; set; } = string.Empty;
 
 
                 [MaxLength(50, ErrorMessage = "Este campo deve ter entre 5 a 50 caracateres")]
                 [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 50 caracateres")]
-                [Column("ShortDescription", TypeName ="VARCHAR(50)")]
+                [Column("ShortDescription", TypeName = "VARCHAR(50)")]
                 public string? ShortDescription
                 {
                     get; set;
@@ -2046,7 +2047,7 @@ Working with Real Data Using Entity Framework Core 6
 
                 [MaxLength(100, ErrorMessage = "Este campo deve ter entre 5 a 100 caracateres")]
                 [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 100 caracateres")]
-                [Column("LongDescription", TypeName ="VARCHAR(100)")]
+                [Column("LongDescription", TypeName = "VARCHAR(100)")]
                 public string? LongDescription
                 {
                     get; set;
@@ -2054,25 +2055,25 @@ Working with Real Data Using Entity Framework Core 6
 
                 [MaxLength(150, ErrorMessage = "Este campo deve ter entre 5 a 150 caracateres")]
                 [MinLength(5, ErrorMessage = "Este campo dever ter entre 5 a 150 caracateres")]
-                [Column("AllergyInformation", TypeName ="VARCHAR(150)")]
+                [Column("AllergyInformation", TypeName = "VARCHAR(150)")]
                 public string? AllergyInformation { get; set; }
 
-                [Precision(15,2)]
-                [Column("Price", TypeName ="DECIMAL(15,2)")]
+                [Precision(15, 2)]
+                [Column("Price", TypeName = "DECIMAL(15,2)")]
                 public decimal Price { get; set; }
 
 
-                [Column("ImageUrl", TypeName ="VARCHAR(255)")]
+                [Column("ImageUrl", TypeName = "VARCHAR(255)")]
                 public string? ImageUrl { get; set; }
 
 
-                [Column("ImageThumbnailUrl", TypeName ="VARCHAR(255)")]
+                [Column("ImageThumbnailUrl", TypeName = "VARCHAR(255)")]
                 public string? ImageThumbnailUrl { get; set; }
 
                 public bool IsPieOfTheWeek { get; set; }
 
 
-                [Column("CategoryId", TypeName ="INTEGER")]
+                [Column("CategoryId", TypeName = "INTEGER")]
                 public int CategoryId { get; set; }
 
 
@@ -2081,14 +2082,18 @@ Working with Real Data Using Entity Framework Core 6
                     get; set;
                 }
 
-                ForeignKey("CategoryId")]
+                [ForeignKey("CategoryId")]
                 public Category Category
                 {
                     get; set;
                 } = default!;
             }
 
-        . Altere a classe "Model" "Cattegory.cs" como abaixo:
+        . Altere a classe "Model" "Category.cs" como abaixo:
+        
+            using System.ComponentModel.DataAnnotations;
+            using System.ComponentModel.DataAnnotations.Schema;
+            using bethanysPieShop.Models;
 
             namespace bethanysPieShop.Models;
 
@@ -2113,7 +2118,6 @@ Working with Real Data Using Entity Framework Core 6
                 [Column("Description", TypeName ="VARCHAR(100)")]
                 public string? Description { get; set; }
 
-                [ForeignKey("PieId")]
                 public List<Pie>? Pies { get; set; }
             }
 
@@ -2141,13 +2145,16 @@ Working with Real Data Using Entity Framework Core 6
 
         . Crie a classe abaixo na pasta "Models":
 
-            namespace BethanysPieShop.Models
+            using bethanysPieShop.Data;
+            using bethanysPieShop.Models;
+
+            namespace bethanysPieShop.Models
             {
                 public static class DbInitializer
                 {
                     public static void Seed(IApplicationBuilder applicationBuilder)
                     {
-                        BethanysPieShopDbContext context = applicationBuilder.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<BethanysPieShopDbContext>();
+                        AppDbContext context = applicationBuilder.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<AppDbContext>();
 
                         if (!context.Categories.Any())
                         {
@@ -2190,9 +2197,9 @@ Working with Real Data Using Entity Framework Core 6
                             {
                                 var genresList = new Category[]
                                 {
-                                    new Category { CategoryName = "Fruit pies" },
-                                    new Category { CategoryName = "Cheese cakes" },
-                                    new Category { CategoryName = "Seasonal pies" }
+                                                new Category { CategoryName = "Fruit pies" },
+                                                new Category { CategoryName = "Cheese cakes" },
+                                                new Category { CategoryName = "Seasonal pies" }
                                 };
 
                                 categories = new Dictionary<string, Category>();
