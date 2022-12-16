@@ -2234,7 +2234,79 @@ Working with Real Data Using Entity Framework Core 6
             https://localhost:[porta]/pie/list
 
 
+Adding Routes and Navigation
+============================
 
-06 Adding Routes and Navigation
+    . Roteando em ASP.NET Cored e ASP.NET Core MVC
+
+        . A responsabilidade pela resposta das requisições ao encargo dos controller, onde contém as rotas que são acionandas pelos usuários através
+            dos Browser.
+
+        . Endpoints:
+
+            . São unidades executáveis que trata uma requisição e geram uma resposta.
+
+            . Podem ser definidas:
+
+                . Minimal API, diretamente de dentro do "Program.cs":
+
+                    ...
+                    app.UseSwagger();// Ativando o Swagger
+
+                    // Endpoints da solução
+                    app.MapGet("/", () => "Hello World!");
+                    ...
+
+                . Controllers:
+
+                    ... 
+                    [Route("minharota")]
+                    public string MinhaAction()
+                    {
+                        return "Ok! Cheguei na rota";
+                    }
+                    ...
+
+        . Os "middlewares" que disponibilizam os recursos de endpoints para a aplicação inicialmente são:
+
+            UseRounting()
+
+            UseEndpoints()
+
+            ╔══════════════════════════════════════════╦═══════════════════════════════════════╗
+            ║             app.UseRouting()             ║          app.UseEndPoints()           ║
+            ╠══════════════════════════════════════════╬═══════════════════════════════════════╣
+            ║               Find Endpoint              ║           Execute Endpoint            ║
+            ║                                          ║                                       ║
+            ║  Adds route matching to the middleware   ║  Adds endpoint execution to the       ║
+            ║  pipeline. This middleware looks at the  ║  middleware pipeline.                 ║
+            ║  set of endpoints defined in the app,    ║  It runs the delegate associated      ║
+            ║  and selects the best match based        ║  with the selected endpoint.          ║
+            ║  on the request.                         ║                                       ║
+            ║                                          ║                                       ║
+            ╚══════════════════════════════════════════╩═══════════════════════════════════════╝            
+
+
+https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
+
+            . Program.cs
+
+                app.UseRouting();
+            
+                app.UseAuthorization();
+            
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                });
+
+
+ 
+
+
+
+06 Adding Routes and Navigation (5.00)
 
 
