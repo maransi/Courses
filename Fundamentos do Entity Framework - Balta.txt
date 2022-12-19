@@ -1190,6 +1190,17 @@ Aula 16. DataAnnotations
             public int RegistrationNumber { get; set; }
 
 
+        Chave composta
+
+            [Index(nameof(Url), nameof(Rating), AllDescending = true)]
+            public class Blog
+            {
+                public int BlogId { get; set; }
+                public string Url { get; set; }
+                public int Rating { get; set; }
+            }
+
+
     NotMapped	        Can be applied to a property or entity class which should be excluded from the 
                         model and should not generate a corresponding column or table in the database.
 
