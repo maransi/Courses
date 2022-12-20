@@ -5,6 +5,7 @@ Observação: Todo parágrafo com o titulo "DEMO" diz respeito a parte prática 
             desenvolver como uma espécie de exercício.
 
 https://asp.mvc-tutorial.com/pt/417/introduction/what-is-mvc/
+https://www.learnrazorpages.com/
 
 Instalações
 ===========
@@ -3343,8 +3344,188 @@ Improving the Vies int the Application
 
             https://localhost:[porta]
 
-    . Trabalhando com "View Components"    
+    . Trabalhando com "View Components"   
 
-07. Improving the Vies int the Application (26.04)
+        . "View Components" trabalha de forma semelhante a "Partial Views". Serve para apresentar informações e reaproveitar
+            código.
+
+        . "View Components" implementam a interface "ViewComponent":
+
+            public class ShoppingCartSummary: ViewComponent
+            {
+                public IViewComponentResult Invoke()
+                {
+                    return View( model );
+                }
+            }
+
+        . "View Component" ficam normalmente armazenadas em subpasta dentro da pasta "Views/Shared/Components".
+
+        . Para invocar um "View Component" podemos fazer de duas formas:
+
+            @await Component.InvokeAsync("ShoppingCartSummary");
+
+                    ou
+            <vc:shopping-cart-summary></vc:shopping-cart-summary>
+
+    (30.30)
+    . DEMO
+
+        . Crie a pasta "Components" na raiz do projeto
+
+        . Dentro da pasta criada crie o "View Component" "ShoppingCartSummary" como abaixo:
+
+            using bethanysPieShop.Models;
+            using bethanysPieShop.ViewModels;
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace bethanysPieShop.Components
+            {
+                public class ShoppingCartSummary: ViewComponent
+                {
+                    private readonly IShoppingCart _shoppingCart;
+
+                    public ShoppingCartSummary(IShoppingCart shoppingCart)
+                    {
+                        _shoppingCart = shoppingCart;
+                    }
+
+                    public IViewComponentResult Invoke()
+                    {
+                        var items = new List<ShoppingCartItem>() { new ShoppingCartItem(), new ShoppingCartItem() };
+
+                        //var items = _shoppingCart.GetShoppingCartItems();
+                        _shoppingCart.ShoppingCartItems = items;
+
+                        var shoppingCartViewModel = new ShoppingCartViewModel(_shoppingCart, _shoppingCart.GetShoppingCartTotal());
+
+                        return View(shoppingCartViewModel);
+                    }
+                }
+            }
+
+        . Crie a pasta "Views/Shared/Components/ShoppingCartSummary"
+
+        . Crie a classe "Razor View" "Default.cshtml" abaixo dentro da pasta criada:
+
+            @model ShoppingCartViewModel
+
+            @if (Model.ShoppingCart.ShoppingCartItems.Count > 0)
+            {
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
+                                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                            </svg>
+                            <span id="cart-status">
+                                @Model.ShoppingCart.ShoppingCartItems.Count
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            }
+
+        . Insira a linha abaixo no arquivo "_ViewImports.cshtml":
+
+            @using bethanysPieShop.Models    
+            @using bethanysPieShop.ViewModels            
+
+            @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers            
+            @addTagHelper *, bethanyPieShop                         // Linha inserida
+
+        . Insira a linha abaixo no arquivo "View/Shared/_Layout.cshtml":
+
+            <!DOCTYPE html>
+
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width" />
+                <title>Bethany's Pie Shop</title>
+                <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
+                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+                <link href="~/css/site.css" rel="stylesheet" />
+                <base href="/" />
+            </head>
+            <body>
+                <div class="container">
+                    <header>
+                        <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary"
+                            aria-label="Bethany's Pie Shop navigation header">
+                            <div class="container-xl">
+                                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                                    <img src="images/bethanys-pie-shop-logo_horiz-white.png" width="151" height="47" class="d-inline-block align-top mb-2 mt-1"
+                                        alt="Bethany's Pie Shop Logo">
+                                </a>
+
+                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                                        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                                    <span class="navbar-toggler-icon"></span>
+                                </button>
+
+                                <div class="collapse navbar-collapse" id="navbarCollapse">
+                                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                                        <!-- Linha Inserida -->
+                                        <vc:category-menu></vc:category-menu>
+                                        <!-- Fim da inserção -->
+
+                                        <li class="nav-item">
+                                            <a asp-controller="Contact" asp-action="Index" class="nav-link">Contact</a>
+                                        </li>
+                                    </ul>
+
+                                    <!-- Linha Inserida -->
+                                    <vc:shopping-cart-summary></vc:shopping-cart-summary>
+                                    <!-- Fim da inserção -->
+
+                                </div>
+                            </div>
+                        </nav>
+                    </header>
+
+                    @RenderBody()
+                </div>
+            </body>
+            </html>
+
+        . Acesse a classe "PieController" e substitua o método "List" pelo abaixo:
+
+            ...
+            public ViewResult List(string category)
+            {
+                IEnumerable<Pie> pies;
+                string? currentCategory;
+
+                if (string.IsNullOrEmpty(category))
+                {
+                    pies = _pieRepository.AllPies.OrderBy(p => p.PieId);
+                    currentCategory = "All pies";
+                }
+                else
+                {
+                    pies = _pieRepository.AllPies.Where(p => p.Category.CategoryName == category)
+                        .OrderBy(p => p.PieId);
+                    currentCategory = _categoryRepository.AllCategories.FirstOrDefault(c => c.CategoryName == category)?.CategoryName;
+                }
+
+                return View(new PieListViewModel(pies, currentCategory));
+            }
+            ...
+
+
+        . Levante o projeto e verifique a partir do botão "Add Cart":
+        
+            . Se aparece o icone de carrinho no topo da tela.
+
+            . Se o menu ao lado do logo "Shop" está filtrando as categorias de "Pie"
+
+            https://localhost:[porta]
+
+    . Criando uma "Custom Tag Helper"
+
+
+07. Improving the Vies int the Application (37.27)
 
 
