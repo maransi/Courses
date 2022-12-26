@@ -2454,6 +2454,13 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
     . Configurando Rotas
 
+        https://www.tutorialsteacher.com/mvc/html-helpers
+                            |
+                            v
+                Pesquisar sobre "HTML Helper" concorrente do "Tag Helper"
+
+
+
         . Criando um link com "Tag Helpers":
 
             . Para inserir uma tag de link no nosso HTML gerado pelo ASP.NET Core utilize a tag abaixo:
@@ -2465,6 +2472,28 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
                 <!-- HTML gerado -->
                 <a href="/Pie/List">View Pie List</a>
+
+            . Podemos utilizar no lugar das "Tag Helper", os "Html Helper", por exemplo:
+
+                <!--
+                @Html.ActionLink($"{pie.Name}", 
+                                    "Details", 
+                                    new{ id = pie.PieId },
+                                    new { @class = "pie-link" }) 
+                                    
+                    https://localhost:[porta]/Pie/[codigo]
+
+                @Html.ActionLink(
+                            linkText: $"{pie.Name}",
+                            actionName: "Details",
+                            controllerName: "Pie",
+                            routeValues: new { id = pie.PieId },
+                            htmlAttributes: new { target = "_blank",@class="btn" , @style="background-color:lightblue;margin: 10px 30px;"})
+
+                    https://localhost:[porta]/Pie/[codigo]
+                -->
+
+
 
             . Para fazer uso das "Tags Helpers" precisamos importá-las no arquivo "_ViewImports.cshtml":
 
@@ -2488,7 +2517,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                                     site when used with the [ValidateAntiForgeryToken] attribute in the HTTP 
                                     Post action method.
                 asp-action          To specify the controller action we want to target using tag helpers
-    //PAREI AQUI
+
     . DEMO
 
         . Insira a linha abaixo no arquivo "_ViewImports.cshtml":
@@ -2541,6 +2570,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
         . Levante o projeto e verifique se os links de "details" na tela de "List" estão funcionando:
 
+    //PAREI AQUI
         . Crie o "ViewModel" abaixo:
 
             using bethanysPieShop.Models;
