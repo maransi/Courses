@@ -2969,8 +2969,6 @@ Improving the Views in the Application
             https://localhost:[porta]
 
 
-//PAREI AQUI
-
     . Criando o "Shopping Cart"
 
         . Para criar um carrinho de compras precisaremos trabalhar:
@@ -2984,6 +2982,7 @@ Improving the Views in the Application
             // Program.cs
 
             builder.Services.AddSession();
+            builder.Services.AddHttpContextAccessor();
 
             ...
 
@@ -2993,30 +2992,34 @@ Improving the Views in the Application
 
         . Crie a classe Model "ShoppingCatItem" dentro da pasta "Models":
 
-            namespace bethanysPieShop.Models
+            using System.ComponentModel.DataAnnotations;
+            using System.ComponentModel.DataAnnotations.Schema;
+            using Microsoft.EntityFrameworkCore;
+
+            namespace bethanysPieShop.Models;
+
+            [Table("ShoppingCartItem")]
+            [Index(nameof(ShoppingCartId), nameof(ShoppingCartItemId), 
+                    IsUnique = true,
+                    Name = "idxShopCartItem_ShoppingCartId")]
+            public class ShoppingCartItem
             {
-                [Table("ShoppingCartItem")]
-                // [Index(nameof(ShoppingCartId), nameof(ShoppingCartItemId), Unique = true)]
-                public class ShoppingCartItem
-                {
-                    [Key]
-                    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-                    [Column("ShoppingCartItemId")]
-                    public int ShoppingCartItemId { get; set; }
+                [Key]    
+                [DatabaseGenerated( DatabaseGeneratedOption.Identity )]
+                [Column("ShoppingCartItemId")]
+                public int ShoppingCartItemId { get; set; }
 
-                    [Column="PieId", DataName="INTEGER"]
-                    public int PieId { get; set; }
+                [Column("PiedId", TypeName = "INTEGER")]
+                public int PieId { get; set; }
 
-                    [ForeignKey("PieId")]
-                    public Pie Pie { get; set; } = default!;
+                [ForeignKey("PieId")]
+                public Pie Pie  { get; set; } = default!;
 
-                    [Column="Amount", DataName="INTEGER"]
-                    public int Amount { get; set; }
+                [Column("Amount", TypeName="INTEGER")]
+                public int Amount { get; set; }
 
-                    [Column="ShoppingCartId", DataName="INTEGER"]
-                    [Index( "idxShopCartItem_Id")]
-                    public string? ShoppingCartId { get; set; }
-                }
+                [Column("ShoppingCartId", TypeName = "INTEGER")]
+                public string? ShoppingCartId { get; set; }
             }
 
         . Insira a linha abaixo na classe "AppDbContext":
@@ -3031,7 +3034,7 @@ Improving the Views in the Application
                     public DbSet<Category>? Categories { get; set; }
                     public DbSet<Pie>? Pies { get; set; }
 
-                    public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }  // Linha inserida
+                    public DbSet<ShoppingCartItem>? ShoppingCartItems { get; set; }  // Linha inserida
 
                     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
                     {
@@ -3059,6 +3062,7 @@ Improving the Views in the Application
 
             dotnet ef database update
 
+// PAREI AQUI
         . Crie a interface "IShoppingCart" abaixo na pasta "Models":
 
             namespace bethanysPieShop.Models
