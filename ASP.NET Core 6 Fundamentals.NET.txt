@@ -3182,8 +3182,28 @@ Improving the Views in the Application
 
                     public decimal GetShoppingCartTotal()
                     {
-                        var total = _context.ShoppingCartItems.Where(c => c.ShoppingCartId == ShoppingCartId)
-                            .Select(c => c.Pie.Price * c.Amount).Sum();
+                        // IMPORTANTE: Devido a incompatibilidade do tipo "decimal" da propriedade "Pie.Price" e o 
+                        //              banco "Sqlite", o EF ao usar o método "SUM()" acusou erro. 
+                        //             Para contornar o problema fui obrigado fazer a totalização manualmente.
+                        //             Se for outro banco, como o SQLServer, provavelmente funcionará da forma
+                        //              como está comentada abaixo.
+
+                        // var total = _context.ShoppingCartItems.Where(c => c.ShoppingCartId == ShoppingCartId)
+                        //     .Select(c => c.Pie.Price * c.Amount).Sum();
+
+                        decimal total = 0M;
+
+                        var shoppingCartItens = _context.ShoppingCartItems.Where(c => c.ShoppingCartId == ShoppingCartId)
+                                        .Select(c => new { preco = c.Pie.Price  * c.Amount } ) 
+                                        .ToList();
+
+                        if ( shoppingCartItens != null )
+                        {
+                            shoppingCartItens.ForEach( item => {
+                                total = total + item.preco;        
+                            });
+                        }
+
                         return total;
                     }
                 }

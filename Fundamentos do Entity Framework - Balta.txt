@@ -3805,6 +3805,20 @@ namespace blog
                                         Count = p.Count()
                                     })
                                     .ToList();
+                
+                /* Exemplo de como usar o "Sum"
+                        https://debuxing.com/entity-framework-group-by-example-c
+
+                    var robotFactories = context
+                            .RobotFactories.GroupBy(x => x.Location)
+                            .Select(x => new { Location = x.Key, Buildings = x.Count() });
+
+                    var catgroup = db.CATEGORies.GroupBy(c => c.CATNAME)
+                        .Select(g => new {
+                            g.Key, 
+                            SUM = g.Sum(s => s.Inqueries.Select(t => t.TotalTimeSpent).Sum())
+                        });
+                */
 
                 posts.ForEach( item => {
                     System.Console.WriteLine($"{item.Title} {item.Count}");
