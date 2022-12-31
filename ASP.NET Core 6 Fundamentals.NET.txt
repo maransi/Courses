@@ -8,6 +8,12 @@ https://asp.mvc-tutorial.com/pt/417/introduction/what-is-mvc/
 https://www.learnrazorpages.com/
 https://techfunda.com/howto/asp-net-mvc
 
+
+Logotipo da loja precisa ser uma imagem PNG com Background Transparente, abaixo site que gera logos deste tipo
+https://www.fococlipping.com
+https://pt.pngtree.com/
+
+
 Instalações
 ===========
 
@@ -349,7 +355,7 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
             
             . Na pasta raiz do projeto execute o comando abaixo:
 
-                dotnet new web -o bhetanyPieShop -n bhetanyPieShop -f net6.0
+                dotnet new web -o bethanysPieShop -n bethanysPieShop -f net6.0
 
                 dotnet clean
 
@@ -3251,7 +3257,6 @@ Improving the Views in the Application
 
             app.Run();
 
-//PAREI AQUI
         . Crie a classe "ViewModel" "ShoppingCartViewModel" na pasta "ViewModels" como abaixo:
 
             using bethanysPieShop.Models;
@@ -3458,9 +3463,9 @@ Improving the Views in the Application
 
                     public IViewComponentResult Invoke()
                     {
-                        var items = new List<ShoppingCartItem>() { new ShoppingCartItem(), new ShoppingCartItem() };
+                        //var items = new List<ShoppingCartItem>() { new ShoppingCartItem(), new ShoppingCartItem() };
 
-                        //var items = _shoppingCart.GetShoppingCartItems();
+                        var items = _shoppingCart.GetShoppingCartItems();
                         _shoppingCart.ShoppingCartItems = items;
 
                         var shoppingCartViewModel = new ShoppingCartViewModel(_shoppingCart, _shoppingCart.GetShoppingCartTotal());
@@ -3469,6 +3474,32 @@ Improving the Views in the Application
                     }
                 }
             }
+
+        . Dentro da pasta "Components" crie o "View Component" "CategoryMenu.cs" como abaixo:
+
+            using bethanysPieShop.Models;
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace bethanysPieShop.Components
+            {
+                public class CategoryMenu : ViewComponent
+                {
+                    private readonly ICategoryRepository _categoryRepository;
+
+                    public CategoryMenu(ICategoryRepository categoryRepository)
+                    {
+                        _categoryRepository = categoryRepository;
+                    }
+
+                    public IViewComponentResult Invoke()
+                    {
+                        var categories = _categoryRepository.AllCategories.OrderBy(c => c.CategoryName);
+                        return View(categories);
+                    }
+                }
+            }
+
+
 
         . Crie a pasta "Views/Shared/Components/ShoppingCartSummary"
 
@@ -3492,13 +3523,48 @@ Improving the Views in the Application
                 </ul>
             }
 
+        . Crie a pasta "Views/Shared/Components/CategoryMenu"
+
+        . Crie a classe "Razor View" "Default.cshtml" abaixo dentro da pasta criada:
+
+            @model IEnumerable<Category>
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle"
+                data-toggle="dropdown"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                id="nav-dropdown"
+                aria-expanded="false">
+                    Shop
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="nav-dropdown">
+                    @foreach (var category in Model)
+                    {
+                        <li>
+                            <a asp-controller="Pie" asp-action="List"
+                            asp-route-category="@category.CategoryName"
+                            class="dropdown-item">
+                                @category.CategoryName
+                            </a>
+                        </li>
+                    }
+                    <li>
+                        <a asp-controller="Pie" asp-action="List" asp-route-Category="" class="dropdown-item">All pies</a>
+                    </li>
+                </ul>
+            </li>
+
+
+
         . Insira a linha abaixo no arquivo "_ViewImports.cshtml":
 
             @using bethanysPieShop.Models    
             @using bethanysPieShop.ViewModels            
 
             @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers            
-            @addTagHelper *, bethanyPieShop                         // Linha inserida
+            @addTagHelper *, bethanysPieShop                         // Linha inserida, coloque o mesmo nome do "[nome projeto a ser importado].csproj"
 
         . Insira a linha abaixo no arquivo "View/Shared/_Layout.cshtml":
 
@@ -3589,6 +3655,8 @@ Improving the Views in the Application
 
             https://localhost:[porta]
 
+
+    // PAREI AQUI
     . Criando uma "Custom Tag Helper"
 
         . As Tag Helpers permitem que o código do lado do servidor participe na criação e renderização de 
