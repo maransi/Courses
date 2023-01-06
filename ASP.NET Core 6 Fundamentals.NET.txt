@@ -3656,7 +3656,7 @@ Improving the Views in the Application
             https://localhost:[porta]
 
 
-    // PAREI AQUI
+
     . Criando uma "Custom Tag Helper"
 
         . As Tag Helpers permitem que o código do lado do servidor participe na criação e renderização de 
@@ -3708,6 +3708,20 @@ Improving the Views in the Application
     (40.00)
     . DEMO
 
+        . Crie o controller "ContactController" abaixo na abaixo na pasta "Controllers":
+
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace bethanysPieShop.Controllers;
+            public class ContactController : Controller
+            {
+                // GET: /<controller>/
+                public IActionResult Index()
+                {
+                    return View();
+                }
+            }
+
         . Crie na pasta raiz a pasta "TagHelpers" e dentro dela crie a classe "TagHelper" "EmailTagHelper" abaixo:
 
             using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -3734,7 +3748,7 @@ Improving the Views in the Application
             @using bethanysPieShop.Models    
             @using bethanysPieShop.ViewModels            
 
-            @addTagHelper bethanysPieShop.TagHelper.*, bethanysPieShop      // Linha inserida
+            @addTagHelper bethanysPieShop.TagHelpers.*, bethanysPieShop      // Linha inserida
 
             @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers            
             @addTagHelper *, bethanyPieShop                         
@@ -3746,7 +3760,7 @@ Improving the Views in the Application
             </h3>
 
             <div class="row gx-5">
-                <img src="~/Images/contact/contact.jpg" class="img-fluid col-5"/>
+                <img src="~/images/contact/contact.jpg" class="img-fluid col-5"/>
                 <div class="col-7">
                     <h1>We'd Love to Hear from You</h1>
                     <h5>Please contact us by sending an email using the button below</h5>
@@ -3809,7 +3823,7 @@ Improving the Views in the Application
                 </div>
             </body>
             </html>
-
+            
         . Levante o projeto e verifique se no topo da tela aparece o link "Contact" e se está funcionando 
             o link "Contact Us" da página "ContactPage"
 
@@ -3818,6 +3832,6 @@ Improving the Views in the Application
             . Verifique o "Source Code" da página "ContactPage" e verifique se o link do email foi inserido corretamente.
 
 
-08. Working with Forms and Model Binding
-
+Working with Forms and Model Binding
+====================================
 
