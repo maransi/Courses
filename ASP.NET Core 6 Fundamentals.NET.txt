@@ -3836,3 +3836,130 @@ Improving the Views in the Application
 Working with Forms and Model Binding
 ====================================
 
+    https://www.dotnettricks.com/learn/aspnetcore/aspnet-core-tag-helpers
+    https://endjin.com/blog/2022/02/tag-helpers-in-aspnet-core
+    https://endjin.com/blog/2022/01/model-binding-in-asp-net-core-using-razor-pages
+
+
+    . Tópicos deste módulo:
+
+        . Criando um formulário utilizando "Tag Helpers"
+
+        . Entendendo "Model Binding"
+
+        . Adicionando Validações
+
+        . Recriando formulários utilizando "Razor Page"
+
+    . Criando um formulário utilizando "Tag Helpers"
+
+        . Principais "Tag Helpers":
+
+            . Form Tag Helper
+
+            . Input Tag Helper
+
+            . Label Tag Helper
+
+            . Textarea Tag Helper
+
+            . Select Tag Helper
+
+            . Validation Tag Helpers
+
+        . Para fazermos uso das "Tag Helper" precisamos inserir a linha abaixo no arquivo "_ViewImports.cshtml":
+
+            @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+        . Exemplo de uma "Tag Helper":
+
+            . Label Tag Helper
+
+                <!-- Tag Helper ->
+                <label asp-for="Username" class="col-md-2 control-label"></label>  
+
+                <!-- HTML Gerado -->
+                <label class="col-md-2 control-label" for="Username">Username</label>
+
+            . Form Tag Helpers
+
+                <!-- Tag Helper -->
+                <form asp-action="Subscribe" method="post" class="form-horizontal" role="form">
+
+                <!-- HTML Gerado -->
+                <form method="post" class="form-horizontal" role="form" action="/Subscriber/Subscribe">
+
+                . Atributos do Form Tag Helper :
+
+                    asp-controller      tag helper can be used to indicate which controller should be targeted by the 
+                                        post action of a form.
+                    asp-route-{value}   tag helper (where {value} can be replaced with the name of the parameter we want to 
+                                        specify the value for) allows us to create a route.
+                    asp-route           tag helper allows us to indicate which main route we want to use.
+                    asp-forgery         tag helper allows us to prevent cross-site request forgery attacks on the 
+                                        site when used with the [ValidateAntiForgeryToken] attribute in the HTTP 
+                                        Post action method.
+                    asp-action          To specify the controller action we want to target using tag helpers
+
+            . Input Tag Helper
+
+                <!-- Tag Helper -->
+                <input asp-for="Username" class="form-control" />
+
+                <!-- HTML Gerado -->
+                <input class="form-control" 
+                        type="text" 
+                        data-val="true" 
+                        data-val-length="Must be between 5 and 80 characters" 
+                        data-val-length-max="80" 
+                        data-val-length-min="5" 
+                        data-val-required="Username is required" 
+                        id="Username" 
+                        maxlength="80" 
+                        name="Username" value="" />
+
+                . The attribute type will change according to the .NET data type or Data Annotation attribute applied 
+                    to the model, such as [DataType(DataType.EmailAddress)] or [DataType(DataType.Password)].
+
+                . Notice also the validation attributes generated. They are the data-val-* attributes and contain 
+                    validation information based on the .NET data type and the data annotations in our model property.
+
+        . Exemplo completo de um formulário:
+
+            @model Subscriber
+
+            <form asp-action="Subscribe" method="post" class="form-horizontal" role="form">
+                <h4>Enter your details in order to subscribe.</h4>
+
+                <div class="form-group">
+                    <label asp-for="Username" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-5">
+                        <input type="submit" class="btn btn-primary" value="Subscribe" />
+                    </div>
+                </div>
+
+            </form>
+    
+    (5.38)
+    . DEMO
