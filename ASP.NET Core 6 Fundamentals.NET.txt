@@ -53,6 +53,7 @@ Instalações
             C# 
             C# Extensions
             C# XML Documentation Comments
+            ASP.NET Helper
             Libman
             Docker
             vscode-icons (Opcional)
@@ -63,6 +64,7 @@ Instalações
             Bracket Pair Colorization Toggler
             Error Lens
             RapidApi
+            Razor Snippets
 
 
         Testar
@@ -1333,6 +1335,12 @@ Criando a primeira página
         . Razor Page
 
             . O Razor nada mais é do que a linguagem C#, ou VB.NET, trabalhando em conjunto com código HTML, para a construção das suas páginas ASP.NET.
+
+            . Para fazer comentário numa página Razor utilize:
+
+                @*
+                    Comentário
+                *@
 
             . Exemplo:
 
@@ -3840,6 +3848,11 @@ Working with Forms and Model Binding
     https://endjin.com/blog/2022/02/tag-helpers-in-aspnet-core
     https://endjin.com/blog/2022/01/model-binding-in-asp-net-core-using-razor-pages
 
+    . As extensões "ASP.NET Helper" e "Razor Snippets" do VSCode ajuda bastante no desenvolvimento de páginas Razor, fazendo 
+        "auto-complete" das "Tag Helpers"
+
+
+Razor Snippets
 
     . Tópicos deste módulo:
 
@@ -3963,3 +3976,369 @@ Working with Forms and Model Binding
     
     (5.38)
     . DEMO
+
+        . Inclua a classe "Order.cs" abaixo na pasta "Models":
+
+            using Microsoft.AspNetCore.Mvc.ModelBinding;
+            using System.ComponentModel.DataAnnotations;
+
+            namespace bethanysPieShop.Models
+            {
+                public class Order
+                {
+                    public int OrderId { get; set; }
+
+                    public List<OrderDetail>? OrderDetails { get; set; }
+
+                    public string FirstName { get; set; } = string.Empty;
+
+                    public string LastName { get; set; } = string.Empty;
+
+                    public string AddressLine1 { get; set; } = string.Empty;
+
+                    public string? AddressLine2 { get; set; }
+
+                    public string ZipCode { get; set; } = string.Empty;
+
+                    public string City { get; set; } = string.Empty;
+
+                    public string? State { get; set; }
+
+                    public string Country { get; set; } = string.Empty;
+
+                    public string PhoneNumber { get; set; } = string.Empty;
+
+                    public string Email { get; set; } = string.Empty;
+
+                    public decimal OrderTotal { get; set; }
+
+                    public DateTime OrderPlaced { get; set; }
+                }
+            }
+
+        . Inclua a classe "OrderDetail.cs" abaixo na pasta "Models":
+
+            namespace bethanysPieShop.Models
+            {
+                public class OrderDetail
+                {
+                    public int OrderDetailId { get; set; }
+                    public int OrderId { get; set; }
+                    public int PieId { get; set; }
+                    public int Amount { get; set; }
+                    public decimal Price { get; set; }
+                    public Pie Pie { get; set; } = default!;
+                    public Order Order { get; set; } = default!;
+                }
+            }
+
+        . Inclua a interface "IOrderRepository" abaixo na pasta "Models":
+
+            namespace bethanysPieShop.Models
+            {
+                public interface IOrderRepository
+                {
+                    void CreateOrder(Order order);
+                }
+            }
+
+
+        . Inclua a classe "OrderRepository.cs" abaixo na pasta "Models":
+
+            namespace bethanysPieShop.Models
+            {
+                public class OrderRepository : IOrderRepository
+                {
+                    private readonly BethanysPieShopDbContext _bethanysPieShopDbContext;
+                    private readonly IShoppingCart _shoppingCart;
+
+                    public OrderRepository(BethanysPieShopDbContext bethanysPieShopDbContext, IShoppingCart shoppingCart)
+                    {
+                        _bethanysPieShopDbContext = bethanysPieShopDbContext;
+                        _shoppingCart = shoppingCart;
+                    }
+
+                    public void CreateOrder(Order order)
+                    {
+                        order.OrderPlaced = DateTime.Now;
+
+                        List<ShoppingCartItem>? shoppingCartItems = _shoppingCart.ShoppingCartItems;
+                        order.OrderTotal = _shoppingCart.GetShoppingCartTotal();
+
+                        order.OrderDetails = new List<OrderDetail>();
+
+                        foreach (ShoppingCartItem? shoppingCartItem in shoppingCartItems)
+                        {
+                            var orderDetail = new OrderDetail
+                            {
+                                Amount = shoppingCartItem.Amount,
+                                PieId = shoppingCartItem.Pie.PieId,
+                                Price = shoppingCartItem.Pie.Price
+                            };
+
+                            order.OrderDetails.Add(orderDetail);
+                        }
+
+                        _bethanysPieShopDbContext.Orders.Add(order);
+
+                        _bethanysPieShopDbContext.SaveChanges();
+                    }
+                }
+            }
+
+        . Insira as linhas abaixo na classe "Data/AppDbContext.cs"
+
+            using bethanysPieShop.Models;
+            using Microsoft.EntityFrameworkCore;
+
+            namespace bethanysPieShop.Data
+            {
+                public class AppDbContext : DbContext
+                {
+                    public DbSet<Category>? Categories { get; set; }
+                    public DbSet<Pie>? Pies { get; set; }
+                    public DbSet<Order> Orders { get; set; }                // Linha Inserida
+                    public DbSet<OrderDetail> OrderDetails { get; set; }    // Linha Inserida
+
+
+                    public DbSet<ShoppingCartItem>? ShoppingCartItems { get; set; }
+
+                    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+                    {
+                    }
+
+                    //            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+                    //                        => optionsBuilder.UseSqlite();
+                    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+                    {
+                        optionsBuilder.UseSqlite();
+                        optionsBuilder.LogTo(Console.WriteLine);
+                    }
+
+
+                }
+            }
+
+        . Acesse a classe "Program.cs" e insira as linhas abaixo:
+
+            ...
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();      
+            builder.Services.AddScoped<IPieRepository, PieRepository>();     
+            builder.Services.AddScoped< IShoppingCart, ShoppingCart >( sp => ShoppingCart.GetCart( sp ) );          
+
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();        // Linha inserida
+
+            ...
+
+        . Execute o comando abaixo na pasta raiz do projeto:
+
+            dotnet clean
+
+            dotnet build
+
+            dotnet ef migrations add [Nome da nova migration]
+
+            dotnet ef database update
+
+        . Acesse o banco e verifique se as tabelas "Order" e "OrderDetail" foram criadas com sucesso.
+
+        . Crie a classe "OrderController" abaixo dentro da pasta "Controllers":
+
+            using bethanysPieShop.Models;
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace bethanysPieShop.Controllers
+            {
+                public class OrderController : Controller
+                {
+                    private readonly IOrderRepository _orderRepository;
+                    private readonly IShoppingCart _shoppingCart;
+
+                    public OrderController(IOrderRepository orderRepository, IShoppingCart shoppingCart)
+                    {
+                        _orderRepository = orderRepository;
+                        _shoppingCart = shoppingCart;
+                    }
+
+                    public IActionResult Checkout()
+                    {
+                        return View();
+                    }
+
+                    [HttpPost]
+                    public IActionResult Checkout(Order order)
+                    {
+                        var items = _shoppingCart.GetShoppingCartItems();
+                        _shoppingCart.ShoppingCartItems = items;
+
+                        if (_shoppingCart.ShoppingCartItems.Count == 0)
+                        {
+                            ModelState.AddModelError("", "Your cart is empty, add some pies first");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            _orderRepository.CreateOrder(order);
+                            _shoppingCart.ClearCart();
+                            return RedirectToAction("CheckoutComplete");
+                        }
+                        return View(order);
+                    }
+
+                    public IActionResult CheckoutComplete()
+                    {
+                        ViewBag.CheckoutCompleteMessage = "Thanks for your order. You'll soon enjoy our delicious pies!";
+                        return View();
+                    }
+                }
+            }
+
+        . Crie a View "Checkout.cshtml" abaixo dentro da pasta "Views/Order":
+
+            @model Order
+
+            <form asp-action="Checkout" method="post" role="form">
+                <h3 class="my-5">
+                    You're just one step away from your delicious pies.
+                </h3>
+
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="col-6">
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <label asp-for="FirstName" class="form-label"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="LastName" class="form-label"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="AddressLine1" class="form-label"></label>
+                            <input asp-for="AddressLine1" class="form-control" />
+                            <span asp-validation-for="AddressLine1" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="AddressLine2" class="form-label"></label>
+                            <input asp-for="AddressLine2" class="form-control" />
+                            <span asp-validation-for="AddressLine2" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-6">
+                            <label asp-for="City" class="form-label"></label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-6">
+                            <label asp-for="State" class="form-label"></label>
+                            <input asp-for="State" class="form-control" />
+                            <span asp-validation-for="State" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-6">
+                            <label asp-for="ZipCode" class="form-label"></label>
+                            <input asp-for="ZipCode" class="form-control" />
+                            <span asp-validation-for="ZipCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-6">
+                            <label asp-for="Country" class="form-label"></label>
+                            <input asp-for="Country" class="form-control" />
+                            <span asp-validation-for="Country" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <div class="col-md-offset-2 col-md-5">
+                            <input type="submit" class="btn btn-secondary" value="Complete order" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        . Insira as linhas abaixo na classe "Views/ShoppingCart/Index.cshtml":
+
+            @model ShoppingCartViewModel
+
+            <h3 class="my-5">
+                Shopping cart
+            </h3>
+
+
+            <div class="row gx-3">
+                <div class="col-8">
+                    @foreach (var line in Model.ShoppingCart.ShoppingCartItems)
+                    {
+                        <div class="card shopping-cart-card mb-2">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <img src="@line.Pie.ImageThumbnailUrl" class="img-fluid rounded-start p-2" alt="@line.Pie.Name">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-text">@line.Amount x @line.Pie.Name</h5>
+                                        <div class="d-flex justify-content-between">
+                                            <h6>@line.Pie.ShortDescription</h6>
+                                            <h2>@line.Pie.Price.ToString("c")</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="col-4">
+                    <div class="card shopping-cart-card p-3">
+                        <div class="row">
+                            <h4 class="col">Total:</h4>
+                            <h4 class="col text-end">@Model.ShoppingCartTotal.ToString("c")</h4>
+                        </div>
+                        <hr />
+                        <div class="text-center d-grid">
+
+                            @*
+                                Linhas abaixo inserida
+                            *@
+
+                            <a class="btn btn-secondary" 
+                                asp-controller="Order" 
+                                asp-action="Checkout">
+                            <h4>Check out now!</h4></a>
+
+                            @* Fim da inserção *@
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        . Levante a aplicação, acione o "Add cart" e verifique dentro do carrinho se aparece o botão "CHECK OUT NOW".
+
+            . Acione o botão "CHECK OUT NOW"
+
+            . Inclua as informações da ordem e faça a gravação das informações.
+
+    (14.50)
+    . Entendendo "Model Binding"
+
