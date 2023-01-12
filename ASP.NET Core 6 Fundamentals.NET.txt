@@ -4489,9 +4489,6 @@ Razor Snippets
 
                 ...
 
-            . Para mais detalhes sobre "ModelState" retorne a aula "Aula 34. Validações" e "Aula 36.  Padronizando erros" 
-                do curso "Fundamentos ASP.NET 6 - Balta".
-
             . Crie a View "CheckoutComplete.cshtml" abaixo dentro da pasta "Views/Order":
 
                 <h3 class="my-5">
@@ -4506,6 +4503,11 @@ Razor Snippets
 
         (24.30)
     . Adicionando validação
+
+        https://www.tektutorialshub.com/asp-net-core/asp-net-core-model-validation/#modelstate-properties
+
+        . Para mais detalhes sobre "ModelState" retorne a aula "Aula 34. Validações" e "Aula 36.  Padronizando erros" 
+            do curso "Fundamentos ASP.NET 6 - Balta".
 
         . Suponha que de alguma forma os dados a serem submetidos para o controller esteja da seguinte forma:
 
@@ -4528,3 +4530,49 @@ Razor Snippets
                 return View();
             }
 
+        . Se utilizarmos as annotations de validação ([Required], [MaxLength], etc) no nosso model. Tudo isso será
+            usado pelo objeto "ModelState" para validar a entrada.
+
+        . Propriedades do "ModelState":
+
+            . IsValid               Indicates if it was possible to bind the incoming values from the request to the model 
+                                    correctly and whether any explicitly specified validation rules were broken during the 
+                                    model binding process
+
+            . GetValidationState    Returns the aggregate ModelValidationState for items starting with the specified key.
+
+            . AddModelError         Adds the specified error message to the Errors instance that is associated with the 
+                                    specified key.
+
+            . Clear                 Removes all keys and values from this instance of ModelStateDictionary.
+
+            . ClearValidationState(String) Clears ModelStateDictionary entries that match the key that is passed as the parameter.
+
+            . GetFieldValidationState(String) Returns the aggregate ModelValidationState for items starting with the specified key.
+
+            . TryAddModelError(String, Exception, ModelMetadata) Attempts to add the specified exception to the Errors instance 
+                                                                    that is associated with the specified key.            
+
+        . Obtendo uma lista de erros: 
+ 
+            foreach (var modelStateKey in ModelState.Keys)
+            {
+                var modelStateVal = ModelState[modelStateKey];
+                foreach (var error in modelStateVal.Errors)
+                {
+                    var key = modelStateKey;
+                    var errorMessage = error.ErrorMessage;
+                }
+            }
+ 
+        . Adicionando uma mensagem de erro customizada: 
+ 
+            if (ModelState.IsValid) { 
+                If (someService.IsProductExists(model)) { 
+                    ModelState.AddModelError("", “Product already exists”); 
+                    return View(model); 
+                } else { 
+                    return View(model); 
+                } 
+            }
+ 
