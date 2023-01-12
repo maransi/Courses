@@ -15,6 +15,10 @@ https://www.fococlipping.com
 https://pt.pngtree.com/
 
 
+Site de perguntas de entrevista
+https://www.fullstack.cafe/
+
+
 Instalações
 ===========
 
@@ -3977,6 +3981,22 @@ Razor Snippets
     (5.38)
     . DEMO
 
+        . Inclua a classe "OrderDetail.cs" abaixo na pasta "Models":
+
+            namespace bethanysPieShop.Models
+            {
+                public class OrderDetail
+                {
+                    public int OrderDetailId { get; set; }
+                    public int OrderId { get; set; }
+                    public int PieId { get; set; }
+                    public int Amount { get; set; }
+                    public decimal Price { get; set; }
+                    public Pie Pie { get; set; } = default!;
+                    public Order Order { get; set; } = default!;
+                }
+            }
+
         . Inclua a classe "Order.cs" abaixo na pasta "Models":
 
             using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -4016,22 +4036,6 @@ Razor Snippets
                 }
             }
 
-        . Inclua a classe "OrderDetail.cs" abaixo na pasta "Models":
-
-            namespace bethanysPieShop.Models
-            {
-                public class OrderDetail
-                {
-                    public int OrderDetailId { get; set; }
-                    public int OrderId { get; set; }
-                    public int PieId { get; set; }
-                    public int Amount { get; set; }
-                    public decimal Price { get; set; }
-                    public Pie Pie { get; set; } = default!;
-                    public Order Order { get; set; } = default!;
-                }
-            }
-
         . Inclua a interface "IOrderRepository" abaixo na pasta "Models":
 
             namespace bethanysPieShop.Models
@@ -4039,50 +4043,6 @@ Razor Snippets
                 public interface IOrderRepository
                 {
                     void CreateOrder(Order order);
-                }
-            }
-
-
-        . Inclua a classe "OrderRepository.cs" abaixo na pasta "Models":
-
-            namespace bethanysPieShop.Models
-            {
-                public class OrderRepository : IOrderRepository
-                {
-                    private readonly BethanysPieShopDbContext _bethanysPieShopDbContext;
-                    private readonly IShoppingCart _shoppingCart;
-
-                    public OrderRepository(BethanysPieShopDbContext bethanysPieShopDbContext, IShoppingCart shoppingCart)
-                    {
-                        _bethanysPieShopDbContext = bethanysPieShopDbContext;
-                        _shoppingCart = shoppingCart;
-                    }
-
-                    public void CreateOrder(Order order)
-                    {
-                        order.OrderPlaced = DateTime.Now;
-
-                        List<ShoppingCartItem>? shoppingCartItems = _shoppingCart.ShoppingCartItems;
-                        order.OrderTotal = _shoppingCart.GetShoppingCartTotal();
-
-                        order.OrderDetails = new List<OrderDetail>();
-
-                        foreach (ShoppingCartItem? shoppingCartItem in shoppingCartItems)
-                        {
-                            var orderDetail = new OrderDetail
-                            {
-                                Amount = shoppingCartItem.Amount,
-                                PieId = shoppingCartItem.Pie.PieId,
-                                Price = shoppingCartItem.Pie.Price
-                            };
-
-                            order.OrderDetails.Add(orderDetail);
-                        }
-
-                        _bethanysPieShopDbContext.Orders.Add(order);
-
-                        _bethanysPieShopDbContext.SaveChanges();
-                    }
                 }
             }
 
@@ -4116,6 +4076,50 @@ Razor Snippets
                     }
 
 
+                }
+            }
+
+
+        . Inclua a classe "OrderRepository.cs" abaixo na pasta "Models":
+
+            namespace bethanysPieShop.Models
+            {
+                public class OrderRepository : IOrderRepository
+                {
+                    private readonly AppDbContext _bethanysPieShopDbContext;
+                    private readonly IShoppingCart _shoppingCart;
+
+                    public OrderRepository(AppDbContext bethanysPieShopDbContext, IShoppingCart shoppingCart)
+                    {
+                        _bethanysPieShopDbContext = bethanysPieShopDbContext;
+                        _shoppingCart = shoppingCart;
+                    }
+
+                    public void CreateOrder(Order order)
+                    {
+                        order.OrderPlaced = DateTime.Now;
+
+                        List<ShoppingCartItem>? shoppingCartItems = _shoppingCart.ShoppingCartItems;
+                        order.OrderTotal = _shoppingCart.GetShoppingCartTotal();
+
+                        order.OrderDetails = new List<OrderDetail>();
+
+                        foreach (ShoppingCartItem? shoppingCartItem in shoppingCartItems)
+                        {
+                            var orderDetail = new OrderDetail
+                            {
+                                Amount = shoppingCartItem.Amount,
+                                PieId = shoppingCartItem.Pie.PieId,
+                                Price = shoppingCartItem.Pie.Price
+                            };
+
+                            order.OrderDetails.Add(orderDetail);
+                        }
+
+                        _bethanysPieShopDbContext.Orders.Add(order);
+
+                        _bethanysPieShopDbContext.SaveChanges();
+                    }
                 }
             }
 
@@ -4194,7 +4198,7 @@ Razor Snippets
                     }
                 }
             }
-
+// PAREI AQUI
         . Crie a View "Checkout.cshtml" abaixo dentro da pasta "Views/Order":
 
             @model Order
@@ -4276,6 +4280,13 @@ Razor Snippets
                     </div>
                 </div>
             </form>
+
+        . Crie a View "CheckoutComplete.cshtml" abaixo dentro da pasta "Views/Order":
+
+            <h3 class="my-5">
+                @ViewBag.CheckoutCompleteMessage
+            </h3>
+
 
         . Insira as linhas abaixo na classe "Views/ShoppingCart/Index.cshtml":
 
