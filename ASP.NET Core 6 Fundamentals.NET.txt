@@ -4170,35 +4170,9 @@ Razor Snippets
                     {
                         return View();
                     }
-
-                    [HttpPost]
-                    public IActionResult Checkout(Order order)
-                    {
-                        var items = _shoppingCart.GetShoppingCartItems();
-                        _shoppingCart.ShoppingCartItems = items;
-
-                        if (_shoppingCart.ShoppingCartItems.Count == 0)
-                        {
-                            ModelState.AddModelError("", "Your cart is empty, add some pies first");
-                        }
-
-                        if (ModelState.IsValid)
-                        {
-                            _orderRepository.CreateOrder(order);
-                            _shoppingCart.ClearCart();
-                            return RedirectToAction("CheckoutComplete");
-                        }
-                        return View(order);
-                    }
-
-                    public IActionResult CheckoutComplete()
-                    {
-                        ViewBag.CheckoutCompleteMessage = "Thanks for your order. You'll soon enjoy our delicious pies!";
-                        return View();
-                    }
                 }
             }
-// PAREI AQUI
+
         . Crie a View "Checkout.cshtml" abaixo dentro da pasta "Views/Order":
 
             @model Order
@@ -4281,13 +4255,6 @@ Razor Snippets
                 </div>
             </form>
 
-        . Crie a View "CheckoutComplete.cshtml" abaixo dentro da pasta "Views/Order":
-
-            <h3 class="my-5">
-                @ViewBag.CheckoutCompleteMessage
-            </h3>
-
-
         . Insira as linhas abaixo na classe "Views/ShoppingCart/Index.cshtml":
 
             @model ShoppingCartViewModel
@@ -4346,10 +4313,218 @@ Razor Snippets
 
         . Levante a aplicação, acione o "Add cart" e verifique dentro do carrinho se aparece o botão "CHECK OUT NOW".
 
-            . Acione o botão "CHECK OUT NOW"
-
-            . Inclua as informações da ordem e faça a gravação das informações.
+            . A funcionalidade está incompleta, somente verifique se o botão "CHECK OUT NOW" apareceu. No próximo DEMO
+                essa funcionalidade será completada.
 
     (14.50)
     . Entendendo "Model Binding"
+
+        . Model Bindings podem ser dividido em dois grupos:
+
+            . Tipos simples: O binding source pode ser valores de rota, string de consulta e dados de formulário.
+
+                http://www.meusite.com/blog/posts/5 ----+
+                                                        |   Mapeia o "id" com o valor da rota
+                                                        V
+                        public IActionResult Detail(int id) => View();
+
+            . Tipos Complexos: O binding source pode ser uma string de consulta e/ou dados de formulário.
+
+                . O model binding da ASP.NET Core mapeia dados de requisições HTTP para parâmetros dos métodos Action dos controladores,
+                    por exemplo:
+
+                    . Razor page "Checkout.cshtml":
+
+                        @model Order
+
+                        <form asp-action="Checkout" method="post" role="form">
+                            ...                                                 ----+
+                        </form>                                                     |
+                                                                                    |
+                    . Controller "OrderController.cs":                              |
+                                                                                    |
+                        using bethanysPieShop.Models;                               |
+                        using Microsoft.AspNetCore.Mvc;                             |
+                                                                                    |
+                        namespace bethanysPieShop.Controllers                       |
+                        {                                                           |
+                            public class OrderController : Controller               |
+                            {                                                       |
+                                ...                                                 |
+                                                                    +-------------+
+                                                                    |     Mapeia todos os inputs do formulário no
+                                [HttpPost]                            V     objeto "order"
+                                public IActionResult Checkout(Order order)
+                                {
+                                    var items = _shoppingCart.GetShoppingCartItems();
+                                    _shoppingCart.ShoppingCartItems = items;
+
+                                    if (_shoppingCart.ShoppingCartItems.Count == 0)
+                                    {
+                                        ModelState.AddModelError("", "Your cart is empty, add some pies first");
+                                    }
+
+                                    if (ModelState.IsValid)
+                                    {
+                                        _orderRepository.CreateOrder(order);
+                                        _shoppingCart.ClearCart();
+                                        return RedirectToAction("CheckoutComplete");
+                                    }
+                                    return View(order);
+                                }
+
+                                ...
+                            }
+                        }
+
+        . Podemos fazer uso de annotation para informar ao "Model Binding" qual é a sua fonte:
+
+            . A lista de annotation possíveis na assinatura dos métodos são:
+
+                . FromForm
+
+                    Este atributo faz com que o Model Binder utilize somente os dados recebidos do formulário enviado.
+
+                        public IActionResult Detail([FromForm] ProdutoViewModel produtoViewModel) => View(produtoViewModel);
+
+                . FromRoute
+
+                    Este atributo faz com que o Model Binder apenas vincule dados que são oriundos da rota de dados
+
+                        public IActionResult Detail([FromRoute] int id) => View();
+
+                . FromQuery
+
+                    Este atributo diz ao Model Binder para receber apenas os dados da cadeia de consulta (querystring).
+
+                        public IActionResult Detail([FromQuery] int id) => View();
+
+                        . Se fizermos uma solicitação com a URL:  Produto/Detalhe/2?Id=4 . O valor 4 será vinculado e não o 
+                            valor 2 conforme seria previsto no comportamento padrão.
+
+                . FromHeader
+
+                    Este atributo diz ao Model Binder para vincular os valores que vêm no cabeçalho da requisição HTTP.
+
+                . FromBody
+
+                    Este atributo diz ao Model Binder para vincular dados a partir do Body do request.
+
+                        public IActionResult Detail([FromBody] ProdutoViewModel produtoViewModel) => View(produtoViewModel);
+
+                . FromServices
+
+                    Este atributo vincula o valor especificado à implementação que foi configurada no seu container de injeção de dependência.
+
+                    public IActionResult Detail([FromServices] IPrintable printer) => View();
+
+                . Bind e BindNever    
+
+                    Este atributo vincula o valor especificado à implementação que foi configurada no seu container de injeção de dependência.
+
+                    O atributo BindNever diz ao model binder que não deve vincular o atributo especificado.
+
+                    Como você pode ver no trecho de código abaixo, IsAdminUser nunca será vinculado.
+
+                    Esta abordagem pode ser chamada de propriedades de lista negra, o que não é uma boa prática de segurança.
+
+                    É melhor listar os atributos que queremos vincular usando o atributo Bind, deixando de fora os que não queremos, 
+                    como você pode ver no exemplo:
+                    
+                        BindNever
+                        ---------
+                        public class ProdutoViewModel
+                        {
+                            [FromQuery]
+                            public int ProdutoId { get; set; }
+                            public string ProdutoName { get; set; }
+                            [BindNever]
+                            public string IsAdminUser { get; set; }
+                        }	
+
+                        Bind
+                        ----
+                        [Bind(nameof(ProdutoId), nameof(ProdutoNome))]
+                        public class ProdutoViewModel
+                        {
+                            [FromQuery]
+                            public int ProdutoId { get; set; }
+                            public string ProdutoNome { get; set; }
+                            public string IsAdminUser { get; set; }
+                        }
+
+            . Podemos usar essas annotations na assinatura dos métodos, ou diretamentamente nos "models", como por exemplo
+                no código acima.
+
+        . DEMO
+
+            . Insira os métodos abaixo na classe "OrderController.cs":
+
+                ...
+                [HttpPost]
+                public IActionResult Checkout(Order order)
+                {
+                    var items = _shoppingCart.GetShoppingCartItems();
+                    _shoppingCart.ShoppingCartItems = items;
+
+                    if (_shoppingCart.ShoppingCartItems.Count == 0)
+                    {
+                        ModelState.AddModelError("", "Your cart is empty, add some pies first");
+                    }
+
+                    if (ModelState.IsValid)
+                    {
+                        _orderRepository.CreateOrder(order);
+                        _shoppingCart.ClearCart();
+                        return RedirectToAction("CheckoutComplete");
+                    }
+                    return View(order);
+                }
+
+                public IActionResult CheckoutComplete()
+                {
+                    ViewBag.CheckoutCompleteMessage = "Thanks for your order. You'll soon enjoy our delicious pies!";
+                    return View();
+                }
+
+                ...
+
+            . Para mais detalhes sobre "ModelState" retorne a aula "Aula 34. Validações" e "Aula 36.  Padronizando erros" 
+                do curso "Fundamentos ASP.NET 6 - Balta".
+
+            . Crie a View "CheckoutComplete.cshtml" abaixo dentro da pasta "Views/Order":
+
+                <h3 class="my-5">
+                    @ViewBag.CheckoutCompleteMessage
+                </h3>
+
+            . Levante a aplicação, acione o "Add cart" e verifique dentro do carrinho se aparece o botão "CHECK OUT NOW".
+
+                . Acione o botão "CHECK OUT NOW"
+
+                . Inclua as informações da ordem e faça a gravação das informações.
+
+        (24.30)
+    . Adicionando validação
+
+        . Suponha que de alguma forma os dados a serem submetidos para o controller esteja da seguinte forma:
+
+
+            Add  "Order"  ------------------------------------> public ViewResult Add( Order order )
+                                                                                             ^
+                                                                                             |
+            OrderId="ABC"        ------------------------------------------------------------+  Dados Inválidos                                                       
+            Total="Hello World"
+            
+        . Podemos validar a situação acima com o objeto "ModelState". Veja o código abaixo no nosso "Controller":
+
+            if (ModelState.IsValid)
+            {
+                _orderRepository.CreateOrder(order);
+
+                return RedirectToAction("CheckoutComplete");
+            }else
+            {
+                return View();
+            }
 
