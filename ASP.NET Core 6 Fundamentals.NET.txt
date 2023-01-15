@@ -2524,6 +2524,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
             . Atributos de Tag Helper disponíveis:
 
+                https://www.learnrazorpages.com/razor-pages/tag-helpers/
                 https://www.dotnettricks.com/learn/aspnetcore/aspnet-core-tag-helpers
                 https://endjin.com/blog/2022/02/tag-helpers-in-aspnet-core
                 https://endjin.com/blog/2022/01/model-binding-in-asp-net-core-using-razor-pages
@@ -4576,3 +4577,87 @@ Razor Snippets
                 } 
             }
  
+    . Validações
+
+        . Podem ser inseridas nas classes models, através de "annotations"
+
+            . Constraints
+            . Required
+            . Regex
+            . Custom Validation
+
+
+    . Tipos:
+
+        . Fluent Mapping
+
+            . Mapeamento fluente
+            . Feito em uma classe externa
+            . Não "polui" a classe principal
+            . Não cria dependências na classe/projeto principal
+
+        . Data Annotations
+
+            . Feitos diretamente nas classes
+            . Mais simples e diretos
+            . Depende do System.ComponentModel.DataAnnotations
+                . Alguns dependem do Microsof.EntityFrameworkCore 
+
+    . Principais annotations:
+
+        . Required
+        . StringLength
+        . Range
+        . RegularExpression
+        . EmailAddress
+        . Phone
+
+    . Mais detalhes, acesse as aulas do curso "Fundamentos do Entity Framework - Balta" entre as aulas
+        16 a 19.
+
+    . Exemplo:
+
+        public class Order
+        {
+            [Required(ErrorMessage="Enter your first name)]
+            [StringLength(50)]
+            public string FirstName { get; set; }
+        }
+
+
+    . A "Tag Helper" "asp-validation-summary" são usadas para renderizar as mensagens de erro de validação 
+
+        <form asp-action="Checkout" method="post">
+            <div asp-validation-summary="All" class="text-danger">
+            </div>                        |
+        </form>                           +-------------------------+
+                                                                    |
+        . Possible ValidationSummary enumeration values are:        |
+                                                                    |
+            Enum	    Description    <----------------------------+
+            ----        -----------
+            None	    providing no validation summary (the default)
+            ModelOnly	summarising only model validation errors
+            All	        summarising model and property validation errors
+    
+
+        . O resultado renderizado será:
+
+            <div class="validation-summary-errors" data-valmsg-summary="true">
+                <ul>
+                    <li>The FirstName field is required.</li>
+                    <li>The LastName field is required.</li>
+                    <li>The DateOfBirth field is required.</li>
+                </ul>
+            </div>
+
+        . Poderiamos deixar mais amigável a validação da seguinte forma:
+
+            <form asp-action="Checkout" method="post">
+                <div asp-validation-summary="All" class="text-danger">
+                    <span>Please correct the following errors</span>    <!-- Msg Inserida -->
+                </div>                        
+            </form>                           
+    
+    (30.00)
+    . DEMO
