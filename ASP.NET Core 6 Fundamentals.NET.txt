@@ -4867,3 +4867,52 @@ Razor Snippets
                 Binding         Injection
 
         . Razor Pages é mais uma opção de renderização de página dentro do ASP.NET Core para geração de HTML.
+
+        . Configurando a aplicação para Razor Pages
+
+            . Acesse o componente "Program.cs" e acrescente as linhas abaixo:
+
+                ...
+                builder.Services.AddRazorPages();
+
+                app.MapRazorPages();
+                ...
+
+            . Exemplo de uma "Razor Pages"
+
+                @page                                       // Diretiva obrigatoria ser colocada no topo do arquivo.
+
+                @{                                          // Bloco padrão C#
+                    var name = string.Empty;
+                    if (Request.HasFormContentType)         // Verifica se a requisição foi postada de "form html"
+                    {
+                        name = Request.Form["name"];
+                    }
+                }
+                <div style="margin-top:30px;">
+                    <form method="post">
+                        <div>Name: <input name="name" /></div>
+                        <div><input type="submit" /></div>
+                    </form>
+                </div>
+                <div>
+                    @if (!string.IsNullOrEmpty(name))
+                    {
+                        <p>Hello @name!</p>
+                    }
+                </div>
+
+
+
+                @page             
+
+                @{                  
+                    var name = string.Empty;
+                    if (Request.HasFormContentType)     
+                    {
+                        name = Request.Form["name"];
+                    }
+                }
+
+
+https://www.learnrazorpages.com/first-look
