@@ -4849,7 +4849,7 @@ Razor Snippets
     . Recriando o formulário utilizando um Razor Page
 
         https://www.learnrazorpages.com/
-
+        https://www.learnrazorpages.com/first-look
 
                             ASP.NET Core Application Frameworks
                 ----------------------------------------------------------------    
@@ -4878,7 +4878,9 @@ Razor Snippets
                 app.MapRazorPages();
                 ...
 
-            . Exemplo de uma "Razor Pages"
+        . Exemplos de "Razor Pages"
+
+            . Arquivo único
 
                 @page                                       // Diretiva obrigatoria ser colocada no topo do arquivo.
 
@@ -4902,17 +4904,270 @@ Razor Snippets
                     }
                 </div>
 
+            . Arquivos "PageModel"
 
+                . Modo mais recomendado para se trabalhar
 
-                @page             
+                . Compartilha as informações entre dois componentes: [nome].cshtml e [nome].cshtml.cs
 
-                @{                  
-                    var name = string.Empty;
-                    if (Request.HasFormContentType)     
+                . Exemplo:
+
+                    Example.cshtml:
+
+                    @page
+                    @model ExampleModel
+                    <div style="margin-top:30px;">
+                        <form method="post">
+                            <div>Name: <input asp-for="Name" /></div>
+                            <div><input type="submit" /></div>
+                        </form>
+                        @if (!string.IsNullOrEmpty(Model.Name))
+                        {
+                            <p>Hello @Model.Name!</p>
+                        }
+                    </div>
+
+                    Example.cshtml.cs:
+
+                    using Microsoft.AspNetCore.Mvc;
+                    using Microsoft.AspNetCore.Mvc.RazorPages;
+                    namespace RazorPages.Pages
                     {
-                        name = Request.Form["name"];
+                        public class ExampleModel : PageModel
+                        {
+                            [BindProperty]
+                            public string Name { get; set; }
+                        }
                     }
+
+        . Estrutura de pastas de uma aplicação "Razor Pages":
+
+            pasta "bin"
+            pasta "obj"
+            pasta "Pages"               ------> Localização padrão dos arquivo "Razor Pages"
+                pasta "Shared"
+                    _ViewImports.cshtml
+                    _ViewStart.cshtml
+                    Error.cshtml
+                    Error.cshtml.cs     ------> Arquivos que finalização com ".cs" são classes "PageModel" "C#"
+                    Index.cshtml
+                    Index.cshtml.cs
+                    Privacy.cshtml
+                    Privacy.cshtml.cs
+            pasta "Properties"
+            pasta "wwwroot"
+                pasta "css"
+                pasta "js"
+                pasta "lib"
+                    pasta "bootstrap"
+                    pasta "jquery"
+            appsettings.Development.json  --+
+            appsettings.json                |   Root Files
+            Program.cs                      |
+            RazorPages.csproj             --+
+
+        . A maioria dos recursos desenvolvido pelo "ASP.NET Core MVC", como: tag helpers, view components, etc, podem ser
+            reutilizados dentro das páginas "Razor Pages"
+
+        . Roteamento "Razor Pages"
+
+            Route                   Page File
+            -----                   ---------
+            /                       /Pages/Index.cshtml
+            /Contact                /Pages/contact.cshtml
+            /Store/Pies             /Pages/Store/Pies.cshtml
+            /Store/Pies/3           /Pages/Store/Pies.cshtml
+                                    @page "{id:int?}"
+
+    (46.40)
+    . DEMO
+
+        . Objetivos:
+
+            . Configurar a aplicação para "Razor Pages"
+
+            . Recriar a página "Checkout" usando "Razor Pages"
+
+        . Acesse o componente "Program.cs" e insira as linhas abaixo:
+
+            using BethanysPieShop.Models;
+            using Microsoft.EntityFrameworkCore;
+
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddControllersWithViews();
+
+            builder.Services.AddRazorPages();                       // Linha inserida
+
+            ...
+
+            app.MapRazorPages();
+
+            app.MapDefaultControllerRoute();                        // Linha inserida
+
+            // app.MapControllerRoute(                              //Linha Alterada - Comente essas linhas
+            //     name: "default",
+            //    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+            DbInitializer.Seed(app);
+
+            app.Run();
+
+        . Crie a pasta "Pages" na raiz do projeto.
+
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" com o conteúdo abaixo:
+
+            @page
+            @model bethanysPieShop.Pages.CheckoutPageModel
+
+            <form method="post" class="form-horizontal" role="form">
+                <h4>You're just one step away from your delicious pies.</h4>
+
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+
+                <div class="form-group">
+                    <label asp-for="Order.LastName" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.LastName" class="form-control" />
+                        <span asp-validation-for="Order.LastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.FirstName" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.FirstName" class="form-control" />
+                        <span asp-validation-for="Order.FirstName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.AddressLine1" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.AddressLine1" class="form-control" />
+                        <span asp-validation-for="Order.AddressLine1" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.AddressLine2" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.AddressLine2" class="form-control" />
+                        <span asp-validation-for="Order.AddressLine2" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.ZipCode" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.ZipCode" class="form-control" />
+                        <span asp-validation-for="Order.ZipCode" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.City" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.City" class="form-control" />
+                        <span asp-validation-for="Order.City" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.State" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.State" class="form-control" />
+                        <span asp-validation-for="Order.State" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.Country" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.Country" class="form-control" />
+                        <span asp-validation-for="Order.Country" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.PhoneNumber" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.PhoneNumber" class="form-control" />
+                        <span asp-validation-for="Order.PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Order.Email" class="col-md-2 control-label"></label>
+                    <div class="col-md-5">
+                        <input asp-for="Order.Email" class="form-control" />
+                        <span asp-validation-for="Order.Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-5">
+                        <input type="submit" class="btn btn-primary" value="Complete order" />
+                    </div>
+                </div>
+
+            </form>
+
+        . Crie o componente "PageModel" abaixo com o nome "CheckoutPage.cshtml.cs" com o conteúdo abaixo:
+
+            using BethanysPieShop.Models;
+            using Microsoft.AspNetCore.Mvc;
+            using Microsoft.AspNetCore.Mvc.RazorPages;
+
+            namespace bethanysPieShop.Pages
+            {
+                public class CheckoutPageModel : PageModel
+                {
+                    private readonly IOrderRepository _orderRepository;
+                    private readonly IShoppingCart _shoppingCart;
+
+                    public CheckoutPageModel(IOrderRepository orderRepository, IShoppingCart shoppingCart)
+                    {
+                        _orderRepository = orderRepository;
+                        _shoppingCart = shoppingCart;
+                    }
+
+
+                    [BindProperty]
+                    public Order Order { get; set; }
+
+                    public void OnGet()
+                    {
+                    }
+
+
+                    public IActionResult OnPost()
+                    {
+                        if (!ModelState.IsValid)
+                        {
+                            return Page();
+                        }
+
+                        var items = _shoppingCart.GetShoppingCartItems();
+                        _shoppingCart.ShoppingCartItems = items;
+
+                        if (_shoppingCart.ShoppingCartItems.Count == 0)
+                        {
+                            ModelState.AddModelError("", "Your cart is empty, add some pies first");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            _orderRepository.CreateOrder(Order);
+                            _shoppingCart.ClearCart();
+                            return RedirectToPage("CheckoutCompletePage");
+                        }
+                        return Page();
+                    }
+
                 }
+            }
 
-
-https://www.learnrazorpages.com/first-look
+(50.33)
