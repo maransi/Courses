@@ -2024,7 +2024,7 @@ Working with Real Data Using Entity Framework Core 6
             namespace bethanysPieShop.Models
             {
                 public class CategoryRepository : ICategoryRepository
-                {
+                 {
                     private readonly AppDbContext _context;
 
                     public CategoryRepository(AppDbContext Context)
@@ -4935,10 +4935,28 @@ Razor Snippets
                     {
                         public class ExampleModel : PageModel
                         {
-                            [BindProperty]
-                            public string Name { get; set; }
+                            [BindProperty]                      // Faz a ligação dos valores do formulário com o componente Model, 
+                            public string Name { get; set; }    // Origem da informação: <div>Name: <input asp-for="Name" /></div>
+
+                            public void OnGet()             // Quando houver uma requisição via "Get", esse método é chamada automaticamente
+                            {
+
+                            }
+
+                            public void OnPost()             // Quando houver uma requisição via "Post", esse método é chamada automaticamente
+                            {
+
+                            }
+
+                            // Se colocarmos na assinatura dos métodos "OnGet()" e "OnPost()" parâmetros, os valores deles serão os mesmos dos campos do formulário "cshtml".
+                            // Para isso o nome dos campos do formulário e os parâmetros devem ser os mesmos.
+
                         }
                     }
+
+        . Para mais possibilidades de como ligar (Bind) as informações do formulário com o Model acesse o link abaixo:
+
+            https://www.learnrazorpages.com/razor-pages/model-binding
 
         . Estrutura de pastas de uma aplicação "Razor Pages":
 
@@ -5016,7 +5034,74 @@ Razor Snippets
 
         . Crie a pasta "Pages" na raiz do projeto.
 
-        . Dentro da pasta "Pages" crie o arquivo "Razor Page" com o conteúdo abaixo:
+        . Crie a pasta "Pages/Shared" no projeto e insira o arquivo "_PagesLayout.cshtml" com o conteúdo abaixo:
+
+            <!DOCTYPE html>
+
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width" />
+                <title>Bethany's Pie Shop</title>
+                <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
+                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery-validate/jquery.validate.js"></script>
+                <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+                <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+                <link href="~/css/site.css" rel="stylesheet" />
+                <base href="/" />
+            </head>
+            <body>
+                <div class="container">
+                    <header>
+                        <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary"
+                            aria-label="Bethany's Pie Shop navigation header">
+                            <div class="container-xl">
+                                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                                    <img src="images/bethanys-pie-shop-logo_horiz-white.png" width="151" height="47" class="d-inline-block align-top mb-2 mt-1"
+                                        alt="Bethany's Pie Shop Logo">
+                                </a>
+
+                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                                        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                                    <span class="navbar-toggler-icon"></span>
+                                </button>
+
+                                <div class="collapse navbar-collapse" id="navbarCollapse">
+                                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                        <vc:category-menu></vc:category-menu>
+                                        <li class="nav-item">
+                                            <a asp-controller="Contact" asp-action="Index" class="nav-link">Contact</a>
+                                        </li>
+                                    </ul>
+                                    <vc:shopping-cart-summary></vc:shopping-cart-summary>
+                                </div>
+                            </div>
+                        </nav>
+                    </header>
+
+                    @RenderBody()
+                </div>
+            </body>
+            </html>
+
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "_ViewStart.cshmtl" com o conteúdo abaixo:
+
+            @{
+                Layout = "_PageLayout";
+            }
+
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "_ViewImports.cshmtl" com o conteúdo abaixo:
+
+            @using bethanysPieShop
+            @using bethanysPieShop.Models
+            @using bethanysPieShop.ViewModels
+            @using bethanysPieShop.Components
+            @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+            @addTagHelper bethanysPieShop.TagHelpers.*, bethanysPieShop
+            @addTagHelper *, bethanysPieShop
+
+
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutPageModel.cshmtl" com o conteúdo abaixo:
 
             @page
             @model bethanysPieShop.Pages.CheckoutPageModel
@@ -5147,7 +5232,7 @@ Razor Snippets
                     {
                         if (!ModelState.IsValid)
                         {
-                            return Page();
+                            return Page();          // Retorna para a página "CheckoutPageModel.cshmtl"
                         }
 
                         var items = _shoppingCart.GetShoppingCartItems();
@@ -5170,4 +5255,401 @@ Razor Snippets
                 }
             }
 
-(50.33)
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutCompletePageModel.cshmtl" com o conteúdo abaixo:
+
+            @page
+            @model bethanysPieShop.Pages.CheckoutCompletePageModel
+
+
+
+            <h1>@ViewData["CheckoutCompleteMessage"]</h1>
+
+
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutCompletePageModel.cshmtl.cs" com o conteúdo abaixo:
+
+            using Microsoft.AspNetCore.Mvc;
+            using Microsoft.AspNetCore.Mvc.RazorPages;
+
+            namespace bethanysPieShop.Pages
+            {
+                public class CheckoutCompletePageModel : PageModel
+                {
+                    public void OnGet()
+                    {
+                        ViewData["CheckoutCompleteMessage"] = "Thanks for your order. You'll soon enjoy our delicious pies!";
+                    }
+                }
+            }
+
+        . Coloque um "BreakPoint" na primeira linha do método "OnPost()" da classe "CheckoutPage.cshtml.cs" 
+
+        . Levante o projeto e acesse o link abaixo:
+
+            https://localhost[porta]/checkoutpage
+
+        . Acomnpanhe a execução do código onde foi marcado o "BreakPoint".
+
+
+
+Testando os Componentes da Aplicação
+====================================
+
+    https://www.toptal.com/qa/how-to-write-testable-code-and-why-it-matters#:~:text=A%20unit%20test%20typically%20features,be%20in%20line%20with%20expectations.
+
+    . A unit test is a method that instantiates a small portion of our application and verifies its behavior independently from other parts.
+
+    . A typical unit test contains 3 phases: 
+    
+        . First, it initializes a small piece of an application it wants to test (also known as the system under test, or SUT), 
+        
+        . Then it applies some stimulus to the system under test (usually by calling a method on it), 
+        
+        . And finally, it observes the resulting behavior. 
+        
+    . If the observed behavior is consistent with the expectations, the unit test passes, otherwise, it fails, indicating that there is a problem somewhere in the system under test. 
+    
+    . These three unit test phases are also known as Arrange, Act and Assert, or simply AAA.
+
+    . Usaremos a biblioteca "xUnit"
+
+    . Exemplo simples de uma "Unit Test":
+
+        public void CanUpdatePiePrice()
+        {
+            // Arrange
+            var pe = new Pie { Name = "Sample pie", Price = 12.95M };
+
+            // Act
+            pie.Price = 20M;
+
+            // Assert
+            Assert.Equal( 20M, pie.Price );
+        }
+
+    (6.35)
+    . DEMO
+
+        https://www.codemag.com/Article/2009101/Interactive-Unit-Testing-with-.NET-Core-and-VS-Code
+        https://xunit.net/docs/getting-started/netcore/cmdline#:~:text=execute%20your%20command.-,Create%20the%20unit%20test%20project,Test%20Project%22%20was%20created%20successfully.
+        https://www.learmoreseekmore.com/2022/02/dotnet6-unit-testing-aspnetcore-web-api-using-xunit.html
+
+        . Objetivos:
+
+            . Implementar as correções nos projetos e pacotes
+
+            . Escrever "Unit Tests" para um controller.
+
+        . Instale o "plugin" ".NET Core Test Explorer" no VSCode
+
+        . Crie um projeto com o comando abaixo:
+
+            dotnet new xunit -o bethanysPieShopTests
+
+        . Apague o arquivo "UnitTest.cs"
+
+        . Acesse o arquivo "bethhanysPieShopTests.csproj" e acrescente a linha abaixo:
+
+            <Project Sdk="Microsoft.NET.Sdk">
+
+            <PropertyGroup>
+                <TargetFramework>net6.0</TargetFramework>
+                <Nullable>enable</Nullable>
+
+                <IsPackable>false</IsPackable>
+            </PropertyGroup>
+
+            <ItemGroup>
+                <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+                <PackageReference Include="xunit" Version="2.4.1" />
+                <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+                <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+                <PrivateAssets>all</PrivateAssets>
+                </PackageReference>
+                <PackageReference Include="coverlet.collector" Version="3.1.0">
+                <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+                <PrivateAssets>all</PrivateAssets>
+                </PackageReference>
+                <PackageReference Include="Moq" Version="4.17.2" />     <!-- linha inserida -->
+            </ItemGroup>
+
+            <ItemGroup>
+                <ProjectReference Include="..\BethanysPieShop\BethanysPieShop.csproj" />
+            </ItemGroup>
+
+            </Project>
+
+        . Crie a dependência desse projeto de testes com o projeto "bethanysPieShop"
+
+        . Crie a pasta "Controllers" dentro do projeto de testes.
+
+        . Crie a class "PieControllerTests.cs" dentro da pasta "Controllers" com o conteúdo abaixo:
+
+            using BethanysPieShop.Controllers;
+            using BethanysPieShop.ViewModels;
+            using BethanysPieShopTests.Mocks;
+            using Microsoft.AspNetCore.Mvc;
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+            using Xunit;
+
+            namespace bethanysPieShopTests.Controllers
+            {
+                public class PieControllerTests
+                {
+                    [Fact]
+                    public void List_EmptyCategory_ReturnsAllPies()
+                    {
+                        //arrange
+                        var mockCategoryRepository = RepositoryMocks.GetCategoryRepository();
+                        var mockPieRepository = RepositoryMocks.GetPieRepository();
+
+                        var pieController = new PieController(mockPieRepository.Object, mockCategoryRepository.Object);
+
+                        //act
+                        var result = pieController.List("");
+
+                        //assert
+                        var viewResult = Assert.IsType<ViewResult>(result);
+                        var pieListViewModel = Assert.IsAssignableFrom<PieListViewModel>(viewResult.ViewData.Model);
+                        Assert.Equal(10, pieListViewModel.Pies.Count());
+                    }
+                }
+            }
+
+        . Crie a pasta "Mocks" dentro do projeto de testes.
+
+        . Crie a class "RepositoryMocks.cs" dentro da pasta "Mocks" com o conteúdo abaixo:
+
+            using BethanysPieShop.Models;
+            using Moq;
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+
+            namespace bethanysPieShopTests.Mocks
+            {
+                public class RepositoryMocks
+                {
+                    public static Mock<IPieRepository> GetPieRepository()
+                    {
+                        var pies = new List<Pie>
+                        {
+                            new Pie
+                            {
+                                Name = "Apple Pie",
+                                Price = 12.95M,
+                                ShortDescription = "Our famous apple pies!",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Fruit pies"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/applepie.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = true,
+                                ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/applepiesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Blueberry Cheese Cake",
+                                Price = 18.95M,
+                                ShortDescription = "You'll love it!",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Cheese cakes"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/blueberrycheesecake.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = false,
+                                ImageThumbnailUrl =
+                                    "https://gillcleerenpluralsight.blob.core.windows.net/files/blueberrycheesecakesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Cheese Cake",
+                                Price = 18.95M,
+                                ShortDescription = "Plain cheese cake. Plain pleasure.",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Cheese cakes"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cheesecake.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = false,
+                                ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cheesecakesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Cherry Pie",
+                                Price = 15.95M,
+                                ShortDescription = "A summer classic!",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Fruit pies"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cherrypie.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = false,
+                                ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cherrypiesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Christmas Apple Pie",
+                                Price = 13.95M,
+                                ShortDescription = "Happy holidays with this pie!",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Seasonal pies"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/christmasapplepie.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = false,
+                                ImageThumbnailUrl =
+                                    "https://gillcleerenpluralsight.blob.core.windows.net/files/christmasapplepiesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Cranberry Pie",
+                                Price = 17.95M,
+                                ShortDescription = "A Christmas favorite",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Seasonal pies"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/cranberrypie.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = false,
+                                ImageThumbnailUrl =
+                                    "https://gillcleerenpluralsight.blob.core.windows.net/files/cranberrypiesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Peach Pie",
+                                Price = 15.95M,
+                                ShortDescription = "Sweet as peach",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Fruit pies"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/peachpie.jpg",
+                                InStock = false,
+                                IsPieOfTheWeek = false,
+                                ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/peachpiesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Pumpkin Pie",
+                                Price = 12.95M,
+                                ShortDescription = "Our Halloween favorite",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Seasonal pies"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/pumpkinpie.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = true,
+                                ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/pumpkinpiesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Rhubarb Pie",
+                                Price = 15.95M,
+                                ShortDescription = "My God, so sweet!",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Fruit pies"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/rhubarbpie.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = true,
+                                ImageThumbnailUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/rhubarbpiesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                            new Pie
+                            {
+                                Name = "Strawberry Pie",
+                                Price = 15.95M,
+                                ShortDescription = "Our delicious strawberry pie!",
+                                LongDescription =
+                                    "Icing carrot cake jelly-o cheesecake. Sweet roll marzipan marshmallow toffee brownie brownie candy tootsie roll. Chocolate cake gingerbread tootsie roll oat cake pie chocolate bar cookie dragée brownie. Lollipop cotton candy cake bear claw oat cake. Dragée candy canes dessert tart. Marzipan dragée gummies lollipop jujubes chocolate bar candy canes. Icing gingerbread chupa chups cotton candy cookie sweet icing bonbon gummies. Gummies lollipop brownie biscuit danish chocolate cake. Danish powder cookie macaroon chocolate donut tart. Carrot cake dragée croissant lemon drops liquorice lemon drops cookie lollipop toffee. Carrot cake carrot cake liquorice sugar plum topping bonbon pie muffin jujubes. Jelly pastry wafer tart caramels bear claw. Tiramisu tart pie cake danish lemon drops. Brownie cupcake dragée gummies.",
+                                Category = Categories["Fruit pies"],
+                                ImageUrl = "https://gillcleerenpluralsight.blob.core.windows.net/files/strawberrypie.jpg",
+                                InStock = true,
+                                IsPieOfTheWeek = false,
+                                ImageThumbnailUrl =
+                                    "https://gillcleerenpluralsight.blob.core.windows.net/files/strawberrypiesmall.jpg",
+                                AllergyInformation = ""
+                            },
+                        };
+
+                        var mockPieRepository = new Mock<IPieRepository>();
+                        mockPieRepository.Setup(repo => repo.AllPies).Returns(pies);
+                        mockPieRepository.Setup(repo => repo.PiesOfTheWeek).Returns(pies.Where(p => p.IsPieOfTheWeek));
+                        mockPieRepository.Setup(repo => repo.GetPieById(It.IsAny<int>())).Returns(pies[0]);
+                        return mockPieRepository;
+                    }
+
+                    public static Mock<ICategoryRepository> GetCategoryRepository()
+                    {
+                        var categories = new List<Category>
+                        {
+                            new Category()
+                            {
+                                CategoryId = 1,
+                                CategoryName = "Fruit Pies",
+                                Description = "Lorem ipsum"
+                            },
+                            new Category()
+                            {
+                                CategoryId = 2,
+                                CategoryName = "Cheese cakes",
+                                Description = "Lorem ipsum"
+                            },
+                            new Category()
+                            {
+                                CategoryId = 3,
+                                CategoryName = "Fruit Pies",
+                                Description = "Seasonal pies"
+                            }
+                        };
+
+                        var mockCategoryRepository = new Mock<ICategoryRepository>();
+                        mockCategoryRepository.Setup(repo => repo.AllCategories).Returns(categories);
+
+                        return mockCategoryRepository;
+                    }
+
+                    private static Dictionary<string, Category>? _categories;
+                    public static Dictionary<string, Category> Categories
+                    {
+                        get
+                        {
+                            if (_categories == null)
+                            {
+                                var genresList = new Category[]
+                                {
+                                    new Category { CategoryName = "Fruit pies" },
+                                    new Category { CategoryName = "Cheese cakes" },
+                                    new Category { CategoryName = "Seasonal pies" }
+                                };
+
+                                _categories = new Dictionary<string, Category>();
+
+                                foreach (var genre in genresList)
+                                {
+                                    _categories.Add(genre.CategoryName, genre);
+                                }
+                            }
+
+                            return _categories;
+                        }
+                    }
+                }
+            }
+
+        . Execute os testes, devem resultar em bem sucedidos.
+
+(14.00)
