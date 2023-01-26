@@ -1118,6 +1118,79 @@ Aula 16. DataAnnotations
         }
 
 
+    DataType    This attribute is used to specify the data type of the model.
+
+        [Required]
+        [DataType(DataType.Password)]
+        [StringLength(10,MinimumLength=4)]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+
+
+    DisplayFormat - Aplica um formato definido a uma propriedade
+
+        [Required]
+        [Display(Name = "Data do pedido")]
+        [DisplayFormat(DataFormatString = "mm/dd/yyyy")]
+        public DateTime Datapedido { get; set; }	[Required]
+
+        [Display(Name = "Preco do Produto")]
+        [DisplayFormat(DataFormatString = "{0,c}")]
+        public decimal PrecoProduto { get; set; }
+
+    Display - Define o texto que será visível para uma propriedade quando usada em um campo de formulário
+
+        [Required(ErrorMessage="O nome do usuário é obrigatório",AllowEmptyStrings=false)]
+        [Display(Name = "Nome do Usuário")]
+        public string UserName { get; set; }
+
+    Range - Define um intervalo para uma propriedade onde a validação será aplicada
+
+        [Required]
+        [Display(Name = "Idade do beneficiário")]
+        [Range(18,65)]
+        public int idadeBeneficiario { get; set; }
+
+    RegularExpression - Permite usar expressões regulares em validações mais específicas
+
+        [Required(ErrorMessage = "Informe o seu email")]
+        [RegularExpression(".+\\@.+\\..+",ErrorMessage = "Informe um email válido...")]
+        public string Email { get; set; }
+
+    Bind e BindNever    
+
+        Este atributo vincula o valor especificado à implementação que foi configurada no seu container de injeção de dependência.
+
+        O atributo BindNever diz ao model binder que não deve vincular o atributo especificado.
+
+        Como você pode ver no trecho de código abaixo, IsAdminUser nunca será vinculado.
+
+        Esta abordagem pode ser chamada de propriedades de lista negra, o que não é uma boa prática de segurança.
+
+        É melhor listar os atributos que queremos vincular usando o atributo Bind, deixando de fora os que não queremos, 
+        como você pode ver no exemplo:
+        
+            BindNever
+            ---------
+            public class ProdutoViewModel
+            {
+                [FromQuery]
+                public int ProdutoId { get; set; }
+                public string ProdutoName { get; set; }
+                [BindNever]
+                public string IsAdminUser { get; set; }
+            }	
+
+            Bind
+            ----
+            [Bind(nameof(ProdutoId), nameof(ProdutoNome))]
+            public class ProdutoViewModel
+            {
+                [FromQuery]
+                public int ProdutoId { get; set; }
+                public string ProdutoNome { get; set; }
+                public string IsAdminUser { get; set; }
+            }
 
 
     System.ComponentModel.DataAnnotations.Schema Attributes

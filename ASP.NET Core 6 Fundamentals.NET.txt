@@ -3670,7 +3670,6 @@ Improving the Views in the Application
             https://localhost:[porta]
 
 
-    // PAREI AQUI
     . Criando uma "Custom Tag Helper"
 
         . As Tag Helpers permitem que o código do lado do servidor participe na criação e renderização de 
@@ -3844,7 +3843,6 @@ Improving the Views in the Application
             https://localhost:[porta]
 
             . Verifique o "Source Code" da página "ContactPage" e verifique se o link do email foi inserido corretamente.
-
 
 Working with Forms and Model Binding
 ====================================
@@ -4352,8 +4350,8 @@ Razor Snippets
                             public class OrderController : Controller               |
                             {                                                       |
                                 ...                                                 |
-                                                                    +-------------+
-                                                                    |     Mapeia todos os inputs do formulário no
+                                                                      +-------------+
+                                                                      |     Mapeia todos os inputs do formulário no
                                 [HttpPost]                            V     objeto "order"
                                 public IActionResult Checkout(Order order)
                                 {
@@ -4658,7 +4656,7 @@ Razor Snippets
                     <span>Please correct the following errors</span>    <!-- Msg Inserida -->
                 </div>                        
             </form>                           
-    
+
     (30.00)
     . DEMO
 
@@ -4667,7 +4665,7 @@ Razor Snippets
             using Microsoft.AspNetCore.Mvc.ModelBinding;
             using System.ComponentModel.DataAnnotations;
 
-            namespace BethanysPieShop.Models
+            namespace bethanysPieShop.Models
             {
                 public class Order
                 {
@@ -4703,7 +4701,8 @@ Razor Snippets
                     [StringLength(50)]
                     public string City { get; set; } = string.Empty;
 
-                    [StringLength(10)]
+                    [Required( ErrorMessage = "Please enter your State")]
+                    [StringLength( 10, ErrorMessage="Length State must be between 2 and 10 digits", MinimumLength = 2)]
                     public string? State { get; set; }
 
                     [Required(ErrorMessage = "Please enter your country")]
@@ -4802,6 +4801,8 @@ Razor Snippets
                     </div>
                 </div>
             </form>
+
+    // PAREI AQUI
 
         . Levante a aplicação e verifique se as v alidações estão funcionando na parte do "Checkout"
 
