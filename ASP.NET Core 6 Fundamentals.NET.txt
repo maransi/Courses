@@ -4802,8 +4802,6 @@ Razor Snippets
                 </div>
             </form>
 
-    // PAREI AQUI
-
         . Levante a aplicação e verifique se as v alidações estão funcionando na parte do "Checkout"
 
         . Validação feita através do JQuery:
@@ -4819,10 +4817,28 @@ Razor Snippets
                     . No item "Library" digite "jquery-validate@1.19.4"
                     . Escolha todas as opção para instalação da biblioteca
 
+                . No VSCode:
+
+                    . Acesse a URL abaixo e faça o download:
+
+                        https://sourceforge.net/projects/jquery-validation.mirror/files/1.19.4/jquery-validation-1.19.4.zip/download
+
+                    . Crie a pasta "wwwroot/lib/jquery-validate" no projeto
+
+                    . Copie a pasta "/dist" do arquivo baixado para dentro da pasta do projeto "wwwroot/lib/jquery-validate"
+
             (35.00)
             . Instale a bibliote JQuer abaixo no projeto:
 
                 jquery-validation-unobtrusive@3.2.12
+
+                . Execute o comando abaixo:
+
+                    npm install jquery-validation-unobtrusive@3.2.12
+
+                . Crie a pasta "wwwroot/lib/query-validation-unobtrusive" no projeto
+
+                . Copie a pasta "/dist" do arquivo baixado para dentro da pasta do projeto "wwwroot/lib/query-validation-unobtrusive"
 
             . Acesse o arquivo "Views/Shared/_Layout.cshtml" e implemente as linhas abaixo:
 
@@ -5009,7 +5025,7 @@ Razor Snippets
 
         . Acesse o componente "Program.cs" e insira as linhas abaixo:
 
-            using BethanysPieShop.Models;
+            using bethanysPieShop.Models;
             using Microsoft.EntityFrameworkCore;
 
             var builder = WebApplication.CreateBuilder(args);
@@ -5020,9 +5036,10 @@ Razor Snippets
 
             ...
 
-            app.MapRazorPages();
 
             app.MapDefaultControllerRoute();                        // Linha inserida
+
+            app.MapRazorPages();                                    // Linha inserida
 
             // app.MapControllerRoute(                              //Linha Alterada - Comente essas linhas
             //     name: "default",
@@ -5035,7 +5052,7 @@ Razor Snippets
 
         . Crie a pasta "Pages" na raiz do projeto.
 
-        . Crie a pasta "Pages/Shared" no projeto e insira o arquivo "_PagesLayout.cshtml" com o conteúdo abaixo:
+        . Crie a pasta "Pages/Shared" no projeto e insira o arquivo "_PageLayout.cshtml" com o conteúdo abaixo:
 
             <!DOCTYPE html>
 
@@ -5085,7 +5102,7 @@ Razor Snippets
             </body>
             </html>
 
-        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "_ViewStart.cshmtl" com o conteúdo abaixo:
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "_ViewStart.cshtml" com o conteúdo abaixo:
 
             @{
                 Layout = "_PageLayout";
@@ -5102,7 +5119,7 @@ Razor Snippets
             @addTagHelper *, bethanysPieShop
 
 
-        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutPageModel.cshmtl" com o conteúdo abaixo:
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutPage.cshtml" com o conteúdo abaixo:
 
             @page
             @model bethanysPieShop.Pages.CheckoutPageModel
@@ -5203,7 +5220,7 @@ Razor Snippets
 
         . Crie o componente "PageModel" abaixo com o nome "CheckoutPage.cshtml.cs" com o conteúdo abaixo:
 
-            using BethanysPieShop.Models;
+            using bethanysPieShop.Models;
             using Microsoft.AspNetCore.Mvc;
             using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -5256,7 +5273,7 @@ Razor Snippets
                 }
             }
 
-        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutCompletePageModel.cshmtl" com o conteúdo abaixo:
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutCompletePage.cshtml" com o conteúdo abaixo:
 
             @page
             @model bethanysPieShop.Pages.CheckoutCompletePageModel
@@ -5266,7 +5283,7 @@ Razor Snippets
             <h1>@ViewData["CheckoutCompleteMessage"]</h1>
 
 
-        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutCompletePageModel.cshmtl.cs" com o conteúdo abaixo:
+        . Dentro da pasta "Pages" crie o arquivo "Razor Page" "CheckoutCompletePage.cshtml.cs" com o conteúdo abaixo:
 
             using Microsoft.AspNetCore.Mvc;
             using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -5291,6 +5308,7 @@ Razor Snippets
         . Acomnpanhe a execução do código onde foi marcado o "BreakPoint".
 
 
+// PAREI AQUI
 
 Testando os Componentes da Aplicação
 ====================================
