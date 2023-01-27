@@ -5308,8 +5308,6 @@ Razor Snippets
         . Acomnpanhe a execução do código onde foi marcado o "BreakPoint".
 
 
-// PAREI AQUI
-
 Testando os Componentes da Aplicação
 ====================================
 
@@ -5362,9 +5360,9 @@ Testando os Componentes da Aplicação
 
         . Crie um projeto com o comando abaixo:
 
-            dotnet new xunit -o bethanysPieShopTests
+            dotnet new xunit -o bhetanyPieShopTests
 
-        . Apague o arquivo "UnitTest.cs"
+        . Apague o arquivo "UnitTest1.cs"
 
         . Acesse o arquivo "bethhanysPieShopTests.csproj" e acrescente a linha abaixo:
 
@@ -5397,52 +5395,21 @@ Testando os Componentes da Aplicação
 
             </Project>
 
-        . Crie a dependência desse projeto de testes com o projeto "bethanysPieShop"
+        . Crie a dependência desse projeto de testes com o projeto "bethanysPieShop":
 
-        . Crie a pasta "Controllers" dentro do projeto de testes.
+            . Na pasta raiz de projetos execute o comando abaixo:
 
-        . Crie a class "PieControllerTests.cs" dentro da pasta "Controllers" com o conteúdo abaixo:
+                dotnet add ./bhetanyPieShopTests/ reference ./bhetanyPieShop/
 
-            using BethanysPieShop.Controllers;
-            using BethanysPieShop.ViewModels;
-            using BethanysPieShopTests.Mocks;
-            using Microsoft.AspNetCore.Mvc;
-            using System;
-            using System.Collections.Generic;
-            using System.Linq;
-            using System.Text;
-            using System.Threading.Tasks;
-            using Xunit;
+        . Execute o comando abaixo na pasta do projeto "bhetanyPieShopTests":
 
-            namespace bethanysPieShopTests.Controllers
-            {
-                public class PieControllerTests
-                {
-                    [Fact]
-                    public void List_EmptyCategory_ReturnsAllPies()
-                    {
-                        //arrange
-                        var mockCategoryRepository = RepositoryMocks.GetCategoryRepository();
-                        var mockPieRepository = RepositoryMocks.GetPieRepository();
-
-                        var pieController = new PieController(mockPieRepository.Object, mockCategoryRepository.Object);
-
-                        //act
-                        var result = pieController.List("");
-
-                        //assert
-                        var viewResult = Assert.IsType<ViewResult>(result);
-                        var pieListViewModel = Assert.IsAssignableFrom<PieListViewModel>(viewResult.ViewData.Model);
-                        Assert.Equal(10, pieListViewModel.Pies.Count());
-                    }
-                }
-            }
+            dotnet restore
 
         . Crie a pasta "Mocks" dentro do projeto de testes.
 
         . Crie a class "RepositoryMocks.cs" dentro da pasta "Mocks" com o conteúdo abaixo:
 
-            using BethanysPieShop.Models;
+            using bethanysPieShop.Models;
             using Moq;
             using System;
             using System.Collections.Generic;
@@ -5668,6 +5635,48 @@ Testando os Componentes da Aplicação
                     }
                 }
             }
+
+        . Crie a pasta "Controllers" dentro do projeto de testes.
+
+        . Crie a class "PieControllerTests.cs" dentro da pasta "Controllers" com o conteúdo abaixo:
+
+            using bethanysPieShop.Controllers;
+            using bethanysPieShop.ViewModels;
+            using bethanysPieShopTests.Mocks;
+            using Microsoft.AspNetCore.Mvc;
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+            using Xunit;
+
+            namespace bethanysPieShopTests.Controllers
+            {
+                public class PieControllerTests
+                {
+                    [Fact]
+                    public void List_EmptyCategory_ReturnsAllPies()
+                    {
+                        //arrange
+                        var mockCategoryRepository = RepositoryMocks.GetCategoryRepository();
+                        var mockPieRepository = RepositoryMocks.GetPieRepository();
+
+                        var pieController = new PieController(mockPieRepository.Object, mockCategoryRepository.Object);
+
+                        //act
+                        var result = pieController.List("");
+
+                        //assert
+                        var viewResult = Assert.IsType<ViewResult>(result);
+                        var pieListViewModel = Assert.IsAssignableFrom<PieListViewModel>(viewResult.ViewData.Model);
+                        Assert.Equal(10, pieListViewModel.Pies.Count());
+                    }
+                }
+            }
+
+
+// PAREI AQUI
 
         . Execute os testes, devem resultar em bem sucedidos.
 
