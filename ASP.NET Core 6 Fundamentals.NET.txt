@@ -5726,3 +5726,326 @@ Testando os Componentes da Aplicação
 
 Deixando o site interativo
 ==========================
+
+
+
+    . Objetivos deste modulo
+
+        . Utilizando Javascript com ASP.NET Core API
+
+            . Criando um ASP.NET Core API
+            . Adicionando JQuery
+
+        . Intrução ao Blazor
+
+    . Utilizando Javascript com ASP.NET Core API
+
+        . Desvantagens do uso raiz do ASP.NET Core MVC ou Razor Page:
+
+            . Atualização da página inteira (resposta) em cada submissão. Recriando header, footer, etc.
+
+            . Excesso de informações na comunicação entre client/server, toda feita através de HTML.
+
+            . Lentidão
+
+        . Refactoring do contexto Razor Page, ou ASP.NET Core MVC.
+
+            . A comunicação será feita através de respostas APIs, utilizando estruturas JSON como respostas e 
+                Javascript para renderizar esses dados no client.
+
+
+    . Criando um ASP.NET Core Restful API
+
+        Rest API Básica
+        ---------------
+
+                        Client A    Request HTTP GET
+                        (Browser)   <-------------------+
+                                    Response JSON       |
+                                                        V
+                                    Request HTTP POST   Server Rest API                         Database
+                        Client B    <------->           ---------------                         --------
+                        (Mobile)    Request JSON        Recebe requisições HTTP dos <-------->  Respondem as chamadas API
+                                                        clientes e faz requisições              
+                                                        ao banco de dados
+                                                        ^
+                        Client C    Request HTTP PUT    |
+                        (Desktop)   <-------------------+
+                                    Response JSON
+
+                                    Response:   JSON/XML
+                                                Status Code (200, 404, ...)
+
+    . Criando uma API com ASP.NET Core
+
+
+                                                MVC app
+                                    -----------------------------
+                    HTTP Request
+                    (Header, Params, 
+                    Authorization)
+            client  <---------------->  Controller
+                    HTTP Response           |
+                    (Json)                  |
+                                            |
+                                            |
+                                            V       model
+                                        Service <---------------+
+                                            |                   |
+                                            |                   |
+                                            |                   |
+                                            V                   |
+                                        Data Access Layer   ----+
+                                            |
+                                            |
+                                            |
+                                            V
+                                        Database
+
+    . Configurando o projeto para trabalhar com Restful API:
+
+        . Insira as linhas abaixo na classe "Program.cs":
+
+            ...
+            builder.Services.AddControllers();
+            ...
+            app.MapControllers();
+            ...
+
+        . Criar uma classe "Controller" implementando a interface "ControllerBase"
+
+            public class PieController: ControllerBase
+            {
+
+            }
+
+        . Configurando as rotas
+
+            // Acessível "/api/pie"
+            //
+            [Route("api/[controller])]
+            public class PieController: ControllerBase
+            {
+
+            }
+    
+        . Configurando os métodos action:
+
+            // Acessível "/api/pie"
+            //
+            [Route("api/[controller])]
+            public class PieController: ControllerBase
+            {
+
+                [HttpGet]
+                public IActionResult GetAll()
+                {
+
+                }
+            }
+
+            . Passando parâmetros
+
+                [Route("api/[controller])]
+                public class PieController: ControllerBase
+                {
+
+                    // Acessível "/api/pie/3"
+                    [HttpGet("{id}")]
+                    public IActionResult GetById( int id )
+                    {
+
+                    }
+                }
+
+                // Neste exemplo utilizamos parâmetro simples, porém podemos utilizar tipos complexos (classes)
+                // em seu lugar
+
+    . DEMO
+
+        . No projeto "bethanys" na classe "Program.cs" avalie as linhas abaixo:
+
+            builder.Services.AddControllersWithViews()
+                .AddJsonOptions(options =>                                                              // Linha inserida
+                {                                                                                       // Linha inserida
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;     // Linha inserida
+                });                                                                                     // Linha inserida
+
+            ...
+            builder.Services.AddDbContext<AppDbContext>( options => {                           
+                options.UseSqlite( 
+                    builder.Configuration["ConnectionStrings:DefaultConnection"]);
+            });
+
+            // builder.Services.AddControllers();           // Devido o projeto já estar configurado para trabalhar com
+                                                            // ASP.NET Core MVC e já configurado com as rotas padrões 
+                                                            // das páginas, não é necessários fazer a inserção do "middleware"
+                                                            // ".AddControllers"; o "AddControllerWithViews" já é suficiente.
+                                                            // Caso não for essa a situação, então acrescente este "middleware"
+
+            app.MapDefaultControllerRoute();                        
+
+            // app.MapControllerRoute(                              //Linha Alterada - Comente essas linhas
+            //     name: "default",
+            //    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+            // app.MapControllers();                        // Pelo mesmo motivo do projeto já estar configurado para ASP.NET Core MVC
+                                                            // não há necessidade de inserir essa linha, pois o "middleware" ".MapDefaultControllerRoute();"
+                                                            // já faz essa função. Caso não tivessemos esta configuração teriamos que adicionar o 
+                                                            // ".MapControllers()"
+
+            . IMPORTANTE: Para evitar infinitos "loops", foi inserido o método "AddJsonOptions" no middleware "AddControllersWithViews".
+                            Isto se deve a situações como o relacionamento entre as classes "Pie" e "Category" que contém coleções umas das
+                            outras. Sem isso, o container irá travar num loop infinito.
+
+
+        . Crie a pasta "Controllers/Api" e dentro dela crie a classe "Controller" abaixo:
+
+            using bethanysPieShop.Models;
+            using Microsoft.AspNetCore.Http;
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace bethanysPieShop.Controllers.Api
+            {
+                [Route("api/[controller]")]
+                [ApiController]
+                public class SearchController : ControllerBase
+                {
+                    private readonly IPieRepository _pieRepository;
+
+                    public SearchController(IPieRepository pieRepository)
+                    {
+                        _pieRepository = pieRepository;
+                    }
+
+
+                    [HttpGet]
+                    public IActionResult GetAll()
+                    {
+
+                    }
+
+                    [HttpGet("{id}")]
+                    public IActionResult GetById(int id)
+                    {
+
+                    }
+
+                }
+            }
+        
+    . A resposta de uma API
+
+        . Resultados dos métodos ACtion de um "ControllerBase"
+
+            ApiController Method    Description
+            --------------------    -----------
+
+            BadRequest() 	        Creates a BadRequestResult object with status code 400.
+            Conflict() 	            Creates a ConflictResult object with status code 409.
+            Content() 	            Creates a NegotiatedContentResult with the specified status code and data.
+            Created() 	            Creates a CreatedNegotiatedContentResult with status code 201 Created.
+            CreatedAtRoute() 	    Creates a CreatedAtRouteNegotiatedContentResult with status code 201 created.
+            InternalServerError()   Creates an InternalServerErrorResult with status code 500 Internal server error.
+            NotFound() 	            Creates a NotFoundResult with status code404.
+            Ok() 	                Creates an OkResult with status code 200.
+            Redirect() 	            Creates a RedirectResult with status code 302.
+            RedirectToRoute() 	    Creates a RedirectToRouteResult with status code 302.
+            ResponseMessage() 	    Creates a ResponseMessageResult with the specified HttpResponseMessage.
+            StatusCode()         	Creates a StatusCodeResult with the specified http status code.
+            Unauthorized() 	        Creates an UnauthorizedResult with status code 401. 
+        
+        . Retornando um StatusCode "200":
+
+            [Route("api/[controller])]
+            public class PieController: ControllerBase
+            {
+
+                private readonly IPieRepository _pieRepository;
+
+                [HttpGet]
+                public IActionResult GetAll()
+                {
+                    return Ok( _pieRepository.AllPies );
+                }
+
+                [HttpGet("{id}")]
+                public IActionResult GetById( int id )
+                {
+                    if !_pieRepository.AllPies.Any( p => p.PieId == id )
+                        return NotFound();
+
+                    ...
+                }
+            }
+
+    . DEMO
+
+        . Insira a linha abaixo na interface "IPieRepository":
+
+            public interface IPieRepository
+            {
+                ...
+                IEnumerable<Pie> SearchPies( string searchQuery );                          // Linha inserida
+            }
+
+        . Insira o método abaixo na classe "PieRepository":
+
+            ...
+             public IEnumaerable<Pie> SearchPies( string searchQuery )
+             {
+                return _bethanysPieShopDbContext.Pies.Where( p => p.Name.Contains( searchQuery ));
+             }
+             ...
+
+        . Insira as linhas no métodos abaixo na classe "SearchController.cs":
+
+            ...
+            [HttpGet]
+            public IActionResult GetAll()
+            {
+                var allPies = _pieRepository.AllPies;                                       // Linha inserida
+                return Ok(allPies);                                                         // Linha inserida
+            }
+
+            [HttpGet("{id}")]
+            public IActionResult GetById(int id)
+            {
+                if (!_pieRepository.AllPies.Any(p => p.PieId == id))                        // Linha inserida
+                    return NotFound();                                                      // Linha inserida
+                return Ok(_pieRepository.AllPies.Where(p => p.PieId == id));                // Linha inserida
+            }
+
+            [HttpPost]                                                                      // Linha inserida
+            public IActionResult SearchPies([FromBody] string searchQuery)                  // Linha inserida
+            {
+                IEnumerable<Pie> pies = new List<Pie>();                                    // Linha inserida
+
+                if (!string.IsNullOrEmpty(searchQuery))                                     // Linha inserida
+                {
+                    pies = _pieRepository.SearchPies(searchQuery);                          // Linha inserida
+                }                                                                           // Linha inserida
+                return new JsonResult(pies);                                                // Linha inserida
+            }
+
+            ...
+
+        . Levante a aplicação e execute as URLs abaixo no navegador
+
+            https://localhost:[porta]/api/search            
+            https://localhost:[porta]/api/search/1
+
+        . No Postman execute a URL abaixo:
+
+            url:    https://localhost:[porta]/api/search
+            method: POST
+            body:
+                    {
+                        JSON: true,
+                        raw: "apple"
+
+                    }
+    
+    (37.08)
+    . Adicionando JQuery e Ajax
