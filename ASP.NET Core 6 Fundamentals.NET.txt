@@ -6049,3 +6049,25 @@ Deixando o site interativo
     
     (37.08)
     . Adicionando JQuery e Ajax
+
+        . Funções JQuery precisam ser executadas somente após o carregamento da página:
+
+            $(document).ready( function(){
+                console.log( "Welcome to Bethany");
+            });
+
+        . Executando uma chamada Ajax:
+
+            $.ajax('/ur/to/api',
+            {
+                dataType: 'json',
+                success: function( data ){
+                    ...
+                },
+                error: function( jqXhr, status, error ){
+                    ...
+                }
+            });
+    (40.54)
+    . DEMO
+    
