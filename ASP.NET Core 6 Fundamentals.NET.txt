@@ -1093,7 +1093,7 @@ Criando a primeira página
 
                 public Pie? GetPieById(int pieId) => AllPies.FirstOrDefault(p => p.PieId == pieId);
 
-                public IEnumerable<Pie> SerachPies(string searchQuery)
+                public IEnumerable<Pie> SearchPies(string searchQuery)
                 {
                     throw new NotImplementedException();
                 }
@@ -1804,7 +1804,7 @@ Criando a primeira página
                     <meta name="viewport" content="width=device-width" />
                     <title>Bethany's Pie Shop</title>
                     <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                    <script src="~/lib/jquery/src/jquery.js"></script>
+                    <script src="~/lib/jquery/dist/jquery.js"></script>
                     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
                     <link href="~/css/site.css" rel="stylesheet" />
                     <base href="/" />
@@ -2718,7 +2718,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                 <meta name="viewport" content="width=device-width" />
                 <title>Bethany's Pie Shop</title>
                 <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
                 <link href="~/css/site.css" rel="stylesheet" />
                 <base href="/" />
@@ -3589,7 +3589,7 @@ Improving the Views in the Application
                 <meta name="viewport" content="width=device-width" />
                 <title>Bethany's Pie Shop</title>
                 <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
                 <link href="~/css/site.css" rel="stylesheet" />
                 <base href="/" />
@@ -3794,7 +3794,7 @@ Improving the Views in the Application
                 <meta name="viewport" content="width=device-width" />
                 <title>Bethany's Pie Shop</title>
                 <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
                 <link href="~/css/site.css" rel="stylesheet" />
                 <base href="/" />
@@ -4849,7 +4849,7 @@ Razor Snippets
                     <meta name="viewport" content="width=device-width" />
                     <title>Bethany's Pie Shop</title>
                     <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                    <script src="~/lib/jquery/jquery.js"></script>
+                    <script src="~/lib/jquery/dist/jquery.js"></script>
                     <script src="~/lib/jquery-validate/jquery.validate.js"></script>                                @* linha inserida *@
                     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>      @* linha inserida *@
                     <script src="~/lib/bootstrap/js/bootstrap.js"></script>
@@ -5061,7 +5061,7 @@ Razor Snippets
                 <meta name="viewport" content="width=device-width" />
                 <title>Bethany's Pie Shop</title>
                 <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/jquery-validate/jquery.validate.js"></script>
                 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
@@ -5973,7 +5973,7 @@ Deixando o site interativo
                 [HttpGet("{id}")]
                 public IActionResult GetById( int id )
                 {
-                    if !_pieRepository.AllPies.Any( p => p.PieId == id )
+                    if (!_pieRepository.AllPies.Any( p => p.PieId == id ) )
                         return NotFound();
 
                     ...
@@ -5990,10 +5990,10 @@ Deixando o site interativo
                 IEnumerable<Pie> SearchPies( string searchQuery );                          // Linha inserida
             }
 
-        . Insira o método abaixo na classe "PieRepository":
+        . Substitua o método abaixo na classe "PieRepository":
 
             ...
-             public IEnumaerable<Pie> SearchPies( string searchQuery )
+             public IEnumerable<Pie> SearchPies( string searchQuery )
              {
                 return _bethanysPieShopDbContext.Pies.Where( p => p.Name.Contains( searchQuery ));
              }
@@ -6034,7 +6034,7 @@ Deixando o site interativo
         . Levante a aplicação e execute as URLs abaixo no navegador
 
             https://localhost:[porta]/api/search            
-            https://localhost:[porta]/api/search/1
+            https://localhost:[porta]/api/search/2
 
         . No Postman execute a URL abaixo:
 
@@ -6043,7 +6043,7 @@ Deixando o site interativo
             body:
                     {
                         JSON: true,
-                        raw: "apple"
+                        raw: "Chocolate"
 
                     }
     
@@ -6085,7 +6085,7 @@ Deixando o site interativo
                 
                 <!-- Arquivos necessários para se trabalhar com JQuery -->
 
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/jquery-validate/jquery.validate.js"></script>
                 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
@@ -6136,7 +6136,7 @@ Deixando o site interativo
                         $("table tbody").html("");
                         $.ajax({
                             type: "POST",
-                            url: "/api/Search",
+                            url: "/api/search",
                             data: "\"" + searchQuery + "\"",
                             contentType: "application/json; charset=utf-8",
                             dataType: "json",
