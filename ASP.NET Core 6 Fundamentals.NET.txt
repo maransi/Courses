@@ -6223,3 +6223,104 @@ Deixando o site interativo
 Configurando Autenticação e Autorização
 =======================================
 
+    https://code-maze.com/asp-net-core-identity-series/
+    https://medium.com/c-sharp-progarmming/tutorial-asp-net-core-with-identity-299d0fe4cba1
+    https://www.learnentityframeworkcore.com/walkthroughs/existing-database
+    https://www.learnrazorpages.com/miscellaneous/scaffolding
+    https://mapadevelopment.com/community/tutorials/generate-views-and-controller-in-dotnet-core-with-codegenerator
+
+    https://education.launchcode.org/csharp-web-development/chapters/auth/scaffolding.html
+    https://www.learmoreseekmore.com/2022/01/dotnet6-implementing-aspnetcore-identity-authentication-in-to-an-existing-blazor-server-app.html
+    https://bjdejongblog.nl/asp-net-core-tips-and-quick-setup-identity-system/
+    https://gavilan.blog/2019/07/18/accountcontroller-missing-razor-class-libraries-dotnet-cli-identity-scaffolding/
+
+
+    # dotnet ef dbcontext scaffold "Server=.\SQLEXPRESS;Database=SchoolDB;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models
+    # dotnet ef dbcontext scaffold "Datasource=C:\ASPNET\APIApp\webbookmarks.db3" -o Models Microsoft.EntityFrameworkCore.Sqlite -c "APIAppDbContext" -f -a
+    # Scaffold-DbContext "DataSource=PATH\mydatabase.sqlite3 "Microsoft.EntityFrameworkCore.Sqlite -OutputDir Models
+
+    . Objetivos:
+
+        . Entender o funcionamento do ASP.NET Core Identity
+
+        . Adicionar autenticação ao site
+
+        . Usar a autorização.
+
+    . Entender o funcionamento do ASP.NET Core Identity
+
+        . ASP.NET Core Identity é um membro do framework ASP.NET Core.
+
+        . Suporte a interface gráfica de funcionalidade de login.
+
+        . Controle de autenticação e autorização.
+
+        . Suport externo a providers de autenticação, como: Google, facebook, etc.
+
+        . Administra usuário, pápeis, claims, senhas, confirmação por email, etc.
+
+        . Suporte a "scaffolding"
+
+    . Para adicionar suporte ao ASP.NET Core Identity precisamos adicionar o serviço abaixo ao projeto no "program.cs":
+
+                                                +---------> Representa a classe "User"
+                                                |
+        builder.Services.AddDefaultIdentity<IdentituUser>()
+            .AddEntityFrameworkStores<BethanysPieShopDbContext>();
+                                                |
+                                                +---------> DbContext
+
+        . Opções para configuração para o ASP.NET Core Identity:
+
+            builder.Services.AddDefaultIdentity<IdentituUser>( options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.User.RequireUniqueEmail = true;
+                
+            })
+            .AddEntityFrameworkStores<BethanysPieShopDbContext>();
+
+    . DEMO
+
+        . Execute o comando abaixo na pasta raiz do projeto:
+
+            dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.13
+
+            dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.13
+
+        . Acesse a classe "DbContext.cs" e altere a linha abaixo:
+
+            ...
+            public class DbContext: IdentityDbContext                    // DbContext       // Linha aterada, substitução da interfae "DbContext" pela "IdentityDbContext"
+            ...
+
+        . Acesse a classe "Program.cs" e faça a atualização abaixo:
+
+            ...
+            app.UseStaticFile();
+            app.UseSession();
+            app.UseAuthentication();                                    // Linha inserida
+            ...
+
+        . Na raiz do projeto execute os comandos abaixo:
+
+            dotnet clean
+
+            dotnet build
+
+            dotnet ef migrations add IdentityMigration
+
+            dotnet ef database update
+
+        . Acesse o banco de dados e verifique se as tabelas do ASP.NET Core Identity foram criadas com sucesso.
+
+(13.00)
+
+        
+
+
+
+
+
