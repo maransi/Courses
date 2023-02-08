@@ -6286,14 +6286,20 @@ Configurando Autenticação e Autorização
 
         . Execute o comando abaixo na pasta raiz do projeto:
 
-            dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.13
+            dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
+            
+            dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.12
 
-            dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.13
+            dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.12
 
-        . Acesse a classe "DbContext.cs" e altere a linha abaixo:
+            dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design --version 6.0.11
+
+            dotnet tool install --global dotnet-aspnet-codegenerator --version 6.0.11
+
+        . Acesse a classe "AppDbContext.cs" e altere a linha abaixo:
 
             ...
-            public class DbContext: IdentityDbContext                    // DbContext       // Linha aterada, substitução da interfae "DbContext" pela "IdentityDbContext"
+            public class AppDbContext: IdentityDbContext                    // DbContext       // Linha aterada, substitução da interfae "DbContext" pela "IdentityDbContext"
             ...
 
         . Acesse a classe "Program.cs" e faça a atualização abaixo:
@@ -6316,9 +6322,48 @@ Configurando Autenticação e Autorização
 
         . Acesse o banco de dados e verifique se as tabelas do ASP.NET Core Identity foram criadas com sucesso.
 
-(13.00)
+        . Execute o comando abaixo para consultar as classes disponiveis no "Identity":
 
-        
+            dotnet aspnet-codegenerator identity -lf
+
+        . Faça a alteração abaixo na classe "Program.cs":
+
+            // builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            //    .AddEntityFrameworkStores<AppDbContext>();
+            builder.Services.AddDefaultIdentity<IdentityUser>()             // Linha alterada
+                .AddEntityFrameworkStores<AppDbContext>();
+            ...
+            app.UseAuthentication();                                    
+            app.UseAuthorization();                                         // Linha inserida
+
+        . Execute os comandos abaixo para fazer o scaffold das classes
+
+            # Aqui deu problema com o parâmetro "-dc bhetanyPieShop.Data.AppDbContext"
+            # Tente omiti-lo
+
+            dotnet aspnet-codegenerator identity -fi Account.Login -dc bhetanyPieShop.Data.AppDbContext
+            dotnet aspnet-codegenerator identity -fi Account.Register -dc bhetanyPieShop.Data.AppDbContext
+            dotnet aspnet-codegenerator identity -fi Account.Logout -dc Data.AppDbContext 
+
+        . Acesse o componente "Views/Shared/_Layout.cshtml" e adicione a linha abaixo:
+
+            ...
+                        <vc:shopping-cart-summary></vc:shopping-cart-summary>
+                        <partial name="_LoginPartial" />                            @* Linha inserida *@
+
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            ...
+            @RenderBody()
+            @RenderSection("Scripts", required: false )                @* Linha inserida *@     
+            ...
+
+        . Levante a aplicação e verifique se os links no cabeçalho da tela "Register" e "Login" estão funcionanado.
+
+20.17        
 
 
 https://education.launchcode.org/csharp-web-development/chapters/auth/scaffolding.html
@@ -6329,10 +6374,11 @@ https://gavilan.blog/2019/07/18/accountcontroller-missing-razor-class-libraries-
 dotnet new mvc -o sampleIdentity -n sampleIdentity -f net6.0
 
 dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.13
-dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.13
-dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.13
 dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 6.0.12
 dotnet add package Microsoft.EntityFrameworkCore.Tools --version 6.0.12
+
+dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.13
+dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.13
 dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design --version 6.0.11
 dotnet tool install --global dotnet-aspnet-codegenerator --version 6.0.11
 
