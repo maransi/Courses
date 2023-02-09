@@ -6363,6 +6363,18 @@ Configurando Autenticação e Autorização
 
         . Levante a aplicação e verifique se os links no cabeçalho da tela "Register" e "Login" estão funcionanado.
 
+        . Inclua a linha abaixo na classe "OrderController.cs":
+
+            ...
+            [Authorize]                                     // Linha inserida
+            public class OrderController : Controller
+            {
+                ...
+            }
+
+        . Levante a aplicação e verifique se se no momento do Checkout não estiver logado se irá desviar para a tela de login
+
+
 20.17        
 
 
