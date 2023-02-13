@@ -6223,6 +6223,12 @@ Deixando o site interativo
 Configurando Autenticação e Autorização
 =======================================
 
+    https://education.launchcode.org/csharp-web-development/chapters/auth/scaffolding.html
+    https://www.learnentityframeworkcore.com/walkthroughs/existing-database
+    https://gavilan.blog/2019/07/18/accountcontroller-missing-razor-class-libraries-dotnet-cli-identity-scaffolding/
+
+
+    https://endjin.com/blog/2022/03/adding-authentication-and-authorisation-to-aspnet-core-web-applications
     https://code-maze.com/asp-net-core-identity-series/
     https://medium.com/c-sharp-progarmming/tutorial-asp-net-core-with-identity-299d0fe4cba1
     https://www.learnentityframeworkcore.com/walkthroughs/existing-database
@@ -6328,22 +6334,32 @@ Configurando Autenticação e Autorização
 
         . Faça a alteração abaixo na classe "Program.cs":
 
-            // builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            //    .AddEntityFrameworkStores<AppDbContext>();
-            builder.Services.AddDefaultIdentity<IdentityUser>()             // Linha alterada
+            builder.Services.AddDbContext<AppDbContext>( options => {                           
+                options.UseSqlite( 
+                    builder.Configuration["ConnectionStrings:DefaultConnection"]);
+            });
+
+            builder.Services.AddDefaultIdentity<IdentityUser>()             // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
                 .AddEntityFrameworkStores<AppDbContext>();
             ...
             app.UseAuthentication();                                    
             app.UseAuthorization();                                         // Linha inserida
 
-        . Execute os comandos abaixo para fazer o scaffold das classes
+        . Execute o comando abaixo na pasta raiz do projeto:
 
-            # Aqui deu problema com o parâmetro "-dc bhetanyPieShop.Data.AppDbContext"
-            # Tente omiti-lo
+            dotnet-aspnet-codegenerator identity --dbContext AppDbContext --files "Account.Login;Account.Logout;Account.Register"
 
-            dotnet aspnet-codegenerator identity -fi Account.Login -dc bhetanyPieShop.Data.AppDbContext
-            dotnet aspnet-codegenerator identity -fi Account.Register -dc bhetanyPieShop.Data.AppDbContext
-            dotnet aspnet-codegenerator identity -fi Account.Logout -dc Data.AppDbContext 
+            # dotnet aspnet-codegenerator identity -fi Account.Login 
+            # dotnet aspnet-codegenerator identity -fi Account.Register 
+            # dotnet aspnet-codegenerator identity -fi Account.Logout 
+
+            # Se for usar os três comandos acima, apague a pasta "Areas/Data" em cada execução
+
+        . Acesse o arquivo "Program.cs" e altere a linha abaixo:
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                                                                                    |
+                                                                                    +---> Alterar para esse valor "DefaultConnection"
 
         . Acesse o componente "Views/Shared/_Layout.cshtml" e adicione a linha abaixo:
 
@@ -6374,26 +6390,7 @@ Configurando Autenticação e Autorização
 
         . Levante a aplicação e verifique se se no momento do Checkout não estiver logado se irá desviar para a tela de login
 
+        . Para criar uma aplicação desde o inicio com "Identity", sem a necessidade das configurações acima execute o comando abaixo:
 
-20.17        
-
-
-https://education.launchcode.org/csharp-web-development/chapters/auth/scaffolding.html
-https://www.learnentityframeworkcore.com/walkthroughs/existing-database
-https://gavilan.blog/2019/07/18/accountcontroller-missing-razor-class-libraries-dotnet-cli-identity-scaffolding/
-
-
-dotnet new mvc -o sampleIdentity -n sampleIdentity -f net6.0
-
-dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.13
-dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 6.0.12
-dotnet add package Microsoft.EntityFrameworkCore.Tools --version 6.0.12
-
-dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.13
-dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.13
-dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design --version 6.0.11
-dotnet tool install --global dotnet-aspnet-codegenerator --version 6.0.11
-
-Criação do DbContext (1936)
-Criação do Model (2114)
+            dotnet new mvc -o sampleIdentity -n sampleIdentity -au Individual -f net6.0
 
