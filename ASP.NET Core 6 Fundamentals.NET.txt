@@ -1093,7 +1093,7 @@ Criando a primeira página
 
                 public Pie? GetPieById(int pieId) => AllPies.FirstOrDefault(p => p.PieId == pieId);
 
-                public IEnumerable<Pie> SerachPies(string searchQuery)
+                public IEnumerable<Pie> SearchPies(string searchQuery)
                 {
                     throw new NotImplementedException();
                 }
@@ -1804,7 +1804,7 @@ Criando a primeira página
                     <meta name="viewport" content="width=device-width" />
                     <title>Bethany's Pie Shop</title>
                     <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                    <script src="~/lib/jquery/src/jquery.js"></script>
+                    <script src="~/lib/jquery/dist/jquery.js"></script>
                     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
                     <link href="~/css/site.css" rel="stylesheet" />
                     <base href="/" />
@@ -2718,7 +2718,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                 <meta name="viewport" content="width=device-width" />
                 <title>Bethany's Pie Shop</title>
                 <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
                 <link href="~/css/site.css" rel="stylesheet" />
                 <base href="/" />
@@ -3589,7 +3589,7 @@ Improving the Views in the Application
                 <meta name="viewport" content="width=device-width" />
                 <title>Bethany's Pie Shop</title>
                 <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
                 <link href="~/css/site.css" rel="stylesheet" />
                 <base href="/" />
@@ -3794,7 +3794,7 @@ Improving the Views in the Application
                 <meta name="viewport" content="width=device-width" />
                 <title>Bethany's Pie Shop</title>
                 <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
                 <link href="~/css/site.css" rel="stylesheet" />
                 <base href="/" />
@@ -4849,7 +4849,7 @@ Razor Snippets
                     <meta name="viewport" content="width=device-width" />
                     <title>Bethany's Pie Shop</title>
                     <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                    <script src="~/lib/jquery/jquery.js"></script>
+                    <script src="~/lib/jquery/dist/jquery.js"></script>
                     <script src="~/lib/jquery-validate/jquery.validate.js"></script>                                @* linha inserida *@
                     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>      @* linha inserida *@
                     <script src="~/lib/bootstrap/js/bootstrap.js"></script>
@@ -5061,7 +5061,7 @@ Razor Snippets
                 <meta name="viewport" content="width=device-width" />
                 <title>Bethany's Pie Shop</title>
                 <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                <script src="~/lib/jquery/jquery.js"></script>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/jquery-validate/jquery.validate.js"></script>
                 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
                 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
@@ -5973,7 +5973,7 @@ Deixando o site interativo
                 [HttpGet("{id}")]
                 public IActionResult GetById( int id )
                 {
-                    if !_pieRepository.AllPies.Any( p => p.PieId == id )
+                    if (!_pieRepository.AllPies.Any( p => p.PieId == id ) )
                         return NotFound();
 
                     ...
@@ -5990,10 +5990,10 @@ Deixando o site interativo
                 IEnumerable<Pie> SearchPies( string searchQuery );                          // Linha inserida
             }
 
-        . Insira o método abaixo na classe "PieRepository":
+        . Substitua o método abaixo na classe "PieRepository":
 
             ...
-             public IEnumaerable<Pie> SearchPies( string searchQuery )
+             public IEnumerable<Pie> SearchPies( string searchQuery )
              {
                 return _bethanysPieShopDbContext.Pies.Where( p => p.Name.Contains( searchQuery ));
              }
@@ -6034,7 +6034,7 @@ Deixando o site interativo
         . Levante a aplicação e execute as URLs abaixo no navegador
 
             https://localhost:[porta]/api/search            
-            https://localhost:[porta]/api/search/1
+            https://localhost:[porta]/api/search/2
 
         . No Postman execute a URL abaixo:
 
@@ -6043,7 +6043,7 @@ Deixando o site interativo
             body:
                     {
                         JSON: true,
-                        raw: "apple"
+                        raw: "Chocolate"
 
                     }
     
@@ -6071,3 +6071,327 @@ Deixando o site interativo
             
     (40.54)
     . DEMO
+    
+        . Confira se os arquivos ".js" apontados na classe "_Layout.cshtml" estão disponíveis na pasta "wwwroot"
+            conforme declarado:
+
+            <!DOCTYPE html>
+
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width" />
+                <title>Bethany's Pie Shop</title>
+                
+                <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
+                
+                <!-- Arquivos necessários para se trabalhar com JQuery -->
+
+                <script src="~/lib/jquery/dist/jquery.js"></script>
+                <script src="~/lib/jquery-validate/jquery.validate.js"></script>
+                <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+                <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+                <link href="~/css/site.css" rel="stylesheet" />
+                <base href="/" />
+            </head>
+            <body>
+                ...
+            </body>
+
+        . Insira o método abaixo na classe "PieController":
+
+            ...
+            public IActionResult Search()
+            {
+                return View();
+            }
+            ...
+
+        (42.58)        
+        . Crie a classe "Search.cshtml" com conteúdo abaixo na pasta "Views/Pie":
+
+
+            <br />
+            <br />
+            <br />
+            <br />
+            Enter your search query:
+            <input id="txtPieName" type="text" />
+            <button id="searchButton">Search</button>
+            <br />
+            <br />
+            <table id="tblPies" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th style="width: 120px"></th>
+                    <th style="width: 120px">Name</th>
+                    <th style="width: 90px">Price</th>
+                </tr>
+                <tbody></tbody>
+            </table>
+
+
+            <script type="text/javascript">
+
+                $(document).ready(function(){
+                $("button").click(function(){
+                    var searchQuery = $.trim($("#txtPieName").val());
+                        $("table tbody").html("");
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/search",
+                            data: "\"" + searchQuery + "\"",
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (pies) {
+                                var table = $("#tblPies");
+                                table.find("tr:not(:first)").remove();
+                                $.each(pies, function (i, pie) {
+                                    $("tbody").append($("<tr>"));
+                                    appendElement = $("tbody tr").last();
+                                    appendElement.append($("<td>").html('<img src=' + pie.imageThumbnailUrl + '>'));
+                                    appendElement.append($("<td>").html('<a href="/pie/details/' + pie.pieId + '">' + pie.name + '</a>'));
+                                    appendElement.append($("<td>").html(pie.price));
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                    console.log(xhr)
+                            }
+                        });
+                    });
+                    });
+
+            </script>
+
+        . Insira as linhas abaixo no componente "Views/Shared/_Layout.cshtml":
+
+            ...
+            <body>
+                <div class="container">
+                    <header>
+                        <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary"
+                            aria-label="Bethany's Pie Shop navigation header">
+                            <div class="container-xl">
+                                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                                    <img src="images/bethanys-pie-shop-logo_horiz-white.png" width="151" height="47" class="d-inline-block align-top mb-2 mt-1"
+                                        alt="Bethany's Pie Shop Logo">
+                                </a>
+
+                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                                        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                                    <span class="navbar-toggler-icon"></span>
+                                </button>
+
+                                <div class="collapse navbar-collapse" id="navbarCollapse">
+                                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                        <vc:category-menu></vc:category-menu>
+                                        <li class="nav-item">
+                                            <a asp-controller="Contact" asp-action="Index" class="nav-link">Contact</a>
+                                        </li>
+                                    </ul>
+
+                                    <!-- Trecho inserido -->
+
+                                    <ul class="navbar-nav mb-2 mb-lg-0">
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-controller="Pie" asp-action="Search">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                                                </svg>
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <!-- Fim do trecho -->
+
+                                    <vc:shopping-cart-summary></vc:shopping-cart-summary>
+                                </div>
+                            </div>
+                        </nav>
+                    </header>
+
+                    @RenderBody()
+                </div>
+            </body>
+
+        . Levante a aplicação e teste o icone de lupa no canto superior direito.
+
+    (46.36)
+    . Introdução ao ASP.NET Core Blazor
+
+        . Blzaor é um framework para construir páginas HTML utilizando C# e HTML, fazendo parte do ASP.NET COre.
+
+        51.50
+
+Configurando Autenticação e Autorização
+=======================================
+
+    https://education.launchcode.org/csharp-web-development/chapters/auth/scaffolding.html
+    https://www.learnentityframeworkcore.com/walkthroughs/existing-database
+    https://gavilan.blog/2019/07/18/accountcontroller-missing-razor-class-libraries-dotnet-cli-identity-scaffolding/
+
+
+    https://endjin.com/blog/2022/03/adding-authentication-and-authorisation-to-aspnet-core-web-applications
+    https://code-maze.com/asp-net-core-identity-series/
+    https://medium.com/c-sharp-progarmming/tutorial-asp-net-core-with-identity-299d0fe4cba1
+    https://www.learnentityframeworkcore.com/walkthroughs/existing-database
+    https://www.learnrazorpages.com/miscellaneous/scaffolding
+    https://mapadevelopment.com/community/tutorials/generate-views-and-controller-in-dotnet-core-with-codegenerator
+
+    https://education.launchcode.org/csharp-web-development/chapters/auth/scaffolding.html
+    https://www.learmoreseekmore.com/2022/01/dotnet6-implementing-aspnetcore-identity-authentication-in-to-an-existing-blazor-server-app.html
+    https://bjdejongblog.nl/asp-net-core-tips-and-quick-setup-identity-system/
+    https://gavilan.blog/2019/07/18/accountcontroller-missing-razor-class-libraries-dotnet-cli-identity-scaffolding/
+
+
+    # dotnet ef dbcontext scaffold "Server=.\SQLEXPRESS;Database=SchoolDB;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models
+    # dotnet ef dbcontext scaffold "Datasource=C:\ASPNET\APIApp\webbookmarks.db3" -o Models Microsoft.EntityFrameworkCore.Sqlite -c "APIAppDbContext" -f -a
+    # Scaffold-DbContext "DataSource=PATH\mydatabase.sqlite3 "Microsoft.EntityFrameworkCore.Sqlite -OutputDir Models
+
+    . Objetivos:
+
+        . Entender o funcionamento do ASP.NET Core Identity
+
+        . Adicionar autenticação ao site
+
+        . Usar a autorização.
+
+    . Entender o funcionamento do ASP.NET Core Identity
+
+        . ASP.NET Core Identity é um membro do framework ASP.NET Core.
+
+        . Suporte a interface gráfica de funcionalidade de login.
+
+        . Controle de autenticação e autorização.
+
+        . Suport externo a providers de autenticação, como: Google, facebook, etc.
+
+        . Administra usuário, pápeis, claims, senhas, confirmação por email, etc.
+
+        . Suporte a "scaffolding"
+
+    . Para adicionar suporte ao ASP.NET Core Identity precisamos adicionar o serviço abaixo ao projeto no "program.cs":
+
+                                                +---------> Representa a classe "User"
+                                                |
+        builder.Services.AddDefaultIdentity<IdentituUser>()
+            .AddEntityFrameworkStores<BethanysPieShopDbContext>();
+                                                |
+                                                +---------> DbContext
+
+        . Opções para configuração para o ASP.NET Core Identity:
+
+            builder.Services.AddDefaultIdentity<IdentituUser>( options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.User.RequireUniqueEmail = true;
+                
+            })
+            .AddEntityFrameworkStores<BethanysPieShopDbContext>();
+
+    . DEMO
+
+        . Execute o comando abaixo na pasta raiz do projeto:
+
+            dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
+            
+            dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.12
+
+            dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.12
+
+            dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design --version 6.0.11
+
+            dotnet tool install --global dotnet-aspnet-codegenerator --version 6.0.11
+
+        . Acesse a classe "AppDbContext.cs" e altere a linha abaixo:
+
+            ...
+            public class AppDbContext: IdentityDbContext                    // DbContext       // Linha aterada, substitução da interfae "DbContext" pela "IdentityDbContext"
+            ...
+
+        . Acesse a classe "Program.cs" e faça a atualização abaixo:
+
+            ...
+            app.UseStaticFile();
+            app.UseSession();
+            app.UseAuthentication();                                    // Linha inserida
+            ...
+
+        . Na raiz do projeto execute os comandos abaixo:
+
+            dotnet clean
+
+            dotnet build
+
+            dotnet ef migrations add IdentityMigration
+
+            dotnet ef database update
+
+        . Acesse o banco de dados e verifique se as tabelas do ASP.NET Core Identity foram criadas com sucesso.
+
+        . Execute o comando abaixo para consultar as classes disponiveis no "Identity":
+
+            dotnet aspnet-codegenerator identity -lf
+
+        . Faça a alteração abaixo na classe "Program.cs":
+
+            builder.Services.AddDbContext<AppDbContext>( options => {                           
+                options.UseSqlite( 
+                    builder.Configuration["ConnectionStrings:DefaultConnection"]);
+            });
+
+            builder.Services.AddDefaultIdentity<IdentityUser>()             // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
+                .AddEntityFrameworkStores<AppDbContext>();
+            ...
+            app.UseAuthentication();                                    
+            app.UseAuthorization();                                         // Linha inserida
+
+        . Execute o comando abaixo na pasta raiz do projeto:
+
+            dotnet-aspnet-codegenerator identity --dbContext AppDbContext --files "Account.Login;Account.Logout;Account.Register"
+
+            # dotnet aspnet-codegenerator identity -fi Account.Login 
+            # dotnet aspnet-codegenerator identity -fi Account.Register 
+            # dotnet aspnet-codegenerator identity -fi Account.Logout 
+
+            # Se for usar os três comandos acima, apague a pasta "Areas/Data" em cada execução
+
+        . Acesse o arquivo "Program.cs" e altere a linha abaixo:
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                                                                                    |
+                                                                                    +---> Alterar para esse valor "DefaultConnection"
+
+        . Acesse o componente "Views/Shared/_Layout.cshtml" e adicione a linha abaixo:
+
+            ...
+                        <vc:shopping-cart-summary></vc:shopping-cart-summary>
+                        <partial name="_LoginPartial" />                            @* Linha inserida *@
+
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            ...
+            @RenderBody()
+            @RenderSection("Scripts", required: false )                @* Linha inserida *@     
+            ...
+
+        . Levante a aplicação e verifique se os links no cabeçalho da tela "Register" e "Login" estão funcionanado.
+
+        . Inclua a linha abaixo na classe "OrderController.cs":
+
+            ...
+            [Authorize]                                     // Linha inserida
+            public class OrderController : Controller
+            {
+                ...
+            }
+
+        . Levante a aplicação e verifique se se no momento do Checkout não estiver logado se irá desviar para a tela de login
+
+        . Para criar uma aplicação desde o inicio com "Identity", sem a necessidade das configurações acima execute o comando abaixo:
+
+            dotnet new mvc -o sampleIdentity -n sampleIdentity -au Individual -f net6.0
+
