@@ -542,7 +542,47 @@ Como declarar ações
                 Situação em 31/12/xxxx:             "Posição do periodo anterior"
                 Situação em 31/12/xxxx:             "Posição do periodo atual (Multiplicar a quantidade ações pelo valor médio apontado na discriminação)"
 
-    (2.50)
+            . Através do botão "Informar Rend. Isento" acesse a parte dos "Rendimentos Isentos e não tributáveis" e faça o lançamento abaixo 
+                para o Dividendos apontado no Informe de Rendimentos:
+
+                Tipo do Rendimento:                 "09 - Lucro e dividendos recebidos"
+                09. Lucro e dividendos recebidos:   [
+                    Tipo do beneficiário:           "Titular"
+                    Beneficiário:                   "CPF do Investidor"
+                    CNPJ da Fonte Pagadora:         "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                    Valor:                          "Valor identificado no informe de rendimentos do banco escriturador"
+
+                ]
+
+            . Retorne ao "Bens e Direitos" da ação declarada e acione o botão "Informar Rend. Exclusivo" e faça o lançamento abaixo para o SCJP:
+
+                Tipo do Rendimento:                 "10 - Juros sobre capital próprio"
+                10 - Juros sobre capital próprio:   [
+                    Tipo do beneficiário:           "Titular"
+                    Beneficiário:                   "CPF do Investidor"
+                    CNPJ da Fonte Pagadora:         "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                    Valor:                          "Valor identificado no informe de rendimentos do banco escriturador"
+
+                ]
+
+        . Créditos em Trânsito:
+
+            . Créditos em trânsito são créditos que a fonte pagadora apontou que irá pagar, porém ainda não caiu na conta.
+
+            . Para fazer o lançamento, acesse "Bens e Direitos" e faça o lançamento abaixo:
+
+                Grupo:                              "99 - Outros bens e direitos"
+                Código:                             "07 - Juros sobre capital próprio, mas não pago"
+                Bem ou direito pertencente ao:      "Titular"
+                Localização:                        "105 - Brasil"
+                CNPJ:                               "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                Discriminação:                      "JSCP em trânsito referente a (xxxx) ações da (empresa pagadora) creditado mas não pago
+                Situação em 31/12/xxxx:             "Posição do periodo anterior"
+                Situação em 31/12/xxxx:             "Posição do periodo atual (Multiplicar a quantidade ações pelo valor médio apontado na discriminação)"
+
+    . Preço médio na compra e venda de ações:
+
+    
 
 
 
