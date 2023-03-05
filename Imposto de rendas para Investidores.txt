@@ -582,7 +582,165 @@ Como declarar ações
 
     . Preço médio na compra e venda de ações:
 
-    
+        . Apuração do preço médio da ação:
+
+            . Importante: Os valores apresentados (Valor de Compra) abaixo deve ser pego pela nota de corretagem. Não pode ser pego pelo valor da cotação
+                            do dia. 
+
+
+            . Exemplo 1 - Compra inicial das ações, não havendo nenhum papel dessa ação na carteira.
+
+                Evento      Data            Qtd             Ação            Valor
+                ------      ----            ---             ---             -----
+                Compra      01/jan          100             WEGE3           2.000,00
+                Compra      05/mar          59              WEGE3           1.000,00
+                Compra      11/nov          50              WEGE3           1.200,00
+                                            --                              --------
+                                            209                             4.200,00    PM => Valor / Qtd => 20,10
+
+                . Acesse "Bens e Direitos" e faça o seguinte lançamento:
+
+                    Grupo:                              "03 - Participações Societária"
+                    Código:                             "01 - Ações (inclusive as listadas na bolsa)
+                    Bem ou direito pertencente ao:      "Titular"
+                    Localização:                        "105 - Brasil"
+                    CNPJ:                               "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                    Discriminação:                      "209 Ações da empresa ( WEG SA) no preço médio de R$ 20,10"
+                    Situação em 31/12/xxxx:             "0,00"
+                    Situação em 31/12/xxxx:             "4.200,00"
+
+            . Exemplo 2 - Compra de ações, onde já havia ações desse papel na carteira no período anterior, ou seja, comprou mais ações no período atual:
+
+                . Posição início do período anterior 
+
+                    Evento      Data            Qtd             Ação            Valor
+                    ------      ----            ---             ---             -----
+                    ...         ...             ...             ...             ...
+                                                ---                             -----
+                                                209                             4.200,00    PM => Valor / Qtd => 20,10
+
+                . Compras no período:
+
+                    Evento      Data            Qtd             Ação            Valor
+                    ------      ----            ---             ---             -----
+                    Compra      01/set          79              WEGE3           3.000,00
+                    Compra      05/out          45              WEGE3           1.500,00
+                    Compra      11/dez          85              WEGE3           3.200,00
+                                                --                              --------
+                                                418                             11.900,00    PM => Valor / Qtd => 28,47
+
+                . Acesse "Bens e Direitos" e faça o seguinte lançamento:
+
+                    Grupo:                              "03 - Participações Societária"
+                    Código:                             "01 - Ações (inclusive as listadas na bolsa)
+                    Bem ou direito pertencente ao:      "Titular"
+                    Localização:                        "105 - Brasil"
+                    CNPJ:                               "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                    Discriminação:                      "418 Ações da empresa ( WEG SA) no preço médio de R$ 28,47"
+                    Situação em 31/12/xxxx:             "4.200,00"
+                    Situação em 31/12/xxxx:             "11.900,00"
+
+            . Exemplo 3 - Venda de ações 
+
+                . Posição início do período anterior 
+
+                    Evento      Data            Qtd             Ação            Valor
+                    ------      ----            ---             ---             -----
+                    ...         ...             ...             ...             ...
+                                                ---                             -----
+                                                418                             11.900,00    PM => Valor / Qtd => 28,47
+
+                . Venda no período:
+
+                    Evento      Data            Qtd             Ação            Valor       Cotação
+                    ------      ----            ---             ---             -----       -------
+                    Venda       01/fev          209             WEGE3           6.270,00    30,00
+
+                    Preço médio ------------->  209                            (5.950,00)    28,47
+                    Lucro   ----------------->  209                               320,00
+
+                    Posição início do período   209                             5.950,00    28,47
+
+                . Acesse "Bens e Direitos" e faça o seguinte lançamento:
+
+                    Grupo:                              "03 - Participações Societária"
+                    Código:                             "01 - Ações (inclusive as listadas na bolsa)
+                    Bem ou direito pertencente ao:      "Titular"
+                    Localização:                        "105 - Brasil"
+                    CNPJ:                               "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                    Discriminação:                      "209 Ações da empresa ( WEG SA) no preço médio de R$ 28,47"
+                    Situação em 31/12/xxxx:             "11.900,00"
+                    Situação em 31/12/xxxx:             "5.950,00"
+
+                    . Caso a venda não foi superior ao limite da receita de R$ 20.000,00, então basta lançar o lucro de R$ 320,00 em 
+                        "Rendimentos Isentos e não Tributáveis"
+
+                        Tipo do Rendimento:                 "20 - Ganhos liquidos em operações no mercado à vista de ações ..."
+                        20 - Ganhos liquidos em operações no mercado à vista de ações ...:   [
+                            Tipo do beneficiário:           "Titular"
+                            Beneficiário:                   "CPF do Investidor"
+                            Valor:                          "320,00"
+
+                        ]
+
+                    . Caso a venda foi superior a R$ 20.000,00 temos que usar o programa GCAP para controlar o pagto da DARF e fazer os 
+                        lançamentos necessário na declaração.
+
+                    . Para deixar a declaração mais simples tente não superar o limite de venda que é de R$ 20.000,00.
+
+    . Bonificação:
+
+        https://www.suno.com.br/artigos/bonificacao/
+
+        . Bonificação de ações nada mais é do que a distribuição gratuita de novos ativos aos acionistas de uma empresa. Com isso, a companhia 
+            pode aumentar sua posição acionária, sem que os investidores precisem injetar mais dinheiro em novas aplicações.
+
+        . Sempre que houver bonificações, a empresa responsável pela ação soltará um comunicado informando o preço por ação e outros detalhes.
+
+            https://www.infomoney.com.br/mercados/gerdau-ggbr4-resultado-quarto-trimestre-2022-anuncio-dividendos/
+
+        . Exemplo:
+
+            . Posição início do período anterior 
+
+                Evento      Data            Qtd             Ação            Valor
+                ------      ----            ---             ---             -----
+                ...         ...             ...             ...             ...
+                                            ---                             -----
+                                            209                             5.950,00    PM => Valor / Qtd => 28,47
+
+                Evento      Data            Qtd             Ação            Valor       Cotação
+                ------      ----            ---             ---             -----       -------
+                Bonific 30% 01/fev          62              WEGE3           252,27      4,07
+
+                Posição início do período   271                             6.202,27    22,88
+
+            . Acesse "Bens e Direitos" e faça o seguinte lançamento:
+
+                Grupo:                              "03 - Participações Societária"
+                Código:                             "01 - Ações (inclusive as listadas na bolsa)
+                Bem ou direito pertencente ao:      "Titular"
+                Localização:                        "105 - Brasil"
+                CNPJ:                               "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                Discriminação:                      "271 Ações da empresa ( WEG SA) no preço médio de R$ 22,88"
+                Situação em 31/12/xxxx:             "4.200,00"
+                Situação em 31/12/xxxx:             "6.202,27"
+
+            . Lançamento da bonificação em "Rendimentos Isentos e Não Tributáveis":
+
+                Tipo do Rendimento:                 "18 - Incorporação de reservas ao capital / Bonificação em ações..."
+                18 - Incorporação de reservas ao capital / Bonificação em ações...:  [
+                    Tipo do beneficiário:           "Titular"
+                    Beneficiário:                   "CPF do Investidor"
+                    CNPJ da Fonte Pagadora:         "CNPJ da empresa responsável pela ação"
+                    Valor:                          "252,27"
+
+                ]
+
+    . Subscrição e desdobramento
+            
+
+
 
 
 
