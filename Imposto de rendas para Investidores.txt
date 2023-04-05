@@ -737,9 +737,93 @@ Como declarar ações
 
                 ]
 
-    . Subscrição e desdobramento
-            
+    . Subscrição 
 
+        . Subscrição é um dirito que o investidor tem de comprar novas ações da empresa de forma prioritária a um determinado valor.
+
+        . Nesse caso a empresa informa ao acionista que será emitido novas ações e dá um desconto no preço, por exemplo:
+
+            Posição inicio do período   ->              209 ações    Totalizando R$ 4.200,00  -> Preço Médio -> R$ 20,10
+
+            Evento              Data        Ação        Qtd         Valor           Custo (PM)
+            ------              ----        ----        ---         -----           -----
+
+            Subscrição 10%      14/05       WEGE3       20          R$ 390,00       R$ 19,50
+
+            Posição fim do período                      229 ações   Totalizando R$ 4.590,00     -> Preço Médio -> R$ 20,04
+
+        . No exemplo acima seria como uma compra adicional, faz o lançamento em bens e direito com a posição fim do periodo.
+
+    . Desdobramento
+
+        . Desdobramento de ações é uma medida tomada pelas empresas negociadas na Bolsa de Valores para reduzir o preço de suas ações, 
+            por meio da divisão do número de ações atual. Assim, o número de ações negociadas é alterada, mas o preço cai na mesma proporção, 
+            sem impactar o valor total do seu investimento.
+
+        . Exemplo:
+
+            Posição inicio do período   ->              209 ações    Totalizando R$ 4.200,00  -> Preço Médio -> R$ 20,10
+
+            Evento              Data        Ação        Qtd         Valor           Custo (PM)
+            ------              ----        ----        ---         -----           -----
+
+            Desdobramento 100%  01/09       WEGE3       209          R$ 0,00       R$ 0,00
+
+            Posição fim do período                      418 ações   Totalizando R$ 4.200,00     -> Preço Médio -> R$ 10,05
+
+        . Para fazer o lançamento na declaração vá em bens e direito e faça o apontamento abaixo:
+
+            Grupo:                          03. Participações societárias
+            Código:                         01. Ações (inclusive as listadas em bolsa)
+            Bem ou direito pertencente ao:  Titular
+            Localização:                    105. Brasil
+            CNPJ:                           [CNPJ da empresa da ação]
+            Discriminação:                  418 ações da empresa WEB SA no preço médio de R$ 10,05
+            Situação em 31/12/xx20:         R$ 4.200,00
+            Situação em 31/12/xx21:         R$ 4.200,00
+
+    . Multiplos eventos:
+
+        . Exemplo:
+
+            Posição inicio do período   ->              209 ações    Totalizando R$ 4.200,00  -> Preço Médio -> R$ 20,10
+
+            Evento              Data        Ação        Qtd         Valor           Custo (PM)
+            ------              ----        ----        ---         -----           -----
+
+            Compra              01/09       WEGE3       79       R$ 3.000,00      R$ 37,97
+            Bonificação 30%     20/10       WEGE3       86         R$ 349,92       R$ 4,07-> A empresa fornecera a informação do valor da ação dada
+            Subscrição 10%      20/11       WEGE3       37         R$ 721,50      R$ 19,50  
+            Desdobramento 100%  10/12       WEGE3       411          R$ 0,00       R$ 0,00
+
+            Posição fim do período                      822 ações   Totalizando R$ 8.271,42     -> Preço Médio -> R$ 10,06
+
+        . Para fazer o lançamento na declaração vá em bens e direito e faça o apontamento abaixo:
+
+            Grupo:                          03. Participações societárias
+            Código:                         01. Ações (inclusive as listadas em bolsa)
+            Bem ou direito pertencente ao:  Titular
+            Localização:                    105. Brasil
+            CNPJ:                           [CNPJ da empresa da ação]
+            Discriminação:                  822 ações da empresa WEB SA no preço médio de R$ 10,06 (Desdobramento 100%, Bonificação 30%, Subscrição 10%)
+            Situação em 31/12/xx20:         R$ 4.200,00
+            Situação em 31/12/xx21:         R$ 8.271,42
+
+        . A bonificação é necessário lançar em "Rendimentos Isentos e Não Tributáveis":
+
+            Tipo do Rendimento:                                             18. Incorporação de reservas ao capital/ Bonificações...
+            18. Incorporação de reservas ao capital/ Bonificações...:   
+                [
+                    Tipo do Beneficiário:                       Titular
+                    Beneficiário:                               CPF do declarante
+                    CNPJ da fonte pagadora:                     CNPJ da empresa da ação
+                    Nome da fonte pagadora:                     Nome da empresa da ação
+                    Valor:                                      R$ 349,92        
+                ]
+
+        . Juros sobre Capital (JCP) será lançado em "Rendimentos sujeitos à tributação exclusiva.
+
+        
 
 
 
