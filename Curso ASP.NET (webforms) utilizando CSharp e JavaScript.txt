@@ -1,6 +1,7 @@
 Curso ASP.NET (webforms) utilizando CSharp e JavaScript
 --------------------------------------------------------
 
+https://www.tutorialspoint.com/asp.net/index.htm
 
 Conceitos Fundamentais
 ======================
@@ -59,6 +60,7 @@ Módulo 1 - Conhecendo os Componentes
 ====================================
 
     Aula 5. Estrutura básica de uma página ASP.NET
+    ----------------------------------------------
 
         . Para trabalhar com ASP.NET WebForm é necessário instalar alguns componentes no IDE:
 
@@ -110,5 +112,166 @@ Módulo 1 - Conhecendo os Componentes
 
                 "AloMundo"
 
-4.10
-    
+            . A página criada será assim:
+
+                <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AloMundo.aspx.cs" Inherits="AloMundo2.AloMundo" %>
+
+                <!DOCTYPE html>
+
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head runat="server">
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+                    <title></title>
+                </head>
+                <body>
+                    <form id="form1" runat="server">
+                        <div>
+                        </div>
+                    </form>
+                </body>
+                </html>
+
+            . Acesse a aba "Design" no rodapé do formulário para ir ao modo de desenho do formulário.
+
+            . Caso queira apresentar tanto o modo código da página e design juntos, acesse no rodapé a aba "Dividir".
+
+            . Acesse a opção de menu "Exibir/Caixa de Ferramentas".
+
+                . Caixa de Ferramentas é o local que disponibiliza os componentes (Input, ListBox, etc.) para incluir no formulário.
+
+            . No modo "Design" localize o componente "TextBox", dê um duplo clique e verifique se este componente foi para o formulário.
+
+                . Clique no componente e pressione "F4" para apresentar as propriedades do componente.
+
+                    . Altere a seguinte propriedade abaixo:
+
+                        ID:                 "txtMsg"
+
+            . Localize o componente "Button", dê um duplo clique.
+
+                . Acesse as propriedades deste componente e altere a propriedade abaixo:
+
+                    ID:                     "btnExecutar"
+                    Text:                   "Executar"
+
+            . Localize o componente "Label", acrescente ele no formulário:
+
+                . Altere as propriedades abaixo:
+
+                    Text:                   "Titulo do Texto"
+                    ID:                     "lblTexto"
+
+            . Após a inserção desses componentes nossa página ficará com seguinte conteúdo:
+
+                <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AloMundo.aspx.cs" Inherits="AloMundo2.AloMundo" %>
+
+                <!DOCTYPE html>
+
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head runat="server">
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+                    <title></title>
+                </head>
+                <body>
+                    <form id="form1" runat="server">
+                        <div>
+                            <p>
+                                <asp:Label ID="lblTexto" runat="server" Text="Título do Texto"></asp:Label><br />
+                                <asp:TextBox ID="txtMsg" runat="server" Width="369px"></asp:TextBox><br />
+                            </p>
+                            <asp:Button ID="btnExecutar" runat="server" Text="Executar" OnClick="btnExecutar_Click" />
+                        </div>
+                    </form>
+                </body>
+                </html>
+
+                . Está pagina será identificada no projeto pelo seu nome + ".aspx" (AloMundo.aspx).
+
+            . Dê um duplo clique no componente "btnExecutar" e altere o evento dele como abaixo:
+
+                ...
+                protected void btnExecutar_Click( object sender, EventArgs e)   
+                {
+                    if (txtMsg.Text == "")
+                    {
+                        lblTexto.Text = "Alô Mundo - Aula '";
+                    }
+                    else
+                    {
+                        lblTexto.Text = txtMsg.Text;
+                    }
+                }
+
+            . Execute a solução com o botão "F5"
+
+        . Todos os controles ASP.NET tem seus eventos implementados na classe ".cs" da página. O evento clique
+            do botão "btnExecutar" foi implementado na classe "AloMundo.aspx.cs".
+
+            . Neste caso os objetos ".aspx" e ".aspx.cs" são inteiramente dependentes. Exemplo:
+
+                AloMundo.aspx       --->        AloMundo.aspx.cs
+
+            . A tag "<asp:...>" informa ao ASP.NET que o objeto deverá postar para o servidor e encontrar o seu evento 
+                na classe "aspx.cs". Caso não for colocado esta tag, colocando somente as tags de HTML, o ambiente não 
+                irá no servidor procurar as ações do evento.
+
+            . Exemplo:
+
+                <asp:Button ID="btnExecutar" runat="server" Text="Executar" OnClick="btnExecutar_Click" />
+                                                    |
+                                                    V
+                protected void btnExecutar_Click( object sender, EventArgs e)   
+
+        . Os eventos mais comuns nos controles são:
+
+            Event	                 Attribute Server	    Controls
+            -----                   ----------------        --------
+
+            Click	                OnClick	                Button, image button, link button, image map
+            Command	                OnCommand	            Button, image button, link button
+            TextChanged	            OnTextChanged	        Text box
+            SelectedIndexChanged	OnSelectedIndexChanged	Drop-down list, list box, radio button list, check box list.
+            CheckedChanged	        OnCheckedChanged	    Check box, radio button
+
+        . Os eventos padrões dos principais controles:
+
+            Control	            Default Event
+            -------             -------------
+            AdRotator	        AdCreated
+            BulletedList	    Click
+            Button	            Click
+            Calender	        SelectionChanged
+            CheckBox	        CheckedChanged
+            CheckBoxList	    SelectedIndexChanged
+            DataGrid	        SelectedIndexChanged
+            DataList	        SelectedIndexChanged
+            DropDownList	    SelectedIndexChanged
+            HyperLink	        Click
+            ImageButton	        Click
+            ImageMap	        Click
+            LinkButton	        Click
+            ListBox	            SelectedIndexChanged
+            Menu	            MenuItemClick
+            RadioButton	        CheckedChanged
+            RadioButtonList	    SelectedIndexChanged
+
+        . Os principais eventos de uma página ".aspx":
+
+            DataBinding - It is raised when a control binds to a data source.
+
+            Disposed - It is raised when the page or the control is released.
+
+            Error - It is a page event, occurs when an unhandled exception is thrown.
+
+            Init - It is raised when the page or the control is initialized.
+
+            Load - It is raised when the page or a control is loaded.
+
+            PreRender - It is raised when the page or the control is to be rendered.
+
+            Unload - It is raised when the page or control is unloaded from memory.
+
+
+    Aula 6. Como criar um projeto no Visual Studio 2019
+    ---------------------------------------------------
+
