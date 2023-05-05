@@ -275,3 +275,140 @@ Módulo 1 - Conhecendo os Componentes
     Aula 6. Como criar um projeto no Visual Studio 2019
     ---------------------------------------------------
 
+        . Abra o Visual Studio 2022
+
+        . Clique no botão "Criar um projeto"
+
+        . Na tela "Criar um novo projeto" escolha a opção "Aplicativo Web ASP.NET (.NET Framework)
+
+        . Na tela "Configurar seu novo projeto" informe:
+
+            Nome do Projeto:                "Nome do projeto"
+            Local:                          "Pasta para criar o projeto"
+            Nome da Solução:                "Container de projetos"
+            Colocar a solução e projeto no
+            mesmo diretório:                True
+            Estrutura:                      ".NET Framework 4.6" a ".NET Framework 4.8.x"
+        
+            . Clique no botão "Criar"
+
+        . Na tela "Criar um Aplicativo Web ASP.NET" podemos escolher:
+
+            . Tipo do projeto:
+
+                Vazio:                          True        (Para o treinamento é true)
+                Web Forms:                      False
+                MVC:                            False
+                API Web:                        False
+                Aplicativo de página única:     False
+
+            . Autenticação:                     False
+
+            . Adicionar as pastas e as principais referências:
+
+                Formulários da Web:             False
+                MVC:                            False
+                API Web:                        False
+
+            . Avançado
+
+                Configurar para HTTPS:          false   (Para o treinamento)
+                Suporte do Docker:              False
+                Além disso, crie um projeto 
+                para testes de unidade:         Flase
+
+            . Clique no botão "Criar"
+
+        . No projeto criado clique na aba lateral "Gerenciador de Soluções"
+
+        . Clique com o botão direito sobre o nó com o nome do projeto e escolha a opção "Adicionar/Formulário Web"
+
+        . Na tela que abriu informe o nome do formulário:
+
+            "Default"
+
+        . Acesse a página criada:
+
+            . Acesse a aba "Origem", no rodapé da página, onde encontra-se o código HTML dela.
+
+            . Acesse a aba "Design", no rodapé, onde podemos fazer o desenho da página acessando a "Caixa de Ferramentas" arrastando
+                os componentes para dentro do formulário.
+
+            . Acesse a aba "Dividir", no rodapé, onde podemos visualizar tanto o código, quanto o desenho, da página.
+
+            . Detalhe: 
+
+                . No modo "Design" podemos clicar no layout da página e navegar por ela com as setas. Se dermos "Enter" será 
+                    inserido a tag HTML "<br/>" no código.
+
+            . Crie no formulário os componentes:
+
+                Label
+                TextInput
+                Button
+
+            . Para criar um evento basta selecionar o objeto, acessar a aba de propriedades e clicar no botão "Evento" com o simbolo de trovão.
+
+                . No método "Click" do componente "Button" insira o código abaixo:
+
+                    Label1.Text = "Alô " + TextBox1.Text;
+        
+            . Execute o projeto acionando o botão "ISS Express"
+
+            . Para utilizar o recurso de carga automática nos casos de alteração do fonte, sem a necessidade de para o projeto e inicia-lo novamente,
+                acesse o botão "Recarga Dinâmica" com o simbolo do "Fogo".
+
+
+    Aula 7.01 Conhecendo os componentes Button, TextBox e DropDownList
+    ------------------------------------------------------------------
+
+        . Adicione um formulário com o nome "wfComponentes".
+
+        . Escolha na "Caixa de Ferramentas" o componente "HTML/Table" e arraste ele para dentro do formulário.
+
+            . Na primeira linha do html/table configure as três colunas, sendo:
+
+                Coluna 1:       {
+                    Caption:        "Site",
+                    Line:           {
+                        TextInput: {
+                            Diversos.ID:    txtSite    
+                        }
+                    }
+                },
+                Coluna 2:       {
+                    Caption:        "Endereço",
+                    Line:           {
+                        TextInput: {
+                            Diversos.ID:    txtEndereco  
+                        }
+                    }
+                },
+                Coluna 3:       {
+                    Caption:        "Opções",
+                    Line:          {
+                        Button: {
+                            Diversos.ID:    "btnInserir",
+                            Font.Text:      "Inserir Site"
+                        }
+                    }
+                }
+
+            . Na segunda linha:
+
+                Coluna 1:       {
+                    Line:           {
+                        DropDownList: {
+                            Diversos.ID:    txtSite    
+                        }
+                    }
+                },
+
+                . Arraste o componente "DropDownList" para dentro da coluna e clique no link "Editar Itens..." após arrastá-lo.
+
+                    . Na tela que se abre acione o botão "Adicionar" e complete as propriedades: "Text" e "Valor" para cada item 
+                        incluido. Inclua uns dois, ou três itens.
+
+            12.00
+
+            
