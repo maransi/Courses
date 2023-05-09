@@ -399,16 +399,49 @@ Módulo 1 - Conhecendo os Componentes
                 Coluna 1:       {
                     Line:           {
                         DropDownList: {
-                            Diversos.ID:    txtSite    
+                            Diversos.ID:    ddlSite    
                         }
                     }
                 },
 
-                . Arraste o componente "DropDownList" para dentro da coluna e clique no link "Editar Itens..." após arrastá-lo.
+                . Arraste o componente "DropDownList" para dentro da coluna:
+                
+                    . Clique na seta ao lado do "DropDownList".
 
+                    . Clique no link "Editar Itens..." após arrastá-lo.
+                    
                     . Na tela que se abre acione o botão "Adicionar" e complete as propriedades: "Text" e "Valor" para cada item 
                         incluido. Inclua uns dois, ou três itens.
 
-            12.00
+                . No código da página é possível implementar novos itens ao "DropDownList":
+
+                    <asp:DropDownList ...>
+                        <asp:ListItem>Item 1</asp:ListItem>
+                        <asp:ListItem>Item 2</asp:ListItem>
+                        ...                     <!-- Novos itens -->
+                    </asp:DropDownList>
+
+                . Clique na seta ao lado do "DropDownList", acesse a propriedade "Valor" e para cada item coloque um valor (1,2,...).
+
+            . No botão do formulário, crie o evento "btnInserir_Click" com o código abaixo:
+
+                ddlSite.Items.Add( txtSite.Text );
+
+            . Execute o projeto e teste a inserção de um novo item no "DropDownList"
+
+            . Altere o código do evento "btnInserir_Click" pelo código abaixo:
+
+                ListItem item = new ListItem( txtSite.Text, ddlSite.Items.Count.ToString());
+
+                ddlSite.Add( item );
+
+                txtSite.Text = "";
+
+            . Execute o projeto e teste a inserção de um novo item no "DropDownList"
+
+
+    Aula 8.02 Conhecendo os componentes DropDownList e ListBox
+    ----------------------------------------------------------
+
 
             
