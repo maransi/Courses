@@ -387,7 +387,7 @@ Módulo 1 - Conhecendo os Componentes
                 Coluna 3:       {
                     Caption:        "Opções",
                     Line:          {
-                        Button: {
+                        Button1: {
                             Diversos.ID:    "btnInserir",
                             Font.Text:      "Inserir Site"
                         }
@@ -433,7 +433,7 @@ Módulo 1 - Conhecendo os Componentes
 
                 ListItem item = new ListItem( txtSite.Text, ddlSite.Items.Count.ToString());
 
-                ddlSite.Add( item );
+                ddlSite.Items.Add( item );
 
                 txtSite.Text = "";
 
@@ -443,5 +443,78 @@ Módulo 1 - Conhecendo os Componentes
     Aula 8.02 Conhecendo os componentes DropDownList e ListBox
     ----------------------------------------------------------
 
+        . DropDownList  - Equivale a uma lista de uma linha, que ao clicar na seta, ou na lista do objeto, é aberto lista para escolha de um item.
 
+        . ListBox       - Equivale a uma lista expandida num retangulo, com várias linhas, que pode haver um scroll para escolhermos um item.
+
+        . Na segunda linha:
+
+            Coluna 2:       {
+                Line:           {
+                    ListBox: {
+                        Diversos.ID:    lstEndereco   
+                    }
+                }
+            },
+
+            . Arraste o componente "ListBox" para dentro da coluna:
             
+                . Clique na seta ao lado do "ListBox".
+
+                . Clique no link "Editar Itens..." após arrastá-lo.
+                
+                . Na tela que se abre acione o botão "Adicionar" e complete as propriedades: "Text" e "Valor" para cada item 
+                    incluido. Inclua uns dois, ou três itens.
+
+            . Altere o código do evento "btnInserir_Click" pelo código abaixo:
+
+                ListItem item = new ListItem( txtEndereco.Text, lstEndereco.Items.Count.ToString());
+
+                lstEndereco.Items.Add( item );
+
+                txtEndereco.Text = "";
+
+            . Retorne a linha no. 1 e insira mais um componente "Button":
+
+                Coluna 3:       {
+                    Caption:        "Opções",
+                    Line:          {
+                        ...,                
+                        Button2: {                              // Botão inserido
+                            Diversos.ID:    "btnSelecionar",
+                            Font.Text:      "Selecionar Site"
+                        }
+                    }
+                }
+
+            . Acesse a aba de propriedades do botão "btnSelecionar" e clique no botão "Evento" com o simbolo de trovão.
+
+                . No método "Click" do componente "Button" insira o código abaixo:
+
+                    ...                     // Método inserido
+                    protected void btnSelecionar_Click( object sender, EventArgs e)
+                    {
+                        txtSite.Text = ddlSite.Text;            // Traz o valor do item da primeira e não o texto da linha selecionada
+                        txtEndereco.Text = lstEndereco.Text;    // Traz o valor do item da primeira e não o texto da linha selecionada
+                    }
+            
+            . Execute o projeto e teste a seleção do item no "ListBox"
+
+            . Pare a execução e faça as alterações abaixo para pegar o texto da linha selecionada:
+
+                    ...                     
+                    protected void btnSelecionar_Click( object sender, EventArgs e)
+                    {
+                        ListItem item = ddlSite.SelectedItem;       // Linha inserida
+
+                        txtSite.Text = item.Text;                   // Linha alterada        
+
+                        ListItem item = lstEndereco.SelectedItem;   // Linha Inserida
+
+                        txtEndereco.Text = item.Text;               // Linha alterada
+                    }
+
+
+    Aula 9.Conhecendo a interface (Painéis)
+    ---------------------------------------
+    
