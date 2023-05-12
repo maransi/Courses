@@ -518,3 +518,123 @@ Módulo 1 - Conhecendo os Componentes
     Aula 9.Conhecendo a interface (Painéis)
     ---------------------------------------
     
+        . Gerenciador de Servidores/Server Explores -  Acessando a opção "View/Server Explorer", ou "Exibir/Gerenciador de Servidores", podemos acessar o 
+            painel de gerenciadores de servidores.
+
+            . Dentre as varias configurações, podemos incluir conexões com banco de dados. 
+            
+                . Basta clicar com o botão direito sobre o nó "Connections".
+
+                . Escolher a opção "Add Connection..."
+
+                . Alguns prodedores/providers de acesso a banco já vem instalado, como: SQL Server e o Oracle.
+
+                . Caso o provider não esteja disponível será necessário localiza-lo na internet e instala-lo.
+                    No caso do MySQL podemos baixar o seu provedor pelo link abaixo:
+
+                    https://downloads.mysql.com/archives/visualstudio/
+
+                    . Após a instalação do provider e a configuração da conexão, acesse a ferramenta do MySQL em "View / Toolbars / MySQL"
+
+                    . Para mais detalhes de como trabalhar com MySQL no Visual Studio acesse o link abaixo:
+
+                        https://www.devmedia.com.br/como-integrar-o-mysql-ao-visual-studio/36872
+
+        . Gerenciador de Soluções/Solution Explorer - Acessamos todos os objetos do projeto, para deixar visivel acesse "Exibir/Gerenciador de Soiluções", ou "View/Solution Explorer"
+
+        . Caixa de Ferramentas/Tolbox - Local que contêm os componentes necessários para construir um formulário Web.
+
+            . Os componentes dessa caixa só fica visivel quando estamos em modo de design
+
+            . Acesse "Exibir/Ferramentas", ou "View/Toolbar", para deixá-la fixada no Visual Studio
+
+        . Ferramenta de Diagnostico/Diagnostic Tools - Caixa que apresenta informações de performance da aplicação, possibilitando a identificação as informações 
+            em tempo de execução.
+
+            . Para mais informações dessa caixa, principal como trabalhar com ela em "Debug" acesse o link abaixo:
+
+                https://www.codeguru.com/csharp/visual-studio-diagnostic-tools-breakdown/
+
+        . Proprieadades/Properties - Caixa responsável pela alteração das propriedades dos objetos do formulário. Podemos acessá-la através da tecla "F4"
+
+
+    Aula 10.03 Exercício Tabuada
+    ----------------------------
+
+        . Clique com o direito sobre o nó do projeto e escolha a opção "Adicionar/Formulário da Web" como nome "wfTabuada".
+
+        . Desenho o formulário como abaixo:
+
+            Tabuada
+
+            +-------------------------------+   +-------------------+
+            | DropDownList:dlNumeros    | V |   | Button:btExecutar |
+            +-------------------------------+   +-------------------+
+
+            +-------------------------------+
+            | ListBox:lbDados               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            +-------------------------------+
+
+        . DropDownList:dlNumeros    - Insira os valores de 1 a 9 nos itens desse componente.
+
+            . Acesse o evento "Page_Load" e insira as linhas abaixo:
+
+                ...
+                protected void Page_Load(object sender, EventArgs e)
+                {
+                    if (!IsPostBack)    
+                    {
+                        for (int i = 2; i < 11; i++)
+                        {
+                            dlNumeros.Items.Add( i.ToString() );
+                        }
+                    }
+                }
+                ...
+
+            . "IsPostBack" - Indica se já estivemos nessa página. De uma forma simplificada podemos dizer que quando a 
+                                primeira requisição para uma página ocorre ela é criada(construtor) e o seu evento OnInit() é 
+                                chamado, logo em seguida o evento page_Load() e acionado e ela é devolvida para o navegador 
+                                do usuário e a página é destruída. O usuário recebe a página navega e ao final efetua alguma 
+                                ação clicando em um botão , link, etc. Isto exige uma nova requisição ao servidor para 
+                                execução do código que porventura possa existir na página. Essa requisição é o que chamamos 
+                                postback.
+
+                . Para mais detalhes verifique o link abaixo:
+                
+                    https://www.macoratti.net/07/07/aspn_pbk.htm
+
+        . Button:btExecutar         - Insira no método "Click" deste componente o código abaixo: 
+
+            ...
+            protected void btExecutar_Click( object sender, EventArgs e)
+            {
+                lbDados.Items.Clear();
+
+                ListItem li = dlNumeros.SelectedItem;
+                int n = Convert.ToInt32( li.Value );
+                int t = 0;
+
+                for (int = 0; i < 11; i++)
+                {
+                    t = i * n;
+                    lbDados.Items.Add( i.ToString() + "X" + n.ToString() + " = " + t.ToString() );
+                }
+            }
+            ...
+
+        . Execute o projeto e verifique se a execução do formulário está correta.
+
+
+    Aula 11.Duvida - IsPostBack
+    ---------------------------
+
+    
