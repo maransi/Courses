@@ -637,4 +637,97 @@ Módulo 1 - Conhecendo os Componentes
     Aula 11.Duvida - IsPostBack
     ---------------------------
 
+        . IsPostBack pode ser entendido como: "É a primeira que a página foi submetida", caso foi a primeira vez o valor de "IsPostBack" é true, caso contrário é falso.
+
+    
+
+    Aula 12.04 DropDownList e ListBox
+    ---------------------------------
+
+        . Retorne a tela da aula 8.02.
+
+        . Altere o formulário como abaixo:
+
+            Site                                                            Endereço
+
+            ________________________________________________________        _________________________________________________________
+
+            +-------------------------------------------------------+
+            |                                                   | ^ |       Opções                  
+            |                                                   |   |       
+            |                                                   |   |       +-------------------+   +-----------------------+    
+            |                                                   |   |       |   Inseriri Site   |   |   Selecionar Site     |
+            |                                                   |   |       +-------------------+   +-----------------------+
+            |                                                   |   |
+            |                                                   |   |
+            |                                                   | V |
+            +-------------------------------------------------------+
+    
+            +-------------------------------------------------------+
+            |                                                   | V |
+            +-------------------------------------------------------+
+
+        . Clique nos componentes "DropDown" e "ListDown" na seta ao lado de cada componente, na tela que abrir clique no botão "Remover" para remover os itens dessas listas
+
+
+        . Altere o código do evento "btnInserir_Click" pelo código abaixo:
+
+            ListItem item = new ListItem( txtSite.Text, txtEndereco.Text );
+
+            txtEndereco.Text = "";
+
+            txtSite.Text = "";
+
+        . Execute o projeto e teste se digitando um site, endereço e clicando no botão "Inserir Site" a carga está sendo feita com sucesso no "ListBox" "lbEndreco"
+
+        . Altere a propriedade do "ListBox" "lbEndereco" abaixo:
+
+            comportamento.SelectiontMode:   Multiple
+
+        . Execute o projeto e verifique se está sendo possível selecionar mais de um item no "ListBox"
+
+        . Altere o código do evento "btSelecionar-Click" pelo abaixo:
+
+            protected void btSelecionar_Click( object sender, EventArgs e)
+            {
+                dlSite.Items.Clear();
+                ListItem li;
+
+                for ( int i = 0; i < lbEndereco.Items.Count; i++)
+                {
+                    li = lbEndereco.Items[i];
+
+                    if ( li.selected)
+                    {
+                        li.Selected = false;        // Para evitar o erro de "SelectionMode: Multiple". O objeto "li" herda essa configuração do "ListBox", porém o "DropDown" não aceita essa propriedade como Multiple
+
+                        dlSite.Items.Add(li);
+                    }
+                }
+            }
+
+        . Execute o projeto e verifique se ao escolher vários itens no "ListBox" e clicar no botão "Selecionar Site" os itens estão indo com sucesso para
+            o "DropDown"
+
+        . Outra forma de fazer a atualização do "DropDown" seria altere o código do evento "btSelecionar-Click" pelo abaixo:
+
+            protected void btSelecionar_Click( object sender, EventArgs e)
+            {
+                foreach( ListItem item in lbEndereco.Items)
+                {
+                    if (item.Selected)
+                    {
+                        item.Selected = false;
+                        dlSite.Items.Add( item );
+                    }
+                }
+            }
+
+        . Execute o projeto e verifique se ao escolher vários itens no "ListBox" e clicar no botão "Selecionar Site" os itens estão indo com sucesso para
+            o "DropDown"
+
+
+    Aula 13.05 Table
+    ----------------
+
     
