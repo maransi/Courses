@@ -2,6 +2,7 @@ Curso ASP.NET (webforms) utilizando CSharp e JavaScript
 --------------------------------------------------------
 
 https://www.tutorialspoint.com/asp.net/index.htm
+https://www.dotnetfunda.com/tutorials/controls/textbox.aspx
 
 Conceitos Fundamentais
 ======================
@@ -847,9 +848,133 @@ Módulo 1 - Conhecendo os Componentes
     Aula 14.06 Table e PlaceHolder
     ------------------------------
 
+        . O componente "PlaceHolder" é utilizado como um container, o qual outros controles podem ser adicionados dinamicamente. Este componente não tem 
+            nenhum HTML de saída, ele é usado somente para carregar um componente num lugar especifico na página 
 
+        . Selecione o componente "PlaceHolder" na caixa de ferramentas e arraste ele abaixo para o formulário, abaixo da "Table" que criamos na aula
+            passada.
 
+        . Clique na "Table" criada na aula anterior e altere a propriedade dela como abaixo:
 
+            Comportamento.Visible: False
 
+        . Comente todo o código do evento "btExecutar_Click" e deixe-o com o conteúdo abaixo:
 
+            ...
+            protected void btExecutar_Click(object sender, EventArgs e)
+            {
+                //lbDados.Items.Clear();
+                ListItem li = dlNumeros.SelectedItem;
+                int n = Convert.ToInt32(li.Value);
+               
+                /*  Linhas comentadas
 
+                int t = 0;                                                                        
+                for (int i = 0; i < 11; i++)
+                {
+                    t = i * n;
+                    //lbDados.Items.Add(i.ToString()+" X "+n.ToString()+" = "+t.ToString());
+                    tbDados.Rows[i].Cells[0].Text = n.ToString();
+                    tbDados.Rows[i].Cells[4].Text = t.ToString();
+                }
+
+                */
+
+                // Linhas abaixo inseridas
+
+                Table tabela = new Table();
+                int t = 0;
+                for (int i = 0; i <= 10; i++)
+                {
+                    TableRow linha = new TableRow();
+                    //1 celula
+                    TableCell coluna = new TableCell();
+                    coluna.Text = n.ToString() + " X " + i.ToString() + " = ";
+                    linha.Cells.Add(coluna);
+                    //2 celula
+                    coluna = new TableCell();
+                    t = i * n;
+                    coluna.Text = t.ToString();
+                    linha.Cells.Add(coluna);
+                    tabela.Rows.Add(linha);
+                }
+                PlaceHolder.Controls.Add(tabela);
+            }
+
+    Aula 15.07 Calendar
+    -------------------
+
+        . Crie sobre o formulário, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfDiasDeVida".
+
+        . Arraste o componente "HTML.Table" para dentro do formulário.
+
+            . Configure a "Table" conforme desenho abaixo:
+
+                +---------------------------------------+-------------------------------------------+-----------------------------------+
+                |   Data de Nascimento                  |       Data Atual                          |                                   |
+                +---------------------------------------+-------------------------------------------+-----------------------------------+
+                |                                       |                                           |                                   |
+                |   +-------------------------------+   |   +-------------------------------+       |                                   |
+                |   |   Setembro de 2017            |   |   |   Setembro de 2017            |       |                                   |
+                |   +-------------------------------+   |   +-------------------------------+       |   +----------------------------+  |
+                |   | Dom Seg Ter Qua Qui Sex Sab   |   |   | Dom Seg Ter Qua Qui Sex Sab   |       |   |   Calcular Dias de Vida    |  |
+                |   +-------------------------------+   |   +-------------------------------+       |   +----------------------------+  |
+                |   |  1   2   3   4   5   6   7    |   |   |  1   2   3   4   5   6   7    |       |                                   |
+                |   | ....                          |   |   |   ...                         |       |   Dias de Vida:                   |
+                |   | ....                          |   |   |   ...                         |       |                                   |
+                |   | ....                          |   |   |   ...                         |       |                                   |
+                |   | ....                          |   |   |   ...                         |       |                                   |
+                |   +-------------------------------+   |   +-------------------------------+       |                                   |
+                |                                       |                                           |                                   |
+                +---------------------------------------+-------------------------------------------+-----------------------------------+
+
+                . "Dias de Vida"
+
+                    Label:  {
+                        Diversos.ID: "lbResultado"
+                    }
+
+        . Clique nos componentes "calendar" dos formulários, na seta ao lado e clique na opção "Formatação Automática.
+
+            . Escolha uma das formatações disponiveis.
+
+        . Altere o evento do "Button" conforme abaixo:
+
+            ...
+            protected void Button1_Click(object sender, EventArgs e)
+            {
+                int dian=0, anon=0, mesn=0;
+                int diaa = 0, anoa = 0, mesa = 0;
+
+                dian = Calendar1.SelectedDate.Day;
+                mesn = Calendar1.SelectedDate.Month*30;
+                anon = Calendar1.SelectedDate.Year*365;
+
+                diaa = Calendar2.SelectedDate.Day;
+                mesa = Calendar2.SelectedDate.Month*30;
+                anoa = Calendar2.SelectedDate.Year*365;
+
+                int total = (diaa + mesa + anoa) - (dian + mesn + anon);
+                lbResultado.Text = "Dias de vida: "+total.ToString();
+
+            }
+            ...
+
+        . Insira o código abaixo no evento "Page_load"
+
+            ...
+            protected void Page_Load(object sender, EventArgs e)
+            {
+                Calendar2.SelectedDate = DateTime.Now;
+            }
+            ...
+
+        . Execute o projeto e faça o teste do formulário.
+
+    
+    Aula 16. 08 Panel e BulletList
+    ------------------------------
+
+    
