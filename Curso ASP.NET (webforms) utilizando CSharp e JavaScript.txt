@@ -6,7 +6,7 @@ https://www.tutorialspoint.com/asp.net/index.htm
 Conceitos Fundamentais
 ======================
 
-Aula 1. Como instalar o Visual Studio
+Seção 1. Como instalar o Visual Studio
 -------------------------------------
 
     . Acesse o link abaixo, baixe a versão "Community" e execute o programa baixado:
@@ -55,6 +55,9 @@ Aula 4. O que é AXML?
         interface, isto é, as ações que as aplicações irão executar são implementadas em um arquivo 
         separado do arquivo utilizado para definir a interface da aplicação.
 
+
+Seção 2 - Conhecendo os componentes
+===================================
 
 Módulo 1 - Conhecendo os Componentes 
 ====================================
@@ -730,4 +733,123 @@ Módulo 1 - Conhecendo os Componentes
     Aula 13.05 Table
     ----------------
 
-    
+        . Retorne ao formulário da Aula 10.03 (Tabuada).
+
+        . Arraste da caixa de ferramentas o componente "Table" do conjunto "Padrão"
+
+            Tabuada
+
+            +-------------------------------+   +-------------------+
+            | DropDownList:dlNumeros    | V |   | Button:btExecutar |
+            +-------------------------------+   +-------------------+
+
+            +-------------------------------+
+            | ListBox:lbDados               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            |                               |
+            +-------------------------------+
+
+            +-------+
+            |       |  --> "asp:table" inserida
+            +-------+
+
+        . Altere a propriedade "Diversos.ID" para "tbDados"
+
+        . Acesse a propriedade "Rows" e insira 1 linha "TableRow" através do botão "Adicionar"
+
+            . Clique na primeira linha "TableRow[0]"
+
+                . Acesse a propriedade "Diversos.Cells"
+
+                    . Na tela que se abrir, clique no botão "Adicionar" e crie 5 "TableCell", ou colunas
+
+                        . Acesse a propriedade da celula do meio "TableCell[1].Text" e altere para a letra "X"
+
+                        . Acesse a propriedade da celula do meio "TableCell[2].Text" e altere para a letra "0"
+
+                        . Acesse a propriedade da celula do meio "TableCell[3].Text" e altere para a letra "="
+
+                        . Feche a tela de propriedade das "TableCell"
+
+        . Retorne ao desenho da tela e acesse a aba "Origem"
+
+        . Na parte que foi montado o código "Html" com a linha e celulas da table, copie o conjunto de "Row and Cells" 
+            abaixo dela mais 9 vezes, formando um total de 10 "Rows and Cells"
+
+        . Altere o valor da terceira celula de cada linha para um número sequencial 1,2,3,... em todas as celulas
+
+            ...
+            <asp:Table ID="tbDados" 
+                        runat="server" 
+                        BackColor="Red" 
+                        BorderColor="Lime" 
+                        BorderWidth="2px" 
+                        CellPadding="5" 
+                        CellSpacing="5" 
+                        Font-Bold="True" 
+                        Font-Size="Medium" 
+                        Visible="False" 
+                        Width="247px">
+                <asp:TableRow runat="server">
+                    <asp:TableCell runat="server"></asp:TableCell>
+                    <asp:TableCell runat="server">X</asp:TableCell>
+                    <asp:TableCell runat="server">0</asp:TableCell>
+                    <asp:TableCell runat="server">=</asp:TableCell>
+                    <asp:TableCell runat="server"></asp:TableCell>
+                </asp:TableRow>
+                <asp:TableRow runat="server">
+                    ...
+                    <asp:TableCell runat="server">1</asp:TableCell>     <!-- Linha Alterada -->
+                    ...
+                </asp:TableRow>
+                <asp:TableRow runat="server">
+                    ...
+                    <asp:TableCell runat="server">2</asp:TableCell>     <!-- Linha Alterada -->
+                    ...
+                </asp:TableRow>
+                ...
+            </asp:Table>
+            ...
+
+        . Acesse o código do evento "btExecutar_Click" e altere o código conforme abaixo:
+
+            ...
+            protected void btExecutar_Click( object sender, EventArgs e)
+            {
+                lbDados.Items.Clear();
+
+                ListItem li = dlNumeros.SelectedItem;
+                int n = Convert.ToInt32( li.Value );
+                int t = 0;
+
+                for (int = 0; i < 11; i++)
+                {
+                    t = i * n;
+                    lbDados.Items.Add( i.ToString() + "X" + n.ToString() + " = " + t.ToString() );
+                    
+                    tbDados.Rows[i].Cells[0].Text = n.ToString();   // Linha inserida
+                    tbDados.Rows[i].Cells[4].Text = t.ToString();   // Linha inserida
+                }
+            }
+            ...
+
+        . Altere a proprieda "Comportamento.Visible" para "False" do componente "lbDados".
+
+        . Execute o projeto e verifique se o botão de executar está atualizando corretamente a nossa "Table".
+
+
+    Aula 14.06 Table e PlaceHolder
+    ------------------------------
+
+
+
+
+
+
+
