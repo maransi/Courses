@@ -904,7 +904,7 @@ Módulo 1 - Conhecendo os Componentes
     Aula 15.07 Calendar
     -------------------
 
-        . Crie sobre o formulário, escolha a opção "Adicionar/ Formulário da Web".
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
 
         . Informe o nome do formulário "wfDiasDeVida".
 
@@ -976,5 +976,198 @@ Módulo 1 - Conhecendo os Componentes
     
     Aula 16. 08 Panel e BulletList
     ------------------------------
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfParOuImparFatorial".
+
+        . Arraste o componente "BulletedList" para dentro da "Div" do formulário.
+
+            . Altere as propriedades desse componente como abaixo:
+
+                Misc.ID:            blLista,
+                Misc.Items:         [
+                    ListemItem: {
+                        Text:   "Par ou Impar"
+                    },
+                    ListemItem: {
+                        Text:   "Calcula o Fatorial"
+                    }
+                ]
+
+        . Arraste o componente "Panel" a baixo do "BulletedList"
+
+            . O componente "Panel" serve para agrupar os componentes.
+
+        . Altere o formulário "wfParOuImparFatorial.aspx" como abaixo:
+
+            <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="wfParOuImparFatorial.aspx.cs" Inherits="waConhecendoOsComponetes.wfParOuImparFatorial" %>
+
+            <!DOCTYPE html>
+
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head runat="server">
+                <title></title>
+            </head>
+            <body>
+                <form id="form1" runat="server">
+
+                    <!-- ALTERE O CODIGO DA DIV ABAIXO NO PROJETO -->
+
+
+                    <div>
+                        <asp:BulletedList   ID="blLista" 
+                                            runat="server" 
+                                            BorderStyle="None" 
+                                            BulletStyle="Square" 
+                                            DisplayMode="LinkButton"            <!--    DisplayMode serve para deixar o "BulletedList" como um link. 
+                                                                                        Podemos também alterar a propriedade do componente 
+                                                                                        "Behavior.DisplayMode" para "LinkButton". Em seguida, clique no 
+                                                                                        icone de trovão, ao lado das propriedade, encontre o evento "Click",
+                                                                                        de um duplo clique onde seria o nome do evento para construir o evento  
+                                                                                        "blLista_Click" -->
+                                            OnClick="blLista_Click"             <!-- Associa o evento "OnClick" com o evento do ASP.NET "blLista_Click" -->
+                                            Visible="False">
+                            <asp:ListItem>Par ou Impar</asp:ListItem>
+                            <asp:ListItem>Calcula o Fatorial</asp:ListItem>
+                        </asp:BulletedList>
+                        <asp:RadioButtonList    ID="RadioButtonList1" 
+                                                runat="server" 
+                                                AutoPostBack="True" 
+                                                OnSelectedIndexChanged="RadioButtonList1_SelectedIndexChanged" 
+                                                Width="306px">
+                            <asp:ListItem>Par ou Impar</asp:ListItem>
+                            <asp:ListItem>Fatorial</asp:ListItem>
+                        </asp:RadioButtonList>
+                        <br />
+                        <br />
+                        <asp:Panel ID="pnParOuImpar" runat="server" Visible="False">
+                            <asp:Label ID="Label1" runat="server" Text="Verifica se o número é par ou impar"></asp:Label>
+                            <br />
+                            <asp:TextBox ID="txtValorpn1" runat="server"></asp:TextBox>
+                            <asp:Button ID="Button1" runat="server" Text="Verificar" OnClick="Button1_Click" />
+                            <br />
+                            <asp:Label ID="LResp1" runat="server"></asp:Label>
+
+                        </asp:Panel>
+                        <br />
+                        <asp:Panel ID="pnFatorial" runat="server" Visible="False">
+                            <asp:Label ID="Label3" runat="server" Text="Calcula o fatorial de um número"></asp:Label>
+                            <br />
+                            <asp:TextBox ID="txtValorpn2" runat="server"></asp:TextBox>
+                            <asp:Button ID="Button2" runat="server" Text="Calcular" OnClick="Button2_Click" />
+                            <br />
+                            <asp:Label ID="LResp2" runat="server"></asp:Label>
+                        </asp:Panel>
+                    </div>
+
+                    <!-- FIM DA ALTERAÇÃO -->
+                </form>
+            </body>
+            </html>
+
+        . Insira os métodos abaixo  no formulário "wfParOuImparFatorial.aspx.cs" como abaixo:
+
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Web;
+            using System.Web.UI;
+            using System.Web.UI.WebControls;
+
+            namespace waConhecendoOsComponetes
+            {
+                public partial class wfParOuImparFatorial : System.Web.UI.Page
+                {
+                    
+                    protected void Page_Load(object sender, EventArgs e)
+                    {
+
+                    }
+
+
+                    // Método Inserido pelo duplo click no nome do evento na caixa de ferramentas
+                    protected void blLista_Click(object sender, BulletedListEventArgs e)
+                    {
+                        pnParOuImpar.Visible = false;
+                        pnFatorial.Visible = false;
+                        switch (e.Index)
+                        {
+                            case 0:
+                                pnParOuImpar.Visible = true;
+                                break;
+                            case 1:
+                                pnFatorial.Visible = true;
+                                break;
+                        }
+                    }
+
+                    // Método Inserido pelo duplo click no nome do evento na caixa de ferramentas
+                    protected void Button1_Click(object sender, EventArgs e)
+                    {
+                        //verificar se é par ou impar
+                        int n = Convert.ToInt32(txtValorpn1.Text);
+                        string txt = "O número é par";
+                        if (n % 2 != 0)
+                        {
+                            txt = "O número é impar";
+                        }
+                        LResp1.Text = txt;
+                    }
+
+                    // Método Inserido pelo duplo click no nome do evento na caixa de ferramentas
+                    protected void Button2_Click(object sender, EventArgs e)
+                    {
+                        try
+                        {
+                            int n = Convert.ToInt32(txtValorpn2.Text);
+                            if (n < 0) {
+                                LResp2.Text = "Informe apenas números positivos";
+                            }
+                            else
+                            {
+                                if (n == 0)
+                                {
+                                    LResp2.Text = "0! = 1";
+                                }
+                                else
+                                {
+                                    int t = n;
+                                    for (int i = n-1; i > 0; i--)
+                                    {
+                                        t = t * i;
+                                    }
+                                    LResp2.Text = n.ToString()+"! = "+ t.ToString();
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            LResp2.Text = "Permitido apenas números positivos";
+                        }
+                        
+                    }
+
+                    // Método Inserido
+                    protected void RadioButtonList1_SelectedIndexChanged(object sender, EventArgs e)
+                    {
+                        pnParOuImpar.Visible = false;
+                        pnFatorial.Visible = false;
+                        if (RadioButtonList1.SelectedIndex == 0)
+                        {
+                            pnParOuImpar.Visible = true;
+                        } else
+                        {
+                            pnFatorial.Visible = true;
+                        }
+                    }
+                }
+            }
+
+        . Execute o projeto e verifique se a tela ficou desenhada de acordo com as nossas especificações.
+
+
+    Aula 17. 09 Panel e RadioButton
+    -------------------------------
 
     
