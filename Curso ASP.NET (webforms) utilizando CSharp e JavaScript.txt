@@ -1284,3 +1284,50 @@ Módulo 1 - Conhecendo os Componentes
     
     Aula 18. 10 Panel e RadioButton
     -------------------------------
+
+        . Retorno ao formulário "wfParOuImparFatorial"
+
+        . Dê um duplo click no botão "Calcular", ou o botão com nome "Button2", para abrir o evento "click" deste componente.
+
+            . Digite o código abaixo no evento "click" desse compomente.
+
+                ...
+                protected void Button2_Click(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        int n = Convert.ToInt32(txtValorpn2.Text);
+                        if (n < 0) {
+                            LResp2.Text = "Informe apenas números positivos";
+                        }
+                        else
+                        {
+                            if (n == 0)
+                            {
+                                LResp2.Text = "0! = 1";
+                            }
+                            else
+                            {
+                                int t = n;
+                                for (int i = n-1; i > 0; i--)
+                                {
+                                    t = t * i;
+                                }
+                                LResp2.Text = n.ToString()+"! = "+ t.ToString();
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        LResp2.Text = "Permitido apenas números positivos";
+                    }
+                    
+                }
+                ...
+
+        . Execute o projeto e verifique se o fatorial foi calculado com sucesso.
+
+    19. 11 MultiView, View e Image
+    ------------------------------
+
+    
