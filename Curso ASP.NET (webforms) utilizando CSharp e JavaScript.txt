@@ -1330,4 +1330,211 @@ Módulo 1 - Conhecendo os Componentes
     19. 11 MultiView, View e Image
     ------------------------------
 
+        . Multiview é um simplificador de exibição de visões, por exemplo, formulários com a lógica
+            de "Wizard" "Next -> Next -> ..."
+
+        . Para mais detalhes deste componenete acesse:
+
+            https://www.dotnetfunda.com/tutorials/controls/multiview.aspx
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfCursos".
+
+        . Arraste o componente "MultiView" para dentro da "Div" do formulário.
+
+        . Arraste três componentes "View" para dentro do componente "MultView", um abaixo do outro:
+
+            . O componente "View" só funcionará dentro do componente "MultView".
+
+        . Clique no nô principal do projeto, clique na opção "New/Folder" e dê o nome de "imagens"        
+
+            . Importe as imagens do projeto do curso (zip) para dentro da pasta "imagens" do nosso projeto.
+
+        . Arraste dois componentes "ImageButton" para dentro da tag "View1"
+
+        . Altere a propriedade abaixo do componente "image1":
+
+            appearance:   {
+                AlternateText: "Do básico ao Multiplayer",
+                ImageUrl: "~/imagens/Curso1.jpg"
+            },
+            Layout: {
+                Height: 500px,
+                Width: 700px
+            }
+
+        . Altere a propriedade abaixo do componente "image2":
+
+            appearance:   {
+                ImageUrl: "~/imagens/Curso2.jpg"
+            },
+            Layout: {
+                Height: 500px,
+                Width: 700px
+            }
+        
+        . Altere a propriedade abaixo do componente "MultView1":
+
+            Behavior:   {
+                ActiveViewIndex: 0
+            }
+
+        . Execute o projeto e verifique se o conteúdo da View1 está aparecendo com sucesso
+
+    Aula 20. 12 MultiView, View, Image e ImageButton
+    ------------------------------------------------
+
+        . Arraste dois componentes "Label" para dentro da tag "View2".
+
+            . Altere a propriedade do "Label1" como abaixo:
+
+                appearance: {
+                    Text:   "Constructor 2 - Do básico ao Multiplayer",
+                    Font:   {
+                        Bold:   True,
+                        Size:   Large
+                    }
+                }
+
+            . Altere a propriedade do "Label2" como abaixo:
+
+                appearance: {
+                    Text:   "O curso tem como objetivo ensinar de maneira prática e dinâmica os conceitos necessários"
+                }
+
+        . Arraste dois componentes "Label" para dentro da tag "View3".
+
+            . Altere a propriedade do "Label3" como abaixo:
+
+                appearance: {
+                    Text:   "Constructor 2 - Construindo um clone do jogo Timberman",
+                    Font:   {
+                        Bold:   True,
+                        Size:   Large
+                    }
+                }
+
+            . Altere a propriedade do "Label4" como abaixo:
+
+                appearance: {
+                    Text:   "O curso tem como objetivo ensinar de maneira prática e dinâmica os conceitos necessários"
+                }
+
+        . Altere a propriedade abaixo do componente "MultView1":
+
+            Behavior:   {
+                ActiveViewIndex: 1
+            }
+
+        . Execute o projeto e verifique se o conteúdo da View2 se está aparecendo com sucesso
+
+        . Modifique as labels "Label2" e "Label4" para a tag "<p>" no código HTML.
+
+        . Acesse os eventos do "ImageButton1" e crie o método abaixo:
+
+            ... 
+            protected void ImageButton1_Click( object sender, ImageClickEventArgs e)
+            {
+                MultiView1.ActiveViewIndex = 1;
+            }
+            ...
+
+        . Acesse os eventos do "ImageButton2" e crie o método abaixo:
+
+            ... 
+            protected void ImageButton1_Click( object sender, ImageClickEventArgs e)
+            {
+                MultiView1.ActiveViewIndex = 2;
+            }
+            ...
+
+    Aula 21. 13 HiperLink e LinkButton
+    ----------------------------------
+
+        . Para mais detalhes deste componenete acesse:
+
+            https://www.dotnetfunda.com/tutorials/controls/hyperlink.aspx
+            https://www.dotnetfunda.com/tutorials/controls/linkbutton.aspx
+
+        . Arraste dois componentes "Hyperlink" para a "View2", abaixo das Labels.
+
+        . No componente "Hyperlink1" altere as propriedades como abaixo:
+
+            appearance: {
+                Text: "Compre o curso Construct 2 - Do básico ao Multiplayer"
+            },
+            Navigation: {
+                NavigationUrl: "https://www.udemy.com",
+                Target: "_blank"
+            }
+
+        . No componente "Hyperlink2" altere as propriedades como abaixo:
+
+            appearance: {
+                Text: "Visite o site dfilitto.com.br"
+            },
+            Navigation: {
+                NavigationUrl: "https://www.dfilitto.com.br",
+                Target: "_blank"
+            }
+
+        . Arraste dois componentes "Hyperlink" para a "View3", abaixo das Labels.
+
+        . No componente "Hyperlink3" altere as propriedades como abaixo:
+
+            appearance: {
+                Text: "Compre o curso Construct 2 - Do básico ao Multiplayer"
+            },
+            Navigation: {
+                NavigationUrl: "https://www.udemy.com",
+                Target: "_blank"
+            }
+
+        . No componente "Hyperlink4" altere as propriedades como abaixo:
+
+            appearance: {
+                Text: "Visite o site dfilitto.com.br"
+            },
+            Navigation: {
+                NavigationUrl: "https://www.dfilitto.com.br",
+                Target: "_blank"
+            }
+
+        . Execute o projeto e verifique se os links estão funcionando.
+
+        . Arraste o componente "LinkButton" para a View2, abaixo do "Hyperlink2"
+
+        . Altere as propriedades abaixo do "LinkButton1":
+
+            Text: "Voltar"
+
+        . Acesse a caixa de eventos e crie o evento "LinkButton1_Click"
+
+            ...
+            protected void LinkButton1_Click( object sender, EventArgs e )
+            {
+                MultView1.ActiveViewIndex = 0;
+            }
+            ...
+
+        . Arraste o componente "LinkButton" para a View3, abaixo do "Hyperlink2"
+
+        . Altere as propriedades abaixo do "LinkButton2":
+
+            Text: "Voltar"
+
+        . Acesse a caixa de eventos e crie o evento "LinkButton2_Click"
+
+            ...
+            protected void LinkButton2_Click( object sender, EventArgs e )
+            {
+                MultView1.ActiveViewIndex = 0;
+            }
+            ...
+            
+
+    Aula 22. 14 AdRotator
+    ---------------------
+
     
