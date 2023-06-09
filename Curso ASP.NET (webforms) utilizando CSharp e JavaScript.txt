@@ -1537,4 +1537,355 @@ Módulo 1 - Conhecendo os Componentes
     Aula 22. 14 AdRotator
     ---------------------
 
+        . Objetivo deste componente é mostrar propaganda. Para mais detalhes acesse o link abaixo:
+
+            https://www.dotnetfunda.com/tutorials/controls/adrotator.aspx        
+
+        . Acesse a página "wfCursos".
+
+        . Arraste o componente "Adrotator" para a tela acima do componente "MultView1"
+
+        . Para definir a fonte das URLs de propagandas podemos:
+
+            . Clicar na seta do componente desenhado na tela e fornecer as propriedades necessárias. Acabando por 
+                criar o conteúdo abaixo na página.
+
+                <asp:AdRotator ID="AdRotator2" runat="Server" AdvertisementFile="~/tutorials/controls/controldata/adRotator.xml"
+                    ImageUrlField="ImageUrl" NavigateUrlField="NavigateUrl" AlternateTextField="AlternateText"
+                    BorderWidth="1" BorderColor="blue" />         
+                    
+                    // Advertisement File
+                    <Advertisements>
+                    <Ad>
+                        <ImageUrl>~/images/samples/DotNetLogo.gif</ImageUrl>
+                        <NavigateUrl>~/tutorials/controls/listbox.aspx</NavigateUrl>
+                        <AlternateText>Go to ListBox tutorials</AlternateText>
+                        <Impression>30</Impression>
+                    </Ad>
+                    <Ad>
+                        <ImageUrl>~/images/samples/NewAdvance.gif</ImageUrl>
+                        <NavigateUrl>~/tutorials/controls/button.aspx</NavigateUrl>
+                        <AlternateText>Go to Button tutorials</AlternateText>
+                        <Impression>15</Impression>
+                    </Ad>
+                    <Ad>
+                        <ImageUrl>~/images/samples/DotNetFunda3.gif</ImageUrl>
+                        <NavigateUrl>~/tutorials/controls/label.aspx</NavigateUrl>
+                        <AlternateText>Go to Label tutorials</AlternateText>
+                        <Impression>15</Impression>
+                    </Ad>
+                    <Ad>
+                        <ImageUrl>~/images/samples/DotNetFunda2.gif</ImageUrl>
+                        <NavigateUrl>~/tutorials/controls/calendar.aspx</NavigateUrl>
+                        <AlternateText>Go to Calendar control tutorials</AlternateText>
+                        <Impression>40</Impression>
+                    </Ad>
+                </Advertisements>       
+
+            . Podemos utilizar um arquivo XML com a estrutura abaixo para representar as URL que serão apresentadas
+                na página.
+
+                . A estrutura do XML seria:
+
+                    <Advertisements>  
+                        <Ad>  
+                            <ImageUrl>  
+                                URL of image to display for Advertisement #1  
+                            </ImageUrl>  
+
+                            <NavigateUrl>  
+                                URL of page to link to for Advertisement #1  
+                            </NavigateUrl>  
+
+                            <AlternateText>  
+                                Text to show as a ToolTip for Advertisement #1  
+                            </AlternateText>  
+
+                            <Keyword>  
+                                Keyword used to filter for Advertisement #1  
+                            </Keyword>  
+
+                            <Impressions>  
+                                Relative importance of Advertisement #1  
+                            </Impressions>  
+
+                            <CustomInformation>  
+                                Custom Data about Advertisement #1  
+                            </CustomInformation>  
+                        </Ad>  
+                    </Advertisements>
+
+
+                    Element	        Description
+                    -------         -----------
+
+                    ImageUrl	    The absolute or relative URL to an image file (optional).
+
+                    NavigateUrl	    The URL of a page to link to if the user clicks the ad (optional). Note: If this element 
+                                    is not set, the HRef property is not rendered on the anchor tag.
+
+                    Height	        The height of the image, in pixels (optional).
+
+                    Width	        The width of the image, in pixels (optional).
+
+                    AlternateText	The text display in place of the image when the image specified by the ImageUrl property 
+                                    is not available (optional).
+
+                                    In some browsers, this text also appears as a ToolTip for the advertisement.
+
+                    Keyword	        A category for the advertisement (for example, "computers") that you can filter by (optional).
+
+                    Impressions	    A number that indicates the importance of the ad in the schedule of rotation relative to the 
+                                    other ads in the file (optional).
+
+                                    The larger the number, the more often the ad is displayed. The total of all <Impressions> values 
+                                    in the XML file cannot exceed 2,047,999,999. If it does, the AdRotator control throws a run-time 
+                                    exception.
+
+                . Exemplo:
+
+                    <Advertisements>  
+                        <Ad>  
+                            <ImageUrl>~/Images/image1.jpg</ImageUrl>  
+                            <height>60</height>  
+                            <width>190</width>  
+                            <NavigateUrl>http://www.microsoft.com</NavigateUrl>  
+                            <AlternateText>Microsoft Main Site</AlternateText>  
+                            <Impressions>80</Impressions>  
+                            <Keyword>Topic1</Keyword>  
+                        </Ad>  
+                        <Ad>  
+                            <ImageUrl>~/Images/image2.jpg</ImageUrl>  
+                            <height>90</height>  
+                            <width>90</width>  
+                            <NavigateUrl>http://www.wingtiptoys.com</NavigateUrl>  
+                            <AlternateText>Wingtip Toys</AlternateText>  
+                            <Impressions>80</Impressions>  
+                            <Keyword>Topic2</Keyword>  
+                        </Ad>  
+                    </Advertisements>
+
+        . Clique com o botão direito sobre o nô do projeto, escolha a opção "Add/XML File" e dê o nome de "Propaganda".
+
+        . Acesse o XML criado e coloque o conteúdo abaixo nele:
+
+            <?xml version="1.0" encoding="utf-8" ?>
+                <Advertisements>
+                <Ad>
+                    <ImageUrl>~/imagens/1.jpg</ImageUrl>
+                    <NavigateUrl>http://www.dfilitto.com.br</NavigateUrl>
+                    <AlternateText>dfilitto</AlternateText>
+                    <Impressions>90</Impressions>
+                </Ad>
+                <Ad>
+                    <ImageUrl>~/imagens/2.jpg</ImageUrl>
+                    <NavigateUrl>http://makeindiegames.com.br</NavigateUrl>
+                    <AlternateText>make indie games</AlternateText>
+                    <Impressions>10</Impressions>
+                </Ad>
+            </Advertisements>
+
+        . Altere as propriedades do componente "AdRotator".
+
+            Behavior:   {
+                AdvertisementFile: "Propaganda",
+                Target: _blank
+            }        
+
+        . Execute o projeto e verifique se o componente "AdRotator" está funcionando.
+
+
+    Aula 23. 15 Literal
+    -------------------
+
+        . O componente "Literal" serve para renderizar o seu contéudo, por exemplo:
+
+        . Insira o conteúdo abaixo na página:
+
+            <asp:Literal    ID="LiteralText" 
+                            runat="server" 
+                            Text="This is example of Literal">
+            </asp:Literal> 
+
+        . Execute o projeto e verifique se na construção da página apareceu o texto:
+
+            <div>  
+                This is example of Literal  
+            </div>
+
+        . Podemos deixar a construção dinâmica, por exemplo:
+
+            . Suponha que temos a página abaixo:
+
+                <%@ Page Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="_Default" %>  
+                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+                
+                <html xmlns="http://www.w3.org/1999/xhtml">  
+                <head runat="server">  
+                    <title>Untitled Page</title>  
+                </head>  
+                <body>  
+                    <form id="form1" runat="server">  
+                    <div>  
+                        <asp:Literal ID="Literal1" runat="server" />  
+                        <asp:Literal ID="Literal2" runat="server" />  
+                        <asp:Literal ID="Literal3" runat="server" />  
+                    </div>  
+                    </form>  
+                </body>  
+                </html>
+
+            . Com o código ".aspx.cs" abaixo:
+
+                using System;  
+                using System.Configuration;  
+                using System.Data;  
+                using System.Linq;  
+                using System.Web;  
+                using System.Web.Security;  
+                using System.Web.UI;  
+                using System.Web.UI.HtmlControls;  
+                using System.Web.UI.WebControls;  
+                using System.Web.UI.WebControls.WebParts;  
+                using System.Xml.Linq;  
+                
+                public partial class _Default : System.Web.UI.Page  
+                {  
+                    protected void Page_Load(object sender, EventArgs e)  
+                    {  
+                        Literal1.Mode = LiteralMode.Encode;  
+                        Literal1.Mode = LiteralMode.PassThrough;  
+                        Literal1.Mode = LiteralMode.Transform;  
+                
+                        Literal1.Text = @"<font size=4 color=red>Literal1 with Encode property example</font><script>alert(""Literal with Encode property"");</script></br></br>";
+                        Literal2.Text = @"<font size=4 color=green>Literal2 with PassThrough property example</font><script>alert(""Literal with PassThrough property"");</script></br></br>";
+                        Literal3.Text = @"<font size=4 color=blue>Literal3 with Encode Transform example</font><script>alert(""Literal with Transform property"");</script></br></br>";   
+                    }  
+                }
+
+    Aula 24. 16 ImageMap
+    --------------------
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfSiteParceiros".
+
+        . Arraste o componente "ImageMap" para dentro do formulário recém criado.
+
+        . Altere a propriedade abaixo do componente "ImageMap":
+
+            appearance:   {
+                ImageUrl: "~/imagens/exemplopropagandas.jpg",
+            },
+            Behavior:   {
+                HotSpots:   {
+                    RectangleHotSpot: {
+                        appearance: {
+                            Bottom: 350,
+                            Left:   0,
+                            Right:  400,
+                            Top:    0
+                        },
+                        Behavior: {
+                            AlternateText: "Site Make Indie Games",
+                            NavigateUrl: "http://www.makeindiegames.com.br",
+                            Targe: "_blank"
+                        }
+                    },
+                    RectangleHotSpot:   {
+                        appearance: {
+                            Bottom: 0,
+                            Left:   450,
+                            Right:  800,
+                            Top:    300
+                        },
+                        Behavior: {
+                            AlternateText: "Site Make Indie Games",
+                            NavigateUrl: "http://www.vivapontal.com.br",
+                            Targe: "_blank"
+                        }
+                    }
+                }
+            }
+
+        . Execute o projeto e verifique se a imagem acima está funcionando como um link
+
+
+    Aula 25. 17 Utilizando JavaScript
+    ---------------------------------
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfBasicoJavascript".
+
+        . Arraste o componente "Image" para dentro do formulário recém criado e altere as propriedades abaixo:
+
+            appearance: {
+                imageUrl: "One-Piece-Chibi-PNG-Image.png"
+            }
+
+        . Acesse o código da página "wfBasicoJavascript.aspx" e altere a tag gerada pelo design como abaixo:
+
+            ...
+            <asp:Image  ID="Image1" 
+                        runat="server" 
+                        ImageUrl="~/imagens/One-Piece-Chibi-PNG-Image.png" 
+                        onMouseOver="alert('Alô Mundo!!!')"/>     <!-- Linha inserida -->
+            ...
+
+        . Execute o projeto e verifique se ao passar com o mouse sobre a imagem vem a mensagem "Alô Mundo!!!"
+
+        . Insira a função javascript como abaixo na página:
+
+            ...
+            <head runat="server">
+                <title></title>
+
+                <!-- função inserida -->
+
+                <script type="text/javascript">
+                    function ExibeMensagem() {
+                        alert('Alô Mundo!!!!!');
+                    }
+                </script>
+
+                <!-- Fim da inserção -->
+
+            </head>
+            ...
+
+        . Altere o evento "onMouseOver" como abaixo:
+
+            ...
+            <asp:Image  ID="Image1" 
+                        runat="server" 
+                        ImageUrl="~/imagens/One-Piece-Chibi-PNG-Image.png" 
+                        onMouseOver="ExibeMensagem()"/>     <!-- Linha inserida -->
+            ...
+
+        . Execute o projeto e verifique se ao passar com o mouse sobre a imagem vem a mensagem "Alô Mundo!!!"
+
+        . Arraste o componente "Button" abaixo do "Image1".
+
+        . Acesse o código da página "wfBasicoJavascript.aspx" e faça a alteração abaixo na tag do componente "Button"
+
+            ...
+            <asp:Button ID="Button1" runat="server" Text="Clique no Botão" Width="628px" />
+            ...
+
+        . Acesse o código da página "wfBasicoJavascript.aspx.cs" e implemente as linhas abaixo:
+
+            ...
+            protected void Page_Load(object sender, EventArgs e)
+            {
+                Button1.Attributes.Add("onClick", "ExibeMensagem()");
+            }
+            ...
+
+        . Execute o projeto e verifique se ao clicar no button vem a mensagem "Alô mUndo!!!".
+
+    Aula 26. 18 Utilizando JavaScript
+    ---------------------------------
+
     
+
