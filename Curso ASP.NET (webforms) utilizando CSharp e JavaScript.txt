@@ -1984,5 +1984,55 @@ Módulo 1 - Conhecendo os Componentes
     Aula 28. 20 Criando a página inicial do nosso site
     --------------------------------------------------    
 
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "index".
+
+        . Arraste da barra de ferramentas o componente "HTML.Table" para dentro do formulário criado na área de desenho.
+
+        . Arraste o três componentes "Hyperlink" para dentro do componente "Table", um para cada celula da primeira linha.
+
+            . Altere as propriedades abaixo em cada "Hyperlink":
+
+                Hyperlink1: {
+                    Apareance.Text:         "Tabuada",
+                    Navigation.NavigateUrl: "~/wfTabuada.aspx"                  // Clique nos "..." da caixa de propriedades dessa propriedade 
+                },                                                              // e escolha a página "wfTabuada"                
+                Hyperlink2: {
+                    Apareance.Text:         "Par ou Impar",
+                    Navigation.NavigateUrl: "~/wfParOuImparFatorial.aspx"      
+                },                                                             
+                Hyperlink3: {
+                    Apareance.Text:         "Calcula os Dias de Vida",
+                    Navigation.NavigateUrl: "~/wfDiasDeVida.aspx"                 
+                }
+
+        . Arraste o três componentes "ImageButton" abaixo de cada "Hyperlink" criado no passo anterior.
+
+            . Altere as propriedades abaixo em cada "Image":
+
+                ImageButton1: {
+                    Apareance.ImageUrl:         "~/imagens/Curso1.jpg",
+                    Layout.Height:              241px,
+                    Layout.Width:               429px,
+                    Behavior.PostBackUrl:       "~/wfCursos.aspx"
+                },
+                ImageButton2: {
+                    Apareance.ImageUrl:         "~/imagens/Curso2.jpg",
+                    Layout.Height:              241px,
+                    Layout.Width:               429px,
+                    Behavior.PostBackUrl:       "~/wfCursos.aspx"
+                },
+                ImageButton3: {
+                    Apareance.ImageUrl:         "~/imagens/OnePeacePoster.png",
+                    Layout.Height:              241px,
+                    Layout.Width:               429px
+                    Behavior.PostBackUrl:       "~/wfAlteraTamanhoFonte.aspx"
+                }
         
+        . Execute o projeto e verifique se ao clicar nos "Hyperlink" se está indo para a página configurada.
+
+
+    Aula 29. UpLoad de arquivo
+    --------------------------    
 
