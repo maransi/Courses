@@ -3,6 +3,7 @@ Curso ASP.NET (webforms) utilizando CSharp e JavaScript
 
 https://www.tutorialspoint.com/asp.net/index.htm
 https://www.dotnetfunda.com/tutorials/controls/textbox.aspx
+https://www.kafle.io/tutorials/asp-dot-net/ajax-aspnet-webform
 
 Conceitos Fundamentais
 ======================
@@ -2036,3 +2037,86 @@ Módulo 1 - Conhecendo os Componentes
     Aula 29. UpLoad de arquivo
     --------------------------    
 
+        https://www.dotnetfunda.com/tutorials/controls/fileupload.aspx
+
+        .  Crie um novo projeto para essa aula:
+
+            . Acesse a opção menu "File / New / Project 
+
+            . Escolha "Visual C#" e "ASP.NET Web Application"
+
+            . Forneça o nome do projeto de "Upload"
+
+            . Escolha um projeto "Empty" 
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "Upload".
+
+        . Arraste o componente "FileUpload" para dentro do formulário em modo "Design"
+
+        . Altere as propriedade do componente "FileUpload" como abaixo:
+
+            Misc.ID:        "fuArquivo"
+
+        . Arraste três componentes "Label" para dentro do formulário em modo "Design":
+
+            1o. Label acima do componente "FileUpload"
+            2o. e 3o. abaixo do componente "FileUpload" um debaixo do outro
+
+        . Arraste Três "TextBox" para dentro do formulário, cada um ao lado do 2o. e 3o. Label inseridos no passo anterior e altere as propriedades abaixo:
+
+            Label1:     {
+                Text:       "UpLoad de Arquivo"
+            },
+            Label2:     {
+                Text:       "Nome do Arquivo"
+            },
+            Label3:     {
+                Text:       "Tamanho do Arquivo"
+            },
+            TextBox1:   {
+                ID:       "txbNome"  
+            },
+            TextBox2:   {
+                ID:     "txbTamanho"
+            }
+
+        . Clique no nô principal do projeto e escolha a opção "Add" / "New Folder" e renomeie a pasta criada com o nome de "Upload"
+
+        . Arraste um componente "Button" para dentro do formulário, abaixo dos componentes "Label3" e "Textbox2" e altere as propriedades abaixo:
+
+            Text: "Enviar Arquivo",
+            ID:     "btEnviar"
+
+        . Acesse a caixa de propriedades do componente "Button", acesse a parte de eventos e dê um duplo clique no evento "Click"
+
+            .  Insira o conteúdo abaixo no método que será criado:
+
+                ...
+                protected void btEnviar_Click( object sender, EventArqgs e )
+                {
+                    String nome = fuArquivo.FileName;
+
+                    String caminho = Server.MapsPath(@"upload\");       // Importante que seja colocado o caracter "\" ao final da string para indicar que é uma pasta
+
+                    txbNome.Text = nome;
+
+                    txbTamanho.Text = fuArquivo.PostedFile.ContentLength.ToString();
+
+                    fuArquivo.PostedFile.SaveAs(caminho + nome);
+
+
+
+                }
+
+
+    Aula 30. Upload de vários arquivos
+    ----------------------------------
+
+
+
+        
+
+
+        
