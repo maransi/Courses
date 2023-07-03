@@ -553,7 +553,11 @@ Como declarar ações
                 Código:                             "01 - Ações (inclusive as listadas na bolsa)" (para ações) "“09 – Demais Fundos de Índice de Mercado (ETFs)” (para ETFs)
                 Bem ou direito pertencente ao:      "Titular"
                 Localização:                        "105 - Brasil"
-                CNPJ:                               "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                CNPJ:                               "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador,
+                                                    ou podemos encontrar nos sites www.investidor10.com.br, ou www.statusinvest.com.br)"
+                                                     
+                                                     IMPORTANTE: No caso de FII o CNPJ deve ser o do fundo
+
                 Discriminação:                      "xxxx Ações da empresa (xxxxxxxxxxxxx) no preço médio de R$ 99.99 (Valor médio em 31/12)"
                 Situação em 31/12/xxxx:             "Posição do periodo anterior"
                 Situação em 31/12/xxxx:             "Posição do periodo atual (Multiplicar a quantidade ações pelo valor médio apontado na discriminação)"
@@ -565,7 +569,11 @@ Como declarar ações
                 09. Lucro e dividendos recebidos:   [
                     Tipo do beneficiário:           "Titular"
                     Beneficiário:                   "CPF do Investidor"
-                    CNPJ da Fonte Pagadora:         "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                    CNPJ da Fonte Pagadora:         "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador,
+                                                     ou podemos encontrar nos sites www.investidor10.com.br, ou www.statusinvest.com.br)"
+                                                     
+                                                     IMPORTANTE: No caso de FII o CNPJ deve ser o do fundo
+
                     Valor:                          "Valor identificado no informe de rendimentos do banco escriturador"
 
                 ]
@@ -576,7 +584,11 @@ Como declarar ações
                 10 - Juros sobre capital próprio:   [
                     Tipo do beneficiário:           "Titular"
                     Beneficiário:                   "CPF do Investidor"
-                    CNPJ da Fonte Pagadora:         "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                    CNPJ da Fonte Pagadora:         "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador,
+                                                     ou podemos encontrar nos sites www.investidor10.com.br, ou www.statusinvest.com.br)"
+                                                     
+                                                     IMPORTANTE: No caso de FII o CNPJ deve ser o do fundo
+
                     Valor:                          "Valor identificado no informe de rendimentos do banco escriturador"
 
                 ]
@@ -591,7 +603,11 @@ Como declarar ações
                 Código:                             "07 - Juros sobre capital próprio, mas não pago"
                 Bem ou direito pertencente ao:      "Titular"
                 Localização:                        "105 - Brasil"
-                CNPJ:                               "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador)"
+                CNPJ da Fonte Pagadora:             "CNPJ da fonte pagadora (Identificada no Informe de Rendimentos fornecido pelo banco escriturador,
+                                                    ou podemos encontrar nos sites www.investidor10.com.br, ou www.statusinvest.com.br)"
+                                                    
+                                                    IMPORTANTE: No caso de FII o CNPJ deve ser o do fundo
+
                 Discriminação:                      "JSCP em trânsito referente a (xxxx) ações da (empresa pagadora) creditado mas não pago
                 Situação em 31/12/xxxx:             "Posição do periodo anterior"
                 Situação em 31/12/xxxx:             "Posição do periodo atual (Multiplicar a quantidade ações pelo valor médio apontado na discriminação)"
@@ -603,6 +619,11 @@ Como declarar ações
             . Importante: Os valores apresentados (Valor de Compra) abaixo deve ser pego pela nota de corretagem. Não pode ser pego pelo valor da cotação
                             do dia. 
 
+                          Também podemos encontrar esses valores na B3, na área de investidores, https://www.investidor.b3.com.br/login . Basta acessar 
+                          a opção "Negociações"
+
+            . Somente as compras são utilizadas para calcular o preço médio. No caso de vendas, abatemos o total de ações vendidas do montante de cotas, porém
+                o valor médio continua sendo o da última compra.
 
             . Exemplo 1 - Compra inicial das ações, não havendo nenhum papel dessa ação na carteira.
 
@@ -675,7 +696,16 @@ Como declarar ações
                     Preço médio ------------->  209                            (5.950,00)    28,47
                     Lucro   ----------------->  209                               320,00
 
-                    Posição início do período   209                             5.950,00    28,47
+
+                    Situação atual
+
+                    Evento      Data            Qtd             Ação            Valor
+                    ------      ----            ---             ---             -----
+                    ...         ...             ...             ...             ...
+                                                ---                             -----
+                                                418                             11.900,00    PM => Valor / Qtd => 28,47
+                    Venda       01/fev          209             WEGE3           
+                    Posição atual               209             WEGE3           5.950,00     PM => Valor / Qtd => 28,47
 
                 . Acesse "Bens e Direitos" e faça o seguinte lançamento:
 
@@ -690,16 +720,41 @@ Como declarar ações
                     Situação em 31/12/xxxx:             "11.900,00"
                     Situação em 31/12/xxxx:             "5.950,00"
 
-                    . Caso a venda não foi superior ao limite da receita de R$ 20.000,00, então basta lançar o lucro de R$ 320,00 em 
-                        "Rendimentos Isentos e não Tributáveis"
 
-                        Tipo do Rendimento:                 "20 - Ganhos liquidos em operações no mercado à vista de ações ..."
-                        20 - Ganhos liquidos em operações no mercado à vista de ações ...:   [
-                            Tipo do beneficiário:           "Titular"
-                            Beneficiário:                   "CPF do Investidor"
-                            Valor:                          "320,00"
+                    VENDA INFERIOR AO LIMITE DA RECEITA R$ 20.000,00
+                    ------------------------------------------------
 
-                        ]
+                        VENDA COM LUCRO
+                        ---------------
+
+                        . Caso a venda , então basta lançar o lucro de R$ 320,00 em 
+                            "Rendimentos Isentos e não Tributáveis"
+
+                            Tipo do Rendimento:                 "20 - Ganhos liquidos em operações no mercado à vista de ações ..."
+                            20 - Ganhos liquidos em operações no mercado à vista de ações ...:   [
+                                Tipo do beneficiário:           "Titular"
+                                Beneficiário:                   "CPF do Investidor"
+                                Valor:                          "320,00"
+
+                            ]
+
+                        COM PREJUIZO
+                        ------------
+
+
+                    VENDA SUPERIOR AO LIMITE DA RECEITA R$ 20.000,00
+                    ------------------------------------------------
+
+                        VENDA COM LUCRO
+                        ---------------
+
+
+
+
+
+                        VENDA COM PREJUIZO
+                        ------------------
+
 
                     . Caso a venda foi superior a R$ 20.000,00 temos que usar o programa GCAP para controlar o pagto da DARF e fazer os 
                         lançamentos necessário na declaração.
