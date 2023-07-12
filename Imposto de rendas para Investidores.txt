@@ -543,6 +543,7 @@ Como declarar ações
                 seu documento de identidade, CPF e Comprovante de endereço para o endereço eletrônico diope.informes@bb.com.br, 
                 para que possamos após verificação dos dados, enviar a informação por e-mail.
 
+
     . Ações, dividendos e JSCP
 
         . Declaração das ações:
@@ -723,99 +724,177 @@ Como declarar ações
                         Situação em 31/12/xxxx:             "5.950,00"
 
 
-                    . Venda de ações:
+        . Controle de Compra e Venda de ações para declaração do imposto de rendas:
 
-                        https://www.youtube.com/watch?v=_180mLGeZtA
-                        https://www.youtube.com/watch?v=lsUY5mR2a5U
+            https://www.youtube.com/watch?v=_180mLGeZtA
+            https://www.youtube.com/watch?v=lsUY5mR2a5U
 
-                        . Sempre que vendemos uma ação temos que apurar o lucro, ou prejuizo, dessa operação.
+            . Fluxo de compra e venda de ações:
 
-                        . Para apurar o lucro/prejuizo devemos confrontar o valor da venda e subtrai-lo pela quantidade de cotas vendida multiplicado pelo valor 
-                            médio daquele momento. Se der positivo significa que tivemos lucro, caso contrário, foi prejuizo.
+                            Obter notas de cor-
+                            retagem e Extrato
+                +---------> da conta para pe-   <-----------------------------------------------------------+
+                |           gar os valores de                                                               |
+                |           compra e venda no mês                                                           |
+                |                |                                                                          |
+                |                |                                                                          |
+                |                |                                                                          |
+                |                V                                                                          |
+                |            Calcular o preço                                                               |
+                |            Médio dos                                                                      |
+                |            Ativos                                                                         |
+                |                |                                                                          |
+                |                |                                                                          |
+                |                V                                                                          | 
+                |            Venda de ações   Não (Lucro Isento)        Montar histórico de valor da        |
+                |            superior a 20K  ------------------------>  venda no mês com Rendimentos -----> |
+                |            ou FII, ou ETF?                            Isentos e não Tributáveis           |
+                |                |                                                                          |
+                |                | Sim                                                                      |
+                |                |                                                                          |
+                |                V                                                                          |
+                |            Totalizar o                                                                    |
+                |            Lucro ou Prejuizo de                                                           |
+                |            cada venda no mês                                                              |
+                |                |                                                                          |
+                |                |                                                                          |
+                |                |                                                                          |
+                |                V                                                                          |
+                |            Saldo final das                                                                |
+                |            vendas                 Não (Lucro)                                             |
+                |            (Lucros - Prejuizo) --------------------------------+                          |
+                |            ficou negativo                                      |                          |
+                |            (Prejuizo)?                                         |                          |
+                |                |                                               V                          |
+                |                | Sim ( Prejuizo )                  Montar log de histórico de valor       |
+                |                |                                   da venda no mês de rendimentos         |
+                |                V                                   com tributação exclusiva               |
+                |            Totalizar o prejuizo                                |                          |
+                |            do mês                                              V                          |
+                |                |                                   Totalizar o lucro no mês               |
+                |                |                                               |                          |
+                |                |                                               |                          |
+                |                V                                               |                          |
+                |            Acumular os lucros e prejuizos                      |                          |
+                |            do mês com acumulado        <-----------------------+                          |
+                |            do mês anterior                                                                |
+                |                |                                                                          |
+                |                |                                                                          |
+                |                |                                                                          |
+                |                V                                                                          |
+                |            Saldo mês anterior     Não ( Controle de Compensação lucro com prejuizo )  Iniciar o saldo do   
+                |            + lucro e prejuizo     ------------------------------------------------->  mês seguinte com o 
+                |            do mês atual deu lucro                                                     prejuizo apurado, ou
+                |            acima dede R$ 10,00?                                                       com saldo positivo 
+                |                |                                                                      inferior a R$ 10,00
+                |                | Sim ( Pagar imposto de renda )
+                |                |
+                |                V
+                |            Montar log de histórico de valores
+                |            de venda no mês com Rendimentos
+                |            Sujeito a Tributação Exclusiva
+                |                |
+                |                |
+                |                V
+                |            Emitir e pagar
+                |            DARF
+                |                |
+                |                |
+                |                |
+                |                V
+                |            Iniciar o saldo mês 
+                +----------- seguinte com saldo
+                            zero.
 
-                        . A tributação de cada grupo de compensação são:
 
-                            . Operações de Swing Trade acima de R$ 20.000,00 tem 15% de tributação.
+            . Sempre que vendemos uma ação temos que apurar o lucro, ou prejuizo, dessa operação.
 
-                            . Operações de Day Trade tem 20% de tributação.
+            . Para apurar o lucro/prejuizo devemos confrontar o valor da venda e subtrai-lo pela quantidade de cotas vendida multiplicado pelo valor 
+                médio daquele momento. Se der positivo significa que tivemos lucro, caso contrário, foi prejuizo.
 
-                            . Operações FIIs e Fiagro tem 20% de tributação
+            . A tributação de cada grupo de compensação são:
 
-                            . FII Infra são totalmente isentos de tributação.
+                . Operações de Swing Trade acima de R$ 20.000,00 tem 15% de tributação.
 
-                        . Lucros com venda de ouro e ações, no Swing Trade, até R$ 20.0000,00 estão isentas do pagamento de Imposto de Renda. Acima disso temos que imprimir a DARF, com 
-                            o código 6015.
+                . Operações de Day Trade tem 20% de tributação.
 
-                            . Podemos acumular o imposto a ser pago de todas as vendas realizadas no mês de todos os tipos de operação.
+                . Operações FIIs e Fiagro tem 20% de tributação
 
-                        . Existem quatro grupos de compensações, onde podemos fazer a apuração dos lucros/prejuizos:
-                        
-                            . Swing Trade
-                            
-                            . Day Trade
-                            
-                            . FII e Fiagros
+                . FII Infra são totalmente isentos de tributação.
 
-                            . FII de Infra
+            . Lucros com venda de ouro e ações, no Swing Trade, até R$ 20.0000,00 estão isentas do pagamento de 
+                Imposto de Renda. Acima disso temos que imprimir a DARF, com o código 6015.
 
-                        . O controle de apuração dos lucros/prejuizos deve ser agrupados de acordo com o tipo da compensação (Swing, Day, FII, Fiagros, Opções, Termo, Futuro dolar, 
-                            Futuro Indíce, ETF e BDR). Não podemos misturá-los, se foi feito venda de ações no Swing Trade a apuração dos lucros/prejuizo deve ser feito dentro dessa
-                            operação; se a venda foi em Swing Trade dentro do Swing Trade; se FII dentro dos FIIs; assim por diante.
+                . Podemos acumular o imposto a ser pago de todas as vendas realizadas no mês de todos os tipos de operação.
 
-                        . As vendas com lucro isento não use esse lucro pra compensar prejuizo do passado, deixe esse lucro como isento. Deixe os prejuizos para 
-                            serem compensados com lucros tributáveis.
+            . Existem quatro grupos de compensações, onde podemos fazer a apuração dos lucros/prejuizos:
+            
+                . Swing Trade
+                
+                . Day Trade
+                
+                . FII e Fiagros
 
-                    . A lógica dos exemplos abaixo servem tanto para venda de ações (Swing e Day Trade); FIIs; ETF. Respeitando a tributação de cada grupo de compensação. Vamos
-                        utilizar nos exemplos a venda de ações no Swing Trade.
+                . FII de Infra
 
-                    . Venda de ações no mês inferior ao limite de R$ 20.000,00 (Isenção de IR )
+            . O controle de apuração dos lucros/prejuizos deve ser agrupados de acordo com o tipo da compensação (Swing, Day, FII, Fiagros, Opções, Termo, Futuro dolar, 
+                Futuro Indíce, ETF e BDR). Não podemos misturá-los, se foi feito venda de ações no Swing Trade a apuração dos lucros/prejuizo deve ser feito dentro dessa
+                operação; se a venda foi em Swing Trade dentro do Swing Trade; se FII dentro dos FIIs; assim por diante.
 
-                        . Venda com Lucro
+            . As vendas com lucro isento não use esse lucro pra compensar prejuizo do passado, deixe esse lucro como isento. Deixe os prejuizos para 
+                serem compensados com lucros tributáveis.
 
-                            . Exemplo:
+        . A lógica dos exemplos abaixo servem tanto para venda de ações (Swing e Day Trade); FIIs; ETF. Respeitando a tributação de cada grupo de compensação. Vamos
+            utilizar nos exemplos a venda de ações no Swing Trade.
 
-                                . Compras no período:
+        . Venda de ações no mês inferior ao limite de R$ 20.000,00 (Isenção de IR )
 
-                                    Evento      Data            Qtd             Ação            Valor
-                                    ------      ----            ---             ---             -----
-                                    Compra      01/set          79              WEGE3           3.000,00
-                                    Compra      05/out          45              WEGE3           1.500,00
-                                    Compra      11/dez          85              WEGE3           3.200,00
-                                                                --                              --------
-                                                                418                             11.900,00    PM => Valor / Qtd => 28,47
+            . Venda com Lucro
 
-                                . Venda no período:
+                . Exemplo:
 
-                                    Evento      Data            Qtd             Ação            Valor       Cotação
-                                    ------      ----            ---             ---             -----       -------
-                                    Venda       01/fev          209             WEGE3           6.270,00    30,00
+                    . Compras no período:
 
-                                    Preço médio ------------->  209                            (5.950,00)    28,47
-                                    Lucro   ----------------->  209                               320,00
+                        Evento      Data            Qtd             Ação            Valor
+                        ------      ----            ---             ---             -----
+                        Compra      01/set          79              WEGE3           3.000,00
+                        Compra      05/out          45              WEGE3           1.500,00
+                        Compra      11/dez          85              WEGE3           3.200,00
+                                                    --                              --------
+                                                    418                             11.900,00    PM => Valor / Qtd => 28,47
 
-                            . Basta lançar o lucro de R$ 320,00 em  "Rendimentos Isentos e não Tributáveis"
+                    . Venda no período:
 
-                                Tipo do Rendimento:                 "20 - Ganhos liquidos em operações no mercado à vista de ações ..."
-                                20 - Ganhos liquidos em operações no mercado à vista de ações ...:   [
-                                    Tipo do beneficiário:           "Titular"
-                                    Beneficiário:                   "CPF do Investidor"
-                                    Valor:                          "320,00"
+                        Evento      Data            Qtd             Ação            Valor       Cotação
+                        ------      ----            ---             ---             -----       -------
+                        Venda       01/fev          209             WEGE3           6.270,00    30,00
 
-                                ]
+                        Preço médio ------------->  209                            (5.950,00)    28,47
+                        Lucro   ----------------->  209                               320,00
 
-                            . Se houver venda de outras ações no mês, que não ultrapassaram o limite dos R$ 20.000,00, podemos realizar um único lançamento, com a soma
-                                de todos os lucros isentos no ano; ou se preferir, fazer um lançamento para cada mês do ano com o lucro isento realizado.
+                . Basta lançar o lucro de R$ 320,00 em  "Rendimentos Isentos e não Tributáveis"
 
-                            . Lembrando, como esse lucro foi de uma venda no mês abaixo dos R$ 20.000,00 não é necessário compensá-lo com os prejuizos do passado. 
-                                Deixe esse lucro como isento e somente os prejuizos para serem compensados com lucros tributáveis.
+                    Tipo do Rendimento:                 "20 - Ganhos liquidos em operações no mercado à vista de ações ..."
+                    20 - Ganhos liquidos em operações no mercado à vista de ações ...:   [
+                        Tipo do beneficiário:           "Titular"
+                        Beneficiário:                   "CPF do Investidor"
+                        Valor:                          "320,00"
 
-                        COM PREJUIZO
-                        ------------
+                    ]
+
+                . Se houver venda de outras ações no mês, que não ultrapassaram o limite dos R$ 20.000,00, podemos realizar um único lançamento, com a soma
+                    de todos os lucros isentos no ano; ou se preferir, fazer um lançamento para cada mês do ano com o lucro isento realizado.
+
+                . Lembrando, como esse lucro foi de uma venda no mês abaixo dos R$ 20.000,00 não é necessário compensá-lo com os prejuizos do passado. 
+                    Deixe esse lucro como isento e somente os prejuizos para serem compensados com lucros tributáveis.
+
+            COM PREJUIZO
+            ------------
 
 https://www.youtube.com/watch?v=b9miR04Y2oE&list=PLpUr9najIhPIIHnVxNxCRd_BlcpxEVm4M&index=47&pp=iAQB
 
-                    VENDA SUPERIOR AO LIMITE DA RECEITA R$ 20.000,00
-                    ------------------------------------------------
+        VENDA SUPERIOR AO LIMITE DA RECEITA R$ 20.000,00
+        ------------------------------------------------
 
 https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s
 
@@ -824,21 +903,21 @@ https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s
 
 
 
-                        VENDA COM LUCRO
-                        ---------------
+            VENDA COM LUCRO
+            ---------------
 
 
 
 
 
-                        VENDA COM PREJUIZO
-                        ------------------
+            VENDA COM PREJUIZO
+            ------------------
 
 
-                    . Caso a venda foi superior a R$ 20.000,00 temos que usar o programa GCAP para controlar o pagto da DARF e fazer os 
-                        lançamentos necessário na declaração.
+        . Caso a venda foi superior a R$ 20.000,00 temos que usar o programa GCAP para controlar o pagto da DARF e fazer os 
+            lançamentos necessário na declaração.
 
-                    . Para deixar a declaração mais simples tente não superar o limite de venda que é de R$ 20.000,00.
+        . Para deixar a declaração mais simples tente não superar o limite de venda que é de R$ 20.000,00.
 
     . Bonificação:
 
