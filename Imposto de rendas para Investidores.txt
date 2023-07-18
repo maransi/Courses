@@ -894,9 +894,9 @@ Como declarar ações
 
                         03. Imposto sobre a renda na fonte (Lei No. 11.033/2004): "0,02"
 
-                https://www.youtube.com/watch?v=Y7HwfX7_eRo     7.29 ---+
-                                                                        |
-                                                                        V
+                        https://www.youtube.com/watch?v=Y7HwfX7_eRo     7.29 ---+
+                                                                                |
+                                                                                V
                 . Chegando no mês de Dezembro, o valor acumulado  item do menu principal "Renda Variável" -> "Operações Comuns/Day Trade";
                     na aba "Titular"; no item "Resultados"; no campo "IR fonte (Lei No. 11.033/2004) a compensar". Lance esse valor no campo:
 
@@ -917,8 +917,8 @@ Como declarar ações
 
             . Venda com Prejuizo
 
-https://www.youtube.com/watch?v=b9miR04Y2oE&list=PLpUr9najIhPIIHnVxNxCRd_BlcpxEVm4M&index=47&pp=iAQB
-https://www.youtube.com/watch?v=d6aZ6e5nujc&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=1&t=559s
+                https://www.youtube.com/watch?v=b9miR04Y2oE&list=PLpUr9najIhPIIHnVxNxCRd_BlcpxEVm4M&index=47&pp=iAQB
+                https://www.youtube.com/watch?v=d6aZ6e5nujc&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=1&t=559s
 
                 . Exemplo:
 
@@ -976,20 +976,142 @@ https://www.youtube.com/watch?v=d6aZ6e5nujc&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq
 
 https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s
 
+            . Venda com lucro
+
+                . Exemplo:
+
+                    . Compras no período:
+
+                        Evento      Data            Qtd             Ação            Valor
+                        ------      ----            ---             ---             -----
+                        Compra      01/set          200              WEGE3           10.000,00
+                        Compra      05/out          200              WEGE3           12.000,00
+                                                    ---                              --------
+                                                    400                              22.000,00    PM => Valor / Qtd => 55,00
+
+                    . Venda no período:
+
+                        Evento      Data            Qtd             Ação            Valor       Cotação
+                        ------      ----            ---             ---             -----       -------
+                        Venda       01/fev          400             WEGE3           26.000,00   65,00
+
+                        Preço Custo ------------->  400                            (22.000,00)  55,00 --> PM
+                        Venda    ---------------->  400                            (26.000,00)  --------> Venda Superior ao Limite de Isenção  
+                                                                                --------------  
+                        Lucro                                                       4.0000,00
+                        IRRF B3 (0,00005 do Vl Vendido)                                  1,30   ----+
+                                                                                                    |
+                        . O valor do "IRRF B3" vem destacado na nota de corretagem da corretora. <--+
+
+                    . Nesse cenário digamos que fechamos o mês anterior com prejuizo de R$ 1.764,00.
+
+                        . Embora somente essa venda foi superior ao limite de isenção, devemos atentar que a apuração do imposto deve ser feito sobre
+                            o acumulado de todas as vendas no mês. Nesse caso se esse total superou o limite da isenção, basta somarmos todas as vendas,
+                            utiliza-lo como base de calculo e proceder com a apuração abaixo.
+
+                        . Importante, como a venda foi superior a R$ 20.000,00, que é o limite de isensção, então podemos nos apropriar do 
+                            prejuizo acumulado dos períodos anteriores para reduzir a base de calculo do imposto a pagar.
+
+                        . Para a base do imposto a pagar seria:
+
+                            R$ 4.000,00 - R$ 1.764,00 => R$ 2.236,00 => R$ 2.236,00 * 15% => R$ 335,40
+
+                    . Na declaração acesse a opção "Renda Variável" -> "Operações Comuns / Day Trade".
+
+                    . Na aba "Titular" do mês da venda:
+                    
+                        . No Item "Mercado à Vista" -> "Mercado à Vista Ações" -> "Operações Comuns"
+                            informe o valor da venda, que foi de R$ 4.000,00.
+
+                            https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s    8.15
+
+                    . Verifique os resultados do calculo do imposto a pagar no item abaixo com o nome de "Resultado". 
+                    
+                        Operações Comuns:   [
+                            RESULTADO LIQUIDO DO MÊS:                   4.000,00,
+                            Resultado negativo até o mês anterior:      1.764,00,
+                            Base de Calculo do Imposto:                 2.236,00,
+                            Prejuizo a compensar:                           0,00,
+                            Aliquota do Imposto:                           15,00%,
+                            Imposto Devido:                               335,40
+                        ]
+
+                    . O "IRRF B3" destacado na nota de corretagem, podemos abate-lo do valor da DARF.
+
+                        . Desça mais abaixo no item "Consolidação do mês"
+
+                        . No item "IR fonte (Lei no. 11.033/2004) no mês" e informe o valor do "IRRF B3" da venda:
+
+                            Consolidação do mês: [
+                                IR fonte (Lei no. 11.033/2004) no mês:      R$ 1,30
+                            ]
+
+                        . Verifique se no item "Consolidação do mês" -> "Imposto a pagar" ficou o valor:
+                        
+                                "Operações Comuns" -> "Imposto Devido"                                                      R$ 335,40
+                            (-) "Consolidação do mês" -> "IR fonte (Lei no. 11.033/2004) no mês"                            R$   1,30
+                            (-) "Consolidação do mês" -> "IR fonte (Lei no. 11.033/2004) nos meses anteriores"              R$   0,00  --> Aqui vem o acumulado do "IRRF B3" não apropriado ainda
+                                                                                                                            ---------
+                            (=) "Imposto a pagar"                                                                           R$ 334,10
+
+                    . O valor "Imposto a pagar" deve ser preenchido uma DARF. O pagamento deve ser feito até o último dia útil do mês seguinte ao mês
+                        da apuração. Mais abaixo teremos mais detalhes de como preencher a DARF.
+
+                        . Para preencher a DARF acesse o video abaixo:
+
+                            https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s        10.22
 
 
+            . Venda com prejuizo
+
+https://www.youtube.com/watch?v=V8PVAugB7Hk&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=10
+https://www.youtube.com/watch?v=b9miR04Y2oE&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=5            
 
 
+        . IR Ações | Venda Parcial de Ações - Como fica meu Imposto de Renda
 
-            VENDA COM LUCRO
-            ---------------
+https://www.youtube.com/watch?v=d6aZ6e5nujc&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=1
+
+        . Declarar a compra e venda de ações no mesmo ano
+
+https://www.youtube.com/watch?v=jYzpdHKslfs&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=11
+
+        . Como declarar rendimento com saldo e bens e direitos zerado
+
+https://www.youtube.com/watch?v=qdD9dP6hjQc
+
+        . Como declarar Compra de Ações em Corretoras Diferentes
+
+https://www.youtube.com/watch?v=GJRDSQcCEPM&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=4
 
 
+        . Como consultar o Informe de rendimento de ações
 
+https://www.youtube.com/watch?v=SSiZmAynm8E&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=22
 
+        . Como consultar o Informe de rendimento de FII
 
-            VENDA COM PREJUIZO
-            ------------------
+https://www.youtube.com/watch?v=MzjLAAK0H5U&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=13
+
+        . Como declarar prejuízo da declaração anterior
+
+https://www.youtube.com/watch?v=G2Hj11cBuzY&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=17
+
+        . Como declarar a Compra de FII
+
+https://www.youtube.com/watch?v=f8sLOiUByH0&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=18
+
+        . Como declarar a Venda Total de FII
+
+https://www.youtube.com/watch?v=eOY-R-rMrac&t=32s
+
+        . Como declarar ETF de Renda Variável
+
+https://www.youtube.com/watch?v=hGcTRbG58v0&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=24
+
+        . Como declarar ETF de Renda Fixa
+
+https://www.youtube.com/watch?v=Pe99GsyBtKk&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=15 
 
 
         . Caso a venda foi superior a R$ 20.000,00 temos que usar o programa GCAP para controlar o pagto da DARF e fazer os 
