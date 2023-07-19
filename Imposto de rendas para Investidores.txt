@@ -751,7 +751,7 @@ Como declarar ações
                 |            superior a 20K  ------------------------>  venda no mês com Rendimentos -----> |
                 |            ou FII, ou ETF?                            Isentos e não Tributáveis           |
                 |                |                                                                          |
-                |                | Sim                                                                      |
+                |                | Sim (Lucro/Prejuizo Tributável)                                          |
                 |                |                                                                          |
                 |                V                                                                          |
                 |            Totalizar o                                                                    |
@@ -974,9 +974,11 @@ Como declarar ações
 
         . Venda superior ao limite de isenção R$ 20.000,00
 
-https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s
-
             . Venda com lucro
+
+                . Baseado no vídeo:
+                    
+                    https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s
 
                 . Exemplo:
 
@@ -1021,7 +1023,7 @@ https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s
                     . Na aba "Titular" do mês da venda:
                     
                         . No Item "Mercado à Vista" -> "Mercado à Vista Ações" -> "Operações Comuns"
-                            informe o valor da venda, que foi de R$ 4.000,00.
+                            informe o valor do lucro, que foi de R$ 4.000,00.
 
                             https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s    8.15
 
@@ -1033,7 +1035,8 @@ https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s
                             Base de Calculo do Imposto:                 2.236,00,
                             Prejuizo a compensar:                           0,00,
                             Aliquota do Imposto:                           15,00%,
-                            Imposto Devido:                               335,40
+                            Imposto Devido:                               335,40,
+                            Imposto Pago:                                   0,00    -------> Importante: Insira aqui o valor pago na DARF, que deve ser o mesmo do valor Devido
                         ]
 
                     . O "IRRF B3" destacado na nota de corretagem, podemos abate-lo do valor da DARF.
@@ -1064,9 +1067,76 @@ https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s
 
             . Venda com prejuizo
 
-https://www.youtube.com/watch?v=V8PVAugB7Hk&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=10
-https://www.youtube.com/watch?v=b9miR04Y2oE&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=5            
+                . Os calculos de venda de ativos superior ao limite de isenção R$ 20.000,00 com prejuizo são os mesmo daquelas vendas
+                    abaixo do limite de isenção.
 
+
+                . Baseado no vídeo:
+
+                    https://www.youtube.com/watch?v=V8PVAugB7Hk&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=10
+
+                . Exemplo:
+
+                    . Compras no período:
+
+                        Evento      Data            Qtd             Ação            Valor
+                        ------      ----            ---             ---             -----
+                        Compra      01/set          50               WEGE3            1.000,00
+                                                    ---                              --------
+                                                    50                                1.000,00    PM => Valor / Qtd => 20,00
+
+                    . Venda no período:
+
+                        Evento      Data            Qtd             Ação            Valor       Cotação
+                        ------      ----            ---             ---             -----       -------
+                        Venda       01/fev          50              WEGE3              750,00   15,00
+
+                        Preço Custo ------------->  50                             (1.000,00)  20,00 --> PM
+                        Venda    ---------------->  50                             (  750,00)  
+                                                                                --------------  
+                        Prejuizo                                                     - 250,00
+                        IRRF B3 (0,00005 do Vl Vendido)                                  0,03   ----+
+                                                                                                    |
+                        . O valor do "IRRF B3" vem destacado na nota de corretagem da corretora. <--+
+
+                    . Na declaração acesse a opção "Renda Variável" -> "Operações Comuns / Day Trade".
+
+                    . Na aba "Titular" do mês da venda:
+                    
+                        . No Item "Mercado à Vista" -> "Mercado à Vista Ações" -> "Operações Comuns"
+                            informe o valor do prejuizo, que foi de R$ -250,00. Observe que o valor deve ficar negativo.
+
+                            https://www.youtube.com/watch?v=V8PVAugB7Hk&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=11    7.26
+
+                    . Verifique os resultados do calculo do imposto a pagar no item abaixo com o nome de "Resultado". 
+                    
+                        Operações Comuns:   [
+                            RESULTADO LIQUIDO DO MÊS:                    -250,00,
+                            Resultado negativo até o mês anterior:          0,00,
+                            Base de Calculo do Imposto:                     0,00,
+                            Prejuizo a compensar:                         250,00,
+                            Aliquota do Imposto:                           15,00%,
+                            Imposto Devido:                                 0,00
+                            Imposto Pago:                                   0,00   
+                        ]
+
+                    . O "IRRF B3" destacado na nota de corretagem, podemos abate-lo do valor da DARF.
+
+                        . Desça mais abaixo no item "Consolidação do mês"
+
+                        . No item "IR fonte (Lei no. 11.033/2004) no mês" e informe o valor do "IRRF B3" da venda:
+
+                            Consolidação do mês: [
+                                IR fonte (Lei no. 11.033/2004) no mês:      R$ 0,03
+                            ]
+
+                        . Verifique se no item "Consolidação do mês" -> "Imposto a pagar" ficou o valor:
+                        
+                                "Operações Comuns" -> "Imposto Devido"                                                      R$   0,00
+                            (-) "Consolidação do mês" -> "IR fonte (Lei no. 11.033/2004) no mês"                            R$   0,03
+                            (-) "Consolidação do mês" -> "IR fonte (Lei no. 11.033/2004) nos meses anteriores"              R$   0,00  --> Aqui vem o acumulado do "IRRF B3" não apropriado ainda
+                                                                                                                            ---------
+                            (=) "Imposto a pagar"                                                                           R$   0,00
 
         . IR Ações | Venda Parcial de Ações - Como fica meu Imposto de Renda
 
