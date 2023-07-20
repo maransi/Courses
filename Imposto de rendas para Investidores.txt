@@ -842,15 +842,25 @@ Como declarar ações
                 Futuro Indíce, ETF e BDR). Não podemos misturá-los, se foi feito venda de ações no Swing Trade a apuração dos lucros/prejuizo deve ser feito dentro dessa
                 operação; se a venda foi em Swing Trade dentro do Swing Trade; se FII dentro dos FIIs; assim por diante.
 
-            . As vendas com lucro isento não use esse lucro pra compensar prejuizo do passado, deixe esse lucro como isento. Deixe os prejuizos para 
+            . As vendas com lucro isento, não use esse lucro pra compensar prejuizo do passado, deixe esse lucro como isento. Deixe os prejuizos para 
                 serem compensados com lucros tributáveis.
 
         . A lógica dos exemplos abaixo servem tanto para venda de ações (Swing e Day Trade); FIIs; ETF. Respeitando a tributação de cada grupo de compensação. Vamos
             utilizar nos exemplos a venda de ações no Swing Trade.
 
+        . Sempre que ocorre uma venda de ativos a B3 faz a retenção de IR, conhecida como "Dedo Duro". É descontado um valor 
+            simbólico de 0,005%, equivalente a 0,00005, sobre o valor da venda.
+
+            . Podemos reaproveitar esse valor de IR retido na B3 para abater pagamentos do IR, via DARF, na operações não isentas, ou seja,
+                vendas superiores a R$ 20.000,00.
+
         . Venda de ações no mês inferior ao limite de R$ 20.000,00 (Isenção de IR )
 
             . Venda com Lucro
+
+                . Baseado no vídeo abaix:
+
+                    https://www.youtube.com/watch?v=Y7HwfX7_eRo
 
                 . Exemplo:
 
@@ -858,9 +868,9 @@ Como declarar ações
 
                         Evento      Data            Qtd             Ação            Valor
                         ------      ----            ---             ---             -----
-                        Compra      01/set          79              WEGE3           3.000,00
-                        Compra      05/out          45              WEGE3           1.500,00
-                        Compra      11/dez          85              WEGE3           3.200,00
+                        Compra      02/jan          79              WEGE3           3.000,00
+                        Compra      05/jan          45              WEGE3           1.500,00
+                        Compra      11/jan          85              WEGE3           3.200,00
                                                     --                              --------
                                                     418                             11.900,00    PM => Valor / Qtd => 28,47
 
@@ -870,19 +880,21 @@ Como declarar ações
                         ------      ----            ---             ---             -----       -------
                         Venda       01/fev          209             WEGE3           6.270,00    30,00
 
-                        Preço médio ------------->  209                            (5.950,00)    28,47
-                        Lucro   ----------------->  209                               320,00
-                        IRRF B3 (0,00005 do Vl Vendido)                                 0,02    ----+
+                        Preço Custo ------------->  209                            (5.950,23)    28,47
+                        Lucro   ----------------->  209                               319,77
+                        IRRF B3 (0,00005 do Vl Vendido)                                 0,31    ----+
                                                                                                     |
                         . O valor do "IRRF B3" vem destacado na nota de corretagem da corretora. <--+
 
-                . Basta lançar o lucro de R$ 320,00 em  "Rendimentos Isentos e não Tributáveis"
+                        Posição atual em 02/fev -> 209                              5.950,23    28,47
+
+                . Basta lançar o lucro de R$ 319,77 em  "Rendimentos Isentos e não Tributáveis"
 
                     Tipo do Rendimento:                 "20 - Ganhos liquidos em operações no mercado à vista de ações ..."
                     20 - Ganhos liquidos em operações no mercado à vista de ações ...:   [
                         Tipo do beneficiário:           "Titular"
                         Beneficiário:                   "CPF do Investidor"
-                        Valor:                          "320,00"
+                        Valor:                          "319,77"
 
                     ]
 
@@ -892,12 +904,12 @@ Como declarar ações
 
                     . No item "Resultados" informe o valor do IR retido na B3 nos campos:
 
-                        03. Imposto sobre a renda na fonte (Lei No. 11.033/2004): "0,02"
+                        03. Imposto sobre a renda na fonte (Lei No. 11.033/2004): "0,31"
 
                         https://www.youtube.com/watch?v=Y7HwfX7_eRo     7.29 ---+
                                                                                 |
                                                                                 V
-                . Chegando no mês de Dezembro, o valor acumulado  item do menu principal "Renda Variável" -> "Operações Comuns/Day Trade";
+                . Chegando no mês de Dezembro, o valor acumulado no item do menu principal "Renda Variável" -> "Operações Comuns/Day Trade";
                     na aba "Titular"; no item "Resultados"; no campo "IR fonte (Lei No. 11.033/2004) a compensar". Lance esse valor no campo:
 
                     . Acesse o item de menu "Impostos Pago/Retido"
@@ -905,7 +917,6 @@ Como declarar ações
                     . Informe o valor acumulado de Dezembro no campo:
 
                         03. Imposto sobre a renda na fonte (Lei 11.033/2004):       "Valor acumulado em Dezembro"
-
 
 . TODO: ESPECIFICAR O CONTROLE MENSAL NECESSÁRIO PARA DEIXAR MAIS FÁCIL OS LANCTOS DURANTE A CONFECCÃO DA DECLARAÇÃO.
 
@@ -926,11 +937,12 @@ Como declarar ações
 
                         Evento      Data            Qtd             Ação            Valor
                         ------      ----            ---             ---             -----
-                        Compra      01/set          79              WEGE3           3.000,00
-                        Compra      05/out          45              WEGE3           1.500,00
-                        Compra      11/dez          85              WEGE3           3.200,00
+                        Compra      02/jan          79              WEGE3           3.000,00
+                        Compra      05/jan          45              WEGE3           1.500,00
+                        Compra      11/jan          85              WEGE3           3.200,00
                                                     --                              --------
                                                     418                             11.900,00    PM => Valor / Qtd => 28,47
+
 
                     . Venda no período:
 
@@ -940,25 +952,25 @@ Como declarar ações
 
                         Preço médio ------------->  209                            (5.950,23)    28,47
                         Prejuízo ---------------->  209                            (1.770,23)   
-                        IRRF B3 (0,00005 do Vl Vendido)                                 0,21    ----+
+                        IRRF B3 (0,00005 do Vl Vendido)                                 0,31    ----+
                                                                                                     |
                         . O valor do "IRRF B3" vem destacado na nota de corretagem da corretora. <--+
 
 . TODO: ESPECIFICAR O CONTROLE MENSAL NECESSÁRIO PARA DEIXAR MAIS FÁCIL OS LANCTOS DURANTE A CONFECCÃO DA DECLARAÇÃO.
 
 
-                . Embora a venda ficou abaixo dos R$ 20.000,00 o investidor pode se apropriar desse prejuízo para compensar lucros futuros.
+                . Independente da venda ficar abaixo dos R$ 20.000,00 o investidor pode se apropriar desse prejuízo para compensar lucros futuros.
 
                     . Na declaração acesse a opção "Renda Variável" -> "Operações Comuns / Day Trade".
 
                     . Na aba "Titular" do mês da venda:
                     
                         . No Item "Mercado à Vista" -> "Mercado à Vista Ações" -> "Operações Comuns"
-                            informe o valor do prejuizo, com sinal negativo.
+                            informe o valor do prejuizo, "com sinal negativo".
 
                             https://www.youtube.com/watch?v=b9miR04Y2oE&list=PLpUr9najIhPIIHnVxNxCRd_BlcpxEVm4M&index=47&pp=iAQB        9.22
 
-                        . No item "Consolidação do Mês" -> "IR fonte (Lei no. 11.033/2004) no mês"  informe o valor do IRRF B3 R$ 0,21
+                        . No item "Consolidação do Mês" -> "IR fonte (Lei no. 11.033/2004) no mês"  informe o valor do IRRF B3 R$ 0,31
 
                 . No caso de várias vendas de ações e total ficou abaixo de R$ 20.000,00 no mês, basta totalizar os valores das vendas
                     e fazer um único lançamento de cada um deles.
@@ -986,8 +998,8 @@ Como declarar ações
 
                         Evento      Data            Qtd             Ação            Valor
                         ------      ----            ---             ---             -----
-                        Compra      01/set          200              WEGE3           10.000,00
-                        Compra      05/out          200              WEGE3           12.000,00
+                        Compra      02/fev          200              WEGE3           10.000,00
+                        Compra      05/fev          200              WEGE3           12.000,00
                                                     ---                              --------
                                                     400                              22.000,00    PM => Valor / Qtd => 55,00
 
@@ -995,7 +1007,7 @@ Como declarar ações
 
                         Evento      Data            Qtd             Ação            Valor       Cotação
                         ------      ----            ---             ---             -----       -------
-                        Venda       01/fev          400             WEGE3           26.000,00   65,00
+                        Venda       01/mar          400             WEGE3           26.000,00   65,00
 
                         Preço Custo ------------->  400                            (22.000,00)  55,00 --> PM
                         Venda    ---------------->  400                            (26.000,00)  --------> Venda Superior ao Limite de Isenção  
@@ -1011,12 +1023,13 @@ Como declarar ações
                             o acumulado de todas as vendas no mês. Nesse caso se esse total superou o limite da isenção, basta somarmos todas as vendas,
                             utiliza-lo como base de calculo e proceder com a apuração abaixo.
 
-                        . Importante, como a venda foi superior a R$ 20.000,00, que é o limite de isensção, então podemos nos apropriar do 
+                        . Importante, como o total de vendas no mês foi superior a R$ 20.000,00, que é o limite de isensção, então podemos nos apropriar do 
                             prejuizo acumulado dos períodos anteriores para reduzir a base de calculo do imposto a pagar.
 
                         . Para a base do imposto a pagar seria:
 
-                            R$ 4.000,00 - R$ 1.764,00 => R$ 2.236,00 => R$ 2.236,00 * 15% => R$ 335,40
+                            -- Lucro da venda --            -- Prejuizo Acumulado --        -- Base Calculo IR --           -- Apuração do IR --        -- IR a Pagar --
+                                R$ 4.000,00         -           R$ 1.764,00             =>      R$ 2.236,00             =>    R$ 2.236,00 * 15%   =>        R$ 335,40
 
                     . Na declaração acesse a opção "Renda Variável" -> "Operações Comuns / Day Trade".
 
@@ -1064,6 +1077,14 @@ Como declarar ações
 
                             https://www.youtube.com/watch?v=hPE1Z1AN0Jk&t=5s        10.22
 
+                    . Chegando no mês de Dezembro, o valor acumulado  item do menu principal "Renda Variável" -> "Operações Comuns/Day Trade";
+                        na aba "Titular"; no item "Resultados"; no campo "IR fonte (Lei No. 11.033/2004) a compensar". Lance esse valor no campo:
+
+                        . Acesse o item de menu "Impostos Pago/Retido"
+
+                        . Informe o valor acumulado de Dezembro no campo:
+
+                            03. Imposto sobre a renda na fonte (Lei 11.033/2004):       "Valor acumulado em Dezembro"
 
             . Venda com prejuizo
 
@@ -1075,46 +1096,46 @@ Como declarar ações
 
                     https://www.youtube.com/watch?v=V8PVAugB7Hk&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=10
 
-                . Exemplo:
 
-                    . Compras no período:
+                . Compras no período:
 
-                        Evento      Data            Qtd             Ação            Valor
-                        ------      ----            ---             ---             -----
-                        Compra      01/set          50               WEGE3            1.000,00
-                                                    ---                              --------
-                                                    50                                1.000,00    PM => Valor / Qtd => 20,00
+                    Evento      Data            Qtd             Ação            Valor
+                    ------      ----            ---             ---             -----
+                    Compra      02/jan          100             WEGE3           5.000,00
+                    Compra      05/jan          100             WEGE3           5.500,00
+                    Compra      11/jan          200             WEGE3          12.000,00
+                                                --                              --------
+                                                400                             23.500,00    PM => Valor / Qtd => R$ 58,75
 
-                    . Venda no período:
 
-                        Evento      Data            Qtd             Ação            Valor       Cotação
-                        ------      ----            ---             ---             -----       -------
-                        Venda       01/fev          50              WEGE3              750,00   15,00
+                . Venda no período:
 
-                        Preço Custo ------------->  50                             (1.000,00)  20,00 --> PM
-                        Venda    ---------------->  50                             (  750,00)  
-                                                                                --------------  
-                        Prejuizo                                                     - 250,00
-                        IRRF B3 (0,00005 do Vl Vendido)                                  0,03   ----+
-                                                                                                    |
-                        . O valor do "IRRF B3" vem destacado na nota de corretagem da corretora. <--+
+                    Evento      Data            Qtd             Ação            Valor       Cotação
+                    ------      ----            ---             ---             -----       -------
+                    Venda       01/fev          400             WEGE3           22.000,00   55,00
+
+                    Preço Custo ------------->  400                            (23.500,00)  58,75
+                    Prejuízo ---------------->                                 ( 1.500,00)   
+                    IRRF B3 (0,00005 do Vl Vendido)                                  1,10   ----+
+                                                                                                |
+                    . O valor do "IRRF B3" vem destacado na nota de corretagem da corretora. <--+
 
                     . Na declaração acesse a opção "Renda Variável" -> "Operações Comuns / Day Trade".
 
                     . Na aba "Titular" do mês da venda:
                     
                         . No Item "Mercado à Vista" -> "Mercado à Vista Ações" -> "Operações Comuns"
-                            informe o valor do prejuizo, que foi de R$ -250,00. Observe que o valor deve ficar negativo.
+                            informe o valor do prejuizo, que foi de R$ -1.500,00. "Observe que o valor deve ficar negativo".
 
                             https://www.youtube.com/watch?v=V8PVAugB7Hk&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=11    7.26
 
                     . Verifique os resultados do calculo do imposto a pagar no item abaixo com o nome de "Resultado". 
                     
                         Operações Comuns:   [
-                            RESULTADO LIQUIDO DO MÊS:                    -250,00,
+                            RESULTADO LIQUIDO DO MÊS:                  -1.500,00,
                             Resultado negativo até o mês anterior:          0,00,
                             Base de Calculo do Imposto:                     0,00,
-                            Prejuizo a compensar:                         250,00,
+                            Prejuizo a compensar:                       1.500,00,
                             Aliquota do Imposto:                           15,00%,
                             Imposto Devido:                                 0,00
                             Imposto Pago:                                   0,00   
@@ -1127,7 +1148,7 @@ Como declarar ações
                         . No item "IR fonte (Lei no. 11.033/2004) no mês" e informe o valor do "IRRF B3" da venda:
 
                             Consolidação do mês: [
-                                IR fonte (Lei no. 11.033/2004) no mês:      R$ 0,03
+                                IR fonte (Lei no. 11.033/2004) no mês:      R$ 1,10
                             ]
 
                         . Verifique se no item "Consolidação do mês" -> "Imposto a pagar" ficou o valor:
@@ -1138,9 +1159,14 @@ Como declarar ações
                                                                                                                             ---------
                             (=) "Imposto a pagar"                                                                           R$   0,00
 
-        . IR Ações | Venda Parcial de Ações - Como fica meu Imposto de Renda
+                    . Chegando no mês de Dezembro, o valor acumulado  item do menu principal "Renda Variável" -> "Operações Comuns/Day Trade";
+                        na aba "Titular"; no item "Resultados"; no campo "IR fonte (Lei No. 11.033/2004) a compensar". Lance esse valor no campo:
 
-https://www.youtube.com/watch?v=d6aZ6e5nujc&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=1
+                        . Acesse o item de menu "Impostos Pago/Retido"
+
+                        . Informe o valor acumulado de Dezembro no campo:
+
+                            03. Imposto sobre a renda na fonte (Lei 11.033/2004):       "Valor acumulado em Dezembro"
 
         . Declarar a compra e venda de ações no mesmo ano
 
@@ -1150,10 +1176,17 @@ https://www.youtube.com/watch?v=jYzpdHKslfs&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq
 
 https://www.youtube.com/watch?v=qdD9dP6hjQc
 
+        . IR Ações | Venda Parcial de Ações - Como fica meu Imposto de Renda
+
+https://www.youtube.com/watch?v=d6aZ6e5nujc&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=1
+
+        . Como declarar prejuízo da declaração anterior
+
+https://www.youtube.com/watch?v=G2Hj11cBuzY&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=17
+
         . Como declarar Compra de Ações em Corretoras Diferentes
 
 https://www.youtube.com/watch?v=GJRDSQcCEPM&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=4
-
 
         . Como consultar o Informe de rendimento de ações
 
@@ -1162,10 +1195,6 @@ https://www.youtube.com/watch?v=SSiZmAynm8E&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq
         . Como consultar o Informe de rendimento de FII
 
 https://www.youtube.com/watch?v=MzjLAAK0H5U&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=13
-
-        . Como declarar prejuízo da declaração anterior
-
-https://www.youtube.com/watch?v=G2Hj11cBuzY&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=17
 
         . Como declarar a Compra de FII
 
