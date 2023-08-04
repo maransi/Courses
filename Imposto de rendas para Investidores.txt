@@ -1481,6 +1481,12 @@ Como declarar ações
             "xxxx Ações "Ticker da ação" da empresa (xxxxxxxxxxxxx) no preço médio de R$ 99.99 (Valor médio em 31/12), sendo 
             999 ações adquiridas por intermédio da corretora A e 999 ações adquiridas pela corretora B"
 
+    . Caso a venda foi superior a R$ 20.000,00 temos que usar o programa GCAP para controlar o pagto da DARF e fazer os 
+        lançamentos necessário na declaração.
+
+    . Para deixar a declaração mais simples tente não superar o limite de venda que é de R$ 20.000,00.
+        
+
 Como declarar ETFs
 ------------------
     
@@ -1562,20 +1568,78 @@ Como declarar ETFs
 
             . Para ETFs de renda fixa basta fazer somente o lançamento em Bens e Direitos da posição em 31/12. Não precisa fazer mais nada.
 
-    . Como declarar fundos de investimentos
 
-https://blog.toroinvestimentos.com.br/irpf/como-declarar-fundos-de-investimento
-https://conteudos.xpi.com.br/aprenda-a-investir/relatorios/como-declarar-fundos-de-investimento-no-imposto-de-renda/
-https://ajuda.nuinvest.com.br/hc/pt-br/articles/360044816153-Imposto-de-Renda-como-declarar-meus-Fundos-de-Investimentos-
+Como declarar fundos de investimentos
+-------------------------------------
+
+        . Baseado no vídeo:
+
+            https://www.youtube.com/watch?v=gm36f3xWCaA&list=PL7yxJa4Na-iqCd2FoW3CYh8uqcl3Xq_0w&index=37
+
+        . Os lançamentos dos fundos de investimentos são inteiramente baseados no informe de rendimentos da corretora.
+
+        . Como declarar as cotas
+
+            . Acesse o item "Bens e direitos" e lance conforme abaixo de acordo com o informe de rendimentos:
+
+                Grupo:                              71 - Fundos de Curto Prazo                                  * Normalmente para fundos Renda Fixa, Multimercado, ou Cambial.
+                                                    72 - Fundo de Longo Prazo e Fundo de                        
+                                                        Investimentos em Direitos Creditórios (FIDC)
+                                                    74 - Fundo de ações, fundos Mútuos de Privatizações, ...    * Normalmente para os demais casos
+                                                    79 - Outros fundos 
+
+                Bem ou direito pertencente ao:      Titular
+                Localização (País):                 105 - BRASIL
+                CNPJ do fundo:                      [CNPJ do fundo]
+                Discriminação:                      xxx cotas do Fundo Investimento (Nome do fundo) CNPJ da Adminitradora (XXXXXXX) (Nome da Administradora)
+                                                    por meio da corretora xxxxxxx
+                Situação em 31/12/xx:               "Valor em Reais convertido"
+                Situação em 31/12/xx:               "Valor em Reais convertido"
+
+                IMPORTANTE: O grupo e o código vem no informe de rendimentos, basta pegar de lá.
+
+        . Como declarar os rendimentos:
+
+            . Para fundos de investimentos de Debentures Incentivadas
+
+                . Acesse o item "Rendimentos Isentos e Não Tributáveis" e faça o lançamento abaixo de acordo com o informe de rendimentos
+
+                    Tipo de Rendimento:                                     26 - Outros
+                    06. Rendimentos de aplicações financeiras: {
+                        Tipo do Beneficiario:                               Titular,
+                        Beneficiario:                                       [CPF do declarante],
+                        CNPJ da fonte Pagadora:                             [CNPJ do informe de rendimentos],
+                        Descrição:                                          [Nome do fundo de acordo com o informe de rendimentos]
+                        Valor:                                              [Valor do informe de rendimentos]
+                   }
 
 
+            . Para os demais fundos:
 
-    . Caso a venda foi superior a R$ 20.000,00 temos que usar o programa GCAP para controlar o pagto da DARF e fazer os 
-        lançamentos necessário na declaração.
+                . Acesse o item "Rendimentos Sujeitos a Tributação Exclusiva/Definitiva" e faça o lançamento abaixo de acordo com o informe de rendimentos:
 
-    . Para deixar a declaração mais simples tente não superar o limite de venda que é de R$ 20.000,00.
+                    Tipo de Rendimento:                                     06 - Rendimentos de aplicações financeiras,
+                    06. Rendimentos de aplicações financeiras: {
+                        Tipo do Beneficiario:                               Titular,
+                        Beneficiario:                                       [CPF do declarante],
+                        CNPJ da fonte Pagadora:                             [CNPJ do informe de rendimentos],
+                        Valor:                                              [Valor do informe de rendimentos]
+                    }
 
-        
+        . Os prejuízos com fundos de investimentos não é preciso declarar.
+
+            . A compensação dos lucros e prejuizo é de responsabilidade da corretora.
+
+        . Caso as informações do informe de rendimentos da corretora está dando divergência com as suas informações, grandes discrepâncias, dê preferência 
+            para as suas informações, desde que tenha certeza que elas estão corretas.
+
+        . Fundos comprados e vendidos no mesmo ano, basta lançar somente os rendimentos (Isentos/Tributados).
+
+
+Emissão da DARF
+---------------
+
+
 GCAP
 ----
 
