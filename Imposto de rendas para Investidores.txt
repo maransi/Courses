@@ -1677,7 +1677,7 @@ Emissão da DARF
 
         . IR abaixo de R$ 10,00 não é necessário realizar o pagamento, acumule esse valor para ser pago na próxima DARF.
 
-         . Após o calculo do preço de custo através do preço médio, confrontamos ele com o preço da venda para encontrar o lucro, ou prejuizo.
+         . Após o calculo do preço de custo, através do preço médio, confrontamos ele com o preço da venda para encontrar o lucro, ou prejuizo.
 
             Lucro/Prejuizo = Total da Venda - Preço de Custo
 
@@ -1689,7 +1689,7 @@ Emissão da DARF
 
         . Regime de compensação de Lucros / Prejuízo:
 
-            . O controle de compensação dos lucros / prejuízos deve ser feito por cada tipo de operação (Ações, FIIS/Fiagro, BDRs/ETFs),
+            . O controle de compensação dos lucros/prejuízos deve ser feito por cada tipo de operação (Ações, FIIS/Fiagro, BDRs/ETFs),
                 versus por tipo de venda ( Swing Trade e Day Trade ):
 
             . No final do mês totalizaremos os lucros e prejuizos para confronta-los e apurar o pagamento, ou não, do IR. 
@@ -1697,22 +1697,33 @@ Emissão da DARF
             . Importante: fazer esse controle para cada tipo da operação vs o tipo da venda, como abaixo:
 
             
-                      ---------------------- Ações --------------------                                             ----------- FIIs/FIAGRAO ------------
-                    Swing Trade                                    Day Trade                                   Swing Trade                         Day Trade
-            ---------------------------------------------   -------------------------------------       -------------------------------------   -----------------------------
-            Data    Ticker  Lucro       Prejuízo    Saldo   Data    Lucro       Prejuízo    Saldo        Data   Ticker  Lucro       Prejuízo    Saldo   Lucro       Prejuízo    Saldo
-            ----    ------  -----       --------    -----   ----    -----       --------    -----        ----   ------  -----       --------    -----   ----        -----       -----   
+                        ---------------------- Ações --------------------                                             ----------- FIIs/FIAGRAO ------------
+                        Swing Trade                                    Day Trade                                   Swing Trade                                  Day Trade
+                ------------------------------------------  ---------------------------------       -----------------------------------------   -----------------------------------------
+                Data    Ticker  Lucro   Prejuízo    Saldo   Data    Lucro   Prejuízo    Saldo       Data   Ticker  Lucro    Prejuízo    Saldo   Data    Ticker  Lucro   Prejuízo    Saldo
+                ----    ------  -----   --------    -----   ----    -----   --------    -----       ----   ------  -----    --------    -----   ----    ------  -----   --------    -----
 
-            03/04   VALE3  500,00           0,00    500,00
-            10/04   KEPL3    0,00        (300,00)   200,00
+                03/04   VALE3  500,00       0,00    500,00                                          20/04   HGLG11 500,00       0,00   500,00
+                10/04   KEPL3    0,00    (300,00)   200,00                                                                              |
+                                                    |                                                                                 |
+                                    -----------------+                                                                 +---------------+
+                                    |                                                                                  |
+                                    V                                                                                  V
+                30/04 IR de 15% do saldo final R$ 30,00                                             30/04 IR 20% do saldo final R$ 100,00
+                                        |                                  (+)                                          |
+                                        +-------------------------------------------------------------------------------+
+                                                                            |
+                Total de IR a pagar 30/04 => 1R$ 130,00 <-------------------+
 
-            30/04 IR de 15% do saldo final R$ 30,00
+            . Totalizar os lucros e prejuízos de todas as vendas, por tipo de operação vs tipo de venda.
 
-        . Totalizamos o lucro e prejuízo de todas as vendas para apurar o saldo no final do mês de todas as operações.
+            . O saldo apurado acima é somado ao saldo (Lucro/Prejuizo) do mês anterior.
 
-            . O saldo apurado e somado do saldo (Lucro/Prejuizo) do mês anterior.
+            . Se ficou positivo:
 
-            . Se ficou positivo, emitiremos a DARF conforme abaixo.
+                . Para cada saldo por tipo de venda vs operação apurar o IR através da sua aliquota pertinente.
+
+                . Emitiremos a DARF conforme abaixo:
 
     . Como emitir a DARF
 
