@@ -250,8 +250,8 @@ Criando um novo projeto
 
             dotnet new mvc SampleApplication -o sampleApplication -n sampleApplication -f net6.0
 
-    Visual Studio Code
-    ------------------
+    Visual Studio
+    -------------
 
         . Na tela de "Get Started" escolha a opção "Create a New Project"
 
@@ -343,9 +343,9 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
 
             . Escolha ASP.NET Core Empty
 
-                Project Name: BhetanyPieShop
+                Project Name: BhetanysPieShop
                 Location: [Pasta do projeto]
-                Solution Name: BhetanyPieShop
+                Solution Name: BhetanysPieShop
                 Place Solution and Project in the same Directory: False
 
             . Additional Information
@@ -915,7 +915,7 @@ Criando a primeira página
 
             builder.Services.AddTransient<IPieRepository, MockPieRepository>();
 
-                . Sempre cira uma nova instância do objeto
+                . Sempre cria uma nova instância do objeto
 
                 . Ideal para cenários onde queremos sempre um novo objeto.
 
@@ -972,6 +972,24 @@ Criando a primeira página
 
             namespace bethanysPieShop.Models;
 
+            public class Category
+            {
+                public int CategoryId { get; set; }
+
+                public string CategoryName { get; set; } = string.Empty;
+
+                public string? Description { get; set; }
+
+                public List<Pie>? Pies { get; set; }
+            }
+
+
+
+
+
+
+            namespace bethanysPieShop.Models;
+
             public class Pie
             {
                 public int PieId { get; set; }
@@ -1013,21 +1031,6 @@ Criando a primeira página
                 } = default!;
             }
 
-
-
-
-            namespace bethanysPieShop.Models;
-
-            public class Category
-            {
-                public int CategoryId { get; set; }
-
-                public string CategoryName { get; set; } = string.Empty;
-
-                public string? Description { get; set; }
-
-                public List<Pie>? Pies { get; set; }
-            }
 
         . Crie as classes e interfaces abaixo na mesma pasta "Models":
 
@@ -1267,7 +1270,7 @@ Criando a primeira página
 
                 . Este erro só ocorrerá em tempo de execução.
 
-            . Além dados fisos, a view pode receber dados de outras formas.
+            . Além dados fixos, a view pode receber dados de outras formas.
 
         . Na estrutura do projeto, cada controller terá uma respectiva pasta dentro da pasta "Views", onde armazenamos os templates "*.cshtml". 
 
@@ -1470,7 +1473,7 @@ Criando a primeira página
 
         . Altere o código do método "PieController.List" como abaixo:
 
-            using betahnysPieShop.ViewModels;   // Linha inserida
+            using bethanysPieShop.ViewModels;   // Linha inserida
             ...
             public IActionResult List()
             {
@@ -1514,6 +1517,12 @@ Criando a primeira página
 
             </html>
 
+
+
+
+
+/*  Trecho desconsiderado 
+
             @model bethanysPieShop.ViewModels.PieListViewModel             <!-- Linha alterada -->
 
             <!DOCTYPE html>
@@ -1539,11 +1548,12 @@ Criando a primeira página
 
             </body>
             </html>
-
+*/
         . Levante o projeto e execute a rota abaixo no navegador:
 
             https://localhost:[porta]/pie/list
 
+// PAREI AQUI
 
     . Usando o _Layout.cshtml
 
