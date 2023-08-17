@@ -1517,43 +1517,10 @@ Criando a primeira página
 
             </html>
 
-
-
-
-
-/*  Trecho desconsiderado 
-
-            @model bethanysPieShop.ViewModels.PieListViewModel             <!-- Linha alterada -->
-
-            <!DOCTYPE html>
-
-            <html>
-            <head>
-                <meta name="viewport" content="width=device-width" />
-                <title>Bethany´s Pie Shop</head>
-            </head>
-
-            <body>
-                <h1>@Model.CurrentCategory</h1>                             <!-- Linha alterada -->
-
-                        
-                @foreach( var pie in Model )
-                {
-                    <div>
-                        <h2>@pie.Name </h2>
-                        <h3>@pie.Price.ToString("c") </h3>
-                        <h4>@pie.Category.CategoryName </h4>
-                    </div>
-                  }
-
-            </body>
-            </html>
-*/
         . Levante o projeto e execute a rota abaixo no navegador:
 
             https://localhost:[porta]/pie/list
 
-// PAREI AQUI
 
     . Usando o _Layout.cshtml
 
@@ -1561,9 +1528,9 @@ Criando a primeira página
 
         . Você define um padrão que será utilizado por toda a aplicação.
 
-        . Toda a página permance, mudando apensas o "miolo"
+        . Toda a página performance, mudando apensas o "miolo"
 
-        . A regição que irá mudar é identificada pelo @Renderbody()
+        . A região que irá mudar é identificada pelo @Renderbody()
 
         . Podemos ter vários layouts
 
@@ -1657,10 +1624,10 @@ Criando a primeira página
                                                                                                                                                                     |   código
         . Altere a view "Views/Pie/List.cshml" como abaixo, retirando todo código de responsabilidade do _Layout.cshtml deixando somente o miolo:                   |
                                                                                                                                                                     |
-            @model bethanysPieShop.ViewModels.PieListViewModel              <---------------------------------------------------------------------------------------+
-
-            @{
-                Layout = "_Layout";
+            @model bethanysPieShop.ViewModels.PieListViewModel                                                                                                      |
+                                                                                                                                                                    |
+            @{                                                                                                                                                      |
+                Layout = "_Layout";                 <---------------------------------------------------------------------------------------------------------------+
             }
             <h1>@Model.CurrentCategory</h1>                             
 
@@ -1678,19 +1645,18 @@ Criando a primeira página
 
             https://localhost:[porta]/pie/list
 
-
         . Trabalhando com _ViewStart:
 
             . Retire o trecho de código abaixo da view "Views/Pie/List.cshml":
 
                 @model bethanysPieShop.ViewModels.PieListViewModel    
 
-                <!--                                                    |
+                @*                                                      |
                                                                         |
                 @{                                                      |
                     Layout = "_Layout"                                  +-----------------------------------------------------------------------------------------------+
                 }                                                       |                                                                                               |
-                -->                                                     |                                                                                               |                                                                                           
+                *@                                                      |                                                                                               |                                                                                           
                                                                                                                                                                         |
                 <h1>@Model.CurrentCategory</h1>                                                                                                                         |
                                                                                                                                                                         |
@@ -1737,7 +1703,7 @@ Criando a primeira página
                 <h1>@Model.CurrentCategory</h1>                             
 
                         
-                @foreach( var pie in Model )
+                @foreach( var pie in Model )        @* Linha Alterada - Alterado de "Model.Pies" para "Model" *@
                 {
                     <div>
                         <h2>@pie.Name </h2>
@@ -1791,6 +1757,7 @@ Criando a primeira página
 
             npm -v
 
+// PAREI AQUI
     . DEMO
 
         . Execute os comandos abaixo na pasta raiz do projeto:
@@ -5732,7 +5699,6 @@ Testando os Componentes da Aplicação
 
         . Execute os testes, devem resultar em bem sucedidos.
 
-// PAREI AQUI
 
 Deixando o site interativo
 ==========================
