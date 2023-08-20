@@ -1976,15 +1976,16 @@ Working with Real Data Using Entity Framework Core 6
 
         . Crie as classes repository abaixo dentro da pasta "Models":
 
+            using bethanysPieShop.Data;
             using Microsoft.EntityFrameworkCore;
 
             namespace bethanysPieShop.Models
             {
                 public class PieRepository : IPieRepository
                 {
-                    private readonly Context _context;
+                    private readonly AppDbContext _context;
 
-                    public PieRepository(Context Context)
+                    public PieRepository(AppDbContext Context)
                     {
                         _context = Context;
                     }
@@ -2160,7 +2161,7 @@ Working with Real Data Using Entity Framework Core 6
 
             dotnet build
 
-            dotnet ef migrations add InitialCreation
+            dotnet ef migrations add CreationNumber-0001
 
             dotnet ef database update
 
@@ -2218,9 +2219,9 @@ Working with Real Data Using Entity Framework Core 6
                             {
                                 var genresList = new Category[]
                                 {
-                                                new Category { CategoryName = "Fruit pies" },
-                                                new Category { CategoryName = "Cheese cakes" },
-                                                new Category { CategoryName = "Seasonal pies" }
+                                                new Category { CategoryName = "Fruit pies", Description = "Fruit pies" },
+                                                new Category { CategoryName = "Cheese cakes", Description = "Cheese cakes" },
+                                                new Category { CategoryName = "Seasonal pies", Description = "Seasonal pies" }
                                 };
 
                                 categories = new Dictionary<string, Category>();
@@ -2248,11 +2249,32 @@ Working with Real Data Using Entity Framework Core 6
 
             app.Run();
 
+        . Execute os comandos abaixo para levantar o projeto:
 
+            dotnet clean
+
+            dotnet build
+
+            dotnet run
+
+        . Caso ocorra erro durante a iniciliazação da aplicação devido a problema de certificados:
+
+            "Unable to configure HTTPS endpoint. No server certificate was specified, and the default developer certificate could not be found or is out of date."
+
+            . Execute o comando abaixo no prompt de comandos na pasta raiz do projeto:
+
+                dotnet dev-certs https
 
         . Levante o projeto e execute a rota abaixo no navegador:
 
             https://localhost:[porta]/pie/list
+
+        . Verifique se na raiz do projeto foi criado o banco de dados com o nome:
+
+            app.db
+
+        . Acesse o IDE "DB Browser", abra o banco "app.db" e verifique se as tabelas e o conteúdo delas foram criados
+            com sucesso.
 
 
 Adding Routes and Navigation
