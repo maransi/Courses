@@ -1892,6 +1892,11 @@ Working with Real Data Using Entity Framework Core 6
             #
             # dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
 
+
+            # Se for usar o banco de dados MySQL execute a linha abaixo
+            #
+            #dotnet add package Pomelo.EntityFrameworkCore.MySql --version 6.0.2
+
             dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.12
 
 
@@ -1899,6 +1904,15 @@ Working with Real Data Using Entity Framework Core 6
             dotnet tool install --global dotnet-ef --version 6.0.12
 
         . Instale o "DB Browser for SQLite" para realizar as consultas no banco de dados
+
+            sudo apt-get update && sudo apt-get upgrade
+
+            sudo apt-get install sqlite3
+
+            sqlite3 --version
+
+            sudo apt-get install sqlitebrowser
+
 
         . Acesse os arquivos "appsettings.json" e "appsettings.Development.json" e insira a linha abaixo:
 
@@ -1944,6 +1958,10 @@ Working with Real Data Using Entity Framework Core 6
 
 
         . Adicione as linhas abaixo na classe "Program.cs":
+
+            using bethanysPieShop.Models;
+            using bethanysPieShop.Data;                                                         // Linha inserida
+            using Microsoft.EntityFrameworkCore;                                                // Linha inserida
 
             ...
             var builder = WebApplication.CreateBuilder(args);
