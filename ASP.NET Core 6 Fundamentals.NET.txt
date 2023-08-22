@@ -1868,7 +1868,6 @@ Criando a primeira página
 
 Working with Real Data Using Entity Framework Core 6
 ====================================================
-// PAREI AQUI
 
     . DEMO
 
@@ -2341,16 +2340,28 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
             . Program.cs
 
-                app.UseRouting();
-            
-                app.UseAuthorization();
-            
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllerRoute(
+                . IMPORTANTE: Para utilizar o ".UseEndPoints" é obrigatório o uso dos middlewares acima (.UseRouting e .UseAuthorization)
+
+                    app.UseRouting();
+                
+                    app.UseAuthorization();
+                
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllerRoute(
+                            name: "default",
+                            pattern: "{controller=Home}/{action=Index}/{id?}");
+                    });
+
+                . Caso o uso for somente para página ASP.NET Core MVC, sem o uso de API Restful. Podemos configurar como abaixo:
+
+                    app.MapDefaultControllerRoute();
+
+                    . Ou, especificando uma rota especifica:
+
+                        app.MapControllerRoute(
                         name: "default",
                         pattern: "{controller=Home}/{action=Index}/{id?}");
-                });
 
         . Tipos de rotas:
 
@@ -2365,21 +2376,23 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                 Program.cs                                              |               |
                 ----------                                              |               |
                                                                         |               |
-                    app.UseRouting();                                   |               |
-                                                                        |               |
-                    app.UseAuthorization();                             |               |
-                                                                        |               |
-                    app.UseEndpoints(endpoints =>               <-------+               |
-                    {                                                                   |
-                        endpoints.MapControllerRoute(                                   |
-                            name: "default",                                            |
-                            pattern: "{controller=Home}/{action=Index}/{id?}");         |
-                    });                                                                 |
+                    app.MapDefaultControllerRoute();     <--------------+               |
+                                                                                        |
+                    // Ou, especificando uma rota especifica:                           |
+                    //                                                                  |
+                    //    app.MapControllerRoute(                                       |
+                    //    name: "default",                                              |
+                    //    pattern: "{controller=Home}/{action=Index}/{id?}");           |
+                                                                                        |                                           
                                                                                         |
                                                                                         |
                 PieController                                                           |
                 ------------                                                            |
                                                                                         |
+                    // Observe que por se tratar somente de páginas web, podemos        |
+                    // implementar a interface "Controller"; no caso de APIs, teriamos  |
+                    // que implementar a interface "ControllerBase" e decorar a classe  |
+                    // com a annotation [ApiController]                                 |
                     public class PieController: Controller                              |
                     {                                                                   V
                         public ViewResult List()    // http://www.bethanypieshop.com/Pie/List
@@ -2392,9 +2405,9 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
             . Roteamento de atributo:
 
                 O roteamento de atributo no ASP.NET Core é a abordagem preferencial para 
-                configurar o roteamento em controladores. Se você estiver criando APIs, 
-                o atributo [ApiController] deverá ser aplicado aos controladores. Entre 
-                outras coisas, esse atributo requer o uso do roteamento de atributo para 
+                configurar o roteamento em controladores. Se você estiver criando APIs, extenda a interface "ControllerBase",
+                adicione o decorate/annotation [ApiController]  acima do nome da classe. 
+                Entre outras coisas, esse atributo requer o uso do roteamento de atributo para 
                 ações nessas classes de controlador                     |       |
                                                                         |       |
                     [HttpGet("api/products/{id}")]              <-------+       |
@@ -2410,44 +2423,51 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                         // ...
                     }
 
-    . DEMO
+    . Observe a linha abaixo na classe "Program.cs" que contém o Middleware "MapDefaultControllerRoute()".
+                                                                                        |
+        ...                                                                             |
+        app.MapDefaultControllerRoute();        <---------------------------------------+
 
-        . Observe a linha abaixo na classe "Program.cs" que contém o Middleware "MapDefaultControllerRoute()".
+        app.MapGet("/", () => "Hello World!");
+
+        DbInitializer.Seed( app );       
+
+        app.Run();
+
+    . Ao invés de usarmos "app.MapDefaultControllerRoute()" como acima, podemos fazer a configuração das rotas através do "app.UseEndPoints":
+
+                                                            Substitui essa linha pelas abaixo
+            // app.MapDefaultControllerRoute(); --------------------------------------------+
                                                                                             |
-            ...                                                                             |
-            app.MapDefaultControllerRoute();        <---------------------------------------+
+            app.UseRouting();                                           |                   |
+                                                                        |                   |
+            app.UseAuthorization();                                     |                   |
+                                                                        |                   |
+            app.UseEndpoints(endpoints =>                               |    <--------------+
+            {                                                           |                   
+                endpoints.MapControllerRoute(                           |                   
+                    name: "default",                                    |
+                    pattern: "{controller=Home}/{action=Index}/{id?}"); |
+            });                                                         |
 
-            app.MapGet("/", () => "Hello World!");
+            O "app.MapDefaultControllerRoute()" já assumirá o padrão de rota "{controller=Home}/{action=Index}/{id?}" sem grandes detalhes.
+                                                                                |                   |            |   
+                                                                                +--> Controller     +---> Action +---> parameter
 
-            DbInitializer.Seed( app );       
+            para enquadrar as requisições e encontrar a classe controller e seu método, exemplo:
 
-            app.Run();
-
-        . Ao usarmos "app.MapDefaultControllerRoute()" como acima ao invés do "app.UseEndPoints":
-
-                app.UseEndpoints(endpoints =>                     
-                {                                                          
-                    endpoints.MapControllerRoute(                          
-                        name: "default",                                   
-                        pattern: "{controller=Home}/{action=Index}/{id?}");
-                });                                                        
-
-                O "app.MapDefaultControllerRoute()" já assumirá o padrão de rota "{controller=Home}/{action=Index}/{id?}" sem grandes detalhes.
-                                                                                    |                   |            |   
-                                                                                    +--> Controller     +---> Action +---> parameter
-
-                para enquadrar as requisições e encontrar a classe controller e seu método, exemplo:
-
-                    http://localhost/           ->      HomeController.Index()  
-                    http://localhost/Home/Index     ->      HomeController.Index()  
-                    http://localhost/Home/Something ->      HomeController.Something()
-                    http://localhost/Test/      ->      HomeController.Test()  
-                    http://localhost/Test/1      ->      HomeController.Test(int id)  
+                http://localhost/           ->      HomeController.Index()  
+                http://localhost/Home/Index     ->      HomeController.Index()  
+                http://localhost/Home/Something ->      HomeController.Something()
+                http://localhost/Test/      ->      HomeController.Test()  
+                http://localhost/Test/1      ->      HomeController.Test(int id)  
 
 
-                . IMPORTANTE: No final tanto o "app.MapDefaultControllerRoute();" quanto o "app.UseEndpoints(endpoints => ... )" da forma como estão acima terão comportamentos
-                    iguais, enquadrão as requisições no padrão de rota "{controller=Home}/{action=Index}/{id?}". No exemplo abaixo faremos uso da maneira mais simples
-                    "app.MapDefaultControllerRoute()".
+            . IMPORTANTE: No final, tanto o "app.MapDefaultControllerRoute();" quanto o "app.UseEndpoints(endpoints => ... )" da forma como estão acima terão comportamentos
+                iguais, enquadrão as requisições no padrão de rota "{controller=Home}/{action=Index}/{id?}". No exemplo abaixo faremos uso da maneira mais simples
+                "app.MapDefaultControllerRoute()".
+
+    . DEMO
 
         . Crie o método abaixo na classe "PieController.cs":
 
@@ -2469,7 +2489,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
         . Crie a View "~/View/Pie/Details.cshtml" com o conteúdo abaixo:
 
-            @model Pie
+            @model bethanysPieShop.Models.Pie
 
             <h3 class="my-5">
                 @Model.Name
@@ -2589,6 +2609,8 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                                 <div class="d-flex justify-content-between mt-2">
                                     <h2 class="text-start">
 
+                                    <!-- <a class="pie-link">@pie.Name</a> -->
+
                                     <!-- Div "a" alterada -->
 
                                         <a asp-controller="Pie"
@@ -2609,6 +2631,9 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                 }
 
             </div>
+
+// PAREI AQUI
+
 
         . Levante o projeto e verifique se os links de "details" na tela de "List" estão funcionando:
 
@@ -2643,7 +2668,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
             using bethanysPieShop.ViewModels;
             using Microsoft.AspNetCore.Mvc;
 
-            namespace bethanysPieShop.Controller
+            namespace bethanysPieShop.Controllers
             {
                 public class HomeController : Controller
                 {
@@ -2789,7 +2814,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
             https://localhost:[porta]
 
-
+// PAREI AQUI
 Improving the Views in the Application
 ======================================
 
