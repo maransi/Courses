@@ -3661,10 +3661,6 @@ Improving the Views in the Application
                                         <!-- Linha Inserida -->
                                         <vc:category-menu></vc:category-menu>
                                         <!-- Fim da inserção -->
-
-                                        <li class="nav-item">
-                                            <a asp-controller="Contact" asp-action="Index" class="nav-link">Contact</a>
-                                        </li>
                                     </ul>
 
                                     <!-- Linha Inserida -->
@@ -3714,7 +3710,6 @@ Improving the Views in the Application
 
             https://localhost:[porta]
 
-// PAREI AQUI    
 
     . Criando uma "Custom Tag Helper"
 
@@ -3767,20 +3762,6 @@ Improving the Views in the Application
     (40.00)
     . DEMO
 
-        . Crie o controller "ContactController" abaixo na abaixo na pasta "Controllers":
-
-            using Microsoft.AspNetCore.Mvc;
-
-            namespace bethanysPieShop.Controllers;
-            public class ContactController : Controller
-            {
-                // GET: /<controller>/
-                public IActionResult Index()
-                {
-                    return View();
-                }
-            }
-
         . Crie na pasta raiz a pasta "TagHelpers" e dentro dela crie a classe "TagHelper" "EmailTagHelper" abaixo:
 
             using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -3812,7 +3793,21 @@ Improving the Views in the Application
             @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers            
             @addTagHelper *, bethanyPieShop                         
 
-        . Insira a linha abaixo na "View" "View/Contact/Index.cshtml":
+        . Crie o controller "ContactController" abaixo na abaixo na pasta "Controllers":
+
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace bethanysPieShop.Controllers;
+            public class ContactController : Controller
+            {
+                // GET: /<controller>/
+                public IActionResult Index()
+                {
+                    return View();
+                }
+            }
+
+        . Crie a pasta "View/Contact" e crie o arquivo "Index.cshtml" dentro dela com o conteúdo abaixo:
 
             <h3 class="my-5">
                 Contact us
@@ -3824,7 +3819,7 @@ Improving the Views in the Application
                     <h1>We'd Love to Hear from You</h1>
                     <h5>Please contact us by sending an email using the button below</h5>
 
-                    <!-- Linha inserida
+                    <!-- Linha inserida -->
                     <email address="info@@bethanyspieshop.com" content="Contact us" class="btn btn-secondary"></email>
                     <!-- Fim da inserção -->
 
@@ -3889,6 +3884,8 @@ Improving the Views in the Application
             https://localhost:[porta]
 
             . Verifique o "Source Code" da página "ContactPage" e verifique se o link do email foi inserido corretamente.
+
+// PAREI AQUI    
 
 Working with Forms and Model Binding
 ====================================
