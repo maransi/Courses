@@ -57,6 +57,7 @@ Instalações
             C# 
             C# Extensions
             C# XML Documentation Comments
+            C# Snippets
             ASP.NET Helper
             Razor Snippets
             Libman
@@ -3885,8 +3886,6 @@ Improving the Views in the Application
 
             . Verifique o "Source Code" da página "ContactPage" e verifique se o link do email foi inserido corretamente.
 
-// PAREI AQUI    
-
 Working with Forms and Model Binding
 ====================================
 
@@ -4023,22 +4022,6 @@ Razor Snippets
     (5.38)
     . DEMO
 
-        . Inclua a classe "OrderDetail.cs" abaixo na pasta "Models":
-
-            namespace bethanysPieShop.Models
-            {
-                public class OrderDetail
-                {
-                    public int OrderDetailId { get; set; }
-                    public int OrderId { get; set; }
-                    public int PieId { get; set; }
-                    public int Amount { get; set; }
-                    public decimal Price { get; set; }
-                    public Pie Pie { get; set; } = default!;
-                    public Order Order { get; set; } = default!;
-                }
-            }
-
         . Inclua a classe "Order.cs" abaixo na pasta "Models":
 
             using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -4075,6 +4058,22 @@ Razor Snippets
                     public decimal OrderTotal { get; set; }
 
                     public DateTime OrderPlaced { get; set; }
+                }
+            }
+
+        . Inclua a classe "OrderDetail.cs" abaixo na pasta "Models":
+
+            namespace bethanysPieShop.Models
+            {
+                public class OrderDetail
+                {
+                    public int OrderDetailId { get; set; }
+                    public int OrderId { get; set; }
+                    public int PieId { get; set; }
+                    public int Amount { get; set; }
+                    public decimal Price { get; set; }
+                    public Pie Pie { get; set; } = default!;
+                    public Order Order { get; set; } = default!;
                 }
             }
 
@@ -4121,8 +4120,9 @@ Razor Snippets
                 }
             }
 
-
         . Inclua a classe "OrderRepository.cs" abaixo na pasta "Models":
+
+            using bethanysPieShop.Data;
 
             namespace bethanysPieShop.Models
             {
@@ -4479,7 +4479,7 @@ Razor Snippets
                         {
                             [FromQuery]
                             public int ProdutoId { get; set; }
-                            public string ProdutoName { get; set; }
+                            public string ProdutoNome { get; set; }
                             [BindNever]
                             public string IsAdminUser { get; set; }
                         }	
@@ -4542,6 +4542,8 @@ Razor Snippets
                 . Acione o botão "CHECK OUT NOW"
 
                 . Inclua as informações da ordem e faça a gravação das informações.
+
+// PAREI AQUI    
 
         (24.30)
     . Adicionando validação
