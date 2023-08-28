@@ -346,7 +346,7 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
 
                 Project Name: BhetanysPieShop
                 Location: [Pasta do projeto]
-                Solution Name: BhetanysPieShop
+                Solution Name: BethanysPieShop
                 Place Solution and Project in the same Directory: False
 
             . Additional Information
@@ -360,10 +360,38 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
             . Run
 
         . Dotnet core
-            
-            . Na pasta raiz do projeto execute o comando abaixo:
+
+            . Crie a pasta da solution e crie a solution nela:
+
+                mkdir Bethanys
+
+                mkdir Bethanys/src
+
+                cd Bethanys/src
+
+                dotnet new sln --name Bethanys
+
+            . Na pasta "/src" execute o comando abaixo:
 
                 dotnet new web -o bethanysPieShop -n bethanysPieShop -f net6.0
+
+            . Na pasta "/src" execute o comando abaixo para adicionar o projeto "bethanysPieShop" a solution:
+
+                dotnet sln add ./bethanysPieShop/
+
+            . Executando o projeto pela solution:
+
+                dotnet clean
+
+                dotnet restore
+
+                dotnet build
+
+                dotnet run --project bethanysPieShop/ --project bethanysPieShop/
+
+            . Executando o projeto diretamente pelo projeto:
+
+                cd Bethanys/src/bethanysPieShop
 
                 dotnet clean
 
@@ -372,8 +400,6 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
                 dotnet build
 
                 dotnet run
-
-
 
 . No .Net 6 a execução começa pela classe "Program.cs"
 
@@ -5350,8 +5376,6 @@ Razor Snippets
 
         . Acomnpanhe a execução do código onde foi marcado o "BreakPoint".
 
-// PAREI AQUI    
-
 Testando os Componentes da Aplicação
 ====================================
 
@@ -5402,13 +5426,20 @@ Testando os Componentes da Aplicação
 
         . Instale o "plugin" ".NET Core Test Explorer" no VSCode
 
-        . Crie um projeto com o comando abaixo:
+        . Acesse a pasta da solution "BethanyPieShop/src" e execute o comando abaixo para criar o projeto de testes:
 
-            dotnet new xunit -o bhetanyPieShopTests
+            dotnet new xunit -o bethanysPieShopTests
 
         . Apague o arquivo "UnitTest1.cs"
 
-        . Acesse o arquivo "bethhanysPieShopTests.csproj" e acrescente a linha abaixo:
+        . Crie a dependência desse projeto de testes com o projeto "bethanysPieShop":
+
+            . Na pasta "src" da solution e execute o comando abaixo:
+
+                dotnet add ./bethanysPieShopTests/ reference ./bethanysPieShop/
+
+
+        . Acesse o arquivo "bethanysPieShopTests.csproj" e acrescente a linha abaixo:
 
             <Project Sdk="Microsoft.NET.Sdk">
 
@@ -5438,12 +5469,6 @@ Testando os Componentes da Aplicação
             </ItemGroup>
 
             </Project>
-
-        . Crie a dependência desse projeto de testes com o projeto "bethanysPieShop":
-
-            . Na pasta raiz de projetos execute o comando abaixo:
-
-                dotnet add ./bhetanyPieShopTests/ reference ./bhetanyPieShop/
 
         . Execute o comando abaixo na pasta do projeto "bhetanyPieShopTests":
 
@@ -5764,8 +5789,20 @@ Testando os Componentes da Aplicação
                 }
             }
 
+        . Acesse a extension de teste, localizado na barra de ferramentas do VSCode no lado esquerdo e configure
+            os parâmetros do arquivo "setting.json" como abaixo:
+
+            {
+               "dotnet-test-explorer.testProjectPath": "**/*Tests.csproj"
+            }
+
+            . Este arquivo é o arquivo de configurações do VSCode.
+
+            . O VSCode cria ele de acordo com as configurações do ambiente que está instalado a solution.
+
         . Execute os testes, devem resultar em bem sucedidos.
 
+// PAREI AQUI 
 
 Deixando o site interativo
 ==========================
