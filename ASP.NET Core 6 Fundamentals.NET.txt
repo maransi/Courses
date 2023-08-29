@@ -65,21 +65,20 @@ Instalações
     ----------------------------------
 
             C# 
-            C# Extensions
+            C# Extensions (JosKreativ)
             C# XML Documentation Comments
             C# Snippets
+            vscode-solution-explorer
             ASP.NET Helper
+            RapidApi
+            Bracket Pair Colorization Toggler
             Razor Snippets
             Libman
             Docker
             vscode-icons (Opcional)
-            NuGet Gallery
             VZ Dotnet File Template
-            Dotnet Project References
             Auto-Using for C#
-            Bracket Pair Colorization Toggler
             Error Lens
-            RapidApi
 
 
         Testar
@@ -5816,8 +5815,6 @@ Testando os Componentes da Aplicação
 
             . Execute os testes pela extension de teste, devem resultar em bem sucedidos.
 
-// PAREI AQUI 
-
 Deixando o site interativo
 ==========================
 
@@ -5957,7 +5954,10 @@ Deixando o site interativo
 
     . DEMO
 
-        . No projeto "bethanys" na classe "Program.cs" avalie as linhas abaixo:
+        . No projeto "bethanysPieShop" na classe "Program.cs" avalie as linhas abaixo:
+
+            using System.Text.Json.Serialization;           // Linha inserida
+            ...
 
             builder.Services.AddControllersWithViews()
                 .AddJsonOptions(options =>                                                              // Linha inserida
@@ -6089,7 +6089,7 @@ Deixando o site interativo
             ...
              public IEnumerable<Pie> SearchPies( string searchQuery )
              {
-                return _bethanysPieShopDbContext.Pies.Where( p => p.Name.Contains( searchQuery ));
+                return _context.Pies.Where( p => p.Name.Contains( searchQuery ));
              }
              ...
 
@@ -6138,7 +6138,6 @@ Deixando o site interativo
                     {
                         JSON: true,
                         raw: "Chocolate"
-
                     }
     
     (37.08)
@@ -6183,7 +6182,7 @@ Deixando o site interativo
                 <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/jquery-validate/jquery.validate.js"></script>
                 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
-                <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+                <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
                 <link href="~/css/site.css" rel="stylesheet" />
                 <base href="/" />
             </head>
@@ -6314,6 +6313,8 @@ Deixando o site interativo
         . Blzaor é um framework para construir páginas HTML utilizando C# e HTML, fazendo parte do ASP.NET COre.
 
         51.50
+
+// PAREI AQUI 
 
 Configurando Autenticação e Autorização
 =======================================
