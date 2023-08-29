@@ -6388,11 +6388,11 @@ Configurando Autenticação e Autorização
 
         . Execute o comando abaixo na pasta raiz do projeto:
 
-            dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
-            
+            dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.12
+
             dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.12
 
-            dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.12
+            dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
 
             dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design --version 6.0.11
 
@@ -6434,9 +6434,9 @@ Configurando Autenticação e Autorização
                 options.UseSqlite( 
                     builder.Configuration["ConnectionStrings:DefaultConnection"]);
             });
-
-            builder.Services.AddDefaultIdentity<IdentityUser>()             // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
-                .AddEntityFrameworkStores<AppDbContext>();
+15.00
+            builder.Services.AddDefaultIdentity<IdentityUser>()         // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
+                .AddEntityFrameworkStores<AppDbContext>();                  // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
             ...
             app.UseAuthentication();                                    
             app.UseAuthorization();                                         // Linha inserida
@@ -6456,7 +6456,7 @@ Configurando Autenticação e Autorização
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
                                                                                     |
                                                                                     +---> Alterar para esse valor "DefaultConnection"
-
+18.00
         . Acesse o componente "Views/Shared/_Layout.cshtml" e adicione a linha abaixo:
 
             ...
