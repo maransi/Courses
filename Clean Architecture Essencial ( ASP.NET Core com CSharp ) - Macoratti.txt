@@ -1,0 +1,275 @@
+Clean Architecture Essencial ( ASP.NET Core com CSharp ) - Macoratti
+--------------------------------------------------------------------
+
+Introdução
+==========
+
+Ambiente
+--------
+
+. Ambiente e Ferramentas usadas no curso
+
+    . .Net Core SDK 6
+
+    . ASP.NET Core 6
+
+    . VSCode
+
+    . SQLite
+
+. Instalação do .NET Core 
+
+        wget https://dot.net/v1/dotnet-install.sh
+        chmod +x dotnet-install.sh
+        ./dotnet-install.sh -c 3.1
+        ./dotnet-install.sh -c 5.0
+        ./dotnet-install.sh -c 6.0
+        ./dotnet-install.sh -c 7.0
+
+        dotnet --version
+
+        # insira as linhas abaixo no arquivo ".bashrc"
+        export PATH="home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"
+        export DOTNET_ROOT=/home/$USER/.dotnet/
+
+        source ~/.bashrc
+
+        sudo ln -s /home/$USER/.dotnet/dotnet /usr/bin/dotnet
+
+        dotnet --version
+        dotnet --list-runtimes
+        dotnet --list-sdks
+
+        cd /home/$USER/Download
+
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+
+
+. Instalação das extensões do VSCode
+
+    . Acessar a pagina de download da microsoft:
+
+        https://code.visualstudio.com/download
+
+    . Baixar o arquivo .deb 
+
+    . Abrir o terminal e acessar a pasta Downloads
+
+    . Executar o comando abaixo:
+
+        sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+    . Atalhos
+
+        Alt + 1, 2, 3, 4, ...	Posiona na aba no.
+        Ctrl + b				Ativar o menu lateral esquerdo 
+        Ctrl + Alt + P			Para ativar a linha de comandos 
+        Ctrl + P 				Localiza um determinado arquivo
+        Ctrl + W				Fecha a aba corrente
+        Ctrl + Shift + W		Fecha todas as abas abertas
+
+        Ctrl + Rolagem do Mouse	
+                sobre as abas 
+                abertas			Faz a rolagem das abas.
+
+        Ctrl + K + C ou 
+        Ctrl + /				Comenta linha atual, ou bloco selecionado
+
+        Ctrl + K + U ou
+        Ctrl + /				Descomenta linha, ou bloco selecionado.
+
+        Ctrl + Shift + 
+                Acento Agudo	Abre o terminal na parte inferior
+
+        Ctrl + X				Apaga linha
+        Ctrl + H				Localiza e atualiza uma expressão
+        Ctrl + F2				Selecione um texto e pressionando Ctrl + F2 
+                                muda todos os textos equivalente a medida
+                                que vai se digitando
+        Alt + Arrow(up/Down)    Move a linha para cima, ou para baixo.
+        Ctrl + Shift + O		Abre a lista de funções/métodos da classe atual
+        Ctrl + G				Posicionar na linha No. que for digitado
+        Alt + Backspace			Apaga palavra inteira a esquerda
+        Ctrl + Shift + .		Mostra os métodos da classe
+        Ctrl + Shift + L		Altera dinamicamente em todo o arquivo a palavra que está sendo alterada
+
+    . Instale as extensões abaixo:
+
+        C# 
+        C# Extensions (JosKreativ)
+        C# XML Documentation Comments
+        C# Snippets
+        vscode-solution-explorer
+        ASP.NET Helper
+        RapidApi
+        Bracket Pair Colorization Toggler
+        Razor Snippets
+        Libman
+        Docker
+        vscode-icons (Opcional)
+        VZ Dotnet File Template
+        Auto-Using for C#
+        Error Lens
+
+
+        . Testar
+
+            Dotnet Solution Explorer
+            Dotnet New Extension
+            Net Core Extension Pack
+            C# Utilities
+            Nuget Package Manager
+            Visual Nuget
+            C# Developer Extension Package
+            Auto closet tag
+            C# Snippets
+
+    . Configurações:
+
+        . Digite Ctrl K+S, localize o item "Delete Line" e configure Ctrl + D
+        . Acesse View / Minimap para retirar o scroll de código da direita
+        . Acessar configurações, ir em "Settings", Text editors, Sugestions:
+            . Na opção "Accept Suggestion On Enter" deixar como off
+            . Na opção "Suggest: Insert Mode" deixar como replace
+            . Na opção "Quick Suggestions Delay" deixar como 1000
+            
+
+. Instalação o "DB Browser for SQLite" para realizar as consultas no banco de dados
+
+    sudo apt-get update && sudo apt-get upgrade
+
+    sudo apt-get install sqlite3
+
+    sqlite3 --version
+
+    sudo apt-get install sqlitebrowser
+
+
+
+
+Conceitos e Fundamentos
+=======================
+
+. Modelo Anêmico
+
+    . Definições
+
+        . O modelo de domínio anêmico é um modelo de domínio onde os objetos que representam as 
+            entidades do domínio contêm pouca ou nenhuma lógica de negócio (validações, cálculos,
+            regras de negócio, etc.)
+
+        . Um modelo de domínio anêmico é um modelo sem compratamentos onde temos diversas 
+            propriedades com get e set públicos definidas sem lógica alguma e onde o cliente do 
+            domínio tem controle sobre como instanciar e modificar o domínio.
+
+            . Conceito de OO é perdido.
+
+            . Regras de negócio espalhada em vários objetos.
+
+            . Mais parecidos com estilo de programação procedural. Parecidos com objetos DTOs.
+
+    . Exemplos de modelos anêmicos
+
+        public class Pedido                                         public class PedidoServide
+        {                                                           {
+            public int Id {get; set; }                                  public void AddItem( int Id, itemPedido item )
+            public string ClienteId {get; set; }                        {
+            public decimal Desconto {get; set; }                            // validações
+            public DateTime? DataPagamento {get; set; }                 }
+            public List<ItemPedido> Itens {get; set;}                   public void DescontoPedido( int Id, decimal desconto){...}
+                                                                        public void PagamentoPedido( int id) {...}
+        }                                                           }
+            |
+            v                                                                   ^
+                                                                                |
+        Não tem lógica nenhuma é preciso colocar a lógica em outra classe   ----+
+
+
+        . Contém somente prorpidades com get e set públicos
+        
+        . Não possuem validações nem comportamentos
+
+        . Não possuem gerenciamento de estado, permitindo que objetos com estado inconsistente sejam cirados
+
+        . Permitem que outros objetos criem instâncias e modifiquem o domínio.
+
+    . Modelos anêmicos - Problemas
+
+        . O cliente precisa interpretar o objetivo e o uso da classe e a lógica é enviada para outras classes,
+            denomidadas serviçoes da classe de domínio
+
+        . Violação do encapsulamento;
+
+        . Lógica de negócios duplicada;
+
+        . Não é possível garantir que as entidades no modelo estejam em u estado consistente;
+
+        . Baixa coesão;
+
+    . Iremos adotar as orientações do Domain-Drive Design. Pesquisar padrões como: Entity, Values, Aggregate
+
+    . Vamos atualizar o modelo com dados, lógica e regras de negócio.
+
+    . Modelo anêmicos - Enriquecendo o modelo
+
+        . Usar propriedades com setters privados ( e as classes como "sealed" )
+
+        . Validar estado da entidade
+
+        . Evitar construtores sem parâmetros.
+
+        . Definir invariantes
+
+        . Trazer as regras de comportamentos dos serviços para o modelo de domínio.
+
+        . Usar os conceitos da programação OO
+
+        . Cuidado e atenção ao usar ferramentas ORM (EF Core)
+
+    . "sealed"
+
+        . Quando aplicado a uma classe, o modificador sealed impede que outras classes herdem dela. 
+            No exemplo a seguir, a classe B herda da classe A, mas nenhuma classe pode herdar da classe B.
+
+            class A {}
+
+            sealed class B : A {}
+
+        . O modificador "sealed" também pode ser usado com métodos para evitar que os métodos sejam sobrescritos 
+            nas classes filhas.
+
+
+    . Enriquecendo o modelo - Exemplo
+
+        public class Cliente                                    public sealed class Cliente
+        {                                                       {
+            public int Id{ get; set; }                              public int Id { get; private set; }
+            public string Nome { get; set; }                        public string NOme {get; private set; }
+            public string Endereco { get; set; }                    public string Endereco { get; private set; }
+        }                                       
+                                                                    public Cliente (int id, string nome, string endereco)
+                                                                    {
+                                                                        Validar( id, nome, endereco);
+
+                                                                        Id = id
+                                                                        Nome = nome;
+                                                                        Endereco = endereco;
+                                                                    }
+
+                                                                    public void Update( int id, string nome, string endereco )
+                                                                    {
+                                                                        Validar( id, nome, endereco);
+
+                                                                        Id = id
+                                                                        Nome = nome;
+                                                                        Endereco = endereco;
+                                                                    }
+
+                                                                    private static void Validar( int id, string nome, string endereco )
+                                                                    {
+                                                                        ...
+                                                                    }
+                                                                }
+
+. Separação dos conceitos.
