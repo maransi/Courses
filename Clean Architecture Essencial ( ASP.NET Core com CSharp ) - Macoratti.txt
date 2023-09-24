@@ -354,6 +354,8 @@ Conceitos e Fundamentos
 
     . Dependency Inversion
 
+        . Para entender como funciona a inversão de dependência no .NET veja o resumo do curso "DI - Dominando Injeção de Dependência - Balta".
+
         . A direção da dependenência em uma aplicação deverá ser na direção da abstração e não nos detalhes de impplementação.
 
         . Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de uma abstração.
@@ -370,46 +372,8 @@ Conceitos e Fundamentos
         . Assim as classes da camada de negócio não devem depender das classes da camada de infraestrura mas 
             devem depender de interfaces ou classe abstratas
 
-
-        . Exemplo 1:
-
-            namespace DI
-            {                                              IOC
-                class programa          Unconcerned logic shifted the externa entity
-                {                                           ^
-                    static voida Main( string[] args)       |
-                    {                                       |
-                        Customer obj = new Customer( New SQLServer() );
-                    }                                       |
-                                               Dependency   |
-                    class Customer             Injection    |
-                    {                          +------------+
-                        private IDal _dal;     |
-                                               V
-
-                        public Customer( IDal obj)
-                        {
-                            _dal = obj;
-                        }
-
-                        public bool validate()
-                        {
-                            return true;
-                        }
-
-                        public void Add()
-                        {
-                            if (validate())
-                            {
-                                dal.Add();
-                            }
-                        }
-
-                    }
-                }
-            }
-            
-        . Exemplo 2:
+        . Exemplo 1. Via Interface - A implementação da injeção de dependência via interface -  Interface Injection -  
+                        utiliza uma interface comum que outras classes necessitam implementar para injetar a dependência.
 
             namespace DIP;
 
@@ -453,8 +417,73 @@ Conceitos e Fundamentos
                 }
             }
 
+
+
+        . Exemplo 2. Via Construtor - A implementação da injeção de dependência via construtor - Construtor Injection - consiste em 
+                        passar as dependências de um objeto para o seu construtor.
+
+            namespace DI
+            {                                              IOC
+                class programa          Unconcerned logic shifted the externa entity
+                {                                           ^
+                    static voida Main( string[] args)       |
+                    {                                       |
+                        Customer obj = new Customer( New SQLServer() );
+                    }                                       |
+                                               Dependency   |
+                    class Customer             Injection    |
+                    {                          +------------+
+                        private IDal _dal;     |
+                                               V
+
+                        public Customer( IDal obj)
+                        {
+                            _dal = obj;
+                        }
+
+                        public bool validate()
+                        {
+                            return true;
+                        }
+
+                        public void Add()
+                        {
+                            if (validate())
+                            {
+                                dal.Add();
+                            }
+                        }
+
+                    }
+                }
+            }
+            
+        . Exemplo 3 - Via Propriedades. A implementação da injeção de dependência via propriedades - Setter Injection - não força 
+                        a dependência ser passada para o construtor. Ao invés disso, as dependências são definidas em 
+                        propriedades públicas expostas pelo objeto.
+
+            public class Cliente
+            {
+            public Cliente() {}
+
+                private IPedido meuPedido;
+
+                public IPedido Pedido {
+                get {
+                        if (meuPedido == null) {
+                            throw new MemberAccessException("meuPedido não foi inicializado");
+                        }
+                    return meuPedido;
+                    }
+                    set { meuPedido = value; }
+                }
+            }
+
+
         . Não confundir o princípio da "inversão da dependência" com ao padrão de projeto "injeção de dependência".
+
+
 
 http://www.linhadecodigo.com.br/artigo/3418/inversao-de-controle-ioc-e-injecao-de-dependencia-di-diferencas.aspx#:~:text=A%20Inje%C3%A7%C3%A3o%20de%20Depend%C3%AAncia%20apenas,passa%20para%20uma%20classe%20externa!
 
-2.42
+7.40
