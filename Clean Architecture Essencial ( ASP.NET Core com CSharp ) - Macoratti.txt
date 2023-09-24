@@ -290,4 +290,171 @@ Conceitos e Fundamentos
                                                                     }
                                                                 }
 
-. Separação dos conceitos.
+. Separação dos conceitos ( Separation of Concerns )
+
+    . Separtion of Concerns - Soc: Separação de conceitos
+
+        . Não se deve misturar conceitos e/ou responsabilidades diferentes denro do design ou do código de um projeto de software.
+
+        . A violação deste princípio causa cpodigo duplicado com mais de uma responsabilidade, vilando també, os princícpios SOLID
+            da responsabilidade Ùnica (SRP) e o princípio DRY Don´t Repeat YourSelf.
+
+        . Exemplos de aplicação do conceito:
+
+            . Separar a interface do usuário (front-end) da lógica de negócios (back-end)
+
+            . Separar o código de acesso a dados do código da apresentação dos dados 
+
+            . Separar o projeto em diferentes módulos/camadas com responsabilidade distintas
+
+            . Criar componentes/classes/funções que realizam apenas uma única tarefa com eficiência.
+
+        . A aplicação da Separação dos Conceitos/Responsabilidades envolve dois processos:
+
+            . Reduzir o acoplamento
+
+            . Aumentar a coesão.
+
+            . Acoplamento
+                
+                . Acoplamento é o nível de dependência/conhecimento que pode existir entre os componentes do sistema. Quanto maior o acoplamento
+                    entre os componenetes do sistema maior será dependêmcia entre eles, e mais difícil será manter, reusar e estender o sistema.
+
+                . Quando há um baixo acoplamento, um componente consegue operar de forma praticamente independente do outro. Alto acoplamento 
+                    já implica em uma conexão forte entre os dois, que pode torná-los até indistinguíveis
+
+            . Coesão
+
+                . A coesão é o grau com o qual um módulo tem uma responsabilidade única e bem definida
+
+                . Coesão é o nível de integridade interna dos componentes do sistema. Quanto maior a coesão enter os componentes mais definidas 
+                    são suas responsabilidades sendo mais difícil desembrar o componente em outros componentes.
+
+            . Portanto quanto menor o acoplamento e mais alta a coesão de um componente ou módulo do sistema mais fácil ele será de matner, 
+                reusar e estender.
+
+        . Vantagens
+
+            . Facilita a manutenção. A não duplicação do código e as responsabilidades bem definidas dos componentes do projeto
+                tornam o sistema mais fácil de manter.
+
+            . Melhor reutilização do código. O principal benefício de reutilizar o código pe a reduçao dos custos de manutenção. Sempre que
+                você precisar estender a funcionalidade ou corrigir um bug - é muito menos doloroso fazer isso quando você tem certeza de que ele
+                parece em apenas um lugar.
+
+            . Melhor clareza de código. É muito mais fácil entender o que está acontecendo no programa quando cada módulo tem uma API concisa
+                e clara com um conjunto de métodos com escopo lógico e bem definido.
+
+            . Melhora a testabilidade. Móduglo independentes com guncionalidade e escopo adequado e com isolamento do resto do aplicativo
+                são fáceis de testar. Você nãp precisa configurar o ambiente inteiro parar ver como seu módulo funciona, basta substituir 
+                os módulos reais por simulações ou fontes de dados falsas.
+
+            . Permite uma evolução mais rápida do projeto. Quer seja um novo recurso ou uma atualização de um recurso existente, o isolamento 
+                dos módulos ajuda a definiri o  escopo das áreas do projeto que podem ser afetadas pela mudanças, acelerando assim o desenvolvimento.
+
+    . Dependency Inversion
+
+        . A direção da dependenência em uma aplicação deverá ser na direção da abstração e não nos detalhes de impplementação.
+
+        . Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de uma abstração.
+
+        . Abstrações não devem depender de detalhes. Detalhes devem depender de abstrações.
+
+        . Módulos de alto nível são classes da camada de negócio que encapsulam uma çógica complexa.
+
+        . Módulos de baixo nível são cçasses da camada de infaestrutura que implementa operações básicas como acesso a dados, 
+            ao disco, protocolos de rede, etc.
+
+        . As abstrações seria interfaces ouclasses abstratas que não possuem implementação.
+
+        . Assim as classes da camada de negócio não devem depender das classes da camada de infraestrura mas 
+            devem depender de interfaces ou classe abstratas
+
+
+        . Exemplo 1:
+
+            namespace DI
+            {                                              IOC
+                class programa          Unconcerned logic shifted the externa entity
+                {                                           ^
+                    static voida Main( string[] args)       |
+                    {                                       |
+                        Customer obj = new Customer( New SQLServer() );
+                    }                                       |
+                                               Dependency   |
+                    class Customer             Injection    |
+                    {                          +------------+
+                        private IDal _dal;     |
+                                               V
+
+                        public Customer( IDal obj)
+                        {
+                            _dal = obj;
+                        }
+
+                        public bool validate()
+                        {
+                            return true;
+                        }
+
+                        public void Add()
+                        {
+                            if (validate())
+                            {
+                                dal.Add();
+                            }
+                        }
+
+                    }
+                }
+            }
+            
+        . Exemplo 2:
+
+            namespace DIP;
+
+            public interface IDataService       ----------------------------------------+
+            {                                                                           |
+                public void Save(string message);                                       |
+            }                                                                           |
+                                                                                        |
+            public class DatabaseService: IDataService  ---------------------------->   |
+            {                                                                           |
+                public void Save(string message)                                        |
+                {                                                                       |
+                    Console.WriteLine("Save the message into the database");            |
+                }                                                                       |
+            }                                                                           |
+                                                                                        |
+            public class Logger                                                         |
+            {                                                                           |
+                private readonly IDataService _dataService;                             |
+                                                                                        |
+                                    +---------------------------------------------------+
+                                    |  Não dependemos de detalhes, somente da abstração
+                                    V
+                public Logger(IDataService dataService)
+                {
+                    _dataService = dataService;
+                }
+
+                public void Log(string message)
+                {
+                    _dataService.Save(message);
+                }
+            }
+
+            public class Program
+            {
+                public static void Main(string[] args)
+                {
+                    var logger = new Logger(new DatabaseService());
+                    logger.Log("Hello");
+                }
+            }
+
+        . Não confundir o princípio da "inversão da dependência" com ao padrão de projeto "injeção de dependência".
+
+http://www.linhadecodigo.com.br/artigo/3418/inversao-de-controle-ioc-e-injecao-de-dependencia-di-diferencas.aspx#:~:text=A%20Inje%C3%A7%C3%A3o%20de%20Depend%C3%AAncia%20apenas,passa%20para%20uma%20classe%20externa!
+
+2.42
