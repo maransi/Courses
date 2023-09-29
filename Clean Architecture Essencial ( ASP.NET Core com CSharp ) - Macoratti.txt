@@ -151,7 +151,8 @@ Ambiente
 Conceitos e Fundamentos
 =======================
 
-. Modelo Anêmico
+Aula 9 - Modelo Anêmico
+----------------------
 
     . Definições
 
@@ -290,7 +291,8 @@ Conceitos e Fundamentos
                                                                     }
                                                                 }
 
-. Separação dos conceitos ( Separation of Concerns )
+Aula 10 - Separação dos conceitos ( Separation of Concerns )
+------------------------------------------------------------
 
     . Separtion of Concerns - Soc: Separação de conceitos
 
@@ -352,132 +354,133 @@ Conceitos e Fundamentos
             . Permite uma evolução mais rápida do projeto. Quer seja um novo recurso ou uma atualização de um recurso existente, o isolamento 
                 dos módulos ajuda a definiri o  escopo das áreas do projeto que podem ser afetadas pela mudanças, acelerando assim o desenvolvimento.
 
-    . Dependency Inversion
+Aula 11 - Dependency Inversion
+------------------------------
 
-        . Para entender como funciona a inversão de dependência no .NET veja o resumo do curso "DI - Dominando Injeção de Dependência - Balta".
+    . Para entender como funciona a inversão de dependência no .NET veja o resumo do curso "DI - Dominando Injeção de Dependência - Balta".
 
-        . A direção da dependenência em uma aplicação deverá ser na direção da abstração e não nos detalhes de impplementação.
+    . A direção da dependenência em uma aplicação deverá ser na direção da abstração e não nos detalhes de impplementação.
 
-        . Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de uma abstração.
+    . Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de uma abstração.
 
-        . Abstrações não devem depender de detalhes. Detalhes devem depender de abstrações.
+    . Abstrações não devem depender de detalhes. Detalhes devem depender de abstrações.
 
-        . Módulos de alto nível são classes da camada de negócio que encapsulam uma çógica complexa.
+    . Módulos de alto nível são classes da camada de negócio que encapsulam uma çógica complexa.
 
-        . Módulos de baixo nível são cçasses da camada de infaestrutura que implementa operações básicas como acesso a dados, 
-            ao disco, protocolos de rede, etc.
+    . Módulos de baixo nível são cçasses da camada de infaestrutura que implementa operações básicas como acesso a dados, 
+        ao disco, protocolos de rede, etc.
 
-        . As abstrações seria interfaces ouclasses abstratas que não possuem implementação.
+    . As abstrações seria interfaces ouclasses abstratas que não possuem implementação.
 
-        . Assim as classes da camada de negócio não devem depender das classes da camada de infraestrura mas 
-            devem depender de interfaces ou classe abstratas
+    . Assim as classes da camada de negócio não devem depender das classes da camada de infraestrura mas 
+        devem depender de interfaces ou classe abstratas
 
-        . Exemplo 1. Via Interface - A implementação da injeção de dependência via interface -  Interface Injection -  
-                        utiliza uma interface comum que outras classes necessitam implementar para injetar a dependência.
+    . Exemplo 1. Via Interface - A implementação da injeção de dependência via interface -  Interface Injection -  
+                    utiliza uma interface comum que outras classes necessitam implementar para injetar a dependência.
 
-            namespace DIP;
+        namespace DIP;
 
-            public interface IDataService       ----------------------------------------+
-            {                                                                           |
-                public void Save(string message);                                       |
-            }                                                                           |
-                                                                                        |
-            public class DatabaseService: IDataService  ---------------------------->   |
-            {                                                                           |
-                public void Save(string message)                                        |
-                {                                                                       |
-                    Console.WriteLine("Save the message into the database");            |
-                }                                                                       |
-            }                                                                           |
-                                                                                        |
-            public class Logger                                                         |
-            {                                                                           |
-                private readonly IDataService _dataService;                             |
-                                                                                        |
-                                    +---------------------------------------------------+
-                                    |  Não dependemos de detalhes, somente da abstração
-                                    V
-                public Logger(IDataService dataService)
-                {
-                    _dataService = dataService;
-                }
-
-                public void Log(string message)
-                {
-                    _dataService.Save(message);
-                }
-            }
-
-            public class Program
+        public interface IDataService       ----------------------------------------+
+        {                                                                           |
+            public void Save(string message);                                       |
+        }                                                                           |
+                                                                                    |
+        public class DatabaseService: IDataService  ---------------------------->   |
+        {                                                                           |
+            public void Save(string message)                                        |
+            {                                                                       |
+                Console.WriteLine("Save the message into the database");            |
+            }                                                                       |
+        }                                                                           |
+                                                                                    |
+        public class Logger                                                         |
+        {                                                                           |
+            private readonly IDataService _dataService;                             |
+                                                                                    |
+                                +---------------------------------------------------+
+                                |  Não dependemos de detalhes, somente da abstração
+                                V
+            public Logger(IDataService dataService)
             {
-                public static void Main(string[] args)
-                {
-                    var logger = new Logger(new DatabaseService());
-                    logger.Log("Hello");
-                }
+                _dataService = dataService;
             }
 
-
-
-        . Exemplo 2. Via Construtor - A implementação da injeção de dependência via construtor - Construtor Injection - consiste em 
-                        passar as dependências de um objeto para o seu construtor.
-
-            namespace DI
-            {                                              IOC
-                class programa          Unconcerned logic shifted the externa entity
-                {                                           ^
-                    static voida Main( string[] args)       |
-                    {                                       |
-                        Customer obj = new Customer( New SQLServer() );
-                    }                                       |
-                                               Dependency   |
-                    class Customer             Injection    |
-                    {                          +------------+
-                        private IDal _dal;     |
-                                               V
-
-                        public Customer( IDal obj)
-                        {
-                            _dal = obj;
-                        }
-
-                        public bool validate()
-                        {
-                            return true;
-                        }
-
-                        public void Add()
-                        {
-                            if (validate())
-                            {
-                                dal.Add();
-                            }
-                        }
-
-                    }
-                }
-            }
-            
-        . Exemplo 3 - Via Propriedades. A implementação da injeção de dependência via propriedades - Setter Injection - não força 
-                        a dependência ser passada para o construtor. Ao invés disso, as dependências são definidas em 
-                        propriedades públicas expostas pelo objeto.
-
-            public class Cliente
+            public void Log(string message)
             {
-            public Cliente() {}
+                _dataService.Save(message);
+            }
+        }
 
-                private IPedido meuPedido;
+        public class Program
+        {
+            public static void Main(string[] args)
+            {
+                var logger = new Logger(new DatabaseService());
+                logger.Log("Hello");
+            }
+        }
 
-                public IPedido Pedido {
-                get {
-                        if (meuPedido == null) {
-                            throw new MemberAccessException("meuPedido não foi inicializado");
-                        }
-                    return meuPedido;
+
+
+    . Exemplo 2. Via Construtor - A implementação da injeção de dependência via construtor - Construtor Injection - consiste em 
+                    passar as dependências de um objeto para o seu construtor.
+
+        namespace DI
+        {                                              IOC
+            class programa          Unconcerned logic shifted the externa entity
+            {                                           ^
+                static voida Main( string[] args)       |
+                {                                       |
+                    Customer obj = new Customer( New SQLServer() );
+                }                                       |
+                                            Dependency   |
+                class Customer             Injection    |
+                {                          +------------+
+                    private IDal _dal;     |
+                                            V
+
+                    public Customer( IDal obj)
+                    {
+                        _dal = obj;
                     }
-                    set { meuPedido = value; }
+
+                    public bool validate()
+                    {
+                        return true;
+                    }
+
+                    public void Add()
+                    {
+                        if (validate())
+                        {
+                            dal.Add();
+                        }
+                    }
+
                 }
             }
+        }
+        
+    . Exemplo 3 - Via Propriedades. A implementação da injeção de dependência via propriedades - Setter Injection - não força 
+                    a dependência ser passada para o construtor. Ao invés disso, as dependências são definidas em 
+                    propriedades públicas expostas pelo objeto.
+
+        public class Cliente
+        {
+        public Cliente() {}
+
+            private IPedido meuPedido;
+
+            public IPedido Pedido {
+            get {
+                    if (meuPedido == null) {
+                        throw new MemberAccessException("meuPedido não foi inicializado");
+                    }
+                return meuPedido;
+                }
+                set { meuPedido = value; }
+            }
+        }
 
     . Resumo
 
@@ -495,7 +498,234 @@ Conceitos e Fundamentos
         . Contâiner IoC (Contâiner de injeção de dependência )  É um framework que permite fazer a injeção de dependência de forma automática 
                                                                 nos componentes.
 
-. Padrão Repository
+Aula 12 - Padrão Repository
+---------------------------
 
-    . 
-                                            
+    . O que é o padrão Repository?
+
+        . O padrão "Repository" faz a mediação entre o domínio e as camadas de mapeamento de dados, agingo como uma coleção de objetos de 
+            domínio em memória.
+
+        . Um repostório é essencialmente uma coleção de objetos de domínio em memória, e, com base nisso o padrão "Repository" permite 
+            desacoplar o modelo de domínio do código de acesso a dados.
+
+        . Ao utilizar o padrão "Epository" você pode realizar a persistência e a separação de interesses em seu código de acesso a dados 
+            visto que ele encapsula a lógica necessária para persistir os objetos do seu domínio na sua fonte de dados.
+
+    . Implementação e Tipos de repositórios
+
+        . Em uma implementação padrão podemos começar definindo uma "interface" que atuará como a nossa fachada de acesso aos dados e a 
+            seguir definiir a implementação na classe concreta.
+
+        . Podemos implementar os seguintes tipos de repositórios:
+
+            . Repositório Genérico
+
+            . Reposítorio Específico
+
+        . E podemos realizar uma implementação síncrona ou assíncrona (Task, async/await).
+
+        . Implementação (Como fazer)
+
+            1. Criar uma "interface" ou classe abstrata e definir o contrato com os métodos do repositório.
+
+            2. Criar a classe concreta que implementa a "interface"
+
+                            Repositório Genérico                                    Repositório Especifico
+                    +------------------------------+                            +---------------------------+
+                    |                              |                            |                           |
+                IRepository<T>              Repository<T>               IProductRepository          ProductRepository
+
+                Add()                       ...                         Add()                       ...
+                Remove()                    ...                         Remove()                    ...
+                Get()                       ...                         Get()                       ...
+                GetId( int id )             ...                         GetId( in id )              ...
+
+                Domain ou Application       Infrastructure              Domain ou Application       Infrastructure
+
+        . Exemplo "Repositório Genérico":
+
+            +-- public interface IRepository<T>: where T class ---------->  public class Repository<T>: IRepository<T> where T: class
+            |    {                                                           {
+            |        IEnumerable<T> GetAll();                                    ... // Implementação
+            |                                                                }
+            |        T GetById( int id );
+            |
+            |        void Add( T item );
+            |
+            |        void Update( T item );
+            |
+            |        void Delete( T item );
+            |    }
+            |
+            |
+            |    public classe CustormerController: Controller
+            |    {
+            |        private readonly IRepository<Customer> _custormerRepository;
+            |
+            +---------------------------------------+
+                                                    | Injeção de Dependência
+                                                    V
+                    public CustomerController( IRepository<Customer> repo)
+                    {
+                        _custormerRepository = repo;
+                    }
+                }
+
+        . Exemplo "Repositório Genérico":
+
+            +-- public interface ICustomerRepository --------------------->  public class CustomerRepository: ICustomerRepository
+            |    {                                                           {
+            |        IEnumerable<T> GetAll();                                    ... // Implementação
+            |                                                                }
+            |        T GetById( int id );
+            |
+            |        void Add( T item );
+            |
+            |        void Update( T item );
+            |
+            |        void Delete( T item );
+            |    }
+            |
+            |
+            |    public classe CustormerController: Controller
+            |    {
+            |        private readonly ICustomerRepository _custormerRepository;
+            |
+            +---------------------------------------+
+                                                    | Injeção de Dependência
+                                                    V
+                    public CustomerController( CustomerRepository repo)
+                    {
+                        _custormerRepository = repo;
+                    }
+                }
+
+        . Qual utilizar? Genérico ou Especifico?
+
+            . Um repositório genérico pode ser usado por qualquer entidade da camada de negócios e com isso economizarmos código.
+
+            . Ocorre que cada entidade da camada de domínio pode possuir sua particularidades distintas de outras entidades e isso 
+                pode inviabilizar o uso de um repositório genèrico.
+
+            . Assim para decidir é preciso fazer uma análise prévia do modelo de domínio e das particularidades de cada entidade.
+
+        . Benfícios:
+
+            . Minimiza a lógica de consultas na sua aplicação evitando consultas esparramdas pelo seu código.
+
+            . Encapsula a lógica das consultas em um repositório
+
+            . Desacopla a sua aplicação dos framworks de persistência como o EF Core.
+
+            . Facilita a realização de testes de unidade em sua alicação (repositório fake)
+
+            . Centraliza a lógica de acesso a dados facilitando a manutenção.
+
+Aula 13 - Padrão MVC
+--------------------
+
+    . O padrão MVC fornece uma maneira de separa a funcionalidade e responsabilidade envolvidas com a manutenção e apresentação 
+        dos dados de uma aplicação usando 3 componentes:
+
+        . O Model           Representa os daos a serem tratados e não inclui detalhes de implementação.
+
+        . A View            Representa o componente de interface com o usuário (UI)  e está vinculado ao "Model"
+
+        . O Controller      Fornece um mecanismo para o usuário interagir como sistema definindo como a interface do usuário vai 
+                            reagir a ação do usuário. É responsável por trocar e interpretar mensagens entre a "View" e o "Model".
+
+                    Request                    Data
+                / --------->  Controller  <----------->   Model
+                /               ^ |     
+                /                | |
+            User                  | | Data
+                \                | |
+                \  Response     | V
+                \ <---------- View
+
+        . Padrões de comunicação:
+
+            . Permitido
+
+                . Os usuários podem interagir com uma "View"
+
+                . "Views" podem interagir com "Controller"
+
+                . "Controller" podem interagir com "Views"
+
+                . "Controller" podem se comunicar com outros "Controller"
+
+                . "Controller" podem se comunicar com o "Model"
+
+            . Não permitido:
+
+                . Os usuários não podem interagir diretamente com o "Model".
+
+                . "Views" não podem interagir diretamente com outras "Views".
+
+                . "Views" não podem interagir diretamente como "Model".
+
+                . "Model" não podem interagir com outros "Models".
+            
+    . Benefícios:
+
+        . A "View" e o "Model" são desacoplados ou dissociados. Isso significa que você pode ter muitas "Views" associadas 
+            com um determinado model.
+
+        . A dissociação "View-Controller" permite que você altere a forma como uma aplicação responde à entrada do usuário 
+            sem alterar o modo de exibição, permitindo que a interface do usuário "view" seja alterada sem alterar a maneira 
+            como o aplicativo responde à entrada do usuário.
+
+        . A separação das responsabilidades permite que diferentes membros da equipe possam se concentrar em uma parte da 
+            aplicação que melhor se alinha com suas respcetivas habilidades.
+
+        . Como o padrão MVC gerencia múltiplos visalizadores usando o mesmo modelo, é fácil manter, testar e atualizar 
+            mais de um sistema.
+
+    . Padrão MVC vs. Arquitetura em 3 Camadas (MVC não é 3 camadas)
+
+        . Padrão MVC                    Está relacionado com a arquitetura da aplicação e em como os componentes se comunicam.
+
+        . Arquitetura em 3 camadas      Está relacionada com a arquitetura do Sistema onde você divide as responsabilidade em 
+                                        camada de apresentação, de negócio e de acesso aos dados.
+
+
+            Arquitetura em 3 camadas
+            ------------------------
+
+                    UI                                              Controller
+                                                                        /\          O padrão MVC é triangular
+                    |                                                  /  \         a view aciona o controller, o 
+                    |                                                 /    \        controller atualiza o modelo, e 
+                    v   Conceitualmente a                         Model --> view    a view é atulizada pelo modelo.
+                        arquitetura de três 
+                   BLL  camadas é linear.        
+                        As dependências são 
+                    |   definidas de cima
+                    |   para baixo
+                    V
+
+                   DAL
+
+        . Os conceito se complementam e podem coexistir harmonicamente sem conflitos. Você pode usar o padrão MVC para a 
+            camada de apresentação de uma arquitetura em camadas.
+
+                                                                +------------------+
+                    UI  ------------------------------------->  |    Controller    |
+                                                                |       /\         |
+                    |                                           |      /  \        |
+                    |                                           |     /    \       |
+                    v   As camadas dizem como                   | Model --> view   |
+                        agrupar os componentes e                +------------------+
+                   BLL  
+                        O MVC diz como interagem os
+                    |   componentes
+                    |   
+                    V
+
+                   DAL
+        
+Aula 14. Padrão CQRS
+--------------------
+
