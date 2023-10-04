@@ -1,0 +1,741 @@
+Clean Architecture Essencial ( ASP.NET Core com CSharp ) - Macoratti
+--------------------------------------------------------------------
+
+Introdução
+==========
+
+Ambiente
+--------
+
+. Ambiente e Ferramentas usadas no curso
+
+    . .Net Core SDK 6
+
+    . ASP.NET Core 6
+
+    . VSCode
+
+    . SQLite
+
+. Instalação do .NET Core 
+
+        wget https://dot.net/v1/dotnet-install.sh
+        chmod +x dotnet-install.sh
+        ./dotnet-install.sh -c 3.1
+        ./dotnet-install.sh -c 5.0
+        ./dotnet-install.sh -c 6.0
+        ./dotnet-install.sh -c 7.0
+
+        dotnet --version
+
+        # insira as linhas abaixo no arquivo ".bashrc"
+        export PATH="home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"
+        export DOTNET_ROOT=/home/$USER/.dotnet/
+
+        source ~/.bashrc
+
+        sudo ln -s /home/$USER/.dotnet/dotnet /usr/bin/dotnet
+
+        dotnet --version
+        dotnet --list-runtimes
+        dotnet --list-sdks
+
+        cd /home/$USER/Download
+
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+
+
+. Instalação das extensões do VSCode
+
+    . Acessar a pagina de download da microsoft:
+
+        https://code.visualstudio.com/download
+
+    . Baixar o arquivo .deb 
+
+    . Abrir o terminal e acessar a pasta Downloads
+
+    . Executar o comando abaixo:
+
+        sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+    . Atalhos
+
+        Alt + 1, 2, 3, 4, ...	Posiona na aba no.
+        Ctrl + b				Ativar o menu lateral esquerdo 
+        Ctrl + Alt + P			Para ativar a linha de comandos 
+        Ctrl + P 				Localiza um determinado arquivo
+        Ctrl + W				Fecha a aba corrente
+        Ctrl + Shift + W		Fecha todas as abas abertas
+
+        Ctrl + Rolagem do Mouse	
+                sobre as abas 
+                abertas			Faz a rolagem das abas.
+
+        Ctrl + K + C ou 
+        Ctrl + /				Comenta linha atual, ou bloco selecionado
+
+        Ctrl + K + U ou
+        Ctrl + /				Descomenta linha, ou bloco selecionado.
+
+        Ctrl + Shift + 
+                Acento Agudo	Abre o terminal na parte inferior
+
+        Ctrl + X				Apaga linha
+        Ctrl + H				Localiza e atualiza uma expressão
+        Ctrl + F2				Selecione um texto e pressionando Ctrl + F2 
+                                muda todos os textos equivalente a medida
+                                que vai se digitando
+        Alt + Arrow(up/Down)    Move a linha para cima, ou para baixo.
+        Ctrl + Shift + O		Abre a lista de funções/métodos da classe atual
+        Ctrl + G				Posicionar na linha No. que for digitado
+        Alt + Backspace			Apaga palavra inteira a esquerda
+        Ctrl + Shift + .		Mostra os métodos da classe
+        Ctrl + Shift + L		Altera dinamicamente em todo o arquivo a palavra que está sendo alterada
+
+    . Instale as extensões abaixo:
+
+        C# 
+        C# Extensions (JosKreativ)
+        C# XML Documentation Comments
+        C# Snippets
+        vscode-solution-explorer
+        ASP.NET Helper
+        RapidApi
+        Bracket Pair Colorization Toggler
+        Razor Snippets
+        Libman
+        Docker
+        vscode-icons (Opcional)
+        VZ Dotnet File Template
+        Auto-Using for C#
+        Error Lens
+
+
+        . Testar
+
+            Dotnet Solution Explorer
+            Dotnet New Extension
+            Net Core Extension Pack
+            C# Utilities
+            Nuget Package Manager
+            Visual Nuget
+            C# Developer Extension Package
+            Auto closet tag
+            C# Snippets
+
+    . Configurações:
+
+        . Digite Ctrl K+S, localize o item "Delete Line" e configure Ctrl + D
+        . Acesse View / Minimap para retirar o scroll de código da direita
+        . Acessar configurações, ir em "Settings", Text editors, Sugestions:
+            . Na opção "Accept Suggestion On Enter" deixar como off
+            . Na opção "Suggest: Insert Mode" deixar como replace
+            . Na opção "Quick Suggestions Delay" deixar como 1000
+            
+
+. Instalação o "DB Browser for SQLite" para realizar as consultas no banco de dados
+
+    sudo apt-get update && sudo apt-get upgrade
+
+    sudo apt-get install sqlite3
+
+    sqlite3 --version
+
+    sudo apt-get install sqlitebrowser
+
+
+
+
+Conceitos e Fundamentos
+=======================
+
+Aula 9 - Modelo Anêmico
+----------------------
+
+    . Definições
+
+        . O modelo de domínio anêmico é um modelo de domínio onde os objetos que representam as 
+            entidades do domínio contêm pouca ou nenhuma lógica de negócio (validações, cálculos,
+            regras de negócio, etc.)
+
+        . Um modelo de domínio anêmico é um modelo sem compratamentos onde temos diversas 
+            propriedades com get e set públicos definidas sem lógica alguma e onde o cliente do 
+            domínio tem controle sobre como instanciar e modificar o domínio.
+
+            . Conceito de OO é perdido.
+
+            . Regras de negócio espalhada em vários objetos.
+
+            . Mais parecidos com estilo de programação procedural. Parecidos com objetos DTOs.
+
+    . Exemplos de modelos anêmicos
+
+        public class Pedido                                         public class PedidoServide
+        {                                                           {
+            public int Id {get; set; }                                  public void AddItem( int Id, itemPedido item )
+            public string ClienteId {get; set; }                        {
+            public decimal Desconto {get; set; }                            // validações
+            public DateTime? DataPagamento {get; set; }                 }
+            public List<ItemPedido> Itens {get; set;}                   public void DescontoPedido( int Id, decimal desconto){...}
+                                                                        public void PagamentoPedido( int id) {...}
+        }                                                           }
+            |
+            v                                                                   ^
+                                                                                |
+        Não tem lógica nenhuma é preciso colocar a lógica em outra classe   ----+
+
+
+        . Contém somente prorpidades com get e set públicos
+        
+        . Não possuem validações nem comportamentos
+
+        . Não possuem gerenciamento de estado, permitindo que objetos com estado inconsistente sejam cirados
+
+        . Permitem que outros objetos criem instâncias e modifiquem o domínio.
+
+    . Modelos anêmicos - Problemas
+
+        . O cliente precisa interpretar o objetivo e o uso da classe e a lógica é enviada para outras classes,
+            denomidadas serviçoes da classe de domínio
+
+        . Violação do encapsulamento;
+
+        . Lógica de negócios duplicada;
+
+        . Não é possível garantir que as entidades no modelo estejam em u estado consistente;
+
+        . Baixa coesão;
+
+    . Iremos adotar as orientações do Domain-Drive Design. Pesquisar padrões como: Entity, Value Object, Aggregate
+
+        https://dev.to/guisfits/easycommerce-01-introducao-ao-ddd-kik
+        https://dev.to/guisfits/implementando-domain-driven-design-3d1h
+
+        . Entity
+            
+            https://www.codeproject.com/Articles/4293/The-Entity-Design-Pattern
+            https://dotnettutorials.net/lesson/repository-design-pattern-csharp/
+
+        . Value Object 
+
+            https://www.macoratti.net/20/11/c_valueobj1.htm
+            https://www.codeproject.com/Articles/1046193/Value-Object-Design-Pattern-in-Csharp
+            https://www.codeproject.com/Articles/5354124/Csharp-Value-Object-Pattern-Data-Transfer-Object-P#:~:text=Value%20Object%20Pattern%20%2D%20Definition,based%20on%20identity%2Freference).
+
+        . Agreagate
+
+            https://code-maze.com/csharp-design-pattern-aggregate/        
+
+    . Vamos atualizar o modelo com dados, lógica e regras de negócio.
+
+    . Modelo anêmicos - Enriquecendo o modelo
+
+        . Usar propriedades com setters privados ( e as classes como "sealed" )
+
+        . Validar estado da entidade
+
+        . Evitar construtores sem parâmetros.
+
+        . Definir invariantes
+
+        . Trazer as regras de comportamentos dos serviços para o modelo de domínio.
+
+        . Usar os conceitos da programação OO
+
+        . Cuidado e atenção ao usar ferramentas ORM (EF Core)
+
+    . "sealed"
+
+        . Quando aplicado a uma classe, o modificador sealed impede que outras classes herdem dela. 
+            No exemplo a seguir, a classe B herda da classe A, mas nenhuma classe pode herdar da classe B.
+
+            class A {}
+
+            sealed class B : A {}
+
+        . O modificador "sealed" também pode ser usado com métodos para evitar que os métodos sejam sobrescritos 
+            nas classes filhas.
+
+
+    . Enriquecendo o modelo - Exemplo
+
+        public class Cliente                                    public sealed class Cliente
+        {                                                       {
+            public int Id{ get; set; }                              public int Id { get; private set; }
+            public string Nome { get; set; }                        public string NOme {get; private set; }
+            public string Endereco { get; set; }                    public string Endereco { get; private set; }
+        }                                       
+                                                                    public Cliente (int id, string nome, string endereco)
+                                                                    {
+                                                                        Validar( id, nome, endereco);
+
+                                                                        Id = id
+                                                                        Nome = nome;
+                                                                        Endereco = endereco;
+                                                                    }
+
+                                                                    public void Update( int id, string nome, string endereco )
+                                                                    {
+                                                                        Validar( id, nome, endereco);
+
+                                                                        Id = id
+                                                                        Nome = nome;
+                                                                        Endereco = endereco;
+                                                                    }
+
+                                                                    private static void Validar( int id, string nome, string endereco )
+                                                                    {
+                                                                        ...
+                                                                    }
+                                                                }
+
+Aula 10 - Separação dos conceitos ( Separation of Concerns )
+------------------------------------------------------------
+
+    . Separtion of Concerns - Soc: Separação de conceitos
+
+        . Não se deve misturar conceitos e/ou responsabilidades diferentes denro do design ou do código de um projeto de software.
+
+        . A violação deste princípio causa cpodigo duplicado com mais de uma responsabilidade, vilando també, os princícpios SOLID
+            da responsabilidade Ùnica (SRP) e o princípio DRY Don´t Repeat YourSelf.
+
+        . Exemplos de aplicação do conceito:
+
+            . Separar a interface do usuário (front-end) da lógica de negócios (back-end)
+
+            . Separar o código de acesso a dados do código da apresentação dos dados 
+
+            . Separar o projeto em diferentes módulos/camadas com responsabilidade distintas
+
+            . Criar componentes/classes/funções que realizam apenas uma única tarefa com eficiência.
+
+        . A aplicação da Separação dos Conceitos/Responsabilidades envolve dois processos:
+
+            . Reduzir o acoplamento
+
+            . Aumentar a coesão.
+
+            . Acoplamento
+                
+                . Acoplamento é o nível de dependência/conhecimento que pode existir entre os componentes do sistema. Quanto maior o acoplamento
+                    entre os componenetes do sistema maior será dependêmcia entre eles, e mais difícil será manter, reusar e estender o sistema.
+
+                . Quando há um baixo acoplamento, um componente consegue operar de forma praticamente independente do outro. Alto acoplamento 
+                    já implica em uma conexão forte entre os dois, que pode torná-los até indistinguíveis
+
+            . Coesão
+
+                . A coesão é o grau com o qual um módulo tem uma responsabilidade única e bem definida
+
+                . Coesão é o nível de integridade interna dos componentes do sistema. Quanto maior a coesão enter os componentes mais definidas 
+                    são suas responsabilidades sendo mais difícil desembrar o componente em outros componentes.
+
+            . Portanto quanto menor o acoplamento e mais alta a coesão de um componente ou módulo do sistema mais fácil ele será de matner, 
+                reusar e estender.
+
+        . Vantagens
+
+            . Facilita a manutenção. A não duplicação do código e as responsabilidades bem definidas dos componentes do projeto
+                tornam o sistema mais fácil de manter.
+
+            . Melhor reutilização do código. O principal benefício de reutilizar o código pe a reduçao dos custos de manutenção. Sempre que
+                você precisar estender a funcionalidade ou corrigir um bug - é muito menos doloroso fazer isso quando você tem certeza de que ele
+                parece em apenas um lugar.
+
+            . Melhor clareza de código. É muito mais fácil entender o que está acontecendo no programa quando cada módulo tem uma API concisa
+                e clara com um conjunto de métodos com escopo lógico e bem definido.
+
+            . Melhora a testabilidade. Móduglo independentes com guncionalidade e escopo adequado e com isolamento do resto do aplicativo
+                são fáceis de testar. Você nãp precisa configurar o ambiente inteiro parar ver como seu módulo funciona, basta substituir 
+                os módulos reais por simulações ou fontes de dados falsas.
+
+            . Permite uma evolução mais rápida do projeto. Quer seja um novo recurso ou uma atualização de um recurso existente, o isolamento 
+                dos módulos ajuda a definiri o  escopo das áreas do projeto que podem ser afetadas pela mudanças, acelerando assim o desenvolvimento.
+
+Aula 11 - Dependency Inversion
+------------------------------
+
+    . Para entender como funciona a inversão de dependência no .NET veja o resumo do curso "DI - Dominando Injeção de Dependência - Balta".
+
+    . A direção da dependenência em uma aplicação deverá ser na direção da abstração e não nos detalhes de impplementação.
+
+    . Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de uma abstração.
+
+    . Abstrações não devem depender de detalhes. Detalhes devem depender de abstrações.
+
+    . Módulos de alto nível são classes da camada de negócio que encapsulam uma çógica complexa.
+
+    . Módulos de baixo nível são cçasses da camada de infaestrutura que implementa operações básicas como acesso a dados, 
+        ao disco, protocolos de rede, etc.
+
+    . As abstrações seria interfaces ouclasses abstratas que não possuem implementação.
+
+    . Assim as classes da camada de negócio não devem depender das classes da camada de infraestrura mas 
+        devem depender de interfaces ou classe abstratas
+
+    . Exemplo 1. Via Interface - A implementação da injeção de dependência via interface -  Interface Injection -  
+                    utiliza uma interface comum que outras classes necessitam implementar para injetar a dependência.
+
+        namespace DIP;
+
+        public interface IDataService       ----------------------------------------+
+        {                                                                           |
+            public void Save(string message);                                       |
+        }                                                                           |
+                                                                                    |
+        public class DatabaseService: IDataService  ---------------------------->   |
+        {                                                                           |
+            public void Save(string message)                                        |
+            {                                                                       |
+                Console.WriteLine("Save the message into the database");            |
+            }                                                                       |
+        }                                                                           |
+                                                                                    |
+        public class Logger                                                         |
+        {                                                                           |
+            private readonly IDataService _dataService;                             |
+                                                                                    |
+                                +---------------------------------------------------+
+                                |  Não dependemos de detalhes, somente da abstração
+                                V
+            public Logger(IDataService dataService)
+            {
+                _dataService = dataService;
+            }
+
+            public void Log(string message)
+            {
+                _dataService.Save(message);
+            }
+        }
+
+        public class Program
+        {
+            public static void Main(string[] args)
+            {
+                var logger = new Logger(new DatabaseService());
+                logger.Log("Hello");
+            }
+        }
+
+
+
+    . Exemplo 2. Via Construtor - A implementação da injeção de dependência via construtor - Construtor Injection - consiste em 
+                    passar as dependências de um objeto para o seu construtor.
+
+        namespace DI
+        {                                              IOC
+            class programa          Unconcerned logic shifted the externa entity
+            {                                           ^
+                static voida Main( string[] args)       |
+                {                                       |
+                    Customer obj = new Customer( New SQLServer() );
+                }                                       |
+                                            Dependency   |
+                class Customer             Injection    |
+                {                          +------------+
+                    private IDal _dal;     |
+                                            V
+
+                    public Customer( IDal obj)
+                    {
+                        _dal = obj;
+                    }
+
+                    public bool validate()
+                    {
+                        return true;
+                    }
+
+                    public void Add()
+                    {
+                        if (validate())
+                        {
+                            dal.Add();
+                        }
+                    }
+
+                }
+            }
+        }
+        
+    . Exemplo 3 - Via Propriedades. A implementação da injeção de dependência via propriedades - Setter Injection - não força 
+                    a dependência ser passada para o construtor. Ao invés disso, as dependências são definidas em 
+                    propriedades públicas expostas pelo objeto.
+
+        public class Cliente
+        {
+        public Cliente() {}
+
+            private IPedido meuPedido;
+
+            public IPedido Pedido {
+            get {
+                    if (meuPedido == null) {
+                        throw new MemberAccessException("meuPedido não foi inicializado");
+                    }
+                return meuPedido;
+                }
+                set { meuPedido = value; }
+            }
+        }
+
+    . Resumo
+
+        . Princípio da inversão de dependência (DIP)    É um princípio que sugere uma solução para o problema da dependência mas não diz
+                                                        como implementar ou que técnica usar.
+
+        . Injeção da dependência (DI)                   Padrão de projeto usado para implementar a inversão da dependência. Permite
+                                                        injetar a implementação concreta de um componente de baixo nível em um componente
+                                                        de alto nível.
+
+        . Inversão de Controle (IoC)                    Outro princípio, que sugere uma forma de aplicar a inversão da dependência permitindo 
+                                                        que componentes de alto nível dependam de uma abstração e não de um componente de
+                                                        baixo nível.
+
+        . Contâiner IoC (Contâiner de injeção de dependência )  É um framework que permite fazer a injeção de dependência de forma automática 
+                                                                nos componentes.
+
+Aula 12 - Padrão Repository
+---------------------------
+
+    . O que é o padrão Repository?
+
+        . O padrão "Repository" faz a mediação entre o domínio e as camadas de mapeamento de dados, agingo como uma coleção de objetos de 
+            domínio em memória.
+
+        . Um repostório é essencialmente uma coleção de objetos de domínio em memória, e, com base nisso o padrão "Repository" permite 
+            desacoplar o modelo de domínio do código de acesso a dados.
+
+        . Ao utilizar o padrão "Epository" você pode realizar a persistência e a separação de interesses em seu código de acesso a dados 
+            visto que ele encapsula a lógica necessária para persistir os objetos do seu domínio na sua fonte de dados.
+
+    . Implementação e Tipos de repositórios
+
+        . Em uma implementação padrão podemos começar definindo uma "interface" que atuará como a nossa fachada de acesso aos dados e a 
+            seguir definiir a implementação na classe concreta.
+
+        . Podemos implementar os seguintes tipos de repositórios:
+
+            . Repositório Genérico
+
+            . Reposítorio Específico
+
+        . E podemos realizar uma implementação síncrona ou assíncrona (Task, async/await).
+
+        . Implementação (Como fazer)
+
+            1. Criar uma "interface" ou classe abstrata e definir o contrato com os métodos do repositório.
+
+            2. Criar a classe concreta que implementa a "interface"
+
+                            Repositório Genérico                                    Repositório Especifico
+                    +------------------------------+                            +---------------------------+
+                    |                              |                            |                           |
+                IRepository<T>              Repository<T>               IProductRepository          ProductRepository
+
+                Add()                       ...                         Add()                       ...
+                Remove()                    ...                         Remove()                    ...
+                Get()                       ...                         Get()                       ...
+                GetId( int id )             ...                         GetId( in id )              ...
+
+                Domain ou Application       Infrastructure              Domain ou Application       Infrastructure
+
+        . Exemplo "Repositório Genérico":
+
+            +-- public interface IRepository<T>: where T class ---------->  public class Repository<T>: IRepository<T> where T: class
+            |    {                                                           {
+            |        IEnumerable<T> GetAll();                                    ... // Implementação
+            |                                                                }
+            |        T GetById( int id );
+            |
+            |        void Add( T item );
+            |
+            |        void Update( T item );
+            |
+            |        void Delete( T item );
+            |    }
+            |
+            |
+            |    public classe CustormerController: Controller
+            |    {
+            |        private readonly IRepository<Customer> _custormerRepository;
+            |
+            +---------------------------------------+
+                                                    | Injeção de Dependência
+                                                    V
+                    public CustomerController( IRepository<Customer> repo)
+                    {
+                        _custormerRepository = repo;
+                    }
+                }
+
+        . Exemplo "Repositório Genérico":
+
+            +-- public interface ICustomerRepository --------------------->  public class CustomerRepository: ICustomerRepository
+            |    {                                                           {
+            |        IEnumerable<T> GetAll();                                    ... // Implementação
+            |                                                                }
+            |        T GetById( int id );
+            |
+            |        void Add( T item );
+            |
+            |        void Update( T item );
+            |
+            |        void Delete( T item );
+            |    }
+            |
+            |
+            |    public classe CustormerController: Controller
+            |    {
+            |        private readonly ICustomerRepository _custormerRepository;
+            |
+            +---------------------------------------+
+                                                    | Injeção de Dependência
+                                                    V
+                    public CustomerController( CustomerRepository repo)
+                    {
+                        _custormerRepository = repo;
+                    }
+                }
+
+        . Qual utilizar? Genérico ou Especifico?
+
+            . Um repositório genérico pode ser usado por qualquer entidade da camada de negócios e com isso economizarmos código.
+
+            . Ocorre que cada entidade da camada de domínio pode possuir sua particularidades distintas de outras entidades e isso 
+                pode inviabilizar o uso de um repositório genèrico.
+
+            . Assim para decidir é preciso fazer uma análise prévia do modelo de domínio e das particularidades de cada entidade.
+
+        . Benfícios:
+
+            . Minimiza a lógica de consultas na sua aplicação evitando consultas esparramdas pelo seu código.
+
+            . Encapsula a lógica das consultas em um repositório
+
+            . Desacopla a sua aplicação dos framworks de persistência como o EF Core.
+
+            . Facilita a realização de testes de unidade em sua alicação (repositório fake)
+
+            . Centraliza a lógica de acesso a dados facilitando a manutenção.
+
+Aula 13 - Padrão MVC
+--------------------
+
+    . O padrão MVC fornece uma maneira de separa a funcionalidade e responsabilidade envolvidas com a manutenção e apresentação 
+        dos dados de uma aplicação usando 3 componentes:
+
+        . O Model           Representa os daos a serem tratados e não inclui detalhes de implementação.
+
+        . A View            Representa o componente de interface com o usuário (UI)  e está vinculado ao "Model"
+
+        . O Controller      Fornece um mecanismo para o usuário interagir como sistema definindo como a interface do usuário vai 
+                            reagir a ação do usuário. É responsável por trocar e interpretar mensagens entre a "View" e o "Model".
+
+                    Request                    Data
+                / --------->  Controller  <----------->   Model
+                /               ^ |     
+                /                | |
+            User                  | | Data
+                \                | |
+                \  Response     | V
+                \ <---------- View
+
+        . Padrões de comunicação:
+
+            . Permitido
+
+                . Os usuários podem interagir com uma "View"
+
+                . "Views" podem interagir com "Controller"
+
+                . "Controller" podem interagir com "Views"
+
+                . "Controller" podem se comunicar com outros "Controller"
+
+                . "Controller" podem se comunicar com o "Model"
+
+            . Não permitido:
+
+                . Os usuários não podem interagir diretamente com o "Model".
+
+                . "Views" não podem interagir diretamente com outras "Views".
+
+                . "Views" não podem interagir diretamente como "Model".
+
+                . "Model" não podem interagir com outros "Models".
+            
+    . Benefícios:
+
+        . A "View" e o "Model" são desacoplados ou dissociados. Isso significa que você pode ter muitas "Views" associadas 
+            com um determinado model.
+
+        . A dissociação "View-Controller" permite que você altere a forma como uma aplicação responde à entrada do usuário 
+            sem alterar o modo de exibição, permitindo que a interface do usuário "view" seja alterada sem alterar a maneira 
+            como o aplicativo responde à entrada do usuário.
+
+        . A separação das responsabilidades permite que diferentes membros da equipe possam se concentrar em uma parte da 
+            aplicação que melhor se alinha com suas respcetivas habilidades.
+
+        . Como o padrão MVC gerencia múltiplos visalizadores usando o mesmo modelo, é fácil manter, testar e atualizar 
+            mais de um sistema.
+
+    . Padrão MVC vs. Arquitetura em 3 Camadas (MVC não é 3 camadas)
+
+        . Padrão MVC                    Está relacionado com a arquitetura da aplicação e em como os componentes se comunicam.
+
+        . Arquitetura em 3 camadas      Está relacionada com a arquitetura do Sistema onde você divide as responsabilidade em 
+                                        camada de apresentação, de negócio e de acesso aos dados.
+
+
+            Arquitetura em 3 camadas
+            ------------------------
+
+                    UI                                              Controller
+                                                                        /\          O padrão MVC é triangular
+                    |                                                  /  \         a view aciona o controller, o 
+                    |                                                 /    \        controller atualiza o modelo, e 
+                    v   Conceitualmente a                         Model --> view    a view é atulizada pelo modelo.
+                        arquitetura de três 
+                   BLL  camadas é linear.        
+                        As dependências são 
+                    |   definidas de cima
+                    |   para baixo
+                    V
+
+                   DAL
+
+        . Os conceito se complementam e podem coexistir harmonicamente sem conflitos. Você pode usar o padrão MVC para a 
+            camada de apresentação de uma arquitetura em camadas.
+
+                                                                +------------------+
+                    UI  ------------------------------------->  |    Controller    |
+                                                                |       /\         |
+                    |                                           |      /  \        |
+                    |                                           |     /    \       |
+                    v   As camadas dizem como                   | Model --> view   |
+                        agrupar os componentes e                +------------------+
+                   BLL  
+                        O MVC diz como interagem os
+                    |   componentes
+                    |   
+                    V
+
+                   DAL
+        
+Aula 14. Padrão CQRS
+--------------------
+
+https://www.youtube.com/watch?v=G0yi5PTzhLA&t=297s
+https://balta.io/blog/aspnet-core-cqrs-mediator
+
+https://balta.io/blog/clean-code
+
+CQRS é a sigla para Command and Queries Responsability Segregation, ou traduzido para o português, Separação de Responsabilidades em Consultas e Comandos.
+
+Podemos interpretar as consultas como a parte de leitura da nossa aplicação e comandos como a parte de escrita.
+
+Pensando desta forma, quando sabemos o que é CQRS, parece até óbvio, afinal em nossas quase nunca são balanceadas, ou tem muita leitura, ou tem muita escrita.
