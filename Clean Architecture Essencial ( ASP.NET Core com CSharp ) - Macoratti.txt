@@ -729,13 +729,144 @@ Aula 13 - Padrão MVC
 Aula 14. Padrão CQRS
 --------------------
 
-https://www.youtube.com/watch?v=G0yi5PTzhLA&t=297s
-https://balta.io/blog/aspnet-core-cqrs-mediator
+    https://www.youtube.com/watch?v=G0yi5PTzhLA&t=297s
+    https://balta.io/blog/aspnet-core-cqrs-mediator
 
-https://balta.io/blog/clean-code
+    https://balta.io/blog/clean-code
 
-CQRS é a sigla para Command and Queries Responsability Segregation, ou traduzido para o português, Separação de Responsabilidades em Consultas e Comandos.
+    . CQRS ( Command Query Responsability Segregation ) ou, numa traução livre, segregação de responsabilidade consulta 
+        e de comando, e é utilizado para aplicar modelos diferentes para operações de leitura e gravação.
 
-Podemos interpretar as consultas como a parte de leitura da nossa aplicação e comandos como a parte de escrita.
+        . Separar a responsabilidade de ler dados, de escrever dados.
 
-Pensando desta forma, quando sabemos o que é CQRS, parece até óbvio, afinal em nossas quase nunca são balanceadas, ou tem muita leitura, ou tem muita escrita.
+    . O CQRS é um padrão de projeto arquitetural para separar os processos de leitura e gravação da sua aplicação. As 
+        alterações de dados são realizados via "Commands" e a leitura de dados são realizados via "Queries".
+
+        . Commands  representam tudo o que altera o estado de uma entidade (inser, update, delete ).
+
+        . Queries   não alteram estado da entidade (select)
+
+    . A utilização do CQRS e indicada para um cenário onde existe uma alta demanda de consumo de daos com operações de 
+        leitura e escrita feitas de forma bem intensa, com grande volume de dados.
+
+    . Cenário clássico:
+
+                        Presentation
+                            &
+                        Application
+                        ||        ||
+                        ||        ||
+                        ||        ||    Command
+                        ||        ||       &
+                        ||        ||     Query
+                        ||        ||
+                        \/        \/
+                       Banco de dados ==>   Usar a mesma base de dados
+                                            para leitura e gravação
+
+    . Cenário com CQRS:
+
+                        Presentation
+                            &
+                        applications        +-----------+
+                        ||        ||        |   Query   |
+                        ||        ||    +---------+     |
+                        ||  +---+ ||    | Command |-----+
+                        ||  |   | ||    +---------+   
+                        ||      v ||     
+                        ||  ^     ||
+                        ||  |   | ||
+                        ||  +---+ ||
+                        \/        \/
+                       Banco     Banco     | Temos aqui a separação da escrita e da leitura
+                         de        de      > (Podemos usar banco de dados distintos c/sincronização)
+                       dados     dados     | 
+                      (Leitura) (Gravação)
+
+        . Separar o tipo da consulta (escrita/leitura) em bancos distintos. Um banco para "SELECTs" e outro
+            somente para "UPDATEs | INSERTs| DELETEs".
+
+    . Funcionamento:
+
+
+        +-----+
+        |     |         +---------------------------+
+        |     |         |       Query Model         |
+        |     |         |   +-------------------+   |
+        |     |  Query  |   |                   |   |
+        |     |<--------|---|       +---+       |   |
+        |     |         |   |       |   |       |   |
+        |     |         |   |       +---+       |   |
+        |     |         |   |                   |   |               
+        |     |         |   |       +---+       |   |               +-----------+
+        |     |         |   |       |   |       |<--|---------------|           |
+        |     |         |   |       +---+       |   |               |           |
+        | UI  |         |   +-------------------+   |               |           |
+        |     |         |                           |               |     DB    |
+        |     |         |       Command Model       |               |           |
+        |     |         |   +-------------------+   |               |           |
+        |     | Command |   |                   |   |               |           |
+        |     |---------|-->| +---+      +---+  |   |               |           |
+        |     |         |   | |   |------|   |  |---|-------------->|           |
+        |     |         |   | +---+      +---+  |   |               +-----------+
+        |     |         |   |   |          |    |   |
+        |     |         |   | +---+        |    |   |
+        |     |         |   | |   |--------+    |   |
+        |     |<--------|---| +---+             |   |      
+        |     |         |   +-------------------+   |
+        |     |         +---------------------------+
+        |     | 
+        +-----+
+        
+        . O CQRS separa leituras e gravações em modelos diferentes, usando comandos para atualizar dados e 
+            consultas para ler dados.
+
+        . Os comandos devem ser baseads em tarefas, e não centrados em dados.
+
+        . Os comandos podem ser colocados em uma fila para processamento asincrono, em ves de serem 
+            processaods de forma sincrona
+
+        . As consulta nunca modeificam o banco de daos, Uma consulta retorna um DTO que nao encapsula nenhum 
+            conhecimento de domínio.
+
+    . Para obter um maior isolamento, você pode separa fiscamente os dados de leitura dos dados de gravação. 
+        Nesse caso, o banco de dados de leitura pode usar seu próprio esquema de dados otimizado para consultas.
+
+    . Beneficios
+
+        . Escala independentes                  O CQRS permite que as cargas de trabalho de leitura e gravação sejam
+                                                escalonadas independentemente o que pode resultar em menos contenções 
+                                                bloqueios.
+
+        . Esquemas de dados otimizados          O lado de leitura pode usar um esquema otimizado para consultas, enquanto 
+                                                o lado de gravação usa um esquem otimizado para atualizações.
+
+        . Segurança                             É mais fácil garantir que apenas as entidades de domínio corretas estejam
+                                                executando gravações nodados.
+
+        . Separação de responsabilidades        A segregação dos lados de leitura e gravação pode resultar em modelos mais 
+                                                flexiveis e fáceis de manter. A maior parte da lógica de negócios complexa 
+                                                entra no modelo de gravação. O model de leitura pode ser relativamente simples,
+                                                sem o uso de "Foreign Keys | Triggers", ou bancos de dados em memória.
+
+        . Consulta mais simples                 Ao armazenar uma visualizaçõa no banco de dados de leitura, o aplicativo pode
+                                                evitar junções (joins) complexas durante a consulta tornando as consultas mais 
+                                                simples.
+
+    . Implementação do CQRS no .NET
+
+        . Usaremos a biblioteca "MediatR" (pattern Mediator)                          
+
+        . E o pacote MediatR.Extensions.Microsoft.DependencyInjection
+
+        . A partir da aula 57 iremos ver a implementação do padrão CQRS num projeto.
+
+    . A utilização do CQRS não é recomendada quando:
+
+        . O domínio ou as regras de negócios forem bem simples;
+
+        . Uma interface de usuário simples no estilo CRUD e operações de acesso a dados forem suficientes para resulver o problema.
+
+
+Aula 15 - Arquiteura Monolítica
+-------------------------------
