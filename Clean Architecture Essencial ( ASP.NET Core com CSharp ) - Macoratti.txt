@@ -870,3 +870,76 @@ Aula 14. Padrão CQRS
 
 Aula 15 - Arquiteura Monolítica
 -------------------------------
+
+    . A arquitetura monolítica é um sistema único, não dividido, que roda em um único processo, ou seja, é uma aplicação na qual 
+        diferentes componenetes estão ligados a um único programa dentro de uma única plataforma.
+
+    . Na arquittura monolítica o núcleo do comportamento da aplicação é executado em seu próprio processo e a aplicação inteira é
+        implantada como uma única unidade.
+
+    . Um aplicativo criado com essa arquitetura pode escalar verticalmente aumentando o poder das máquinas em que a aplicação roda 
+        ou horizontalmente com a adição instâncias atrás de um Load Balancer.
+
+    . Vantagens      
+
+        . Mais simples de desenvolver: A organização fica concentrada em um único sistema e muitos desenvolvedores estão 
+            familiarizados com este modelo sendo que o desenvolvimento inicial é mais rápido.
+
+        . Simples de fazer o deploy para o servidor: Fazemos o deploy de um único pacote final
+
+        . Exige uma equipe menor: Necessita de um time menor para desenvolver e manter a aplicação.
+
+    . Desvantagens
+
+        . Manutenção: A aplicação se torna cada vez maior de acordo com o seu tamanho, o código será cada vez mais difícil de entender 
+            e o desagio de fazer alterações rápidas e ter que subir para o servidor só cresce.
+
+        . Alterações: Para cada alteração feita, é necessário realizar um novo deploy de toda a aplicação.
+
+        . Fagrilidade: Uma linha de código que subiu errada pode quebrar todo o sistema e ele ficar totlamente inoperante.
+
+    . Um exemplo de uma aplicação monolítica são os projetos gerados pelos templates do ASP.NET Core MVC.
+
+        . Dentro da mesma aplicação ele cria as camadas:
+
+            . Data Access Logic:
+
+                . EF Migrations
+
+                . EF DbContext and model design
+
+            . Models
+
+            . Application Services (interfaces and implementations)
+
+            . Presentation Logic ( Views )
+
+            . Application Entru Point and Configuration ( appSettings.json, *.csproj, Program.cs )
+
+        . Desvantagens:
+
+            . O no. de pastas tende a crescer e as pastas não estão agrupadas em ordem
+
+            . A lógica de negócio está espalhada entre as pastas Models e Services.
+
+            . Não existe umaindicação clara das dependências entre as classes na pastas.
+
+            . Falta de organização leva ao código espaguete.
+
+    . Evolução
+
+        . As aplicações que usam a arquitetura monolítica podem se beneficiar usando a separação lógica de responsabilidades em camadas.
+
+        . Para isso as aplicações evoluem para soluções com váriaos projetos onde cada projeto reside em uma camada com responsabilidades 
+            especificas.
+
+        . Podemos ter uma evolução de uma arquitetura monolítica de projetos único para uma arquitetura monolítica em camadas também 
+            conhecida como arqutetura em camadas.
+
+Aula 16 - Arquitetura em Camadas
+-------------------------------
+
+  
+
+
+    
