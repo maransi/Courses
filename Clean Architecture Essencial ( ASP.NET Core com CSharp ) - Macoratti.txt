@@ -939,7 +939,90 @@ Aula 15 - Arquiteura Monolítica
 Aula 16 - Arquitetura em Camadas
 -------------------------------
 
-  
+    . A arquitetura em camadas visa a crição de aplicativos modulares, de forma que cada camada possui uma responsabilidade e onde a 
+        camada superior se comunica com a camada inferior e assim por diante, fazendo com que uma camada seja dependente apenas da camada
+        imediatamente infeior. 
+
+    . Podemos assim dividir um sistema em uma, duas, três ou ncamadas dependendo do objetivo e da complexidade do sistema.
+
+    . Dependendo do conteto as camadas podem ser lógicas (Layers) ou físicas (Tiers).
+
+    . Uma das mais conhecias é a arquitetura em três camadas, onde temos as camadas de interface (UI), a camada lógica dos negócios (BLL) e 
+        a camada de acesso aos dados (DAL).
 
 
-    
+        +-----------------------------------+
+        |   User Interface Layer (UI)       |   Aqui temos a dependência entre as camadas
+        | (HTML, Javascript, Razor, CSS)    |   definida de cma para baixo
+        +-----------------------------------+
+                        |
+                        v
+        +-----------------------------------+
+        |   Business Logic Layer (BLL)      |   A camada UI depende da camada BLL e esta
+        |       (.NET, C#, classes)         |   depende da camada DAL
+        +-----------------------------------+
+                        |
+                        v
+        +-----------------------------------+
+        |     Data Access  Layer (DAL)      |   A comunicação deve passar pela camada de 
+        |   (EF Core, SQL Server, MySQL)    |   de negócios (BLL)
+        +-----------------------------------+
+
+    . Exemplo de projetos .NET
+
+        Solution
+            |
+            +-- src
+                 |
+                 +-- ApplicationCore    <------------- Business/Aplication Model
+                 |
+                 +-- Infrastructure     <------------- Data Logic (Infrastructure)
+                 |                                      . EF Migration
+                 |                                      . EF DbContext and model design
+                 |
+                 +-- Web                <------------- Presentation Logic
+                 |                                      . wwwroot
+                 |                                      . Controllers
+                 |                                      . Services
+                 |                                      . ViewModels
+                 |                                      . Views
+                 |
+                 +-- Tests              <------------- Automated Tests
+
+        . Os usuários interagem com camada de UI
+
+        . A camada de UI interage apenas com a camada de negócios (BLL)
+
+        . A camada de negócios pode chamar a camada de acesso a dados (DAL)
+
+        . A camada de UI não deve interagir com a DAL diretamente
+
+        . A implantação é feita como uma unidade única pois ainda estamos na arquitetura Monolítica.
+
+        . Vantagens
+
+            . Com a organização do código em camadas podemos reutilizar a funcionalidade de baixo nível em todo o aplicativo
+
+            . Com uma arquitetura em camadas, os aplicativos podem impor restrições sobre quais camadas podem se comunicar com 
+                outras camadas.
+
+            . Essa arquitetura ajuda a atingir o encapsulamento.
+
+            . Quando uma camada é alterada ou substrituida, apensa as camadas que interagem com ela serão afetadas.
+
+            . As camadas ( e o encapsulamento) tornam muito mais fácil substituir a funcionalidade dentro do projeto.
+
+        . Desvantagens
+
+            . As dependêmcias em tempo de compilação são executadas de cima para baixo
+
+            . Assim a camada de negócios (BLL)  depende dos detalhes de implementação da camada de acesso aos dados.
+
+            . Testar a lógica de negócio nesta arquitetura é difícil pois exige um banco de dados de teste.
+
+            . Para resolver esse problema podemos usar a inversão da dependência em uma arquitetura mais robusta como a "Arquitetura
+                Cebola (Onion Archittecture).
+
+
+Aula 17. Arquitetura Cebola
+---------------------------
