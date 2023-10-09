@@ -1066,17 +1066,26 @@ Aula 17. Arquitetura Cebola
 
                             Arquitetura Cebola
 
-                +-----------------------------------------------------------+   
-                |                                                           |
-                |                                                           |
-                |           +---------------------------------------+       |
-                |  User     |                                       |  Data |
-                | Interface-|-------->  Business (Domínio)  <-------|-Access|
-                |           |                                       |       |
-                |           +---------------------------------------+       |
-                |                                                           |
-                |                                                           |
-                +-----------------------------------------------------------+   
+
+        +-----------------------------------------------------------------------------------------------+
+        |                                                                                               |   
+        |   +-------------------------------------------------------------------------------+           |
+        |   |                                                                               |           |
+        |   |   +---------------------------------------------------------------+           |           |
+        |   |   |                                                               |           |           |
+        |   |   |                                                               |           |           |
+        |   |   |           +---------------------------------------+           |           |           |
+        |   |   |           |                                       |           | Aplication|           |
+        |   |   |           |           Business (Domínio)  <-------| Infra <---|-Services<-|-- UI      |
+        |   |   |           |                                       |           |           |   Tests   |
+        |   |   |           +---------------------------------------+           |           |           |
+        |   |   |                                                               |           |           |
+        |   |   |                                                               |           |           |
+        |   |   +---------------------------------------------------------------+           |           |     
+        |   |                                                                               |           |
+        |   +-------------------------------------------------------------------------------+           |       
+        |                                                                                               |   
+        +-----------------------------------------------------------------------------------------------+
 
     . A Onion Architecture usa o conceito de camadas, mas são diferentes das camadas da arquitetura de três e 
         n-camadas. Vamos ver o que cada uma dessas camadas representa e o que deve conter.
@@ -1090,7 +1099,15 @@ Aula 17. Arquitetura Cebola
                 nenhum código pesado ou dependências. (Se um aplicativo for desenvolvido usando um ORM como o Entity Framework,  
                 essa camada conterá classes POCO.)
 
-        . Camada de Repositório (Repository Layer)
+            . A camada central (domínio) não depende das camadas externas ( UI e Data Access ).
+
+            . As camadas externas são clientes da camada interna.
+
+            . As camadas externas podem ser substituidas mais facilmente.
+
+            . A regra de dependência é sempre de fora pra dentro.
+
+        . Camada de Repositório (Infra, Repository Layer, Data Access)
 
             . Essa camada cria uma abstração entre as entidades do domínio e a lógica de negócios do aplicativo. Nesta camada, 
                 geralmente adicionamos interfaces que fornecem o comportamento de salvar e recuperar objetos, geralmente envolvendo 
@@ -1099,7 +1116,7 @@ Aula 17. Arquitetura Cebola
                 mapear os dados da fonte de dados para uma entidade comercial e persistir alterações na entidade comercial na 
                 fonte de dados.
 
-        . Camada de Serviços (Service Layer)
+        . Camada de Serviços (Service Layer, Application )
 
             . A camada de serviços mantém interfaces com operações comuns, como Adicionar, Salvar, Editar e Excluir. Além disso, 
             essa camada é usada para se comunicar com a camada da interface do usuário e a camada do repositório. A camada de 
@@ -1117,7 +1134,8 @@ Aula 17. Arquitetura Cebola
 
         . A seguir, estão algumas vantagens da implementação da Onion Architecture:
 
-            As camadas da Onion Architecture são conectadas através de interfaces. As implementações são fornecidas durante o tempo de execução;
+            As camadas da Onion Architecture são conectadas através de interfaces. As implementações são fornecidas durante o 
+                tempo de execução;
 
             A arquitetura do aplicativo é construída sobre um modelo de domínio;
 
@@ -1135,8 +1153,38 @@ Aula 17. Arquitetura Cebola
 
         . Algumas desvantagens da arquitetura Onion, como a seguir:
 
-            Não é fácil de entender para iniciantes, e tem uma curva de aprendizado. Os arquitetos geralmente confundem a divisão de responsabilidades entre as camadas;
+            Não é fácil de entender para iniciantes, e tem uma curva de aprendizado. Os arquitetos geralmente confundem a 
+                divisão de responsabilidades entre as camadas;
 
             Utiliza Interfaces em profusão;
 
-2.35
+    . Acesse o link abaixo:
+
+        # Como construir um projeto DDD em arquitetura cebola
+        https://www.macoratti.net/20/07/aspnc_ucddd1.htm
+
+    . A seguir vou me basear em uma arquitetura genérica para criar a aplicação e que será definida da seguinte forma:
+
+        . Apresentação      Cuida da interação com quem vai usar a nossa aplicação;  Podemos ter aqui um projeto Web, Mobile, Web API, 
+                            Desktop, etc.
+        
+        . Aplicação         Cuida da comunicação com o Domínio; Aqui podemos ter: Classes de serviços, Interfaces, DTOs, etc.
+        
+        . Domínio           É o coração do projeto e deve representar o negócio; Aqui teremos : entidades, Interfaces, Validações, etc.
+        
+        . Infraestrutura    Cuida do suporte geral às demais implementações e em geral possui uma outra camada que se comunica com 
+                            todas as camadas do projeto; Aqui podemos ter Repositórios, Persistência, Mapeamentos, Migrations, Context, etc.   
+
+    . Cada camada acima será um projeto em nossa solução.
+
+        . Dessa forma em nossa implementação criaremos uma solução e 4 projetos :
+
+            Contatos.sln - Solução
+            Contatos.Web - projeto Web API Asp .NET Core
+            Contatos.Application -  projeto Class Library
+            Contatos.Domain - projeto Class Library
+            Contatos.Infra - projeto Class Library
+
+
+Aula 18. DDD - Domain Drive Design
+----------------------------------
