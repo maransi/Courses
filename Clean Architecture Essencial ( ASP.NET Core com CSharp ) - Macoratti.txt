@@ -1026,3 +1026,117 @@ Aula 16 - Arquitetura em Camadas
 
 Aula 17. Arquitetura Cebola
 ---------------------------
+
+    . Arquitetura Cebola (Onion Architecture)
+
+        . Acesse a imagem abaixo para entender as camadas da arquitetura em cebola:
+
+            https://www.macoratti.net/20/05/net_onion11.jpg
+
+        . A arquitetura de cebola está baseada no princípio da inversão de controle e é composta por várias camadas concêntricas que se 
+            interconectam em direção ao núcleo que representa o domínio. Ela não depende da camada de dados como nas arquiteturas em 
+            várias camadas, mas dos modelos de comínio reais.
+
+        . A "Onion Architecture" resolveu o provlema do acoplamento entre as camadas defnindo camadas a partir do núcleo para a infraestrura.
+
+        . Ela aplica a regra fundamental movendos todos acoplamentos em direção ao centro, sendo que no centro da "Onion Architecture" está 
+            o modelo de domínio, que representa os objetos de negócios e co comportamento.
+
+        . Ao redor da camada de domínio existem outras camadas (UI, Infa, repositórios, interfaces) com mais comportamentos.
+
+    . Evolução da arquitetura em camadas para arquitetura cebola.
+
+        Arquitetura em Camadas                          Arquitetura Cebola
+        (Layered Architecture)                          (Onion Arquitecture)
+        +------------------------+                      +------------------------+
+        |   User Interface (UI)  |                      |   User Interface (UI)  |
+        +------------------------+                      +------------------------+
+                    |                                               |
+                    V                                               V
+        +------------------------+                      +------------------------+
+        |   Business (BLL)       |                      |   Business (BLL)       |
+        +------------------------+                      +------------------------+
+                    |   A camada de negócio                         ^   A arquitetura cebola 
+                    V   depende da camada dados                     |   inverte essa dependência
+        +------------------------+                      +------------------------+
+        |   Data Access (DAL)    |                      |   Data Access (DAL)    |
+        +------------------------+                      +------------------------+
+        Produz um forte acoplamento
+
+
+                            Arquitetura Cebola
+
+                +-----------------------------------------------------------+   
+                |                                                           |
+                |                                                           |
+                |           +---------------------------------------+       |
+                |  User     |                                       |  Data |
+                | Interface-|-------->  Business (Domínio)  <-------|-Access|
+                |           |                                       |       |
+                |           +---------------------------------------+       |
+                |                                                           |
+                |                                                           |
+                +-----------------------------------------------------------+   
+
+    . A Onion Architecture usa o conceito de camadas, mas são diferentes das camadas da arquitetura de três e 
+        n-camadas. Vamos ver o que cada uma dessas camadas representa e o que deve conter.
+
+        . Camada de Domínio (a camada mais interna)
+
+            . A camada de domínio reside na parte central da arquitetura Onion, e representa os objetos de negócios e 
+                o comportamento. A idéia é ter todos os seus objetos de domínio nesse núcleo. Ele contém todos os objetos 
+                de domínio do aplicativo. Além dos objetos de domínio, você também pode ter interfaces de domínio. Essas 
+                entidades de domínio não têm dependências. Objetos de domínio também são simples como deveriam ser, sem 
+                nenhum código pesado ou dependências. (Se um aplicativo for desenvolvido usando um ORM como o Entity Framework,  
+                essa camada conterá classes POCO.)
+
+        . Camada de Repositório (Repository Layer)
+
+            . Essa camada cria uma abstração entre as entidades do domínio e a lógica de negócios do aplicativo. Nesta camada, 
+                geralmente adicionamos interfaces que fornecem o comportamento de salvar e recuperar objetos, geralmente envolvendo 
+                um banco de dados. Essa camada consiste no padrão de acesso a dados, que é uma abordagem mais fracamente acoplada 
+                ao acesso a dados. Também criamos um repositório genérico e adicionamos consultas para recuperar dados da fonte,
+                mapear os dados da fonte de dados para uma entidade comercial e persistir alterações na entidade comercial na 
+                fonte de dados.
+
+        . Camada de Serviços (Service Layer)
+
+            . A camada de serviços mantém interfaces com operações comuns, como Adicionar, Salvar, Editar e Excluir. Além disso, 
+            essa camada é usada para se comunicar com a camada da interface do usuário e a camada do repositório. A camada de 
+            serviço também pode conter lógica de negócios para uma entidade. Nesta camada, as interfaces de serviço são mantidas 
+            separadas de sua implementação, tendo em mente o acoplamento e a separação de responsabilidades.
+
+        . Camada de Interface do Usuário (UI Layer)
+
+            . É a camada mais externa e mantém responsabilidades periféricas como interface do usuário e testes. Pode ser uma 
+            aplicação Web, uma API, um projeto de Testes, etc. Essa camada possui uma implementação do padrão da injeção de 
+            dependência, para que o aplicativo construa uma estrutura fracamente acoplada e possa se comunicar com a camada 
+            interna por meio de interfaces.
+
+    . Vantagens e desvantagens da arquitetura Onion
+
+        . A seguir, estão algumas vantagens da implementação da Onion Architecture:
+
+            As camadas da Onion Architecture são conectadas através de interfaces. As implementações são fornecidas durante o tempo de execução;
+
+            A arquitetura do aplicativo é construída sobre um modelo de domínio;
+
+            Toda dependência externa, como acesso ao banco de dados e chamadas de serviço, é representada em camadas externas;
+
+            Não há nenhuma dependência da camada Interna com camadas externas;
+
+            Os acoplamentos estão voltados para o centro;
+
+            Arquitetura flexível, sustentável e portátil;
+
+            Não há necessidade de criar projetos comuns e compartilhados;
+
+            Pode ser testada rapidamente porque o núcleo do aplicativo não depende de nada;
+
+        . Algumas desvantagens da arquitetura Onion, como a seguir:
+
+            Não é fácil de entender para iniciantes, e tem uma curva de aprendizado. Os arquitetos geralmente confundem a divisão de responsabilidades entre as camadas;
+
+            Utiliza Interfaces em profusão;
+
+2.35
