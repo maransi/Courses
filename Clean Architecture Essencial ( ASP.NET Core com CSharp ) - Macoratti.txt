@@ -1188,3 +1188,268 @@ Aula 17. Arquitetura Cebola
 
 Aula 18. DDD - Domain Drive Design
 ----------------------------------
+
+    . Links interessantes:
+
+        https://www.devmedia.com.br/ddd-domain-driven-design-com-net/14416
+
+    . O DDD não é arquitetura, não é tecnologia, não é framework, não é linguagem e não é padrão.
+
+    . O DDD ( Comain Driven Design) é uma abordagem ao design de software que se baseia no conceito de comínio, é uma filosifia voltada ao 
+        domínio do negócio.
+
+    . A principal ídeia do DDD é a de que o mais importante em um software não é o seu código, nem sua arquitetura, nem a tecnologia sobre a 
+        qual foi desenvolfido, mas sim o problema que o mesmo se propõe a resolver, ou em outras palavras, a regra de negócio.
+
+    . Quem criou?
+
+        . Eric Evans, apresentou o DDD em seu livro:
+
+            . Domain-Driven Design Tackling Complexity in the Heart of Software ( Design Orientado a Domínio: Combatendo a Complexidade no Coração 
+                do Software). Onde foram definidos um conjunto de conceitos básicos para apresentar o Domain Drive Design.
+
+    . Quando usar?
+
+        . O DDD não vai te ajudar a gerenciar melhor os dados
+
+        . Não vai te ajudar a aumentar o desempenho da sua aplicação
+
+        . Não vai te ajudar na complexidade da tecnologia usada no seu porjeto
+
+        . O DDD vai te ajudar a resolver problemas na complexidade do negócio
+
+    . A abordagem Doamin Driven Design será útil em projetos onde a complexidade da lógica de negócio justificar a sua adoção.
+
+    . Principais conceitos usados
+
+        . Ubiquitous Language (Linguagem Onipresente)
+
+            . A ubiquitous language é uma linguagem estruturada em torno do modelo de domínio e usada por todos os membros da equipe para conectar 
+                todas as atividades da equipe ao software.
+
+        . Model
+
+            . O modelo de um projeto orientado a domínio é a sua solução para o problema. O Model geralmente representa um aspecto da realidade ou
+                algo de interesse do negócio: o lanche, o cliente, a entrega, o produto, a venda, etc.
+
+        . Bounded Context
+
+            . Um Bounded Context é um limite conceitual no qual um modelo de domínio é aplicável, sendo que ele fornece um contexto para a linguagem 
+                ubíqua que é falada pela equipe e é expressa no modelo de software projetado.
+
+        . Context Maps 
+
+            . Os Context Maps ou Mapas de Contextos permitem identificar o relacionamento entre os Bounded Contexts e as equipes reponsáveis por cada 
+                contexto.
+
+        . Strategic Design (Modelagem Estratética)
+
+            . O objetivo principal da modelagem estratégica é definir 3 conceitos importantes com a equipe de projeto:
+
+                . Ubiquitous Language
+
+                . Bounded Context
+
+                . Context Maps.
+
+        . Tatical Design (Modelagem Tática)
+
+            . A modelagem tática está relacionada com os blocos de construção da DDD podendo ser:
+
+                Entities, Services, Repositories, Values Objects, Agreggates, Events, Factories, Modules, etc.
+
+            . Sendo um conjunto de recursos técnicos usados na construção do Modelo de domínio do negócio.
+
+        . Architecture Design
+            
+            . Refere-se aos estilos de arquitetura usado na implementação do DDD como: Hexagonal, Onion, Layred, CQRS, REST, etc.
+
+            . Uma das grandes vantagens do DDD é que ele não requer o uso de nenhuma arquiteutra específica.
+
+    . Principais beneficios
+
+        . Facilita a comunicação entr as equipes com o uso da linguagem onipresente.
+
+        . O código do projeto fica mais coeso e menos acoplado.
+
+        . O negócio é melhor compreendido por todos da equipe o que facilita o desenvolvimento.
+
+        . Melhora a flexibilidade do projeto deido ao domínio ser baseado no design orientado a objetos estando bem encapsulado e modularizado.
+
+        . Enfatiza o domínio sobre a interface onde o foco no domínio signifca produzir um produto que ressoa bem com o público associado a esse domínio.
+
+    . Desvantagens
+
+        . Possui um aalta complexidade exigindo experiência, conhecimento e capacidade de interação com os especialista do negócio.
+
+        . Requer um conhecimento robusto do domínio
+
+        . Não adequado para projetos com uma alta complexidade técnica nem para projetos simples como um CRUD básico.
+
+    . Livros indicados:
+
+        . Domain-Driven Design Tackling Complexity in the Heart of Software (Eric Evans)
+
+        . Implementado Domain-Driven Design (Vaughn Vernon)
+
+        . Hands-On Domain-Driven Design with .NET Core: Tackling complexity in the heart of software by putting DDD principles into practice (Alexey Zimarev)
+
+
+Aula 19. Clean Architecture
+---------------------------
+
+    . Arquitetura de Software
+
+        . A arquitetura de software expõe a estrutura de um sisema enquanto oculta os detalhes de implementação
+
+        . A arquitetura de softwware define o que é o sistema em termos de componentes de software, os relacionamentos entre estes componentes e os padrões 
+            que guiam a sua composição e restrições
+
+        . Assim, a arquitetura significa o design geral do projeto.
+
+        . É a organização do código em classe, arquivos, componenetes ou módulos.
+
+        . E é como todos esses grupos de código se relacionam entre si.
+
+    . Livros
+
+        . Clean Architecture: A Craftsman's Guide to Software Structure and Design (Robert C. Martin)
+
+        . Código limpo: habilidades práticas do Agile software (Robert C Martin)
+
+        . O codificador limpo: um código de conduta para programadores profissionais (Bob Martin)
+
+        . Clean Agile: Back To Basics (Robert C Martin)
+
+    . Clean Architecture
+
+        . Arquitetura limpa é um conceito proposto por Robert C Martin (Uncle Bob) em seu livro "Clena Architecture" como uma forma de construir soluções de software 
+            altamente flexíveis e sustentáveis.
+
+        . O conceito foi baseado nas boas práticas e nas arquiteturas hexagonal e cebola, dentre outras, que já propunham a separação das responsabilidades em camadas e 
+            tinham como objetivo produzir sistemas com as seguintes características:
+
+            . Independente de frameworks
+
+            . Testáveis 
+
+            . Independentes da interfae do usuário
+
+            . Indepentes do banco de dados
+
+            . Independente de qualquer agente externo.
+
+        . Fluxo do Clean Architecture:
+
+            +-----------------------------------------------------------------------+
+            |                                                                       |
+            |                                  Web                                  |   
+            |                                                                       |
+            |       +-------------------------------------------------------+       |
+            |   D   |                                                       |       |
+            |   e   |                       Controllers                     |       |
+            |   v   |                                                       |       |
+            |   i   |       +---------------------------------------+       |       |
+            |   c   |   G   |                                       |   P   |       |
+            |   e   |   a   |              Uses Cases               |   r   |       |
+            |   s   |   t   |                                       |   e   |       |
+            |       |   e   |       +-----------------------+       |   s   |       |
+            |       |   w   |       |                       |       |   e   |       |
+        +-> |   ----|-> a --|->  ---|->     Entities        |       |   n   |   U   |
+        |   |       |   y   |       |                       |       |   t   |   I   |
+        |   |       |   s   |       +-----------------------+       |   e   |       |
+        |   |    D  |       |                                       |   r   |       |                 
+        |   |    B  |       |                                       |   s   |       |
+        |   |       |       +---------------------------------------+       |       |
+        |   |       |                                                       |       |
+        |   |       |                                                       |       |
+        |   |       |                                                       |       |
+        |   |       +-------------------------------------------------------+       |
+        |   |                                                                       |   
+        |   |                          External Interface                           |   
+        |   |                                                                       |   
+        |   +-----------------------------------------------------------------------+
+        |   
+        |   . Arquitetura limpa refere-se à organização do projeto de forma que ele seja fácil de entender, fácil de testar, 
+        |        fácil de manter e fácil de mudar conforme o projeto cresce.
+        |
+        +-- . A regra de depedência, que afirma que a dependência do código-fonte só pode apontar para o interior do aplicativo
+
+            . Entidades
+
+                . No centro da arquitetura, temos as classes responsáveis pelas regras de negócio, que podem ser de dois tipos: 
+                    Entidades e casos de uso.
+
+                . Uma entidade é um conjunto de regras de negócios relacionadas que são críticas para o funcionamento do aplicativo.
+
+                . As regras seriam agrupadas como métodos em uma classe.
+
+                . As regras existem mesmo se não existir a aplicação.
+
+                . Como as entidades não conhecem as outras camadas elas não dependem de nada.
+
+            . Casos de Uso
+
+                . Contém as regras de negócio específicas do aplicativo.
+
+                . Dizem como automatizar o sistema determinando o seu comportamento.
+
+                    . Orquestram o fluxo de dados de e para as entidades.
+
+                    . Direcionam as entidades a usar suas regras de negócios.
+
+                    . Exemplo:
+
+                        . Obter informações de um produto: nome, preço, quantidade, etc.
+
+                        . Montar catálogo de produtos
+
+                        . Validar nome, preço, estoque
+
+                        . Verificar estoque
+
+                        . Se houver estoque incluir o produto no catálogo.
+
+                . Os casos de uso interagem e dependem das entidades, mas não sabem nada sobre as camadas mais distantes.
+
+            . Adaptadores (Controllers, Gateways e Presenters)
+
+                . Na terceira camada, a partir do centro, temos classes e interfaces chamadas de "adaptadores".
+
+                . A função delas é converter dados de um formato para outro.
+
+                . São os tradutores entre o domínio e a infraestrutura.
+
+                . Convertem os dados do formato mais conveniente para os casos de uso e entidades.
+
+                . É essa camada que via conter implementação MVC de uma UI com apresentadores, viauzliações e controladores, ou, que 
+                    poderá realizar a implementação dos endipoints de uma API REST. (recebe as requisições e encaminh para os casos de uso).
+
+                . Nenhum código dentro desse circulo deve saber absolutamente nada sobre o banco de dados.
+
+            . Camadas mais externa
+
+                . Essa camada é para onde vão todos os componentes de entrada e saída ou I/O, a interface com o usuário - UI, o banco de dados,
+                    os frameworks, os dispositivos, etc.
+
+                . Esta camada é para onde vão todos os detalhes. A interface é um detalhe. O bando de dados é um detalhe. É a camada mais volátil 
+                    pois pode mudar com frequência.
+
+                . Essa camada é mantida o mais longe possível das camadas de domínio.
+
+                . Como elas são mantidas separadas, é fácil fazer alterações ou trocar um componente por outro. Por exemplo: UI, banco de daos, 
+                    estrutura, dispositivos
+
+            . As camadas internas são mais estáveis
+
+            . As camadas externas são mais sujeitas a mudanças.
+
+            . As entidades raramente devem ser modificadas.
+
+            . Alterações nos Use Cases não devem ser motivadas por mudanças na tecnologia, banco de dados, grameworks, etc.
+
+            . A regra de dependência garnte que as entidades e os casos de uso sejam classes limpas de qq tecnologia ou serviços externo ao sistema.
+
+
+Aula 20. Testes de Unidade - xUnit
+----------------------------------            
