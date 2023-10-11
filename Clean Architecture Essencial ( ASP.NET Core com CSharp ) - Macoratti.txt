@@ -1355,14 +1355,14 @@ Aula 19. Clean Architecture
             |   s   |   t   |                                       |   e   |       |
             |       |   e   |       +-----------------------+       |   s   |       |
             |       |   w   |       |                       |       |   e   |       |
-        +-> |   ----|-> a --|->  ---|->  Entities/Domain    |       |   n   |   U   |
+        +-> |   ----|-> a --|->  ---|->  Entities/* Domain  |       |   n   |   U   |
         |   |       |   y   |       |                       |       |   t   |   I   |
         |   |       |   s   |       +-----------------------+       |   e   |       |
         |   |    D  |       |                                       |   r   |       |                 
-        |   |    B  |       |         Application                   |   s   |       |
+        |   |    B  |       |           * Application               |   s   |       |
         |   |       |       +---------------------------------------+       |       |
         |   |       |                                                       |       |
-        |   |       |                     Infrastructure                    |       |
+        |   |       |                   * Infrastructure                    |       |
         |   |       |                                                       |       |
         |   |       +-------------------------------------------------------+       |
         |   |                                                                       |   
@@ -1579,4 +1579,150 @@ Aula 20. Testes de Unidade - xUnit
                 Soma_DoisNumerosInteiros_RetornaNumeroInteiro()
                   1       2                   3
 
-                
+
+Apresentando o Problema, o Projeto e a Solução
+==============================================
+
+Aula 22. Apresentando o projeto : objetivo e escopo geral
+---------------------------------------------------------
+
+    . Escopo Geral
+
+        . Criar um proejto Web para tratar com produtos e categorias que podem ser usados para criar ctálogo de produto de vendas.
+
+        . Criar um aplicação ASP.NET Core MVC.
+
+        . Definir no projeto as funcilidades para poder consultar, criar, editar e excluir (CRUD) protudos e categorias.
+
+        . Definir o modelo de domínio usando classes e com propriedades e comportamentos: Product e Category
+
+        . Definir qual arquitetura a ser usada o projeto: Usar a abordagem da Clean Architecture
+
+        . Definir os padrões que iremos implmentar no projeto: MVC, Repository e CQRS
+
+        . Definir os atributos para o domínio 
+            
+            . Product         
+
+                Id          int, Identity
+                Name        sring
+                Description string
+                Price       decimal
+                Stock       int
+                Image       string
+
+            . Category
+
+                CategoryId  int, Identity
+                Name        string
+
+        . Definir o relacionamento usado. Teremos um relacionamento um-para-muitos entre Category e Product.
+
+    . Persistência dos dados usados no projeto
+
+        . Usar bancod de dados relacional: SQL Server, MySQL, SQLite, Oracle, etc.
+
+        . Usar ferramenta ORM: Entity Framework Core
+
+        . Usar a abordagem "Code-First" do EF Core para criar o bd e as tabelas.
+
+        . Provedor do banco de dados: Microsoft.EntityFrameworkCore.SqlServer, ou do banco escolhido
+
+        . Ferramenta para aplicar o Migrations: Microsoft.EntityFrameworkCore.Tools
+
+        . Desacoplar a camada de acesso a dados ORM: Padrão Repository
+
+    . Nomenclatura
+
+        . Usar a nomenclatura recomendada pela Microsoft para nomear classe, métodos, parâmetros e variáveis
+
+        . CamelCase             Em palabras compostas ou frases, a primeira letra da primeira palavra é iniciada 
+                                com minúscula e unidas sem espaços: Exemplo: valorDesconto, nomeCompleto
+
+        . PascalCase            Em palavras compostas ou frases montadas com palavras, a primeira letra de cada palavra
+                                é iniciada com maiúscula. Exemplo: CalculaImpostoDeRenda(), ValorDesconto().
+
+            Recurso                     Nomenclatura                                Exemplo
+            -------                     ------------                                -------
+            Classe                      PascalCase                                  Product, Category
+            Interface                   I + PascalCase                              IUser, ICalculateTotal
+            Método, Propriedade         PascalCase                                  Address, FirstName
+            Variáveis, parâmetros       CamelCase                                   stock, taxValue
+            Constantes                  Maiúsculas com sublinhado                   DISCOUNT_VALUE
+
+
+Aula 23. Apresentando a solução
+-------------------------------            
+
+    . Usar a regra de dependÊncia. Seguindo das camadas externas para a interna.
+
+    . Será composto por 5 projetos
+
+        . CleanArchMvc  (Solution)
+
+            . CleanArchMvc.Domain           Modelo de domínio, regras de negócio, interfaces
+
+            . CleanArchMvc.Application      Regras de domínio da aplicação, mapeamentos, serviços, DTOs, CQRS
+
+            . CleanArchMvc.Infra.Data       EF Core, Contexto, Configurações, Migratins, Repository
+
+            . CleanArchMvc.Infra.IoC        Dependency Injection, registro dos serviços, tempo de vida
+                                  |  
+                                  +-> Podia ter sido usado como "CrossCutting"  
+
+            . CleanArchMvc.WebUI            MVC, Controllers, Views, Filtros, ViewModels
+
+    . O projeto CleanArchMvc.WebUI é do tipo ASP.NET Core Web App (MVC)
+
+    . Os demais projetos serão do tipo "Class Library"
+
+    . Relacionamento e depedência entre os projetos:
+
+        . CleanArchMvc.Domain           Não possui nenhuma dependência
+
+        . CleanArchMvc.Application      Dependência com o projeto "Domain"
+
+        . CleanArchMvc.Infra.Data       Dependência com o projeto "Domain"
+
+        . CleanArchMvc.Infra.IoC        Dependência com os projetos "Domain, Aplication, Infra.Data"
+
+        . CleanArchMvc.WebUI            Dependência com o projeto "Infra.IoC"
+
+                        User Interface (WebUI)
+                        ----------------------
+                            |
+                            V
+            Infrastructure(Data/IoC)    Tests
+            ------------------------    -----
+                            |             |
+                            v             V
+                           Domain/Application
+                           ------------------
+
+    . Componentes distruibuidos por camadas e responsabilidade
+
+       ^  --------------------------------------------------------------------------------------------------------------------
+    R  |  Domain              Entities  Product       Interfaces  IProductRepository      Account IAuthenticate
+    e  |                      --------  Category      ----------  ICategoryRepository     ------- ISeedRoleInitial
+    g  |                                Entity                                                    IUser
+    r  |  --------------------------------------------------------------------------------------------------------------------
+    a  |  Application         Service ProductService      DTOs    ProdctDTO       Mappings    DomainViewModel    
+       |                      ------- CategoryService     ----    CategoryDTO     --------    ViewModelDomain
+    d  |  
+    e  |                      Interfaces  IProductService     Exceptions  CQRS
+       |                      ----------  ICategoryService    ----------  Command
+    D  |                                                                  Queries 
+    e  |                                                                  Handlers
+    p  |  ---------------------------------------------------------------------------------------------------------------------
+    e  |  Infra.Data          Repositories    ProductRepository       Context ApplicationContext      Migrations      Identity
+    n  |                      ------------    CategoryRepository      -------                         ----------      --------
+    d  |
+    ê  |  Infra.IoC           DependencyInjection
+    n  |                      -------------------
+    c  |  ---------------------------------------------------------------------------------------------------------------------
+    i  |  WebUI               Controllers AccountController       View    Filters     Components      ViewModels      MapConfig
+    a  |                      -----------                         ----    -------     ----------      ----------      ---------
+
+
+Aula 24. Criação da solução e dos projetos
+------------------------------------------
