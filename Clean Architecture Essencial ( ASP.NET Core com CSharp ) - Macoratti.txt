@@ -1355,18 +1355,18 @@ Aula 19. Clean Architecture
             |   s   |   t   |                                       |   e   |       |
             |       |   e   |       +-----------------------+       |   s   |       |
             |       |   w   |       |                       |       |   e   |       |
-        +-> |   ----|-> a --|->  ---|->     Entities        |       |   n   |   U   |
+        +-> |   ----|-> a --|->  ---|->  Entities/Domain    |       |   n   |   U   |
         |   |       |   y   |       |                       |       |   t   |   I   |
         |   |       |   s   |       +-----------------------+       |   e   |       |
         |   |    D  |       |                                       |   r   |       |                 
-        |   |    B  |       |                                       |   s   |       |
+        |   |    B  |       |         Application                   |   s   |       |
         |   |       |       +---------------------------------------+       |       |
         |   |       |                                                       |       |
-        |   |       |                                                       |       |
+        |   |       |                     Infrastructure                    |       |
         |   |       |                                                       |       |
         |   |       +-------------------------------------------------------+       |
         |   |                                                                       |   
-        |   |                          External Interface                           |   
+        |   |            External Interface             Framework                   |   
         |   |                                                                       |   
         |   +-----------------------------------------------------------------------+
         |   
@@ -1450,6 +1450,133 @@ Aula 19. Clean Architecture
 
             . A regra de dependência garnte que as entidades e os casos de uso sejam classes limpas de qq tecnologia ou serviços externo ao sistema.
 
+    . Exemplo de um projeto .NET
+
+        https://www.tatvasoft.com/blog/clean-architecture-net-core/
+        https://juldhais.net/clean-architecture-in-asp-net-core-web-api-4e5ef0b96f99
+        https://www.cmarix.com/blog/clean-architecture-net-core/
+        https://www.c-sharpcorner.com/article/clean-architecture-in-asp-net-core-web-api/
+        https://www.macoratti.net/20/10/aspnc_impclean1.htm
+
 
 Aula 20. Testes de Unidade - xUnit
 ----------------------------------            
+
+    . Objetivo: Tesar pequenas partes do software como métodos, funções, ou qualquer classe que trate com uma funcionalidade da aplicação.
+
+    . É uma responsabilidade do desenvolvedor
+
+    . Vantagens realizar os testes de unidade:
+
+        . Revelam se o software está funcionando conforme o esperado.
+
+        . Ajudam a capturar erros/problemas e corrigi-los antes de implantar o software em produção.
+
+        . Ajudam a entender os requisitos do software e se eles foram implementados.
+
+        . Ajudam os desenvolvedores a entender a funcionalidade real do software.
+
+        . Ajudam a reduzir o número de erros (bugs) no início do desenvolvimento.
+
+    . Dicas para escrever testes de unidade.
+
+        . Não escrever casos de testes de unidades no mesmo projeto, criar um projeto separado.
+
+        . Escrever casos de testes apenas para uma pequena unidade.
+
+        . Não escrever casos de testes que dependam de outros casos de teste.
+
+        . Os casos de testes de unidade devem ser bem organizados, ser sustentáveis e isolados.
+
+        . Os casos de teste devem ser sempre independentes de recursos externos, banco de dados por exemplo.
+
+    . Testes na plataforma .NET
+
+        . MSTest            É o mais antigo e simple e usa os atributos [TestClass] e [TestMethod]
+
+        . NUnit             É muito popular e tem uma implementação semlhante ao MSTest
+
+        . xUnit             Nasceu a partir do NUnit e por isso apresenta muitas semelhanças a este, sendo o mais recente (criado pel mesmo autor do NUnit)
+
+    . Exemplo do uso do xUnit:
+
+        . xUnit utiliza as anotações [Fact] e [Theory]
+
+            . Os métodos de teste sem parâmetros são decorados com o atributo [Fact]
+
+                [Fact]
+                public void SomarDoisValoresResultadoCorreto()
+                {
+                    ...
+                }
+    
+            . Os métodos de teste com parâmetros são decorados com o atributo [Theory]
+
+                [Theory]
+                [InlineData(-10)]
+                public void NaoPodeCriarValorNegativo( decimal valor)
+                {
+                    ...
+                }
+
+                . Os valores são fornecidos pelo parâmetro do atributo [InlineData]
+
+            . Podemos desativar um teste usando a propriedade "Skip" e indicar o motivo
+
+                [Fact( Skip = "Teste ainda não diponível")]
+                public void Teste()
+                {
+                    ...
+                }
+
+            . Podemos organizar os testes em grupos com o atributo [Trait] e criar nomes de categorias.
+
+                [Fact(DisplayName = "Teste No. 2")]
+                [Trait("Calculo", "Somar")]
+                public void SomarDoisNumerosRetornaNumero()
+                {
+                    ...
+                }
+
+                . Estes exemplo vai exibir o título "Calculo[Somar]"
+
+            . Princípio AAA - Arrange, Act e Assert ( Organizar, Agir e Assertar )
+
+                . Arrange   É onde preparamos tudo para o teste, onde preparamos a cena para testar (criar os objetos e 
+                            configurá-los conforme necessário).
+
+                . Act       É onde o método que esamos testando será executado.
+
+                . Assert    É a parte final do teste em que comparamos o que esperamos que aconteça com o resultado real 
+                            da execução do métdoto de teste.
+
+                . Exemplo:
+
+                    [Fact]                      // Atributo aplicado ao método p/indicar que é um método de teste de unidade vai ser executado pelo "Teste Runner"
+                    public void MetodoTeste()
+                    {
+                        // Arrange              // Preparação onde são configurados os recursos necessários ao teste
+
+                        // Act                  // Executa a ação de testar ou seja executa o teste preparado
+
+                        // Assert               // Faz a verificação e validação se a ação do teste foi correta comparando o resultado esperado com o resultado do teste
+                    }
+
+        . Definindo o nome dos métodos de testes de unidade
+
+            . Os nomes dos métodos de teste devem ser tão descritivos quanto possível.
+
+            . Usar um nome descritivo de forma a facilitar o entendimento do propósito do método a ser executado.
+
+            . Exemplo:
+
+                1. A primeira parte do nome representa o nome do método que está sendo testado.
+
+                2. a segund aparte do nome nos informa mais sobre o cenário de teste.
+
+                3. A última parte do nome é o resultado esperado.
+
+                Soma_DoisNumerosInteiros_RetornaNumeroInteiro()
+                  1       2                   3
+
+                
