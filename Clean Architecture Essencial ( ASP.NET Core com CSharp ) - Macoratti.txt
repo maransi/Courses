@@ -145,7 +145,10 @@ Ambiente
 
     sudo apt-get install sqlitebrowser
 
+. Instalação do Nodejs
 
+    sudo apt-get install nodejs
+    sudo apt-get install npm
 
 
 Conceitos e Fundamentos
@@ -1724,8 +1727,15 @@ Aula 23. Apresentando a solução
     a  |                      -----------                         ----    -------     ----------      ----------      ---------
 
 
+        . Observe que a dependência será sempre para o interior da arquitetura, porém um projeto poderá ter mais de uma dependência de projeto,
+            mas sempre obedecendo a regra de dependência para o interior.
+
+
 Aula 24. Criação da solução e dos projetos
 ------------------------------------------
+
+
+
 
     . Criação do solução em branco, execute os comandos abaixo:
 
@@ -1736,16 +1746,133 @@ Aula 24. Criação da solução e dos projetos
 
         dotnet new sln -n CleanArchMvc
 
+    . Criação do projeto "Class Library" abaixo:
+
+        dotnet new classlib -o ./src/CleanArchMvc.Domain -n Domain -f net6.0
+
+        rm ./src/CleanArchMvc.Domain/Class1.cs
+
+        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Domain
+
+
+
+
+        dotnet new classlib -o ./src/CleanArchMvc.Application -n Application -f net6.0
+
+        rm ./src/CleanArchMvc.Application/Class1.cs
+
+        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Application
+
+
+
+
+        dotnet new classlib -o ./src/CleanArchMvc.Infra.Data -n Infra.Data -f net6.0
+
+        rm ./src/CleanArchMvc.Infra.Data/Class1.cs
+
+        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Infra.Data
+
+
+
+
+        dotnet new classlib -o ./src/CleanArchMvc.Infra.IoC -n Infra.IoC -f net6.0
+
+        rm ./src/CleanArchMvc.Infra.IoC/Class1.cs
+
+        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Infra.IoC
+
+
+    . Criação do projeto "Web":
+
+        dotnet new mvc -o ./src/CleanArchMvc.WebUI -n WebUI -f net6.0
+
+        cd ./src/CleanArchMvc.WebUI
+
+        dotnet add package Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation --version 6.0.23
+
+        cd ../..
+
+        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.WebUI
+
+    . Criação do projeto de "Test"
+
+        dotnet new xUnit -o ./tests/Application.IntegrationTests -n Application.IntegrationTests -f net6.0
+        dotnet new xUnit -o ./tests/UnitTests -n UnitTests -f net6.0
+        dotnet new xUnit -o ./tests/Infrastructure.UnitTests -n Tests -f net6.0
+
+        dotnet sln CleanArchMvc.sln add ./tests/Application.IntegrationTests
+        dotnet sln CleanArchMvc.sln add ./tests/UnitTests
+        dotnet sln CleanArchMvc.sln add ./tests/Infrastructure.UnitTests
+
+    . Verificação dos projetos na solution:
+
         dotnet sln CleanArchMvc.sln list
 
-    . Criação do projeto Domain:
+    . Execute o comando abaixo para executar a solution:
 
-        # IMPORTANTE: verifique se o correto é "dotnet new classlib -o "CleanArchMvc/Domain / CleanArchMvc.Domain"
-        dotnet new classlib -o CleanArchMvc/Domain -n Domain -f net6.0
+        # Executar na pasta da solution
+        dotnet clean
 
-        rm CleanArchMvc/Domain/Class1.cs
+        dotnet restore
 
-        dotnet sln CleanArchMvc.sln add CleanArchMvc/Domain
+        dotnet build
+
+        dotnet run --project ./src/CleanArchMvc.WebUI/
+
+    . Deixando mais facil a execução do passo acima:
+
+        . Crie o arquivo "package.json" com o conteúdo abaixo na pasta da solution, mesmo local que encontra-se o arquivo ".sln":
+
+            {
+                "name": "dotnet-run-default-project",
+                "private": true,
+                "version": "1.0.0", 
+                "scripts": {
+                    "start": 
+                        "dotnet clean & dotnet restore & dotnet build & dotnet run --project ./src/CleanArchMvc.WebUI/"
+                }
+            }
+
+        . Execute o comando abaixo na pasta da solution:
+
+            npm start
 
 
+Aula 26. Criando as dependências entre os projetos
+--------------------------------------------------
+
+    . Relacionamento e dependência entre os projetos:
+
+        . CleanArchMvc.Domain           Não possui nenhuma dependência
+
+        . CleanArchMvc.Application      Dependência com o projeto "Domain"
+
+        . CleanArchMvc.Infra.Data       Dependência com o projeto "Domain"
+
+        . CleanArchMvc.Infra.IoC        Dependência com os projetos "Domain, Application, Infra.Data
+
+        . CleanArchMvc.WebUI            Dependência com o projeto "Infra.IoC"
+
+    . Dentro da pasta raiz da solution, execute os comandos abaixo para criar as referências entre projetos:
+
+        . Adicionando a referencia do projeto "Application"
+
+            dotnet add ./src/CleanArchMvc.Application/ reference ./src/CleanArchMvc.Domain/
+
+        . Adicionando a referencia do projeto "Infra.Data"
+
+            dotnet add ./src/CleanArchMvc.Infra.Data/ reference ./src/CleanArchMvc.Domain/
+
+        . Adicionando a referencia do projeto "Infra.IoC"
+
+            dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Domain/
+
+            dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Application/
+
+            dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Infra.Data/
+
+        . Adicionando a referencia do projeto "WebUI"
+
+            dotnet add ./src/CleanArchMvc.WebUI/ reference ./src/CleanArchMvc.Infra.IoC/
+        
 
