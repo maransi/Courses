@@ -1730,19 +1730,21 @@ Aula 24. Criação da solução e dos projetos
     . Criação do solução em branco, execute os comandos abaixo:
 
         # Execute esse comando na pasta de projetos
-        dotnet new sln CleanArchMvc
+        mkdir CleanArchMvc
 
         cd CleanArchMvc
+
+        dotnet new sln -n CleanArchMvc
 
         dotnet sln CleanArchMvc.sln list
 
     . Criação do projeto Domain:
 
         # IMPORTANTE: verifique se o correto é "dotnet new classlib -o "CleanArchMvc/Domain / CleanArchMvc.Domain"
-        dotnet new classlib -o CleanArchMvc/Domain
+        dotnet new classlib -o CleanArchMvc/Domain -n Domain -f net6.0
 
         rm CleanArchMvc/Domain/Class1.cs
-        
+
         dotnet sln CleanArchMvc.sln add CleanArchMvc/Domain
 
 
