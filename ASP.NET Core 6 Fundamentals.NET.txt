@@ -6423,6 +6423,23 @@ Configurando Autenticação e Autorização
             public class AppDbContext: IdentityDbContext                    // DbContext       // Linha aterada, substitução da interfae "DbContext" pela "IdentityDbContext"
             ...
 
+        . Faça a alteração abaixo na classe "Program.cs":
+
+            ...
+            using Microsoft.AspNetCore.Identity;                    // Linha inserida
+            ...
+
+            builder.Services.AddDbContext<AppDbContext>( options => {                           
+                options.UseSqlite( 
+                    builder.Configuration["ConnectionStrings:DefaultConnection"]);
+            });
+15.00
+            builder.Services.AddDefaultIdentity<IdentityUser>()         // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
+                .AddEntityFrameworkStores<AppDbContext>();                  // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
+            ...
+            app.UseAuthentication();                                    
+            app.UseAuthorization();                                         // Linha inserida
+
         . Acesse a classe "Program.cs" e faça a atualização abaixo:
 
             ...
@@ -6488,23 +6505,6 @@ Configurando Autenticação e Autorização
                 Account.ResetPassword
                 Account.ResetPasswordConfirmation
 
-
-        . Faça a alteração abaixo na classe "Program.cs":
-
-            ...
-            using Microsoft.AspNetCore.Identity;                    // Linha inserida
-            ...
-
-            builder.Services.AddDbContext<AppDbContext>( options => {                           
-                options.UseSqlite( 
-                    builder.Configuration["ConnectionStrings:DefaultConnection"]);
-            });
-15.00
-            builder.Services.AddDefaultIdentity<IdentityUser>()         // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
-                .AddEntityFrameworkStores<AppDbContext>();                  // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
-            ...
-            app.UseAuthentication();                                    
-            app.UseAuthorization();                                         // Linha inserida
 
         . Execute o comando abaixo na pasta raiz do projeto:
 
