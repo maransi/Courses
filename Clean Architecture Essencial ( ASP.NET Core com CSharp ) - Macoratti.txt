@@ -1876,3 +1876,249 @@ Aula 26. Criando as dependências entre os projetos
             dotnet add ./src/CleanArchMvc.WebUI/ reference ./src/CleanArchMvc.Infra.IoC/
         
 
+Implementando a Camada de Doamin
+================================
+
+Aula 28. Criando as entidades do modelo domínio
+-----------------------------------------------
+
+    . Camada de Domínio
+
+        . A camada de domínio é responsável por representar conceitos do negócio, informações sobre a 
+            situação do negócio e regras de negócio.
+
+        . O estado que reflete a situação do negócio é controlado e usado aqui, embora os detalhes técnicos 
+            de armazemanmento sejam delegados à infraestrutura.
+
+    . Implementando a camada Domain - Definindo o escopo do projeto Domain
+
+        . Criar as pastas no projeto CleanArchMvc.Domain
+
+            . Entities:     Contém as classes "Category" e "Product" que representam o nosso modelo de domínio
+
+            . Interfaces:   Contém as interfaces "ICategoryRepository" e "IProductRepository"
+
+            . Validation:   Contém a classe "DomainExceptionValidation" para vaidar o modelo de domínio.
+
+        . Entity - "Uma entidade é um objeto dentro do nosso projeto que incorpora um conjunto de regras críticas             
+                    de negócio operando em dados crtíticos de negócios"
+
+        . Não estamos usando os conceitos de DDD como Entity, Value Object e Aggregate.
+
+        . Objetivo: criar um modelo de dominio não anêmico procurando isolar o domínio do mundo externo de forma que 
+            ele seja independente de todas as outras camadas do projeto, e, garantir que as entidades de domínio sejam 
+            sempre válidas.
+
+        . Recursos:
+
+            . Classes "sealed" - Quando aplicado a uma classe, o modificador sealed impede que outras classes herdem dela.
+
+            . Setters private
+
+            . Construtor parametrizado
+
+            . Definir uma classe base de entidade
+
+            . Definir comportamentos no modelo de domínio
+
+            . Definir a validação do modelo
+
+            . Definir interfaces para o repositório
+
+            . Realizar testes de unidade para o projeto Domain
+
+        . Acesse o projeto "Domain" e crie as pastas abaixo na raiz:
+
+            . Entities
+
+            . Interfaces
+
+            . Validation
+
+        . Crie a classe "Category" abaixo na pasta "Entities":
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            using System.Collections.Generic;
+
+            public class Category
+            {
+                public int Id { get; set; }
+
+                public string Name {get; set; }
+
+                public ICollection<Product>  Products {get; set; }
+            }
+
+        . Crie a classe "Product" abaixo na pasta "Entities":
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            public class Product
+            {
+                public int Id { get; set; }
+
+                public string Name {get; set; }
+
+                public string Description  {get; set; }
+                
+                public decimal Price  {get; set; }
+                
+                public int Stock {get; set; }
+                
+                public string Image {get; set; }
+
+                public int CategoryId  {get; set; }
+
+                public Category Category {get; set; }
+            }
+
+        . As classes "Category" e "Product" fazem parte de um modelo anêmico, ou seja, uma forma de modelagem 
+            de domínio que consiste na separação entre classes que apresentam apenas estado ou apenas comportamentos.
+
+        . Iremos transforma esse modelo num modelo rico.
+
+
+Aula 29. Enriquecendo o modelo de domínio criado - I
+----------------------------------------------------
+
+    . Altere as classes "Category" e "Product" colocando o modificador de acesso "sealed" para impedir que elas sejam herdadas.
+
+            public sealed class Category
+            {
+                ...
+            }
+
+            public sealed class Product
+            {
+                ...
+            }
+
+    . Altere as classes "Category" e "Product" alterando os "Setter" para "private":
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            using System.Collections.Generic;
+
+            public sealed class Category
+            {
+                public int Id { get; private set; }
+
+                public string Name {get; private set; }
+
+                public ICollection<Product>  Products {get; set; }
+            }
+
+
+
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            public sealed class Product
+            {
+                public int Id { get; private set; }
+
+                public string Name {get; private set; }
+
+                public string Description  {get; private set; }
+                
+                public decimal Price  {get; private set; }
+                
+                public int Stock {get; private set; }
+                
+                public string Image {get; private set; }
+
+                public int CategoryId  {get; private set; }
+
+                public Category Category {get; private set; }
+            }
+
+    . Crie os construtores com parâmetros nas classes "Category" e "Product":
+
+        public sealed class Category
+        {
+            public Category( string name )
+            {
+                Name = name;
+            }
+
+            public Category( int id, string name )
+            {
+                Id = id;
+                Name = name;
+            }
+
+            ...
+        }
+
+
+
+
+        public sealed class Product
+        {
+            public Category( string name, ... )
+            {
+                Name = name;
+                ...
+            }
+
+            public Category( int id, string name, ... )
+            {
+                Id = id;
+                Name = name;
+                ...
+            }
+
+            ...
+        }
+
+    . Crie a classe "DomainExcetpionValidation" no pacote "Validation":
+
+        namespace CleanArchMvc.Domain.Validation;
+
+        public class DomainExceptionValidation: Exception
+        {
+            public DomainExceptionValidation( string error): base(error)
+            {
+
+            }
+
+            public static void When( bool hasError, string error )
+            {
+                if (hasError)
+                    throw new DomainExceptionValidation(error);
+            }
+        }
+
+
+    . Altere a classe "Category" como abaixo:
+
+        ...
+        public Category( string name )
+        {
+            ValidateDomain(name);           // Linha alterada
+        }
+
+        public Category( int id, string name )
+        {
+            DomainExceptionValidation.When( id < 0, "Invalid Id value");
+
+            ValidateDomain( name );
+
+            Id = id;
+        }
+
+        ...
+
+        private void ValidateDomain( string name )  // Método inserido
+        {
+            DomainExceptionValidation.When( string.IsNullOrEmpty(name), "Invalid name. Name is Required");
+
+            DomainExceptionValidation.When( name.Lenght < 3, "Invalid name. Too short, minimum 3 characters");
+
+            Name = name;
+        }
+
+
+Aula 30. Enriquecendo o modelo de domínio criado - II
+-----------------------------------------------------
