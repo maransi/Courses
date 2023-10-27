@@ -2028,9 +2028,9 @@ Aula 29. Enriquecendo o modelo de domínio criado - I
                 
                 public string Image {get; private set; }
 
-                public int CategoryId  {get; private set; }
+                public int CategoryId  {get; set; }             // Não é necessário colocar "private" aqui porque estes atributos não fazem parte do modelo de domínio
 
-                public Category Category {get; private set; }
+                public Category Category {get; set; }
             }
 
     . Crie os construtores com parâmetros nas classes "Category" e "Product":
@@ -2122,3 +2122,135 @@ Aula 29. Enriquecendo o modelo de domínio criado - I
 
 Aula 30. Enriquecendo o modelo de domínio criado - II
 -----------------------------------------------------
+
+    . Altere a classe "Category como abaixo:
+
+        ...
+        public Category( int id, string name )
+        {
+            DomainExceptionValidation.When( id < 0, "Invalid Id value");
+
+            ValidateDomain( name );
+
+            Id = id;
+        }
+
+        public void Update( string name)        // Método inserido
+        {
+            ValidateDomain( name );
+        }
+        ...
+
+    . Altere a classe "Product" como abaixo:
+
+        using CleanArchMvc.Domain.Validation;
+
+        namespace CleanArchMvc.Domain.Entities;
+
+        public sealed class Product
+        {
+            public int Id { get; private set; }
+            public string Name { get; private set; }
+            public string Description { get; private set; }
+            public decimal Price { get; private set; }
+            public int Stock { get; private set; }
+            public string Image { get; private set; }
+
+            // Construtor inserido
+            public Product(string name, string description, decimal price, int stock, string image)
+            {
+                ValidateDomain(name, description, price, stock, image);
+            }
+
+            // Construtor inserido
+            public Product(int id, string name, string description, decimal price, int stock, string image)
+            {
+                DomainExceptionValidation.When(id < 0, "Invalid Id value.");
+                Id = id;
+                ValidateDomain(name, description, price, stock, image);
+            }
+
+            // Método inserido
+            public void Update(string name, string description, decimal price, int stock, string image, int categoryId)
+            {
+                ValidateDomain(name, description, price, stock, image);
+                CategoryId = categoryId;
+            }
+
+            // Método inserido
+            private void ValidateDomain(string name, string description, decimal price, int stock, string image)
+            {
+                DomainExceptionValidation.When(string.IsNullOrEmpty(name), 
+                    "Invalid name. Name is required");
+
+                DomainExceptionValidation.When(name.Length < 3,
+                    "Invalid name, too short, minimum 3 characters");
+
+                DomainExceptionValidation.When(string.IsNullOrEmpty(description),
+                    "Invalid description. Description is required");
+
+                DomainExceptionValidation.When(description.Length < 5, 
+                    "Invalid description, too short, minimum 5 characters");
+
+                DomainExceptionValidation.When(price < 0, "Invalid price value");
+
+                DomainExceptionValidation.When(stock < 0, "Invalid stock value");
+
+                DomainExceptionValidation.When(image.Length > 250,
+                    "Invalid image name, too long, maximum 250 characters");
+
+                Name = name;
+                Description = description;
+                Price = price;
+                Stock = stock;
+                Image = image;
+
+            }
+        }
+
+    . Crie a classe "Entity.cs" abaixo na pasta "Entities":
+
+        namespace CleanArchMvc.Domain.Entities;
+
+        public abstract class Entity
+        {
+            public int Id { get; protected set; }
+        }
+
+    . Faça as alterações abaixo nas classes "Category" e "Product":
+
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            using System.Collections.Generic;
+
+            // Estenda a classe "Entity"
+            public sealed class Category: Entity
+            {
+                // Apague a linha abaixo
+                // public int Id { get; private set; }
+
+                ...
+            }
+
+
+
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            using System.Collections.Generic;
+
+            // Estenda a classe "Entity"
+            public sealed class Product: Entity
+            {
+                // Apague a linha abaixo
+                // public int Id { get; private set; }
+
+                ...
+            }
+
+
+
+Aula 31. Criando as interfaces dos repositórios
+-----------------------------------------------
+
