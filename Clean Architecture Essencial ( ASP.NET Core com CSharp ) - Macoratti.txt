@@ -2254,3 +2254,50 @@ Aula 30. Enriquecendo o modelo de domínio criado - II
 Aula 31. Criando as interfaces dos repositórios
 -----------------------------------------------
 
+    . Crie as interfaces abaixo na namespace "CleanArchMvc.Domain.Interfaces":
+
+        namespace CleanArchMvc.Domain.Interfaces
+        {
+            public interface ICategoryRepository
+            {
+                Task<IEnumerable<Category>> GetCategoriesAsync();
+
+                Task<Category> GetByIdAsync( int? id);
+
+                Task<Category> CreateAsync( Category category );
+
+                Task<Category> UpdateAsync( Category category );
+
+                Task<Category> RemoveAsync( Category category );
+            }
+        }
+
+
+        namespace CleanArchMvc.Domain.Interfaces
+        {
+            public interface IProductRepository
+            {
+                Task<IEnumerable<Product>> GetProductsAsync();
+
+                Task<Product> GetById(Async int? id);
+
+                Task<Product> CreateAsync( Product product );
+
+                Task<Product> UpdateAsync( Product product );
+
+                Task<Product> RemoveAsync( Product product );
+
+            }
+        }
+
+    . Essas interfaces funcionarão como contratos que devem ser seguidas por quem for implementar os repositórios.
+
+    . Essas interfaces serão utilizadas para acessar o repositório e o repositório não será immplementado aqui na camada
+        de domínio porque estamos usando interfaces. A implementação dos repositórios serão feita na camada de infraestrutura
+        
+    . O padrão pe um repositório será usado para encapsular as interações com o bando de dados por meio de uma camada de abstração.
+
+
+
+Aula 32. Implementando os testes de unidade para o projeto Domain
+-----------------------------------------------------------------
