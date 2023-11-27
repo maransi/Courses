@@ -1794,7 +1794,7 @@ Aula 24. Criação da solução e dos projetos
 
         dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.WebUI
 
-    . Criação do projeto de "Test"
+    . Criação dos projetos de "Test"
 
         dotnet new xUnit -o ./tests/Application.IntegrationTests -n Application.IntegrationTests -f net6.0
         dotnet new xUnit -o ./tests/UnitTests -n UnitTests -f net6.0
@@ -2306,3 +2306,316 @@ Aula 31. Criando as interfaces dos repositórios
 
 Aula 32. Implementando os testes de unidade para o projeto Domain
 -----------------------------------------------------------------
+
+    . Objetivos:
+
+        . Criar um projeto do tipo xUnit Test Project
+
+            . CleanArchMvc.Domain.Tests
+
+            . Referenciar o proejto Domain
+
+            . Criar as classes de testes: CategoryUnit Test1 e ProductUnitTest1
+
+        . Incluir o pacote FluentAssertions
+
+            . Ajuda a especificar testes de forma simples
+
+            . Facilita a leitura e entendimento dos testes de unidade
+
+            . https://fluentassertions.com
+
+        . Usar a extesion "Test Explorer" do Visual Studio
+
+        . Padrões de nomenclatura dos testes
+
+            . A primeira parte do nome representa o nome do que esta sendo testado;
+
+            . A segunda parte do nome complementa a informação sobre o cenário de teste;
+
+            . A última parte do nome representa o resultado esperado do teste;
+
+            . Exemplos:
+
+                CreateProduct_WithValidParameters_ResultObjectValidState()
+
+                CreateProduct_InvalidStockValue_DomainExceptinNegativeValue( int value )
+
+                
+
+                [Fact( DisplayName = "Create Category Object With Valid State")]
+                public void CreateCategory_WithValidParameters_ResultObjectValidState()
+                {
+                    Action action = () => new Category( 1, "Category Name" );
+
+                    action.Should()
+                        . NotThrow< eStore.Domain.Validation.DomainExceptionValidation >();
+                }
+
+
+Aula 33. Testes de unidade para a entidade Category
+--------------------------------------------------
+
+    . Dentro da pasta raiz da solution, execute os comandos abaixo para criar o projeto de teste e as referências entre projetos:
+
+        . Criação do projeto de "Test"
+
+            dotnet new xUnit -o ./tests/Domain.UnitTests -n Domain.UnitTests -f net6.0
+
+            dotnet sln CleanArchMvc.sln add ./tests/Domain.UnitTests
+
+
+        . Adicionando a referencia do projeto "Doamin"
+
+            dotnet add ./test/Domain.UnitTests/ reference ./src/CleanArchMvc.Domain/
+
+        . Verificação dos projetos na solution:
+
+            dotnet sln CleanArchMvc.sln list
+
+    . Adicionando a package "FluentAssertions" no projeto de testes:
+
+        cd ./tests/Domain.UnitTests
+
+        dotnet add package FluentAssertions --version 6.12.0
+
+        cd ../..
+
+    . Execute o comando abaixo para executar a solution:
+
+        # Executar na pasta da solution
+        dotnet clean
+
+        dotnet restore
+
+        dotnet build
+
+        dotnet run --project ./src/CleanArchMvc.WebUI/
+
+    . No projeto "./test/Domain.Tests" renomeie a classe:
+
+        "UnitTest1.cs"  ----> "CategoryUnitTest1.cs"
+
+    . Altere o conteúdo da classe "CategoryUnitTest1.cs" pelo abaixo:
+
+        using CleanArchMvc.Domain.Entities;
+        using FluentAssertions;
+        using System;
+        using Xunit;
+
+        namespace Domain.UnitTests
+        {
+            public class CategoryUnitTest1
+            {
+                [Fact(DisplayName ="Create Category With Valid State")]
+                public void CreateCategory_WithValidParameters_ResultObjectValidState()
+                {
+                    Action action = () => new Category(1, "Category Name ");
+                    action.Should()
+                        .NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                }
+
+                [Fact]
+                public void CreateCategory_NegativeIdValue_DomainExceptionInvalidId()
+                {
+                    Action action = () => new Category(-1, "Category Name ");
+                    action.Should()
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid Id value.");
+                }
+
+                [Fact]
+                public void CreateCategory_ShortNameValue_DomainExceptionShortName()
+                {
+                    Action action = () => new Category(1, "Ca");
+                    action.Should()
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid name, too short, minimum 3 characters");
+                }
+
+                [Fact]
+                public void CreateCategory_MissingNameValue_DomainExceptionRequiredName()
+                {
+                    Action action = () => new Category(1, "");
+                    action.Should()
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid name.Name is required");
+                }
+
+                [Fact]
+                public void CreateCategory_WithNullNameValue_DomainExceptionInvalidName()
+                {
+                    Action action = () => new Category(1, null);
+                    action.Should()
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                }
+            }
+        }
+
+    . Execute os testes.
+
+    . Verifique mais detalhes de como executar testes no curso "ASP.NET 6 Fundamentals" e na "Aula 20. Testes de Unidade - xUnit"
+
+
+Aula 34. Testes de unidade para a entidade Product
+--------------------------------------------------
+
+    . Crie a classe "ProductUnitTest1" abaixo na raiz do projeto
+
+        using CleanArchMvc.Domain.Entities;
+        using FluentAssertions;
+        using System;
+        using Xunit;
+
+        namespace Domain.UnitTests
+        {
+            public class ProductUnitTest1
+            {
+                [Fact]
+                public void CreateProduct_WithValidParameters_ResultObjectValidState()
+                {
+                    Action action = () => new Product(1, "Product Name", "Product Description", 9.99m,
+                        99, "product image");
+                    action.Should()
+                        .NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                }
+
+                [Fact]
+                public void CreateProduct_NegativeIdValue_DomainExceptionInvalidId()
+                {
+                    Action action = () => new Product(-1, "Product Name", "Product Description", 9.99m,
+                        99, "product image");
+
+                    action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid Id value.");
+                }
+
+                [Fact]
+                public void CreateProduct_ShortNameValue_DomainExceptionShortName()
+                {
+                    Action action = () => new Product(1, "Pr", "Product Description", 9.99m, 99,
+                        "product image");
+                    action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid name, too short, minimum 3 characters");
+                }
+
+                [Fact]
+                public void CreateProduct_LongImageName_DomainExceptionLongImageName()
+                {
+                    Action action = () => new Product(1, "Product Name", "Product Description", 9.99m,
+                        99, "product image toooooooooooooooooooooooooooooooooooooooooooo loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg");
+
+                    action.Should()
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid image name, too long, maximum 250 characters");
+                }
+
+                [Fact]
+                public void CreateProduct_WithNullImageName_NoDomainException()
+                {
+                    Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);
+                    action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                }
+
+                [Fact]
+                public void CreateProduct_WithEmptyImageName_NoDomainException()
+                {
+                    Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, "");
+                    action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                }
+
+                [Fact]
+                public void CreateProduct_InvalidPriceValue_DomainException()
+                {
+                    Action action = () => new Product(1, "Product Name", "Product Description", -9.99m,
+                        99, "");
+                    action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid price value");
+                }
+
+                [Theory]
+                [InlineData(-5)]
+                public void CreateProduct_InvalidStockValue_ExceptionDomainNegativeValue(int value)
+                {
+                    Action action = () => new Product(1, "Pro", "Product Description", 9.99m, value,
+                        "product image");
+                    action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid stock value");
+                }
+
+            }
+        }
+
+    . Execute os testes.
+
+
+Aula 35. Fazendo ajustes no modelo de domínio Product
+-----------------------------------------------------
+
+    . No teste que verifica se o tamanho do nome da imagem é maior que 255, o teste manda para o construtor da classe
+        "domain" um valor nulo. O teste passa porque ele está preparado somente para verificar a "exception" 
+        "DomainExceptionValidation" ------------------------------------------------------------------------------------+
+                                                                                                                        |
+            [Fact]                                                                                                      |
+            public void CreateProduct_WithNullImageName_NoDomainException()                                             |
+            {                                                                                                           |
+                Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);           |
+                action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();                   |
+            }                                                                   ^                                       |
+                                                                                +---------------------------------------+
+
+    . Emobra o teste está sendo executado com sucesso, uma excessão é levantada "NullReferenceException". Se quisessemos forçar 
+        a não entrada de imagens com nomes nulo teriamos que criar mais um método como abaixo:  ------------------------+
+                                                                                                                        |
+            [Fact]                                                                                                      |
+            public void CreateProduct_WithNullImageNameNullReferenceException()                                             |
+            {                                                                                                           |
+                Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);           |
+                action.Should().NotThrow<NullReferenceException>();                                                     |
+            }                               ^                                                                           |
+                                            +---------------------------------------------------------------------------+
+
+    . Crie na classe de teste "ProductUnitTest1.cs" o método acima que contempla a "Exception" "NullRereferenceException" e execute o teste.
+
+    . Verifique se o teste dessa vez não passou, devido ao conteúdo nulo do nome da imagem.
+
+    . Como o objetivo é permitir que cadastremos imagens com valores nulos/vázio vamos desfazer a condição "NullReferenceException" dos testes e substituir
+        pelo operador condicional "?":
+
+        ########## . Elimine o método acima "CreateProduct_WithNullImageNameNullReferenceException" da classe de teste.
+
+        . Altere a linha abaixo deixando o operador "?":
+
+            private void ValidateDomain(string name, string description, decimal price, int stock, string image)
+            {
+                DomainExceptionValidation.When(string.IsNullOrEmpty(name), 
+                    "Invalid name. Name is required");
+
+                DomainExceptionValidation.When(name.Length < 3,
+                    "Invalid name, too short, minimum 3 characters");
+
+                DomainExceptionValidation.When(string.IsNullOrEmpty(description),
+                    "Invalid description. Description is required");
+
+                DomainExceptionValidation.When(description.Length < 5, 
+                    "Invalid description, too short, minimum 5 characters");
+
+                DomainExceptionValidation.When(price < 0, "Invalid price value");
+
+                DomainExceptionValidation.When(stock < 0, "Invalid stock value");
+
+                
+                // Linha alterada - Insirido o operador "?"
+                DomainExceptionValidation.When(image?.Length > 250,
+                    "Invalid image name, too long, maximum 250 characters");
+
+
+                Name = name;
+                Description = description;
+                Price = price;
+                Stock = stock;
+                Image = image;
+
+            }
+
+    . Execute os testes e verifique se valores nulos são permitidos novamente.
