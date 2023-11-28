@@ -1465,7 +1465,7 @@ Aula 19. Clean Architecture
 Aula 20. Testes de Unidade - xUnit
 ----------------------------------            
 
-    . Objetivo: Tesar pequenas partes do software como métodos, funções, ou qualquer classe que trate com uma funcionalidade da aplicação.
+    . Objetivo: Testar pequenas partes do software como métodos, funções, ou qualquer classe que trate com uma funcionalidade da aplicação.
 
     . É uma responsabilidade do desenvolvedor
 
@@ -1548,7 +1548,7 @@ Aula 20. Testes de Unidade - xUnit
                 . Arrange   É onde preparamos tudo para o teste, onde preparamos a cena para testar (criar os objetos e 
                             configurá-los conforme necessário).
 
-                . Act       É onde o método que esamos testando será executado.
+                . Act       É onde o método que estamos testando será executado.
 
                 . Assert    É a parte final do teste em que comparamos o que esperamos que aconteça com o resultado real 
                             da execução do métdoto de teste.
@@ -1565,22 +1565,134 @@ Aula 20. Testes de Unidade - xUnit
                         // Assert               // Faz a verificação e validação se a ação do teste foi correta comparando o resultado esperado com o resultado do teste
                     }
 
-        . Definindo o nome dos métodos de testes de unidade
+            . Definindo o nome dos métodos de testes de unidade
 
-            . Os nomes dos métodos de teste devem ser tão descritivos quanto possível.
+                . Os nomes dos métodos de teste devem ser tão descritivos quanto possível.
 
-            . Usar um nome descritivo de forma a facilitar o entendimento do propósito do método a ser executado.
+                . Usar um nome descritivo de forma a facilitar o entendimento do propósito do método a ser executado.
 
-            . Exemplo:
+        . Demo
 
-                1. A primeira parte do nome representa o nome do método que está sendo testado.
+            1. A primeira parte do nome representa o nome do método que está sendo testado.
 
-                2. a segund aparte do nome nos informa mais sobre o cenário de teste.
+            2. a segund aparte do nome nos informa mais sobre o cenário de teste.
 
-                3. A última parte do nome é o resultado esperado.
+            3. A última parte do nome é o resultado esperado.
 
-                Soma_DoisNumerosInteiros_RetornaNumeroInteiro()
-                  1       2                   3
+            Soma_DoisNumerosInteiros_RetornaNumeroInteiro()
+                1       2                   3
+
+    . Exemplo:
+
+        . Crie a solution abaixo:
+
+            dotnet new sln -n teste-unitario-com-xunit
+
+        . Crie o projeto abaixo:
+
+            dotnet new classlib -n calculos
+
+        . Adicione a referencia do projeto calculos na solution:
+
+            dotnet sln teste-unitario-com-xunit.sln add calculos/calculos.csproj
+
+        . Crie o projeto de testes:
+
+            dotnet new xunit -n calculos.tests
+
+        . Adicione a referencia do projeto calculos na solution:
+
+            dotnet sln teste-unitario-com-xunit.sln add calculos.tests/calculos.tests.csproj
+
+        . Crie a classe abaixo dentro do projeto "calculos":
+
+            public class Calculadora
+            {
+                public int Soma(int operador1, int operador2) => operador1 + operador2;
+                public int Subtracao(int operador1, int operador2) => operador1 - operador2;
+                public int Multiplicao(int operador1, int operador2) => operador1 * operador2;
+                public int Divisao(int dividento, int divisor) => dividento / divisor;
+                public (int quociente, int resto) RestoDivisao(int dividento, int divisor) => (dividento / divisor, dividento % divisor);
+            }
+
+        . No projeto de teste criado, remova o arquivo UnitTest1.cs e adicione uma classe chamada CalculadoraTest, nela adicione o método abaixo:
+
+            public class CalculadoraTest
+            {
+                [Fact]
+                public void Soma_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.Soma(10, 20);
+                    //Verifica se o resultado é igual a 30        
+                    Assert.Equal(30, resultado);
+                }
+
+                [Theory]
+                [InlineData(1)]
+                [InlineData(2)]
+                [InlineData(3)]
+                public void RestoDivisao_DeveRetornarZero(int value)
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.RestoDivisao(12, value);
+                    //Verifica se o resto da divisão é 0
+                    Assert.Equal(0, resultado.resto);
+                }
+
+                [Fact]
+                public void RestoDivisao_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.RestoDivisao(10, 3);
+                    //Verifica se o quociente da divisão é 3 e o resto 1
+                    Assert.Equal(3, resultado.quociente);
+                    Assert.Equal(1, resultado.resto);
+                }
+
+                [Fact]
+                public void Subtracao_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.Subtracao(20, 10);
+                    //Verifica se o resultado é igual a 10
+                    Assert.Equal(10, resultado);
+                }
+
+                [Fact]
+                public void Divisao_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.Divisao(100, 10);
+                    //Verifica se o resultado é igual a 10
+                    Assert.Equal(10, resultado);
+                }
+
+                [Fact]
+                public void Multiplicao_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.Multiplicao(5, 2);
+                    //Verifica se o resultado é igual a 10
+                    Assert.Equal(10, resultado);
+                }
+            }
+
+        . Execute os testes com o comando abaixo:
+
+            dotnet test
+
+        . Além do método "Assert.Equal" temos também:
+
+            . Assert.True
+
+            . Assert.False
+
+            . Assert.Null
+
+            . Assert.NotNull
+
+            . Assert.NotEqual
 
 
 Apresentando o Problema, o Projeto e a Solução
@@ -1876,11 +1988,16 @@ Aula 26. Criando as dependências entre os projetos
             dotnet add ./src/CleanArchMvc.WebUI/ reference ./src/CleanArchMvc.Infra.IoC/
         
 
-Implementando a Camada de Doamin
+Implementando a Camada de Domain
 ================================
 
 Aula 28. Criando as entidades do modelo domínio
 -----------------------------------------------
+
+    . Material complementar
+
+        https://www.codemotion.com/magazine/languages/testing-your-c-code-with-xunit/
+        https://www.treinaweb.com.br/blog/testes-unitarios-no-c-com-o-xunit
 
     . Camada de Domínio
 
@@ -1942,17 +2059,17 @@ Aula 28. Criando as entidades do modelo domínio
 
         . Crie a classe "Category" abaixo na pasta "Entities":
 
-            namespace CleanArchMvc.Domain.Entities;
-
             using System.Collections.Generic;
+
+            namespace CleanArchMvc.Domain.Entities;
 
             public class Category
             {
                 public int Id { get; set; }
 
-                public string Name {get; set; }
+                public string? Name {get; set; }
 
-                public ICollection<Product>  Products {get; set; }
+                public ICollection<Product>?  Products {get; set; }
             }
 
         . Crie a classe "Product" abaixo na pasta "Entities":
@@ -1963,25 +2080,26 @@ Aula 28. Criando as entidades do modelo domínio
             {
                 public int Id { get; set; }
 
-                public string Name {get; set; }
+                public string? Name { get; set; }
 
-                public string Description  {get; set; }
-                
-                public decimal Price  {get; set; }
-                
-                public int Stock {get; set; }
-                
-                public string Image {get; set; }
+                public string? Description { get; set; }
 
-                public int CategoryId  {get; set; }
+                public decimal Price { get; set; }
 
-                public Category Category {get; set; }
+                public int Stock { get; set; }
+
+                public string? Image { get; set; }
+
+                public int CategoryId { get; set; }
+
+                public Category? Category { get; set; }
             }
 
         . As classes "Category" e "Product" fazem parte de um modelo anêmico, ou seja, uma forma de modelagem 
             de domínio que consiste na separação entre classes que apresentam apenas estado ou apenas comportamentos.
 
         . Iremos transforma esse modelo num modelo rico.
+
 
 
 Aula 29. Enriquecendo o modelo de domínio criado - I
@@ -2097,6 +2215,8 @@ Aula 29. Enriquecendo o modelo de domínio criado - I
 
 
     . Altere a classe "Category" como abaixo:
+
+        using CleanArchMvc.Domain.Validation;   // Linha inserida
 
         ...
         public Category( string name )
@@ -2284,7 +2404,7 @@ Aula 31. Criando as interfaces dos repositórios
             {
                 Task<IEnumerable<Product>> GetProductsAsync();
 
-                Task<Product> GetById(Async int? id);
+                Task<Product> GetByIdAsync( int? id);
 
                 Task<Product> CreateAsync( Product product );
 
@@ -2309,13 +2429,17 @@ Aula 32. Implementando os testes de unidade para o projeto Domain
 
     . Objetivos:
 
-        . Criar um projeto do tipo xUnit Test Project
+        . Criar a pasta "Domain" dentro do projeto "./tests/UnitTests";
 
-            . CleanArchMvc.Domain.Tests
+            . Referenciar o projeto Domain. Execute o comando abaixo dentro da pasta raiz da solution:
 
-            . Referenciar o proejto Domain
+                dotnet add ./tests/UnitTests/ reference ./src/CleanArchMvc.Domain/
 
-            . Criar as classes de testes: CategoryUnit Test1 e ProductUnitTest1
+            . Crie as classes de testes abaixo dentro da pasta "/tests/UnitTests/Domain": 
+            
+                . CategoryUnitTest1
+                
+                . ProductUnitTest1
 
         . Incluir o pacote FluentAssertions
 
@@ -2325,7 +2449,9 @@ Aula 32. Implementando os testes de unidade para o projeto Domain
 
             . https://fluentassertions.com
 
-        . Usar a extesion "Test Explorer" do Visual Studio
+        . Usar a extesion "Test Explorer" no Visual Studio; e no VSCode a extensão ".NET Core Test Explorer"
+
+            . Instale o "plugin" ".NET Core Test Explorer" no VSCode
 
         . Padrões de nomenclatura dos testes
 
@@ -2356,26 +2482,9 @@ Aula 32. Implementando os testes de unidade para o projeto Domain
 Aula 33. Testes de unidade para a entidade Category
 --------------------------------------------------
 
-    . Dentro da pasta raiz da solution, execute os comandos abaixo para criar o projeto de teste e as referências entre projetos:
-
-        . Criação do projeto de "Test"
-
-            dotnet new xUnit -o ./tests/Domain.UnitTests -n Domain.UnitTests -f net6.0
-
-            dotnet sln CleanArchMvc.sln add ./tests/Domain.UnitTests
-
-
-        . Adicionando a referencia do projeto "Doamin"
-
-            dotnet add ./test/Domain.UnitTests/ reference ./src/CleanArchMvc.Domain/
-
-        . Verificação dos projetos na solution:
-
-            dotnet sln CleanArchMvc.sln list
-
     . Adicionando a package "FluentAssertions" no projeto de testes:
 
-        cd ./tests/Domain.UnitTests
+        cd ./tests/UnitTests
 
         dotnet add package FluentAssertions --version 6.12.0
 
@@ -2390,11 +2499,10 @@ Aula 33. Testes de unidade para a entidade Category
 
         dotnet build
 
-        dotnet run --project ./src/CleanArchMvc.WebUI/
+        dotnet test -t
 
-    . No projeto "./test/Domain.Tests" renomeie a classe:
+    . Apague a classe "./tests/UnitTests/UnitTest1.cs"
 
-        "UnitTest1.cs"  ----> "CategoryUnitTest1.cs"
 
     . Altere o conteúdo da classe "CategoryUnitTest1.cs" pelo abaixo:
 
@@ -2452,7 +2560,9 @@ Aula 33. Testes de unidade para a entidade Category
             }
         }
 
-    . Execute os testes.
+    . Execute o comando abaixo na pasta raiz da solution:
+
+        dotnet test
 
     . Verifique mais detalhes de como executar testes no curso "ASP.NET 6 Fundamentals" e na "Aula 20. Testes de Unidade - xUnit"
 
@@ -2546,9 +2656,11 @@ Aula 34. Testes de unidade para a entidade Product
             }
         }
 
-    . Execute os testes.
+    . Execute o comando abaixo na pasta raiz da solution:
 
+        dotnet test
 
+// PAREI AQUI
 Aula 35. Fazendo ajustes no modelo de domínio Product
 -----------------------------------------------------
 
