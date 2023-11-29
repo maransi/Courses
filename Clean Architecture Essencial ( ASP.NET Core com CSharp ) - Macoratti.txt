@@ -2237,9 +2237,9 @@ Aula 29. Enriquecendo o modelo de domínio criado - I
 
         private void ValidateDomain( string name )  // Método inserido
         {
-            DomainExceptionValidation.When( string.IsNullOrEmpty(name), "Invalid name. Name is Required");
+            DomainExceptionValidation.When( string.IsNullOrEmpty(name), "Invalid [name]. Name is required.");
 
-            DomainExceptionValidation.When( name.Lenght < 3, "Invalid name. Too short, minimum 3 characters");
+            DomainExceptionValidation.When( name.Lenght < 3, "Invalid name, too short, minimum 3 characters");
 
             Name = name;
         }
@@ -2453,6 +2453,16 @@ Aula 32. Implementando os testes de unidade para o projeto Domain
 
             . Instale o "plugin" ".NET Core Test Explorer" no VSCode
 
+            . Acesse "Configurações/Extensões/.NET Core Test Explorer"
+
+            . Localize a configuração/campo "Test Project Path" e coloque a pasta que estão as unidades de testes, por exemplo:
+
+                tests/*
+
+            . Material complementar:
+
+                https://www.youtube.com/watch?v=B9lfzQPq38Y
+
         . Padrões de nomenclatura dos testes
 
             . A primeira parte do nome representa o nome do que esta sendo testado;
@@ -2499,10 +2509,110 @@ Aula 33. Testes de unidade para a entidade Category
 
         dotnet build
 
+        # Lista todas as unidades de testes encontradas
         dotnet test -t
 
     . Apague a classe "./tests/UnitTests/UnitTest1.cs"
 
+
+    . Funcionamento do mecânismo de teste do xUnit:
+
+        . Annotation [Fact] é utilizado para identificar um método que servirá como uma unidade de teste unitário.
+
+            . Se quiser deixar mais amigável os testes podemos colocar uma identificação na unidade de teste através do parâmetro "DisplayName",
+                a identificação será exibida durante a execução do teste, ao invés do nome da classe.
+
+                [Fact( DisplayName = "Invalid Value Price")]
+
+        . Annotation [Theory] utilizado para identificar um método que servirá como uma unidade de teste unitário, porém somente poderá
+            ser usado essa annotation quando houver parâmetros envolvidos na assinatura do método, por exemplo:
+
+            [Theory]
+            [InlineData(-5)]
+            public void CreateProduct_InvalidStockValue_ExceptionDomainNegativeValue(int value)
+            {
+                ...
+            }
+
+            . Neste caso podemos fornecer valores padrões para os parâmetros através da annotation [InlineData(...)]
+
+        . Seguindo o padrão AAA - Arrange, Act e Assert podemos utilizar as classes "Action", ou "Assert":
+
+            . Action
+
+                [Fact]
+                public void CreateProduct_InvalidPriceValue_DomainException()                       
+                {                                                                                 +----> Forçamos uma situação de erro para levantar uma exception e com uma msg especifica
+                    // Act - Prepara a ação                                                       |                                                         |                 |
+                    Action action = () => new Product(1, "Product Name", "Product Description", -9.99m,                                                     |                 |
+                        99, "");                                                                                                                            |                 |
+                                                                                                                                                            |                 |
+                    // Assert - Executa a ação                                                                                                              |                 |
+                    action.Should()                                                         // Deveria lançar                                               |                 |
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()  // Exception esperada   <---------------------------------------+                 |
+                        .WithMessage("Invalid price value");                                // Mensagem esperada    <---------------------------------------------------------+
+                }
+
+                . Act - Somente prepara a action
+
+                     Action action = () => new Product(1, "Product Name", "Product Description", -9.99m,
+                                                        99, "");                                                                       
+
+                . Assert - Executa a action, somente neste ponto que a classe será criada e disparado a exception da classe Domain
+
+                    action.Should()                                                       
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid price value");                              
+
+            . Assert
+
+                [Fact]
+                public void CreateProduct_InvalidPriceValue_DomainException()
+                {
+                    // Arrange
+                    var message = "Invalid price value";
+
+                    // Act
+                    var assert = Assert.Throws<CleanArchMvc.Domain.Validation.DomainExceptionValidation>( () => new Product(1, 
+                                                                                                                            "Product Name", 
+                                                                                                                            "Product Description", 
+                                                                                                                            -9.99m,
+                                                                                                                            99, 
+                                                                                                                            "") );
+                    // Assert
+                    Assert.Equal(message, assert.Message);
+                }
+
+                . Arrage - Prepara as informações necessárias para auxiliar na execução da unidade de teste
+
+                    var message = "Invalid price value";
+
+                . Act - Somente prepara a action
+
+                    var assert = Assert.Throws<CleanArchMvc.Domain.Validation.DomainExceptionValidation>( () => new Product(1, 
+                                                                                                                            "Product Name", 
+                                                                                                                            "Product Description", 
+                                                                                                                            -9.99m,
+                                                                                                                            99, 
+                                                                                                                            "") );
+
+                . Assert - Executa a action, somente neste ponto que a classe será criada e disparado a exception da classe Domain
+
+                    Assert.Equal(message, assert.Message);
+
+                    . IMPORTANTE: Não se esqueça, essa unidade de teste foi feita para dar erro, pois o preço está invalido (-9.99m).
+                                    Sendo assim, será levantado uma exception; algo esperado pela unidade de teste através:
+
+                                        var assert = Assert.Throws<CleanArchMvc.Domain.Validation.DomainExceptionValidation>(...);
+
+                                    Neste caso, quando colocar o valor inválido, estamos testando se a validação de valor negativo
+                                    está sendo validada com sucesso, assim o teste passará com sucesso.
+
+                                    De resto seria somente verificar a mensagem de erro retornada pela classe Domain "Invalid price value"
+
+                                        // Se o contéudo de "message" for igual ao "assert.Message" não será levantado uma exception para a execução do teste.
+                                        // SOMENTE HAVERÁ EXCEPTION PARA O TESTE SE FOREM DIFERENTES E O TESTE NÃO PASSARÁ COM SUCESSO
+                                        Assert.Equal(message, assert.Message);
 
     . Altere o conteúdo da classe "CategoryUnitTest1.cs" pelo abaixo:
 
@@ -2529,7 +2639,7 @@ Aula 33. Testes de unidade para a entidade Category
                     Action action = () => new Category(-1, "Category Name ");
                     action.Should()
                         .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid Id value.");
+                        .WithMessage("Invalid [id] value");
                 }
 
                 [Fact]
@@ -2547,7 +2657,7 @@ Aula 33. Testes de unidade para a entidade Category
                     Action action = () => new Category(1, "");
                     action.Should()
                         .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid name.Name is required");
+                        .WithMessage("Invalid [name]. Name is required.");
                 }
 
                 [Fact]
@@ -2660,7 +2770,7 @@ Aula 34. Testes de unidade para a entidade Product
 
         dotnet test
 
-// PAREI AQUI
+
 Aula 35. Fazendo ajustes no modelo de domínio Product
 -----------------------------------------------------
 
@@ -2680,7 +2790,7 @@ Aula 35. Fazendo ajustes no modelo de domínio Product
         a não entrada de imagens com nomes nulo teriamos que criar mais um método como abaixo:  ------------------------+
                                                                                                                         |
             [Fact]                                                                                                      |
-            public void CreateProduct_WithNullImageNameNullReferenceException()                                             |
+            public void CreateProduct_WithNullImageNameNullReferenceException()                                         |
             {                                                                                                           |
                 Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);           |
                 action.Should().NotThrow<NullReferenceException>();                                                     |
