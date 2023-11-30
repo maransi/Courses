@@ -1779,7 +1779,7 @@ Aula 23. Apresentando a solução
 
             . CleanArchMvc.Application      Regras de domínio da aplicação, mapeamentos, serviços, DTOs, CQRS
 
-            . CleanArchMvc.Infra.Data       EF Core, Contexto, Configurações, Migratins, Repository
+            . CleanArchMvc.Infra.Data       EF Core, Contexto, Configurações, Migrations, Repository
 
             . CleanArchMvc.Infra.IoC        Dependency Injection, registro dos serviços, tempo de vida
                                   |  
@@ -2841,3 +2841,288 @@ Aula 35. Fazendo ajustes no modelo de domínio Product
             }
 
     . Execute os testes e verifique se valores nulos são permitidos novamente.
+
+
+
+Implementando a Camada de Infraestrutura
+========================================
+
+Aula 36. Criando a estrutura do projeto, incluindo as referências e criando o contexto
+--------------------------------------------------------------------------------------
+
+    . A camada de infraestrutura é a camada mais externa da arquitetura que lida com as necessidades de infraestrutura e 
+        fornece a implmentação de suas interfaces de repositóiro.
+
+    . É nesta camada que conectamos a lógica de acesso a dados ou a lógica de chamdas de serviço. Apenas a camada de 
+        infraestrutura deve saber sobre o banco de dados e a tecnologia de acesso a dados ( Entity Framework, ADO.NET, etc.),
+        as demais camadas não devem saber nada sobre de onde vêm os dados e como estão sendo armazenados.
+
+
+    . Componentes distruibuidos por camadas e responsabilidade
+
+       ^  --------------------------------------------------------------------------------------------------------------------
+    R  |  Domain              Entities  Product       Interfaces  IProductRepository      Account IAuthenticate
+    e  |                      --------  Category      ----------  ICategoryRepository     ------- ISeedRoleInitial
+    g  |                                Entity                                                    IUser
+    r  |  --------------------------------------------------------------------------------------------------------------------
+    a  |  Application         Service ProductService      DTOs    ProdctDTO       Mappings    DomainViewModel    
+       |                      ------- CategoryService     ----    CategoryDTO     --------    ViewModelDomain
+    d  |  
+    e  |                      Interfaces  IProductService     Exceptions  CQRS
+       |                      ----------  ICategoryService    ----------  Command
+    D  |                                                                  Queries 
+    e  |                                                                  Handlers
+    p  |  ---------------------------------------------------------------------------------------------------------------------
+    e  |  Infra.Data          Repositories    ProductRepository       Context ApplicationContext      Migrations      Identity
+    n  |                      ------------    CategoryRepository      -------                         ----------      --------
+    d  |
+    ê  |  Infra.IoC           DependencyInjection
+    n  |                      -------------------
+    c  |  ---------------------------------------------------------------------------------------------------------------------
+    i  |  WebUI               Controllers AccountController       View    Filters     Components      ViewModels      MapConfig
+    a  |                      -----------                         ----    -------     ----------      ----------      ---------
+
+
+    . Camada de infraestrutura - CleanArchMvc.Infra.Data
+
+        . Criaremos as pastas:
+
+            . Context                   Onde vamos definir o contexto da aplicação (DbContext) e mapeamento ORM.
+
+            . EntitiesConfiguration     Onde vamos definir as configurações (Fluent API) das entidades do contexto.
+
+            . Repositories              Onde vamos implementar as interfaces dos repositórios para "category" e "product"
+
+            . Identity                  Onde definimos as configurações e os recursos de autenticação e autorização do Identity;
+
+        . Incluiremos referência aos pacotes NUGET:
+
+            . Microsoft.EntityFramworkcore.SqlServer
+
+            . Microsoft.EntityFramworkcore.Tools
+
+            . Microsoft.EntityFramworkcore.Design
+
+        . Criaremos a classe "ApplicationDbContext" que herda da classe DbContext do Entity Framework Core
+
+            public class ApplicationDbContext: DbContext
+            {
+                ...
+            }
+
+        . Definiremos o mapeamento ORM usando DbSet<T> e as configurações da Fluent API nas propriedades das entidades.
+
+                                        DbContext
+                                        ---------
+                                        . Gerenciar conexões de banco de dados
+                                        . Configurar modelo e relacionamento
+                                        . Consultar banco de dados
+            Classes de Domínio <------> . Salvar dados no banco de dados        <----------> Banco de Dados
+            ------------------          . Configurar o controle de alterações                --------------
+                                        . Cache
+                                        . Gerenciar transções
+
+    . Demo
+
+        . Crie as pastas abaixo no projeto "CleanArchMvc.Infra.Data"
+
+            . Context
+
+            . EntitiesConfiguration
+
+            . Repositories
+
+            . Identity
+
+        . Acesse a pasta raiz do projeto "CleanArchMvc.Infra.Data" e execute os comandos abaixo:
+
+
+            dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 6.0.12
+
+            dotnet add package Microsoft.EntityFrameworkCore.Tools --version 6.0.12
+
+            dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.12
+
+        . Crie a classe abaixo dentro da pasta "Context":
+
+            using Microsoft.EntityFrameworkCore;
+
+            public class ApplicationDbContext: DbContext
+            {
+                public ApplicationDbContext( DbContextOpetions< ApplicationDbContext > options): base(options)
+                {
+
+                }
+
+                public DbSet<Product> Products{ get; set;  }
+                public DbSet<Category> Categories{ get; set; }
+
+                protected override void OnModelCreating( ModelBuilder builder )
+                {
+                    base.OnModelCreating( builder );
+                    builder.ApplyConfigurationsFromAssembly( typof( ApplicationDbContext).Assembly );
+                }
+
+            }
+
+Aula 37. Configurando as entidades usando a Fluent API
+------------------------------------------------------
+
+    . Configurando as entidades do modelo
+
+        . Por que preciso configurar as entidades do modelo usando a "Fluent API"?
+
+            . Porque vou usar o EF Core na abordagem "Code-First"
+
+                . Nesta abordagem (Code-First) partimos das entidades do modelo de domínio definidas no contexto e criamos o banco de 
+                    dados e as tabelas.
+
+                    Entidades do Modelo ----------->   EF core   -----------> Banco de dados
+                        (Contexto)                   Code-/first
+
+            . Poderiamos usar o EF Core na abordagem "Database-First"
+
+                . Nesta abordagem criamos o banco de dados e as tabelas primeiro, e depois geramos as classes das entidades do modelo 
+                    de domínio
+
+                    Banco de dados ------------>    EF Core     -------------> Entidade do Modelo
+                                                 Database-First                     (Contexto)
+
+        . Poderiamos usar "ADO.NET" ou "Dapper" ou outra ferramenta
+
+            . Nesta abordagem, dependendo da opção usanda, geralmente criamos o banco de daos e as tabelas e a seguir implmentamos o código
+                com a lógica de acesso ao banco de dados.
+
+
+                Banco de dados ---------> ADO.NET, Dapper, etc  ----------> Entidade do Modelo
+                                          Camada com lógica de                  (Contexto)
+                                          acesso aos dados                    
+            
+        . Na abordagem "Code-First" o EF Core segue convenções para gerar o banco de daos e as tabelas.
+
+            . O banco de dados será gerado com base no provedor informado e na string de conexão
+
+            . Para gera as tabelas ele verifica as entidades mapeadas no arquivo de contexto ( AplicationDbContext )
+
+            . E gera as tabelas no banco de daos com os nomes definidos no mapeamento DbSet<T>
+
+            . Com base nas propriedades definidas no modelo de domínio ele gera as colunas das tabelas com o mesmo nome das propriedades
+
+        . Problemas da abordagem "Code-First"
+
+            . O tipo de dado "string" será mapeado para uma coluna do tipo nvarchar(max) e nullable igual a true.
+
+            . O tipo "decimal" será mapeado para uma coluna do tipo decimal(18,2) e será emitida um amensagem de alerta para perda de dados 
+                por problemas de precisão.
+
+        . Para resolver o problema acima, usaremos a Fluent API para configurar as propriedades Id e o tipo string:
+
+            public class CategoryConfiguration: IEntityTypeConfiguration<Category>
+            {
+                public void Configure( EntityTypeBuilder<Category> builder )
+                {
+                    builder.HasKey( t => t.Id );
+
+                    builder.Property( p => p.Name).HasMaxLength(100).IsRequired();
+                }
+            } 
+        
+        . Funcionamento do mecânismo de criação das tabelas durante a "migration":
+
+            1. No método da classe "ApplicationDbContext.OnModelCreating" temos a chama do método "builder.ApplyConfigurationFromAssembly":
+
+                protected override void OnModelCreating( ModelBuilder builder )
+                {
+                    base.OnModelCreating( builder );
+                    builder.ApplyConfigurationsFromAssembly( typof( ApplicationDbContext).Assembly );
+                }
+
+                . Ao invés de dar o "ApplyConfigurationsFromAssembly" como acima poderia executar individualmente para cada classe de entidade:
+
+                    protected override void OnModelCreating( ModelBuilder builder )
+                    {
+                        base.OnModelCreating( builder );
+                        
+                        // builder.ApplyConfigurationsFromAssembly( typof( ApplicationDbContext).Assembly );
+                        builder.ApplyConfiguration( new CategoryConfiguration() );
+                        builder.ApplyConfiguration( new ProductConfiguration() );
+                    }
+
+            2. Quando o método "builder.ApplyConfigurationsFromAssembly( typof( ApplicationDbContext).Assembly );" é chamado, é vasculhado no 
+                projeto através do arquivo de context "ApplicationContext" para verificar as entidades e encontra:
+
+                    public DbSet<Product> Products{ get; set;  }
+                    public DbSet<Category> Categories{ get; set; }
+
+            3. Durante a execução haverá o relacionamento dos "DbSet" acima com as classes de "Configuration" ( CategoryConfiguration e ProductConfiguration ).
+
+                . Como essas classes de configuração estendem a interface "IEntityTypeConfiguration" com o seu tipo (Category/Product),
+                    ele irá executar automaticamente o método "Configure", que a criação das tabelas no banco com as configurações apresentadas
+
+                    builder.HasKey( t => t.Id );
+
+                    builder.Property( p => p.Name).HasMaxLength(100).IsRequired();
+
+    . Demo
+
+        . Crie as classes abaixo dentro da pasta "EntitiesConfiguration"
+
+            public class CategoryConfiguration: IEntityTypeConfiguration<Category>
+            {
+                public void Configure( EntityTypeBuilder<Category> builder )
+                {
+                    builder.HasKey( t => t.Id );
+
+                    builder.Property( p => p.Name).HasMaxLength(100).IsRequired();
+
+                    builder.HasData( new Category( 1, "Material Escolar" ),
+                                        new Category( 2, "Eletrônicos"),
+                                        new Category( 3, "Acessorios") );
+                }
+            } 
+
+
+
+            public class ProductConfiguration: IEntityTypeConfiguration<Product>
+            {
+                public void Configure( EntityTypeBuilder<Product> builder )
+                {
+                    builder.HasKey( t => t.Id );
+
+                    builder.Property( p => p.Name ).HasMasLength( 100 ). IsRequired();
+                    builder.Property( p => p.Description ).HasMaxLength( 200 ).IsRequired();
+
+                    builder.Property( p => p.Price ).HasPrecicion( 10,2 );
+
+                    builder.Has.One( e => e.Category ).WithMany( e => e.Products ).HasForeignKey( e => e.CategoryId );
+
+                }
+            }
+
+Aula 38. Implementação dos Repositórios - Conceitos
+---------------------------------------------------
+
+    . Implementando os repositórios
+
+        +------------------------------------------ Camada de Domínio ----------------------------------------------------------+
+        |                                                                                                                       |
+        |   ICategoryRepository                                             IProductRepository                                  |
+        |   -------------------                                             ------------------                                  |
+        |   public interface ICategoryRepository                            public interface IProductRepository                 |
+        |   {                                                               {                                                   |
+        |       Task<IEnumerable<Category>> GetCategories();                    Task<IEnumerable<Product> GetProductAsync();    |
+        |       ...                                                             ...                                             |
+        |   }                   ^                                           }               ^                                   |
+        |                       |                                                           |                                   |
+        +-----------------------------------------------------------------------------------------------------------------------+
+                                |                                                           |
+                                |                                                           |
+                                |                                                           |
+                                |                                                           |
+        +-----------------------|------------------ Camada de Infra.Data -------------------|-----------------------------------+
+        |                       |                                                           |                                   |
+        |               CategoryRepository                                          ProductRepository                           |
+        |                                                                                                                       |
+        +-----------------------------------------------------------------------------------------------------------------------+
+
+    1.20
