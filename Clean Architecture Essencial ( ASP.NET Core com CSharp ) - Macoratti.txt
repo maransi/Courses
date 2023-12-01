@@ -3125,4 +3125,160 @@ Aula 38. Implementação dos Repositórios - Conceitos
         |                                                                                                                       |
         +-----------------------------------------------------------------------------------------------------------------------+
 
-    1.20
+        . Métodos assíncronos
+
+            . A assinatura do método deve incluir o modificador "async";
+
+            . O método deve ter um tipo de retorno da Task<T>, Task ou void;
+
+            . As declarações de método devem incluir pelo menos uma única expressão await - Isso diz ao compilador que o método precisa ser suspenso enquanto a 
+                operação aguardada estiver ocupada.
+
+            . Por último, o nome do método deve termina com o sufixo "async" (mesmo que isso seja mais convencional do que o necessário).
+
+        . Injeção de dependência - Injetar uma instância do contexto no construtor da classe concreta
+
+            public class CategoryReposicoty: ICategoryRepository
+            {
+                private ApplicationDbContext _categoryContext;
+
+                public CategoryRepository( ApplicationDbContext context)
+                {
+                    _categoryContext = context;
+                }
+
+                // métodos
+                ...
+            }
+
+        . Porque não implementar um reposítorio genérico?
+
+            . Um reposítorio é parte de um domínio que está sendo modelado e um domínio não é genérico, nem todas as entidades podem ser excluídas, nem adicionadas,
+                nem todas possuem um repositório.
+
+            . As consulta variam muito; a API do repsotório torna-se tão única quanto a própria entidade.
+
+Aula 39. Implementando o Repositório - CategoryRepository
+---------------------------------------------------------
+
+    . Demo
+
+        . Crie a classe repositório abaixo no projeto "CleanArchMvc.Infra.Data" na pasta "Repositories":
+
+            using CleanArchMvc.Domain.Entities;
+            using CleanArchMvc.Domain.Interfaces;
+            using CleanArchMvc.Infra.Data.Context;
+            using Microsoft.EntityFrameworkCore;
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+
+            namespace CleanArchMvc.Infra.Data.Repositories
+            {
+                public class CategoryRepository : ICategoryRepository
+                {
+                    private ApplicationDbContext _categoryContext;
+                    public CategoryRepository(ApplicationDbContext context)
+                    {
+                        _categoryContext = context;
+                    }
+
+                    public async Task<Category> CreateAsync(Category category)
+                    {
+                        _categoryContext.Add(category);
+                        await _categoryContext.SaveChangesAsync();
+                        return category;
+                    }
+
+                    public async Task<Category> GetByIdAsync(int? id)
+                    {
+                        return await _categoryContext.Categories.FindAsync(id);
+                    }
+
+                    public async Task<IEnumerable<Category>> GetCategoriesAsync()
+                    {
+                        return await _categoryContext.Categories.ToListAsync();
+                    }
+
+                    public async Task<Category> RemoveAsync(Category category)
+                    {
+                        _categoryContext.Remove(category);
+                        await _categoryContext.SaveChangesAsync();
+                        return category;
+                    }
+
+                    public async Task<Category> UpdateAsync(Category category)
+                    {
+                        _categoryContext.Update(category);
+                        await _categoryContext.SaveChangesAsync();
+                        return category;
+                    }
+                }
+            }
+
+Aula 40. Implementando o repositório - ProductRepository
+--------------------------------------------------------
+
+    . Demo
+
+        . Crie a classe repositório abaixo no projeto "CleanArchMvc.Infra.Data" na pasta "Repositories":
+
+            using CleanArchMvc.Domain.Entities;
+            using CleanArchMvc.Domain.Interfaces;
+            using CleanArchMvc.Infra.Data.Context;
+            using Microsoft.EntityFrameworkCore;
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+
+            namespace CleanArchMvc.Infra.Data.Repositories
+            {
+                public class ProductRepository : IProductRepository
+                {
+                    private ApplicationDbContext _productContext;
+                    public ProductRepository(ApplicationDbContext context)
+                    {
+                        _productContext = context;
+                    }
+
+                    public async Task<Product> CreateAsync(Product product)
+                    {
+                        _productContext.Add(product);
+                        await _productContext.SaveChangesAsync();
+                        return product;
+                    }
+
+                    public async Task<Product> GetByIdAsync(int? id)
+                    {
+                        return await _productContext.Products.FindAsync(id);
+                    }
+
+                    public async Task<Product> GetProductCategoryAsync(int? id)
+                    {
+                        //eager loading
+                        return await _productContext.Products.Include(c => c.Category)
+                            .SingleOrDefaultAsync(p => p.Id == id);
+                    }
+
+                    public async Task<IEnumerable<Product>> GetProductsAsync()
+                    {
+                        return await _productContext.Products.ToListAsync();
+                    }
+
+                    public async Task<Product> RemoveAsync(Product product)
+                    {
+                        _productContext.Remove(product);
+                        await _productContext.SaveChangesAsync();
+                        return product;
+                    }
+
+                    public async Task<Product> UpdateAsync(Product product)
+                    {
+                        _productContext.Update(product);
+                        await _productContext.SaveChangesAsync();
+                        return product;
+                    }
+                }
+            }
+
+Aula 41. Apresentando o contêiner de injeção de dependência
+-----------------------------------------------------------
+
