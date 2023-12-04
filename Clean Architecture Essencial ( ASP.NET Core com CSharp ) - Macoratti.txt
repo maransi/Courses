@@ -1846,146 +1846,147 @@ Aula 23. Apresentando a solução
 Aula 24. Criação da solução e dos projetos
 ------------------------------------------
 
+    . DEMO
 
+        . Criação do solução em branco, execute os comandos abaixo:
 
+            # Execute esse comando na pasta de projetos
+            mkdir CleanArchMvc
 
-    . Criação do solução em branco, execute os comandos abaixo:
+            cd CleanArchMvc
 
-        # Execute esse comando na pasta de projetos
-        mkdir CleanArchMvc
+            dotnet new sln -n CleanArchMvc
 
-        cd CleanArchMvc
+        . Criação do projeto "Class Library" abaixo:
 
-        dotnet new sln -n CleanArchMvc
+            dotnet new classlib -o ./src/CleanArchMvc.Domain -n Domain -f net6.0
 
-    . Criação do projeto "Class Library" abaixo:
+            rm ./src/CleanArchMvc.Domain/Class1.cs
 
-        dotnet new classlib -o ./src/CleanArchMvc.Domain -n Domain -f net6.0
-
-        rm ./src/CleanArchMvc.Domain/Class1.cs
-
-        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Domain
-
-
-
-
-        dotnet new classlib -o ./src/CleanArchMvc.Application -n Application -f net6.0
-
-        rm ./src/CleanArchMvc.Application/Class1.cs
-
-        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Application
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Domain
 
 
 
 
-        dotnet new classlib -o ./src/CleanArchMvc.Infra.Data -n Infra.Data -f net6.0
+            dotnet new classlib -o ./src/CleanArchMvc.Application -n Application -f net6.0
 
-        rm ./src/CleanArchMvc.Infra.Data/Class1.cs
+            rm ./src/CleanArchMvc.Application/Class1.cs
 
-        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Infra.Data
-
-
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Application
 
 
-        dotnet new classlib -o ./src/CleanArchMvc.Infra.IoC -n Infra.IoC -f net6.0
-
-        rm ./src/CleanArchMvc.Infra.IoC/Class1.cs
-
-        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Infra.IoC
 
 
-    . Criação do projeto "Web":
+            dotnet new classlib -o ./src/CleanArchMvc.Infra.Data -n Infra.Data -f net6.0
 
-        dotnet new mvc -o ./src/CleanArchMvc.WebUI -n WebUI -f net6.0
+            rm ./src/CleanArchMvc.Infra.Data/Class1.cs
 
-        cd ./src/CleanArchMvc.WebUI
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Infra.Data
 
-        dotnet add package Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation --version 6.0.23
 
-        cd ../..
 
-        dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.WebUI
 
-    . Criação dos projetos de "Test"
+            dotnet new classlib -o ./src/CleanArchMvc.Infra.IoC -n Infra.IoC -f net6.0
 
-        dotnet new xUnit -o ./tests/Application.IntegrationTests -n Application.IntegrationTests -f net6.0
-        dotnet new xUnit -o ./tests/UnitTests -n UnitTests -f net6.0
-        dotnet new xUnit -o ./tests/Infrastructure.UnitTests -n Tests -f net6.0
+            rm ./src/CleanArchMvc.Infra.IoC/Class1.cs
 
-        dotnet sln CleanArchMvc.sln add ./tests/Application.IntegrationTests
-        dotnet sln CleanArchMvc.sln add ./tests/UnitTests
-        dotnet sln CleanArchMvc.sln add ./tests/Infrastructure.UnitTests
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Infra.IoC
 
-    . Verificação dos projetos na solution:
 
-        dotnet sln CleanArchMvc.sln list
+        . Criação do projeto "Web":
 
-    . Execute o comando abaixo para executar a solution:
+            dotnet new mvc -o ./src/CleanArchMvc.WebUI -n WebUI -f net6.0
 
-        # Executar na pasta da solution
-        dotnet clean
+            cd ./src/CleanArchMvc.WebUI
 
-        dotnet restore
+            dotnet add package Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation --version 6.0.23
 
-        dotnet build
+            cd ../..
 
-        dotnet run --project ./src/CleanArchMvc.WebUI/
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.WebUI
 
-    . Deixando mais facil a execução do passo acima:
+        . Criação dos projetos de "Test"
 
-        . Crie o arquivo "package.json" com o conteúdo abaixo na pasta da solution, mesmo local que encontra-se o arquivo ".sln":
+            dotnet new xUnit -o ./tests/Application.IntegrationTests -n Application.IntegrationTests -f net6.0
+            dotnet new xUnit -o ./tests/UnitTests -n UnitTests -f net6.0
+            dotnet new xUnit -o ./tests/Infrastructure.UnitTests -n Tests -f net6.0
 
-            {
-                "name": "dotnet-run-default-project",
-                "private": true,
-                "version": "1.0.0", 
-                "scripts": {
-                    "start": 
-                        "dotnet clean & dotnet restore & dotnet build & dotnet run --project ./src/CleanArchMvc.WebUI/"
+            dotnet sln CleanArchMvc.sln add ./tests/Application.IntegrationTests
+            dotnet sln CleanArchMvc.sln add ./tests/UnitTests
+            dotnet sln CleanArchMvc.sln add ./tests/Infrastructure.UnitTests
+
+        . Verificação dos projetos na solution:
+
+            dotnet sln CleanArchMvc.sln list
+
+        . Execute o comando abaixo para executar a solution:
+
+            # Executar na pasta da solution
+            dotnet clean
+
+            dotnet restore
+
+            dotnet build
+
+            dotnet run --project ./src/CleanArchMvc.WebUI/
+
+        . Deixando mais facil a execução do passo acima:
+
+            . Crie o arquivo "package.json" com o conteúdo abaixo na pasta da solution, mesmo local que encontra-se o arquivo ".sln":
+
+                {
+                    "name": "dotnet-run-default-project",
+                    "private": true,
+                    "version": "1.0.0", 
+                    "scripts": {
+                        "start": 
+                            "dotnet clean & dotnet restore & dotnet build & dotnet run --project ./src/CleanArchMvc.WebUI/"
+                    }
                 }
-            }
 
-        . Execute o comando abaixo na pasta da solution:
+            . Execute o comando abaixo na pasta da solution:
 
-            npm start
+                npm start
 
 
 Aula 26. Criando as dependências entre os projetos
 --------------------------------------------------
 
-    . Relacionamento e dependência entre os projetos:
+    . DEMO
 
-        . CleanArchMvc.Domain           Não possui nenhuma dependência
+        . Relacionamento e dependência entre os projetos:
 
-        . CleanArchMvc.Application      Dependência com o projeto "Domain"
+            . CleanArchMvc.Domain           Não possui nenhuma dependência
 
-        . CleanArchMvc.Infra.Data       Dependência com o projeto "Domain"
+            . CleanArchMvc.Application      Dependência com o projeto "Domain"
 
-        . CleanArchMvc.Infra.IoC        Dependência com os projetos "Domain, Application, Infra.Data
+            . CleanArchMvc.Infra.Data       Dependência com o projeto "Domain"
 
-        . CleanArchMvc.WebUI            Dependência com o projeto "Infra.IoC"
+            . CleanArchMvc.Infra.IoC        Dependência com os projetos "Domain, Application, Infra.Data
 
-    . Dentro da pasta raiz da solution, execute os comandos abaixo para criar as referências entre projetos:
+            . CleanArchMvc.WebUI            Dependência com o projeto "Infra.IoC"
 
-        . Adicionando a referencia do projeto "Application"
+        . Dentro da pasta raiz da solution, execute os comandos abaixo para criar as referências entre projetos:
 
-            dotnet add ./src/CleanArchMvc.Application/ reference ./src/CleanArchMvc.Domain/
+            . Adicionando a referencia do projeto "Application"
 
-        . Adicionando a referencia do projeto "Infra.Data"
+                dotnet add ./src/CleanArchMvc.Application/ reference ./src/CleanArchMvc.Domain/
 
-            dotnet add ./src/CleanArchMvc.Infra.Data/ reference ./src/CleanArchMvc.Domain/
+            . Adicionando a referencia do projeto "Infra.Data"
 
-        . Adicionando a referencia do projeto "Infra.IoC"
+                dotnet add ./src/CleanArchMvc.Infra.Data/ reference ./src/CleanArchMvc.Domain/
 
-            dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Domain/
+            . Adicionando a referencia do projeto "Infra.IoC"
 
-            dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Application/
+                dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Domain/
 
-            dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Infra.Data/
+                dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Application/
 
-        . Adicionando a referencia do projeto "WebUI"
+                dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Infra.Data/
 
-            dotnet add ./src/CleanArchMvc.WebUI/ reference ./src/CleanArchMvc.Infra.IoC/
+            . Adicionando a referencia do projeto "WebUI"
+
+                dotnet add ./src/CleanArchMvc.WebUI/ reference ./src/CleanArchMvc.Infra.IoC/
         
 
 Implementando a Camada de Domain
@@ -2049,6 +2050,8 @@ Aula 28. Criando as entidades do modelo domínio
 
             . Realizar testes de unidade para o projeto Domain
 
+    . DEMO
+
         . Acesse o projeto "Domain" e crie as pastas abaixo na raiz:
 
             . Entities
@@ -2105,315 +2108,321 @@ Aula 28. Criando as entidades do modelo domínio
 Aula 29. Enriquecendo o modelo de domínio criado - I
 ----------------------------------------------------
 
-    . Altere as classes "Category" e "Product" colocando o modificador de acesso "sealed" para impedir que elas sejam herdadas.
+    . DEMO
+
+        . Altere as classes "Category" e "Product" colocando o modificador de acesso "sealed" para impedir que elas sejam herdadas.
+
+                public sealed class Category
+                {
+                    ...
+                }
+
+                public sealed class Product
+                {
+                    ...
+                }
+
+        . Altere as classes "Category" e "Product" alterando os "Setter" para "private":
+
+                namespace CleanArchMvc.Domain.Entities;
+
+                using System.Collections.Generic;
+
+                public sealed class Category
+                {
+                    public int Id { get; private set; }
+
+                    public string Name {get; private set; }
+
+                    public ICollection<Product>  Products {get; set; }
+                }
+
+
+
+
+                namespace CleanArchMvc.Domain.Entities;
+
+                public sealed class Product
+                {
+                    public int Id { get; private set; }
+
+                    public string Name {get; private set; }
+
+                    public string Description  {get; private set; }
+                    
+                    public decimal Price  {get; private set; }
+                    
+                    public int Stock {get; private set; }
+                    
+                    public string Image {get; private set; }
+
+                    public int CategoryId  {get; set; }             // Não é necessário colocar "private" aqui porque estes atributos não fazem parte do modelo de domínio
+
+                    public Category Category {get; set; }
+                }
+
+        . Crie os construtores com parâmetros nas classes "Category" e "Product":
 
             public sealed class Category
             {
+                public Category( string name )
+                {
+                    Name = name;
+                }
+
+                public Category( int id, string name )
+                {
+                    Id = id;
+                    Name = name;
+                }
+
                 ...
             }
 
+
+
+
             public sealed class Product
             {
+                public Category( string name, ... )
+                {
+                    Name = name;
+                    ...
+                }
+
+                public Category( int id, string name, ... )
+                {
+                    Id = id;
+                    Name = name;
+                    ...
+                }
+
                 ...
             }
 
-    . Altere as classes "Category" e "Product" alterando os "Setter" para "private":
+        . Crie a classe "DomainExcetpionValidation" no pacote "Validation":
 
-            namespace CleanArchMvc.Domain.Entities;
+            namespace CleanArchMvc.Domain.Validation;
 
-            using System.Collections.Generic;
-
-            public sealed class Category
+            public class DomainExceptionValidation: Exception
             {
-                public int Id { get; private set; }
+                public DomainExceptionValidation( string error): base(error)
+                {
 
-                public string Name {get; private set; }
+                }
 
-                public ICollection<Product>  Products {get; set; }
+                public static void When( bool hasError, string error )
+                {
+                    if (hasError)
+                        throw new DomainExceptionValidation(error);
+                }
             }
 
 
+        . Altere a classe "Category" como abaixo:
 
+            using CleanArchMvc.Domain.Validation;   // Linha inserida
 
-            namespace CleanArchMvc.Domain.Entities;
-
-            public sealed class Product
-            {
-                public int Id { get; private set; }
-
-                public string Name {get; private set; }
-
-                public string Description  {get; private set; }
-                
-                public decimal Price  {get; private set; }
-                
-                public int Stock {get; private set; }
-                
-                public string Image {get; private set; }
-
-                public int CategoryId  {get; set; }             // Não é necessário colocar "private" aqui porque estes atributos não fazem parte do modelo de domínio
-
-                public Category Category {get; set; }
-            }
-
-    . Crie os construtores com parâmetros nas classes "Category" e "Product":
-
-        public sealed class Category
-        {
+            ...
             public Category( string name )
             {
-                Name = name;
+                ValidateDomain(name);           // Linha alterada
             }
 
             public Category( int id, string name )
             {
+                DomainExceptionValidation.When( id < 0, "Invalid Id value");
+
+                ValidateDomain( name );
+
                 Id = id;
-                Name = name;
             }
 
             ...
-        }
 
-
-
-
-        public sealed class Product
-        {
-            public Category( string name, ... )
+            private void ValidateDomain( string name )  // Método inserido
             {
+                DomainExceptionValidation.When( string.IsNullOrEmpty(name), "Invalid [name]. Name is required.");
+
+                DomainExceptionValidation.When( name.Lenght < 3, "Invalid name, too short, minimum 3 characters");
+
                 Name = name;
-                ...
             }
-
-            public Category( int id, string name, ... )
-            {
-                Id = id;
-                Name = name;
-                ...
-            }
-
-            ...
-        }
-
-    . Crie a classe "DomainExcetpionValidation" no pacote "Validation":
-
-        namespace CleanArchMvc.Domain.Validation;
-
-        public class DomainExceptionValidation: Exception
-        {
-            public DomainExceptionValidation( string error): base(error)
-            {
-
-            }
-
-            public static void When( bool hasError, string error )
-            {
-                if (hasError)
-                    throw new DomainExceptionValidation(error);
-            }
-        }
-
-
-    . Altere a classe "Category" como abaixo:
-
-        using CleanArchMvc.Domain.Validation;   // Linha inserida
-
-        ...
-        public Category( string name )
-        {
-            ValidateDomain(name);           // Linha alterada
-        }
-
-        public Category( int id, string name )
-        {
-            DomainExceptionValidation.When( id < 0, "Invalid Id value");
-
-            ValidateDomain( name );
-
-            Id = id;
-        }
-
-        ...
-
-        private void ValidateDomain( string name )  // Método inserido
-        {
-            DomainExceptionValidation.When( string.IsNullOrEmpty(name), "Invalid [name]. Name is required.");
-
-            DomainExceptionValidation.When( name.Lenght < 3, "Invalid name, too short, minimum 3 characters");
-
-            Name = name;
-        }
 
 
 Aula 30. Enriquecendo o modelo de domínio criado - II
 -----------------------------------------------------
 
-    . Altere a classe "Category como abaixo:
+    . DEMO
 
-        ...
-        public Category( int id, string name )
-        {
-            DomainExceptionValidation.When( id < 0, "Invalid Id value");
+        . Altere a classe "Category como abaixo:
 
-            ValidateDomain( name );
-
-            Id = id;
-        }
-
-        public void Update( string name)        // Método inserido
-        {
-            ValidateDomain( name );
-        }
-        ...
-
-    . Altere a classe "Product" como abaixo:
-
-        using CleanArchMvc.Domain.Validation;
-
-        namespace CleanArchMvc.Domain.Entities;
-
-        public sealed class Product
-        {
-            public int Id { get; private set; }
-            public string Name { get; private set; }
-            public string Description { get; private set; }
-            public decimal Price { get; private set; }
-            public int Stock { get; private set; }
-            public string Image { get; private set; }
-
-            // Construtor inserido
-            public Product(string name, string description, decimal price, int stock, string image)
+            ...
+            public Category( int id, string name )
             {
-                ValidateDomain(name, description, price, stock, image);
-            }
+                DomainExceptionValidation.When( id < 0, "Invalid Id value");
 
-            // Construtor inserido
-            public Product(int id, string name, string description, decimal price, int stock, string image)
-            {
-                DomainExceptionValidation.When(id < 0, "Invalid Id value.");
+                ValidateDomain( name );
+
                 Id = id;
-                ValidateDomain(name, description, price, stock, image);
             }
 
-            // Método inserido
-            public void Update(string name, string description, decimal price, int stock, string image, int categoryId)
+            public void Update( string name)        // Método inserido
             {
-                ValidateDomain(name, description, price, stock, image);
-                CategoryId = categoryId;
+                ValidateDomain( name );
             }
+            ...
 
-            // Método inserido
-            private void ValidateDomain(string name, string description, decimal price, int stock, string image)
-            {
-                DomainExceptionValidation.When(string.IsNullOrEmpty(name), 
-                    "Invalid name. Name is required");
+        . Altere a classe "Product" como abaixo:
 
-                DomainExceptionValidation.When(name.Length < 3,
-                    "Invalid name, too short, minimum 3 characters");
-
-                DomainExceptionValidation.When(string.IsNullOrEmpty(description),
-                    "Invalid description. Description is required");
-
-                DomainExceptionValidation.When(description.Length < 5, 
-                    "Invalid description, too short, minimum 5 characters");
-
-                DomainExceptionValidation.When(price < 0, "Invalid price value");
-
-                DomainExceptionValidation.When(stock < 0, "Invalid stock value");
-
-                DomainExceptionValidation.When(image.Length > 250,
-                    "Invalid image name, too long, maximum 250 characters");
-
-                Name = name;
-                Description = description;
-                Price = price;
-                Stock = stock;
-                Image = image;
-
-            }
-        }
-
-    . Crie a classe "Entity.cs" abaixo na pasta "Entities":
-
-        namespace CleanArchMvc.Domain.Entities;
-
-        public abstract class Entity
-        {
-            public int Id { get; protected set; }
-        }
-
-    . Faça as alterações abaixo nas classes "Category" e "Product":
-
+            using CleanArchMvc.Domain.Validation;
 
             namespace CleanArchMvc.Domain.Entities;
 
-            using System.Collections.Generic;
-
-            // Estenda a classe "Entity"
-            public sealed class Category: Entity
+            public sealed class Product
             {
-                // Apague a linha abaixo
-                // public int Id { get; private set; }
+                public int Id { get; private set; }
+                public string Name { get; private set; }
+                public string Description { get; private set; }
+                public decimal Price { get; private set; }
+                public int Stock { get; private set; }
+                public string Image { get; private set; }
 
-                ...
+                // Construtor inserido
+                public Product(string name, string description, decimal price, int stock, string image)
+                {
+                    ValidateDomain(name, description, price, stock, image);
+                }
+
+                // Construtor inserido
+                public Product(int id, string name, string description, decimal price, int stock, string image)
+                {
+                    DomainExceptionValidation.When(id < 0, "Invalid Id value.");
+                    Id = id;
+                    ValidateDomain(name, description, price, stock, image);
+                }
+
+                // Método inserido
+                public void Update(string name, string description, decimal price, int stock, string image, int categoryId)
+                {
+                    ValidateDomain(name, description, price, stock, image);
+                    CategoryId = categoryId;
+                }
+
+                // Método inserido
+                private void ValidateDomain(string name, string description, decimal price, int stock, string image)
+                {
+                    DomainExceptionValidation.When(string.IsNullOrEmpty(name), 
+                        "Invalid name. Name is required");
+
+                    DomainExceptionValidation.When(name.Length < 3,
+                        "Invalid name, too short, minimum 3 characters");
+
+                    DomainExceptionValidation.When(string.IsNullOrEmpty(description),
+                        "Invalid description. Description is required");
+
+                    DomainExceptionValidation.When(description.Length < 5, 
+                        "Invalid description, too short, minimum 5 characters");
+
+                    DomainExceptionValidation.When(price < 0, "Invalid price value");
+
+                    DomainExceptionValidation.When(stock < 0, "Invalid stock value");
+
+                    DomainExceptionValidation.When(image.Length > 250,
+                        "Invalid image name, too long, maximum 250 characters");
+
+                    Name = name;
+                    Description = description;
+                    Price = price;
+                    Stock = stock;
+                    Image = image;
+
+                }
             }
 
-
-
+        . Crie a classe "Entity.cs" abaixo na pasta "Entities":
 
             namespace CleanArchMvc.Domain.Entities;
 
-            using System.Collections.Generic;
-
-            // Estenda a classe "Entity"
-            public sealed class Product: Entity
+            public abstract class Entity
             {
-                // Apague a linha abaixo
-                // public int Id { get; private set; }
-
-                ...
+                public int Id { get; protected set; }
             }
+
+        . Faça as alterações abaixo nas classes "Category" e "Product":
+
+
+                namespace CleanArchMvc.Domain.Entities;
+
+                using System.Collections.Generic;
+
+                // Estenda a classe "Entity"
+                public sealed class Category: Entity
+                {
+                    // Apague a linha abaixo
+                    // public int Id { get; private set; }
+
+                    ...
+                }
+
+
+
+
+                namespace CleanArchMvc.Domain.Entities;
+
+                using System.Collections.Generic;
+
+                // Estenda a classe "Entity"
+                public sealed class Product: Entity
+                {
+                    // Apague a linha abaixo
+                    // public int Id { get; private set; }
+
+                    ...
+                }
 
 
 
 Aula 31. Criando as interfaces dos repositórios
 -----------------------------------------------
 
-    . Crie as interfaces abaixo na namespace "CleanArchMvc.Domain.Interfaces":
+    . DEMO
 
-        namespace CleanArchMvc.Domain.Interfaces
-        {
-            public interface ICategoryRepository
+        . Crie as interfaces abaixo na namespace "CleanArchMvc.Domain.Interfaces":
+
+            namespace CleanArchMvc.Domain.Interfaces
             {
-                Task<IEnumerable<Category>> GetCategoriesAsync();
+                public interface ICategoryRepository
+                {
+                    Task<IEnumerable<Category>> GetCategoriesAsync();
 
-                Task<Category> GetByIdAsync( int? id);
+                    Task<Category> GetByIdAsync( int? id);
 
-                Task<Category> CreateAsync( Category category );
+                    Task<Category> CreateAsync( Category category );
 
-                Task<Category> UpdateAsync( Category category );
+                    Task<Category> UpdateAsync( Category category );
 
-                Task<Category> RemoveAsync( Category category );
+                    Task<Category> RemoveAsync( Category category );
+                }
             }
-        }
 
 
-        namespace CleanArchMvc.Domain.Interfaces
-        {
-            public interface IProductRepository
+            namespace CleanArchMvc.Domain.Interfaces
             {
-                Task<IEnumerable<Product>> GetProductsAsync();
+                public interface IProductRepository
+                {
+                    Task<IEnumerable<Product>> GetProductsAsync();
 
-                Task<Product> GetByIdAsync( int? id);
+                    Task<Product> GetByIdAsync( int? id);
 
-                Task<Product> CreateAsync( Product product );
+                    Task<Product> CreateAsync( Product product );
 
-                Task<Product> UpdateAsync( Product product );
+                    Task<Product> UpdateAsync( Product product );
 
-                Task<Product> RemoveAsync( Product product );
+                    Task<Product> RemoveAsync( Product product );
 
+                }
             }
-        }
 
     . Essas interfaces funcionarão como contratos que devem ser seguidas por quem for implementar os repositórios.
 
@@ -2492,27 +2501,29 @@ Aula 32. Implementando os testes de unidade para o projeto Domain
 Aula 33. Testes de unidade para a entidade Category
 --------------------------------------------------
 
-    . Adicionando a package "FluentAssertions" no projeto de testes:
+    . DEMO
 
-        cd ./tests/UnitTests
+        . Adicionando a package "FluentAssertions" no projeto de testes:
 
-        dotnet add package FluentAssertions --version 6.12.0
+            cd ./tests/UnitTests
 
-        cd ../..
+            dotnet add package FluentAssertions --version 6.12.0
 
-    . Execute o comando abaixo para executar a solution:
+            cd ../..
 
-        # Executar na pasta da solution
-        dotnet clean
+        . Execute o comando abaixo para executar a solution:
 
-        dotnet restore
+            # Executar na pasta da solution
+            dotnet clean
 
-        dotnet build
+            dotnet restore
 
-        # Lista todas as unidades de testes encontradas
-        dotnet test -t
+            dotnet build
 
-    . Apague a classe "./tests/UnitTests/UnitTest1.cs"
+            # Lista todas as unidades de testes encontradas
+            dotnet test -t
+
+        . Apague a classe "./tests/UnitTests/UnitTest1.cs"
 
 
     . Funcionamento do mecânismo de teste do xUnit:
@@ -2614,161 +2625,165 @@ Aula 33. Testes de unidade para a entidade Category
                                         // SOMENTE HAVERÁ EXCEPTION PARA O TESTE SE FOREM DIFERENTES E O TESTE NÃO PASSARÁ COM SUCESSO
                                         Assert.Equal(message, assert.Message);
 
-    . Altere o conteúdo da classe "CategoryUnitTest1.cs" pelo abaixo:
+    . DEMO
 
-        using CleanArchMvc.Domain.Entities;
-        using FluentAssertions;
-        using System;
-        using Xunit;
+        . Altere o conteúdo da classe "CategoryUnitTest1.cs" pelo abaixo:
 
-        namespace Domain.UnitTests
-        {
-            public class CategoryUnitTest1
+            using CleanArchMvc.Domain.Entities;
+            using FluentAssertions;
+            using System;
+            using Xunit;
+
+            namespace Domain.UnitTests
             {
-                [Fact(DisplayName ="Create Category With Valid State")]
-                public void CreateCategory_WithValidParameters_ResultObjectValidState()
+                public class CategoryUnitTest1
                 {
-                    Action action = () => new Category(1, "Category Name ");
-                    action.Should()
-                        .NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
-                }
+                    [Fact(DisplayName ="Create Category With Valid State")]
+                    public void CreateCategory_WithValidParameters_ResultObjectValidState()
+                    {
+                        Action action = () => new Category(1, "Category Name ");
+                        action.Should()
+                            .NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
 
-                [Fact]
-                public void CreateCategory_NegativeIdValue_DomainExceptionInvalidId()
-                {
-                    Action action = () => new Category(-1, "Category Name ");
-                    action.Should()
-                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid [id] value");
-                }
+                    [Fact]
+                    public void CreateCategory_NegativeIdValue_DomainExceptionInvalidId()
+                    {
+                        Action action = () => new Category(-1, "Category Name ");
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid [id] value");
+                    }
 
-                [Fact]
-                public void CreateCategory_ShortNameValue_DomainExceptionShortName()
-                {
-                    Action action = () => new Category(1, "Ca");
-                    action.Should()
-                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid name, too short, minimum 3 characters");
-                }
+                    [Fact]
+                    public void CreateCategory_ShortNameValue_DomainExceptionShortName()
+                    {
+                        Action action = () => new Category(1, "Ca");
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid name, too short, minimum 3 characters");
+                    }
 
-                [Fact]
-                public void CreateCategory_MissingNameValue_DomainExceptionRequiredName()
-                {
-                    Action action = () => new Category(1, "");
-                    action.Should()
-                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid [name]. Name is required.");
-                }
+                    [Fact]
+                    public void CreateCategory_MissingNameValue_DomainExceptionRequiredName()
+                    {
+                        Action action = () => new Category(1, "");
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid [name]. Name is required.");
+                    }
 
-                [Fact]
-                public void CreateCategory_WithNullNameValue_DomainExceptionInvalidName()
-                {
-                    Action action = () => new Category(1, null);
-                    action.Should()
-                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    [Fact]
+                    public void CreateCategory_WithNullNameValue_DomainExceptionInvalidName()
+                    {
+                        Action action = () => new Category(1, null);
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
                 }
             }
-        }
 
-    . Execute o comando abaixo na pasta raiz da solution:
+        . Execute o comando abaixo na pasta raiz da solution:
 
-        dotnet test
+            dotnet test
 
-    . Verifique mais detalhes de como executar testes no curso "ASP.NET 6 Fundamentals" e na "Aula 20. Testes de Unidade - xUnit"
+        . Verifique mais detalhes de como executar testes no curso "ASP.NET 6 Fundamentals" e na "Aula 20. Testes de Unidade - xUnit"
 
 
 Aula 34. Testes de unidade para a entidade Product
 --------------------------------------------------
 
-    . Crie a classe "ProductUnitTest1" abaixo na raiz do projeto
+    . DEMO
 
-        using CleanArchMvc.Domain.Entities;
-        using FluentAssertions;
-        using System;
-        using Xunit;
+        . Crie a classe "ProductUnitTest1" abaixo na raiz do projeto
 
-        namespace Domain.UnitTests
-        {
-            public class ProductUnitTest1
+            using CleanArchMvc.Domain.Entities;
+            using FluentAssertions;
+            using System;
+            using Xunit;
+
+            namespace Domain.UnitTests
             {
-                [Fact]
-                public void CreateProduct_WithValidParameters_ResultObjectValidState()
+                public class ProductUnitTest1
                 {
-                    Action action = () => new Product(1, "Product Name", "Product Description", 9.99m,
-                        99, "product image");
-                    action.Should()
-                        .NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    [Fact]
+                    public void CreateProduct_WithValidParameters_ResultObjectValidState()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", 9.99m,
+                            99, "product image");
+                        action.Should()
+                            .NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
+
+                    [Fact]
+                    public void CreateProduct_NegativeIdValue_DomainExceptionInvalidId()
+                    {
+                        Action action = () => new Product(-1, "Product Name", "Product Description", 9.99m,
+                            99, "product image");
+
+                        action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid Id value.");
+                    }
+
+                    [Fact]
+                    public void CreateProduct_ShortNameValue_DomainExceptionShortName()
+                    {
+                        Action action = () => new Product(1, "Pr", "Product Description", 9.99m, 99,
+                            "product image");
+                        action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid name, too short, minimum 3 characters");
+                    }
+
+                    [Fact]
+                    public void CreateProduct_LongImageName_DomainExceptionLongImageName()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", 9.99m,
+                            99, "product image toooooooooooooooooooooooooooooooooooooooooooo loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg");
+
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid image name, too long, maximum 250 characters");
+                    }
+
+                    [Fact]
+                    public void CreateProduct_WithNullImageName_NoDomainException()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);
+                        action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
+
+                    [Fact]
+                    public void CreateProduct_WithEmptyImageName_NoDomainException()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, "");
+                        action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
+
+                    [Fact]
+                    public void CreateProduct_InvalidPriceValue_DomainException()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", -9.99m,
+                            99, "");
+                        action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid price value");
+                    }
+
+                    [Theory]
+                    [InlineData(-5)]
+                    public void CreateProduct_InvalidStockValue_ExceptionDomainNegativeValue(int value)
+                    {
+                        Action action = () => new Product(1, "Pro", "Product Description", 9.99m, value,
+                            "product image");
+                        action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid stock value");
+                    }
+
                 }
-
-                [Fact]
-                public void CreateProduct_NegativeIdValue_DomainExceptionInvalidId()
-                {
-                    Action action = () => new Product(-1, "Product Name", "Product Description", 9.99m,
-                        99, "product image");
-
-                    action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid Id value.");
-                }
-
-                [Fact]
-                public void CreateProduct_ShortNameValue_DomainExceptionShortName()
-                {
-                    Action action = () => new Product(1, "Pr", "Product Description", 9.99m, 99,
-                        "product image");
-                    action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid name, too short, minimum 3 characters");
-                }
-
-                [Fact]
-                public void CreateProduct_LongImageName_DomainExceptionLongImageName()
-                {
-                    Action action = () => new Product(1, "Product Name", "Product Description", 9.99m,
-                        99, "product image toooooooooooooooooooooooooooooooooooooooooooo loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg");
-
-                    action.Should()
-                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid image name, too long, maximum 250 characters");
-                }
-
-                [Fact]
-                public void CreateProduct_WithNullImageName_NoDomainException()
-                {
-                    Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);
-                    action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
-                }
-
-                [Fact]
-                public void CreateProduct_WithEmptyImageName_NoDomainException()
-                {
-                    Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, "");
-                    action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
-                }
-
-                [Fact]
-                public void CreateProduct_InvalidPriceValue_DomainException()
-                {
-                    Action action = () => new Product(1, "Product Name", "Product Description", -9.99m,
-                        99, "");
-                    action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid price value");
-                }
-
-                [Theory]
-                [InlineData(-5)]
-                public void CreateProduct_InvalidStockValue_ExceptionDomainNegativeValue(int value)
-                {
-                    Action action = () => new Product(1, "Pro", "Product Description", 9.99m, value,
-                        "product image");
-                    action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
-                        .WithMessage("Invalid stock value");
-                }
-
             }
-        }
 
-    . Execute o comando abaixo na pasta raiz da solution:
+        . Execute o comando abaixo na pasta raiz da solution:
 
-        dotnet test
+            dotnet test
 
 
 Aula 35. Fazendo ajustes no modelo de domínio Product
@@ -2797,50 +2812,52 @@ Aula 35. Fazendo ajustes no modelo de domínio Product
             }                               ^                                                                           |
                                             +---------------------------------------------------------------------------+
 
-    . Crie na classe de teste "ProductUnitTest1.cs" o método acima que contempla a "Exception" "NullRereferenceException" e execute o teste.
+    . DEMO
 
-    . Verifique se o teste dessa vez não passou, devido ao conteúdo nulo do nome da imagem.
+        . Crie na classe de teste "ProductUnitTest1.cs" o método acima que contempla a "Exception" "NullRereferenceException" e execute o teste.
 
-    . Como o objetivo é permitir que cadastremos imagens com valores nulos/vázio vamos desfazer a condição "NullReferenceException" dos testes e substituir
-        pelo operador condicional "?":
+        . Verifique se o teste dessa vez não passou, devido ao conteúdo nulo do nome da imagem.
 
-        ########## . Elimine o método acima "CreateProduct_WithNullImageNameNullReferenceException" da classe de teste.
+        . Como o objetivo é permitir que cadastremos imagens com valores nulos/vázio vamos desfazer a condição "NullReferenceException" dos testes e substituir
+            pelo operador condicional "?":
 
-        . Altere a linha abaixo deixando o operador "?":
+            ########## . Elimine o método acima "CreateProduct_WithNullImageNameNullReferenceException" da classe de teste.
 
-            private void ValidateDomain(string name, string description, decimal price, int stock, string image)
-            {
-                DomainExceptionValidation.When(string.IsNullOrEmpty(name), 
-                    "Invalid name. Name is required");
+            . Altere a linha abaixo deixando o operador "?":
 
-                DomainExceptionValidation.When(name.Length < 3,
-                    "Invalid name, too short, minimum 3 characters");
+                private void ValidateDomain(string name, string description, decimal price, int stock, string image)
+                {
+                    DomainExceptionValidation.When(string.IsNullOrEmpty(name), 
+                        "Invalid name. Name is required");
 
-                DomainExceptionValidation.When(string.IsNullOrEmpty(description),
-                    "Invalid description. Description is required");
+                    DomainExceptionValidation.When(name.Length < 3,
+                        "Invalid name, too short, minimum 3 characters");
 
-                DomainExceptionValidation.When(description.Length < 5, 
-                    "Invalid description, too short, minimum 5 characters");
+                    DomainExceptionValidation.When(string.IsNullOrEmpty(description),
+                        "Invalid description. Description is required");
 
-                DomainExceptionValidation.When(price < 0, "Invalid price value");
+                    DomainExceptionValidation.When(description.Length < 5, 
+                        "Invalid description, too short, minimum 5 characters");
 
-                DomainExceptionValidation.When(stock < 0, "Invalid stock value");
+                    DomainExceptionValidation.When(price < 0, "Invalid price value");
 
-                
-                // Linha alterada - Insirido o operador "?"
-                DomainExceptionValidation.When(image?.Length > 250,
-                    "Invalid image name, too long, maximum 250 characters");
+                    DomainExceptionValidation.When(stock < 0, "Invalid stock value");
+
+                    
+                    // Linha alterada - Insirido o operador "?"
+                    DomainExceptionValidation.When(image?.Length > 250,
+                        "Invalid image name, too long, maximum 250 characters");
 
 
-                Name = name;
-                Description = description;
-                Price = price;
-                Stock = stock;
-                Image = image;
+                    Name = name;
+                    Description = description;
+                    Price = price;
+                    Stock = stock;
+                    Image = image;
 
-            }
+                }
 
-    . Execute os testes e verifique se valores nulos são permitidos novamente.
+        . Execute os testes e verifique se valores nulos são permitidos novamente.
 
 
 
@@ -3412,46 +3429,48 @@ Aula 41. Apresentando o contêiner de injeção de dependência
 Aula 42. Projeto Infra.IoC - Registrando os serviços do contexto e do repositório
 ---------------------------------------------------------------------------------
 
-    . Crie a classe abaixo na raiz do projeto "CleanArchMvc.Infra.IoC"
+    . DEMO
 
-        using CleanArchMvc.Domain.Interfaces;
-        using CleanArchMvc.Infra.Data.Context;
-        using CleanArchMvc.Infra.Data.Repositories;
-        using Microsoft.EntityFrameworkCore;
-        using Microsoft.Extensions.Configuration;
-        using Microsoft.Extensions.DependencyInjection;
+        . Crie a classe abaixo na raiz do projeto "CleanArchMvc.Infra.IoC"
 
-        namespace CleanArchMvc.Infra.IoC
-        {
-            public static class DependencyInjection
+            using CleanArchMvc.Domain.Interfaces;
+            using CleanArchMvc.Infra.Data.Context;
+            using CleanArchMvc.Infra.Data.Repositories;
+            using Microsoft.EntityFrameworkCore;
+            using Microsoft.Extensions.Configuration;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace CleanArchMvc.Infra.IoC
             {
-                public static IServiceCollection AddInfrastructure(this IServiceCollection services,
-                    IConfiguration configuration)
+                public static class DependencyInjection
                 {
-                    services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"
-                    ), b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+                    public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+                        IConfiguration configuration)
+                    {
+                        services.AddDbContext<ApplicationDbContext>(options =>
+                        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"
+                        ), b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
-                    services.AddScoped<ICategoryRepository, CategoryRepository>();
-                    services.AddScoped<IProductRepository, ProductRepository>();
+                        services.AddScoped<ICategoryRepository, CategoryRepository>();
+                        services.AddScoped<IProductRepository, ProductRepository>();
 
-                    return services;
+                        return services;
+                    }
                 }
             }
-        }
 
-    . Na classe "Program.cs" do projeto "CleanArchMvc.WebUI" insira as linhas abaixo: (5.36)
+        . Na classe "Program.cs" do projeto "CleanArchMvc.WebUI" insira as linhas abaixo: (5.36)
 
-        services.AddInfrastructure( Configuration );
+            services.AddInfrastructure( Configuration );
 
-    . Na classe "appsettings.json" do projeto "CleanArchMvc.WebUI" insira a linha abaixo:
+        . Na classe "appsettings.json" do projeto "CleanArchMvc.WebUI" insira a linha abaixo:
 
-        {
-            "ConnectionStrings": {
-                "DefaultConnection": "..."
-            },
-            ...
-        }
+            {
+                "ConnectionStrings": {
+                    "DefaultConnection": "..."
+                },
+                ...
+            }
 
 
 
