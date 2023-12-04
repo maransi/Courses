@@ -3282,3 +3282,179 @@ Aula 40. Implementando o repositório - ProductRepository
 Aula 41. Apresentando o contêiner de injeção de dependência
 -----------------------------------------------------------
 
+    . Container de injeção de dependência nativo
+
+
+        ICategoryRepository
+        -------------------
+                ^
+                |
+                |               CategoryRepository( Context context )
+        CategoryRepository  <------------------------------------------- ApplicationDbContext
+        ------------------                              ^                --------------------
+                                                        |
+                                            Container IoC ( Container de injeção de dpendência nativo )
+                                                        |
+        IProductRepository                              V
+        -------------------
+                ^
+                |
+                |               ProductRepository( Context context )
+        ProductRepository   <------------------------------------------- ApplicationDbContext
+        ------------------                                               --------------------
+
+    . O container do ASP.NET é responsável por criar as instâncias das classes e injetá-las onde 
+        for necessário:
+
+        . AddTransient
+
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddTransient<ICategoryRepository, CategoryRepository >();
+            builder.Services.AddTransient<IProductRepository, ProductRepository >();
+
+                . Sempre cira uma nova instância do objeto
+
+                . Ideal para cenários onde queremos sempre um novo objeto.
+
+        . AddScoped
+
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddTransient<ICategoryRepository, CategoryRepository >();
+            builder.Services.AddTransient<IProductRepository, ProductRepository >();
+
+
+                . Cria um objeto por transação/requisição
+
+                . Se você chamar 2 ou mais serviços que dendem do mesmo objeto, a mesma instância será utilizada
+
+                . Ideal para cenários onde queremos apenas um objeto por requisição (banco).
+
+        . AddSingleton
+
+            . Cria um objeto quando a aplicação inicia e apaga da sessão quando a aplicação termina.
+
+                builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
+
+            . Mantém este objeto na memória até a aplicação para ou reiniciar 
+
+            . Sempre devolve a mesma instância deste objeto, com os mesmos valores.
+
+            . Padrão que visa garantir apenas um instância de um objeto para aplicão toda
+
+            . Um bom exemplo são as configurações
+
+                . Uma vez carregadas, ficam até a aplicação reiniciar.
+
+        . AddDbContext
+
+            . Item especial do tipo Scoped
+
+                builder.Services.AddDbContext<BlogDataContext>( x => useSqlServer( connStr ));
+
+            . Utilizado exclusivamente com o EF
+
+            . Garante que a conexão só dura até o fim da requisição
+
+    . No ASP.NET Core 5 a configuração da injeção de dependência é feita na class "startup.cs":
+
+        public void ConfigureServices( IServiceCollection services )
+        {
+            ...
+            services.AddDbContxt< ApplicationDbContext>( options => 
+                                            option.UseSqlServer( configuration.GetConnectionString("defaultConnection")));
+
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+                
+        }
+
+    . No ASP.NET 6 em diante a configuração é feita na classe "Program.cs"
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddTransient<ICategoryRepository, CategoryRepository >();
+        builder.Services.AddTransient<IProductRepository, ProductRepository >();
+
+    . Como dissemos, esse serviço de injeção é nativo do container ASP.NET, que reside na camada "WebUI". Para fazermos esse 
+        serviço funcionar precisariamos criar um forte acoplamento entre os projetos "WebUI" e "Infra.Data", violando a regra de dependência
+        da "Clean Archicteture":
+
+        using Microsoft.EntityFrameworkCore;        
+        using CleanArchMvc.Infra.DataRepositories;  ------> Acoplamento entre os projetos
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddTransient<ICategoryRepository, CategoryRepository >();
+        builder.Services.AddTransient<IProductRepository, ProductRepository >();
+
+    . Para resolver esse problema de alto acoplamento, criaremos uma classe que fará as vezes da injeção de dependência no projeto "Infra.IoC":
+
+        public static class DependencyInjection
+        {
+            public static IServiceCollection AddInfrastructure( this IServiceCollenction services,
+                                                                IConfiguration configuration )
+            {
+                services.AddDbContext< ApplicationDbContext >( options =>
+                                            options.UseSqlServer(   configuration.GetConnectionString("DefaultConnection"),
+                                                                    b => b.MigrationsAssembly( typeof( ApplicatonDbContext )
+                                                                          .Assembly.FullName )));
+
+                services.AddScoped<IProductRepository, ProductRepository>();
+                services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+                return services;
+            }
+        }
+
+
+Aula 42. Projeto Infra.IoC - Registrando os serviços do contexto e do repositório
+---------------------------------------------------------------------------------
+
+    . Crie a classe abaixo na raiz do projeto "CleanArchMvc.Infra.IoC"
+
+        using CleanArchMvc.Domain.Interfaces;
+        using CleanArchMvc.Infra.Data.Context;
+        using CleanArchMvc.Infra.Data.Repositories;
+        using Microsoft.EntityFrameworkCore;
+        using Microsoft.Extensions.Configuration;
+        using Microsoft.Extensions.DependencyInjection;
+
+        namespace CleanArchMvc.Infra.IoC
+        {
+            public static class DependencyInjection
+            {
+                public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+                    IConfiguration configuration)
+                {
+                    services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"
+                    ), b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+
+                    services.AddScoped<ICategoryRepository, CategoryRepository>();
+                    services.AddScoped<IProductRepository, ProductRepository>();
+
+                    return services;
+                }
+            }
+        }
+
+    . Na classe "Program.cs" do projeto "CleanArchMvc.WebUI" insira as linhas abaixo: (5.36)
+
+        services.AddInfrastructure( Configuration );
+
+    . Na classe "appsettings.json" do projeto "CleanArchMvc.WebUI" insira a linha abaixo:
+
+        {
+            "ConnectionStrings": {
+                "DefaultConnection": "..."
+            },
+            ...
+        }
+
+
+
+Aula 43. Migrations - Conceitos e recursos usados
+-------------------------------------------------
+
