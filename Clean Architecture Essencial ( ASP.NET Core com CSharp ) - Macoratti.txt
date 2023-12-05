@@ -145,6 +145,18 @@ Ambiente
 
     sudo apt-get install sqlitebrowser
 
+
+. Instalação do "SQLite Studio":
+
+    . Acesse o site https://sqlitestudio.pl/
+
+    . Base o arquivo de instalação
+
+    . No prompt de comando execute os comandos abaixo:
+
+        chmod a+x SQLiteStudio-3.4.4-linux-x64-installer.run 
+        sudo ./SQLiteStudio-3.4.4-linux-x64-installer.run
+
 . Instalação do Nodejs
 
     sudo apt-get install nodejs
@@ -2861,7 +2873,6 @@ Aula 35. Fazendo ajustes no modelo de domínio Product
         . Execute os testes e verifique se valores nulos são permitidos novamente.
 
 
-// PAREI AQUI
 Implementando a Camada de Infraestrutura
 ========================================
 
@@ -3428,6 +3439,9 @@ Aula 41. Apresentando o contêiner de injeção de dependência
 
         public static class DependencyInjection
         {
+
+            // Para mais detalhes do funcionamento do "this" na assinatura do método acesse a aula 
+            // "Aula 26. Implementando Extension Methods" do curso "DI - Dominando Injeção de Dependência - Balta"
             public static IServiceCollection AddInfrastructure( this IServiceCollenction services,
                                                                 IConfiguration configuration )
             {
@@ -3497,4 +3511,72 @@ Aula 42. Projeto Infra.IoC - Registrando os serviços do contexto e do repositó
 
 Aula 43. Migrations - Conceitos e recursos usados
 -------------------------------------------------
+
+    . EF Core Migrations
+
+        . Permite atualizar de forma invremental o esquema de banco de dados e mantém a sincronia com o modelo
+            de dados do aplicativo, preservando os dados exitentes no banco de dados.
+
+        . Após qualquer alteração no modelo de dados podemos adicionar uma nova migração correspondente que descreve as 
+            atualizações necessárias para manter o esquema de banco de dados em sincronia.
+
+        . Como fazer isso:
+
+            Visual studio                                   Net Cli
+            -------------                                   -------
+            Add-migration [nome]                            dotnet tool install --global dotnet-ef
+                                                            dotnet ef migrations add [nome]
+
+
+        . O EF Core compara o model atual com um instantâneo do modelo antigo para determinar as diferenças e gera arquivos
+            de origem de migração
+
+        . Depois que uma nova migração é gerada, é possível aplicá-la a um banco usando os seguintes comandos:
+
+            Visual studio                                   Net Cli
+            -------------                                   -------
+            update-database                                 dotnet ef database update
+
+        . O EF Core registra todas as migrações aplicadas em uma tabela de histórico especial, permitindo que ela saiba quais migrações 
+            foram, ou não, aplicadas.
+
+        . Outros comandos do "Migrations":
+
+            Visual studio                                   Net Cli
+            -------------                                   -------
+            remove-migration                                dotnet ef migrations remove
+            get-migration                                   dotnet ef migrations list
+
+    . Criar o banco de dados:
+
+        . Informação sobre o prvedor do banco de dados usado (Infra.IoC)
+
+        . Informação sobre a strng de coneção usada (appsettings.json)
+
+            {
+                "ConnectionStrings": {              
+                    "DefaultConnection": "DataSource=app.db;Cache=Shared"
+                },
+                ...
+            }
+
+        . Site para encontrar detalhes da construção da string de conexão para diversos bancos:
+
+            https://www.connectionstrings.com/
+
+        . Criar as tabelas:
+
+            . Definição do arquivo de contexto (ApplicationDbContext) contendo as configurações e o mapeamento ORM.
+
+        . Ferramentas que podem ser utilizadas para trabalhar com banco de dados:
+
+            SQL Server                                          Sqlite
+            ----------                                          ------
+            SQL Server Management studio                        DB Browser
+            Server Explorer ( Visual Studio )                   Sqlite Studio
+            Azure Data Studio
+
+// PAREI AQUI
+Aula 44. Aplicando o Migrations do EF Core
+------------------------------------------
 
