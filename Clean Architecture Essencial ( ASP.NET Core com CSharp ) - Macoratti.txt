@@ -2390,13 +2390,14 @@ Aula 31. Criando as interfaces dos repositórios
 
         . Crie as interfaces abaixo na namespace "CleanArchMvc.Domain.Interfaces":
 
+            using CleanArchMvc.Domain.Entities;
+
             namespace CleanArchMvc.Domain.Interfaces
             {
                 public interface ICategoryRepository
                 {
                     Task<IEnumerable<Category>> GetCategoriesAsync();
-
-                    Task<Category> GetByIdAsync( int? id);
+                    Task<Category> GetByIdAsync(int? id);
 
                     Task<Category> CreateAsync( Category category );
 
@@ -2962,24 +2963,27 @@ Aula 36. Criando a estrutura do projeto, incluindo as referências e criando o c
 
         . Crie a classe abaixo dentro da pasta "Context":
 
+            using CleanArchMvc.Domain.Entities;
+            // using CleanArchMvc.Infra.Data.EntitiesConfiguration;
             using Microsoft.EntityFrameworkCore;
 
-            public class ApplicationDbContext: DbContext
+            namespace CleanArchMvc.Infra.Data.Context
             {
-                public ApplicationDbContext( DbContextOpetions< ApplicationDbContext > options): base(options)
+                public class ApplicationDbContext : DbContext
                 {
+                    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+                        : base(options)
+                    { }
 
+                    public DbSet<Category> Categories { get; set; }
+                    public DbSet<Product> Products { get; set; }
+
+                    protected override void OnModelCreating(ModelBuilder builder)
+                    {
+                        base.OnModelCreating(builder);
+                        builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+                    }
                 }
-
-                public DbSet<Product> Products{ get; set;  }
-                public DbSet<Category> Categories{ get; set; }
-
-                protected override void OnModelCreating( ModelBuilder builder )
-                {
-                    base.OnModelCreating( builder );
-                    builder.ApplyConfigurationsFromAssembly( typof( ApplicationDbContext).Assembly );
-                }
-
             }
 
 Aula 37. Configurando as entidades usando a Fluent API
@@ -3051,7 +3055,7 @@ Aula 37. Configurando as entidades usando a Fluent API
                 protected override void OnModelCreating( ModelBuilder builder )
                 {
                     base.OnModelCreating( builder );
-                    builder.ApplyConfigurationsFromAssembly( typof( ApplicationDbContext).Assembly );
+                    builder.ApplyConfigurationsFromAssembly( typeof( ApplicationDbContext).Assembly );
                 }
 
                 . Ao invés de dar o "ApplyConfigurationsFromAssembly" como acima poderia executar individualmente para cada classe de entidade:
@@ -3084,34 +3088,48 @@ Aula 37. Configurando as entidades usando a Fluent API
 
         . Crie as classes abaixo dentro da pasta "EntitiesConfiguration"
 
-            public class CategoryConfiguration: IEntityTypeConfiguration<Category>
+            using CleanArchMvc.Domain.Entities;
+            using Microsoft.EntityFrameworkCore;
+            using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+            namespace CleanArchMvc.Infra.Data.EntitiesConfiguration
             {
-                public void Configure( EntityTypeBuilder<Category> builder )
+                public class CategoryConfiguration : IEntityTypeConfiguration<Category>
                 {
-                    builder.HasKey( t => t.Id );
+                    public void Configure(EntityTypeBuilder<Category> builder)
+                    {
+                        builder.HasKey(t => t.Id);
+                        builder.Property(p => p.Name).HasMaxLength(100).IsRequired();
 
-                    builder.Property( p => p.Name).HasMaxLength(100).IsRequired();
-
-                    builder.HasData( new Category( 1, "Material Escolar" ),
-                                        new Category( 2, "Eletrônicos"),
-                                        new Category( 3, "Acessorios") );
+                        builder.HasData(
+                        new Category(1, "Material Escolar"),
+                        new Category(2, "Eletrônicos"),
+                        new Category(3, "Acessórios")
+                        );
+                    }
                 }
-            } 
+            }
 
 
 
-            public class ProductConfiguration: IEntityTypeConfiguration<Product>
+            using CleanArchMvc.Domain.Entities;
+            using Microsoft.EntityFrameworkCore;
+            using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+            namespace CleanArchMvc.Infra.Data.EntitiesConfiguration;
+
+            public class ProductConfiguration : IEntityTypeConfiguration<Product>
             {
-                public void Configure( EntityTypeBuilder<Product> builder )
+                public void Configure(EntityTypeBuilder<Product> builder)
                 {
-                    builder.HasKey( t => t.Id );
+                    builder.HasKey(t => t.Id);
 
-                    builder.Property( p => p.Name ).HasMasLength( 100 ). IsRequired();
-                    builder.Property( p => p.Description ).HasMaxLength( 200 ).IsRequired();
+                    builder.Property(p => p.Name).HasMaxLength(100).IsRequired();
+                    builder.Property(p => p.Description).HasMaxLength(200).IsRequired();
 
-                    builder.Property( p => p.Price ).HasPrecicion( 10,2 );
+                    builder.Property(p => p.Price).HasPrecision(10, 2);
 
-                    builder.Has.One( e => e.Category ).WithMany( e => e.Products ).HasForeignKey( e => e.CategoryId );
+                    builder.HasOne(e => e.Category).WithMany(e => e.Products).HasForeignKey(e => e.CategoryId);
 
                 }
             }
@@ -3379,7 +3397,7 @@ Aula 41. Apresentando o contêiner de injeção de dependência
         public void ConfigureServices( IServiceCollection services )
         {
             ...
-            services.AddDbContxt< ApplicationDbContext>( options => 
+            services.AddDbContext< ApplicationDbContext>( options => 
                                             option.UseSqlServer( configuration.GetConnectionString("defaultConnection")));
 
             services.AddScoped<IProductRepository, ProductRepository>();
@@ -3447,9 +3465,10 @@ Aula 42. Projeto Infra.IoC - Registrando os serviços do contexto e do repositó
                     public static IServiceCollection AddInfrastructure(this IServiceCollection services,
                         IConfiguration configuration)
                     {
-                        services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"
-                        ), b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+                        services.AddDbContext<ApplicationDbContext>( options =>                            // Linha inserida
+                            options.UseSqlite( 
+                                configuration.GetConnectionString("DefaultConnection"),
+                                    b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
                         services.AddScoped<ICategoryRepository, CategoryRepository>();
                         services.AddScoped<IProductRepository, ProductRepository>();
@@ -3461,13 +3480,15 @@ Aula 42. Projeto Infra.IoC - Registrando os serviços do contexto e do repositó
 
         . Na classe "Program.cs" do projeto "CleanArchMvc.WebUI" insira as linhas abaixo: (5.36)
 
-            services.AddInfrastructure( Configuration );
+            builder.Services.AddControllersWithViews();
+
+            services.AddInfrastructure( builder.Configuration );    // Linha inserida
 
         . Na classe "appsettings.json" do projeto "CleanArchMvc.WebUI" insira a linha abaixo:
 
             {
-                "ConnectionStrings": {
-                    "DefaultConnection": "..."
+                "ConnectionStrings": {              
+                    "DefaultConnection": "DataSource=app.db;Cache=Shared"
                 },
                 ...
             }
