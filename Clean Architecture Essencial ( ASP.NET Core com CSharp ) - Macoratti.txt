@@ -3580,3 +3580,142 @@ Aula 43. Migrations - Conceitos e recursos usados
 Aula 44. Aplicando o Migrations do EF Core
 ------------------------------------------
 
+    . Demo
+
+        . Se for no "Visual Studio":
+
+            . Abra a console do "Package Manager Console"
+
+            . Defina o projeto "Default"
+
+            . Execute o comando abaixo:
+
+                add-migrations Initial
+
+
+        . Se for no ".Net Cli", acesse a pasta raiz do projeto da "Solution" e execute o comando abaixo:
+
+            dotnet clean
+
+            dotnet build
+
+            dotnet ef migration add initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+
+            . IMPORTANTE: Se ocorrer erro indicando que não há referencia do pacote "Microsoft.EntityFrameworkCore.Design" no projeto "CleanArchMvc.WebUI"
+                            então proceda as correções abaixo:
+
+                . Acesse o arquivo "Data.csproj" do projeto "CleanArchMvc.Infra.Data" e altere a referência do pacote "Microsoft.EntityFrameworkCore.Design"
+                    como abaixo:
+
+                    <Project Sdk="...">
+                        ...
+
+                        <ItemGroup>
+                            <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="...">
+                                <!-- <PrivateAssets>all</PrivateAssets> --> 
+                                <!-- Altere a linha acima pelo abaixo -->
+                                <PrivateAssets>none</PrivateAssets>
+                        </ItemGroup>
+
+                        ...
+                    </Project>
+
+        . Para remover uma "migration":
+
+            dotnet ef migration remove --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+
+        . Verifique se a pasta "Migrations" foi criada com sucess dentro da estrutura do projeto "CleanArchMvc.Infra.Data"
+
+        . Execute o comando abaixo na pasta raiz da "Solution":
+
+            dotnet ef database update Initial --project CleanArchMvc.Infra.Data -s CleanArqchMvc.WebUI -c ApplicationDbContext 
+
+        . Verifique se na raiz do projeto foi criado o banco de dados com o nome:
+
+            app.db
+
+        . Acesse o IDE "DB Browser", abra o banco "app.db" e verifique se as tabelas e o conteúdo delas foram criados
+            com sucesso.
+
+        . Para criar dados na tabela "Products" execute os passos abaixo:
+
+            . Acesse a pasta raiz da "Solution" e execute o comando abaixo:
+
+                dotnet ef migration add initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+
+            . Abra o arquivo criado pela "Migrations" do passo anterior e inclua as linhas abaixo do metodo "Up", no respectivo método 
+                da classe criada acima:
+
+                using Microsoft.EntityFrameworkCore.Migrations;
+
+                namespace CleanArchMvc.Infra.Data.Migrations
+                {
+                    public partial class SeedProducts : Migration
+                    {
+                        protected override void Up(MigrationBuilder mb)     // Linha alterada "mb"
+                        {
+                            // Linhas inseridas
+                            mb.Sql("INSERT INTO Products(Name,Description,Price,Stock,Image,CategoryId) " +
+                            "VALUES('Caderno espiral','Caderno espiral 100 fôlhas',7.45,50,'caderno1.jpg',1)");
+
+                            mb.Sql("INSERT INTO Products(Name,Description,Price,Stock,Image,CategoryId) " +
+                            "VALUES('Estojo escolar','Estojo escolar cinza',5.65,70,'estojo1.jpg',1)");
+
+                            mb.Sql("INSERT INTO Products(Name,Description,Price,Stock,Image,CategoryId) " +
+                            "VALUES('Borracha escolar','Borracha branca pequena',3.25,80,'borracha1.jpg',1)");
+
+                            mb.Sql("INSERT INTO Products(Name,Description,Price,Stock,Image,CategoryId) " +
+                            "VALUES('Calculadora escolar','Calculadora simples',15.39,20,'calculadora1.jpg',2)");
+                            // Fim da inserção
+                        }
+
+                        protected override void Down(MigrationBuilder mb)   // Linha alterada "mb"
+                        {
+                            mb.Sql("DELETE FROM Products");     // Linha inserida
+                        }
+                    }
+                }
+
+            . Execute o comando abaixo na pasta raiz da "Solution":
+
+                dotnet ef database update Initial --project CleanArchMvc.Infra.Data -s CleanArqchMvc.WebUI -c ApplicationDbContext 
+
+            . Acesse o IDE "DB Browser", abra o banco "app.db" e verifique se foram criado com sucesso os dados na tabela "Products"
+
+Aula 45. Migrations Erros - Alternativa
+---------------------------------------
+
+    . Para verificar mais detalhadamente se nosso projeto tem algum erro/problema, durante a "Migration" podemos efetuar o comando com mais
+        detalhes e assim identificar possiveis erros.
+
+        . No ".Net Cli"
+
+            dotnet ef migration add initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext --verbose
+        
+            . dotnet ef migrations add Initial                  Comando para criar a migração com o nome Initial
+
+            . --project CleanArchMvc.Infra.Data                 Defnine o projeto onde os arquivos de migração serão criados
+
+            . -s CleanArchMvc.WebUI                             Define o projeto ASP.NET Core MVC ou ASP.NET Core Web API
+
+            . -c ApplicationDbContext                           Define o nome do arquivo de contexto usado
+
+            . --verbose                                         Exibe mensagens detalhadas do processo de migração
+
+        . No "Visual Studio":
+
+            . Abra a console do "Package Manager Console"
+
+            . Defina o projeto "Default"
+
+            . Execute o comando abaixo:
+
+                add-migrations Initial --verbose
+
+
+
+Implementando a camada de Aplicação
+===================================
+
+Aula 46. Mapeamento de objetos - Data Transfer Objects e AutoMapper
+-------------------------------------------------------------------
