@@ -3599,7 +3599,9 @@ Aula 44. Aplicando o Migrations do EF Core
 
             dotnet build
 
-            dotnet ef migration add initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+            cd src
+
+            dotnet ef migrations add initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
 
             . IMPORTANTE: Se ocorrer erro indicando que não há referencia do pacote "Microsoft.EntityFrameworkCore.Design" no projeto "CleanArchMvc.WebUI"
                             então proceda as correções abaixo:
@@ -3620,17 +3622,17 @@ Aula 44. Aplicando o Migrations do EF Core
                         ...
                     </Project>
 
-        . Para remover uma "migration":
+        . Para remover uma "migration" se for necessário:
 
             dotnet ef migration remove --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
 
         . Verifique se a pasta "Migrations" foi criada com sucess dentro da estrutura do projeto "CleanArchMvc.Infra.Data"
 
-        . Execute o comando abaixo na pasta raiz da "Solution":
+        . Execute o comando abaixo na pasta "src" da "Solution":
 
-            dotnet ef database update Initial --project CleanArchMvc.Infra.Data -s CleanArqchMvc.WebUI -c ApplicationDbContext 
+            dotnet ef database update Initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
 
-        . Verifique se na raiz do projeto foi criado o banco de dados com o nome:
+        . Verifique se na pasta do projeto "CleanArchMvc.WebUI" foi criado o banco de dados com o nome:
 
             app.db
 
@@ -3639,11 +3641,11 @@ Aula 44. Aplicando o Migrations do EF Core
 
         . Para criar dados na tabela "Products" execute os passos abaixo:
 
-            . Acesse a pasta raiz da "Solution" e execute o comando abaixo:
+            . Acesse a pasta "src" da raiz da "Solution", execute o comando abaixo para criar um arquivo de migração vazio:
 
-                dotnet ef migration add initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+                dotnet ef migrations add Initial-Insert-Products --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
 
-            . Abra o arquivo criado pela "Migrations" do passo anterior e inclua as linhas abaixo do metodo "Up", no respectivo método 
+            . Abra o arquivo "*_Initial-Insert-Products.cs" criado pela "Migrations" do passo anterior e inclua as linhas abaixo do metodo "Up", no respectivo método 
                 da classe criada acima:
 
                 using Microsoft.EntityFrameworkCore.Migrations;
@@ -3678,7 +3680,7 @@ Aula 44. Aplicando o Migrations do EF Core
 
             . Execute o comando abaixo na pasta raiz da "Solution":
 
-                dotnet ef database update Initial --project CleanArchMvc.Infra.Data -s CleanArqchMvc.WebUI -c ApplicationDbContext 
+                dotnet ef database update Initial-Insert-Products --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
 
             . Acesse o IDE "DB Browser", abra o banco "app.db" e verifique se foram criado com sucesso os dados na tabela "Products"
 
