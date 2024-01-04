@@ -18,6 +18,16 @@ https://pt.pngtree.com/
 Site de perguntas de entrevista
 https://www.fullstack.cafe/
 
+Sites de dashboard free
+    https://startbootstrap.com/
+
+    Assista o vídeo abaixo primeiro:
+    https://www.youtube.com/watch?v=29pUjQbiTlk&list=PL7yxJa4Na-irux26rILnjv0G33DrTC3Jq
+    https://coreui.io/#live-preview
+    https://demo-basic.adminkit.io/         https://demo-basic.adminkit.io/upgrade-to-pro
+    https://demos.creative-tim.com/
+    
+
 
 Instalações
 ===========
@@ -55,20 +65,20 @@ Instalações
     ----------------------------------
 
             C# 
-            C# Extensions
+            C# Extensions (JosKreativ)
             C# XML Documentation Comments
+            C# Snippets
+            vscode-solution-explorer
             ASP.NET Helper
+            RapidApi
+            Bracket Pair Colorization Toggler
             Razor Snippets
             Libman
             Docker
             vscode-icons (Opcional)
-            NuGet Gallery
             VZ Dotnet File Template
-            Dotnet Project References
             Auto-Using for C#
-            Bracket Pair Colorization Toggler
             Error Lens
-            RapidApi
 
 
         Testar
@@ -114,6 +124,11 @@ Entendendo o ASP.NET Core 6 e ASP.NET Core 6 MVC
         . Net 6
 
         . Visual Studio 2022
+
+            . Antes de começar executar o Visual Studio, execute o comando abaixo para criar o certificados nos navegadores.
+                Tem quer ser na pasta da solution
+
+                dotnet dev-certs https --trust
 
 . O que é o ASP.NET Core?
 
@@ -250,8 +265,8 @@ Criando um novo projeto
 
             dotnet new mvc SampleApplication -o sampleApplication -n sampleApplication -f net6.0
 
-    Visual Studio Code
-    ------------------
+    Visual Studio
+    -------------
 
         . Na tela de "Get Started" escolha a opção "Create a New Project"
 
@@ -278,6 +293,9 @@ Criando um novo projeto
 
     . Execute o projeto
 
+        . Antes de executar o projeto, execute o comando abaixo na pasta raiz da solution, ou do projeto:
+
+            dotnet dev-certs https --trust
 
 Explorando os arquivos gerados
 ------------------------------
@@ -343,9 +361,9 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
 
             . Escolha ASP.NET Core Empty
 
-                Project Name: BhetanyPieShop
+                Project Name: BhetanysPieShop
                 Location: [Pasta do projeto]
-                Solution Name: BhetanyPieShop
+                Solution Name: BethanysPieShop
                 Place Solution and Project in the same Directory: False
 
             . Additional Information
@@ -359,10 +377,38 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
             . Run
 
         . Dotnet core
-            
-            . Na pasta raiz do projeto execute o comando abaixo:
+
+            . Crie a pasta da solution e crie a solution nela:
+
+                mkdir Bethanys
+
+                mkdir Bethanys/src
+
+                cd Bethanys/src
+
+                dotnet new sln --name Bethanys
+
+            . Na pasta "/src" execute o comando abaixo:
 
                 dotnet new web -o bethanysPieShop -n bethanysPieShop -f net6.0
+
+            . Na pasta "/src" execute o comando abaixo para adicionar o projeto "bethanysPieShop" a solution:
+
+                dotnet sln add ./bethanysPieShop/
+
+            . Executando o projeto pela solution:
+
+                dotnet clean
+
+                dotnet restore
+
+                dotnet build
+
+                dotnet run --project bethanysPieShop/ --project bethanysPieShop/
+
+            . Executando o projeto diretamente pelo projeto:
+
+                cd Bethanys/src/bethanysPieShop
 
                 dotnet clean
 
@@ -371,8 +417,6 @@ https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
                 dotnet build
 
                 dotnet run
-
-
 
 . No .Net 6 a execução começa pela classe "Program.cs"
 
@@ -915,7 +959,7 @@ Criando a primeira página
 
             builder.Services.AddTransient<IPieRepository, MockPieRepository>();
 
-                . Sempre cira uma nova instância do objeto
+                . Sempre cria uma nova instância do objeto
 
                 . Ideal para cenários onde queremos sempre um novo objeto.
 
@@ -972,6 +1016,24 @@ Criando a primeira página
 
             namespace bethanysPieShop.Models;
 
+            public class Category
+            {
+                public int CategoryId { get; set; }
+
+                public string CategoryName { get; set; } = string.Empty;
+
+                public string? Description { get; set; }
+
+                public List<Pie>? Pies { get; set; }
+            }
+
+
+
+
+
+
+            namespace bethanysPieShop.Models;
+
             public class Pie
             {
                 public int PieId { get; set; }
@@ -1013,21 +1075,6 @@ Criando a primeira página
                 } = default!;
             }
 
-
-
-
-            namespace bethanysPieShop.Models;
-
-            public class Category
-            {
-                public int CategoryId { get; set; }
-
-                public string CategoryName { get; set; } = string.Empty;
-
-                public string? Description { get; set; }
-
-                public List<Pie>? Pies { get; set; }
-            }
 
         . Crie as classes e interfaces abaixo na mesma pasta "Models":
 
@@ -1267,7 +1314,7 @@ Criando a primeira página
 
                 . Este erro só ocorrerá em tempo de execução.
 
-            . Além dados fisos, a view pode receber dados de outras formas.
+            . Além dados fixos, a view pode receber dados de outras formas.
 
         . Na estrutura do projeto, cada controller terá uma respectiva pasta dentro da pasta "Views", onde armazenamos os templates "*.cshtml". 
 
@@ -1470,7 +1517,7 @@ Criando a primeira página
 
         . Altere o código do método "PieController.List" como abaixo:
 
-            using betahnysPieShop.ViewModels;   // Linha inserida
+            using bethanysPieShop.ViewModels;   // Linha inserida
             ...
             public IActionResult List()
             {
@@ -1514,32 +1561,6 @@ Criando a primeira página
 
             </html>
 
-            @model bethanysPieShop.ViewModels.PieListViewModel             <!-- Linha alterada -->
-
-            <!DOCTYPE html>
-
-            <html>
-            <head>
-                <meta name="viewport" content="width=device-width" />
-                <title>Bethany´s Pie Shop</head>
-            </head>
-
-            <body>
-                <h1>@Model.CurrentCategory</h1>                             <!-- Linha alterada -->
-
-                        
-                @foreach( var pie in Model )
-                {
-                    <div>
-                        <h2>@pie.Name </h2>
-                        <h3>@pie.Price.ToString("c") </h3>
-                        <h4>@pie.Category.CategoryName </h4>
-                    </div>
-                  }
-
-            </body>
-            </html>
-
         . Levante o projeto e execute a rota abaixo no navegador:
 
             https://localhost:[porta]/pie/list
@@ -1551,9 +1572,9 @@ Criando a primeira página
 
         . Você define um padrão que será utilizado por toda a aplicação.
 
-        . Toda a página permance, mudando apensas o "miolo"
+        . Toda a página performance, mudando apensas o "miolo"
 
-        . A regição que irá mudar é identificada pelo @Renderbody()
+        . A região que irá mudar é identificada pelo @Renderbody()
 
         . Podemos ter vários layouts
 
@@ -1647,10 +1668,10 @@ Criando a primeira página
                                                                                                                                                                     |   código
         . Altere a view "Views/Pie/List.cshml" como abaixo, retirando todo código de responsabilidade do _Layout.cshtml deixando somente o miolo:                   |
                                                                                                                                                                     |
-            @model bethanysPieShop.ViewModels.PieListViewModel              <---------------------------------------------------------------------------------------+
-
-            @{
-                Layout = "_Layout";
+            @model bethanysPieShop.ViewModels.PieListViewModel                                                                                                      |
+                                                                                                                                                                    |
+            @{                                                                                                                                                      |
+                Layout = "_Layout";                 <---------------------------------------------------------------------------------------------------------------+
             }
             <h1>@Model.CurrentCategory</h1>                             
 
@@ -1668,19 +1689,18 @@ Criando a primeira página
 
             https://localhost:[porta]/pie/list
 
-
         . Trabalhando com _ViewStart:
 
             . Retire o trecho de código abaixo da view "Views/Pie/List.cshml":
 
                 @model bethanysPieShop.ViewModels.PieListViewModel    
 
-                <!--                                                    |
+                @*                                                      |
                                                                         |
                 @{                                                      |
                     Layout = "_Layout"                                  +-----------------------------------------------------------------------------------------------+
                 }                                                       |                                                                                               |
-                -->                                                     |                                                                                               |                                                                                           
+                *@                                                      |                                                                                               |                                                                                           
                                                                                                                                                                         |
                 <h1>@Model.CurrentCategory</h1>                                                                                                                         |
                                                                                                                                                                         |
@@ -1727,7 +1747,7 @@ Criando a primeira página
                 <h1>@Model.CurrentCategory</h1>                             
 
                         
-                @foreach( var pie in Model )
+                @foreach( var pie in Model )        @* Linha Alterada - Alterado de "Model.Pies" para "Model" *@
                 {
                     <div>
                         <h2>@pie.Name </h2>
@@ -1785,7 +1805,7 @@ Criando a primeira página
 
         . Execute os comandos abaixo na pasta raiz do projeto:
 
-            npm install bootstrat@5.1.3
+            npm install bootstrap@5.1.3
 
             npm install jquery@3.6.0
 
@@ -1794,6 +1814,10 @@ Criando a primeira página
         . Copie as pastas bootstrap e jquery para dentro da pasta "wwwroot/lib"
 
         . Acesse o arquivo de material do curso "asp-dot-net-core-6-fundamentals" para pegar o conteúdo abaixo:
+
+            . Os arquivos encontram-se na URL abaixo, no repositório do github:
+
+                https://github.com/maransi/Courses/tree/master/Material%20Complementar%20do%20Curso%20ASP.NET%20Core%206%20Fundamentals
 
             . Atualize o conteúdo do arquivo "Shared/_Layout.cshtml" com o código abaixo:
 
@@ -1816,7 +1840,7 @@ Criando a primeira página
                                 aria-label="Bethany's Pie Shop navigation header">
                                 <div class="container-xl">
                                     <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                                        <img src="~/images/bethanys-pie-shop-logo_horiz-white.png" width="151" height="47" class="d-inline-block align-top mb-2 mt-1"
+                                        <img src="~/images/bethanys-pie-shop-logo_horiz-white-2.png" width="151" height="47" class="d-inline-block align-top mb-2 mt-1"
                                             alt="Bethany's Pie Shop Logo">
                                     </a>
 
@@ -1911,6 +1935,11 @@ Working with Real Data Using Entity Framework Core 6
             #
             # dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
 
+
+            # Se for usar o banco de dados MySQL execute a linha abaixo
+            #
+            #dotnet add package Pomelo.EntityFrameworkCore.MySql --version 6.0.2
+
             dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.12
 
 
@@ -1918,6 +1947,15 @@ Working with Real Data Using Entity Framework Core 6
             dotnet tool install --global dotnet-ef --version 6.0.12
 
         . Instale o "DB Browser for SQLite" para realizar as consultas no banco de dados
+
+            sudo apt-get update && sudo apt-get upgrade
+
+            sudo apt-get install sqlite3
+
+            sqlite3 --version
+
+            sudo apt-get install sqlitebrowser
+
 
         . Acesse os arquivos "appsettings.json" e "appsettings.Development.json" e insira a linha abaixo:
 
@@ -1964,6 +2002,10 @@ Working with Real Data Using Entity Framework Core 6
 
         . Adicione as linhas abaixo na classe "Program.cs":
 
+            using bethanysPieShop.Models;
+            using bethanysPieShop.Data;                                                         // Linha inserida
+            using Microsoft.EntityFrameworkCore;                                                // Linha inserida
+
             ...
             var builder = WebApplication.CreateBuilder(args);
 
@@ -1977,15 +2019,16 @@ Working with Real Data Using Entity Framework Core 6
 
         . Crie as classes repository abaixo dentro da pasta "Models":
 
+            using bethanysPieShop.Data;
             using Microsoft.EntityFrameworkCore;
 
             namespace bethanysPieShop.Models
             {
                 public class PieRepository : IPieRepository
                 {
-                    private readonly Context _context;
+                    private readonly AppDbContext _context;
 
-                    public PieRepository(Context Context)
+                    public PieRepository(AppDbContext Context)
                     {
                         _context = Context;
                     }
@@ -2161,7 +2204,7 @@ Working with Real Data Using Entity Framework Core 6
 
             dotnet build
 
-            dotnet ef migrations add InitialCreation
+            dotnet ef migrations add CreationNumber-0001
 
             dotnet ef database update
 
@@ -2219,9 +2262,9 @@ Working with Real Data Using Entity Framework Core 6
                             {
                                 var genresList = new Category[]
                                 {
-                                                new Category { CategoryName = "Fruit pies" },
-                                                new Category { CategoryName = "Cheese cakes" },
-                                                new Category { CategoryName = "Seasonal pies" }
+                                                new Category { CategoryName = "Fruit pies", Description = "Fruit pies" },
+                                                new Category { CategoryName = "Cheese cakes", Description = "Cheese cakes" },
+                                                new Category { CategoryName = "Seasonal pies", Description = "Seasonal pies" }
                                 };
 
                                 categories = new Dictionary<string, Category>();
@@ -2249,11 +2292,32 @@ Working with Real Data Using Entity Framework Core 6
 
             app.Run();
 
+        . Execute os comandos abaixo para levantar o projeto:
 
+            dotnet clean
+
+            dotnet build
+
+            dotnet run
+
+        . Caso ocorra erro durante a iniciliazação da aplicação devido a problema de certificados:
+
+            "Unable to configure HTTPS endpoint. No server certificate was specified, and the default developer certificate could not be found or is out of date."
+
+            . Execute o comando abaixo no prompt de comandos na pasta raiz do projeto:
+
+                dotnet dev-certs https
 
         . Levante o projeto e execute a rota abaixo no navegador:
 
             https://localhost:[porta]/pie/list
+
+        . Verifique se na raiz do projeto foi criado o banco de dados com o nome:
+
+            app.db
+
+        . Acesse o IDE "DB Browser", abra o banco "app.db" e verifique se as tabelas e o conteúdo delas foram criados
+            com sucesso.
 
 
 Adding Routes and Navigation
@@ -2320,16 +2384,28 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
             . Program.cs
 
-                app.UseRouting();
-            
-                app.UseAuthorization();
-            
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllerRoute(
+                . IMPORTANTE: Para utilizar o ".UseEndPoints" é obrigatório o uso dos middlewares acima (.UseRouting e .UseAuthorization)
+
+                    app.UseRouting();
+                
+                    app.UseAuthorization();
+                
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllerRoute(
+                            name: "default",
+                            pattern: "{controller=Home}/{action=Index}/{id?}");
+                    });
+
+                . Caso o uso for somente para página ASP.NET Core MVC, sem o uso de API Restful. Podemos configurar como abaixo:
+
+                    app.MapDefaultControllerRoute();
+
+                    . Ou, especificando uma rota especifica:
+
+                        app.MapControllerRoute(
                         name: "default",
                         pattern: "{controller=Home}/{action=Index}/{id?}");
-                });
 
         . Tipos de rotas:
 
@@ -2344,21 +2420,23 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                 Program.cs                                              |               |
                 ----------                                              |               |
                                                                         |               |
-                    app.UseRouting();                                   |               |
-                                                                        |               |
-                    app.UseAuthorization();                             |               |
-                                                                        |               |
-                    app.UseEndpoints(endpoints =>               <-------+               |
-                    {                                                                   |
-                        endpoints.MapControllerRoute(                                   |
-                            name: "default",                                            |
-                            pattern: "{controller=Home}/{action=Index}/{id?}");         |
-                    });                                                                 |
+                    app.MapDefaultControllerRoute();     <--------------+               |
+                                                                                        |
+                    // Ou, especificando uma rota especifica:                           |
+                    //                                                                  |
+                    //    app.MapControllerRoute(                                       |
+                    //    name: "default",                                              |
+                    //    pattern: "{controller=Home}/{action=Index}/{id?}");           |
+                                                                                        |                                           
                                                                                         |
                                                                                         |
                 PieController                                                           |
                 ------------                                                            |
                                                                                         |
+                    // Observe que por se tratar somente de páginas web, podemos        |
+                    // implementar a interface "Controller"; no caso de APIs, teriamos  |
+                    // que implementar a interface "ControllerBase" e decorar a classe  |
+                    // com a annotation [ApiController]                                 |
                     public class PieController: Controller                              |
                     {                                                                   V
                         public ViewResult List()    // http://www.bethanypieshop.com/Pie/List
@@ -2371,9 +2449,9 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
             . Roteamento de atributo:
 
                 O roteamento de atributo no ASP.NET Core é a abordagem preferencial para 
-                configurar o roteamento em controladores. Se você estiver criando APIs, 
-                o atributo [ApiController] deverá ser aplicado aos controladores. Entre 
-                outras coisas, esse atributo requer o uso do roteamento de atributo para 
+                configurar o roteamento em controladores. Se você estiver criando APIs, extenda a interface "ControllerBase",
+                adicione o decorate/annotation [ApiController]  acima do nome da classe. 
+                Entre outras coisas, esse atributo requer o uso do roteamento de atributo para 
                 ações nessas classes de controlador                     |       |
                                                                         |       |
                     [HttpGet("api/products/{id}")]              <-------+       |
@@ -2389,44 +2467,51 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                         // ...
                     }
 
-    . DEMO
+    . Observe a linha abaixo na classe "Program.cs" que contém o Middleware "MapDefaultControllerRoute()".
+                                                                                        |
+        ...                                                                             |
+        app.MapDefaultControllerRoute();        <---------------------------------------+
 
-        . Observe a linha abaixo na classe "Program.cs" que contém o Middleware "MapDefaultControllerRoute()".
+        app.MapGet("/", () => "Hello World!");
+
+        DbInitializer.Seed( app );       
+
+        app.Run();
+
+    . Ao invés de usarmos "app.MapDefaultControllerRoute()" como acima, podemos fazer a configuração das rotas através do "app.UseEndPoints":
+
+                                                            Substitui essa linha pelas abaixo
+            // app.MapDefaultControllerRoute(); --------------------------------------------+
                                                                                             |
-            ...                                                                             |
-            app.MapDefaultControllerRoute();        <---------------------------------------+
+            app.UseRouting();                                           |                   |
+                                                                        |                   |
+            app.UseAuthorization();                                     |                   |
+                                                                        |                   |
+            app.UseEndpoints(endpoints =>                               |    <--------------+
+            {                                                           |                   
+                endpoints.MapControllerRoute(                           |                   
+                    name: "default",                                    |
+                    pattern: "{controller=Home}/{action=Index}/{id?}"); |
+            });                                                         |
 
-            app.MapGet("/", () => "Hello World!");
+            O "app.MapDefaultControllerRoute()" já assumirá o padrão de rota "{controller=Home}/{action=Index}/{id?}" sem grandes detalhes.
+                                                                                |                   |            |   
+                                                                                +--> Controller     +---> Action +---> parameter
 
-            DbInitializer.Seed( app );       
+            para enquadrar as requisições e encontrar a classe controller e seu método, exemplo:
 
-            app.Run();
-
-        . Ao usarmos "app.MapDefaultControllerRoute()" como acima ao invés do "app.UseEndPoints":
-
-                app.UseEndpoints(endpoints =>                     
-                {                                                          
-                    endpoints.MapControllerRoute(                          
-                        name: "default",                                   
-                        pattern: "{controller=Home}/{action=Index}/{id?}");
-                });                                                        
-
-                O "app.MapDefaultControllerRoute()" já assumirá o padrão de rota "{controller=Home}/{action=Index}/{id?}" sem grandes detalhes.
-                                                                                    |                   |            |   
-                                                                                    +--> Controller     +---> Action +---> parameter
-
-                para enquadrar as requisições e encontrar a classe controller e seu método, exemplo:
-
-                    http://localhost/           ->      HomeController.Index()  
-                    http://localhost/Home/Index     ->      HomeController.Index()  
-                    http://localhost/Home/Something ->      HomeController.Something()
-                    http://localhost/Test/      ->      HomeController.Test()  
-                    http://localhost/Test/1      ->      HomeController.Test(int id)  
+                http://localhost/           ->      HomeController.Index()  
+                http://localhost/Home/Index     ->      HomeController.Index()  
+                http://localhost/Home/Something ->      HomeController.Something()
+                http://localhost/Test/      ->      HomeController.Test()  
+                http://localhost/Test/1      ->      HomeController.Test(int id)  
 
 
-                . IMPORTANTE: No final tanto o "app.MapDefaultControllerRoute();" quanto o "app.UseEndpoints(endpoints => ... )" da forma como estão acima terão comportamentos
-                    iguais, enquadrão as requisições no padrão de rota "{controller=Home}/{action=Index}/{id?}". No exemplo abaixo faremos uso da maneira mais simples
-                    "app.MapDefaultControllerRoute()".
+            . IMPORTANTE: No final, tanto o "app.MapDefaultControllerRoute();" quanto o "app.UseEndpoints(endpoints => ... )" da forma como estão acima terão comportamentos
+                iguais, enquadrão as requisições no padrão de rota "{controller=Home}/{action=Index}/{id?}". No exemplo abaixo faremos uso da maneira mais simples
+                "app.MapDefaultControllerRoute()".
+
+    . DEMO
 
         . Crie o método abaixo na classe "PieController.cs":
 
@@ -2448,7 +2533,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
 
         . Crie a View "~/View/Pie/Details.cshtml" com o conteúdo abaixo:
 
-            @model Pie
+            @model bethanysPieShop.Models.Pie
 
             <h3 class="my-5">
                 @Model.Name
@@ -2568,6 +2653,8 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
                                 <div class="d-flex justify-content-between mt-2">
                                     <h2 class="text-start">
 
+                                    <!-- <a class="pie-link">@pie.Name</a> -->
+
                                     <!-- Div "a" alterada -->
 
                                         <a asp-controller="Pie"
@@ -2622,7 +2709,7 @@ https://www.tektutorialshub.com/asp-net-core/asp-net-core-endpoint-routing/
             using bethanysPieShop.ViewModels;
             using Microsoft.AspNetCore.Mvc;
 
-            namespace bethanysPieShop.Controller
+            namespace bethanysPieShop.Controllers
             {
                 public class HomeController : Controller
                 {
@@ -2929,7 +3016,7 @@ Improving the Views in the Application
 
             </div>
 
-        . Levante o projeto e verifique se a lista da página inicial e o link "Pies" da tela inicial estão funcionando:
+        . Levante o projeto e verifique se a lista DE "Pies" da página inicial e da lista de "Pies" estão funcionando:
 
             https://localhost:[porta]
 
@@ -2984,7 +3071,7 @@ Improving the Views in the Application
 
             ...
 
-        . Levante o projeto e verifique se o carrossel da página inicial está funcionando:
+        . Levante o projeto e verifique se o carrossel da página inicial está funcionando ao clicar nos botões dele:
 
             https://localhost:[porta]
 
@@ -3007,10 +3094,10 @@ Improving the Views in the Application
             ...
 
             app.UseSession();
-    
+
     . DEMO
 
-        . Crie a classe Model "ShoppingCatItem" dentro da pasta "Models":
+        . Crie a classe Model "ShoppingCartItem" dentro da pasta "Models":
 
             using System.ComponentModel.DataAnnotations;
             using System.ComponentModel.DataAnnotations.Schema;
@@ -3102,6 +3189,8 @@ Improving the Views in the Application
         . Crie a classe de implementação "ShoppingCart" abaixo na pasta "Models":
 
             using Microsoft.EntityFrameworkCore;
+            using bethanysPieShop.Data;
+
 
             namespace bethanysPieShop.Models
             {
@@ -3616,10 +3705,6 @@ Improving the Views in the Application
                                         <!-- Linha Inserida -->
                                         <vc:category-menu></vc:category-menu>
                                         <!-- Fim da inserção -->
-
-                                        <li class="nav-item">
-                                            <a asp-controller="Contact" asp-action="Index" class="nav-link">Contact</a>
-                                        </li>
                                     </ul>
 
                                     <!-- Linha Inserida -->
@@ -3663,7 +3748,7 @@ Improving the Views in the Application
 
         . Levante o projeto e verifique a partir do botão "Add Cart":
         
-            . Se aparece o icone de carrinho no topo da tela.
+            . Se aparece o icone de carrinho no topo da tela, após clicar no botão "+ ADD TO CART" de um dos produtos.
 
             . Se o menu ao lado do logo "Shop" está filtrando as categorias de "Pie"
 
@@ -3721,20 +3806,6 @@ Improving the Views in the Application
     (40.00)
     . DEMO
 
-        . Crie o controller "ContactController" abaixo na abaixo na pasta "Controllers":
-
-            using Microsoft.AspNetCore.Mvc;
-
-            namespace bethanysPieShop.Controllers;
-            public class ContactController : Controller
-            {
-                // GET: /<controller>/
-                public IActionResult Index()
-                {
-                    return View();
-                }
-            }
-
         . Crie na pasta raiz a pasta "TagHelpers" e dentro dela crie a classe "TagHelper" "EmailTagHelper" abaixo:
 
             using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -3766,7 +3837,21 @@ Improving the Views in the Application
             @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers            
             @addTagHelper *, bethanyPieShop                         
 
-        . Insira a linha abaixo na "View" "View/Contact/Index.cshtml":
+        . Crie o controller "ContactController" abaixo na abaixo na pasta "Controllers":
+
+            using Microsoft.AspNetCore.Mvc;
+
+            namespace bethanysPieShop.Controllers;
+            public class ContactController : Controller
+            {
+                // GET: /<controller>/
+                public IActionResult Index()
+                {
+                    return View();
+                }
+            }
+
+        . Crie a pasta "View/Contact" e crie o arquivo "Index.cshtml" dentro dela com o conteúdo abaixo:
 
             <h3 class="my-5">
                 Contact us
@@ -3778,7 +3863,7 @@ Improving the Views in the Application
                     <h1>We'd Love to Hear from You</h1>
                     <h5>Please contact us by sending an email using the button below</h5>
 
-                    <!-- Linha inserida
+                    <!-- Linha inserida -->
                     <email address="info@@bethanyspieshop.com" content="Contact us" class="btn btn-secondary"></email>
                     <!-- Fim da inserção -->
 
@@ -3980,22 +4065,6 @@ Razor Snippets
     (5.38)
     . DEMO
 
-        . Inclua a classe "OrderDetail.cs" abaixo na pasta "Models":
-
-            namespace bethanysPieShop.Models
-            {
-                public class OrderDetail
-                {
-                    public int OrderDetailId { get; set; }
-                    public int OrderId { get; set; }
-                    public int PieId { get; set; }
-                    public int Amount { get; set; }
-                    public decimal Price { get; set; }
-                    public Pie Pie { get; set; } = default!;
-                    public Order Order { get; set; } = default!;
-                }
-            }
-
         . Inclua a classe "Order.cs" abaixo na pasta "Models":
 
             using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -4032,6 +4101,22 @@ Razor Snippets
                     public decimal OrderTotal { get; set; }
 
                     public DateTime OrderPlaced { get; set; }
+                }
+            }
+
+        . Inclua a classe "OrderDetail.cs" abaixo na pasta "Models":
+
+            namespace bethanysPieShop.Models
+            {
+                public class OrderDetail
+                {
+                    public int OrderDetailId { get; set; }
+                    public int OrderId { get; set; }
+                    public int PieId { get; set; }
+                    public int Amount { get; set; }
+                    public decimal Price { get; set; }
+                    public Pie Pie { get; set; } = default!;
+                    public Order Order { get; set; } = default!;
                 }
             }
 
@@ -4078,8 +4163,9 @@ Razor Snippets
                 }
             }
 
-
         . Inclua a classe "OrderRepository.cs" abaixo na pasta "Models":
+
+            using bethanysPieShop.Data;
 
             namespace bethanysPieShop.Models
             {
@@ -4436,7 +4522,7 @@ Razor Snippets
                         {
                             [FromQuery]
                             public int ProdutoId { get; set; }
-                            public string ProdutoName { get; set; }
+                            public string ProdutoNome { get; set; }
                             [BindNever]
                             public string IsAdminUser { get; set; }
                         }	
@@ -4828,40 +4914,40 @@ Razor Snippets
                     . Copie a pasta "/dist" do arquivo baixado para dentro da pasta do projeto "wwwroot/lib/jquery-validate"
 
             (35.00)
-            . Instale a bibliote JQuer abaixo no projeto:
+        . Instale a biblioteca JQuery abaixo no projeto:
 
-                jquery-validation-unobtrusive@3.2.12
+            jquery-validation-unobtrusive@3.2.12
 
-                . Execute o comando abaixo:
+            . Execute o comando abaixo:
 
-                    npm install jquery-validation-unobtrusive@3.2.12
+                npm install jquery-validation-unobtrusive@3.2.12
 
-                . Crie a pasta "wwwroot/lib/query-validation-unobtrusive" no projeto
+            . Crie a pasta "wwwroot/lib/jquery-validation-unobtrusive" no projeto
 
-                . Copie a pasta "/dist" do arquivo baixado para dentro da pasta do projeto "wwwroot/lib/query-validation-unobtrusive"
+            . Copie a pasta "/dist" do arquivo baixado para dentro da pasta do projeto "wwwroot/lib/query-validation-unobtrusive"
 
-            . Acesse o arquivo "Views/Shared/_Layout.cshtml" e implemente as linhas abaixo:
+        . Acesse o arquivo "Views/Shared/_Layout.cshtml" e implemente as linhas abaixo:
 
-                <!DOCTYPE html>
+            <!DOCTYPE html>
 
-                <html>
-                <head>
-                    <meta name="viewport" content="width=device-width" />
-                    <title>Bethany's Pie Shop</title>
-                    <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
-                    <script src="~/lib/jquery/dist/jquery.js"></script>
-                    <script src="~/lib/jquery-validate/jquery.validate.js"></script>                                @* linha inserida *@
-                    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>      @* linha inserida *@
-                    <script src="~/lib/bootstrap/js/bootstrap.js"></script>
-                    <link href="~/css/site.css" rel="stylesheet" />
-                    <base href="/" />
-                </head>
-                <body>
-                    ...
-                </body>
-                </html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width" />
+                <title>Bethany's Pie Shop</title>
+                <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet' type='text/css'>
+                <script src="~/lib/jquery/dist/jquery.js"></script>
+                <script src="~/lib/jquery-validate/jquery.validate.js"></script>                                @* linha inserida *@
+                <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>      @* linha inserida *@
+                <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+                <link href="~/css/site.css" rel="stylesheet" />
+                <base href="/" />
+            </head>
+            <body>
+                ...
+            </body>
+            </html>
 
-            . Levante a aplicação e verifique se as v alidações estão funcionando na parte do "Checkout"
+        . Levante a aplicação e verifique se as v alidações estão funcionando na parte do "Checkout"
 
     . Recriando o formulário utilizando um Razor Page
 
@@ -5307,7 +5393,6 @@ Razor Snippets
 
         . Acomnpanhe a execução do código onde foi marcado o "BreakPoint".
 
-
 Testando os Componentes da Aplicação
 ====================================
 
@@ -5358,13 +5443,24 @@ Testando os Componentes da Aplicação
 
         . Instale o "plugin" ".NET Core Test Explorer" no VSCode
 
-        . Crie um projeto com o comando abaixo:
+        . Acesse a pasta da solution "BethanyPieShop/src" e execute o comando abaixo para criar o projeto de testes:
 
-            dotnet new xunit -o bhetanyPieShopTests
+            dotnet new xunit -o bethanysPieShopTests
+
+        . Adicione o projeto de teste a solution:
+
+            dotnet sln add bethanysPieShopTests/
 
         . Apague o arquivo "UnitTest1.cs"
 
-        . Acesse o arquivo "bethhanysPieShopTests.csproj" e acrescente a linha abaixo:
+        . Crie a dependência desse projeto de testes com o projeto "bethanysPieShop":
+
+            . Na pasta "src" da solution e execute o comando abaixo:
+
+                dotnet add ./bethanysPieShopTests/ reference ./bethanysPieShop/
+
+
+        . Acesse o arquivo "bethanysPieShopTests.csproj" e acrescente a linha abaixo:
 
             <Project Sdk="Microsoft.NET.Sdk">
 
@@ -5394,12 +5490,6 @@ Testando os Componentes da Aplicação
             </ItemGroup>
 
             </Project>
-
-        . Crie a dependência desse projeto de testes com o projeto "bethanysPieShop":
-
-            . Na pasta raiz de projetos execute o comando abaixo:
-
-                dotnet add ./bhetanyPieShopTests/ reference ./bhetanyPieShop/
 
         . Execute o comando abaixo na pasta do projeto "bhetanyPieShopTests":
 
@@ -5720,9 +5810,18 @@ Testando os Componentes da Aplicação
                 }
             }
 
-        . Execute os testes, devem resultar em bem sucedidos.
+        . Acesse a extension de teste, localizado na barra de ferramentas do VSCode no lado esquerdo e configure
+            os parâmetros do arquivo "setting.json" como abaixo:
 
-// PAREI AQUI
+            {
+               "dotnet-test-explorer.testProjectPath": "**/*Tests.csproj"
+            }
+
+            . Este arquivo é o arquivo de configurações do VSCode.
+
+            . O VSCode cria ele de acordo com as configurações do ambiente que está instalado a solution.
+
+            . Execute os testes pela extension de teste, devem resultar em bem sucedidos.
 
 Deixando o site interativo
 ==========================
@@ -5863,7 +5962,10 @@ Deixando o site interativo
 
     . DEMO
 
-        . No projeto "bethanys" na classe "Program.cs" avalie as linhas abaixo:
+        . No projeto "bethanysPieShop" na classe "Program.cs" avalie as linhas abaixo:
+
+            using System.Text.Json.Serialization;           // Linha inserida
+            ...
 
             builder.Services.AddControllersWithViews()
                 .AddJsonOptions(options =>                                                              // Linha inserida
@@ -5995,7 +6097,7 @@ Deixando o site interativo
             ...
              public IEnumerable<Pie> SearchPies( string searchQuery )
              {
-                return _bethanysPieShopDbContext.Pies.Where( p => p.Name.Contains( searchQuery ));
+                return _context.Pies.Where( p => p.Name.Contains( searchQuery ));
              }
              ...
 
@@ -6044,7 +6146,6 @@ Deixando o site interativo
                     {
                         JSON: true,
                         raw: "Chocolate"
-
                     }
     
     (37.08)
@@ -6089,7 +6190,7 @@ Deixando o site interativo
                 <script src="~/lib/jquery/dist/jquery.js"></script>
                 <script src="~/lib/jquery-validate/jquery.validate.js"></script>
                 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
-                <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+                <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
                 <link href="~/css/site.css" rel="stylesheet" />
                 <base href="/" />
             </head>
@@ -6217,9 +6318,22 @@ Deixando o site interativo
     (46.36)
     . Introdução ao ASP.NET Core Blazor
 
-        . Blzaor é um framework para construir páginas HTML utilizando C# e HTML, fazendo parte do ASP.NET COre.
+        . Blazaor é um framework para construir páginas HTML utilizando C# e HTML, fazendo parte do ASP.NET COre.
 
         51.50
+
+// PAREI AQUI 
+
+Layouts, RenderBody, RenderSection e RenderPage em ASP.NET MVC
+==============================================================
+
+    https://www.dotnettricks.com/learn/mvc/layouts-renderbody-rendersection-and-renderpage-in-aspnet-mvc
+
+
+View() vs RedirectToAction() vs Redirect() Methods
+==================================================
+
+    https://www.dotnettricks.com/learn/mvc/return-view-vs-return-redirecttoaction-vs-return-redirect-vs-return-redirecttoroute
 
 Configurando Autenticação e Autorização
 =======================================
@@ -6241,6 +6355,12 @@ Configurando Autenticação e Autorização
     https://bjdejongblog.nl/asp-net-core-tips-and-quick-setup-identity-system/
     https://gavilan.blog/2019/07/18/accountcontroller-missing-razor-class-libraries-dotnet-cli-identity-scaffolding/
 
+
+    # ASP .NET Core - Scaffolding : criando Controllers e Views via linha de comando
+    https://www.macoratti.net/17/12/aspcore_ctrlcmd2.htm
+    https://learn.microsoft.com/pt-br/aspnet/core/mvc/controllers/areas?view=aspnetcore-7.0
+    https://www.mattmillican.com/posts/aspnetcore-controller-scaffolding/
+    https://www.learnhowtoprogram.com/c-and-net/building-an-api/scaffolding-api-controllers
 
     # dotnet ef dbcontext scaffold "Server=.\SQLEXPRESS;Database=SchoolDB;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models
     # dotnet ef dbcontext scaffold "Datasource=C:\ASPNET\APIApp\webbookmarks.db3" -o Models Microsoft.EntityFrameworkCore.Sqlite -c "APIAppDbContext" -f -a
@@ -6293,11 +6413,11 @@ Configurando Autenticação e Autorização
 
         . Execute o comando abaixo na pasta raiz do projeto:
 
-            dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
-            
+            dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.12
+
             dotnet add package Microsoft.AspNetCore.Identity.UI --version 6.0.12
 
-            dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 6.0.12
+            dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.12
 
             dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design --version 6.0.11
 
@@ -6305,9 +6425,28 @@ Configurando Autenticação e Autorização
 
         . Acesse a classe "AppDbContext.cs" e altere a linha abaixo:
 
+            using Microsoft.AspNetCore.Identity.EntityFrameworkCore;        // Linha inserida
+
             ...
             public class AppDbContext: IdentityDbContext                    // DbContext       // Linha aterada, substitução da interfae "DbContext" pela "IdentityDbContext"
             ...
+
+        . Faça a alteração abaixo na classe "Program.cs":
+
+            ...
+            using Microsoft.AspNetCore.Identity;                    // Linha inserida
+            ...
+
+            builder.Services.AddDbContext<AppDbContext>( options => {                           
+                options.UseSqlite( 
+                    builder.Configuration["ConnectionStrings:DefaultConnection"]);
+            });
+15.00
+            builder.Services.AddDefaultIdentity<IdentityUser>()         // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
+                .AddEntityFrameworkStores<AppDbContext>();                  // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
+            ...
+            app.UseAuthentication();                                    
+            app.UseAuthorization();                                         // Linha inserida
 
         . Acesse a classe "Program.cs" e faça a atualização abaixo:
 
@@ -6333,18 +6472,47 @@ Configurando Autenticação e Autorização
 
             dotnet aspnet-codegenerator identity -lf
 
-        . Faça a alteração abaixo na classe "Program.cs":
+                # Saída do comando
 
-            builder.Services.AddDbContext<AppDbContext>( options => {                           
-                options.UseSqlite( 
-                    builder.Configuration["ConnectionStrings:DefaultConnection"]);
-            });
+                Building project ...
+                Finding the generator 'identity'...
+                Running the generator 'identity'...
+                File List:
+                Account._StatusMessage
+                Account.AccessDenied
+                Account.ConfirmEmail
+                Account.ConfirmEmailChange
+                Account.ExternalLogin
+                Account.ForgotPassword
+                Account.ForgotPasswordConfirmation
+                Account.Lockout
+                Account.Login
+                Account.LoginWith2fa
+                Account.LoginWithRecoveryCode
+                Account.Logout
+                Account.Manage._Layout
+                Account.Manage._ManageNav
+                Account.Manage._StatusMessage
+                Account.Manage.ChangePassword
+                Account.Manage.DeletePersonalData
+                Account.Manage.Disable2fa
+                Account.Manage.DownloadPersonalData
+                Account.Manage.Email
+                Account.Manage.EnableAuthenticator
+                Account.Manage.ExternalLogins
+                Account.Manage.GenerateRecoveryCodes
+                Account.Manage.Index
+                Account.Manage.PersonalData
+                Account.Manage.ResetAuthenticator
+                Account.Manage.SetPassword
+                Account.Manage.ShowRecoveryCodes
+                Account.Manage.TwoFactorAuthentication
+                Account.Register
+                Account.RegisterConfirmation
+                Account.ResendEmailConfirmation
+                Account.ResetPassword
+                Account.ResetPasswordConfirmation
 
-            builder.Services.AddDefaultIdentity<IdentityUser>()             // Linha inserida (Tem que ser colocada debaixo do "AddDbContext")
-                .AddEntityFrameworkStores<AppDbContext>();
-            ...
-            app.UseAuthentication();                                    
-            app.UseAuthorization();                                         // Linha inserida
 
         . Execute o comando abaixo na pasta raiz do projeto:
 
@@ -6361,7 +6529,7 @@ Configurando Autenticação e Autorização
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
                                                                                     |
                                                                                     +---> Alterar para esse valor "DefaultConnection"
-
+18.00
         . Acesse o componente "Views/Shared/_Layout.cshtml" e adicione a linha abaixo:
 
             ...
@@ -6382,6 +6550,8 @@ Configurando Autenticação e Autorização
 
         . Inclua a linha abaixo na classe "OrderController.cs":
 
+            ...
+            using Microsoft.AspNetCore.Authorization;       // Linha inserida
             ...
             [Authorize]                                     // Linha inserida
             public class OrderController : Controller

@@ -3,6 +3,12 @@ Curso ASP.NET (webforms) utilizando CSharp e JavaScript
 
 https://www.tutorialspoint.com/asp.net/index.htm
 https://www.dotnetfunda.com/tutorials/controls/textbox.aspx
+https://www.kafle.io/tutorials/asp-dot-net/ajax-aspnet-webform
+https://www.c-sharpcorner.com/article/ajax-in-asp-net/
+https://www.youtube.com/watch?v=-Kkz1l8pDs4
+https://www.youtube.com/watch?v=hlK00KhuU-Y&list=PLLndLcOzKRT_ULVU4L9YoQWLZv23nkuxK
+https://www.youtube.com/watch?v=xyDARNtYXjo
+
 
 Conceitos Fundamentais
 ======================
@@ -904,7 +910,7 @@ Módulo 1 - Conhecendo os Componentes
     Aula 15.07 Calendar
     -------------------
 
-        . Crie sobre o formulário, escolha a opção "Adicionar/ Formulário da Web".
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
 
         . Informe o nome do formulário "wfDiasDeVida".
 
@@ -977,4 +983,1145 @@ Módulo 1 - Conhecendo os Componentes
     Aula 16. 08 Panel e BulletList
     ------------------------------
 
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfParOuImparFatorial".
+
+        . Arraste o componente "BulletedList" para dentro da "Div" do formulário.
+
+            . Altere as propriedades desse componente como abaixo:
+
+                Misc.ID:            blLista,
+                Misc.Items:         [
+                    ListemItem: {
+                        Text:   "Par ou Impar"
+                    },
+                    ListemItem: {
+                        Text:   "Calcula o Fatorial"
+                    }
+                ]
+
+        . Arraste o componente "Panel" a baixo do "BulletedList"
+
+            . O componente "Panel" serve para agrupar os componentes.
+
+        . Altere o formulário "wfParOuImparFatorial.aspx" como abaixo:
+
+            <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="wfParOuImparFatorial.aspx.cs" Inherits="waConhecendoOsComponetes.wfParOuImparFatorial" %>
+
+            <!DOCTYPE html>
+
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head runat="server">
+                <title></title>
+            </head>
+            <body>
+                <form id="form1" runat="server">
+
+                    <!-- ALTERE O CODIGO DA DIV ABAIXO NO PROJETO -->
+
+
+                    <div>
+                        <asp:BulletedList   ID="blLista" 
+                                            runat="server" 
+                                            BorderStyle="None" 
+                                            BulletStyle="Square" 
+                                            DisplayMode="LinkButton"            <!--    DisplayMode serve para deixar o "BulletedList" como um link. 
+                                                                                        Podemos também alterar a propriedade do componente 
+                                                                                        "Behavior.DisplayMode" para "LinkButton". Em seguida, clique no 
+                                                                                        icone de trovão, ao lado das propriedade, encontre o evento "Click",
+                                                                                        de um duplo clique onde seria o nome do evento para construir o evento  
+                                                                                        "blLista_Click" -->
+                                            OnClick="blLista_Click"             <!-- Associa o evento "OnClick" com o evento do ASP.NET "blLista_Click" -->
+                                            Visible="False">
+                            <asp:ListItem>Par ou Impar</asp:ListItem>
+                            <asp:ListItem>Calcula o Fatorial</asp:ListItem>
+                        </asp:BulletedList>
+                        <br />
+                        <br />
+                        <asp:Panel ID="pnParOuImpar" runat="server" Visible="False">
+                            <asp:Label ID="Label1" runat="server" Text="Verifica se o número é par ou impar"></asp:Label>
+                            <br />
+                            <asp:TextBox ID="txtValorpn1" runat="server"></asp:TextBox>
+                            <asp:Button ID="Button1" runat="server" Text="Verificar" OnClick="Button1_Click" />
+                            <br />
+                            <asp:Label ID="LResp1" runat="server"></asp:Label>
+                        </asp:Panel>
+                        <br />
+                        <asp:Panel ID="pnFatorial" runat="server" Visible="False">
+                            <asp:Label ID="Label3" runat="server" Text="Calcula o fatorial de um número"></asp:Label>
+                            <br />
+                            <asp:TextBox ID="txtValorpn2" runat="server"></asp:TextBox>
+                            <asp:Button ID="Button2" runat="server" Text="Calcular" OnClick="Button2_Click" />
+                            <br />
+                            <asp:Label ID="LResp2" runat="server"></asp:Label>
+                        </asp:Panel>
+                    </div>
+
+                    <!-- FIM DA ALTERAÇÃO -->
+                </form>
+            </body>
+            </html>
+
+        . Insira os métodos abaixo  no formulário "wfParOuImparFatorial.aspx.cs" como abaixo:
+
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Web;
+            using System.Web.UI;
+            using System.Web.UI.WebControls;
+
+            namespace waConhecendoOsComponetes
+            {
+                public partial class wfParOuImparFatorial : System.Web.UI.Page
+                {
+                    
+                    protected void Page_Load(object sender, EventArgs e)
+                    {
+
+                    }
+
+
+                    // Método Inserido pelo duplo click no nome do evento na caixa de ferramentas
+                    protected void blLista_Click(object sender, BulletedListEventArgs e)
+                    {
+                        pnParOuImpar.Visible = false;
+                        pnFatorial.Visible = false;
+                        switch (e.Index)
+                        {
+                            case 0:
+                                pnParOuImpar.Visible = true;
+                                break;
+                            case 1:
+                                pnFatorial.Visible = true;
+                                break;
+                        }
+                    }
+
+                    // Método Inserido pelo duplo click no nome do evento na caixa de ferramentas
+                    protected void Button1_Click(object sender, EventArgs e)
+                    {
+                        //verificar se é par ou impar
+                        int n = Convert.ToInt32(txtValorpn1.Text);
+                        string txt = "O número é par";
+                        if (n % 2 != 0)
+                        {
+                            txt = "O número é impar";
+                        }
+                        LResp1.Text = txt;
+                    }
+
+                    // Método Inserido pelo duplo click no nome do evento na caixa de ferramentas
+                    protected void Button2_Click(object sender, EventArgs e)
+                    {
+                        try
+                        {
+                            int n = Convert.ToInt32(txtValorpn2.Text);
+                            if (n < 0) {
+                                LResp2.Text = "Informe apenas números positivos";
+                            }
+                            else
+                            {
+                                if (n == 0)
+                                {
+                                    LResp2.Text = "0! = 1";
+                                }
+                                else
+                                {
+                                    int t = n;
+                                    for (int i = n-1; i > 0; i--)
+                                    {
+                                        t = t * i;
+                                    }
+                                    LResp2.Text = n.ToString()+"! = "+ t.ToString();
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            LResp2.Text = "Permitido apenas números positivos";
+                        }
+                        
+                    }
+
+                }
+            }
+
+        . Execute o projeto e verifique se a tela ficou desenhada de acordo com as nossas especificações.
+
+
+    Aula 17. 09 Panel e RadioButton
+    -------------------------------
+
+        . Insira o código abaixo na página ASP "wfParOuImparFatorial.aspx"
+
+            ...
+            <div>
+                <asp:BulletedList   ID="blLista" 
+                                    runat="server" 
+                                    BorderStyle="None" 
+                                    BulletStyle="Square" 
+                                    DisplayMode="LinkButton"            <!--    DisplayMode serve para deixar o "BulletedList" como um link. 
+                                                                                Podemos também alterar a propriedade do componente 
+                                                                                "Behavior.DisplayMode" para "LinkButton". Em seguida, clique no 
+                                                                                icone de trovão, ao lado das propriedade, encontre o evento "Click",
+                                                                                de um duplo clique onde seria o nome do evento para construir o evento  
+                                                                                "blLista_Click" -->
+                                    OnClick="blLista_Click"             <!-- Associa o evento "OnClick" com o evento do ASP.NET "blLista_Click" -->
+                                    Visible="False">
+                    <asp:ListItem>Par ou Impar</asp:ListItem>
+                    <asp:ListItem>Calcula o Fatorial</asp:ListItem>
+                </asp:BulletedList>
+        
+                <!-- Código inserido -->
+
+                <asp:RadioButton ID="RadioButton1" runat="server" />
+                <asp:RadioButton ID="RadioButton2" runat="server" />
+               
+                <!-- Fim da Inserção -->
+
+                ...
+            </div>
+            ...
+
+            . Para gerar o código acima podemos arrastar da caixa de Ferramentas "ToolBox" o componente para dentro da página
+
+            . Clique no componente "RadioButton1" desenhado na página e altere a propriedade abaixo:
+
+                Text: "Par ou Impar",
+                Behavior.GroupName: "g1"            
+
+            . Clique no componente "RadioButton2" desenhado na página e altere a propriedade abaixo:
+
+                Text: "Calcula o Fatorial ",
+                Behavior.GroupName: "g1"
+
+            . A propriedade "Behavior.GroupName" força o agrupamento dos "RadioButton", fazendo com que ao clicar num item os
+                demais sejam desmarcados.
+
+        . Execute o projeto e verifique se os componenete "RadioButton" estã funcionando corretamente.
+
+        . Ao invés de utilizar "RadioButtons" podemos utilizar também outro componente conhecido como "RadioButtonList".
+
+        . Apague os componentes "RadioButton" desenhado na página.
+
+        . Arraste o componente "RadioButtonList" da Caixa de Ferramentas para dentro da página.
+
+            . Acesse a opção "Edit Items" do componente e crie os seguintes items:
+
+                Misc.ID:            blLista,
+                Misc.Items:         [
+                    ListemItem: {
+                        Text:   "Par ou Impar"
+                    },
+                    ListemItem: {
+                        Text:   "Calcula o Fatorial"
+                    }
+                ]
+
+            . Altere a opção "Enable AutoPostBack" ao clicar sobre o componenete "RadioButtonList".
+
+                . AutoPostBack  true/false. If true, the form is automatically posted back to the server when user click any 
+                                of the radiobutton. It will also fire OnSelectedIndexChanged method.
+
+            . Acesse o código da página ASP "wfParOuImparFatorial.aspx" e verifique se ficou como abaixo:
+
+                ...
+                <div>
+                    <asp:BulletedList   ID="blLista" 
+                                        runat="server" 
+                                        BorderStyle="None" 
+                                        BulletStyle="Square" 
+                                        DisplayMode="LinkButton"            <!--    DisplayMode serve para deixar o "BulletedList" como um link. 
+                                                                                    Podemos também alterar a propriedade do componente 
+                                                                                    "Behavior.DisplayMode" para "LinkButton". Em seguida, clique no 
+                                                                                    icone de trovão, ao lado das propriedade, encontre o evento "Click",
+                                                                                    de um duplo clique onde seria o nome do evento para construir o evento  
+                                                                                    "blLista_Click" -->
+                                        OnClick="blLista_Click"             <!-- Associa o evento "OnClick" com o evento do ASP.NET "blLista_Click" -->
+                                        Visible="False">
+                        <asp:ListItem>Par ou Impar</asp:ListItem>
+                        <asp:ListItem>Calcula o Fatorial</asp:ListItem>
+                    </asp:BulletedList>
+            
+                    <!-- Código inserido -->
+
+                    <asp:RadioButtonList    ID="RadioButtonList1" 
+                                            runat="server" 
+                                            AutoPostBack="True" 
+                                            OnSelectedIndexChanged="RadioButtonList1_SelectedIndexChanged" 
+                                            Width="306px">
+                        <asp:ListItem>Par ou Impar</asp:ListItem>
+                        <asp:ListItem>Fatorial</asp:ListItem>
+                    </asp:RadioButtonList>
+                    
+                    <!-- Fim da Inserção -->
+
+                    ...
+                </div>
+                ...
+
+            . Acesse os eventos do componente "RadioButtonList" e dê um duplo clique no nome do evento.
+
+                . Insira o código abaixo no componente "wfParOuImparFatorial.aspx.cs"
+
+                    ...
+                    protected void RadioButtonList1_SelectedIndexChanged(object sender, EventArgs e)
+                    {
+                        pnParOuImpar.Visible = false;
+                        pnFatorial.Visible = false;
+                        if (RadioButtonList1.SelectedIndex == 0)
+                        {
+                            pnParOuImpar.Visible = true;
+                        } else
+                        {
+                            pnFatorial.Visible = true;
+                        }
+                    }
+                    ...
+
+        . Execute o projeto e verifique se os componenete "RadioButton" estã funcionando corretamente.
+
+        . Para mais detalhes deste componenete acesse:
+
+            https://www.dotnetfunda.com/tutorials/controls/radiobuttonlist.aspx
+
     
+    Aula 18. 10 Panel e RadioButton
+    -------------------------------
+
+        . Retorno ao formulário "wfParOuImparFatorial"
+
+        . Dê um duplo click no botão "Calcular", ou o botão com nome "Button2", para abrir o evento "click" deste componente.
+
+            . Digite o código abaixo no evento "click" desse compomente.
+
+                ...
+                protected void Button2_Click(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        int n = Convert.ToInt32(txtValorpn2.Text);
+                        if (n < 0) {
+                            LResp2.Text = "Informe apenas números positivos";
+                        }
+                        else
+                        {
+                            if (n == 0)
+                            {
+                                LResp2.Text = "0! = 1";
+                            }
+                            else
+                            {
+                                int t = n;
+                                for (int i = n-1; i > 0; i--)
+                                {
+                                    t = t * i;
+                                }
+                                LResp2.Text = n.ToString()+"! = "+ t.ToString();
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        LResp2.Text = "Permitido apenas números positivos";
+                    }
+                    
+                }
+                ...
+
+        . Execute o projeto e verifique se o fatorial foi calculado com sucesso.
+
+    19. 11 MultiView, View e Image
+    ------------------------------
+
+        . Multiview é um simplificador de exibição de visões, por exemplo, formulários com a lógica
+            de "Wizard" "Next -> Next -> ..."
+
+        . Para mais detalhes deste componenete acesse:
+
+            https://www.dotnetfunda.com/tutorials/controls/multiview.aspx
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfCursos".
+
+        . Arraste o componente "MultiView" para dentro da "Div" do formulário.
+
+        . Arraste três componentes "View" para dentro do componente "MultView", um abaixo do outro:
+
+            . O componente "View" só funcionará dentro do componente "MultView".
+
+        . Clique no nô principal do projeto, clique na opção "New/Folder" e dê o nome de "imagens"        
+
+            . Importe as imagens do projeto do curso (zip) para dentro da pasta "imagens" do nosso projeto.
+
+        . Arraste dois componentes "ImageButton" para dentro da tag "View1"
+
+        . Altere a propriedade abaixo do componente "image1":
+
+            appearance:   {
+                AlternateText: "Do básico ao Multiplayer",
+                ImageUrl: "~/imagens/Curso1.jpg"
+            },
+            Layout: {
+                Height: 500px,
+                Width: 700px
+            }
+
+        . Altere a propriedade abaixo do componente "image2":
+
+            appearance:   {
+                ImageUrl: "~/imagens/Curso2.jpg"
+            },
+            Layout: {
+                Height: 500px,
+                Width: 700px
+            }
+        
+        . Altere a propriedade abaixo do componente "MultView1":
+
+            Behavior:   {
+                ActiveViewIndex: 0
+            }
+
+        . Execute o projeto e verifique se o conteúdo da View1 está aparecendo com sucesso
+
+    Aula 20. 12 MultiView, View, Image e ImageButton
+    ------------------------------------------------
+
+        . Arraste dois componentes "Label" para dentro da tag "View2".
+
+            . Altere a propriedade do "Label1" como abaixo:
+
+                appearance: {
+                    Text:   "Constructor 2 - Do básico ao Multiplayer",
+                    Font:   {
+                        Bold:   True,
+                        Size:   Large
+                    }
+                }
+
+            . Altere a propriedade do "Label2" como abaixo:
+
+                appearance: {
+                    Text:   "O curso tem como objetivo ensinar de maneira prática e dinâmica os conceitos necessários"
+                }
+
+        . Arraste dois componentes "Label" para dentro da tag "View3".
+
+            . Altere a propriedade do "Label3" como abaixo:
+
+                appearance: {
+                    Text:   "Constructor 2 - Construindo um clone do jogo Timberman",
+                    Font:   {
+                        Bold:   True,
+                        Size:   Large
+                    }
+                }
+
+            . Altere a propriedade do "Label4" como abaixo:
+
+                appearance: {
+                    Text:   "O curso tem como objetivo ensinar de maneira prática e dinâmica os conceitos necessários"
+                }
+
+        . Altere a propriedade abaixo do componente "MultView1":
+
+            Behavior:   {
+                ActiveViewIndex: 1
+            }
+
+        . Execute o projeto e verifique se o conteúdo da View2 se está aparecendo com sucesso
+
+        . Modifique as labels "Label2" e "Label4" para a tag "<p>" no código HTML.
+
+        . Acesse os eventos do "ImageButton1" e crie o método abaixo:
+
+            ... 
+            protected void ImageButton1_Click( object sender, ImageClickEventArgs e)
+            {
+                MultiView1.ActiveViewIndex = 1;
+            }
+            ...
+
+        . Acesse os eventos do "ImageButton2" e crie o método abaixo:
+
+            ... 
+            protected void ImageButton1_Click( object sender, ImageClickEventArgs e)
+            {
+                MultiView1.ActiveViewIndex = 2;
+            }
+            ...
+
+    Aula 21. 13 HiperLink e LinkButton
+    ----------------------------------
+
+        . Para mais detalhes deste componenete acesse:
+
+            https://www.dotnetfunda.com/tutorials/controls/hyperlink.aspx
+            https://www.dotnetfunda.com/tutorials/controls/linkbutton.aspx
+
+        . Arraste dois componentes "Hyperlink" para a "View2", abaixo das Labels.
+
+        . No componente "Hyperlink1" altere as propriedades como abaixo:
+
+            appearance: {
+                Text: "Compre o curso Construct 2 - Do básico ao Multiplayer"
+            },
+            Navigation: {
+                NavigationUrl: "https://www.udemy.com",
+                Target: "_blank"
+            }
+
+        . No componente "Hyperlink2" altere as propriedades como abaixo:
+
+            appearance: {
+                Text: "Visite o site dfilitto.com.br"
+            },
+            Navigation: {
+                NavigationUrl: "https://www.dfilitto.com.br",
+                Target: "_blank"
+            }
+
+        . Arraste dois componentes "Hyperlink" para a "View3", abaixo das Labels.
+
+        . No componente "Hyperlink3" altere as propriedades como abaixo:
+
+            appearance: {
+                Text: "Compre o curso Construct 2 - Do básico ao Multiplayer"
+            },
+            Navigation: {
+                NavigationUrl: "https://www.udemy.com",
+                Target: "_blank"
+            }
+
+        . No componente "Hyperlink4" altere as propriedades como abaixo:
+
+            appearance: {
+                Text: "Visite o site dfilitto.com.br"
+            },
+            Navigation: {
+                NavigationUrl: "https://www.dfilitto.com.br",
+                Target: "_blank"
+            }
+
+        . Execute o projeto e verifique se os links estão funcionando.
+
+        . Arraste o componente "LinkButton" para a View2, abaixo do "Hyperlink2"
+
+        . Altere as propriedades abaixo do "LinkButton1":
+
+            Text: "Voltar"
+
+        . Acesse a caixa de eventos e crie o evento "LinkButton1_Click"
+
+            ...
+            protected void LinkButton1_Click( object sender, EventArgs e )
+            {
+                MultView1.ActiveViewIndex = 0;
+            }
+            ...
+
+        . Arraste o componente "LinkButton" para a View3, abaixo do "Hyperlink2"
+
+        . Altere as propriedades abaixo do "LinkButton2":
+
+            Text: "Voltar"
+
+        . Acesse a caixa de eventos e crie o evento "LinkButton2_Click"
+
+            ...
+            protected void LinkButton2_Click( object sender, EventArgs e )
+            {
+                MultView1.ActiveViewIndex = 0;
+            }
+            ...
+            
+
+    Aula 22. 14 AdRotator
+    ---------------------
+
+        . Objetivo deste componente é mostrar propaganda. Para mais detalhes acesse o link abaixo:
+
+            https://www.dotnetfunda.com/tutorials/controls/adrotator.aspx        
+
+        . Acesse a página "wfCursos".
+
+        . Arraste o componente "Adrotator" para a tela acima do componente "MultView1"
+
+        . Para definir a fonte das URLs de propagandas podemos:
+
+            . Clicar na seta do componente desenhado na tela e fornecer as propriedades necessárias. Acabando por 
+                criar o conteúdo abaixo na página.
+
+                <asp:AdRotator ID="AdRotator2" runat="Server" AdvertisementFile="~/tutorials/controls/controldata/adRotator.xml"
+                    ImageUrlField="ImageUrl" NavigateUrlField="NavigateUrl" AlternateTextField="AlternateText"
+                    BorderWidth="1" BorderColor="blue" />         
+                    
+                    // Advertisement File
+                    <Advertisements>
+                    <Ad>
+                        <ImageUrl>~/images/samples/DotNetLogo.gif</ImageUrl>
+                        <NavigateUrl>~/tutorials/controls/listbox.aspx</NavigateUrl>
+                        <AlternateText>Go to ListBox tutorials</AlternateText>
+                        <Impression>30</Impression>
+                    </Ad>
+                    <Ad>
+                        <ImageUrl>~/images/samples/NewAdvance.gif</ImageUrl>
+                        <NavigateUrl>~/tutorials/controls/button.aspx</NavigateUrl>
+                        <AlternateText>Go to Button tutorials</AlternateText>
+                        <Impression>15</Impression>
+                    </Ad>
+                    <Ad>
+                        <ImageUrl>~/images/samples/DotNetFunda3.gif</ImageUrl>
+                        <NavigateUrl>~/tutorials/controls/label.aspx</NavigateUrl>
+                        <AlternateText>Go to Label tutorials</AlternateText>
+                        <Impression>15</Impression>
+                    </Ad>
+                    <Ad>
+                        <ImageUrl>~/images/samples/DotNetFunda2.gif</ImageUrl>
+                        <NavigateUrl>~/tutorials/controls/calendar.aspx</NavigateUrl>
+                        <AlternateText>Go to Calendar control tutorials</AlternateText>
+                        <Impression>40</Impression>
+                    </Ad>
+                </Advertisements>       
+
+            . Podemos utilizar um arquivo XML com a estrutura abaixo para representar as URL que serão apresentadas
+                na página.
+
+                . A estrutura do XML seria:
+
+                    <Advertisements>  
+                        <Ad>  
+                            <ImageUrl>  
+                                URL of image to display for Advertisement #1  
+                            </ImageUrl>  
+
+                            <NavigateUrl>  
+                                URL of page to link to for Advertisement #1  
+                            </NavigateUrl>  
+
+                            <AlternateText>  
+                                Text to show as a ToolTip for Advertisement #1  
+                            </AlternateText>  
+
+                            <Keyword>  
+                                Keyword used to filter for Advertisement #1  
+                            </Keyword>  
+
+                            <Impressions>  
+                                Relative importance of Advertisement #1  
+                            </Impressions>  
+
+                            <CustomInformation>  
+                                Custom Data about Advertisement #1  
+                            </CustomInformation>  
+                        </Ad>  
+                    </Advertisements>
+
+
+                    Element	        Description
+                    -------         -----------
+
+                    ImageUrl	    The absolute or relative URL to an image file (optional).
+
+                    NavigateUrl	    The URL of a page to link to if the user clicks the ad (optional). Note: If this element 
+                                    is not set, the HRef property is not rendered on the anchor tag.
+
+                    Height	        The height of the image, in pixels (optional).
+
+                    Width	        The width of the image, in pixels (optional).
+
+                    AlternateText	The text display in place of the image when the image specified by the ImageUrl property 
+                                    is not available (optional).
+
+                                    In some browsers, this text also appears as a ToolTip for the advertisement.
+
+                    Keyword	        A category for the advertisement (for example, "computers") that you can filter by (optional).
+
+                    Impressions	    A number that indicates the importance of the ad in the schedule of rotation relative to the 
+                                    other ads in the file (optional).
+
+                                    The larger the number, the more often the ad is displayed. The total of all <Impressions> values 
+                                    in the XML file cannot exceed 2,047,999,999. If it does, the AdRotator control throws a run-time 
+                                    exception.
+
+                . Exemplo:
+
+                    <Advertisements>  
+                        <Ad>  
+                            <ImageUrl>~/Images/image1.jpg</ImageUrl>  
+                            <height>60</height>  
+                            <width>190</width>  
+                            <NavigateUrl>http://www.microsoft.com</NavigateUrl>  
+                            <AlternateText>Microsoft Main Site</AlternateText>  
+                            <Impressions>80</Impressions>  
+                            <Keyword>Topic1</Keyword>  
+                        </Ad>  
+                        <Ad>  
+                            <ImageUrl>~/Images/image2.jpg</ImageUrl>  
+                            <height>90</height>  
+                            <width>90</width>  
+                            <NavigateUrl>http://www.wingtiptoys.com</NavigateUrl>  
+                            <AlternateText>Wingtip Toys</AlternateText>  
+                            <Impressions>80</Impressions>  
+                            <Keyword>Topic2</Keyword>  
+                        </Ad>  
+                    </Advertisements>
+
+        . Clique com o botão direito sobre o nô do projeto, escolha a opção "Add/XML File" e dê o nome de "Propaganda".
+
+        . Acesse o XML criado e coloque o conteúdo abaixo nele:
+
+            <?xml version="1.0" encoding="utf-8" ?>
+                <Advertisements>
+                <Ad>
+                    <ImageUrl>~/imagens/1.jpg</ImageUrl>
+                    <NavigateUrl>http://www.dfilitto.com.br</NavigateUrl>
+                    <AlternateText>dfilitto</AlternateText>
+                    <Impressions>90</Impressions>
+                </Ad>
+                <Ad>
+                    <ImageUrl>~/imagens/2.jpg</ImageUrl>
+                    <NavigateUrl>http://makeindiegames.com.br</NavigateUrl>
+                    <AlternateText>make indie games</AlternateText>
+                    <Impressions>10</Impressions>
+                </Ad>
+            </Advertisements>
+
+        . Altere as propriedades do componente "AdRotator".
+
+            Behavior:   {
+                AdvertisementFile: "Propaganda",
+                Target: _blank
+            }        
+
+        . Execute o projeto e verifique se o componente "AdRotator" está funcionando.
+
+
+    Aula 23. 15 Literal
+    -------------------
+
+        . O componente "Literal" serve para renderizar o seu contéudo, por exemplo:
+
+        . Insira o conteúdo abaixo na página:
+
+            <asp:Literal    ID="LiteralText" 
+                            runat="server" 
+                            Text="This is example of Literal">
+            </asp:Literal> 
+
+        . Execute o projeto e verifique se na construção da página apareceu o texto:
+
+            <div>  
+                This is example of Literal  
+            </div>
+
+        . Podemos deixar a construção dinâmica, por exemplo:
+
+            . Suponha que temos a página abaixo:
+
+                <%@ Page Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="_Default" %>  
+                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+                
+                <html xmlns="http://www.w3.org/1999/xhtml">  
+                <head runat="server">  
+                    <title>Untitled Page</title>  
+                </head>  
+                <body>  
+                    <form id="form1" runat="server">  
+                    <div>  
+                        <asp:Literal ID="Literal1" runat="server" />  
+                        <asp:Literal ID="Literal2" runat="server" />  
+                        <asp:Literal ID="Literal3" runat="server" />  
+                    </div>  
+                    </form>  
+                </body>  
+                </html>
+
+            . Com o código ".aspx.cs" abaixo:
+
+                using System;  
+                using System.Configuration;  
+                using System.Data;  
+                using System.Linq;  
+                using System.Web;  
+                using System.Web.Security;  
+                using System.Web.UI;  
+                using System.Web.UI.HtmlControls;  
+                using System.Web.UI.WebControls;  
+                using System.Web.UI.WebControls.WebParts;  
+                using System.Xml.Linq;  
+                
+                public partial class _Default : System.Web.UI.Page  
+                {  
+                    protected void Page_Load(object sender, EventArgs e)  
+                    {  
+                        Literal1.Mode = LiteralMode.Encode;  
+                        Literal1.Mode = LiteralMode.PassThrough;  
+                        Literal1.Mode = LiteralMode.Transform;  
+                
+                        Literal1.Text = @"<font size=4 color=red>Literal1 with Encode property example</font><script>alert(""Literal with Encode property"");</script></br></br>";
+                        Literal2.Text = @"<font size=4 color=green>Literal2 with PassThrough property example</font><script>alert(""Literal with PassThrough property"");</script></br></br>";
+                        Literal3.Text = @"<font size=4 color=blue>Literal3 with Encode Transform example</font><script>alert(""Literal with Transform property"");</script></br></br>";   
+                    }  
+                }
+
+    Aula 24. 16 ImageMap
+    --------------------
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfSiteParceiros".
+
+        . Arraste o componente "ImageMap" para dentro do formulário recém criado.
+
+        . Altere a propriedade abaixo do componente "ImageMap":
+
+            appearance:   {
+                ImageUrl: "~/imagens/exemplopropagandas.jpg",
+            },
+            Behavior:   {
+                HotSpots:   {
+                    RectangleHotSpot: {
+                        appearance: {
+                            Bottom: 350,
+                            Left:   0,
+                            Right:  400,
+                            Top:    0
+                        },
+                        Behavior: {
+                            AlternateText: "Site Make Indie Games",
+                            NavigateUrl: "http://www.makeindiegames.com.br",
+                            Targe: "_blank"
+                        }
+                    },
+                    RectangleHotSpot:   {
+                        appearance: {
+                            Bottom: 0,
+                            Left:   450,
+                            Right:  800,
+                            Top:    300
+                        },
+                        Behavior: {
+                            AlternateText: "Site Make Indie Games",
+                            NavigateUrl: "http://www.vivapontal.com.br",
+                            Targe: "_blank"
+                        }
+                    }
+                }
+            }
+
+        . Execute o projeto e verifique se a imagem acima está funcionando como um link
+
+
+    Aula 25. 17 Utilizando JavaScript
+    ---------------------------------
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfBasicoJavascript".
+
+        . Arraste o componente "Image" para dentro do formulário recém criado e altere as propriedades abaixo:
+
+            appearance: {
+                imageUrl: "One-Piece-Chibi-PNG-Image.png"
+            }
+
+        . Acesse o código da página "wfBasicoJavascript.aspx" e altere a tag gerada pelo design como abaixo:
+
+            ...
+            <asp:Image  ID="Image1" 
+                        runat="server" 
+                        ImageUrl="~/imagens/One-Piece-Chibi-PNG-Image.png" 
+                        onMouseOver="alert('Alô Mundo!!!')"/>     <!-- Linha inserida -->
+            ...
+
+        . Execute o projeto e verifique se ao passar com o mouse sobre a imagem vem a mensagem "Alô Mundo!!!"
+
+        . Insira a função javascript como abaixo na página:
+
+            ...
+            <head runat="server">
+                <title></title>
+
+                <!-- função inserida -->
+
+                <script type="text/javascript">
+                    function ExibeMensagem() {
+                        alert('Alô Mundo!!!!!');
+                    }
+                </script>
+
+                <!-- Fim da inserção -->
+
+            </head>
+            ...
+
+        . Altere o evento "onMouseOver" como abaixo:
+
+            ...
+            <asp:Image  ID="Image1" 
+                        runat="server" 
+                        ImageUrl="~/imagens/One-Piece-Chibi-PNG-Image.png" 
+                        onMouseOver="ExibeMensagem()"/>     <!-- Linha inserida -->
+            ...
+
+        . Execute o projeto e verifique se ao passar com o mouse sobre a imagem vem a mensagem "Alô Mundo!!!"
+
+        . Arraste o componente "Button" abaixo do "Image1".
+
+        . Acesse o código da página "wfBasicoJavascript.aspx" e faça a alteração abaixo na tag do componente "Button"
+
+            ...
+            <asp:Button ID="Button1" runat="server" Text="Clique no Botão" Width="628px" />
+            ...
+
+        . Acesse o código da página "wfBasicoJavascript.aspx.cs" e implemente as linhas abaixo:
+
+            ...
+            protected void Page_Load(object sender, EventArgs e)
+            {
+                Button1.Attributes.Add("onClick", "ExibeMensagem()");
+            }
+            ...
+
+        . Execute o projeto e verifique se ao clicar no button vem a mensagem "Alô mUndo!!!".
+
+    Aula 26. 18 Utilizando JavaScript
+    ---------------------------------
+
+        . Comente a linha abaixo para não conflitar com o próximo item:
+
+            ...
+            protected void Page_Load(object sender, EventArgs e)
+            {
+                // Button1.Attributes.Add("onClick", "ExibeMensagem()");
+            }
+            ...
+
+        . Acesse os eventos do "Button1" e altere o metodo "Behavior.onClientClick" com o conteúdo abaixo:
+
+            Behavior.onClientClick: "ExibeMensagem()"
+
+        . Execute o projeto e verifique se ao clicar no button vem a mensagem "Alô mUndo!!!".
+
+
+    Aula 27. 19 Utilizando JavaScript - Exercício
+    ---------------------------------------------
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "wfAlteraTamanhoFonte".
+
+        . Acesse o código fonte da página "wfAlteraTamanhoFonte.aspx" e faça as alterações abaixo:
+
+            <%@ Page Language="C#" 
+                        AutoEventWireup="true" 
+                        CodeBehind="wfAlteraTamanhoFonte.aspx.cs" 
+                        Inherits="waConhecendoOsComponetes.wfAlteraTamanhoFonte" %>
+
+            <!DOCTYPE html>
+
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head runat="server">
+                <title></title>
+
+                <!-- Bloco inserido -->
+
+                <script type="text/javascript">
+                    var tam = 12;
+                    function IncText() {
+                        tam = tam + 1;
+                        document.getElementById("p1").style.fontSize = tam + "px";
+                        document.getElementById("p2").style.fontSize = tam + "px";
+                    }
+                    function DecText() {
+                        tam = tam - 1;
+                        document.getElementById("p1").style.fontSize = tam + "px";
+                        document.getElementById("p2").style.fontSize = tam + "px";
+                    }
+                </script>
+
+                <!-- Fim da inserção -->
+
+            </head>
+            <body>
+                <form id="form1" runat="server">
+                    <div>
+                        <asp:HyperLink ID="HyperLink1" runat="server" onClick="IncText()">++++++++</asp:HyperLink>
+                        <br />
+                        <asp:HyperLink ID="HyperLink2" runat="server" onClick="DecText()">--------</asp:HyperLink>
+                        <br />
+                    </div>
+
+                    <!-- Bloco inserido -->
+
+                    <p id="p1"> Exemplo de como alterar o tamanho da fonte de um páragrafo</p>
+                    <p id="p2">Visite o nosso site <a href="http://www.dfilitto.com.br">dfilitto</a></p>
+
+                    <!-- Fim da inserção -->
+                </form>
+                <p>&nbsp;</p>
+            </body>
+            </html>
+
+        . Arraste dois "Hyperlink" para o topo da página, acesse a página "wfAlteraTamanhoFonte.aspx" e faça as alterações abaixo.
+
+                ...
+                <form id="form1" runat="server">
+                    <div>
+                        <asp:HyperLink ID="HyperLink1" runat="server" onClick="IncText()">++++++++</asp:HyperLink>  <!-- Linha alterada -->
+                        <br />                                                                                      <!-- Linha inserida -->
+                        <asp:HyperLink ID="HyperLink2" runat="server" onClick="DecText()">--------</asp:HyperLink>  <!-- Linha alterada -->
+                        <br />                                                                                      <!-- Linha inserida -->
+                    </div>
+                    ...
+                </form>
+                ...
+
+            . Importante: Foi utilizado os componentes "Hyperlink" porque não fazem "Post" na página, diferente do que ocorre no "Button"
+
+        . Execute o projeto e verifique se ao clicar nos "Hyperlink" é alterado o tamanho da fonte.
+
+
+    Aula 28. 20 Criando a página inicial do nosso site
+    --------------------------------------------------    
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "index".
+
+        . Arraste da barra de ferramentas o componente "HTML.Table" para dentro do formulário criado na área de desenho.
+
+        . Arraste o três componentes "Hyperlink" para dentro do componente "Table", um para cada celula da primeira linha.
+
+            . Altere as propriedades abaixo em cada "Hyperlink":
+
+                Hyperlink1: {
+                    Apareance.Text:         "Tabuada",
+                    Navigation.NavigateUrl: "~/wfTabuada.aspx"                  // Clique nos "..." da caixa de propriedades dessa propriedade 
+                },                                                              // e escolha a página "wfTabuada"                
+                Hyperlink2: {
+                    Apareance.Text:         "Par ou Impar",
+                    Navigation.NavigateUrl: "~/wfParOuImparFatorial.aspx"      
+                },                                                             
+                Hyperlink3: {
+                    Apareance.Text:         "Calcula os Dias de Vida",
+                    Navigation.NavigateUrl: "~/wfDiasDeVida.aspx"                 
+                }
+
+        . Arraste o três componentes "ImageButton" abaixo de cada "Hyperlink" criado no passo anterior.
+
+            . Altere as propriedades abaixo em cada "Image":
+
+                ImageButton1: {
+                    Apareance.ImageUrl:         "~/imagens/Curso1.jpg",
+                    Layout.Height:              241px,
+                    Layout.Width:               429px,
+                    Behavior.PostBackUrl:       "~/wfCursos.aspx"
+                },
+                ImageButton2: {
+                    Apareance.ImageUrl:         "~/imagens/Curso2.jpg",
+                    Layout.Height:              241px,
+                    Layout.Width:               429px,
+                    Behavior.PostBackUrl:       "~/wfCursos.aspx"
+                },
+                ImageButton3: {
+                    Apareance.ImageUrl:         "~/imagens/OnePeacePoster.png",
+                    Layout.Height:              241px,
+                    Layout.Width:               429px
+                    Behavior.PostBackUrl:       "~/wfAlteraTamanhoFonte.aspx"
+                }
+        
+        . Execute o projeto e verifique se ao clicar nos "Hyperlink" se está indo para a página configurada.
+
+
+    Aula 29. UpLoad de arquivo
+    --------------------------    
+
+        https://www.dotnetfunda.com/tutorials/controls/fileupload.aspx
+
+        .  Crie um novo projeto para essa aula:
+
+            . Acesse a opção menu "File / New / Project 
+
+            . Escolha "Visual C#" e "ASP.NET Web Application"
+
+            . Forneça o nome do projeto de "Upload"
+
+            . Escolha um projeto "Empty" 
+
+        . Clique sobre o nô do projeto, escolha a opção "Adicionar/ Formulário da Web".
+
+        . Informe o nome do formulário "Upload".
+
+        . Arraste o componente "FileUpload" para dentro do formulário em modo "Design"
+
+        . Altere as propriedade do componente "FileUpload" como abaixo:
+
+            Misc.ID:        "fuArquivo"
+
+        . Arraste três componentes "Label" para dentro do formulário em modo "Design":
+
+            1o. Label acima do componente "FileUpload"
+            2o. e 3o. abaixo do componente "FileUpload" um debaixo do outro
+
+        . Arraste Três "TextBox" para dentro do formulário, cada um ao lado do 2o. e 3o. Label inseridos no passo anterior e altere as propriedades abaixo:
+
+            Label1:     {
+                Text:       "UpLoad de Arquivo"
+            },
+            Label2:     {
+                Text:       "Nome do Arquivo"
+            },
+            Label3:     {
+                Text:       "Tamanho do Arquivo"
+            },
+            TextBox1:   {
+                ID:       "txbNome"  
+            },
+            TextBox2:   {
+                ID:     "txbTamanho"
+            }
+
+        . Clique no nô principal do projeto e escolha a opção "Add" / "New Folder" e renomeie a pasta criada com o nome de "Upload"
+
+        . Arraste um componente "Button" para dentro do formulário, abaixo dos componentes "Label3" e "Textbox2" e altere as propriedades abaixo:
+
+            Text: "Enviar Arquivo",
+            ID:     "btEnviar"
+
+        . Acesse a caixa de propriedades do componente "Button", acesse a parte de eventos e dê um duplo clique no evento "Click"
+
+            .  Insira o conteúdo abaixo no método que será criado:
+
+                ...
+                protected void btEnviar_Click( object sender, EventArqgs e )
+                {
+                    String nome = fuArquivo.FileName;
+
+                    String caminho = Server.MapsPath(@"upload\");       // Importante que seja colocado o caracter "\" ao final da string para indicar que é uma pasta
+
+                    txbNome.Text = nome;
+
+                    txbTamanho.Text = fuArquivo.PostedFile.ContentLength.ToString();
+
+                    fuArquivo.PostedFile.SaveAs(caminho + nome);
+
+
+
+                }
+
+
+    Aula 30. Upload de vários arquivos
+    ----------------------------------
+
+
+
+        
+
+
+        

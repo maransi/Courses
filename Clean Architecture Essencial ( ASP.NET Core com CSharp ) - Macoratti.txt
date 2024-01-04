@@ -1,0 +1,3723 @@
+Clean Architecture Essencial ( ASP.NET Core com CSharp ) - Macoratti
+--------------------------------------------------------------------
+
+Introdução
+==========
+
+Ambiente
+--------
+
+. Ambiente e Ferramentas usadas no curso
+
+    . .Net Core SDK 6
+
+    . ASP.NET Core 6
+
+    . VSCode
+
+    . SQLite
+
+. Instalação do .NET Core 
+
+        wget https://dot.net/v1/dotnet-install.sh
+        chmod +x dotnet-install.sh
+        ./dotnet-install.sh -c 3.1
+        ./dotnet-install.sh -c 5.0
+        ./dotnet-install.sh -c 6.0
+        ./dotnet-install.sh -c 7.0
+
+        dotnet --version
+
+        # insira as linhas abaixo no arquivo ".bashrc"
+        export PATH="home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"
+        export DOTNET_ROOT=/home/$USER/.dotnet/
+
+        source ~/.bashrc
+
+        sudo ln -s /home/$USER/.dotnet/dotnet /usr/bin/dotnet
+
+        dotnet --version
+        dotnet --list-runtimes
+        dotnet --list-sdks
+
+        cd /home/$USER/Download
+
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+
+
+. Instalação das extensões do VSCode
+
+    . Acessar a pagina de download da microsoft:
+
+        https://code.visualstudio.com/download
+
+    . Baixar o arquivo .deb 
+
+    . Abrir o terminal e acessar a pasta Downloads
+
+    . Executar o comando abaixo:
+
+        sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+    . Atalhos
+
+        Alt + 1, 2, 3, 4, ...	Posiona na aba no.
+        Ctrl + b				Ativar o menu lateral esquerdo 
+        Ctrl + Alt + P			Para ativar a linha de comandos 
+        Ctrl + P 				Localiza um determinado arquivo
+        Ctrl + W				Fecha a aba corrente
+        Ctrl + Shift + W		Fecha todas as abas abertas
+
+        Ctrl + Rolagem do Mouse	
+                sobre as abas 
+                abertas			Faz a rolagem das abas.
+
+        Ctrl + K + C ou 
+        Ctrl + /				Comenta linha atual, ou bloco selecionado
+
+        Ctrl + K + U ou
+        Ctrl + /				Descomenta linha, ou bloco selecionado.
+
+        Ctrl + Shift + 
+                Acento Agudo	Abre o terminal na parte inferior
+
+        Ctrl + X				Apaga linha
+        Ctrl + H				Localiza e atualiza uma expressão
+        Ctrl + F2				Selecione um texto e pressionando Ctrl + F2 
+                                muda todos os textos equivalente a medida
+                                que vai se digitando
+        Alt + Arrow(up/Down)    Move a linha para cima, ou para baixo.
+        Ctrl + Shift + O		Abre a lista de funções/métodos da classe atual
+        Ctrl + G				Posicionar na linha No. que for digitado
+        Alt + Backspace			Apaga palavra inteira a esquerda
+        Ctrl + Shift + .		Mostra os métodos da classe
+        Ctrl + Shift + L		Altera dinamicamente em todo o arquivo a palavra que está sendo alterada
+
+    . Instale as extensões abaixo:
+
+        C# 
+        C# Extensions (JosKreativ)
+        C# XML Documentation Comments
+        C# Snippets
+        vscode-solution-explorer
+        ASP.NET Helper
+        RapidApi
+        Bracket Pair Colorization Toggler
+        Razor Snippets
+        Libman
+        Docker
+        vscode-icons (Opcional)
+        VZ Dotnet File Template
+        Auto-Using for C#
+        Error Lens
+
+
+        . Testar
+
+            Dotnet Solution Explorer
+            Dotnet New Extension
+            Net Core Extension Pack
+            C# Utilities
+            Nuget Package Manager
+            Visual Nuget
+            C# Developer Extension Package
+            Auto closet tag
+            C# Snippets
+
+    . Configurações:
+
+        . Digite Ctrl K+S, localize o item "Delete Line" e configure Ctrl + D
+        . Acesse View / Minimap para retirar o scroll de código da direita
+        . Acessar configurações, ir em "Settings", Text editors, Sugestions:
+            . Na opção "Accept Suggestion On Enter" deixar como off
+            . Na opção "Suggest: Insert Mode" deixar como replace
+            . Na opção "Quick Suggestions Delay" deixar como 1000
+            
+
+. Instalação o "DB Browser for SQLite" para realizar as consultas no banco de dados
+
+    sudo apt-get update && sudo apt-get upgrade
+
+    sudo apt-get install sqlite3
+
+    sqlite3 --version
+
+    sudo apt-get install sqlitebrowser
+
+
+. Instalação do "SQLite Studio":
+
+    . Acesse o site https://sqlitestudio.pl/
+
+    . Base o arquivo de instalação
+
+    . No prompt de comando execute os comandos abaixo:
+
+        chmod a+x SQLiteStudio-3.4.4-linux-x64-installer.run 
+        sudo ./SQLiteStudio-3.4.4-linux-x64-installer.run
+
+. Instalação do Nodejs
+
+    sudo apt-get install nodejs
+    sudo apt-get install npm
+
+
+Conceitos e Fundamentos
+=======================
+
+Aula 9 - Modelo Anêmico
+----------------------
+
+    . Definições
+
+        . O modelo de domínio anêmico é um modelo de domínio onde os objetos que representam as 
+            entidades do domínio contêm pouca ou nenhuma lógica de negócio (validações, cálculos,
+            regras de negócio, etc.)
+
+        . Um modelo de domínio anêmico é um modelo sem compratamentos onde temos diversas 
+            propriedades com get e set públicos definidas sem lógica alguma e onde o cliente do 
+            domínio tem controle sobre como instanciar e modificar o domínio.
+
+            . Conceito de OO é perdido.
+
+            . Regras de negócio espalhada em vários objetos.
+
+            . Mais parecidos com estilo de programação procedural. Parecidos com objetos DTOs.
+
+    . Exemplos de modelos anêmicos
+
+        public class Pedido                                         public class PedidoServide
+        {                                                           {
+            public int Id {get; set; }                                  public void AddItem( int Id, itemPedido item )
+            public string ClienteId {get; set; }                        {
+            public decimal Desconto {get; set; }                            // validações
+            public DateTime? DataPagamento {get; set; }                 }
+            public List<ItemPedido> Itens {get; set;}                   public void DescontoPedido( int Id, decimal desconto){...}
+                                                                        public void PagamentoPedido( int id) {...}
+        }                                                           }
+            |
+            v                                                                   ^
+                                                                                |
+        Não tem lógica nenhuma é preciso colocar a lógica em outra classe   ----+
+
+
+        . Contém somente prorpidades com get e set públicos
+        
+        . Não possuem validações nem comportamentos
+
+        . Não possuem gerenciamento de estado, permitindo que objetos com estado inconsistente sejam cirados
+
+        . Permitem que outros objetos criem instâncias e modifiquem o domínio.
+
+    . Modelos anêmicos - Problemas
+
+        . O cliente precisa interpretar o objetivo e o uso da classe e a lógica é enviada para outras classes,
+            denomidadas serviçoes da classe de domínio
+
+        . Violação do encapsulamento;
+
+        . Lógica de negócios duplicada;
+
+        . Não é possível garantir que as entidades no modelo estejam em u estado consistente;
+
+        . Baixa coesão;
+
+    . Iremos adotar as orientações do Domain-Drive Design. Pesquisar padrões como: Entity, Value Object, Aggregate
+
+        https://dev.to/guisfits/easycommerce-01-introducao-ao-ddd-kik
+        https://dev.to/guisfits/implementando-domain-driven-design-3d1h
+
+        . Entity
+            
+            https://www.codeproject.com/Articles/4293/The-Entity-Design-Pattern
+            https://dotnettutorials.net/lesson/repository-design-pattern-csharp/
+
+        . Value Object 
+
+            https://www.macoratti.net/20/11/c_valueobj1.htm
+            https://www.codeproject.com/Articles/1046193/Value-Object-Design-Pattern-in-Csharp
+            https://www.codeproject.com/Articles/5354124/Csharp-Value-Object-Pattern-Data-Transfer-Object-P#:~:text=Value%20Object%20Pattern%20%2D%20Definition,based%20on%20identity%2Freference).
+
+        . Agreagate
+
+            https://code-maze.com/csharp-design-pattern-aggregate/        
+
+    . Vamos atualizar o modelo com dados, lógica e regras de negócio.
+
+    . Modelo anêmicos - Enriquecendo o modelo
+
+        . Usar propriedades com setters privados ( e as classes como "sealed" )
+
+        . Validar estado da entidade
+
+        . Evitar construtores sem parâmetros.
+
+        . Definir invariantes
+
+        . Trazer as regras de comportamentos dos serviços para o modelo de domínio.
+
+        . Usar os conceitos da programação OO
+
+        . Cuidado e atenção ao usar ferramentas ORM (EF Core)
+
+    . "sealed"
+
+        . Quando aplicado a uma classe, o modificador sealed impede que outras classes herdem dela. 
+            No exemplo a seguir, a classe B herda da classe A, mas nenhuma classe pode herdar da classe B.
+
+            class A {}
+
+            sealed class B : A {}
+
+        . O modificador "sealed" também pode ser usado com métodos para evitar que os métodos sejam sobrescritos 
+            nas classes filhas.
+
+
+    . Enriquecendo o modelo - Exemplo
+
+        public class Cliente                                    public sealed class Cliente
+        {                                                       {
+            public int Id{ get; set; }                              public int Id { get; private set; }
+            public string Nome { get; set; }                        public string NOme {get; private set; }
+            public string Endereco { get; set; }                    public string Endereco { get; private set; }
+        }                                       
+                                                                    public Cliente (int id, string nome, string endereco)
+                                                                    {
+                                                                        Validar( id, nome, endereco);
+
+                                                                        Id = id
+                                                                        Nome = nome;
+                                                                        Endereco = endereco;
+                                                                    }
+
+                                                                    public void Update( int id, string nome, string endereco )
+                                                                    {
+                                                                        Validar( id, nome, endereco);
+
+                                                                        Id = id
+                                                                        Nome = nome;
+                                                                        Endereco = endereco;
+                                                                    }
+
+                                                                    private static void Validar( int id, string nome, string endereco )
+                                                                    {
+                                                                        ...
+                                                                    }
+                                                                }
+
+Aula 10 - Separação dos conceitos ( Separation of Concerns )
+------------------------------------------------------------
+
+    . Separtion of Concerns - Soc: Separação de conceitos
+
+        . Não se deve misturar conceitos e/ou responsabilidades diferentes denro do design ou do código de um projeto de software.
+
+        . A violação deste princípio causa cpodigo duplicado com mais de uma responsabilidade, vilando també, os princícpios SOLID
+            da responsabilidade Ùnica (SRP) e o princípio DRY Don´t Repeat YourSelf.
+
+        . Exemplos de aplicação do conceito:
+
+            . Separar a interface do usuário (front-end) da lógica de negócios (back-end)
+
+            . Separar o código de acesso a dados do código da apresentação dos dados 
+
+            . Separar o projeto em diferentes módulos/camadas com responsabilidade distintas
+
+            . Criar componentes/classes/funções que realizam apenas uma única tarefa com eficiência.
+
+        . A aplicação da Separação dos Conceitos/Responsabilidades envolve dois processos:
+
+            . Reduzir o acoplamento
+
+            . Aumentar a coesão.
+
+            . Acoplamento
+                
+                . Acoplamento é o nível de dependência/conhecimento que pode existir entre os componentes do sistema. Quanto maior o acoplamento
+                    entre os componenetes do sistema maior será dependêmcia entre eles, e mais difícil será manter, reusar e estender o sistema.
+
+                . Quando há um baixo acoplamento, um componente consegue operar de forma praticamente independente do outro. Alto acoplamento 
+                    já implica em uma conexão forte entre os dois, que pode torná-los até indistinguíveis
+
+            . Coesão
+
+                . A coesão é o grau com o qual um módulo tem uma responsabilidade única e bem definida
+
+                . Coesão é o nível de integridade interna dos componentes do sistema. Quanto maior a coesão enter os componentes mais definidas 
+                    são suas responsabilidades sendo mais difícil desembrar o componente em outros componentes.
+
+            . Portanto quanto menor o acoplamento e mais alta a coesão de um componente ou módulo do sistema mais fácil ele será de matner, 
+                reusar e estender.
+
+        . Vantagens
+
+            . Facilita a manutenção. A não duplicação do código e as responsabilidades bem definidas dos componentes do projeto
+                tornam o sistema mais fácil de manter.
+
+            . Melhor reutilização do código. O principal benefício de reutilizar o código pe a reduçao dos custos de manutenção. Sempre que
+                você precisar estender a funcionalidade ou corrigir um bug - é muito menos doloroso fazer isso quando você tem certeza de que ele
+                parece em apenas um lugar.
+
+            . Melhor clareza de código. É muito mais fácil entender o que está acontecendo no programa quando cada módulo tem uma API concisa
+                e clara com um conjunto de métodos com escopo lógico e bem definido.
+
+            . Melhora a testabilidade. Móduglo independentes com guncionalidade e escopo adequado e com isolamento do resto do aplicativo
+                são fáceis de testar. Você nãp precisa configurar o ambiente inteiro parar ver como seu módulo funciona, basta substituir 
+                os módulos reais por simulações ou fontes de dados falsas.
+
+            . Permite uma evolução mais rápida do projeto. Quer seja um novo recurso ou uma atualização de um recurso existente, o isolamento 
+                dos módulos ajuda a definiri o  escopo das áreas do projeto que podem ser afetadas pela mudanças, acelerando assim o desenvolvimento.
+
+Aula 11 - Dependency Inversion
+------------------------------
+
+    . Para entender como funciona a inversão de dependência no .NET veja o resumo do curso "DI - Dominando Injeção de Dependência - Balta".
+
+    . A direção da dependenência em uma aplicação deverá ser na direção da abstração e não nos detalhes de impplementação.
+
+    . Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de uma abstração.
+
+    . Abstrações não devem depender de detalhes. Detalhes devem depender de abstrações.
+
+    . Módulos de alto nível são classes da camada de negócio que encapsulam uma çógica complexa.
+
+    . Módulos de baixo nível são cçasses da camada de infaestrutura que implementa operações básicas como acesso a dados, 
+        ao disco, protocolos de rede, etc.
+
+    . As abstrações seria interfaces ouclasses abstratas que não possuem implementação.
+
+    . Assim as classes da camada de negócio não devem depender das classes da camada de infraestrura mas 
+        devem depender de interfaces ou classe abstratas
+
+    . Exemplo 1. Via Interface - A implementação da injeção de dependência via interface -  Interface Injection -  
+                    utiliza uma interface comum que outras classes necessitam implementar para injetar a dependência.
+
+        namespace DIP;
+
+        public interface IDataService       ----------------------------------------+
+        {                                                                           |
+            public void Save(string message);                                       |
+        }                                                                           |
+                                                                                    |
+        public class DatabaseService: IDataService  ---------------------------->   |
+        {                                                                           |
+            public void Save(string message)                                        |
+            {                                                                       |
+                Console.WriteLine("Save the message into the database");            |
+            }                                                                       |
+        }                                                                           |
+                                                                                    |
+        public class Logger                                                         |
+        {                                                                           |
+            private readonly IDataService _dataService;                             |
+                                                                                    |
+                                +---------------------------------------------------+
+                                |  Não dependemos de detalhes, somente da abstração
+                                V
+            public Logger(IDataService dataService)
+            {
+                _dataService = dataService;
+            }
+
+            public void Log(string message)
+            {
+                _dataService.Save(message);
+            }
+        }
+
+        public class Program
+        {
+            public static void Main(string[] args)
+            {
+                var logger = new Logger(new DatabaseService());
+                logger.Log("Hello");
+            }
+        }
+
+
+
+    . Exemplo 2. Via Construtor - A implementação da injeção de dependência via construtor - Construtor Injection - consiste em 
+                    passar as dependências de um objeto para o seu construtor.
+
+        namespace DI
+        {                                              IOC
+            class programa          Unconcerned logic shifted the externa entity
+            {                                           ^
+                static voida Main( string[] args)       |
+                {                                       |
+                    Customer obj = new Customer( New SQLServer() );
+                }                                       |
+                                            Dependency   |
+                class Customer             Injection    |
+                {                          +------------+
+                    private IDal _dal;     |
+                                            V
+
+                    public Customer( IDal obj)
+                    {
+                        _dal = obj;
+                    }
+
+                    public bool validate()
+                    {
+                        return true;
+                    }
+
+                    public void Add()
+                    {
+                        if (validate())
+                        {
+                            dal.Add();
+                        }
+                    }
+
+                }
+            }
+        }
+        
+    . Exemplo 3 - Via Propriedades. A implementação da injeção de dependência via propriedades - Setter Injection - não força 
+                    a dependência ser passada para o construtor. Ao invés disso, as dependências são definidas em 
+                    propriedades públicas expostas pelo objeto.
+
+        public class Cliente
+        {
+        public Cliente() {}
+
+            private IPedido meuPedido;
+
+            public IPedido Pedido {
+            get {
+                    if (meuPedido == null) {
+                        throw new MemberAccessException("meuPedido não foi inicializado");
+                    }
+                return meuPedido;
+                }
+                set { meuPedido = value; }
+            }
+        }
+
+    . Resumo
+
+        . Princípio da inversão de dependência (DIP)    É um princípio que sugere uma solução para o problema da dependência mas não diz
+                                                        como implementar ou que técnica usar.
+
+        . Injeção da dependência (DI)                   Padrão de projeto usado para implementar a inversão da dependência. Permite
+                                                        injetar a implementação concreta de um componente de baixo nível em um componente
+                                                        de alto nível.
+
+        . Inversão de Controle (IoC)                    Outro princípio, que sugere uma forma de aplicar a inversão da dependência permitindo 
+                                                        que componentes de alto nível dependam de uma abstração e não de um componente de
+                                                        baixo nível.
+
+        . Contâiner IoC (Contâiner de injeção de dependência )  É um framework que permite fazer a injeção de dependência de forma automática 
+                                                                nos componentes.
+
+Aula 12 - Padrão Repository
+---------------------------
+
+    . O que é o padrão Repository?
+
+        . O padrão "Repository" faz a mediação entre o domínio e as camadas de mapeamento de dados, agingo como uma coleção de objetos de 
+            domínio em memória.
+
+        . Um repostório é essencialmente uma coleção de objetos de domínio em memória, e, com base nisso o padrão "Repository" permite 
+            desacoplar o modelo de domínio do código de acesso a dados.
+
+        . Ao utilizar o padrão "Epository" você pode realizar a persistência e a separação de interesses em seu código de acesso a dados 
+            visto que ele encapsula a lógica necessária para persistir os objetos do seu domínio na sua fonte de dados.
+
+    . Implementação e Tipos de repositórios
+
+        . Em uma implementação padrão podemos começar definindo uma "interface" que atuará como a nossa fachada de acesso aos dados e a 
+            seguir definiir a implementação na classe concreta.
+
+        . Podemos implementar os seguintes tipos de repositórios:
+
+            . Repositório Genérico
+
+            . Reposítorio Específico
+
+        . E podemos realizar uma implementação síncrona ou assíncrona (Task, async/await).
+
+        . Implementação (Como fazer)
+
+            1. Criar uma "interface" ou classe abstrata e definir o contrato com os métodos do repositório.
+
+            2. Criar a classe concreta que implementa a "interface"
+
+                            Repositório Genérico                                    Repositório Especifico
+                    +------------------------------+                            +---------------------------+
+                    |                              |                            |                           |
+                IRepository<T>              Repository<T>               IProductRepository          ProductRepository
+
+                Add()                       ...                         Add()                       ...
+                Remove()                    ...                         Remove()                    ...
+                Get()                       ...                         Get()                       ...
+                GetId( int id )             ...                         GetId( in id )              ...
+
+                Domain ou Application       Infrastructure              Domain ou Application       Infrastructure
+
+        . Exemplo "Repositório Genérico":
+
+            +-- public interface IRepository<T>: where T class ---------->  public class Repository<T>: IRepository<T> where T: class
+            |    {                                                           {
+            |        IEnumerable<T> GetAll();                                    ... // Implementação
+            |                                                                }
+            |        T GetById( int id );
+            |
+            |        void Add( T item );
+            |
+            |        void Update( T item );
+            |
+            |        void Delete( T item );
+            |    }
+            |
+            |
+            |    public classe CustormerController: Controller
+            |    {
+            |        private readonly IRepository<Customer> _custormerRepository;
+            |
+            +---------------------------------------+
+                                                    | Injeção de Dependência
+                                                    V
+                    public CustomerController( IRepository<Customer> repo)
+                    {
+                        _custormerRepository = repo;
+                    }
+                }
+
+        . Exemplo "Repositório Genérico":
+
+            +-- public interface ICustomerRepository --------------------->  public class CustomerRepository: ICustomerRepository
+            |    {                                                           {
+            |        IEnumerable<T> GetAll();                                    ... // Implementação
+            |                                                                }
+            |        T GetById( int id );
+            |
+            |        void Add( T item );
+            |
+            |        void Update( T item );
+            |
+            |        void Delete( T item );
+            |    }
+            |
+            |
+            |    public classe CustormerController: Controller
+            |    {
+            |        private readonly ICustomerRepository _custormerRepository;
+            |
+            +---------------------------------------+
+                                                    | Injeção de Dependência
+                                                    V
+                    public CustomerController( CustomerRepository repo)
+                    {
+                        _custormerRepository = repo;
+                    }
+                }
+
+        . Qual utilizar? Genérico ou Especifico?
+
+            . Um repositório genérico pode ser usado por qualquer entidade da camada de negócios e com isso economizarmos código.
+
+            . Ocorre que cada entidade da camada de domínio pode possuir sua particularidades distintas de outras entidades e isso 
+                pode inviabilizar o uso de um repositório genèrico.
+
+            . Assim para decidir é preciso fazer uma análise prévia do modelo de domínio e das particularidades de cada entidade.
+
+        . Benfícios:
+
+            . Minimiza a lógica de consultas na sua aplicação evitando consultas esparramdas pelo seu código.
+
+            . Encapsula a lógica das consultas em um repositório
+
+            . Desacopla a sua aplicação dos framworks de persistência como o EF Core.
+
+            . Facilita a realização de testes de unidade em sua alicação (repositório fake)
+
+            . Centraliza a lógica de acesso a dados facilitando a manutenção.
+
+Aula 13 - Padrão MVC
+--------------------
+
+    . O padrão MVC fornece uma maneira de separa a funcionalidade e responsabilidade envolvidas com a manutenção e apresentação 
+        dos dados de uma aplicação usando 3 componentes:
+
+        . O Model           Representa os daos a serem tratados e não inclui detalhes de implementação.
+
+        . A View            Representa o componente de interface com o usuário (UI)  e está vinculado ao "Model"
+
+        . O Controller      Fornece um mecanismo para o usuário interagir como sistema definindo como a interface do usuário vai 
+                            reagir a ação do usuário. É responsável por trocar e interpretar mensagens entre a "View" e o "Model".
+
+                    Request                    Data
+                / --------->  Controller  <----------->   Model
+                /               ^ |     
+                /                | |
+            User                  | | Data
+                \                | |
+                \  Response     | V
+                \ <---------- View
+
+        . Padrões de comunicação:
+
+            . Permitido
+
+                . Os usuários podem interagir com uma "View"
+
+                . "Views" podem interagir com "Controller"
+
+                . "Controller" podem interagir com "Views"
+
+                . "Controller" podem se comunicar com outros "Controller"
+
+                . "Controller" podem se comunicar com o "Model"
+
+            . Não permitido:
+
+                . Os usuários não podem interagir diretamente com o "Model".
+
+                . "Views" não podem interagir diretamente com outras "Views".
+
+                . "Views" não podem interagir diretamente como "Model".
+
+                . "Model" não podem interagir com outros "Models".
+            
+    . Benefícios:
+
+        . A "View" e o "Model" são desacoplados ou dissociados. Isso significa que você pode ter muitas "Views" associadas 
+            com um determinado model.
+
+        . A dissociação "View-Controller" permite que você altere a forma como uma aplicação responde à entrada do usuário 
+            sem alterar o modo de exibição, permitindo que a interface do usuário "view" seja alterada sem alterar a maneira 
+            como o aplicativo responde à entrada do usuário.
+
+        . A separação das responsabilidades permite que diferentes membros da equipe possam se concentrar em uma parte da 
+            aplicação que melhor se alinha com suas respcetivas habilidades.
+
+        . Como o padrão MVC gerencia múltiplos visalizadores usando o mesmo modelo, é fácil manter, testar e atualizar 
+            mais de um sistema.
+
+    . Padrão MVC vs. Arquitetura em 3 Camadas (MVC não é 3 camadas)
+
+        . Padrão MVC                    Está relacionado com a arquitetura da aplicação e em como os componentes se comunicam.
+
+        . Arquitetura em 3 camadas      Está relacionada com a arquitetura do Sistema onde você divide as responsabilidade em 
+                                        camada de apresentação, de negócio e de acesso aos dados.
+
+
+            Arquitetura em 3 camadas
+            ------------------------
+
+                    UI                                              Controller
+                                                                        /\          O padrão MVC é triangular
+                    |                                                  /  \         a view aciona o controller, o 
+                    |                                                 /    \        controller atualiza o modelo, e 
+                    v   Conceitualmente a                         Model --> view    a view é atulizada pelo modelo.
+                        arquitetura de três 
+                   BLL  camadas é linear.        
+                        As dependências são 
+                    |   definidas de cima
+                    |   para baixo
+                    V
+
+                   DAL
+
+        . Os conceito se complementam e podem coexistir harmonicamente sem conflitos. Você pode usar o padrão MVC para a 
+            camada de apresentação de uma arquitetura em camadas.
+
+                                                                +------------------+
+                    UI  ------------------------------------->  |    Controller    |
+                                                                |       /\         |
+                    |                                           |      /  \        |
+                    |                                           |     /    \       |
+                    v   As camadas dizem como                   | Model --> view   |
+                        agrupar os componentes e                +------------------+
+                   BLL  
+                        O MVC diz como interagem os
+                    |   componentes
+                    |   
+                    V
+
+                   DAL
+        
+Aula 14. Padrão CQRS
+--------------------
+
+    https://www.youtube.com/watch?v=G0yi5PTzhLA&t=297s
+    https://balta.io/blog/aspnet-core-cqrs-mediator
+
+    https://balta.io/blog/clean-code
+
+    . CQRS ( Command Query Responsability Segregation ) ou, numa traução livre, segregação de responsabilidade consulta 
+        e de comando, e é utilizado para aplicar modelos diferentes para operações de leitura e gravação.
+
+        . Separar a responsabilidade de ler dados, de escrever dados.
+
+    . O CQRS é um padrão de projeto arquitetural para separar os processos de leitura e gravação da sua aplicação. As 
+        alterações de dados são realizados via "Commands" e a leitura de dados são realizados via "Queries".
+
+        . Commands  representam tudo o que altera o estado de uma entidade (inser, update, delete ).
+
+        . Queries   não alteram estado da entidade (select)
+
+    . A utilização do CQRS e indicada para um cenário onde existe uma alta demanda de consumo de daos com operações de 
+        leitura e escrita feitas de forma bem intensa, com grande volume de dados.
+
+    . Cenário clássico:
+
+                        Presentation
+                            &
+                        Application
+                        ||        ||
+                        ||        ||
+                        ||        ||    Command
+                        ||        ||       &
+                        ||        ||     Query
+                        ||        ||
+                        \/        \/
+                       Banco de dados ==>   Usar a mesma base de dados
+                                            para leitura e gravação
+
+    . Cenário com CQRS:
+
+                        Presentation
+                            &
+                        applications        +-----------+
+                        ||        ||        |   Query   |
+                        ||        ||    +---------+     |
+                        ||  +---+ ||    | Command |-----+
+                        ||  |   | ||    +---------+   
+                        ||      v ||     
+                        ||  ^     ||
+                        ||  |   | ||
+                        ||  +---+ ||
+                        \/        \/
+                       Banco     Banco     | Temos aqui a separação da escrita e da leitura
+                         de        de      > (Podemos usar banco de dados distintos c/sincronização)
+                       dados     dados     | 
+                      (Leitura) (Gravação)
+
+        . Separar o tipo da consulta (escrita/leitura) em bancos distintos. Um banco para "SELECTs" e outro
+            somente para "UPDATEs | INSERTs| DELETEs".
+
+    . Funcionamento:
+
+
+        +-----+
+        |     |         +---------------------------+
+        |     |         |       Query Model         |
+        |     |         |   +-------------------+   |
+        |     |  Query  |   |                   |   |
+        |     |<--------|---|       +---+       |   |
+        |     |         |   |       |   |       |   |
+        |     |         |   |       +---+       |   |
+        |     |         |   |                   |   |               
+        |     |         |   |       +---+       |   |               +-----------+
+        |     |         |   |       |   |       |<--|---------------|           |
+        |     |         |   |       +---+       |   |               |           |
+        | UI  |         |   +-------------------+   |               |           |
+        |     |         |                           |               |     DB    |
+        |     |         |       Command Model       |               |           |
+        |     |         |   +-------------------+   |               |           |
+        |     | Command |   |                   |   |               |           |
+        |     |---------|-->| +---+      +---+  |   |               |           |
+        |     |         |   | |   |------|   |  |---|-------------->|           |
+        |     |         |   | +---+      +---+  |   |               +-----------+
+        |     |         |   |   |          |    |   |
+        |     |         |   | +---+        |    |   |
+        |     |         |   | |   |--------+    |   |
+        |     |<--------|---| +---+             |   |      
+        |     |         |   +-------------------+   |
+        |     |         +---------------------------+
+        |     | 
+        +-----+
+        
+        . O CQRS separa leituras e gravações em modelos diferentes, usando comandos para atualizar dados e 
+            consultas para ler dados.
+
+        . Os comandos devem ser baseads em tarefas, e não centrados em dados.
+
+        . Os comandos podem ser colocados em uma fila para processamento asincrono, em ves de serem 
+            processaods de forma sincrona
+
+        . As consulta nunca modeificam o banco de daos, Uma consulta retorna um DTO que nao encapsula nenhum 
+            conhecimento de domínio.
+
+    . Para obter um maior isolamento, você pode separa fiscamente os dados de leitura dos dados de gravação. 
+        Nesse caso, o banco de dados de leitura pode usar seu próprio esquema de dados otimizado para consultas.
+
+    . Beneficios
+
+        . Escala independentes                  O CQRS permite que as cargas de trabalho de leitura e gravação sejam
+                                                escalonadas independentemente o que pode resultar em menos contenções 
+                                                bloqueios.
+
+        . Esquemas de dados otimizados          O lado de leitura pode usar um esquema otimizado para consultas, enquanto 
+                                                o lado de gravação usa um esquem otimizado para atualizações.
+
+        . Segurança                             É mais fácil garantir que apenas as entidades de domínio corretas estejam
+                                                executando gravações nodados.
+
+        . Separação de responsabilidades        A segregação dos lados de leitura e gravação pode resultar em modelos mais 
+                                                flexiveis e fáceis de manter. A maior parte da lógica de negócios complexa 
+                                                entra no modelo de gravação. O model de leitura pode ser relativamente simples,
+                                                sem o uso de "Foreign Keys | Triggers", ou bancos de dados em memória.
+
+        . Consulta mais simples                 Ao armazenar uma visualizaçõa no banco de dados de leitura, o aplicativo pode
+                                                evitar junções (joins) complexas durante a consulta tornando as consultas mais 
+                                                simples.
+
+    . Implementação do CQRS no .NET
+
+        . Usaremos a biblioteca "MediatR" (pattern Mediator)                          
+
+        . E o pacote MediatR.Extensions.Microsoft.DependencyInjection
+
+        . A partir da aula 57 iremos ver a implementação do padrão CQRS num projeto.
+
+    . A utilização do CQRS não é recomendada quando:
+
+        . O domínio ou as regras de negócios forem bem simples;
+
+        . Uma interface de usuário simples no estilo CRUD e operações de acesso a dados forem suficientes para resulver o problema.
+
+
+Aula 15 - Arquiteura Monolítica
+-------------------------------
+
+    . A arquitetura monolítica é um sistema único, não dividido, que roda em um único processo, ou seja, é uma aplicação na qual 
+        diferentes componenetes estão ligados a um único programa dentro de uma única plataforma.
+
+    . Na arquittura monolítica o núcleo do comportamento da aplicação é executado em seu próprio processo e a aplicação inteira é
+        implantada como uma única unidade.
+
+    . Um aplicativo criado com essa arquitetura pode escalar verticalmente aumentando o poder das máquinas em que a aplicação roda 
+        ou horizontalmente com a adição instâncias atrás de um Load Balancer.
+
+    . Vantagens      
+
+        . Mais simples de desenvolver: A organização fica concentrada em um único sistema e muitos desenvolvedores estão 
+            familiarizados com este modelo sendo que o desenvolvimento inicial é mais rápido.
+
+        . Simples de fazer o deploy para o servidor: Fazemos o deploy de um único pacote final
+
+        . Exige uma equipe menor: Necessita de um time menor para desenvolver e manter a aplicação.
+
+    . Desvantagens
+
+        . Manutenção: A aplicação se torna cada vez maior de acordo com o seu tamanho, o código será cada vez mais difícil de entender 
+            e o desagio de fazer alterações rápidas e ter que subir para o servidor só cresce.
+
+        . Alterações: Para cada alteração feita, é necessário realizar um novo deploy de toda a aplicação.
+
+        . Fagrilidade: Uma linha de código que subiu errada pode quebrar todo o sistema e ele ficar totlamente inoperante.
+
+    . Um exemplo de uma aplicação monolítica são os projetos gerados pelos templates do ASP.NET Core MVC.
+
+        . Dentro da mesma aplicação ele cria as camadas:
+
+            . Data Access Logic:
+
+                . EF Migrations
+
+                . EF DbContext and model design
+
+            . Models
+
+            . Application Services (interfaces and implementations)
+
+            . Presentation Logic ( Views )
+
+            . Application Entru Point and Configuration ( appSettings.json, *.csproj, Program.cs )
+
+        . Desvantagens:
+
+            . O no. de pastas tende a crescer e as pastas não estão agrupadas em ordem
+
+            . A lógica de negócio está espalhada entre as pastas Models e Services.
+
+            . Não existe umaindicação clara das dependências entre as classes na pastas.
+
+            . Falta de organização leva ao código espaguete.
+
+    . Evolução
+
+        . As aplicações que usam a arquitetura monolítica podem se beneficiar usando a separação lógica de responsabilidades em camadas.
+
+        . Para isso as aplicações evoluem para soluções com váriaos projetos onde cada projeto reside em uma camada com responsabilidades 
+            especificas.
+
+        . Podemos ter uma evolução de uma arquitetura monolítica de projetos único para uma arquitetura monolítica em camadas também 
+            conhecida como arqutetura em camadas.
+
+Aula 16 - Arquitetura em Camadas
+-------------------------------
+
+    . A arquitetura em camadas visa a crição de aplicativos modulares, de forma que cada camada possui uma responsabilidade e onde a 
+        camada superior se comunica com a camada inferior e assim por diante, fazendo com que uma camada seja dependente apenas da camada
+        imediatamente infeior. 
+
+    . Podemos assim dividir um sistema em uma, duas, três ou ncamadas dependendo do objetivo e da complexidade do sistema.
+
+    . Dependendo do conteto as camadas podem ser lógicas (Layers) ou físicas (Tiers).
+
+    . Uma das mais conhecias é a arquitetura em três camadas, onde temos as camadas de interface (UI), a camada lógica dos negócios (BLL) e 
+        a camada de acesso aos dados (DAL).
+
+
+        +-----------------------------------+
+        |   User Interface Layer (UI)       |   Aqui temos a dependência entre as camadas
+        | (HTML, Javascript, Razor, CSS)    |   definida de cma para baixo
+        +-----------------------------------+
+                        |
+                        v
+        +-----------------------------------+
+        |   Business Logic Layer (BLL)      |   A camada UI depende da camada BLL e esta
+        |       (.NET, C#, classes)         |   depende da camada DAL
+        +-----------------------------------+
+                        |
+                        v
+        +-----------------------------------+
+        |     Data Access  Layer (DAL)      |   A comunicação deve passar pela camada de 
+        |   (EF Core, SQL Server, MySQL)    |   de negócios (BLL)
+        +-----------------------------------+
+
+    . Exemplo de projetos .NET
+
+        Solution
+            |
+            +-- src
+                 |
+                 +-- ApplicationCore    <------------- Business/Aplication Model
+                 |
+                 +-- Infrastructure     <------------- Data Logic (Infrastructure)
+                 |                                      . EF Migration
+                 |                                      . EF DbContext and model design
+                 |
+                 +-- Web                <------------- Presentation Logic
+                 |                                      . wwwroot
+                 |                                      . Controllers
+                 |                                      . Services
+                 |                                      . ViewModels
+                 |                                      . Views
+                 |
+                 +-- Tests              <------------- Automated Tests
+
+        . Os usuários interagem com camada de UI
+
+        . A camada de UI interage apenas com a camada de negócios (BLL)
+
+        . A camada de negócios pode chamar a camada de acesso a dados (DAL)
+
+        . A camada de UI não deve interagir com a DAL diretamente
+
+        . A implantação é feita como uma unidade única pois ainda estamos na arquitetura Monolítica.
+
+        . Vantagens
+
+            . Com a organização do código em camadas podemos reutilizar a funcionalidade de baixo nível em todo o aplicativo
+
+            . Com uma arquitetura em camadas, os aplicativos podem impor restrições sobre quais camadas podem se comunicar com 
+                outras camadas.
+
+            . Essa arquitetura ajuda a atingir o encapsulamento.
+
+            . Quando uma camada é alterada ou substrituida, apensa as camadas que interagem com ela serão afetadas.
+
+            . As camadas ( e o encapsulamento) tornam muito mais fácil substituir a funcionalidade dentro do projeto.
+
+        . Desvantagens
+
+            . As dependêmcias em tempo de compilação são executadas de cima para baixo
+
+            . Assim a camada de negócios (BLL)  depende dos detalhes de implementação da camada de acesso aos dados.
+
+            . Testar a lógica de negócio nesta arquitetura é difícil pois exige um banco de dados de teste.
+
+            . Para resolver esse problema podemos usar a inversão da dependência em uma arquitetura mais robusta como a "Arquitetura
+                Cebola (Onion Archittecture).
+
+
+Aula 17. Arquitetura Cebola
+---------------------------
+
+    . Arquitetura Cebola (Onion Architecture)
+
+        . Acesse a imagem abaixo para entender as camadas da arquitetura em cebola:
+
+            https://www.macoratti.net/20/05/net_onion11.jpg
+
+        . A arquitetura de cebola está baseada no princípio da inversão de controle e é composta por várias camadas concêntricas que se 
+            interconectam em direção ao núcleo que representa o domínio. Ela não depende da camada de dados como nas arquiteturas em 
+            várias camadas, mas dos modelos de comínio reais.
+
+        . A "Onion Architecture" resolveu o provlema do acoplamento entre as camadas defnindo camadas a partir do núcleo para a infraestrura.
+
+        . Ela aplica a regra fundamental movendos todos acoplamentos em direção ao centro, sendo que no centro da "Onion Architecture" está 
+            o modelo de domínio, que representa os objetos de negócios e co comportamento.
+
+        . Ao redor da camada de domínio existem outras camadas (UI, Infa, repositórios, interfaces) com mais comportamentos.
+
+    . Evolução da arquitetura em camadas para arquitetura cebola.
+
+        Arquitetura em Camadas                          Arquitetura Cebola
+        (Layered Architecture)                          (Onion Arquitecture)
+        +------------------------+                      +------------------------+
+        |   User Interface (UI)  |                      |   User Interface (UI)  |
+        +------------------------+                      +------------------------+
+                    |                                               |
+                    V                                               V
+        +------------------------+                      +------------------------+
+        |   Business (BLL)       |                      |   Business (BLL)       |
+        +------------------------+                      +------------------------+
+                    |   A camada de negócio                         ^   A arquitetura cebola 
+                    V   depende da camada dados                     |   inverte essa dependência
+        +------------------------+                      +------------------------+
+        |   Data Access (DAL)    |                      |   Data Access (DAL)    |
+        +------------------------+                      +------------------------+
+        Produz um forte acoplamento
+
+
+                            Arquitetura Cebola
+
+
+        +-----------------------------------------------------------------------------------------------+
+        |                                                                                               |   
+        |   +-------------------------------------------------------------------------------+           |
+        |   |                                                                               |           |
+        |   |   +---------------------------------------------------------------+           |           |
+        |   |   |                                                               |           |           |
+        |   |   |                                                               |           |           |
+        |   |   |           +---------------------------------------+           |           |           |
+        |   |   |           |                                       |           | Aplication|           |
+        |   |   |           |           Business (Domínio)  <-------| Infra <---|-Services<-|-- UI      |
+        |   |   |           |                                       |           |           |   Tests   |
+        |   |   |           +---------------------------------------+           |           |           |
+        |   |   |                                                               |           |           |
+        |   |   |                                                               |           |           |
+        |   |   +---------------------------------------------------------------+           |           |     
+        |   |                                                                               |           |
+        |   +-------------------------------------------------------------------------------+           |       
+        |                                                                                               |   
+        +-----------------------------------------------------------------------------------------------+
+
+    . A Onion Architecture usa o conceito de camadas, mas são diferentes das camadas da arquitetura de três e 
+        n-camadas. Vamos ver o que cada uma dessas camadas representa e o que deve conter.
+
+        . Camada de Domínio (a camada mais interna)
+
+            . A camada de domínio reside na parte central da arquitetura Onion, e representa os objetos de negócios e 
+                o comportamento. A idéia é ter todos os seus objetos de domínio nesse núcleo. Ele contém todos os objetos 
+                de domínio do aplicativo. Além dos objetos de domínio, você também pode ter interfaces de domínio. Essas 
+                entidades de domínio não têm dependências. Objetos de domínio também são simples como deveriam ser, sem 
+                nenhum código pesado ou dependências. (Se um aplicativo for desenvolvido usando um ORM como o Entity Framework,  
+                essa camada conterá classes POCO.)
+
+            . A camada central (domínio) não depende das camadas externas ( UI e Data Access ).
+
+            . As camadas externas são clientes da camada interna.
+
+            . As camadas externas podem ser substituidas mais facilmente.
+
+            . A regra de dependência é sempre de fora pra dentro.
+
+        . Camada de Repositório (Infra, Repository Layer, Data Access)
+
+            . Essa camada cria uma abstração entre as entidades do domínio e a lógica de negócios do aplicativo. Nesta camada, 
+                geralmente adicionamos interfaces que fornecem o comportamento de salvar e recuperar objetos, geralmente envolvendo 
+                um banco de dados. Essa camada consiste no padrão de acesso a dados, que é uma abordagem mais fracamente acoplada 
+                ao acesso a dados. Também criamos um repositório genérico e adicionamos consultas para recuperar dados da fonte,
+                mapear os dados da fonte de dados para uma entidade comercial e persistir alterações na entidade comercial na 
+                fonte de dados.
+
+        . Camada de Serviços (Service Layer, Application )
+
+            . A camada de serviços mantém interfaces com operações comuns, como Adicionar, Salvar, Editar e Excluir. Além disso, 
+            essa camada é usada para se comunicar com a camada da interface do usuário e a camada do repositório. A camada de 
+            serviço também pode conter lógica de negócios para uma entidade. Nesta camada, as interfaces de serviço são mantidas 
+            separadas de sua implementação, tendo em mente o acoplamento e a separação de responsabilidades.
+
+        . Camada de Interface do Usuário (UI Layer)
+
+            . É a camada mais externa e mantém responsabilidades periféricas como interface do usuário e testes. Pode ser uma 
+            aplicação Web, uma API, um projeto de Testes, etc. Essa camada possui uma implementação do padrão da injeção de 
+            dependência, para que o aplicativo construa uma estrutura fracamente acoplada e possa se comunicar com a camada 
+            interna por meio de interfaces.
+
+    . Vantagens e desvantagens da arquitetura Onion
+
+        . A seguir, estão algumas vantagens da implementação da Onion Architecture:
+
+            As camadas da Onion Architecture são conectadas através de interfaces. As implementações são fornecidas durante o 
+                tempo de execução;
+
+            A arquitetura do aplicativo é construída sobre um modelo de domínio;
+
+            Toda dependência externa, como acesso ao banco de dados e chamadas de serviço, é representada em camadas externas;
+
+            Não há nenhuma dependência da camada Interna com camadas externas;
+
+            Os acoplamentos estão voltados para o centro;
+
+            Arquitetura flexível, sustentável e portátil;
+
+            Não há necessidade de criar projetos comuns e compartilhados;
+
+            Pode ser testada rapidamente porque o núcleo do aplicativo não depende de nada;
+
+        . Algumas desvantagens da arquitetura Onion, como a seguir:
+
+            Não é fácil de entender para iniciantes, e tem uma curva de aprendizado. Os arquitetos geralmente confundem a 
+                divisão de responsabilidades entre as camadas;
+
+            Utiliza Interfaces em profusão;
+
+    . Acesse o link abaixo:
+
+        # Como construir um projeto DDD em arquitetura cebola
+        https://www.macoratti.net/20/07/aspnc_ucddd1.htm
+
+    . A seguir vou me basear em uma arquitetura genérica para criar a aplicação e que será definida da seguinte forma:
+
+        . Apresentação      Cuida da interação com quem vai usar a nossa aplicação;  Podemos ter aqui um projeto Web, Mobile, Web API, 
+                            Desktop, tests, etc.
+        
+        . Aplicação         Cuida da comunicação com o Domínio; Aqui podemos ter: Classes de serviços, Interfaces, DTOs, etc.
+        
+        . Domínio           É o coração do projeto e deve representar o negócio; Aqui teremos : entidades, Interfaces, Validações, etc.
+        
+        . Infraestrutura    Cuida do suporte geral às demais implementações e em geral possui uma outra camada que se comunica com 
+                            todas as camadas do projeto; Aqui podemos ter Repositórios, Persistência, Mapeamentos, Migrations, Context, etc.   
+
+    . Cada camada acima será um projeto em nossa solução.
+
+        . Dessa forma em nossa implementação criaremos uma solução e 4 projetos :
+
+            Contatos.sln - Solução
+            Contatos.Web - projeto Web API Asp .NET Core
+            Contatos.Application -  projeto Class Library
+            Contatos.Domain - projeto Class Library
+            Contatos.Infra - projeto Class Library
+
+
+Aula 18. DDD - Domain Drive Design
+----------------------------------
+
+    . Links interessantes:
+
+        https://www.devmedia.com.br/ddd-domain-driven-design-com-net/14416
+
+    . O DDD não é arquitetura, não é tecnologia, não é framework, não é linguagem e não é padrão.
+
+    . O DDD ( Comain Driven Design) é uma abordagem ao design de software que se baseia no conceito de comínio, é uma filosifia voltada ao 
+        domínio do negócio.
+
+    . A principal ídeia do DDD é a de que o mais importante em um software não é o seu código, nem sua arquitetura, nem a tecnologia sobre a 
+        qual foi desenvolfido, mas sim o problema que o mesmo se propõe a resolver, ou em outras palavras, a regra de negócio.
+
+    . Quem criou?
+
+        . Eric Evans, apresentou o DDD em seu livro:
+
+            . Domain-Driven Design Tackling Complexity in the Heart of Software ( Design Orientado a Domínio: Combatendo a Complexidade no Coração 
+                do Software). Onde foram definidos um conjunto de conceitos básicos para apresentar o Domain Drive Design.
+
+    . Quando usar?
+
+        . O DDD não vai te ajudar a gerenciar melhor os dados
+
+        . Não vai te ajudar a aumentar o desempenho da sua aplicação
+
+        . Não vai te ajudar na complexidade da tecnologia usada no seu porjeto
+
+        . O DDD vai te ajudar a resolver problemas na complexidade do negócio
+
+    . A abordagem Doamin Driven Design será útil em projetos onde a complexidade da lógica de negócio justificar a sua adoção.
+
+    . Principais conceitos usados
+
+        . Ubiquitous Language (Linguagem Onipresente)
+
+            . A ubiquitous language é uma linguagem estruturada em torno do modelo de domínio e usada por todos os membros da equipe para conectar 
+                todas as atividades da equipe ao software.
+
+        . Model
+
+            . O modelo de um projeto orientado a domínio é a sua solução para o problema. O Model geralmente representa um aspecto da realidade ou
+                algo de interesse do negócio: o lanche, o cliente, a entrega, o produto, a venda, etc.
+
+        . Bounded Context
+
+            . Um Bounded Context é um limite conceitual no qual um modelo de domínio é aplicável, sendo que ele fornece um contexto para a linguagem 
+                ubíqua que é falada pela equipe e é expressa no modelo de software projetado.
+
+        . Context Maps 
+
+            . Os Context Maps ou Mapas de Contextos permitem identificar o relacionamento entre os Bounded Contexts e as equipes reponsáveis por cada 
+                contexto.
+
+        . Strategic Design (Modelagem Estratética)
+
+            . O objetivo principal da modelagem estratégica é definir 3 conceitos importantes com a equipe de projeto:
+
+                . Ubiquitous Language
+
+                . Bounded Context
+
+                . Context Maps.
+
+        . Tatical Design (Modelagem Tática)
+
+            . A modelagem tática está relacionada com os blocos de construção da DDD podendo ser:
+
+                Entities, Services, Repositories, Values Objects, Agreggates, Events, Factories, Modules, etc.
+
+            . Sendo um conjunto de recursos técnicos usados na construção do Modelo de domínio do negócio.
+
+        . Architecture Design
+            
+            . Refere-se aos estilos de arquitetura usado na implementação do DDD como: Hexagonal, Onion, Layred, CQRS, REST, etc.
+
+            . Uma das grandes vantagens do DDD é que ele não requer o uso de nenhuma arquiteutra específica.
+
+    . Principais beneficios
+
+        . Facilita a comunicação entr as equipes com o uso da linguagem onipresente.
+
+        . O código do projeto fica mais coeso e menos acoplado.
+
+        . O negócio é melhor compreendido por todos da equipe o que facilita o desenvolvimento.
+
+        . Melhora a flexibilidade do projeto deido ao domínio ser baseado no design orientado a objetos estando bem encapsulado e modularizado.
+
+        . Enfatiza o domínio sobre a interface onde o foco no domínio signifca produzir um produto que ressoa bem com o público associado a esse domínio.
+
+    . Desvantagens
+
+        . Possui um aalta complexidade exigindo experiência, conhecimento e capacidade de interação com os especialista do negócio.
+
+        . Requer um conhecimento robusto do domínio
+
+        . Não adequado para projetos com uma alta complexidade técnica nem para projetos simples como um CRUD básico.
+
+    . Livros indicados:
+
+        . Domain-Driven Design Tackling Complexity in the Heart of Software (Eric Evans)
+
+        . Implementado Domain-Driven Design (Vaughn Vernon)
+
+        . Hands-On Domain-Driven Design with .NET Core: Tackling complexity in the heart of software by putting DDD principles into practice (Alexey Zimarev)
+
+
+Aula 19. Clean Architecture
+---------------------------
+
+    . Arquitetura de Software
+
+        . A arquitetura de software expõe a estrutura de um sisema enquanto oculta os detalhes de implementação
+
+        . A arquitetura de softwware define o que é o sistema em termos de componentes de software, os relacionamentos entre estes componentes e os padrões 
+            que guiam a sua composição e restrições
+
+        . Assim, a arquitetura significa o design geral do projeto.
+
+        . É a organização do código em classe, arquivos, componenetes ou módulos.
+
+        . E é como todos esses grupos de código se relacionam entre si.
+
+    . Livros
+
+        . Clean Architecture: A Craftsman's Guide to Software Structure and Design (Robert C. Martin)
+
+        . Código limpo: habilidades práticas do Agile software (Robert C Martin)
+
+        . O codificador limpo: um código de conduta para programadores profissionais (Bob Martin)
+
+        . Clean Agile: Back To Basics (Robert C Martin)
+
+    . Clean Architecture
+
+        . Arquitetura limpa é um conceito proposto por Robert C Martin (Uncle Bob) em seu livro "Clena Architecture" como uma forma de construir soluções de software 
+            altamente flexíveis e sustentáveis.
+
+        . O conceito foi baseado nas boas práticas e nas arquiteturas hexagonal e cebola, dentre outras, que já propunham a separação das responsabilidades em camadas e 
+            tinham como objetivo produzir sistemas com as seguintes características:
+
+            . Independente de frameworks
+
+            . Testáveis 
+
+            . Independentes da interfae do usuário
+
+            . Indepentes do banco de dados
+
+            . Independente de qualquer agente externo.
+
+        . Fluxo do Clean Architecture:
+
+            +-----------------------------------------------------------------------+
+            |                                                                       |
+            |                                  Web                                  |   
+            |                                                                       |
+            |       +-------------------------------------------------------+       |
+            |   D   |                                                       |       |
+            |   e   |                       Controllers                     |       |
+            |   v   |                                                       |       |
+            |   i   |       +---------------------------------------+       |       |
+            |   c   |   G   |                                       |   P   |       |
+            |   e   |   a   |              Uses Cases               |   r   |       |
+            |   s   |   t   |                                       |   e   |       |
+            |       |   e   |       +-----------------------+       |   s   |       |
+            |       |   w   |       |                       |       |   e   |       |
+        +-> |   ----|-> a --|->  ---|->  Entities/* Domain  |       |   n   |   U   |
+        |   |       |   y   |       |                       |       |   t   |   I   |
+        |   |       |   s   |       +-----------------------+       |   e   |       |
+        |   |    D  |       |                                       |   r   |       |                 
+        |   |    B  |       |           * Application               |   s   |       |
+        |   |       |       +---------------------------------------+       |       |
+        |   |       |                                                       |       |
+        |   |       |                   * Infrastructure                    |       |
+        |   |       |                                                       |       |
+        |   |       +-------------------------------------------------------+       |
+        |   |                                                                       |   
+        |   |            External Interface             Framework                   |   
+        |   |                                                                       |   
+        |   +-----------------------------------------------------------------------+
+        |   
+        |   . Arquitetura limpa refere-se à organização do projeto de forma que ele seja fácil de entender, fácil de testar, 
+        |        fácil de manter e fácil de mudar conforme o projeto cresce.
+        |
+        +-- . A regra de depedência, que afirma que a dependência do código-fonte só pode apontar para o interior do aplicativo
+
+            . Entidades
+
+                . No centro da arquitetura, temos as classes responsáveis pelas regras de negócio, que podem ser de dois tipos: 
+                    Entidades e casos de uso.
+
+                . Uma entidade é um conjunto de regras de negócios relacionadas que são críticas para o funcionamento do aplicativo.
+
+                . As regras seriam agrupadas como métodos em uma classe.
+
+                . As regras existem mesmo se não existir a aplicação.
+
+                . Como as entidades não conhecem as outras camadas elas não dependem de nada.
+
+            . Casos de Uso
+
+                . Contém as regras de negócio específicas do aplicativo.
+
+                . Dizem como automatizar o sistema determinando o seu comportamento.
+
+                    . Orquestram o fluxo de dados de e para as entidades.
+
+                    . Direcionam as entidades a usar suas regras de negócios.
+
+                    . Exemplo:
+
+                        . Obter informações de um produto: nome, preço, quantidade, etc.
+
+                        . Montar catálogo de produtos
+
+                        . Validar nome, preço, estoque
+
+                        . Verificar estoque
+
+                        . Se houver estoque incluir o produto no catálogo.
+
+                . Os casos de uso interagem e dependem das entidades, mas não sabem nada sobre as camadas mais distantes.
+
+            . Adaptadores (Controllers, Gateways e Presenters)
+
+                . Na terceira camada, a partir do centro, temos classes e interfaces chamadas de "adaptadores".
+
+                . A função delas é converter dados de um formato para outro.
+
+                . São os tradutores entre o domínio e a infraestrutura.
+
+                . Convertem os dados do formato mais conveniente para os casos de uso e entidades.
+
+                . É essa camada que via conter implementação MVC de uma UI com apresentadores, viauzliações e controladores, ou, que 
+                    poderá realizar a implementação dos endipoints de uma API REST. (recebe as requisições e encaminh para os casos de uso).
+
+                . Nenhum código dentro desse circulo deve saber absolutamente nada sobre o banco de dados.
+
+            . Camadas mais externa
+
+                . Essa camada é para onde vão todos os componentes de entrada e saída ou I/O, a interface com o usuário - UI, o banco de dados,
+                    os frameworks, os dispositivos, etc.
+
+                . Esta camada é para onde vão todos os detalhes. A interface é um detalhe. O bando de dados é um detalhe. É a camada mais volátil 
+                    pois pode mudar com frequência.
+
+                . Essa camada é mantida o mais longe possível das camadas de domínio.
+
+                . Como elas são mantidas separadas, é fácil fazer alterações ou trocar um componente por outro. Por exemplo: UI, banco de daos, 
+                    estrutura, dispositivos
+
+            . As camadas internas são mais estáveis
+
+            . As camadas externas são mais sujeitas a mudanças.
+
+            . As entidades raramente devem ser modificadas.
+
+            . Alterações nos Use Cases não devem ser motivadas por mudanças na tecnologia, banco de dados, grameworks, etc.
+
+            . A regra de dependência garnte que as entidades e os casos de uso sejam classes limpas de qq tecnologia ou serviços externo ao sistema.
+
+    . Exemplo de um projeto .NET
+
+        https://www.tatvasoft.com/blog/clean-architecture-net-core/
+        https://juldhais.net/clean-architecture-in-asp-net-core-web-api-4e5ef0b96f99
+        https://www.cmarix.com/blog/clean-architecture-net-core/
+        https://www.c-sharpcorner.com/article/clean-architecture-in-asp-net-core-web-api/
+        https://www.macoratti.net/20/10/aspnc_impclean1.htm
+
+
+Aula 20. Testes de Unidade - xUnit
+----------------------------------            
+
+    . Objetivo: Testar pequenas partes do software como métodos, funções, ou qualquer classe que trate com uma funcionalidade da aplicação.
+
+    . É uma responsabilidade do desenvolvedor
+
+    . Vantagens realizar os testes de unidade:
+
+        . Revelam se o software está funcionando conforme o esperado.
+
+        . Ajudam a capturar erros/problemas e corrigi-los antes de implantar o software em produção.
+
+        . Ajudam a entender os requisitos do software e se eles foram implementados.
+
+        . Ajudam os desenvolvedores a entender a funcionalidade real do software.
+
+        . Ajudam a reduzir o número de erros (bugs) no início do desenvolvimento.
+
+    . Dicas para escrever testes de unidade.
+
+        . Não escrever casos de testes de unidades no mesmo projeto, criar um projeto separado.
+
+        . Escrever casos de testes apenas para uma pequena unidade.
+
+        . Não escrever casos de testes que dependam de outros casos de teste.
+
+        . Os casos de testes de unidade devem ser bem organizados, ser sustentáveis e isolados.
+
+        . Os casos de teste devem ser sempre independentes de recursos externos, banco de dados por exemplo.
+
+    . Testes na plataforma .NET
+
+        . MSTest            É o mais antigo e simple e usa os atributos [TestClass] e [TestMethod]
+
+        . NUnit             É muito popular e tem uma implementação semlhante ao MSTest
+
+        . xUnit             Nasceu a partir do NUnit e por isso apresenta muitas semelhanças a este, sendo o mais recente (criado pel mesmo autor do NUnit)
+
+    . Exemplo do uso do xUnit:
+
+        . xUnit utiliza as anotações [Fact] e [Theory]
+
+            . Os métodos de teste sem parâmetros são decorados com o atributo [Fact]
+
+                [Fact]
+                public void SomarDoisValoresResultadoCorreto()
+                {
+                    ...
+                }
+    
+            . Os métodos de teste com parâmetros são decorados com o atributo [Theory]
+
+                [Theory]
+                [InlineData(-10)]
+                public void NaoPodeCriarValorNegativo( decimal valor)
+                {
+                    ...
+                }
+
+                . Os valores são fornecidos pelo parâmetro do atributo [InlineData]
+
+            . Podemos desativar um teste usando a propriedade "Skip" e indicar o motivo
+
+                [Fact( Skip = "Teste ainda não diponível")]
+                public void Teste()
+                {
+                    ...
+                }
+
+            . Podemos organizar os testes em grupos com o atributo [Trait] e criar nomes de categorias.
+
+                [Fact(DisplayName = "Teste No. 2")]
+                [Trait("Calculo", "Somar")]
+                public void SomarDoisNumerosRetornaNumero()
+                {
+                    ...
+                }
+
+                . Estes exemplo vai exibir o título "Calculo[Somar]"
+
+            . Princípio AAA - Arrange, Act e Assert ( Organizar, Agir e Assertar )
+
+                . Arrange   É onde preparamos tudo para o teste, onde preparamos a cena para testar (criar os objetos e 
+                            configurá-los conforme necessário).
+
+                . Act       É onde o método que estamos testando será executado.
+
+                . Assert    É a parte final do teste em que comparamos o que esperamos que aconteça com o resultado real 
+                            da execução do métdoto de teste.
+
+                . Exemplo:
+
+                    [Fact]                      // Atributo aplicado ao método p/indicar que é um método de teste de unidade vai ser executado pelo "Teste Runner"
+                    public void MetodoTeste()
+                    {
+                        // Arrange              // Preparação onde são configurados os recursos necessários ao teste
+
+                        // Act                  // Executa a ação de testar ou seja executa o teste preparado
+
+                        // Assert               // Faz a verificação e validação se a ação do teste foi correta comparando o resultado esperado com o resultado do teste
+                    }
+
+            . Definindo o nome dos métodos de testes de unidade
+
+                . Os nomes dos métodos de teste devem ser tão descritivos quanto possível.
+
+                . Usar um nome descritivo de forma a facilitar o entendimento do propósito do método a ser executado.
+
+        . Demo
+
+            1. A primeira parte do nome representa o nome do método que está sendo testado.
+
+            2. a segund aparte do nome nos informa mais sobre o cenário de teste.
+
+            3. A última parte do nome é o resultado esperado.
+
+            Soma_DoisNumerosInteiros_RetornaNumeroInteiro()
+                1       2                   3
+
+    . Exemplo:
+
+        . Crie a solution abaixo:
+
+            dotnet new sln -n teste-unitario-com-xunit
+
+        . Crie o projeto abaixo:
+
+            dotnet new classlib -n calculos
+
+        . Adicione a referencia do projeto calculos na solution:
+
+            dotnet sln teste-unitario-com-xunit.sln add calculos/calculos.csproj
+
+        . Crie o projeto de testes:
+
+            dotnet new xunit -n calculos.tests
+
+        . Adicione a referencia do projeto calculos na solution:
+
+            dotnet sln teste-unitario-com-xunit.sln add calculos.tests/calculos.tests.csproj
+
+        . Crie a classe abaixo dentro do projeto "calculos":
+
+            public class Calculadora
+            {
+                public int Soma(int operador1, int operador2) => operador1 + operador2;
+                public int Subtracao(int operador1, int operador2) => operador1 - operador2;
+                public int Multiplicao(int operador1, int operador2) => operador1 * operador2;
+                public int Divisao(int dividento, int divisor) => dividento / divisor;
+                public (int quociente, int resto) RestoDivisao(int dividento, int divisor) => (dividento / divisor, dividento % divisor);
+            }
+
+        . No projeto de teste criado, remova o arquivo UnitTest1.cs e adicione uma classe chamada CalculadoraTest, nela adicione o método abaixo:
+
+            public class CalculadoraTest
+            {
+                [Fact]
+                public void Soma_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.Soma(10, 20);
+                    //Verifica se o resultado é igual a 30        
+                    Assert.Equal(30, resultado);
+                }
+
+                [Theory]
+                [InlineData(1)]
+                [InlineData(2)]
+                [InlineData(3)]
+                public void RestoDivisao_DeveRetornarZero(int value)
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.RestoDivisao(12, value);
+                    //Verifica se o resto da divisão é 0
+                    Assert.Equal(0, resultado.resto);
+                }
+
+                [Fact]
+                public void RestoDivisao_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.RestoDivisao(10, 3);
+                    //Verifica se o quociente da divisão é 3 e o resto 1
+                    Assert.Equal(3, resultado.quociente);
+                    Assert.Equal(1, resultado.resto);
+                }
+
+                [Fact]
+                public void Subtracao_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.Subtracao(20, 10);
+                    //Verifica se o resultado é igual a 10
+                    Assert.Equal(10, resultado);
+                }
+
+                [Fact]
+                public void Divisao_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.Divisao(100, 10);
+                    //Verifica se o resultado é igual a 10
+                    Assert.Equal(10, resultado);
+                }
+
+                [Fact]
+                public void Multiplicao_DeveRetornarOValorCorreto()
+                {
+                    Calculadora c = new Calculadora();
+                    var resultado = c.Multiplicao(5, 2);
+                    //Verifica se o resultado é igual a 10
+                    Assert.Equal(10, resultado);
+                }
+            }
+
+        . Execute os testes com o comando abaixo:
+
+            dotnet test
+
+        . Além do método "Assert.Equal" temos também:
+
+            . Assert.True
+
+            . Assert.False
+
+            . Assert.Null
+
+            . Assert.NotNull
+
+            . Assert.NotEqual
+
+
+Apresentando o Problema, o Projeto e a Solução
+==============================================
+
+Aula 22. Apresentando o projeto : objetivo e escopo geral
+---------------------------------------------------------
+
+    . Escopo Geral
+
+        . Criar um proejto Web para tratar com produtos e categorias que podem ser usados para criar ctálogo de produto de vendas.
+
+        . Criar um aplicação ASP.NET Core MVC.
+
+        . Definir no projeto as funcilidades para poder consultar, criar, editar e excluir (CRUD) protudos e categorias.
+
+        . Definir o modelo de domínio usando classes e com propriedades e comportamentos: Product e Category
+
+        . Definir qual arquitetura a ser usada o projeto: Usar a abordagem da Clean Architecture
+
+        . Definir os padrões que iremos implmentar no projeto: MVC, Repository e CQRS
+
+        . Definir os atributos para o domínio 
+            
+            . Product         
+
+                Id          int, Identity
+                Name        sring
+                Description string
+                Price       decimal
+                Stock       int
+                Image       string
+
+            . Category
+
+                CategoryId  int, Identity
+                Name        string
+
+        . Definir o relacionamento usado. Teremos um relacionamento um-para-muitos entre Category e Product.
+
+    . Persistência dos dados usados no projeto
+
+        . Usar bancod de dados relacional: SQL Server, MySQL, SQLite, Oracle, etc.
+
+        . Usar ferramenta ORM: Entity Framework Core
+
+        . Usar a abordagem "Code-First" do EF Core para criar o bd e as tabelas.
+
+        . Provedor do banco de dados: Microsoft.EntityFrameworkCore.SqlServer, ou do banco escolhido
+
+        . Ferramenta para aplicar o Migrations: Microsoft.EntityFrameworkCore.Tools
+
+        . Desacoplar a camada de acesso a dados ORM: Padrão Repository
+
+    . Nomenclatura
+
+        . Usar a nomenclatura recomendada pela Microsoft para nomear classe, métodos, parâmetros e variáveis
+
+        . CamelCase             Em palabras compostas ou frases, a primeira letra da primeira palavra é iniciada 
+                                com minúscula e unidas sem espaços: Exemplo: valorDesconto, nomeCompleto
+
+        . PascalCase            Em palavras compostas ou frases montadas com palavras, a primeira letra de cada palavra
+                                é iniciada com maiúscula. Exemplo: CalculaImpostoDeRenda(), ValorDesconto().
+
+            Recurso                     Nomenclatura                                Exemplo
+            -------                     ------------                                -------
+            Classe                      PascalCase                                  Product, Category
+            Interface                   I + PascalCase                              IUser, ICalculateTotal
+            Método, Propriedade         PascalCase                                  Address, FirstName
+            Variáveis, parâmetros       CamelCase                                   stock, taxValue
+            Constantes                  Maiúsculas com sublinhado                   DISCOUNT_VALUE
+
+
+Aula 23. Apresentando a solução
+-------------------------------            
+
+    . Usar a regra de dependÊncia. Seguindo das camadas externas para a interna.
+
+    . Será composto por 5 projetos
+
+        . CleanArchMvc  (Solution)
+
+            . CleanArchMvc.Domain           Modelo de domínio, regras de negócio, interfaces
+
+            . CleanArchMvc.Application      Regras de domínio da aplicação, mapeamentos, serviços, DTOs, CQRS
+
+            . CleanArchMvc.Infra.Data       EF Core, Contexto, Configurações, Migrations, Repository
+
+            . CleanArchMvc.Infra.IoC        Dependency Injection, registro dos serviços, tempo de vida
+                                  |  
+                                  +-> Podia ter sido usado como "CrossCutting"  
+
+            . CleanArchMvc.WebUI            MVC, Controllers, Views, Filtros, ViewModels
+
+    . O projeto CleanArchMvc.WebUI é do tipo ASP.NET Core Web App (MVC)
+
+    . Os demais projetos serão do tipo "Class Library"
+
+    . Relacionamento e depedência entre os projetos:
+
+        . CleanArchMvc.Domain           Não possui nenhuma dependência
+
+        . CleanArchMvc.Application      Dependência com o projeto "Domain"
+
+        . CleanArchMvc.Infra.Data       Dependência com o projeto "Domain"
+
+        . CleanArchMvc.Infra.IoC        Dependência com os projetos "Domain, Aplication, Infra.Data"
+
+        . CleanArchMvc.WebUI            Dependência com o projeto "Infra.IoC"
+
+                        User Interface (WebUI)
+                        ----------------------
+                            |
+                            V
+            Infrastructure(Data/IoC)    Tests
+            ------------------------    -----
+                            |             |
+                            v             V
+                           Domain/Application
+                           ------------------
+
+    . Componentes distruibuidos por camadas e responsabilidade
+
+       ^  --------------------------------------------------------------------------------------------------------------------
+    R  |  Domain              Entities  Product       Interfaces  IProductRepository      Account IAuthenticate
+    e  |                      --------  Category      ----------  ICategoryRepository     ------- ISeedRoleInitial
+    g  |                                Entity                                                    IUser
+    r  |  --------------------------------------------------------------------------------------------------------------------
+    a  |  Application         Service ProductService      DTOs    ProdctDTO       Mappings    DomainViewModel    
+       |                      ------- CategoryService     ----    CategoryDTO     --------    ViewModelDomain
+    d  |  
+    e  |                      Interfaces  IProductService     Exceptions  CQRS
+       |                      ----------  ICategoryService    ----------  Command
+    D  |                                                                  Queries 
+    e  |                                                                  Handlers
+    p  |  ---------------------------------------------------------------------------------------------------------------------
+    e  |  Infra.Data          Repositories    ProductRepository       Context ApplicationContext      Migrations      Identity
+    n  |                      ------------    CategoryRepository      -------                         ----------      --------
+    d  |
+    ê  |  Infra.IoC           DependencyInjection
+    n  |                      -------------------
+    c  |  ---------------------------------------------------------------------------------------------------------------------
+    i  |  WebUI               Controllers AccountController       View    Filters     Components      ViewModels      MapConfig
+    a  |                      -----------                         ----    -------     ----------      ----------      ---------
+
+
+        . Observe que a dependência será sempre para o interior da arquitetura, porém um projeto poderá ter mais de uma dependência de projeto,
+            mas sempre obedecendo a regra de dependência para o interior.
+
+
+Aula 24. Criação da solução e dos projetos
+------------------------------------------
+
+    . DEMO
+
+        . Criação do solução em branco, execute os comandos abaixo:
+
+            # Execute esse comando na pasta de projetos
+            mkdir CleanArchMvc
+
+            cd CleanArchMvc
+
+            dotnet new sln -n CleanArchMvc
+
+        . Criação do projeto "Class Library" abaixo:
+
+            dotnet new classlib -o ./src/CleanArchMvc.Domain -n Domain -f net6.0
+
+            rm ./src/CleanArchMvc.Domain/Class1.cs
+
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Domain
+
+
+
+
+            dotnet new classlib -o ./src/CleanArchMvc.Application -n Application -f net6.0
+
+            rm ./src/CleanArchMvc.Application/Class1.cs
+
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Application
+
+
+
+
+            dotnet new classlib -o ./src/CleanArchMvc.Infra.Data -n Infra.Data -f net6.0
+
+            rm ./src/CleanArchMvc.Infra.Data/Class1.cs
+
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Infra.Data
+
+
+
+
+            dotnet new classlib -o ./src/CleanArchMvc.Infra.IoC -n Infra.IoC -f net6.0
+
+            rm ./src/CleanArchMvc.Infra.IoC/Class1.cs
+
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.Infra.IoC
+
+
+        . Criação do projeto "Web":
+
+            dotnet new mvc -o ./src/CleanArchMvc.WebUI -n WebUI -f net6.0
+
+            cd ./src/CleanArchMvc.WebUI
+
+            dotnet add package Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation --version 6.0.23
+
+            cd ../..
+
+            dotnet sln CleanArchMvc.sln add ./src/CleanArchMvc.WebUI
+
+        . Criação dos projetos de "Test"
+
+            dotnet new xUnit -o ./tests/Application.IntegrationTests -n Application.IntegrationTests -f net6.0
+            dotnet new xUnit -o ./tests/UnitTests -n UnitTests -f net6.0
+            dotnet new xUnit -o ./tests/Infrastructure.UnitTests -n Tests -f net6.0
+
+            dotnet sln CleanArchMvc.sln add ./tests/Application.IntegrationTests
+            dotnet sln CleanArchMvc.sln add ./tests/UnitTests
+            dotnet sln CleanArchMvc.sln add ./tests/Infrastructure.UnitTests
+
+        . Verificação dos projetos na solution:
+
+            dotnet sln CleanArchMvc.sln list
+
+        . Execute o comando abaixo para executar a solution:
+
+            # Executar na pasta da solution
+            dotnet clean
+
+            dotnet restore
+
+            dotnet build
+
+            dotnet run --project ./src/CleanArchMvc.WebUI/
+
+        . Deixando mais facil a execução do passo acima:
+
+            . Crie o arquivo "package.json" com o conteúdo abaixo na pasta da solution, mesmo local que encontra-se o arquivo ".sln":
+
+                {
+                    "name": "dotnet-run-default-project",
+                    "private": true,
+                    "version": "1.0.0", 
+                    "scripts": {
+                        "start": 
+                            "dotnet clean & dotnet restore & dotnet build & dotnet run --project ./src/CleanArchMvc.WebUI/"
+                    }
+                }
+
+            . Execute o comando abaixo na pasta da solution:
+
+                npm start
+
+
+Aula 26. Criando as dependências entre os projetos
+--------------------------------------------------
+
+    . DEMO
+
+        . Relacionamento e dependência entre os projetos:
+
+            . CleanArchMvc.Domain           Não possui nenhuma dependência
+
+            . CleanArchMvc.Application      Dependência com o projeto "Domain"
+
+            . CleanArchMvc.Infra.Data       Dependência com o projeto "Domain"
+
+            . CleanArchMvc.Infra.IoC        Dependência com os projetos "Domain, Application, Infra.Data
+
+            . CleanArchMvc.WebUI            Dependência com o projeto "Infra.IoC"
+
+        . Dentro da pasta raiz da solution, execute os comandos abaixo para criar as referências entre projetos:
+
+            . Adicionando a referencia do projeto "Application"
+
+                dotnet add ./src/CleanArchMvc.Application/ reference ./src/CleanArchMvc.Domain/
+
+            . Adicionando a referencia do projeto "Infra.Data"
+
+                dotnet add ./src/CleanArchMvc.Infra.Data/ reference ./src/CleanArchMvc.Domain/
+
+            . Adicionando a referencia do projeto "Infra.IoC"
+
+                dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Domain/
+
+                dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Application/
+
+                dotnet add ./src/CleanArchMvc.Infra.IoC/ reference ./src/CleanArchMvc.Infra.Data/
+
+            . Adicionando a referencia do projeto "WebUI"
+
+                dotnet add ./src/CleanArchMvc.WebUI/ reference ./src/CleanArchMvc.Infra.IoC/
+        
+
+Implementando a Camada de Domain
+================================
+
+Aula 28. Criando as entidades do modelo domínio
+-----------------------------------------------
+
+    . Material complementar
+
+        https://www.codemotion.com/magazine/languages/testing-your-c-code-with-xunit/
+        https://www.treinaweb.com.br/blog/testes-unitarios-no-c-com-o-xunit
+
+    . Camada de Domínio
+
+        . A camada de domínio é responsável por representar conceitos do negócio, informações sobre a 
+            situação do negócio e regras de negócio.
+
+        . O estado que reflete a situação do negócio é controlado e usado aqui, embora os detalhes técnicos 
+            de armazemanmento sejam delegados à infraestrutura.
+
+    . Implementando a camada Domain - Definindo o escopo do projeto Domain
+
+        . Criar as pastas no projeto CleanArchMvc.Domain
+
+            . Entities:     Contém as classes "Category" e "Product" que representam o nosso modelo de domínio
+
+            . Interfaces:   Contém as interfaces "ICategoryRepository" e "IProductRepository"
+
+            . Validation:   Contém a classe "DomainExceptionValidation" para vaidar o modelo de domínio.
+
+        . Entity - "Uma entidade é um objeto dentro do nosso projeto que incorpora um conjunto de regras críticas             
+                    de negócio operando em dados crtíticos de negócios"
+
+        . Não estamos usando os conceitos de DDD como Entity, Value Object e Aggregate.
+
+        . Objetivo: criar um modelo de dominio não anêmico procurando isolar o domínio do mundo externo de forma que 
+            ele seja independente de todas as outras camadas do projeto, e, garantir que as entidades de domínio sejam 
+            sempre válidas.
+
+        . Recursos:
+
+            . Classes "sealed" - Quando aplicado a uma classe, o modificador sealed impede que outras classes herdem dela.
+
+                public sealed class Category
+                {
+                    ...
+                }
+
+            . Setters private
+
+            . Construtor parametrizado
+
+            . Definir uma classe base de entidade
+
+            . Definir comportamentos no modelo de domínio
+
+            . Definir a validação do modelo
+
+            . Definir interfaces para o repositório
+
+            . Realizar testes de unidade para o projeto Domain
+
+    . DEMO
+
+        . Acesse o projeto "Domain" e crie as pastas abaixo na raiz:
+
+            . Entities
+
+            . Interfaces
+
+            . Validation
+
+        . Crie a classe "Category" abaixo na pasta "Entities":
+
+            using System.Collections.Generic;
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            public class Category
+            {
+                public int Id { get; set; }
+
+                public string? Name {get; set; }
+
+                public ICollection<Product>?  Products {get; set; }
+            }
+
+        . Crie a classe "Product" abaixo na pasta "Entities":
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            public class Product
+            {
+                public int Id { get; set; }
+
+                public string? Name { get; set; }
+
+                public string? Description { get; set; }
+
+                public decimal Price { get; set; }
+
+                public int Stock { get; set; }
+
+                public string? Image { get; set; }
+
+                public int CategoryId { get; set; }
+
+                public Category? Category { get; set; }
+            }
+
+        . As classes "Category" e "Product" fazem parte de um modelo anêmico, ou seja, uma forma de modelagem 
+            de domínio que consiste na separação entre classes que apresentam apenas estado ou apenas comportamentos.
+
+        . Iremos transforma esse modelo num modelo rico.
+
+
+
+Aula 29. Enriquecendo o modelo de domínio criado - I
+----------------------------------------------------
+
+    . DEMO
+
+        . Altere as classes "Category" e "Product" colocando o modificador de acesso "sealed" para impedir que elas sejam herdadas.
+
+                public sealed class Category
+                {
+                    ...
+                }
+
+                public sealed class Product
+                {
+                    ...
+                }
+
+        . Altere as classes "Category" e "Product" alterando os "Setter" para "private":
+
+                namespace CleanArchMvc.Domain.Entities;
+
+                using System.Collections.Generic;
+
+                public sealed class Category
+                {
+                    public int Id { get; private set; }
+
+                    public string Name {get; private set; }
+
+                    public ICollection<Product>  Products {get; set; }
+                }
+
+
+
+
+                namespace CleanArchMvc.Domain.Entities;
+
+                public sealed class Product
+                {
+                    public int Id { get; private set; }
+
+                    public string Name {get; private set; }
+
+                    public string Description  {get; private set; }
+                    
+                    public decimal Price  {get; private set; }
+                    
+                    public int Stock {get; private set; }
+                    
+                    public string Image {get; private set; }
+
+                    public int CategoryId  {get; set; }             // Não é necessário colocar "private" aqui porque estes atributos não fazem parte do modelo de domínio
+
+                    public Category Category {get; set; }
+                }
+
+        . Crie os construtores com parâmetros nas classes "Category" e "Product":
+
+            public sealed class Category
+            {
+                public Category( string name )
+                {
+                    Name = name;
+                }
+
+                public Category( int id, string name )
+                {
+                    Id = id;
+                    Name = name;
+                }
+
+                ...
+            }
+
+
+
+
+            public sealed class Product
+            {
+                public Category( string name, ... )
+                {
+                    Name = name;
+                    ...
+                }
+
+                public Category( int id, string name, ... )
+                {
+                    Id = id;
+                    Name = name;
+                    ...
+                }
+
+                ...
+            }
+
+        . Crie a classe "DomainExcetpionValidation" no pacote "Validation":
+
+            namespace CleanArchMvc.Domain.Validation;
+
+            public class DomainExceptionValidation: Exception
+            {
+                public DomainExceptionValidation( string error): base(error)
+                {
+
+                }
+
+                public static void When( bool hasError, string error )
+                {
+                    if (hasError)
+                        throw new DomainExceptionValidation(error);
+                }
+            }
+
+
+        . Altere a classe "Category" como abaixo:
+
+            using CleanArchMvc.Domain.Validation;   // Linha inserida
+
+            ...
+            public Category( string name )
+            {
+                ValidateDomain(name);           // Linha alterada
+            }
+
+            public Category( int id, string name )
+            {
+                DomainExceptionValidation.When( id < 0, "Invalid Id value");
+
+                ValidateDomain( name );
+
+                Id = id;
+            }
+
+            ...
+
+            private void ValidateDomain( string name )  // Método inserido
+            {
+                DomainExceptionValidation.When( string.IsNullOrEmpty(name), "Invalid [name]. Name is required.");
+
+                DomainExceptionValidation.When( name.Lenght < 3, "Invalid name, too short, minimum 3 characters");
+
+                Name = name;
+            }
+
+
+Aula 30. Enriquecendo o modelo de domínio criado - II
+-----------------------------------------------------
+
+    . DEMO
+
+        . Altere a classe "Category como abaixo:
+
+            ...
+            public Category( int id, string name )
+            {
+                DomainExceptionValidation.When( id < 0, "Invalid Id value");
+
+                ValidateDomain( name );
+
+                Id = id;
+            }
+
+            public void Update( string name)        // Método inserido
+            {
+                ValidateDomain( name );
+            }
+            ...
+
+        . Altere a classe "Product" como abaixo:
+
+            using CleanArchMvc.Domain.Validation;
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            public sealed class Product
+            {
+                public int Id { get; private set; }
+                public string Name { get; private set; }
+                public string Description { get; private set; }
+                public decimal Price { get; private set; }
+                public int Stock { get; private set; }
+                public string Image { get; private set; }
+
+                // Construtor inserido
+                public Product(string name, string description, decimal price, int stock, string image)
+                {
+                    ValidateDomain(name, description, price, stock, image);
+                }
+
+                // Construtor inserido
+                public Product(int id, string name, string description, decimal price, int stock, string image)
+                {
+                    DomainExceptionValidation.When(id < 0, "Invalid Id value.");
+                    Id = id;
+                    ValidateDomain(name, description, price, stock, image);
+                }
+
+                // Método inserido
+                public void Update(string name, string description, decimal price, int stock, string image, int categoryId)
+                {
+                    ValidateDomain(name, description, price, stock, image);
+                    CategoryId = categoryId;
+                }
+
+                // Método inserido
+                private void ValidateDomain(string name, string description, decimal price, int stock, string image)
+                {
+                    DomainExceptionValidation.When(string.IsNullOrEmpty(name), 
+                        "Invalid name. Name is required");
+
+                    DomainExceptionValidation.When(name.Length < 3,
+                        "Invalid name, too short, minimum 3 characters");
+
+                    DomainExceptionValidation.When(string.IsNullOrEmpty(description),
+                        "Invalid description. Description is required");
+
+                    DomainExceptionValidation.When(description.Length < 5, 
+                        "Invalid description, too short, minimum 5 characters");
+
+                    DomainExceptionValidation.When(price < 0, "Invalid price value");
+
+                    DomainExceptionValidation.When(stock < 0, "Invalid stock value");
+
+                    DomainExceptionValidation.When(image.Length > 250,
+                        "Invalid image name, too long, maximum 250 characters");
+
+                    Name = name;
+                    Description = description;
+                    Price = price;
+                    Stock = stock;
+                    Image = image;
+
+                }
+            }
+
+        . Crie a classe "Entity.cs" abaixo na pasta "Entities":
+
+            namespace CleanArchMvc.Domain.Entities;
+
+            public abstract class Entity
+            {
+                public int Id { get; protected set; }
+            }
+
+        . Faça as alterações abaixo nas classes "Category" e "Product":
+
+
+                namespace CleanArchMvc.Domain.Entities;
+
+                using System.Collections.Generic;
+
+                // Estenda a classe "Entity"
+                public sealed class Category: Entity
+                {
+                    // Apague a linha abaixo
+                    // public int Id { get; private set; }
+
+                    ...
+                }
+
+
+
+
+                namespace CleanArchMvc.Domain.Entities;
+
+                using System.Collections.Generic;
+
+                // Estenda a classe "Entity"
+                public sealed class Product: Entity
+                {
+                    // Apague a linha abaixo
+                    // public int Id { get; private set; }
+
+                    ...
+                }
+
+
+
+Aula 31. Criando as interfaces dos repositórios
+-----------------------------------------------
+
+    . DEMO
+
+        . Crie as interfaces abaixo na namespace "CleanArchMvc.Domain.Interfaces":
+
+            using CleanArchMvc.Domain.Entities;
+
+            namespace CleanArchMvc.Domain.Interfaces
+            {
+                public interface ICategoryRepository
+                {
+                    Task<IEnumerable<Category>> GetCategoriesAsync();
+                    Task<Category> GetByIdAsync(int? id);
+
+                    Task<Category> CreateAsync( Category category );
+
+                    Task<Category> UpdateAsync( Category category );
+
+                    Task<Category> RemoveAsync( Category category );
+                }
+            }
+
+
+            namespace CleanArchMvc.Domain.Interfaces
+            {
+                public interface IProductRepository
+                {
+                    Task<IEnumerable<Product>> GetProductsAsync();
+
+                    Task<Product> GetByIdAsync( int? id);
+
+                    Task<Product> CreateAsync( Product product );
+
+                    Task<Product> UpdateAsync( Product product );
+
+                    Task<Product> RemoveAsync( Product product );
+
+                }
+            }
+
+    . Essas interfaces funcionarão como contratos que devem ser seguidas por quem for implementar os repositórios.
+
+    . Essas interfaces serão utilizadas para acessar o repositório e o repositório não será immplementado aqui na camada
+        de domínio porque estamos usando interfaces. A implementação dos repositórios serão feita na camada de infraestrutura
+        
+    . O padrão pe um repositório será usado para encapsular as interações com o bando de dados por meio de uma camada de abstração.
+
+
+
+Aula 32. Implementando os testes de unidade para o projeto Domain
+-----------------------------------------------------------------
+
+    . Objetivos:
+
+        . Criar a pasta "Domain" dentro do projeto "./tests/UnitTests";
+
+            . Referenciar o projeto Domain. Execute o comando abaixo dentro da pasta raiz da solution:
+
+                dotnet add ./tests/UnitTests/ reference ./src/CleanArchMvc.Domain/
+
+            . Crie as classes de testes abaixo dentro da pasta "/tests/UnitTests/Domain": 
+            
+                . CategoryUnitTest1
+                
+                . ProductUnitTest1
+
+        . Incluir o pacote FluentAssertions
+
+            . Ajuda a especificar testes de forma simples
+
+            . Facilita a leitura e entendimento dos testes de unidade
+
+            . https://fluentassertions.com
+
+        . Usar a extesion "Test Explorer" no Visual Studio; e no VSCode a extensão ".NET Core Test Explorer"
+
+            . Instale o "plugin" ".NET Core Test Explorer" no VSCode
+
+            . Acesse "Configurações/Extensões/.NET Core Test Explorer"
+
+            . Localize a configuração/campo "Test Project Path" e coloque a pasta que estão as unidades de testes, por exemplo:
+
+                tests/*
+
+            . Material complementar:
+
+                https://www.youtube.com/watch?v=B9lfzQPq38Y
+
+        . Padrões de nomenclatura dos testes
+
+            . A primeira parte do nome representa o nome do que esta sendo testado;
+
+            . A segunda parte do nome complementa a informação sobre o cenário de teste;
+
+            . A última parte do nome representa o resultado esperado do teste;
+
+            . Exemplos:
+
+                CreateProduct_WithValidParameters_ResultObjectValidState()
+
+                CreateProduct_InvalidStockValue_DomainExceptinNegativeValue( int value )
+
+                
+
+                [Fact( DisplayName = "Create Category Object With Valid State")]
+                public void CreateCategory_WithValidParameters_ResultObjectValidState()
+                {
+                    Action action = () => new Category( 1, "Category Name" );
+
+                    action.Should()
+                        . NotThrow< eStore.Domain.Validation.DomainExceptionValidation >();
+                }
+
+
+Aula 33. Testes de unidade para a entidade Category
+--------------------------------------------------
+
+    . DEMO
+
+        . Adicionando a package "FluentAssertions" no projeto de testes:
+
+            cd ./tests/UnitTests
+
+            dotnet add package FluentAssertions --version 6.12.0
+
+            cd ../..
+
+        . Execute o comando abaixo para executar a solution:
+
+            # Executar na pasta da solution
+            dotnet clean
+
+            dotnet restore
+
+            dotnet build
+
+            # Lista todas as unidades de testes encontradas
+            dotnet test -t
+
+        . Apague a classe "./tests/UnitTests/UnitTest1.cs"
+
+
+    . Funcionamento do mecânismo de teste do xUnit:
+
+        . Annotation [Fact] é utilizado para identificar um método que servirá como uma unidade de teste unitário.
+
+            . Se quiser deixar mais amigável os testes podemos colocar uma identificação na unidade de teste através do parâmetro "DisplayName",
+                a identificação será exibida durante a execução do teste, ao invés do nome da classe.
+
+                [Fact( DisplayName = "Invalid Value Price")]
+
+        . Annotation [Theory] utilizado para identificar um método que servirá como uma unidade de teste unitário, porém somente poderá
+            ser usado essa annotation quando houver parâmetros envolvidos na assinatura do método, por exemplo:
+
+            [Theory]
+            [InlineData(-5)]
+            public void CreateProduct_InvalidStockValue_ExceptionDomainNegativeValue(int value)
+            {
+                ...
+            }
+
+            . Neste caso podemos fornecer valores padrões para os parâmetros através da annotation [InlineData(...)]
+
+        . Seguindo o padrão AAA - Arrange, Act e Assert podemos utilizar as classes "Action", ou "Assert":
+
+            . Action
+
+                [Fact]
+                public void CreateProduct_InvalidPriceValue_DomainException()                       
+                {                                                                                 +----> Forçamos uma situação de erro para levantar uma exception e com uma msg especifica
+                    // Act - Prepara a ação                                                       |                                                         |                 |
+                    Action action = () => new Product(1, "Product Name", "Product Description", -9.99m,                                                     |                 |
+                        99, "");                                                                                                                            |                 |
+                                                                                                                                                            |                 |
+                    // Assert - Executa a ação                                                                                                              |                 |
+                    action.Should()                                                         // Deveria lançar                                               |                 |
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()  // Exception esperada   <---------------------------------------+                 |
+                        .WithMessage("Invalid price value");                                // Mensagem esperada    <---------------------------------------------------------+
+                }
+
+                . Act - Somente prepara a action
+
+                     Action action = () => new Product(1, "Product Name", "Product Description", -9.99m,
+                                                        99, "");                                                                       
+
+                . Assert - Executa a action, somente neste ponto que a classe será criada e disparado a exception da classe Domain
+
+                    action.Should()                                                       
+                        .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                        .WithMessage("Invalid price value");                              
+
+            . Assert
+
+                [Fact]
+                public void CreateProduct_InvalidPriceValue_DomainException()
+                {
+                    // Arrange
+                    var message = "Invalid price value";
+
+                    // Act
+                    var assert = Assert.Throws<CleanArchMvc.Domain.Validation.DomainExceptionValidation>( () => new Product(1, 
+                                                                                                                            "Product Name", 
+                                                                                                                            "Product Description", 
+                                                                                                                            -9.99m,
+                                                                                                                            99, 
+                                                                                                                            "") );
+                    // Assert
+                    Assert.Equal(message, assert.Message);
+                }
+
+                . Arrage - Prepara as informações necessárias para auxiliar na execução da unidade de teste
+
+                    var message = "Invalid price value";
+
+                . Act - Somente prepara a action
+
+                    var assert = Assert.Throws<CleanArchMvc.Domain.Validation.DomainExceptionValidation>( () => new Product(1, 
+                                                                                                                            "Product Name", 
+                                                                                                                            "Product Description", 
+                                                                                                                            -9.99m,
+                                                                                                                            99, 
+                                                                                                                            "") );
+
+                . Assert - Executa a action, somente neste ponto que a classe será criada e disparado a exception da classe Domain
+
+                    Assert.Equal(message, assert.Message);
+
+                    . IMPORTANTE: Não se esqueça, essa unidade de teste foi feita para dar erro, pois o preço está invalido (-9.99m).
+                                    Sendo assim, será levantado uma exception; algo esperado pela unidade de teste através:
+
+                                        var assert = Assert.Throws<CleanArchMvc.Domain.Validation.DomainExceptionValidation>(...);
+
+                                    Neste caso, quando colocar o valor inválido, estamos testando se a validação de valor negativo
+                                    está sendo validada com sucesso, assim o teste passará com sucesso.
+
+                                    De resto seria somente verificar a mensagem de erro retornada pela classe Domain "Invalid price value"
+
+                                        // Se o contéudo de "message" for igual ao "assert.Message" não será levantado uma exception para a execução do teste.
+                                        // SOMENTE HAVERÁ EXCEPTION PARA O TESTE SE FOREM DIFERENTES E O TESTE NÃO PASSARÁ COM SUCESSO
+                                        Assert.Equal(message, assert.Message);
+
+    . DEMO
+
+        . Altere o conteúdo da classe "CategoryUnitTest1.cs" pelo abaixo:
+
+            using CleanArchMvc.Domain.Entities;
+            using FluentAssertions;
+            using System;
+            using Xunit;
+
+            namespace Domain.UnitTests
+            {
+                public class CategoryUnitTest1
+                {
+                    [Fact(DisplayName ="Create Category With Valid State")]
+                    public void CreateCategory_WithValidParameters_ResultObjectValidState()
+                    {
+                        Action action = () => new Category(1, "Category Name ");
+                        action.Should()
+                            .NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
+
+                    [Fact]
+                    public void CreateCategory_NegativeIdValue_DomainExceptionInvalidId()
+                    {
+                        Action action = () => new Category(-1, "Category Name ");
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid [id] value");
+                    }
+
+                    [Fact]
+                    public void CreateCategory_ShortNameValue_DomainExceptionShortName()
+                    {
+                        Action action = () => new Category(1, "Ca");
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid name, too short, minimum 3 characters");
+                    }
+
+                    [Fact]
+                    public void CreateCategory_MissingNameValue_DomainExceptionRequiredName()
+                    {
+                        Action action = () => new Category(1, "");
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid [name]. Name is required.");
+                    }
+
+                    [Fact]
+                    public void CreateCategory_WithNullNameValue_DomainExceptionInvalidName()
+                    {
+                        Action action = () => new Category(1, null);
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
+                }
+            }
+
+        . Execute o comando abaixo na pasta raiz da solution:
+
+            dotnet test
+
+        . Verifique mais detalhes de como executar testes no curso "ASP.NET 6 Fundamentals" e na "Aula 20. Testes de Unidade - xUnit"
+
+
+Aula 34. Testes de unidade para a entidade Product
+--------------------------------------------------
+
+    . DEMO
+
+        . Crie a classe "ProductUnitTest1" abaixo na raiz do projeto
+
+            using CleanArchMvc.Domain.Entities;
+            using FluentAssertions;
+            using System;
+            using Xunit;
+
+            namespace Domain.UnitTests
+            {
+                public class ProductUnitTest1
+                {
+                    [Fact]
+                    public void CreateProduct_WithValidParameters_ResultObjectValidState()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", 9.99m,
+                            99, "product image");
+                        action.Should()
+                            .NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
+
+                    [Fact]
+                    public void CreateProduct_NegativeIdValue_DomainExceptionInvalidId()
+                    {
+                        Action action = () => new Product(-1, "Product Name", "Product Description", 9.99m,
+                            99, "product image");
+
+                        action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid Id value.");
+                    }
+
+                    [Fact]
+                    public void CreateProduct_ShortNameValue_DomainExceptionShortName()
+                    {
+                        Action action = () => new Product(1, "Pr", "Product Description", 9.99m, 99,
+                            "product image");
+                        action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid name, too short, minimum 3 characters");
+                    }
+
+                    [Fact]
+                    public void CreateProduct_LongImageName_DomainExceptionLongImageName()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", 9.99m,
+                            99, "product image toooooooooooooooooooooooooooooooooooooooooooo loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg");
+
+                        action.Should()
+                            .Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid image name, too long, maximum 250 characters");
+                    }
+
+                    [Fact]
+                    public void CreateProduct_WithNullImageName_NoDomainException()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);
+                        action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
+
+                    [Fact]
+                    public void CreateProduct_WithEmptyImageName_NoDomainException()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, "");
+                        action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();
+                    }
+
+                    [Fact]
+                    public void CreateProduct_InvalidPriceValue_DomainException()
+                    {
+                        Action action = () => new Product(1, "Product Name", "Product Description", -9.99m,
+                            99, "");
+                        action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid price value");
+                    }
+
+                    [Theory]
+                    [InlineData(-5)]
+                    public void CreateProduct_InvalidStockValue_ExceptionDomainNegativeValue(int value)
+                    {
+                        Action action = () => new Product(1, "Pro", "Product Description", 9.99m, value,
+                            "product image");
+                        action.Should().Throw<CleanArchMvc.Domain.Validation.DomainExceptionValidation>()
+                            .WithMessage("Invalid stock value");
+                    }
+
+                }
+            }
+
+        . Execute o comando abaixo na pasta raiz da solution:
+
+            dotnet test
+
+
+Aula 35. Fazendo ajustes no modelo de domínio Product
+-----------------------------------------------------
+
+    . No teste que verifica se o tamanho do nome da imagem é maior que 255, o teste manda para o construtor da classe
+        "domain" um valor nulo. O teste passa porque ele está preparado somente para verificar a "exception" 
+        "DomainExceptionValidation" ------------------------------------------------------------------------------------+
+                                                                                                                        |
+            [Fact]                                                                                                      |
+            public void CreateProduct_WithNullImageName_NoDomainException()                                             |
+            {                                                                                                           |
+                Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);           |
+                action.Should().NotThrow<CleanArchMvc.Domain.Validation.DomainExceptionValidation>();                   |
+            }                                                                   ^                                       |
+                                                                                +---------------------------------------+
+
+    . Emobra o teste está sendo executado com sucesso, uma excessão é levantada "NullReferenceException". Se quisessemos forçar 
+        a não entrada de imagens com nomes nulo teriamos que criar mais um método como abaixo:  ------------------------+
+                                                                                                                        |
+            [Fact]                                                                                                      |
+            public void CreateProduct_WithNullImageNameNullReferenceException()                                         |
+            {                                                                                                           |
+                Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);           |
+                action.Should().NotThrow<NullReferenceException>();                                                     |
+            }                               ^                                                                           |
+                                            +---------------------------------------------------------------------------+
+
+    . DEMO
+
+        . Crie na classe de teste "ProductUnitTest1.cs" o método acima que contempla a "Exception" "NullRereferenceException" e execute o teste.
+
+        . Verifique se o teste dessa vez não passou, devido ao conteúdo nulo do nome da imagem.
+
+        . Como o objetivo é permitir que cadastremos imagens com valores nulos/vázio vamos desfazer a condição "NullReferenceException" dos testes e substituir
+            pelo operador condicional "?":
+
+            ########## . Elimine o método acima "CreateProduct_WithNullImageNameNullReferenceException" da classe de teste.
+
+            . Altere a linha abaixo deixando o operador "?":
+
+                private void ValidateDomain(string name, string description, decimal price, int stock, string image)
+                {
+                    DomainExceptionValidation.When(string.IsNullOrEmpty(name), 
+                        "Invalid name. Name is required");
+
+                    DomainExceptionValidation.When(name.Length < 3,
+                        "Invalid name, too short, minimum 3 characters");
+
+                    DomainExceptionValidation.When(string.IsNullOrEmpty(description),
+                        "Invalid description. Description is required");
+
+                    DomainExceptionValidation.When(description.Length < 5, 
+                        "Invalid description, too short, minimum 5 characters");
+
+                    DomainExceptionValidation.When(price < 0, "Invalid price value");
+
+                    DomainExceptionValidation.When(stock < 0, "Invalid stock value");
+
+                    
+                    // Linha alterada - Insirido o operador "?"
+                    DomainExceptionValidation.When(image?.Length > 250,
+                        "Invalid image name, too long, maximum 250 characters");
+
+
+                    Name = name;
+                    Description = description;
+                    Price = price;
+                    Stock = stock;
+                    Image = image;
+
+                }
+
+        . Execute os testes e verifique se valores nulos são permitidos novamente.
+
+
+Implementando a Camada de Infraestrutura
+========================================
+
+Aula 36. Criando a estrutura do projeto, incluindo as referências e criando o contexto
+--------------------------------------------------------------------------------------
+
+    . A camada de infraestrutura é a camada mais externa da arquitetura que lida com as necessidades de infraestrutura e 
+        fornece a implmentação de suas interfaces de repositóiro.
+
+    . É nesta camada que conectamos a lógica de acesso a dados ou a lógica de chamdas de serviço. Apenas a camada de 
+        infraestrutura deve saber sobre o banco de dados e a tecnologia de acesso a dados ( Entity Framework, ADO.NET, etc.),
+        as demais camadas não devem saber nada sobre de onde vêm os dados e como estão sendo armazenados.
+
+
+    . Componentes distruibuidos por camadas e responsabilidade
+
+       ^  --------------------------------------------------------------------------------------------------------------------
+    R  |  Domain              Entities  Product       Interfaces  IProductRepository      Account IAuthenticate
+    e  |                      --------  Category      ----------  ICategoryRepository     ------- ISeedRoleInitial
+    g  |                                Entity                                                    IUser
+    r  |  --------------------------------------------------------------------------------------------------------------------
+    a  |  Application         Service ProductService      DTOs    ProdctDTO       Mappings    DomainViewModel    
+       |                      ------- CategoryService     ----    CategoryDTO     --------    ViewModelDomain
+    d  |  
+    e  |                      Interfaces  IProductService     Exceptions  CQRS
+       |                      ----------  ICategoryService    ----------  Command
+    D  |                                                                  Queries 
+    e  |                                                                  Handlers
+    p  |  ---------------------------------------------------------------------------------------------------------------------
+    e  |  Infra.Data          Repositories    ProductRepository       Context ApplicationContext      Migrations      Identity
+    n  |                      ------------    CategoryRepository      -------                         ----------      --------
+    d  |
+    ê  |  Infra.IoC           DependencyInjection
+    n  |                      -------------------
+    c  |  ---------------------------------------------------------------------------------------------------------------------
+    i  |  WebUI               Controllers AccountController       View    Filters     Components      ViewModels      MapConfig
+    a  |                      -----------                         ----    -------     ----------      ----------      ---------
+
+
+    . Camada de infraestrutura - CleanArchMvc.Infra.Data
+
+        . Criaremos as pastas:
+
+            . Context                   Onde vamos definir o contexto da aplicação (DbContext) e mapeamento ORM.
+
+            . EntitiesConfiguration     Onde vamos definir as configurações (Fluent API) das entidades do contexto.
+
+            . Repositories              Onde vamos implementar as interfaces dos repositórios para "category" e "product"
+
+            . Identity                  Onde definimos as configurações e os recursos de autenticação e autorização do Identity;
+
+        . Incluiremos referência aos pacotes NUGET:
+
+            . Microsoft.EntityFramworkcore.SqlServer
+
+            . Microsoft.EntityFramworkcore.Tools
+
+            . Microsoft.EntityFramworkcore.Design
+
+        . Criaremos a classe "ApplicationDbContext" que herda da classe DbContext do Entity Framework Core
+
+            public class ApplicationDbContext: DbContext
+            {
+                ...
+            }
+
+        . Definiremos o mapeamento ORM usando DbSet<T> e as configurações da Fluent API nas propriedades das entidades.
+
+                                        DbContext
+                                        ---------
+                                        . Gerenciar conexões de banco de dados
+                                        . Configurar modelo e relacionamento
+                                        . Consultar banco de dados
+            Classes de Domínio <------> . Salvar dados no banco de dados        <----------> Banco de Dados
+            ------------------          . Configurar o controle de alterações                --------------
+                                        . Cache
+                                        . Gerenciar transções
+
+    . Demo
+
+        . Crie as pastas abaixo no projeto "CleanArchMvc.Infra.Data"
+
+            . Context
+
+            . EntitiesConfiguration
+
+            . Repositories
+
+            . Identity
+
+        . Acesse a pasta raiz do projeto "CleanArchMvc.Infra.Data" e execute os comandos abaixo:
+
+
+            dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 6.0.12
+
+            dotnet add package Microsoft.EntityFrameworkCore.Tools --version 6.0.12
+
+            dotnet add package Microsoft.EntityFrameworkCore.Design --version 6.0.12
+
+        . Crie a classe abaixo dentro da pasta "Context":
+
+            using CleanArchMvc.Domain.Entities;
+            // using CleanArchMvc.Infra.Data.EntitiesConfiguration;
+            using Microsoft.EntityFrameworkCore;
+
+            namespace CleanArchMvc.Infra.Data.Context
+            {
+                public class ApplicationDbContext : DbContext
+                {
+                    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+                        : base(options)
+                    { }
+
+                    public DbSet<Category> Categories { get; set; }
+                    public DbSet<Product> Products { get; set; }
+
+                    protected override void OnModelCreating(ModelBuilder builder)
+                    {
+                        base.OnModelCreating(builder);
+                        builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+                    }
+                }
+            }
+
+Aula 37. Configurando as entidades usando a Fluent API
+------------------------------------------------------
+
+    . Configurando as entidades do modelo
+
+        . Por que preciso configurar as entidades do modelo usando a "Fluent API"?
+
+            . Porque vou usar o EF Core na abordagem "Code-First"
+
+                . Nesta abordagem (Code-First) partimos das entidades do modelo de domínio definidas no contexto e criamos o banco de 
+                    dados e as tabelas.
+
+                    Entidades do Modelo ----------->   EF core   -----------> Banco de dados
+                        (Contexto)                   Code-/first
+
+            . Poderiamos usar o EF Core na abordagem "Database-First"
+
+                . Nesta abordagem criamos o banco de dados e as tabelas primeiro, e depois geramos as classes das entidades do modelo 
+                    de domínio
+
+                    Banco de dados ------------>    EF Core     -------------> Entidade do Modelo
+                                                 Database-First                     (Contexto)
+
+        . Poderiamos usar "ADO.NET" ou "Dapper" ou outra ferramenta
+
+            . Nesta abordagem, dependendo da opção usanda, geralmente criamos o banco de daos e as tabelas e a seguir implmentamos o código
+                com a lógica de acesso ao banco de dados.
+
+
+                Banco de dados ---------> ADO.NET, Dapper, etc  ----------> Entidade do Modelo
+                                          Camada com lógica de                  (Contexto)
+                                          acesso aos dados                    
+            
+        . Na abordagem "Code-First" o EF Core segue convenções para gerar o banco de daos e as tabelas.
+
+            . O banco de dados será gerado com base no provedor informado e na string de conexão
+
+            . Para gera as tabelas ele verifica as entidades mapeadas no arquivo de contexto ( AplicationDbContext )
+
+            . E gera as tabelas no banco de daos com os nomes definidos no mapeamento DbSet<T>
+
+            . Com base nas propriedades definidas no modelo de domínio ele gera as colunas das tabelas com o mesmo nome das propriedades
+
+        . Problemas da abordagem "Code-First"
+
+            . O tipo de dado "string" será mapeado para uma coluna do tipo nvarchar(max) e nullable igual a true.
+
+            . O tipo "decimal" será mapeado para uma coluna do tipo decimal(18,2) e será emitida um amensagem de alerta para perda de dados 
+                por problemas de precisão.
+
+        . Para resolver o problema acima, usaremos a Fluent API para configurar as propriedades Id e o tipo string:
+
+            public class CategoryConfiguration: IEntityTypeConfiguration<Category>
+            {
+                public void Configure( EntityTypeBuilder<Category> builder )
+                {
+                    builder.HasKey( t => t.Id );
+
+                    builder.Property( p => p.Name).HasMaxLength(100).IsRequired();
+                }
+            } 
+        
+        . Funcionamento do mecânismo de criação das tabelas durante a "migration":
+
+            1. No método da classe "ApplicationDbContext.OnModelCreating" temos a chama do método "builder.ApplyConfigurationFromAssembly":
+
+                protected override void OnModelCreating( ModelBuilder builder )
+                {
+                    base.OnModelCreating( builder );
+                    builder.ApplyConfigurationsFromAssembly( typeof( ApplicationDbContext).Assembly );
+                }
+
+                . Ao invés de dar o "ApplyConfigurationsFromAssembly" como acima poderia executar individualmente para cada classe de entidade:
+
+                    protected override void OnModelCreating( ModelBuilder builder )
+                    {
+                        base.OnModelCreating( builder );
+                        
+                        // builder.ApplyConfigurationsFromAssembly( typof( ApplicationDbContext).Assembly );
+                        builder.ApplyConfiguration( new CategoryConfiguration() );
+                        builder.ApplyConfiguration( new ProductConfiguration() );
+                    }
+
+            2. Quando o método "builder.ApplyConfigurationsFromAssembly( typof( ApplicationDbContext).Assembly );" é chamado, é vasculhado no 
+                projeto através do arquivo de context "ApplicationContext" para verificar as entidades e encontra:
+
+                    public DbSet<Product> Products{ get; set;  }
+                    public DbSet<Category> Categories{ get; set; }
+
+            3. Durante a execução haverá o relacionamento dos "DbSet" acima com as classes de "Configuration" ( CategoryConfiguration e ProductConfiguration ).
+
+                . Como essas classes de configuração estendem a interface "IEntityTypeConfiguration" com o seu tipo (Category/Product),
+                    ele irá executar automaticamente o método "Configure", que a criação das tabelas no banco com as configurações apresentadas
+
+                    builder.HasKey( t => t.Id );
+
+                    builder.Property( p => p.Name).HasMaxLength(100).IsRequired();
+
+    . Demo
+
+        . Crie as classes abaixo dentro da pasta "EntitiesConfiguration"
+
+            using CleanArchMvc.Domain.Entities;
+            using Microsoft.EntityFrameworkCore;
+            using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+            namespace CleanArchMvc.Infra.Data.EntitiesConfiguration
+            {
+                public class CategoryConfiguration : IEntityTypeConfiguration<Category>
+                {
+                    public void Configure(EntityTypeBuilder<Category> builder)
+                    {
+                        builder.HasKey(t => t.Id);
+                        builder.Property(p => p.Name).HasMaxLength(100).IsRequired();
+
+                        builder.HasData(
+                        new Category(1, "Material Escolar"),
+                        new Category(2, "Eletrônicos"),
+                        new Category(3, "Acessórios")
+                        );
+                    }
+                }
+            }
+
+
+
+            using CleanArchMvc.Domain.Entities;
+            using Microsoft.EntityFrameworkCore;
+            using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+            namespace CleanArchMvc.Infra.Data.EntitiesConfiguration;
+
+            public class ProductConfiguration : IEntityTypeConfiguration<Product>
+            {
+                public void Configure(EntityTypeBuilder<Product> builder)
+                {
+                    builder.HasKey(t => t.Id);
+
+                    builder.Property(p => p.Name).HasMaxLength(100).IsRequired();
+                    builder.Property(p => p.Description).HasMaxLength(200).IsRequired();
+
+                    builder.Property(p => p.Price).HasPrecision(10, 2);
+
+                    builder.HasOne(e => e.Category).WithMany(e => e.Products).HasForeignKey(e => e.CategoryId);
+
+                }
+            }
+
+Aula 38. Implementação dos Repositórios - Conceitos
+---------------------------------------------------
+
+    . Implementando os repositórios
+
+        +------------------------------------------ Camada de Domínio ----------------------------------------------------------+
+        |                                                                                                                       |
+        |   ICategoryRepository                                             IProductRepository                                  |
+        |   -------------------                                             ------------------                                  |
+        |   public interface ICategoryRepository                            public interface IProductRepository                 |
+        |   {                                                               {                                                   |
+        |       Task<IEnumerable<Category>> GetCategories();                    Task<IEnumerable<Product> GetProductAsync();    |
+        |       ...                                                             ...                                             |
+        |   }                   ^                                           }               ^                                   |
+        |                       |                                                           |                                   |
+        +-----------------------------------------------------------------------------------------------------------------------+
+                                |                                                           |
+                                |                                                           |
+                                |                                                           |
+                                |                                                           |
+        +-----------------------|------------------ Camada de Infra.Data -------------------|-----------------------------------+
+        |                       |                                                           |                                   |
+        |               CategoryRepository                                          ProductRepository                           |
+        |                                                                                                                       |
+        +-----------------------------------------------------------------------------------------------------------------------+
+
+        . Métodos assíncronos
+
+            . A assinatura do método deve incluir o modificador "async";
+
+            . O método deve ter um tipo de retorno da Task<T>, Task ou void;
+
+            . As declarações de método devem incluir pelo menos uma única expressão await - Isso diz ao compilador que o método precisa ser suspenso enquanto a 
+                operação aguardada estiver ocupada.
+
+            . Por último, o nome do método deve termina com o sufixo "async" (mesmo que isso seja mais convencional do que o necessário).
+
+        . Injeção de dependência - Injetar uma instância do contexto no construtor da classe concreta
+
+            public class CategoryReposicoty: ICategoryRepository
+            {
+                private ApplicationDbContext _categoryContext;
+
+                public CategoryRepository( ApplicationDbContext context)
+                {
+                    _categoryContext = context;
+                }
+
+                // métodos
+                ...
+            }
+
+        . Porque não implementar um reposítorio genérico?
+
+            . Um reposítorio é parte de um domínio que está sendo modelado e um domínio não é genérico, nem todas as entidades podem ser excluídas, nem adicionadas,
+                nem todas possuem um repositório.
+
+            . As consulta variam muito; a API do repsotório torna-se tão única quanto a própria entidade.
+
+Aula 39. Implementando o Repositório - CategoryRepository
+---------------------------------------------------------
+
+    . Demo
+
+        . Crie a classe repositório abaixo no projeto "CleanArchMvc.Infra.Data" na pasta "Repositories":
+
+            using CleanArchMvc.Domain.Entities;
+            using CleanArchMvc.Domain.Interfaces;
+            using CleanArchMvc.Infra.Data.Context;
+            using Microsoft.EntityFrameworkCore;
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+
+            namespace CleanArchMvc.Infra.Data.Repositories
+            {
+                public class CategoryRepository : ICategoryRepository
+                {
+                    private ApplicationDbContext _categoryContext;
+                    public CategoryRepository(ApplicationDbContext context)
+                    {
+                        _categoryContext = context;
+                    }
+
+                    public async Task<Category> CreateAsync(Category category)
+                    {
+                        _categoryContext.Add(category);
+                        await _categoryContext.SaveChangesAsync();
+                        return category;
+                    }
+
+                    public async Task<Category> GetByIdAsync(int? id)
+                    {
+                        return await _categoryContext.Categories.FindAsync(id);
+                    }
+
+                    public async Task<IEnumerable<Category>> GetCategoriesAsync()
+                    {
+                        return await _categoryContext.Categories.ToListAsync();
+                    }
+
+                    public async Task<Category> RemoveAsync(Category category)
+                    {
+                        _categoryContext.Remove(category);
+                        await _categoryContext.SaveChangesAsync();
+                        return category;
+                    }
+
+                    public async Task<Category> UpdateAsync(Category category)
+                    {
+                        _categoryContext.Update(category);
+                        await _categoryContext.SaveChangesAsync();
+                        return category;
+                    }
+                }
+            }
+
+Aula 40. Implementando o repositório - ProductRepository
+--------------------------------------------------------
+
+    . Demo
+
+        . Crie a classe repositório abaixo no projeto "CleanArchMvc.Infra.Data" na pasta "Repositories":
+
+            using CleanArchMvc.Domain.Entities;
+            using CleanArchMvc.Domain.Interfaces;
+            using CleanArchMvc.Infra.Data.Context;
+            using Microsoft.EntityFrameworkCore;
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+
+            namespace CleanArchMvc.Infra.Data.Repositories
+            {
+                public class ProductRepository : IProductRepository
+                {
+                    private ApplicationDbContext _productContext;
+                    public ProductRepository(ApplicationDbContext context)
+                    {
+                        _productContext = context;
+                    }
+
+                    public async Task<Product> CreateAsync(Product product)
+                    {
+                        _productContext.Add(product);
+                        await _productContext.SaveChangesAsync();
+                        return product;
+                    }
+
+                    public async Task<Product> GetByIdAsync(int? id)
+                    {
+                        return await _productContext.Products.FindAsync(id);
+                    }
+
+                    public async Task<Product> GetProductCategoryAsync(int? id)
+                    {
+                        //eager loading
+                        return await _productContext.Products.Include(c => c.Category)
+                            .SingleOrDefaultAsync(p => p.Id == id);
+                    }
+
+                    public async Task<IEnumerable<Product>> GetProductsAsync()
+                    {
+                        return await _productContext.Products.ToListAsync();
+                    }
+
+                    public async Task<Product> RemoveAsync(Product product)
+                    {
+                        _productContext.Remove(product);
+                        await _productContext.SaveChangesAsync();
+                        return product;
+                    }
+
+                    public async Task<Product> UpdateAsync(Product product)
+                    {
+                        _productContext.Update(product);
+                        await _productContext.SaveChangesAsync();
+                        return product;
+                    }
+                }
+            }
+
+Aula 41. Apresentando o contêiner de injeção de dependência
+-----------------------------------------------------------
+
+    . Container de injeção de dependência nativo
+
+
+        ICategoryRepository
+        -------------------
+                ^
+                |
+                |               CategoryRepository( Context context )
+        CategoryRepository  <------------------------------------------- ApplicationDbContext
+        ------------------                              ^                --------------------
+                                                        |
+                                            Container IoC ( Container de injeção de dpendência nativo )
+                                                        |
+        IProductRepository                              V
+        -------------------
+                ^
+                |
+                |               ProductRepository( Context context )
+        ProductRepository   <------------------------------------------- ApplicationDbContext
+        ------------------                                               --------------------
+
+    . O container do ASP.NET é responsável por criar as instâncias das classes e injetá-las onde 
+        for necessário:
+
+        . AddTransient
+
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddTransient<ICategoryRepository, CategoryRepository >();
+            builder.Services.AddTransient<IProductRepository, ProductRepository >();
+
+                . Sempre cira uma nova instância do objeto
+
+                . Ideal para cenários onde queremos sempre um novo objeto.
+
+        . AddScoped
+
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddTransient<ICategoryRepository, CategoryRepository >();
+            builder.Services.AddTransient<IProductRepository, ProductRepository >();
+
+
+                . Cria um objeto por transação/requisição
+
+                . Se você chamar 2 ou mais serviços que dendem do mesmo objeto, a mesma instância será utilizada
+
+                . Ideal para cenários onde queremos apenas um objeto por requisição (banco).
+
+        . AddSingleton
+
+            . Cria um objeto quando a aplicação inicia e apaga da sessão quando a aplicação termina.
+
+                builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
+
+            . Mantém este objeto na memória até a aplicação para ou reiniciar 
+
+            . Sempre devolve a mesma instância deste objeto, com os mesmos valores.
+
+            . Padrão que visa garantir apenas um instância de um objeto para aplicão toda
+
+            . Um bom exemplo são as configurações
+
+                . Uma vez carregadas, ficam até a aplicação reiniciar.
+
+        . AddDbContext
+
+            . Item especial do tipo Scoped
+
+                builder.Services.AddDbContext<BlogDataContext>( x => useSqlServer( connStr ));
+
+            . Utilizado exclusivamente com o EF
+
+            . Garante que a conexão só dura até o fim da requisição
+
+    . No ASP.NET Core 5 a configuração da injeção de dependência é feita na class "startup.cs":
+
+        public void ConfigureServices( IServiceCollection services )
+        {
+            ...
+            services.AddDbContext< ApplicationDbContext>( options => 
+                                            option.UseSqlServer( configuration.GetConnectionString("defaultConnection")));
+
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+                
+        }
+
+    . No ASP.NET 6 em diante a configuração é feita na classe "Program.cs"
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddTransient<ICategoryRepository, CategoryRepository >();
+        builder.Services.AddTransient<IProductRepository, ProductRepository >();
+
+    . Como dissemos, esse serviço de injeção é nativo do container ASP.NET, que reside na camada "WebUI". Para fazermos esse 
+        serviço funcionar precisariamos criar um forte acoplamento entre os projetos "WebUI" e "Infra.Data", violando a regra de dependência
+        da "Clean Archicteture":
+
+        using Microsoft.EntityFrameworkCore;        
+        using CleanArchMvc.Infra.DataRepositories;  ------> Acoplamento entre os projetos
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddTransient<ICategoryRepository, CategoryRepository >();
+        builder.Services.AddTransient<IProductRepository, ProductRepository >();
+
+    . Para resolver esse problema de alto acoplamento, criaremos uma classe que fará as vezes da injeção de dependência no projeto "Infra.IoC":
+
+        public static class DependencyInjection
+        {
+
+            // Para mais detalhes do funcionamento do "this" na assinatura do método acesse a aula 
+            // "Aula 26. Implementando Extension Methods" do curso "DI - Dominando Injeção de Dependência - Balta"
+            public static IServiceCollection AddInfrastructure( this IServiceCollenction services,
+                                                                IConfiguration configuration )
+            {
+                services.AddDbContext< ApplicationDbContext >( options =>
+                                            options.UseSqlServer(   configuration.GetConnectionString("DefaultConnection"),
+                                                                    b => b.MigrationsAssembly( typeof( ApplicatonDbContext )
+                                                                          .Assembly.FullName )));
+
+                services.AddScoped<IProductRepository, ProductRepository>();
+                services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+                return services;
+            }
+        }
+
+
+Aula 42. Projeto Infra.IoC - Registrando os serviços do contexto e do repositório
+---------------------------------------------------------------------------------
+
+    . DEMO
+
+        . Crie a classe abaixo na raiz do projeto "CleanArchMvc.Infra.IoC"
+
+            using CleanArchMvc.Domain.Interfaces;
+            using CleanArchMvc.Infra.Data.Context;
+            using CleanArchMvc.Infra.Data.Repositories;
+            using Microsoft.EntityFrameworkCore;
+            using Microsoft.Extensions.Configuration;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace CleanArchMvc.Infra.IoC
+            {
+                public static class DependencyInjection
+                {
+                    public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+                        IConfiguration configuration)
+                    {
+                        services.AddDbContext<ApplicationDbContext>( options =>                            // Linha inserida
+                            options.UseSqlite( 
+                                configuration.GetConnectionString("DefaultConnection"),
+                                    b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+
+                        services.AddScoped<ICategoryRepository, CategoryRepository>();
+                        services.AddScoped<IProductRepository, ProductRepository>();
+
+                        return services;
+                    }
+                }
+            }
+
+        . Na classe "Program.cs" do projeto "CleanArchMvc.WebUI" insira as linhas abaixo: (5.36)
+
+            builder.Services.AddControllersWithViews();
+
+            services.AddInfrastructure( builder.Configuration );    // Linha inserida
+
+        . Na classe "appsettings.json" do projeto "CleanArchMvc.WebUI" insira a linha abaixo:
+
+            {
+                "ConnectionStrings": {              
+                    "DefaultConnection": "DataSource=app.db;Cache=Shared"
+                },
+                ...
+            }
+
+
+
+Aula 43. Migrations - Conceitos e recursos usados
+-------------------------------------------------
+
+    . EF Core Migrations
+
+        . Permite atualizar de forma invremental o esquema de banco de dados e mantém a sincronia com o modelo
+            de dados do aplicativo, preservando os dados exitentes no banco de dados.
+
+        . Após qualquer alteração no modelo de dados podemos adicionar uma nova migração correspondente que descreve as 
+            atualizações necessárias para manter o esquema de banco de dados em sincronia.
+
+        . Como fazer isso:
+
+            Visual studio                                   Net Cli
+            -------------                                   -------
+            Add-migration [nome]                            dotnet tool install --global dotnet-ef
+                                                            dotnet ef migrations add [nome]
+
+
+        . O EF Core compara o model atual com um instantâneo do modelo antigo para determinar as diferenças e gera arquivos
+            de origem de migração
+
+        . Depois que uma nova migração é gerada, é possível aplicá-la a um banco usando os seguintes comandos:
+
+            Visual studio                                   Net Cli
+            -------------                                   -------
+            update-database                                 dotnet ef database update
+
+        . O EF Core registra todas as migrações aplicadas em uma tabela de histórico especial, permitindo que ela saiba quais migrações 
+            foram, ou não, aplicadas.
+
+        . Outros comandos do "Migrations":
+
+            Visual studio                                   Net Cli
+            -------------                                   -------
+            remove-migration                                dotnet ef migrations remove
+            get-migration                                   dotnet ef migrations list
+
+    . Criar o banco de dados:
+
+        . Informação sobre o prvedor do banco de dados usado (Infra.IoC)
+
+        . Informação sobre a strng de coneção usada (appsettings.json)
+
+            {
+                "ConnectionStrings": {              
+                    "DefaultConnection": "DataSource=app.db;Cache=Shared"
+                },
+                ...
+            }
+
+        . Site para encontrar detalhes da construção da string de conexão para diversos bancos:
+
+            https://www.connectionstrings.com/
+
+        . Criar as tabelas:
+
+            . Definição do arquivo de contexto (ApplicationDbContext) contendo as configurações e o mapeamento ORM.
+
+        . Ferramentas que podem ser utilizadas para trabalhar com banco de dados:
+
+            SQL Server                                          Sqlite
+            ----------                                          ------
+            SQL Server Management studio                        DB Browser
+            Server Explorer ( Visual Studio )                   Sqlite Studio
+            Azure Data Studio
+
+// PAREI AQUI
+Aula 44. Aplicando o Migrations do EF Core
+------------------------------------------
+
+    . Demo
+
+        . Se for no "Visual Studio":
+
+            . Abra a console do "Package Manager Console"
+
+            . Defina o projeto "Default"
+
+            . Execute o comando abaixo:
+
+                add-migrations Initial
+
+
+        . Se for no ".Net Cli", acesse a pasta raiz do projeto da "Solution" e execute o comando abaixo:
+
+            dotnet clean
+
+            dotnet build
+
+            cd src
+
+            dotnet ef migrations add initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+
+            . IMPORTANTE: Se ocorrer erro indicando que não há referencia do pacote "Microsoft.EntityFrameworkCore.Design" no projeto "CleanArchMvc.WebUI"
+                            então proceda as correções abaixo:
+
+                . Acesse o arquivo "Data.csproj" do projeto "CleanArchMvc.Infra.Data" e altere a referência do pacote "Microsoft.EntityFrameworkCore.Design"
+                    como abaixo:
+
+                    <Project Sdk="...">
+                        ...
+
+                        <ItemGroup>
+                            <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="...">
+                                <!-- <PrivateAssets>all</PrivateAssets> --> 
+                                <!-- Altere a linha acima pelo abaixo -->
+                                <PrivateAssets>none</PrivateAssets>
+                        </ItemGroup>
+
+                        ...
+                    </Project>
+
+        . Para remover uma "migration" se for necessário:
+
+            dotnet ef migration remove --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+
+        . Verifique se a pasta "Migrations" foi criada com sucess dentro da estrutura do projeto "CleanArchMvc.Infra.Data"
+
+        . Execute o comando abaixo na pasta "src" da "Solution":
+
+            dotnet ef database update Initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+
+        . Verifique se na pasta do projeto "CleanArchMvc.WebUI" foi criado o banco de dados com o nome:
+
+            app.db
+
+        . Acesse o IDE "DB Browser", abra o banco "app.db" e verifique se as tabelas e o conteúdo delas foram criados
+            com sucesso.
+
+        . Para criar dados na tabela "Products" execute os passos abaixo:
+
+            . Acesse a pasta "src" da raiz da "Solution", execute o comando abaixo para criar um arquivo de migração vazio:
+
+                dotnet ef migrations add Initial-Insert-Products --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+
+            . Abra o arquivo "*_Initial-Insert-Products.cs" criado pela "Migrations" do passo anterior e inclua as linhas abaixo do metodo "Up", no respectivo método 
+                da classe criada acima:
+
+                using Microsoft.EntityFrameworkCore.Migrations;
+
+                namespace CleanArchMvc.Infra.Data.Migrations
+                {
+                    public partial class SeedProducts : Migration
+                    {
+                        protected override void Up(MigrationBuilder mb)     // Linha alterada "mb"
+                        {
+                            // Linhas inseridas
+                            mb.Sql("INSERT INTO Products(Name,Description,Price,Stock,Image,CategoryId) " +
+                            "VALUES('Caderno espiral','Caderno espiral 100 fôlhas',7.45,50,'caderno1.jpg',1)");
+
+                            mb.Sql("INSERT INTO Products(Name,Description,Price,Stock,Image,CategoryId) " +
+                            "VALUES('Estojo escolar','Estojo escolar cinza',5.65,70,'estojo1.jpg',1)");
+
+                            mb.Sql("INSERT INTO Products(Name,Description,Price,Stock,Image,CategoryId) " +
+                            "VALUES('Borracha escolar','Borracha branca pequena',3.25,80,'borracha1.jpg',1)");
+
+                            mb.Sql("INSERT INTO Products(Name,Description,Price,Stock,Image,CategoryId) " +
+                            "VALUES('Calculadora escolar','Calculadora simples',15.39,20,'calculadora1.jpg',2)");
+                            // Fim da inserção
+                        }
+
+                        protected override void Down(MigrationBuilder mb)   // Linha alterada "mb"
+                        {
+                            mb.Sql("DELETE FROM Products");     // Linha inserida
+                        }
+                    }
+                }
+
+            . Execute o comando abaixo na pasta raiz da "Solution":
+
+                dotnet ef database update Initial-Insert-Products --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext 
+
+            . Acesse o IDE "DB Browser", abra o banco "app.db" e verifique se foram criado com sucesso os dados na tabela "Products"
+
+Aula 45. Migrations Erros - Alternativa
+---------------------------------------
+
+    . Para verificar mais detalhadamente se nosso projeto tem algum erro/problema, durante a "Migration" podemos efetuar o comando com mais
+        detalhes e assim identificar possiveis erros.
+
+        . No ".Net Cli"
+
+            dotnet ef migration add initial --project CleanArchMvc.Infra.Data -s CleanArchMvc.WebUI -c ApplicationDbContext --verbose
+        
+            . dotnet ef migrations add Initial                  Comando para criar a migração com o nome Initial
+
+            . --project CleanArchMvc.Infra.Data                 Defnine o projeto onde os arquivos de migração serão criados
+
+            . -s CleanArchMvc.WebUI                             Define o projeto ASP.NET Core MVC ou ASP.NET Core Web API
+
+            . -c ApplicationDbContext                           Define o nome do arquivo de contexto usado
+
+            . --verbose                                         Exibe mensagens detalhadas do processo de migração
+
+        . No "Visual Studio":
+
+            . Abra a console do "Package Manager Console"
+
+            . Defina o projeto "Default"
+
+            . Execute o comando abaixo:
+
+                add-migrations Initial --verbose
+
+
+
+Implementando a camada de Aplicação
+===================================
+
+Aula 46. Mapeamento de objetos - Data Transfer Objects e AutoMapper
+-------------------------------------------------------------------
