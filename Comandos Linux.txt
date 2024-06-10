@@ -247,9 +247,20 @@ sudo snap remove <snapname>
 
 17. Comando para descobrir o IP da máquina
 
-    hostname -I
-    ifconfig
-    ip a
+    . Instala o "net-tools":
+
+        sudo apt install net-tools
+
+    . Comandos para encontrar endereços TCP/IP:
+
+        hostname -I
+        ifconfig
+        ip a
+
+    . Comando para encontrar portas TCP/IP:
+
+        netstat -nlnt | grep [porta]    
+        lsof -i
 
 18. Como inserir uma variavel ambiental
 
