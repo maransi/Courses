@@ -319,8 +319,13 @@ sudo snap remove <snapname>
         # Mostra resumo do espaço em disco
         df -h .
 
+    
+
         # Apresenta o tamanho das pastas ocultas
         du -h --max-depth=1 | sort -hr
+
+        # Mostra tamanho usado em cada pasta
+        du -sh *
 
         # Ordenado pelo tamanho do arquivo crescente
         sudo du -sh * printf "%s\t%p\n" | sort -nr
