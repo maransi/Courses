@@ -1,0 +1,127 @@
+Curso de Javascript
+-------------------
+
+1. Instalações
+
+    . Instalação do Nodejs
+
+        sudo apt-get install nodejs
+        sudo apt-get install npm
+
+        ou
+
+        sudo apt-get install curl python-software-properties
+        curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+        sudo apt-get install -y nodejs
+        node -v
+        npm -v
+
+. Instalação do VSCode:
+
+    . Acessar a pagina de download da microsoft:
+
+        https://code.visualstudio.com/download
+
+    . Baixar o arquivo .deb 
+
+    . Abrir o terminal e acessar a pasta Downloads
+
+    . Executar o comando abaixo:
+
+        sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+    . Atalhos
+
+        Alt + 1, 2, 3, 4, ...	Posiona na aba no.
+        Ctrl + b				Ativar o menu lateral esquerdo 
+        Ctrl + Alt + P			Para ativar a linha de comandos 
+        Ctrl + P 				Localiza um determinado arquivo
+        Ctrl + W				Fecha a aba corrente
+        Ctrl + Shift + W		Fecha todas as abas abertas
+
+        Ctrl + Rolagem do Mouse	
+                sobre as abas 
+                abertas			Faz a rolagem das abas.
+
+        Ctrl + K + C ou 
+        Ctrl + /				Comenta linha atual, ou bloco selecionado
+
+        Ctrl + K + U ou
+        Ctrl + /				Descomenta linha, ou bloco selecionado.
+
+        Ctrl + Shift + 
+                Acento Agudo	Abre o terminal na parte inferior
+
+        Ctrl + X				Apaga linha
+        Ctrl + H				Localiza e atualiza uma expressão
+        Ctrl + F2				Selecione um texto e pressionando Ctrl + F2 
+                                muda todos os textos equivalente a medida
+                                que vai se digitando
+        Alt + Arrow(up/Down)    Move a linha para cima, ou para baixo.
+        Ctrl + Shift + O		Abre a lista de funções/métodos da classe atual
+        Ctrl + G				Posicionar na linha No. que for digitado
+        Alt + Backspace			Apaga palavra inteira a esquerda
+        Ctrl + Shift + .		Mostra os métodos da classe
+        Ctrl + Shift + L		Altera dinamicamente em todo o arquivo a palavra que está sendo alterada
+        Ctrl + M				Para cercar um conjunto de tags numa página HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
+        cTRL + Ctrl + -			Para apagar uma tag que abraça um conjunto de tags HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
+
+
+    . Instale as seguinte Extensões:
+
+        open-in-browser			- Shortcut Ctrl+Alt+O, Alt + B
+        Material Icon Theme
+        Numbered Bookmarks		- Shortcut Ctrl+Shit+1,2,3... , Ctrl+1,2,3...
+        HTML CSS Support		- Ctrl + Space mostra as opções
+        Intellisense for CSS Class
+        JS-CSS-HTML Formatter	- Ctrl + Shift + I
+        Live Server				- File -> Open Folder, Alt + L + O / Click no simbolo na barra do rodapé
+                                - Extensao que exibe online as alteraçoes feitas a página 
+                                    no navegador.
+                                - Acesse o setting e inclua  "liveServer.settings.CustomBrowser": "chrome"
+                                - Para colocar o VSCode do lado do navegador clique Super + Left no VSCode
+                                    e Super + Left no navegador
+        Rainbow Brackets		- Ajuda identificar a abertura e fechamentos dos parenteses
+        JQuery Code Snippets	- Basta digitar algo que comece com "jq"
+        tslint - Plugin para apontar ausências no padrão de programação, deixando em vermelhos os pontos que não estão
+                    em conformidade. 
+
+            . Quando for trabalhar numa pasta de projeto, digite Ctrl + Shift + P e digitar "tslint", 
+                surge vários comandos especificos do plugin, escolha "Enable Workspace Library Execution"
+
+            . Acrescente o trecho abaixo no arquivo launch.json para habilitar o plugin:
+
+                // Dentro do array "configurations"
+                "editor.codeActionsOnSave": {
+                    "source.fixAll.tslint": true
+                }
+
+    . Configurações:
+
+        . Digite Ctrl K+S, localize o item "Delete Line" e configure Ctrl + D
+        . Acesse View / Minimap para retirar o scroll de código da direita
+        . Acessar configurações, ir em "Settings", Text editors, Sugestions:
+            . Na opção "Accept Suggestion On Enter" deixar como off
+            . Na opção "Suggest: Insert Mode" deixar como replace
+            . Na opção "Quick Suggestions Delay" deixar como 1000
+        . Acesse "Keyboard Shortcuts" em configurações:
+            . Digite "Emmet: Wrap..." e altere o "Keybinding" para "Alt + M"
+                . De agora em diante, ao editar uma página HTML e quiser cercar um bloco de tags com uma outra, 
+                    basta:
+                    . Selecionar o bloco
+                    . Digitar "Alt + M"
+                    . Informar a tag que deseja colocar, somente a identificação sem "<>", por exemplo: "div"
+            . Digite "Emmet: Remove Tag" e altere o "Keybinding" para "Alt+Shift+-", o "-" deve ser do bloco numerico
+                . De agora em diante, se precisar apagar uma tag HTML que cerca um conjunto de outras tags, basta posicioinar
+                    o cursor sobre a "TAg" que deseja apagar e pressionar "Ctrl+Shift+-"
+        . Digite "Ctrl+Shift+P" e digite "Preferência: Abrir as Configurações do Usuário (JSON)"
+            . Digite a configuração abaixo:
+
+                ...
+                "workbench.tree.indent": 20,
+                "workbench.tree.renderIndentGuides": "always",
+                "workbench.colorCustomizations": {
+                    "tree.indentGuidesStroke": "#c8e0be"
+                }
+        . Acesse Configurações -> Profile -> Import Profile 
+            . Informe o link "https://vscode.dev/profile/github/12bd0215e34ffe344361b7dcf767842b" para resgatar as configurações para desenvolvimento em .NET
