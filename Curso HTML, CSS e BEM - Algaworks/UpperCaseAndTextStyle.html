@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário com Manipulação de Texto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Campo 1 em maiúsculas */
+        #campo1 {
+            text-transform: uppercase;
+        }
+
+        /* Campo 2 em maiúsculas, se a classe remove-acentos for aplicada */
+        #campo2 {
+            text-transform: uppercase;
+        }
+
+        /* Campo 3 em minúsculas */
+        #campo3 {
+            text-transform: lowercase;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Formulário de Exemplo</h2>
+    <form>
+        <label for="campo1">Campo 1:</label>
+        <input type="text" id="campo1" name="campo1">
+
+        <label for="campo2">Campo 2:</label>
+        <input type="text" id="campo2" name="campo2" class="remove-acentos">
+
+        <label for="campo3">Campo 3:</label>
+        <input type="text" id="campo3" name="campo3">
+
+        <input type="submit" value="Enviar">
+    </form>
+
+    <script>
+        document.querySelectorAll('.remove-acentos').forEach(function(input) {
+            input.addEventListener('input', function(event) {
+                let texto = event.target.value;
+
+                // Substituir acentos e "ç"
+                texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove acentos
+                texto = texto.replace(/ç/g, 'c').replace(/Ç/g, 'C'); // Substitui "ç" por "c"
+                
+                // Forçar texto em maiúsculas
+                texto = texto.toUpperCase();
+
+                event.target.value = texto;
+            });
+        });
+    </script>
+</body>
+</html>
