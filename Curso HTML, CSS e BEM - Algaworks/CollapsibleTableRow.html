@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collapsible Table Rows</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .collapsible {
+            cursor: pointer;
+        }
+        .hidden-row {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Collapsible Table Rows</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Header 1</th>
+                <th>Header 2</th>
+                <th>Header 3</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="collapsible">
+                <td>Row 1</td>
+                <td>Data 1</td>
+                <td>More Data 1</td>
+            </tr>
+            <tr class="hidden-row">
+                <td colspan="3">Row 1.1</td>
+            </tr>
+            <tr class="collapsible">
+                <td>Row 2</td>
+                <td>Data 2</td>
+                <td>More Data 2</td>
+            </tr>
+            <tr class="hidden-row">
+                <td colspan="3">Row 2.1</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const collapsibleRows = document.querySelectorAll('.collapsible');
+            collapsibleRows.forEach(row => {
+                row.addEventListener('click', function() {
+                    const nextRow = row.nextElementSibling;
+                    if (nextRow && nextRow.classList.contains('hidden-row')) {
+                        nextRow.style.display = nextRow.style.display === 'none' ? 'table-row' : 'none';
+                    }
+                });
+            });
+
+            // Initially hide all hidden rows
+            const hiddenRows = document.querySelectorAll('.hidden-row');
+            hiddenRows.forEach(row => {
+                row.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
