@@ -238,7 +238,7 @@ https://www.javascripttutorial.net/
             </html>
 
 
-2. Fundamentos
+3. Fundamentos
 --------------
 
     . Ponto e virgula ";"
@@ -552,6 +552,8 @@ https://www.javascripttutorial.net/
 
                     let numbers = [1, 2, 3, 4, 5];
 
+                    console.log( numbers[0] );  // 1
+
                     let scores = new Array(9,10,8,7,6);
 
                     let athletes = new Array(3); 
@@ -589,6 +591,50 @@ https://www.javascripttutorial.net/
                 . Para verificar se um objeto é array utilizamos o metodo "isArray":
 
                     console.log(Array.isArray(seas)); // true
+
+                . Formas de iterar um array:
+
+                    const scores = [22, 54, 76, 92, 43, 33];
+
+
+                    // Com "for..in"
+                    for (i in scores) {
+                        console.log(scores[i]);
+                    }
+
+                    // Com "forEach"
+                    scores.forEach((score) => {
+                        console.log(score);
+                    });
+
+                    scores.forEach((score) => console.log(score));
+
+                    // Com "while"
+                    let i = 0;
+
+                    while (i < scores.length) {
+                        console.log(scores[i]);
+                        i++;
+                    }
+
+                    // Com "do"
+                    let i = 0;
+
+                    do {
+                        console.log(scores[i]);
+                        i++;
+                    } while (i < scores.length);
+
+
+                    // Com "for"
+                    for (let i = 0; i < scores.length; i++) {
+                        console.log(scores[i]);
+                    }
+
+                    // Com "for..of"
+                    for (score of scores) {
+                        console.log(score);
+                    }
 
             Function
 
@@ -666,4 +712,159 @@ https://www.javascripttutorial.net/
                 console.log(person, numbers, greet, now, pattern, map, set);
 
     . Objetos
+
+        . Objetos em javascript assemelha-se um pouco com uma estrutura json:
+
+            let person = {
+                firstName: 'John',
+                lastName: 'Doe'
+            };
+
+        . Podemos incluir métodos:
+
+            let apple = {
+                valueOf: function () {
+                    return 10;
+                },
+            };
+
+            let orange = {
+                toString: function () {
+                    return '20';
+                },
+            };
+
+            console.log( apple.valueOf() );
+            console.log( orange.toString() );
+
+        . Exemplos de como obter as informações dos objetos javascript:
+
+            console.log(person.firstName);
+            console.log(person.lastName);
+
+            console.log(person['firstName']);
+            console.log(person['lastName']);
+
+        . O nome das propriedades podem conter espaços, porém não é uma boa prática:
+
+            let address = {
+                'building no': 3960,
+                street: 'North 1st street',
+                state: 'CA',
+                country: 'USA'
+            };
+
+            console.log( address['building no'] );
+            console.log( address.'building no' );   // Neste caso ocorrerá um erro
+
+        . Para adicionar dinamicamente uma nova propriedade, basta atribuir um valor a nova propriedade:
+
+            address.zipCode = "02423100";   // Adiciona dinamicamente a nova propriedade
+
+            console.log( address.zipCode );
+
+
+4. Operadores
+-------------
+
+    . Aritiméticos
+
+        Operator	    Sign
+        --------        ----
+        Addition	    +
+        Subtraction	    -
+        Multiplication	*
+        Division	    /
+        Resto           %
+
+    . Atribuição
+
+        Operator	Meaning	    Description
+        --------    -------     -----------
+        a = b	    a = b	    Assigns the value of b to a.
+        a += b	    a = a + b	Assigns the result of a plus b to a.
+        a -= b	    a = a - b	Assigns the result of a minus b to a.
+        a *= b	    a = a * b	Assigns the result of a times b to a.
+        a /= b	    a = a / b	Assigns the result of a divided by b to a.
+        a %= b	    a = a % b	Assigns the result of a modulo b to a.
+        a &=b	    a = a & b	Assigns the result of a AND b to a.
+        a |=b	    a = a | b	Assigns the result of a OR b to a.
+        a ^=b	    a = a ^ b	Assigns the result of a XOR b to a.
+        a <<= b	    a = a << b	Assigns the result of a shifted left by b to a.
+        a >>= b	    a = a >> b	Assigns the result of a shifted right (sign preserved) by b to a.
+        a >>>= b	a = a >>> b	Assigns the result of a shifted right by b to a.    
+
+    . Unários
+
+        Unary Operators	    Name	                        
+        ---------------     ----                            
+        ++x	                Incrementa o valor 1 primeiro no x
+        –-x	                Decrementa o valor 1 primeiro no x
+        x++	                Utiliza o valor do x na operação para depois fazer a adição de 1 ao x
+        x–-	                Utiliza o valor do x na operação para depois fazer a subtração de 1 ao x
+
+    . Comparação
+
+        Operator	Meaning
+        --------    -------
+        <	        less than
+        >	        greater than
+        <=	        less than or equal to
+        >=	        greater than or equal to
+        ==	        equal to
+        !=	        not equal to
+        ===	        strict equal
+        !==	        not strict equal
+
+        . Diferença entre "==" e "==="
+
+            . "==" quando utilizado para uma condição o operador irá converter o tipo da segunda parte da comparação para o tipo 
+                da primeira. Caso o conteúdo encontrado forem iguais a condição é verdadeira "true"
+
+            . "===" quando utilizado não faz nenhuma conversão e se os tipos forem diferentes dará falso.
+
+            . Exemplo:
+
+                console.log( 1 == "1" );        // true
+                console.log( 1 === "1" );       // false
+
+    . Operadores lógicos
+
+        ! (Logical NOT)
+        || (Logical OR)
+        && (Logical AND)
+
+    . Operador (nullish coalescing) "IFNULL"
+
+        . Representado pelo simbolo "??", retorna o segundo valor se o primeiro for null/undefined:
+
+            const name = null ?? 'John';
+
+            console.log(name); // 'John'
+
+            const age = undefined ?? 28;
+
+            console.log(age);   // 28
+
+            const city = ( null || undefined ) ?? "SAO PAULO";
+
+            console.log( city );        // SAO PAULO
+
+    . Exponenciação
+
+        . Utilizamos o simbolo "**", equivalente a função "Math.pow( value1, value2 )". São forma de obter um número levado a uma determinada potência.
+
+        . Exemplo:
+
+            console.log( Math.pow( 2,2 ) );         // 4
+
+            console.log( 2 ** 2 );                  // 4
+
+        . Se o primeiro número for negativo ele deve vir entre parenteses. Já o segundo não há restrição.
+
+            console.log( (-2) ** 2 );                  // 4
+
+
+5. Controle de Fluxo
+--------------------
 
