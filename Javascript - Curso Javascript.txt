@@ -215,27 +215,23 @@ https://www.javascripttutorial.net/
 
         . Existem dois atributos que podemos definir para carregar os scripts:
 
-            . async
+            . async - instrui o navegador para executar o script de forma assíncrona
 
-            . defer
+                <script async src="service.js"></script>
+                <script async src="app.js"></script>
 
-        . O atributo "async" instrui o navegador para executar o script de forma assíncrona
+            . defer - instrui o navegador executar o script depois que a página for carregada
 
-            <script async src="service.js"></script>
-            <script async src="app.js"></script>
-
-        . O atributo "defer" instrui o navegador executar o script depois que a página for carregada
-
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>JavaScript defer demonstration</title>
-                    <script defer src="defer-script.js"></script>
-                </head>
-                <body>
-                </body>
-            </html>
+                <!DOCTYPE html>
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>JavaScript defer demonstration</title>
+                        <script defer src="defer-script.js"></script>
+                    </head>
+                    <body>
+                    </body>
+                </html>
 
 
 3. Fundamentos
@@ -596,6 +592,11 @@ https://www.javascripttutorial.net/
 
                     const scores = [22, 54, 76, 92, 43, 33];
 
+                    // Com método "map"
+                    scores.map( (elemento, indice ) => 
+                    { 
+                        console.log( "Score " + elemento + " Indíce " + indice );
+                    });
 
                     // Com "for..in"
                     for (i in scores) {
@@ -836,6 +837,8 @@ https://www.javascripttutorial.net/
 
     . Operador (nullish coalescing) "IFNULL"
 
+        . Importante, esse operador só funciona no ambiente do navegador. No ambiente do nodejs não executou.
+
         . Representado pelo simbolo "??", retorna o segundo valor se o primeiro for null/undefined:
 
             const name = null ?? 'John';
@@ -867,4 +870,300 @@ https://www.javascripttutorial.net/
 
 5. Controle de Fluxo
 --------------------
+
+    . "if"
+
+        . Exemplos:
+
+            // Exemplo de um simple "if"
+            let age = 18;
+
+            if (age >= 18) {
+                console.log('You can sign up');
+            }
+
+
+            // Exemplo de um "if/else"
+            let age = 18;
+
+            if (age >= 18) {
+                console.log('You can sign up.');
+            } else {
+                console.log('You must be at least 18 to sign up.');
+            }
+
+            // Exemplo de um "if/else if"
+            let month = 6;
+            let monthName;
+
+            if (month == 1) {
+                monthName = 'Jan';
+            } else if (month == 2) {
+                monthName = 'Feb';
+            } else if (month == 3) {
+                monthName = 'Mar';
+            } else if (month == 4) {
+                monthName = 'Apr';
+            } else if (month == 5) {
+                monthName = 'May';
+            } else if (month == 6) {
+                monthName = 'Jun';
+            } else if (month == 7) {
+                monthName = 'Jul';
+            } else if (month == 8) {
+                monthName = 'Aug';
+            } else if (month == 9) {
+                monthName = 'Sep';
+            } else if (month == 10) {
+                monthName = 'Oct';
+            } else if (month == 11) {
+                monthName = 'Nov';
+            } else if (month == 12) {
+                monthName = 'Dec';
+            } else {
+                monthName = 'Invalid month';
+            }
+
+            console.log(monthName);
+
+    . Operador Ternário "?:"
+
+        let age = 18;
+        let message;
+
+        age >= 16 ? (message = 'You can drive.') : (message = 'You cannot drive.');
+
+        console.log(message);
+
+        message = age<18 ? "de menor" : "de maior";
+
+        console.log(message);
+
+    . "switch case"
+
+        let day = 3;
+        let dayName;
+
+        switch (day) {
+            case 1:
+                dayName = 'Sunday';
+                break;                  
+            case 2:
+                dayName = 'Monday';
+                break;
+            case 3:
+                dayName = 'Tuesday';
+                break;                      // O "break" é obrigatório para sair do case, 
+            case 4:                         // caso contrário a execução irá para o próximo case, até encontrar um outro "break"
+                dayName = 'Wednesday';
+                break;
+            case 5:
+                dayName = 'Thursday';
+                break;
+            case 6:
+                dayName = 'Friday';
+                break;
+            case 7:
+                dayName = 'Saturday';
+                break;
+            default:
+                dayName = 'Invalid day';
+        }
+
+        console.log(dayName); // Tuesday
+
+    . "while"
+
+        let count = 1;
+        while (count < 10) {
+            console.log(count);
+            count +=2;
+        }
+
+    . "do while"
+
+        let count = 0;
+        do {
+            console.log(count);
+            count++;
+        } while (count < 5)
+
+    . "for"
+
+        for (let i = 1; i < 5; i++) {
+            console.log(i);
+        }
+
+    . "break" - Pode ser usado para "for", "while" e "do while"
+
+        for (let i = 0; i < 5; i++) {
+            console.log(i);
+
+            if (i == 2) {
+                break;
+            }
+        }
+
+    . "continue" - Pode ser usado para "for", "while" e "do while"
+
+        for (let i = 0; i < 10; i++) {
+            if (i % 2 === 0) {
+                continue;
+            }
+
+            console.log(i);
+        }
+
+
+6. Funções
+----------
+
+    . Declaração de forma simples:
+
+        function say(message) {
+            console.log(message);
+        }
+
+    . Armazenando funções em variáveis:
+
+        function add(a, b) {
+            return a + b;
+        }
+
+        let sum = add;
+
+        console.log(sum(5, 7)); // 12        
+
+    . Passando uma função como parâmetro:
+
+        function add(a, b) {
+            return a + b;
+        }
+
+        let sum = add;
+
+        function average(a, b, fn) {
+            return fn(a, b) / 2;
+        }
+
+        let result = average(10, 20, sum);
+
+        console.log(result);
+
+    . Retornando um função de dentro de uma função:
+
+        // Crie a função
+        function compareBy(propertyName) {
+            return function (a, b) {
+                let x = a[propertyName],
+                y = b[propertyName];
+
+                if (x > y) {
+                    return 1;
+                } else if (x < y) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            };
+        }
+
+
+        // Crie o objeto abaixo
+        let products = [
+            {name: 'Xiomi', price: 900},
+            {name: 'Samsung Galaxy', price: 850},
+            {name: 'Sony Xperia', price: 700}
+        ];
+
+
+        // Execute o código abaixo:
+        console.log('Products sorted by name:');
+        products.sort(compareBy('name'));
+
+        console.table(products);
+
+        ┌─────────┬──────────────────┬───────┐
+        │ (index) │       name       │ price │
+        ├─────────┼──────────────────┼───────┤
+        │    0    │ 'Samsung Galaxy' │  850  │
+        │    1    │  'Sony Xperia'   │  700  │
+        │    2    │     'Xiomi'      │  900  │
+        └─────────┴──────────────────┴───────┘
+
+
+    . Funções anônimas:
+
+        // Forma simples de declarar uma função anônima
+        let show = function() {
+            console.log('Anonymous function');
+        }
+
+        show();
+
+
+        // Arrow function
+        let show2 = () => {
+            console.log('Arrow function');
+        }
+
+        // Arrow function resumida
+        let show3 = () => console.log('Arrow function resumida');
+
+
+        // Outro exemplo, passando a função anônima parâmetro
+        setTimeout(function() {
+            console.log('Execute later after 1 second')
+        }, 1000);
+
+
+
+        // Invocando imediatamente a função
+        (function() {
+            console.log('IIFE');
+        })();
+
+    . Passagem de parâmetros por valor e por referência:
+
+
+        . ByVal
+
+            function square(x) {
+                x = x * x;
+                return x;
+            }
+
+            let y = 10;
+            let result = square(y);     // Devido a variavel "y" ser primitiva ela será passada por valor
+
+            console.log(result); // 100 
+            console.log(y);             // Neste caso "y" não altera o valor, permanecendo com valor 10
+
+        . ByRef
+
+            let person = {
+                name: 'John',
+                age: 25,
+            };
+
+            function increaseAge(obj) {
+                obj.age += 1;
+            }
+
+            increaseAge(person);        // "person" Por ser um objeto será passado por referência
+
+            console.log(person);        // Neste caso a propriedade "age" passará de 25 para 26
+
+    . Parâmetros Default
+
+        function say(message='Hi') {
+            console.log(message);
+        }
+
+        say(); // 'Hi'
+        say('Hello') // 'Hello'
+
+7. Objetos
+----------
+
 
