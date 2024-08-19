@@ -1166,4 +1166,60 @@ https://www.javascripttutorial.net/
 7. Objetos
 ----------
 
+    . Como dito anteriormente, objetos em javascript assemelha-se um pouco com uma estrutura json:
 
+        let person = {
+            firstName: 'John',
+            lastName: 'Doe'
+        };
+
+    . Porém, a diferença inicia com a possibilidade que temos de inserir métodos. Os métodos podem ser inseridos nos 
+        objetos de diversas formas:
+
+        . Forma No. 1:
+
+            let person = {
+                firstName: 'John',
+                lastName: 'Doe'
+            };
+
+            person.greet = function () {
+                console.log('Hello!');
+            }
+
+            person.greet();
+
+        . Forma No. 2:
+
+            let person = {
+                firstName: 'John',
+                lastName: 'Doe'
+            };
+
+            function greet() {
+                console.log('Hello, World!');
+            }
+
+            person.greet = greet;
+
+            person.greet();
+
+        . Forma No. 3:
+
+            let person = {
+                firstName: 'John',
+                lastName: 'Doe',
+                greet: function () {
+                    console.log('Hello, World!');
+                },
+                getFullName: function () {
+                    return this.firstName + ' ' + this.lastName;
+                }
+            };
+
+
+            console.log(person.getFullName());
+
+    . Construtor
+
+    https://www.javascripttutorial.net/javascript-constructor-function/
