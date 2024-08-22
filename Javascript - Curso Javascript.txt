@@ -1222,4 +1222,54 @@ https://www.javascripttutorial.net/
 
     . Construtor
 
-    https://www.javascripttutorial.net/javascript-constructor-function/
+        . A forma para se criar um objeto com um método construtor é criar uma função:
+
+            function Person(firstName, lastName) {
+                // add properties to this
+                this.firstName = firstName;
+                this.lastName = lastName;
+
+                // return this;
+            }
+
+
+            let person = new Person('John','Doe');
+
+        . Importante, as propriedades do objetos são criadas automaticamente durante a atribuição dos valores.
+
+        . Os parâmetros do construtor podem ser feitos com valores "defaults":
+
+            // Valor defaults   ----------+     ----------------+
+            //                            |                     |
+            //                            v                     V
+            function Person(firstName = "Mark", lastName = "Silva") {
+                ...
+            }
+
+
+        . Podemos construir métodos dentro desses objetos:
+
+            // Método construtor
+            function Person(firstName, lastName) {
+                this.firstName = firstName;
+                this.lastName = lastName;
+
+                this.getFullName = function () {
+                    return this.firstName + " " + this.lastName;
+                };
+            }
+
+            let person = new Person("John", "Doe");
+
+            console.log(person.getFullName());
+
+        . A criação de classe com construtor obedece duas regras:
+
+            . O nome da função deve começar com letra maiuscula, embora essa seja mais uma convenção porque nos testes
+                o nome com letra minuscula também funcionou perfeitamente.
+
+            . A criação do objeto deve sempre ser feito através do operador "new"
+
+    . Prototype
+
+    
