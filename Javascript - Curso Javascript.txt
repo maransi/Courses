@@ -2,6 +2,13 @@ Curso de Javascript
 -------------------
 
 https://www.javascripttutorial.net/
+https://learn-js.org/
+
+https://javascript.info/
+
+https://www.java5cript.com/
+https://github.com/trekhleb/javascrip...
+https://www.jsv9000.app/
 
 1. Instalações
 
@@ -1220,6 +1227,58 @@ https://www.javascripttutorial.net/
 
             console.log(person.getFullName());
 
+        . Forma 4
+
+            let person = {
+                firstName: 'John',
+                lastName: 'Doe',
+                greet() {
+                    console.log('Hello, World!');
+                },
+                getFullName() {
+                    return this.firstName + ' ' + this.lastName;
+                }
+            };
+
+
+            console.log(person.getFullName());
+
+    . Fabrica de funções:
+
+        function createPerson(firstName, lastName) {
+            return {
+                firstName: firstName,
+                lastName: lastName,
+                getFullName() {
+                return firstName + ' ' + lastName;
+                },
+            };
+        }
+
+        let person1 = createPerson('John', 'Doe');
+        let person2 = createPerson('Jane', 'Doe');
+
+        console.log(person1.getFullName());
+        console.log(person2.getFullName());
+
+
+    . Obtendo valores das propriedades do objeto:
+
+        var person = {
+            firstName: 'John',
+            lastName: 'Doe',
+            ssn: '299-24-2351',
+            getFullName: function () {
+                return this.firstName + ' ' + this.lastName;
+            }
+        };
+
+        for (var prop in person) {
+            if (typeof person[prop] === 'function') continue;   // Para imprimir somente o valor das propriedades
+
+            console.log(prop + ':' + person[prop]);
+        }
+
     . Construtor
 
         . A forma para se criar um objeto com um método construtor é criar uma função:
@@ -1270,7 +1329,181 @@ https://www.javascripttutorial.net/
 
             . A criação do objeto deve sempre ser feito através do operador "new"
 
+    . Object.Create
+
+        var personActions = {
+            getFullName() {
+                return this.firstName + ' ' + this.lastName;
+            },
+        };
+
+        function createPerson(firstName, lastName) {
+            let person = Object.create(personActions);  // Cria um objeto com o objeto "Object", envia o objeto "personActions" no construtor.
+            person.firstName = firstName;               // O retorno será um objeto com o "personActions" na estrutura.
+            person.lastName = lastName;                 
+            return person;                              // Incrementa as propriedades no objeto criado, formando um único.
+        }
+
+        let person1 = createPerson('John', 'Doe');
+        let person2 = createPerson('Jane', 'Doe');
+
+        console.log(person1.getFullName());
+        console.log(person2.getFullName());
+
+    . Initializer shorthand
+
+        Exemplo 1:
+
+            let name = 'Computer',
+                status = 'On';
+
+            let machine = {
+                name,
+                status
+            };
+
+            console.log(machine);   // {name: 'Computer', status: 'On'}
+
+        Exemplo 2
+
+            function createMachine(name, status) {
+                return {
+                    name,
+                    status
+                };
+            }
+
+            let machine1 = createMachine('Computer', 'On');
+
+            console.log(machine);   // {name: 'Computer', status: 'On'}
+
     . This
 
-    https://www.javascripttutorial.net/javascript-this/
+        .  É uma palavra-chave que se refere ao objeto atual que está sendo executado. Em outras palavras, é o contexto 
+            em que uma função é chamada.
 
+        .  Referência ao objeto corrente:
+
+            . Exemplo 1:
+
+                let counter = {
+                    count: 0,
+                    next: function () {
+                        return ++this.count;        // Aqui
+                    },
+                };
+
+                counter.next();
+
+            . Exemplo 2:
+
+                function Pessoa(nome) {
+                    this.nome = nome;
+                }
+
+                const joao = new Pessoa('João');
+
+                console.log(joao.nome); // João
+
+        . Contexto global - Fora de um objeto, this referencia a "window"
+
+            this.color= 'Red';
+            console.log(window.color); // 'Red'
+
+        . Diferenças do uso do this em function e object:
+
+            . Function - O uso do "this" é obrigatório quando criamos funções/métodos dentro de funções:
+
+                function Person(firstName = "Marco", lastName = "Silva") {
+                    this.firstName = firstName;
+                    this.lastName = lastName;
+
+                    // Aqui
+                    this.getFullName = function () {
+                        return this.firstName + " " + this.lastName;
+                    };
+
+                    // Aqui
+                    this.showFullName = function () {
+                        console.log(this.getFullName());
+                    };
+                }
+
+                const p = new Person("Jose", "Maria");
+
+                p.showFullName();
+
+            . Object - O uso não é necessário:
+
+                const pessoa = {
+                    nome: 'João',
+
+                    falar: function () {       //                      Function
+                        console.log(this.nome); // João
+                    }
+                };
+
+                pessoa.falar(); 
+
+        . Atenção - Em função de seta (arrow function), this não é redefinido e não herda o contexto do objeto e sim do pai
+
+            const pessoa = {
+                nome: 'João',
+                falar: () => {              //                      Arrow function
+                    console.log(this.nome); // undefined
+                },
+
+                falar2: function () {       //                      Function
+                    console.log(this.nome); // João
+                }
+            };
+
+            pessoa.falar(); // undefined
+
+            pessoa.falar2();    // João
+
+8 . Prototype
+-------------
+
+    . Em JavaScript, prototype é uma propriedade de funções e objetos.
+
+    . Em JavaScript, todas as funções são objetos. E cada função tem uma propriedade prototype que é um objeto. 
+        Esse objeto contém propriedades e métodos que são compartilhados por todas as instâncias da função.
+
+    . Quando você cria uma instância de uma função usando a palavra-chave new, a instância recebe todas as 
+        propriedades e métodos do objeto prototype da função. Isso significa que você pode acessar essas 
+        propriedades e métodos diretamente na instância.
+
+        Por exemplo:
+
+            function Pessoa(nome) {
+                this.nome = nome;
+            }
+
+            Pessoa.prototype.falar = function() {
+                console.log('Olá, meu nome é ' + this.nome);
+            }
+
+            const joao = new Pessoa('João');
+
+            joao.falar(); // Olá, meu nome é João
+
+    . Se quisermos fazer um "override" do método/função "falar" na classe concreta, a chamada desse método será da classe concreta:
+
+            function Pessoa(nome) {
+                this.nome = nome;
+
+                this.falar = function(){
+                    console.log("Meu nome é " + this.nome );
+                }
+            }
+
+            Pessoa.prototype.falar = function() {
+                console.log('Olá, meu nome é ' + this.nome);
+            }
+
+            const joao = new Pessoa('João');
+
+            joao.falar(); // Meu nome é João
+
+https://www.javascripttutorial.net/javascript-class/
