@@ -1506,4 +1506,290 @@ https://www.jsv9000.app/
 
             joao.falar(); // Meu nome é João
 
-https://www.javascripttutorial.net/javascript-class/
+
+9. Classes
+----------
+
+    . Existem várias maneiras de declarar uma classe em JavaScript. Aqui estão algumas delas:
+
+        . Declarando uma classe com a palavra-chave class
+
+            class Pessoa {
+                constructor(nome, idade) {
+                    this.nome = nome;
+                    this.idade = idade;
+                }
+
+                falar() {
+                    console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos.`);
+                }
+            }
+        
+            const pessoa = new Pessoa("Marco", 57 );
+
+            pessoa.falar();
+
+        . Declarando uma classe com a função function
+
+            function Pessoa(nome, idade) {
+                this.nome = nome;
+                this.idade = idade;
+            }
+
+            // Se criar um método dentro da classe com o "falar" e chamá-lo, a execução será sempre do método "prototype"
+            Pessoa.prototype.falar = function() {
+                console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos.`);
+            };
+
+            const pessoa = new Pessoa("Marco", 57 );
+
+            pessoa.falar();
+
+
+        . Declarando uma classe com a sintaxe de objeto
+
+            const Pessoa = {
+                constructor: function(nome, idade) {
+                    this.nome = nome;
+                    this.idade = idade;
+                },
+                falar: function() {
+                    console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos.`);
+                }
+            };
+
+            Pessoa.falar();         // Neste caso não é preciso criar o objeto, já pode usá-lo
+
+
+        .  Declarando uma classe com a sintaxe de classe de ES6
+
+            class Pessoa {
+                constructor(nome, idade) {
+                    this.nome = nome;
+                    this.idade = idade;
+                }
+
+                falar() {
+                    console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos.`);
+                }
+
+                static criarPessoa(nome, idade) {
+                    return new Pessoa(nome, idade);
+                }
+            }
+
+            const pessoa = Pessoa.criarPessoa('Marco', 57 );
+
+            pessoa.falar();
+
+        . Declarando uma classe com a sintaxe de classe de ES6 com herança
+
+            class Pessoa {
+                constructor(nome, idade) {
+                    this.nome = nome;
+                    this.idade = idade;
+                }
+
+                falar() {
+                    console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos.`);
+                }
+            }
+
+            class Aluno extends Pessoa {
+                constructor(nome, idade, matricula) {
+                    super(nome, idade);
+                    this.matricula = matricula;
+                }
+
+                estudar() {
+                    console.log(`Estou estudando...`);
+                }
+            }
+
+            const pessoa = new Pessoa('Marco', 57);
+
+            pessoa.falar();
+
+            const aluno = new Aluno('Marco', 57, '123456');
+
+            aluno.estudar();
+            aluno.falar();
+
+        . Declarando uma classe como expressão:
+
+            let Person = class {
+                constructor(name) {
+                    this.name = name;
+                }
+                getName() {
+                    return this.name;
+                }
+            }
+
+            const marco = new Person('Marco');
+            console.log(marco.name);
+
+    . Getter and Setters
+
+        class Person {
+            constructor(name) {
+                this._name = name;
+            }
+            get name() {
+                return this._name;
+            }
+            set name(newName) {
+                if (typeof newName !== 'string') {
+                    throw 'The name must be a string';
+                }
+
+                newName = newName.trim();
+                if (newName === '') {
+                    throw 'The name cannot be empty';
+                }
+                this._name = newName;
+            }
+        }
+
+        const marco = new Person('Marco');
+
+        console.log(marco.name);
+
+        marco.name = 'Antonio';
+
+        console.log(marco.name);
+
+    . Propriedades privadas - Utiliza-se o caracter "#" para identificar que a propriedade é privada
+
+        class Pessoa {
+            #nome;
+            #idade;
+
+            constructor(nome, idade) {
+                this.#nome = nome;
+                this.#idade = idade;
+            }
+
+            get nome() {
+                return this.#nome;
+            }
+        }
+
+        class Funcionario extends Pessoa {
+            constructor(nome, idade, cargo) {
+                super(nome, idade);
+                this.cargo = cargo;
+            }
+        }
+
+        const marco = new Funcionario('Marco', 57, 'Programador');
+
+        console.log(marco.nome);
+
+        // Esta linha levantará uma exception. Propriedades com identificação de "#" não podem ser
+        // acessadas diretamente. É preciso que se construa um método dentro da classe pai para acessá-la
+        console.log(marco.#nome);
+
+    . Métodos Privados - O funcionamento de métodos privados segue a mesma lógica das propriedades privadas
+
+        class Pessoa {
+            #nome;
+            #idade;
+
+            constructor(nome, idade) {
+                this.#nome = nome;
+                this.#idade = idade;
+            }
+
+            #getNomePrivado() {
+                return this.#nome;
+            }
+        }
+
+        class Funcionario extends Pessoa {
+            constructor(nome, idade, cargo) {
+                super(nome, idade);
+                this.cargo = cargo;
+            }
+
+            getNome() {
+                return this.#getNomePrivado(); // Erro: SyntaxError: Private method '#getNomePrivado' must be declared in an enclosing class
+            }
+        }
+
+
+    . new.target    - É uma propriedade que retorna o construtor que foi chamado com o operador new. 
+                        Ela é usada para determinar se uma função foi chamada como um construtor ou como uma função regular.
+
+                        Quando uma função é chamada com o operador new, o valor de new.target é o próprio construtor
+
+        function Pessoa(nome) {
+            if (new.target === Pessoa) {
+                this.nome = nome;
+            } else {
+                throw new Error('Pessoa deve ser chamada com o operador new');
+            }
+        }
+
+        // Neste caso o construtor não levantará uma exception
+        const pessoa = new Pessoa('Marco');
+
+        // Aqui será levantado uma exception
+        Pessoa('Marco');
+
+    . Métodos Estáticos
+
+        class Person {
+            constructor(name) {
+                this.name = name;
+            }
+            getName() {
+                return this.name;
+            }
+            static createAnonymous() {
+                return "createAnonymous";
+            }
+        }
+
+
+        console.log(Person.createAnonymous());
+
+    . Propriedades Estáticas
+
+        class Item {
+            constructor(name, quantity) {
+                this.name = name;
+                this.quantity = quantity;
+                this.constructor.count++;
+            }
+            static count = 0;
+            static getCount() {
+                return Item.count;
+            }
+        }
+
+
+        const parafuso = new Item('Parafuso', 10);
+
+        console.log(Item.getCount());   // 1
+
+
+        const tijolo = new Item('Tijolo', 5);
+
+        console.log(Item.getCount());   // 2
+
+    . instanceof - É utilizado para conferir se um objeto é derivado de uma determinada classe:
+
+        function Person(name) {
+            this.name = name;
+        }
+
+        let p1 = new Person('John');
+
+        console.log(p1 instanceof Person); // true    
+
+
+10. Tipos de Função
+-------------------
+
+https://www.javascripttutorial.net/javascript-function-type/
