@@ -521,7 +521,7 @@ https://www.jsv9000.app/
             
                     let bigInt = 1234567890123456789012345678901234567890n;        
 
-        . Tipos de Referência (Objetos)
+        . Tipos de Referência
         
             Object
 
@@ -553,47 +553,173 @@ https://www.jsv9000.app/
         
                 . Exemplo:
 
+                    let arr = new Array();
+                    let arr = [];
+                    let athletes = new Array(3); 
+
                     let numbers = [1, 2, 3, 4, 5];
 
                     console.log( numbers[0] );  // 1
 
                     let scores = new Array(9,10,8,7,6);
 
-                    let athletes = new Array(3); 
 
                 . Observe se usarmos a criação do array com o construtor Array(1,2,...), precisamos do operador "new".
 
-                . Para adicionar um elemento ao array utilizamos o método "push", ou "unshift" para adicionar o item no inicio:
+                . Podemos adicionar um novo item diretamente no array sem fazer uso de funções/métodos:
 
-                    let seas = ['Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea'];
-                    seas.push('Red Sea');   // Adiciona no final do array
+                    let fruits = ["Apple", "Orange", "Plum"];
 
-                    console.log(seas);  // [ 'Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea', 'Red Sea' ]
+                    fruits[3] = "Banana";
+                    fruits[4] = "Pear";
+                    fruits[5] = "Peach";
 
-                    seas.unshift('Blue Sea');   // Adiciona no inicio do array
+                    console.log(fruits);    // ['Apple', 'Orange', 'Plum', 'Banana', 'Pear', 'Peach']
+                    console.log(fruits[3]); // "Banana"
 
-                    console.log(seas);  // [ 'Blue Sea', 'Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea', 'Red Sea' ]
+                . Um array pode adicionar outros tipos de objetos:
 
-                . Para eliminar um elemento ao array utilizamos "pop", ou "shift"
+                    // mix of values
+                    let arr = [ 'Apple', { name: 'John' }, true, function() { console.log('hello'); } ];
 
-                    let seas = ['Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea'];
-                    const lastElement = seas.pop();         // Remove o item no final do array
-                    console.log(lastElement); 
+                    console.log(arr[0]); // Apple
 
-                    const firstElement = seas.shift();
+                    // get the object at index 1 and then show its name
+                    console.log( arr[1].name ); // John
 
-                    console.log(firstElement);              // Remove o item do inicio do array
+                    // get the function at index 3 and run it
+                    arr[3](); // hello
 
-                . Para localizar um item no array utilizamos o método "indexOf":
 
-                    let seas = ['Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea'];
-                    let index = seas.indexOf('North Sea');
+                . Métodos de um objeto Array:
 
-                    console.log(index); // 2
+                    . "length" - Retorna o total de elementos do array:
 
-                . Para verificar se um objeto é array utilizamos o metodo "isArray":
+                        let fruits = ["Apple", "Orange", "Plum"];
 
-                    console.log(Array.isArray(seas)); // true
+                        console.log( fruits.length ); // 3
+
+                    . "push" e "unshift" - Para adicionar um elemento ao array utilizamos o método "push", ou "unshift" para adicionar o item no inicio:
+
+                        let seas = ['Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea'];
+                        seas.push('Red Sea');   // Adiciona no final do array
+
+                        console.log(seas);  // [ 'Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea', 'Red Sea' ]
+
+                        seas.unshift('Blue Sea');   // Adiciona no inicio do array
+
+                        console.log(seas);  // [ 'Blue Sea', 'Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea', 'Red Sea' ]
+
+                    . "pop" e "shift" - Para eliminar um elemento ao array utilizamos "pop", ou "shift"
+
+                        let seas = ['Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea'];
+                        const lastElement = seas.pop();         // Remove o item no final do array
+                        console.log(lastElement); 
+
+                        const firstElement = seas.shift();
+
+                        console.log(firstElement);              // Remove o item do inicio do array
+
+                    . "indexOf" - Para localizar um item no array utilizamos o método "indexOf":
+
+                        let seas = ['Black Sea', 'Caribbean Sea', 'North Sea', 'Baltic Sea'];
+                        let index = seas.indexOf('North Sea');
+
+                        console.log(index); // 2
+
+                    . "isArray" - Para verificar se um objeto é array utilizamos o metodo "isArray":
+
+                        console.log(Array.isArray(seas)); // true
+
+                    . "filter" -  função de array que cria um novo array com todos os elementos que passam no teste implementado pela função 
+                                    fornecida.
+
+                        // arr      é o array original
+                        // callback é a função de teste que é chamada para cada elemento do array
+                        // thisArg  é o valor que é usado como this dentro da função de teste
+                        var novoArray = arr.filter(callback[, thisArg])                                    
+
+                        . A função de teste callback é chamada com os seguintes argumentos:
+
+                            element: o elemento atual do array
+                            index: o índice do elemento atual no array
+                            array: o array original
+
+                        .Se a função de teste retornar true, o elemento é incluído no novo array. Se retornar false, o elemento é ignorado.
+
+                            var numeros = [1, 2, 3, 4, 5, 6];
+
+                            var pares = numeros.filter(function(element) {
+                                return element % 2 === 0;
+                            });
+
+                            console.log(pares); // [2, 4, 6]
+
+                        . Podemos usar arrow functions para tornar o código mais conciso:
+
+                            var numeros = [1, 2, 3, 4, 5, 6];
+
+                            var pares = numeros.filter(element => element % 2 == 0 );
+
+                            console.log(pares); // [2, 4, 6]
+
+                    . "find" - Função de array que retorna o primeiro elemento do array que passa no teste implementado pela função fornecida.
+
+                        // Os parâmetros segue a mesma lógica do método "filter"
+                        var encontrado = arr.find(callback[, thisArg])
+
+                        Exemplo:
+
+                            var frutas = ['maçã', 'banana', 'laranja', 'uva'];
+
+                            var encontrada = frutas.find(function(fruta) {
+                                return fruta === 'banana';
+                            });
+
+                            console.log(encontrada); // 'banana'
+
+
+
+                            ou
+
+                            var frutas = ['maçã', 'banana', 'laranja', 'uva'];
+
+                            var encontrada = frutas.find(fruta => fruta === 'banana');                            
+
+                            console.log(encontrada); // 'banana'
+
+                    . "reduce" -  é usado para aplicar uma função a cada elemento de um array e reduzi-los a um único valor
+
+                        const numbers = [1, 2, 3, 4, 5];
+
+                        //                                  +----------------> A função de callback (accumulator, current) é chamada para cada elemento do array
+                        //                                  |
+                        const sum = numbers.reduce((accumulator, current) => {
+                            return accumulator + current;
+                        }, 0);  //      |           |
+                        // |            |           +------------------------> O current é o elemento atual do array
+                        // |            +------------------------------------> O accumulator é o valor retornado pela função de callback na iteração anterior
+                        // +-------------------------------------------------> Valor utilizado para iniciar a variável "accumalator"
+                        //
+                        // No primeiro passo, o accumulator é iniciado com o valor 0 (o segundo argumento da função reduce) e o 
+                        // current é o primeiro elemento do array (1). A função de callback retorna 0 + 1 = 1.
+                        //
+                        // No segundo passo, o accumulator é 1 e o current é o segundo elemento do array (2). A função de callback retorna 1 + 2 = 3
+
+
+                        console.log(sum); // imprime 15
+
+
+                        // Outro Exemplo
+
+                        const names = ['John', 'Jane', 'Bob', 'Alice'];
+
+                        const fullName = names.reduce((accumulator, current) => {
+                            return accumulator + ', ' + current;
+                        }, '');
+
+                        console.log(fullName); // imprime 'John, Jane, Bob, Alice'
+
 
                 . Formas de iterar um array:
 
@@ -679,7 +805,18 @@ https://www.jsv9000.app/
                 . Exemplo:
 
                     let map = new Map();
+
                     map.set('key1', 'value1');
+
+                    for (item of map) {
+                        console.log(item);  // [ 'key1', 'value1' ]
+                    }
+
+                    for (let item of map.values()) {
+                        console.log(item);  // 'value1'
+                    }
+
+                    console.log(map.get('key1'));   // 'value1'
 
             Set
 
@@ -687,9 +824,33 @@ https://www.jsv9000.app/
 
                 . Exemplo:
             
-                    let set = new Set();
-                    set.add(1);
-                    set.add(2);
+                    // Criando um novo Set
+                    const mySet = new Set();
+
+                    // Adicionando valores ao Set
+                    mySet.add(1);
+                    mySet.add('hello');
+                    mySet.add({ name: 'John' });
+
+                    // Verificando se um valor está presente no Set
+                    console.log(mySet.has(1)); // true
+                    console.log(mySet.has('hello')); // true
+                    console.log(mySet.has({ name: 'John' })); // true
+
+                    // Obtenendo o tamanho do Set
+                    console.log(mySet.size); // 3
+
+                    // Iterando sobre os valores do Set
+                    mySet.forEach(value => {
+                        console.log(value);
+                    });
+
+                    // Removendo um valor do Set
+                    mySet.delete('hello');
+
+                    // Verificando se um valor está ausente do Set
+                    console.log(mySet.has('hello')); // false
+
 
         . Exemplo de Uso
         
