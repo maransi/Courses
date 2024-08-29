@@ -547,6 +547,39 @@ https://www.jsv9000.app/
                     console.log( contact["phone"]);
                     console.log( contact.address.street );
 
+                . "bind" -  É uma função que cria uma nova função que tem o mesmo comportamento que a função original, 
+                            mas com um contexto (this) específico.
+
+                                    +---------------------->     é o objeto que será usado como contexto (this) dentro da função
+                                    |
+                    função.bind(thisArg, arg1, arg2, ...)
+                                            |   |
+                                            +---+---------->     são argumentos opcionais que serão passados para a função  
+
+                    Exemplo:
+
+                        const pessoa = {
+                            nome: 'João',
+                            idade: 30
+                        };
+
+                        function apresentar(titulo, cidade) {
+                            console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos. Sou ${titulo} de ${cidade}.`);
+                        }
+
+                        const apresentarJoao = apresentar.bind(pessoa); // É possivel passar parâmetros além do "thisArg", porém nesse caso
+                                                                        // os parâmetros passados pela chamada "apresentarJoao( 'Engenheiro', 'São Paulo')
+                                                                        // terão que trocar de lugar indo para o método "bind" "
+                                                                        // apresentar.bind(pessoa, 'Engenheiro', 'São Paulo')"
+
+                        apresentarJoao('Engenheiro', 'São Paulo');
+                        // Saída: "Olá, meu nome é João e tenho 30 anos. Sou Engenheiro de São Paulo."
+
+                    . Quando o método "bind" é chamado, ele cria uma nova função que tem o mesmo comportamento que a função original, 
+                        mas com o contexto (this) definido por thisArg. Além disso, os argumentos arg1, arg2, ... são passados para 
+                        a função como argumentos adicionais
+
+
             Array
 
                 . Um tipo especial de objeto usado para armazenar listas ordenadas de valores.
@@ -720,6 +753,39 @@ https://www.jsv9000.app/
 
                         console.log(fullName); // imprime 'John, Jane, Bob, Alice'
 
+                    . "apply" ou "call" - É um método que permite chamar uma função em um contexto específico, definido pelo objeto "this". 
+                                            Ela é usada para definir o valor de "this" dentro da função e passar argumentos para a função.
+
+                        //              +------------------>    é o objeto que será usado como contexto (this) dentro da função 
+                        //              |
+                        função.apply(thisArg, argsArray)
+                        //       |                |
+                        //       |                +-------->     é um array de argumentos que serão passados para a função
+                        //       +------------------------->     poderia ter sido usado a função "call" ao invés de "apply"
+
+                        . Quando a função "apply()" é chamada, a função é executada com o contexto (this) definido por "thisArg" e os 
+                            argumentos passados em "argsArray".
+
+                            const pessoa = {
+                                nome: 'João',
+                                idade: 30
+                            };
+
+                            function apresentar() {
+                                console.log(`Olá, meu nome é ${this.nome} e tenho ${this.idade} anos.`);
+                            }
+
+                            apresentar.apply(pessoa); // Saída: "Olá, meu nome é João e tenho 30 anos."
+
+                        . Diferença entre "apply" e "call":
+
+                            . "apply" - Os argumentos são passados em um array.
+
+                                função.apply(thisArg, argsArray)
+
+                            . "call" - Os argumentos são passados individualmente, separados por vírgulas.
+
+                                função.call(thisArg, arg1, arg2, ...)
 
                 . Formas de iterar um array:
 
@@ -1894,9 +1960,18 @@ https://www.jsv9000.app/
 
         // Neste caso o construtor não levantará uma exception
         const pessoa = new Pessoa('Marco');
+        //              ^
+        //              |
+        //              +-------------- Se retirar o operador "new" da expressão "const pessoa = Pessoa('Marco');" a execução 
+        //                              desse código levantará uma exceção
+        //
+        //                              Para que o "new.target" retorne o nome do construtor é necessário o uso de "new"
+
 
         // Aqui será levantado uma exception
         Pessoa('Marco');
+
+        console.log( pessoa.nome );
 
     . Métodos Estáticos
 
@@ -1953,7 +2028,5 @@ https://www.jsv9000.app/
 10. Tipos de Função
 -------------------
 
-https://www.javascripttutorial.net/javascript-function-type/
 
-Inserir os conceitos do vídeo abaixo na parte dos Arrays
-https://www.youtube.com/watch?v=R371yaBjb54
+https://www.javascripttutorial.net/javascript-closure/
