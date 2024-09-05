@@ -1269,6 +1269,48 @@ https://www.jsv9000.app/
 
         console.log(sum(5, 7)); // 12        
 
+    . Definindo número infinito de parâmetros (...):
+
+        // "..." representa o número indefinido de parâmetros
+        function sum(...args) {
+            let total = 0;
+
+            for (const a of args) {
+                total += a;
+            }
+
+            return total;
+        }
+
+        console.log(sum(1, 2, 3));  // 6
+
+    . Definindo número infinito de parâmetros (...), porém com tipos de parâmetros diferentes:
+
+        function sum(...args) {
+            return args
+                .filter(function (e) {
+                    return typeof e === 'number';
+                })
+                .reduce(function (prev, curr, index, arr) {
+
+                    // prev: o valor anterior (ou o valor inicial, se for o primeiro elemento).
+                    // curr: o elemento atual.
+                    // index: o índice do elemento atual. Na prática, o index iniciará não pela indíce "0" e sim pelo "1"
+                    // array: o array original.
+
+                    console.log(index);
+                    console.log(arr);
+                    console.log(prev, curr);
+                    
+                    
+                    return prev + curr;
+                });
+        }
+
+        let result = sum(10, 'Hi', null, undefined, 20, 30, 40);
+
+        console.log(result);
+ 
     . Passando uma função como parâmetro:
 
         function add(a, b) {
@@ -1325,7 +1367,6 @@ https://www.jsv9000.app/
         │    1    │  'Sony Xperia'   │  700  │
         │    2    │     'Xiomi'      │  900  │
         └─────────┴──────────────────┴───────┘
-
 
     . Funções anônimas:
 
@@ -1412,9 +1453,6 @@ https://www.jsv9000.app/
         let name = getNames();
 
         console.log(name.firstName + ' ' + name.lastName);
-
-
-
 
     . Passagem de parâmetros por valor e por referência:
 
@@ -1733,20 +1771,46 @@ https://www.jsv9000.app/
 
         . Atenção - Em função de seta (arrow function), this não é redefinido e não herda o contexto do objeto e sim do pai
 
-            const pessoa = {
-                nome: 'João',
-                falar: () => {              //                      Arrow function
-                    console.log(this.nome); // undefined
-                },
+            . Exemplos de como não usar o "this":
 
-                falar2: function () {       //                      Function
-                    console.log(this.nome); // João
-                }
-            };
+                . Exemplo 1:
 
-            pessoa.falar(); // undefined
+                    const pessoa = {
+                        nome: 'João',
+                        falar: () => {              //                      Arrow function
+                            console.log(this.nome); // undefined
+                        },
 
-            pessoa.falar2();    // João
+                        falar2: function () {       //                      Function
+                            console.log(this.nome); // João
+                        }
+                    };
+
+                    pessoa.falar(); // undefined
+
+                    pessoa.falar2();    // João
+
+                . Exemplo 2:
+
+                    ...
+                    <input type="text" name="username" id="username" placeholder="Enter a username">
+                    <div id="greeting"></div>
+                    ...
+
+                    <script>
+                        const greeting = document.querySelector('#greeting');
+                        const username = document.querySelector('#username');
+
+                        username.addEventListener('keyup', () => {
+                            greeting.textContent = 'Hello ' + this.value;       // Ao invés de usar o this, use "greeting.textContent = `Hello, ${userName.value}`;"
+                        });                             //      |
+                                                        //      +------> O resultado aqui é um "undefined", porque o this representa a variável global "window"
+                    </script>                   
+
+                            
+
+
+                
 
 8 . Prototype
 -------------
@@ -2088,4 +2152,4 @@ https://www.jsv9000.app/
 -------------------
 
 
-https://www.javascripttutorial.net/when-you-should-not-use-arrow-functions/
+https://www.javascripttutorial.net/javascript-callback/
