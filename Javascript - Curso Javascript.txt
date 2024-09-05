@@ -11,6 +11,7 @@ https://github.com/trekhleb/javascrip...
 https://www.jsv9000.app/
 
 1. Instalações
+--------------
 
     . Instalação do Nodejs
 
@@ -1336,7 +1337,7 @@ https://www.jsv9000.app/
         show();
 
 
-        // Arrow function
+        // Arrow function com blocos de código
         let show2 = () => {
             console.log('Arrow function');
         }
@@ -1353,9 +1354,67 @@ https://www.jsv9000.app/
 
 
         // Invocando imediatamente a função
-        (function() {
-            console.log('IIFE');
+        (function add(a,b) {
+            console.log("O valor de a + b é: " + (a + b) );     // O valor a + b é: 3
+            
+            return a + b;                                       // 3
+        })(1,2);
+
+        // Utilizando um objeto com funções
+        const calculator = (function () {
+            function add(a, b) {
+                return a + b;
+            }
+
+            function multiply(a, b) {
+                return a * b;
+            }
+
+            return {
+                add: add,
+                multiply: multiply
+            }
         })();
+
+        console.log(calculator.add(1, 2));
+        console.log(calculator.multiply(1, 2));
+
+        // Retornando vários valores numa função
+        function getNames() {
+            // get names from the database or API
+            let firstName = 'John',
+                lastName = 'Doe';
+
+            // return as an array
+            return [firstName, lastName];
+        }
+
+        console.log(getNames());
+
+        // Retornando um objeto com varios valores numa função
+        function getNames() {
+            // get names from the database or API
+            let firstName = 'John',
+                lastName = 'Doe';
+
+            // return values
+            return {
+                'firstName': firstName,
+                'lastName': lastName
+            };
+        }
+
+        let firstName = getNames().firstName;
+        let lastName = getNames().lastName;
+
+        console.log(firstName + ' ' + lastName);
+
+        let name = getNames();
+
+        console.log(name.firstName + ' ' + name.lastName);
+
+
+
 
     . Passagem de parâmetros por valor e por referência:
 
@@ -2029,4 +2088,4 @@ https://www.jsv9000.app/
 -------------------
 
 
-https://www.javascripttutorial.net/javascript-closure/
+https://www.javascripttutorial.net/when-you-should-not-use-arrow-functions/
