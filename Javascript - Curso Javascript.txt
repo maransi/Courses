@@ -2192,9 +2192,50 @@ https://www.jsv9000.app/
 
         Rejected: O estado em que a promise foi rejeitada e um erro ocorreu.
 
-        Resolved: O estado em que a promise foi resolvida, seja com sucesso ou com erro.    
+        Resolved: O estado em que a promise foi resolvida, seja com sucesso ou com erro.  
 
-    . Exemplo:
+    . Para consumir uma promise temos três métodos:
+
+        . then      O método then é usado para lidar com o resultado de uma promise quando ela é resolvida com sucesso. 
+                    Ele recebe uma função de callback que é executada quando a promise é resolvida. 
+
+            const promise = new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve("Olá, mundo!");
+                }, 2000);
+            });
+
+            promise.then((resultado) => {
+                console.log(resultado); // imprime "Olá, mundo!" após 2 segundos
+            });
+
+        . catch     O método catch é usado para lidar com o resultado de uma promise quando ela é rejeitada com um erro. 
+                    Ele recebe uma função de callback que é executada quando a promise é rejeitada.
+
+            const promise = new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    reject("Erro ocorreu!");
+                }, 2000);
+            });
+
+            promise.catch((erro) => {
+                console.log(erro); // imprime "Erro ocorreu!" após 2 segundos
+            });
+
+        . finally   O método finally é usado para executar uma ação independente do resultado da promise. 
+                    Ele recebe uma função de callback que é executada quando a promise é resolvida ou rejeitada.
+
+            const promise = new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve("Olá, mundo!");
+                }, 2000);
+            });
+
+            promise.finally(() => {
+                console.log("Promise finalizada!"); // imprime "Promise finalizada!" após 2 segundos
+            });
+
+    . Exemplo do funcionamento 
 
         // Declaração da função que retornará uma Promise
         function getUsers() {
@@ -2215,32 +2256,32 @@ https://www.jsv9000.app/
         }
 
         const promise = getUsers();
-        promise.then(onFulfilled);  // Aqui é feito o disparo da ação assincronica que retorna um "resolve" e automaticamente executará a função onFullfilled
+        promise.then(onFulfilled);  // Aqui é feito o disparo da ação assincronica que retorna um "resolve" e 
+                                    // automaticamente executará a função onFullfilled
 
-    . Exemplo mais simples para uma situação de "resolve":
-
-        const promise = new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve("Olá, mundo!");
-            }, 2000);
-        });
-
-        promise.then((resultado) => {
-            console.log(resultado); // imprime "Olá, mundo!" após 2 segundos
-        });
-
-    . Exemplo para uma situação de "reject":
+    . No exemplo abaixo, a função de callback do then é executada quando a promise é resolvida, e a função de 
+        callback do finally é executada independente do resultado da promise.
 
         const promise = new Promise((resolve, reject) => {
             setTimeout(() => {
-                reject("Erro ocorreu!");
+                reject("Olá, mundo!");
+                // resolve("Olá, mundo!");
             }, 2000);
         });
 
-        promise.catch((erro) => {
-            console.log(erro); // imprime "Erro ocorreu!" após 2 segundos
+        promise
+            .then((result) => {
+                console.log(result);
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+        .finally(() => {
+            console.log("Promise finalizada!");
         });
 
+11. ES6 MOdules
+---------------
 
 
-https://www.javascripttutorial.net/es6/javascript-promises/
+https://www.javascripttutorial.net/es6-modules/
