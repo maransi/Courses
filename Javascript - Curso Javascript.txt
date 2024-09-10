@@ -2280,8 +2280,84 @@ https://www.jsv9000.app/
             console.log("Promise finalizada!");
         });
 
-11. ES6 MOdules
+11. ES6 Modules
 ---------------
 
+    . Módulos em ECMAScript 6, é uma forma de organizar e estruturar o código JavaScript em pequenas unidades reutilizáveis, 
+        chamadas de módulos. Esses módulos podem ser carregados e usados em outros arquivos JavaScript, permitindo que 
+        você crie aplicações mais complexas e escaláveis.
 
-https://www.javascripttutorial.net/es6-modules/
+    . Características dos módulos ES6:
+
+        . Declarativos: Os módulos ES6 são declarativos, o que significa que você define o que o módulo exporta e importa, 
+                        em vez de ter que escrever código para carregar e vincular os módulos.
+
+        . Independentes: Os módulos ES6 são independentes, o que significa que eles não compartilham variáveis ou funções 
+                        com outros módulos, a menos que sejam explicitamente exportadas ou importadas.
+
+        . Reutilizáveis: Os módulos ES6 são reutilizáveis, o que significa que você pode usar o mesmo módulo em diferentes partes 
+                         da sua aplicação.
+
+        . Caching:      Os módulos ES6 são cacheados, o que significa que o navegador ou ambiente de execução pode armazenar em 
+                        cache os módulos carregados e reutilizá-los em vez de carregá-los novamente.        
+
+    . Exemplo:
+
+        . Crie uma pasta na raiz do projeto com o nome "js".
+
+        . Dentro da pasta "js" crie o arquivo fornecedora das funções, utilize uma das duas formas:
+
+            . Utilizando "export" como atributo da função
+
+                export function display(message) {
+                    const el = document.createElement('div');
+                    el.innerText = message;
+                    document.body.appendChild(el);
+                }
+
+                export function showMessage(message) {
+                    alert(message);
+                }
+
+            . Utilizando o "export" como linha de comando:
+
+                function display(message) {
+                    const el = document.createElement('div');
+                    el.innerText = message;
+                    document.body.appendChild(el);
+                }
+
+                function showMessage(message) {
+                    alert(message);
+                }
+
+                export { display, showMessage };
+
+        . Na pasta "js" crie outro o arquivo que consumirá as funções do arquivo "site.js":
+
+            import { display, showMessage } from './site.js';
+
+            display('Hello World');
+            showMessage('Hello, World!');
+
+        . Crie a página "index.html" abaixo:
+
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+            </head>
+            <body>
+
+            <!-- IMPORTANTE: Observe o "type=module", na declaração do script que                -->
+            <!--             consumirá as funções é obrigatório a identificação do "type=module" -->
+            <script src="js/index.js" type="module"></script>  
+            </body>
+            </html>
+
+
+
+https://www.javascripttutorial.net/javascript-export/
+https://www.javascripttutorial.net/ex-next/javascript-import/
