@@ -2301,11 +2301,11 @@ https://www.jsv9000.app/
         . Caching:      Os módulos ES6 são cacheados, o que significa que o navegador ou ambiente de execução pode armazenar em 
                         cache os módulos carregados e reutilizá-los em vez de carregá-los novamente.        
 
-    . Exemplo:
+    . Exportando funções:
 
         . Crie uma pasta na raiz do projeto com o nome "js".
 
-        . Dentro da pasta "js" crie o arquivo fornecedora das funções, utilize uma das duas formas:
+        . Dentro da pasta "js" crie o arquivo fornecedora das funções, com o nome de "site.js", utilize uma das duas formas:
 
             . Utilizando "export" como atributo da função
 
@@ -2333,7 +2333,7 @@ https://www.jsv9000.app/
 
                 export { display, showMessage };
 
-        . Na pasta "js" crie outro o arquivo que consumirá as funções do arquivo "site.js":
+        . Na pasta "js" crie outro o arquivo, "index.js", que consumirá as funções do arquivo "site.js":
 
             import { display, showMessage } from './site.js';
 
@@ -2357,7 +2357,56 @@ https://www.jsv9000.app/
             </body>
             </html>
 
+        . Execute a página "index.html" e veja se os resultado foram exibidos com sucesso.
+
+    . Exportando variáveis:
+
+        . Inclua as linhas do arquivo "site.js" a linha abaixo:
+
+            // Linha inserida
+            let count = 0;
+
+            ...
+
+            function showMessage(message) {
+                alert(message);
+            }
+
+            // Linha alterada, inserido o export da variável "count"
+            export { display, showMessage, count };
+
+        . Inclua na última linha do arquivo "index.js" a linha abaixo:
+
+            // Linha alterada, inserido o import da variável "count"
+            import { display, showMessage, count } from './site.js';
+
+            ...
+            // linha inserida
+            console.log(count);
 
 
-https://www.javascripttutorial.net/javascript-export/
-https://www.javascripttutorial.net/ex-next/javascript-import/
+        . Execute a página "index.html" e veja se o resultado da variável "count" foi exibido com sucesso.
+
+    . Outra forma de fazer import de funções:
+
+        . Acesse o arquivo "index.js" e faça as alterações abaixo:
+
+            // Retire a função display do import
+            import { showMessage, count } from './site.js';
+
+            // Insira a linha abaixo
+            let site = await import('./site.js');
+
+            // Alere a linha abaixo, no lugar de "display(...)", altere pelo "site.display(...)"
+            site.display('Hello, World!');
+
+            showMessage('Hello, World!');
+
+            console.log(count);
+
+        . Execute o arquivo "index.html" e verifique se a função "display" executou com sucesso.
+
+
+
+# Voltar nas Promise e acrescentar
+https://www.javascripttutorial.net/javascript-top-level-await/
