@@ -2406,7 +2406,108 @@ https://www.jsv9000.app/
 
         . Execute o arquivo "index.html" e verifique se a função "display" executou com sucesso.
 
+    . Outra forma de fazer export de funções "export default":
+
+        . Quando você usa export default para exportar uma função, você está criando um export padrão. 
+            Isso significa que a função é exportada sem um nome específico e pode ser importada por outros 
+            módulos sem precisar especificar o nome.
+
+        . Exemplo:
+
+            . Crie o arquivo "user.mjs" com o conteúdo abaixo:
+
+                let users;
+
+                // O export default abaixo, exporta uma promise que quando resolvida, faz com que o valor da variavel "users" seja alterado.
+                // Isso é possível pois a variavel "users" é inicializada com o valor "undefined" e a promise   resolvida ap s o fetch.
+                // Isso é importante pois quem importa o módulo "user.mjs" pode usar o valor de "users" mesmo antes dele ser realmente carregado.
+                // O "export default" faz com que ao ser importado pode ser dado qq nome a função para ser usado.
+                export default (async () => {
+                    const url = 'https://jsonplaceholder.typicode.com/users';
+                    const response = await fetch(url);
+                    users = await response.json();
+                })();
+
+                export { users };            
+
+            . Crie o arquivo "app.mjs" com o conteúdo abaixo:
+
+                // O nome dado para a função anônima do arquivo "user.mjs" foi "promise". Poderia ser qq nome "mmm", ou "getUsers", ...
+                import promise, { users } from './user.mjs';
+
+                function render(users) {
+                    if (!users) {
+                        throw 'The user list is not available.';
+                    }
+                    let list = users
+                        .map((user) => {
+                            return `<li> ${user.name}(<a href="email:${user.email}">${user.email}</a>)</li>`;
+                        })
+                        .join(' ');
+
+                    return `<ol>${list}</ol>`;
+                }
+
+                // Aqui, se o retorno foi um "resolve", ou se a execução foi bem sucedida, então 
+                // é executado o método "then"
+                promise.then(() => {
+                    let container = document.querySelector('.container');
+                    try {
+                        container.innerHTML = render(users);
+                    } catch (error) {
+                        container.innerHTML = error;
+                    }
+                });
+
+            . Crie a página "index.html" com o conteúdo abaixo:
+
+                <!DOCTYPE html>
+                <html lang="en">
+
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>JavaScript Top-Level Await Demo</title>
+                </head>
+
+                <body>
+                    <div class="container"></div>
+                    <script type="module" src="app.mjs"></script>
+                </body>
+
+                </html>
+
+            . Execute a página e veja o resultado.
+
+12. Try..Catch
+
+        try {
+            // Código que pode gerar uma exceção
+            int x = 5 / 0;
+        } catch (ArithmeticException e) {
+            // Lide com a exceção
+            System.out.println("Erro: " + e.getMessage());
+        } finally {
+            // Libere recursos
+            System.out.println("Liberando recursos...");
+        }
+
+    . Levantando exceção:
+
+        function divide(a, b) {
+            if (b === 0) {
+                throw new Error("Erro: divisão por zero");
+        }
+            return a / b;
+        }
+
+        try {
+            const resultado = divide(10, 0);
+            console.log(resultado);
+        } catch (error) {
+            console.error(error.message);
+        }
 
 
-# Voltar nas Promise e acrescentar
-https://www.javascripttutorial.net/javascript-top-level-await/
+
+https://www.javascripttutorial.net/javascript-try-catch/
