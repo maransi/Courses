@@ -925,31 +925,58 @@ sudo apt install remmina remmina-plugin-rdp remmina-plugin-secret
 
 22. Instalação do Nodejs
 
-sudo apt-get install nodejs
-sudo apt-get install npm
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | $SHELL
+	nvm --version
 
-ou
+	# Para instalar a versão lts mais recente
+	nvm install --lts
 
-sudo apt-get install curl python-software-properties
-curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
-sudo apt-get install -y nodejs
-node -v
-npm -v
+	# Se quiser instalar uma versão especifica, utilize:
+	# nvm install 18.20.4
 
-ou
+	# Se quiser listar as versões do node disponivel no repositorio remoto
+	# nvm ls-remote
 
-sudo apt-get remove nodejs --purge
-sudo apt-get remove npm --purge
-sudo apt autoremove
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install node@20
-brew
-sudo apt-get install build-essential
-brew install node@20
-export LDFLAGS="-L/home/linuxbrew/.linuxbrew/opt/node@20/lib"
-source ~/.zshrc
-node -v
-npm -v
+	# Se quiser listar as versões instalada na máquina atual
+	# nvm ls
+
+	# Para usar uma versão instalada na máquina atual
+	# nvm use 20.17.0
+
+	# Para desinstalar uma versão do node js
+	# nvm uninstall 18.20.4
+
+	node -v
+	npm -v
+
+
+	ou
+
+	sudo apt-get install nodejs
+	sudo apt-get install npm
+
+	ou
+
+	sudo apt-get install curl python-software-properties
+	curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+	sudo apt-get install -y nodejs
+	node -v
+	npm -v
+
+	ou
+
+	sudo apt-get remove nodejs --purge
+	sudo apt-get remove npm --purge
+	sudo apt autoremove
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	brew install node@20
+	brew
+	sudo apt-get install build-essential
+	brew install node@20
+	export LDFLAGS="-L/home/linuxbrew/.linuxbrew/opt/node@20/lib"
+	source ~/.zshrc
+	node -v
+	npm -v
 
 23. Instalação do TypeScript
 

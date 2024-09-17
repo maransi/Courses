@@ -10,21 +10,40 @@ https://www.java5cript.com/
 https://github.com/trekhleb/javascrip...
 https://www.jsv9000.app/
 
+Fundamentos
+-----------
+
+
 1. Instalações
 --------------
 
     . Instalação do Nodejs
 
-        sudo apt-get install nodejs
-        sudo apt-get install npm
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | $SHELL
+        nvm --version
 
-        ou
+        # Para instalar a versão lts mais recente
+        nvm install --lts
 
-        sudo apt-get install curl python-software-properties
-        curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
-        sudo apt-get install -y nodejs
+        # Se quiser instalar uma versão especifica, utilize:
+        # nvm install 18.20.4
+
+        # Se quiser listar as versões do node disponivel no repositorio remoto
+        # nvm ls-remote
+
+        # Se quiser listar as versões instalada na máquina atual
+        # nvm ls
+
+        # Para usar uma versão instalada na máquina atual
+        # nvm use 20.17.0
+
+        # Para desinstalar uma versão do node js
+        # nvm uninstall 18.20.4
+
         node -v
         npm -v
+
+
 
     . Instalação do VSCode:
 
@@ -240,7 +259,6 @@ https://www.jsv9000.app/
                     <body>
                     </body>
                 </html>
-
 
 3. Fundamentos
 --------------
@@ -999,7 +1017,6 @@ https://www.jsv9000.app/
 
             console.log( address.zipCode );
 
-
 4. Operadores
 -------------
 
@@ -1101,7 +1118,6 @@ https://www.jsv9000.app/
         . Se o primeiro número for negativo ele deve vir entre parenteses. Já o segundo não há restrição.
 
             console.log( (-2) ** 2 );                  // 4
-
 
 5. Controle de Fluxo
 --------------------
@@ -1248,7 +1264,6 @@ https://www.jsv9000.app/
 
             console.log(i);
         }
-
 
 6. Funções
 ----------
@@ -1521,8 +1536,6 @@ https://www.jsv9000.app/
             const resultado = numeros.map(dobrar);
 
             console.log(resultado); // imprime [2, 4, 6, 8, 10]
-
-
 
 7. Objetos
 ----------
@@ -1881,7 +1894,6 @@ https://www.jsv9000.app/
 
             joao.falar(); // Meu nome é João
 
-
 9. Classes
 ----------
 
@@ -2172,7 +2184,6 @@ https://www.jsv9000.app/
 
         console.log(p1 instanceof Person); // true    
 
-
 10. Promisses
 -------------
 
@@ -2279,6 +2290,34 @@ https://www.jsv9000.app/
         .finally(() => {
             console.log("Promise finalizada!");
         });
+
+    . async/await
+
+        . Sempre que uma função for precedida da palavra "async" o retorno será uma promise:
+
+            async function f() {
+                return 1;           // Seria a mesma coisa que "return Promise.resolve(1);"
+            }        
+
+            f().then(console.log); // 1
+
+        . Sempre que for usado a palavra "await" na chamada de uma função, o javascript aguardará o 
+            retorno dela para ir a próxima linha
+
+
+            async function f() {
+
+                let promise = new Promise((resolve, reject) => {
+                    setTimeout(() => resolve("done!"), 10000)
+                });
+            
+                let result = await promise; // wait until the promise resolves (*)
+            
+                console.log(result);
+                
+            }
+            
+            f();        
 
 11. ES6 Modules
 ---------------
@@ -2480,6 +2519,7 @@ https://www.jsv9000.app/
             . Execute a página e veja o resultado.
 
 12. Try..Catch
+--------------
 
         try {
             // Código que pode gerar uma exceção
@@ -2508,6 +2548,102 @@ https://www.jsv9000.app/
             console.error(error.message);
         }
 
+    . Usando try...catch sem identificar a exceção:
+
+        const isValidJSON = (str) => {
+            try {
+                JSON.parse(str);
+                return true;
+            } catch {
+                return false;
+            }
+        };
+
+        let valid = isValidJSON(`{"language":"JavaScript"}`);
+        console.log(valid);
 
 
-https://www.javascripttutorial.net/javascript-try-catch/
+    . Existem várias exceções que podem ser utilizadas para lidar com erros e exceções em um programa. 
+        Aqui estão algumas das principais exceções utilizadas no JavaScript:
+
+        Error:          É a exceção mais genérica e é utilizada para representar um erro genérico.
+        TypeError:      É utilizada para representar um erro de tipo, como quando se tenta executar uma 
+                        operação em um valor que não é do tipo correto.
+        RangeError:     É utilizada para representar um erro de intervalo, como quando se tenta acessar um 
+                        índice de um array que está fora do intervalo válido.
+        ReferenceError: É utilizada para representar um erro de referência, como quando se tenta acessar 
+                        uma variável que não foi declarada.
+        SyntaxError:    É utilizada para representar um erro de sintaxe, como quando se tenta executar um 
+                        código que contém erros de sintaxe.
+        URIError:       É utilizada para representar um erro de URI, como quando se tenta criar um objeto 
+                        URI com um valor inválido.
+        EvalError:      É utilizada para representar um erro de avaliação, como quando se tenta executar 
+                        um código que contém erros de avaliação.
+        InternalError:  É utilizada para representar um erro interno, como quando o motor do JavaScript 
+                        encontra um erro interno.
+        AggregateError: É utilizada para representar um erro agregado, como quando se tenta executar uma 
+                        operação que envolve vários erros.
+
+    . Além disso, também existem algumas exceções específicas para certas APIs e bibliotecas, como:
+
+        DOMException:           É utilizada para representar um erro de DOM, como quando se tenta acessar um 
+                                elemento do DOM que não existe.
+        WebGLRenderingContext:  É utilizada para representar um erro de WebGL, como quando se tenta executar 
+                                uma operação que não é suportada pelo contexto WebGL.
+
+
+Browser: Document, Eventos e Interfaces
+---------------------------------------
+
+13. Document
+------------
+
+    . Ambiente e especificação do navegador - Abaixo a estrutura do que o javascript enxerga quando é executado no navegador:
+
+
+                                                          Window
+                                                          ------
+                                                            | 
+         +----------------------------------------------------------------------------------+           
+         |                                                  |                               |
+         v                                                  v                               v
+        DOM (Document Object Model)             BOM (Browser Object Model)              Javascript
+        ---------------------------             --------------------------              ----------
+        document                                navigator                               Object
+        ...                                     screen                                  Array
+                                                location                                Function
+                                                frames                                  ...
+                                                history
+                                                XMLHttpRequest
+
+
+        . Por exemplo:
+
+            <!DOCTYPE html>
+            <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>JavaScript Top-Level Await Demo</title>
+            </head>
+
+            <body>
+                <div class="container"></div>
+                <script>
+                    function sayHi() {
+                        alert("Hello");
+                    }
+
+                    // global functions are methods of the global object:
+                    window.sayHi();
+                    alert(window.innerHeight); 
+
+                </script>
+            </body>
+
+            </html>
+
+    . DOM
+
+https://javascript.info/dom-nodes
