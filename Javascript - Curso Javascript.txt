@@ -95,7 +95,6 @@ Fundamentos
             Ctrl + M				Para cercar um conjunto de tags numa página HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
             cTRL + Ctrl + -			Para apagar uma tag que abraça um conjunto de tags HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
 
-
         . Instale as seguinte Extensões:
 
             open-in-browser			- Shortcut Ctrl+Alt+O, Alt + B
@@ -143,7 +142,7 @@ Fundamentos
                 . Digite "Emmet: Remove Tag" e altere o "Keybinding" para "Alt+Shift+-", o "-" deve ser do bloco numerico
                     . De agora em diante, se precisar apagar uma tag HTML que cerca um conjunto de outras tags, basta posicioinar
                         o cursor sobre a "TAg" que deseja apagar e pressionar "Ctrl+Shift+-"
-            . Digite "Ctrl+Shift+P" e digite "Preferência: Abrir as Configurações do Usuário (JSON)"
+            . Digite "Ctrl+Shift+P" e digite "Preference: Open User Settings (JSON)"
                 . Digite a configuração abaixo:
 
                     ...
@@ -2675,173 +2674,464 @@ Browser: Document, Eventos e Interfaces
 
             console.log( document.head )
 
-        . childNodes, firstChild, lastChild
+    . childNodes, firstChild, lastChild
 
-            . childNodes - propriedade que retorna uma coleção de nodos filhos de um elemento.
+        . childNodes - propriedade que retorna uma coleção de nodos filhos de um elemento.
 
-                . Execute o comando abaixo no console do navegador:
+            . Execute o comando abaixo no console do navegador:
 
-                    console.log( document.body.childNodes )                 // Apresentará todos os nôs dentro do body
-                    console.log(document.body.childNodes[1].textContent)    // Apresenta o conteúdo da tag <h1>
-                    
-                . firstChild - Apresenta o primeiro Nô da tag
+                console.log( document.body.childNodes )                 // Apresentará todos os nôs dentro do body
+                console.log(document.body.childNodes[1].textContent)    // Apresenta o conteúdo da tag <h1>
+                
+            . firstChild - Apresenta o primeiro Nô da tag
 
-                . lastChild - Apresenta o último.
+            . lastChild - Apresenta o último.
 
-                . Execute os comandos abaixo no console do navegador:
+            . Execute os comandos abaixo no console do navegador:
 
-                    console.log(document.body.firstNode );
-                    console.log(documento.body.lastNode );
+                console.log(document.body.firstNode );
+                console.log(documento.body.lastNode );
 
-            . Iterando os nôs dos filhos:
+        . Iterando os nôs dos filhos:
 
-                // for..of é a maneira mais indicada para iterar os nôs, 
-                // evite usar for..in, ele itera todos os itens da coleção além dos filhos
+            // for..of é a maneira mais indicada para iterar os nôs, 
+            // evite usar for..in, ele itera todos os itens da coleção além dos filhos
 
-                for (let node of document.body.childNodes) {
-                    alert(node.textContent); // shows all nodes from the collection
-                }
+            for (let node of document.body.childNodes) {
+                alert(node.textContent); // shows all nodes from the collection
+            }
 
-            . Inclua as linhas abaixo no arquivo HTML:
+        . Inclua as linhas abaixo no arquivo HTML:
 
-                <!DOCTYPE HTML>
-                <html>
-                    <head>
-                        <title>About elk</title>
-                    </head>
-
-                    <body>
-                        <h1>The truth about elk.</h1>
-
-                        <!-- Script incluido -->
-                        <script>
-                            for (let node of document.body.childNodes) {
-                                alert(node.textContent); // shows all nodes from the collection
-                            }
-                        </script>
-                    </body>
-                </html>
-
-        . children  - É uma propriedade que retorna uma coleção de elementos filhos de um elemento. Essa coleção é 
-                        uma lista de elementos que são filhos diretos do elemento atual.
-
-            . A propriedade "children" é semelhante à propriedade childNodes, mas com uma diferença importante: 
-                children só inclui elementos, enquanto "childNodes" inclui todos os tipos de nodos, incluindo texto, 
-                comentários e outros.
-
-            . Exemplo:
-
-                <html>
-                    <body>
-                        <div>Begin</div>
-
-                        <ul>
-                            <li>Information</li>
-                        </ul>
-
-                        <div>End</div>
-
-                        <script>
-                            for (let elem of document.body.children) {
-                                alert(elem); // DIV, UL, DIV, SCRIPT
-                            }
-                        </script>
-                    </body>
-                </html>
-
-
-        . tables    - O DOM fornece propriedades adicionais a alguns tipos de tags HTML, como por exemplo <table>
-
+            <!DOCTYPE HTML>
             <html>
+                <head>
+                    <title>About elk</title>
+                </head>
+
                 <body>
-                    <table id="myTable" border="1">
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Email</th>
+                    <h1>The truth about elk.</h1>
 
-                        <tr>
-                            <td>1</td>
-                            <td>Marco</td>
-                            <td>marco.gmail.com</td>
-                        </tr>
-
-                        <tr>
-                            <td>2</td>
-                            <td>Lucas</td>
-                            <td>lucas.gmail.com</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Lucas</td>
-                            <td>lucas.gmail.com</td>
-                        </tr>
-                    </table>
-
+                    <!-- Script incluido -->
                     <script>
-                        
-                        // Para acessar as propriedades da tag "table" basta referenciar ao "id" da tag html
-                        //
-                        //          +---> <table id="myTable" border="1">
-                        //          |
-                        let td = myTable.rows[0].cells[1];
-
-                        td.style.backgroundColor = "red";         
+                        for (let node of document.body.childNodes) {
+                            alert(node.textContent); // shows all nodes from the collection
+                        }
                     </script>
                 </body>
             </html>
 
-        . getElement*, querySelector*
+    . children  - É uma propriedade que retorna uma coleção de elementos filhos de um elemento. Essa coleção é 
+                    uma lista de elementos que são filhos diretos do elemento atual.
 
-            . document.getElementById   - O método document.getElementById é uma função do JavaScript que retorna um 
-                                            elemento HTML com o ID especificado. Se o elemento não for encontrado, o 
-                                            método retorna null.
+        . A propriedade "children" é semelhante à propriedade childNodes, mas com uma diferença importante: 
+            children só inclui elementos, enquanto "childNodes" inclui todos os tipos de nodos, incluindo texto, 
+            comentários e outros.
 
-                . Exemplo:
+        . Exemplo:
 
-                    const elemento = document.getElementById('meuId');
+            <html>
+                <body>
+                    <div>Begin</div>
 
-                    elemento.textContent = 'Novo texto';
+                    <ul>
+                        <li>Information</li>
+                    </ul>
 
-            . document.querySelectorAll - O método querySelectorAll é uma função do JavaScript que retorna uma coleção 
-                                            de elementos HTML que correspondem a um seletor que pode ser:
+                    <div>End</div>
 
-                . Seletor de classe:    .nome-da-classe - seleciona todos os elementos que têm a 
-                                        classe nome-da-classe.
+                    <script>
+                        for (let elem of document.body.children) {
+                            alert(elem); // DIV, UL, DIV, SCRIPT
+                        }
+                    </script>
+                </body>
+            </html>
 
-                    document.querySelectorAll('.nome-da-classe')
+    . tables    - O DOM fornece propriedades adicionais a alguns tipos de tags HTML, como por exemplo <table>
 
-                . Seletor de ID:        #id-do-elemento - seleciona o elemento que tem o ID id-do-elemento.
+        <html>
+            <body>
+                <table id="myTable" border="1">
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
 
-                    document.querySelectorAll('#id-do-elemento')
+                    <tr>
+                        <td>1</td>
+                        <td>Marco</td>
+                        <td>marco.gmail.com</td>
+                    </tr>
 
-                . Seletor de tag:       nome-da-tag - seleciona todos os elementos que têm a tag nome-da-tag.
+                    <tr>
+                        <td>2</td>
+                        <td>Lucas</td>
+                        <td>lucas.gmail.com</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Lucas</td>
+                        <td>lucas.gmail.com</td>
+                    </tr>
+                </table>
 
-                    document.querySelectorAll('table')
-
-                . Seletor de pseudoclasse: :pseudo-classe - seleciona todos os elementos que correspondam à 
-                                            pseudoclasse pseudo-classe.
-
-                    document.querySelectorAll('td:first-child') // Retorna todas as primeiras TDs de todas as TRs da tag <table> 
-                    document.querySelectorAll('td:last-child')  // Retorna todos os últimos TDs de todas as TRs da tag <table> 
+                <script>
                     
-                    document.querySelectorAll('td:first-child')[0].textContent  // Retorna o conteúdo da primeira TD devido ao indice 0 
+                    // Para acessar as propriedades da tag "table" basta referenciar ao "id" da tag html
+                    //
+                    //          +---> <table id="myTable" border="1">
+                    //          |
+                    let td = myTable.rows[0].cells[1];
 
-                . Seletor de atributo:  [nome-do-atributo] - seleciona todos os elementos que têm o 
-                                        atributo nome-do-atributo.
+                    td.style.backgroundColor = "red";         
+                </script>
+            </body>
+        </html>
+
+    . getElement*, querySelector*
+
+        . document.querySelectorAll - O método querySelectorAll é uma função do JavaScript que retorna uma coleção 
+                                        de elementos HTML que correspondem a um seletor que pode ser:
+
+            . Seletor de classe:    .nome-da-classe - seleciona todos os elementos que têm a 
+                                    classe nome-da-classe.
+
+                document.querySelectorAll('.nome-da-classe')
+
+            . Seletor de ID:        #id-do-elemento - seleciona o elemento que tem o ID id-do-elemento.
+
+                document.querySelectorAll('#id-do-elemento')
+
+            . Seletor de tag:       nome-da-tag - seleciona todos os elementos que têm a tag nome-da-tag.
+
+                document.querySelectorAll('table')
+
+            . Seletor de pseudoclasse: :pseudo-classe - seleciona todos os elementos que correspondam à 
+                                        pseudoclasse pseudo-classe.
+
+                document.querySelectorAll('td:first-child') // Retorna todas as primeiras TDs de todas as TRs da tag <table> 
+                document.querySelectorAll('td:last-child')  // Retorna todos os últimos TDs de todas as TRs da tag <table> 
                 
-parei aqui
+                document.querySelectorAll('td:first-child')[0].textContent  // Retorna o conteúdo da primeira TD devido ao indice 0 
+
+            . Seletor de atributo:  [nome-do-atributo] - seleciona todos os elementos que têm o atributo nome-do-atributo.
+            
+                <!-- Exemplo de uso do método querySelectorAll em uma página HTML -->
+
+                <!-- HTML -->
+                <div id="container">
+                    <p data-id="1">Parágrafo 1</p>
+                    <p data-id="2">Parágrafo 2</p>
+                    <p>Parágrafo 3</p>
+                    <p data-id="4">Parágrafo 4</p>
+                </div>
+
+                <!-- JavaScript -->
+                <script>
+                    // Seleciona todos os elementos com o atributo "data-id"
+                    const elementos = document.querySelectorAll('[data-id]');
+
+                    // Exibe a lista de elementos selecionados
+                    console.log(elementos);
+
+                    // Altera o estilo dos elementos selecionados
+                    elementos.forEach((elemento) => {
+                        elemento.style.color = 'blue';
+                    });
+                </script>
+
+            . Seletor de combinação: seletor1, seletor2 - seleciona todos os elementos que correspondam a 
+                                        qualquer um dos seletores seletor1 ou seletor2.
+
+                <!-- Exemplo de uso do método querySelectorAll com combinação de seletores em uma página HTML -->
+
+                <!-- HTML -->
+                <div id="container">
+                    <h2>Título</h2>
+                    <ul>
+                        <li>Item 1</li>
+                        <li>Item 2</li>
+                        <li>Item 3</li>
+                    </ul>
+                    <p>Parágrafo</p>
+                    <div class="destaque">
+                        <h3>Destaque</h3>
+                        <p>Este é um destaque</p>
+                    </div>
+                </div>
+
+                <!-- JavaScript -->
+                <script>
+                    // Seleciona todos os elementos que são filhos diretos do elemento com id "container"
+                    // e que são elementos h2 ou ul
+                    const elementos = document.querySelectorAll('#container>h2, #container>ul');
+
+                    // Exibe a lista de elementos selecionados
+                    console.log(elementos);
+
+                    // Altera o estilo dos elementos selecionados
+                    elementos.forEach((elemento) => {
+                        elemento.style.color = 'red';
+                    });
+                </script>
+
+            . Seletor de descendente: seletor1 seletor2 - seleciona todos os elementos que correspondam ao 
+                                        seletor seletor2 e que sejam descendentes do elemento que corresponde ao 
+                                        seletor seletor1.
+
+                <!-- Exemplo de uso do método querySelectorAll com seletores descendentes em uma página HTML -->
+
+                <!-- HTML -->
+                <div id="container">
+                    <h2>Título</h2>
+                    <ul>
+                        <li>Item 1</li>
+                        <li>Item 2</li>
+                        <li>Item 3</li>
+                    </ul>
+                    <div class="destaque">
+                        <h3>Destaque</h3>
+                        <p>Este é um destaque</p>
+                        <ul>
+                        <li>Item 4</li>
+                        <li>Item 5</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- JavaScript -->
+                <script>
+                    // Seleciona todos os elementos ul que são descendentes do elemento com id "container"
+                    const elementos = document.querySelectorAll('#container ul');
+
+                    // Exibe a lista de elementos selecionados
+                    console.log(elementos);
+
+                    // Altera o estilo dos elementos selecionados
+                    elementos.forEach((elemento) => {
+                        elemento.style.backgroundColor = 'lightblue';
+                    });
+                </script>
+
+            . Seletor de filho: seletor1 > seletor2 - seleciona todos os elementos que correspondam 
+                                ao seletor seletor2 e que sejam filhos diretos do elemento que corresponde ao seletor seletor1.
 
 
-                . Seletor de combinação: seletor1, seletor2 - seleciona todos os elementos que correspondam a 
-                                            qualquer um dos seletores seletor1 ou seletor2.
+                <!-- Exemplo de uso do método querySelectorAll com seletores de filho em uma página HTML -->
 
-                . Seletor de descendente: seletor1 seletor2 - seleciona todos os elementos que correspondam ao 
-                                            seletor seletor2 e que sejam descendentes do elemento que corresponde ao 
-                                            seletor seletor1.
+                <!-- HTML -->
+                <div id="container">
+                    <h2>Título</h2>
+                    <ul>
+                        <li>Item 1</li>
+                        <li>Item 2</li>
+                        <li>Item 3</li>
+                    </ul>
+                    <div class="destaque">
+                        <h3>Destaque</h3>
+                        <p>Este é um destaque</p>
+                        <ul>
+                        <li>Item 4</li>
+                        <li>Item 5</li>
+                        </ul>
+                    </div>
+                </div>
 
-                . Seletor de filho: seletor1 > seletor2 - seleciona todos os elementos que correspondam 
-                                    ao seletor seletor2 e que sejam filhos diretos do elemento que corresponde ao seletor seletor1.
+                <!-- JavaScript -->
+                <script>
+                    // Seleciona todos os elementos li que são filhos diretos do primeiro elemento ul
+                    const elementos = document.querySelectorAll('#container > ul > li');
+
+                    // Exibe a lista de elementos selecionados
+                    console.log(elementos);
+
+                    // Altera o estilo dos elementos selecionados
+                    elementos.forEach((elemento) => {
+                        elemento.style.backgroundColor = 'lightblue';
+                    });
+                </script>
+
+        . document.querySelector    - é uma função do DOM (Document Object Model) que permite selecionar um elemento HTML 
+                                        baseado em uma expressão de seleção CSS. Ele retorna o primeiro elemento que corresponde 
+                                        à expressão de seleção especificada, ou null se não for encontrado nenhum elemento.
+
+                                        O querySelector retorna apenas o primeiro elemento que corresponde à expressão de seleção. 
+                                        Se precisar selecionar todos os elementos que correspondem à expressão, use o método 
+                                        querySelectorAll em vez disso.
+
+            . Exemplo:
+
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Exemplo querySelector</title>
+                    </head>
+
+                    <body>
+                        <h1 id="titulo1" class="titulo">Título 1 da página</h1>
+                        <h1 id="titulo2" class="titulo">Título 2 da página</h1>
+
+                        <p class="paragrafo">Este é um parágrafo.</p>
+                        <button class="botao">Clique aqui</button>
+
+                        <script>
+                            const titulo = document.querySelector('.titulo');
+                            console.log(titulo.textContent); // Saída: "Título 1 da página"
+                        </script>
+                    </body>
+                </html>
+
+        . document.getElementById   - O método document.getElementById é uma função do JavaScript que retorna um 
+                                        elemento HTML com o ID especificado. Se o elemento não for encontrado, o 
+                                        método retorna null.
+
+            . Exemplo:
+
+                <!DOCTYPE html>
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Document</title>
+                    </head>
+
+                    <body>
+                        <h1 id="titulo1" class="titulo">Título 1 da página</h1>
+                        <h1 id="titulo2" class="titulo">Título 2 da página</h1>
+
+                        <p class="paragrafo">Este é um parágrafo.</p>
+                        <button class="botao">Clique aqui</button>
+
+                        <script>
+                            const titulo = document.getElementById('titulo2');
+                            console.log(titulo.textContent); // Saída: "Título da página"
+                        </script>
+                    </body>
+
+                </html>
+
+        . document.getElementByTagName - O método getElementsByTagName do DOM é um método que retorna uma coleção de 
+                                        elementos que correspondem ao nome de tag especificado.
+
+                                        Em outras palavras, ele permite que você selecione todos os elementos de uma página 
+                                        HTML que têm um determinado nome de tag, como p, div, span, img, etc.
+
+            Exemplo:
+
+                <!DOCTYPE html>
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Document</title>
+                    </head>
+
+                    <body>
+                        <table id="table">
+                            <tr>
+                                <td>Your age:</td>
+
+                                <td>
+                                    <label>
+                                        <input type="radio" name="age" value="young" checked> less than 18
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="age" value="mature"> from 18 to 50
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="age" value="senior"> more than 60
+                                    </label>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <script>
+                            let inputs = table.getElementsByTagName('input');
+
+                            for (let input of inputs) {
+                                alert(input.value + ': ' + input.checked);
+                            }
+                        </script>
+                    </body>
+                </html>
+
+        . document.getElementByName - É um método que retorna uma coleção de elementos que correspondem ao atributo name 
+                                        especificado.
+
+                                        Ele permite que você selecione todos os elementos de uma página HTML que têm um 
+                                        determinado valor no atributo name.
+
+            Exemplo: 
+
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Exemplo de getElementsByName</title>
+                    </head>
+                    <body>
+                        <form>
+                            <input type="text" name="nome" value="Nome" placeholder="Digite seu nome">
+                            <input type="email" name="email" placeholder="Digite seu e-mail">
+                            <input type="text" name="nome" value="Sobrenome" placeholder="Digite sobrenome">
+                        </form>
+
+                        <script>
+                            const elementosNome = document.getElementsByName('nome');
+                            console.log(elementosNome); // retorna uma coleção de elementos com name="nome"
+
+                            elementosNome.forEach( elemento => {
+                                console.log(elemento.value);
+                            });
+                        </script>
+                    </body>
+                </html>
+
+        . document.getElementByClassName -  É um método que retorna uma coleção de elementos que correspondem ao nome da 
+                                            classe especificado.
+
+                                            Ele permite que você selecione todos os elementos de uma página HTML que têm 
+                                            uma determinada classe.
+
+            Exemplo:
+
+                <!DOCTYPE html>
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Document</title>
+                    </head>
+
+                    <body>
+                        <form>
+                            <input type="text" name="nome" value="Nome" class="form-control" placeholder="Digite seu nome">
+                            <input type="email" name="email" class="form-control-sm" placeholder="Digite seu e-mail">
+                            <input type="text" name="nome" class="form-control" value="Sobrenome" placeholder="Digite sobrenome">
+                        </form>
+
+                        <script>
+                            const elementosNome = document.getElementsByClassName('form-control');
+                            console.log(elementosNome); // retorna uma coleção de elementos com name="nome"
+
+                            elementosNome.forEach( elemento => {
+                                console.log(elemento.value);
+                            });
+                        </script>
+                    </body>
+                </html>
+
+        . Comparação entre os métodos para nôs do DOM:
+
+            Method	                Searches by...	        Can call on an element?	
+            ------                  --------------          ----------------------- 
+
+            querySelector	        CSS-selector	        ✔	                    
+            querySelectorAll	    CSS-selector	        ✔	                    
+            getElementById	        id	                    -	                    
+            getElementsByName	    name	                -	                    
+            getElementsByTagName	tag or '*'	            ✔	                    
+            getElementsByClassName	class	                ✔	                    
 
 
 
-https://javascript.info/searching-elements-dom
+https://javascript.info/basic-dom-node-properties
