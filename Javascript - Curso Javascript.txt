@@ -2643,6 +2643,30 @@ Browser: Document, Eventos e Interfaces
 
             </html>
 
+    . Comandos para apresentar valores dos objetos na console:
+
+        . console.log(): Exibe uma mensagem no console.
+
+        . console.debug(): Exibe uma mensagem de depuração no console.
+
+        . console.info(): Exibe uma mensagem de informação no console.
+
+        . console.warn(): Exibe um aviso no console.
+
+        . console.error(): Exibe um erro no console.
+
+        . console.dir(): Exibe informações detalhadas sobre um objeto no console.
+
+        . console.table(): Exibe um objeto como uma tabela no console.
+
+        . console.time() e console.timeEnd(): Usados para medir o tempo de execução de um trecho de código.
+
+        . console.count(): Exibe uma contagem de quantas vezes o método console.count() foi chamado com o mesmo nome.
+
+        . console.group() e console.groupEnd(): Usados para agrupar mensagens relacionadas no console.
+
+        . console.clear(): Limpa o console.
+
     . BOM - Usado para interagir com o navegador e realizar ações relacionadas ao navegador
 
     . DOM - Usado para manipular e interagir com os elementos HTML em uma página web.
@@ -3010,7 +3034,7 @@ Browser: Document, Eventos e Interfaces
 
                 </html>
 
-        . document.getElementByTagName - O método getElementsByTagName do DOM é um método que retorna uma coleção de 
+        . document.getElementsByTagName - O método getElementsByTagName do DOM é um método que retorna uma coleção de 
                                         elementos que correspondem ao nome de tag especificado.
 
                                         Em outras palavras, ele permite que você selecione todos os elementos de uma página 
@@ -3055,7 +3079,7 @@ Browser: Document, Eventos e Interfaces
                     </body>
                 </html>
 
-        . document.getElementByName - É um método que retorna uma coleção de elementos que correspondem ao atributo name 
+        . document.getElementsByName - É um método que retorna uma coleção de elementos que correspondem ao atributo name 
                                         especificado.
 
                                         Ele permite que você selecione todos os elementos de uma página HTML que têm um 
@@ -3079,14 +3103,14 @@ Browser: Document, Eventos e Interfaces
                             const elementosNome = document.getElementsByName('nome');
                             console.log(elementosNome); // retorna uma coleção de elementos com name="nome"
 
-                            elementosNome.forEach( elemento => {
-                                console.log(elemento.value);
-                            });
+                            for( const elemento of elementosNome){
+                                console.log( elemento );
+                            }
                         </script>
                     </body>
                 </html>
 
-        . document.getElementByClassName -  É um método que retorna uma coleção de elementos que correspondem ao nome da 
+        . document.getElementsByClassName -  É um método que retorna uma coleção de elementos que correspondem ao nome da 
                                             classe especificado.
 
                                             Ele permite que você selecione todos os elementos de uma página HTML que têm 
@@ -3113,24 +3137,137 @@ Browser: Document, Eventos e Interfaces
                             const elementosNome = document.getElementsByClassName('form-control');
                             console.log(elementosNome); // retorna uma coleção de elementos com name="nome"
 
-                            elementosNome.forEach( elemento => {
-                                console.log(elemento.value);
-                            });
+                            for( const elemento of elementosNome){
+                                console.log( elemento );
+                            }
                         </script>
                     </body>
                 </html>
 
         . Comparação entre os métodos para nôs do DOM:
 
-            Method	                Searches by...	        Can call on an element?	
-            ------                  --------------          ----------------------- 
+            Method	                Searches by...	        Can call on an element?	    run "forEach" in collection?
+            ------                  --------------          -----------------------     ----------------------------
 
-            querySelector	        CSS-selector	        ✔	                    
-            querySelectorAll	    CSS-selector	        ✔	                    
-            getElementById	        id	                    -	                    
-            getElementsByName	    name	                -	                    
-            getElementsByTagName	tag or '*'	            ✔	                    
-            getElementsByClassName	class	                ✔	                    
+            querySelector	        CSS-selector	        ✔	                        ✔
+            querySelectorAll	    CSS-selector	        ✔	                        ✔
+            getElementById	        id	                    -	                        -
+            getElementsByName	    name	                -	                        -
+            getElementsByTagName	tag or '*'	            ✔	                        - 
+            getElementsByClassName	class	                ✔	                        -
+
+        . Importante: Cuidado, os métodos: getElementsByTagName, getElementsByName e getElementsByClassName retornam uma coleção, por isso seus nomes estão no plural.
+                                                     -                     -                   -
+                                                     |                     |                   |
+                                                     +---------------------+-------------------+
+                                                                           |
+                                                                           V
+
+                                                        Cuidado para não esquecer o "s", pois retornam 
+                                                        uma coleção, diferente do "getElementById" que
+                                                        retorna um único elemento.         
+
+    . innerHTML - É uma propriedade de leitura e escrita que permite acessar ou modificar o conteúdo HTML interno de um elemento HTML.
+
+        . Exemplo 1: Acessando o conteúdo HTML interno
+
+            <!-- HTML -->
+            <div id="meu-div">Olá, <span>mundo!</span></div>
+
+            // Código Javascript
+            const div = document.getElementById('meu-div');
+            console.log(div.innerHTML); // Saída: "Olá, <span>mundo!</span>"
+
+        . Exemplo 2: Modificando o conteúdo HTML interno
+
+            <!-- HTML -->
+            <div id="meu-div">Olá, mundo!</div>
+
+            // Código Javascript
+            const div = document.getElementById('meu-div');
+            div.innerHTML = 'Olá, <strong>mundo!</strong>';
+            console.log(div.innerHTML); // Saída: "Olá, <strong>mundo!</strong>"
+
+    . outerHTML - É uma propriedade de leitura e escrita que permite acessar ou modificar todo o conteúdo HTML de um elemento, 
+                    incluindo o próprio elemento.
+
+                    . Retorna não somente o conteúdo interno, mas também o conteúdo do elemento da tag pai.
+
+        . Exemplo:
+
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Document</title>
+                </head>
+
+                <body>
+                    <div id="container">
+                        <input type="text" name="nome" id="nome">
+                    </div>
+
+                    <script>
+                        let divContainer = document.getElementById('container');
+
+                        console.log( divContainer.outerHTML );
+                        console.log( divContainer.innerHTML );
+
+                        divContainer.outerHTML = 'Hello, World!';
+
+                        console.log( divContainer.outerHTML ); 
+                        // Saída
+                        //
+                        // <div id="container"> <!-- Tag Responsável pelo conteúdo interno -->
+                        //     <input type="text" name="nome" id="nome">
+                        // </div>
+
+                        console.log( divContainer.innerHTML );
+                        // Saída
+                        //
+                        // <input type="text" name="nome" id="nome">
+
+                    </script>
+                </body>
+            </html>
+
+        . Assemelha-se muito com o "innerHTML", porém existem diferenças grandes:
+
+            . Ao acessar a propriedade "outerHTML", retorna o conteúdo completo da tag.
+
+            . Se utilizarmos o "outerHTML" para alterar o conteúdo da página, a página exibida é alterada, 
+                mas o conteúdo dela não. Se consultarmos o conteúdo da página após o "outerHTML" veremos
+                que não mudou, porém a exibição sim.
+
+                Exemplo: 
+
+                    <!DOCTYPE html>
+                    <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Document</title>
+                        </head>
+
+                        <body>
+                            <div id="container">
+                                <input type="text" name="nome" id="nome">
+                            </div>
+
+                            <script>
+                                let divContainer = document.getElementById('container');
+
+                                console.log( divContainer.outerHTML );
+                                console.log( divContainer.innerHTML );
+
+                                divContainer.outerHTML = 'Hello, World!';
+
+                                console.log( divContainer.outerHTML );  // Continuará o input type text na página
+                                console.log( divContainer.innerHTML );  // Idem
+                            </script>
+                        </body>
+                    </html>
 
 
 
