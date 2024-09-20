@@ -3269,6 +3269,85 @@ Browser: Document, Eventos e Interfaces
                         </body>
                     </html>
 
+    . HTML Attributes -  são informações adicionais que podem ser adicionadas a uma tag HTML para fornecer mais contexto e significado ao 
+                        elemento. Eles são escritos na forma de pares de nome-valor, separados por um sinal de igual (=), e são colocados 
+                        dentro da tag de abertura do elemento.  
+
+        Exemplo:
+
+            <!DOCTYPE html>
+            <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+            </head>
+
+            <body>
+
+                <div id="elem" about="Elephant"></div>
+                <!--  |           |                 -->
+                <!--  |           V                 -->
+                <!--  +-> HTML Attributes           -->
+
+            </body>
+
+            </html>
+
+        . Podemos acessar esses attributes através das funções abaixo:
+
+            . elem.hasAttribute(name) –         Verifica a existência do atributo.
+            . elem.getAttribute(name) –         Obtêm o valor.
+            . elem.setAttribute(name, value) –  Configura o valor, se o atributo existir ele atualiza; caso contrário cria o atributo.
+            . elem.removeAttribute(name) –      removes the attribute.
+
+        . Exemplo:
+
+            <!DOCTYPE html>
+            <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+            </head>
+
+            <body>
+                <div id="elem" about="Elephant"></div>
+                <input type="text" name="name" id="name" value="John">
+
+                <script>
+                    console.log(elem.getAttribute('About')); // (1) 'Elephant', reading
+
+                    elem.setAttribute('Test', 123); // (2), writing
+
+                    console.log(elem.outerHTML); // (3), <div id="elem" about="Elephant" test="123"></div>
+
+                    for (let attr of elem.attributes) { // (4) list all
+                        console.log(`${attr.name} = ${attr.value}`);
+                    }
+
+                    elem.setAttribute('Test', 456);
+
+                    console.log( elem.outerHTML );   // <div id="elem" about="Elephant" test="456"></div>
 
 
-https://javascript.info/basic-dom-node-properties
+                    let name = document.getElementById('name'); 
+
+                    console.log(name.value);        // John
+
+                    name.value = 'Jane';
+
+                    console.log(name.value);        // Jane
+
+                </script>
+            </body>
+
+            </html>
+
+
+
+
+# Parei no "DOM properties are typed"
+https://javascript.info/dom-attributes-and-properties
