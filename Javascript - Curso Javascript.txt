@@ -440,11 +440,56 @@ Fundamentos
           
                 . Representa números inteiros e de ponto flutuante.
 
-                . Exemplo:
+                    . Exemplo:
 
-                    let age = 25;
-                    let price = 19.99;
+                        let age = 25;
+                        let price = 19.99;
 
+                        let numero = 10.5;
+                        console.log(numero.toFixed(2)); // Saída: "10.50"
+
+                        let stringNumero = "10.5";
+                        console.log(parseFloat(stringNumero)); // Saída: 10.5
+
+                        console.log(Number(stringNumero)); // Saída: 10.5                
+
+
+                . Se você precisar de uma precisão maior, pode considerar usar uma biblioteca de aritmética de precisão, como a decimal.js.
+
+                    . Exemplo:
+
+                        ...
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.2.1/decimal.min.js"></script>
+
+                        <script>
+                            // Criando um objeto Decimal
+                            let decimal1 = new Decimal(1.2345);
+                            let decimal2 = new Decimal("6.7890");
+
+                            // Adição
+                            let resultado = decimal1.plus(decimal2);
+                            console.log(resultado.toString()); // Saída: "7.0235"
+
+                            // Subtração
+                            let diferenca = decimal1.minus(decimal2);
+                            console.log(diferenca.toString()); // Saída: "-5.5545"
+
+                            // Multiplicação
+                            let produto = decimal1.times(decimal2);
+                            console.log(produto.toString()); // Saída: "7.86392"
+
+                            // Divisão
+                            let quociente = decimal1.dividedBy(decimal2);
+                            console.log(quociente.toString()); // Saída: "0.177346842105263157894736842105263"
+
+                            // Potenciação
+                            let exponenciacao = decimal1.pow(2);
+                            console.log(exponenciacao.toString()); // Saída: "1.5237313432835820753283582075328"
+
+                            // Arredondamento
+                            let arredondado = decimal1.toDecimalPlaces(2);
+                            console.log(arredondado.toString()); // Saída: "1.23"
+                        </script>
             String
 
                 . Representa uma sequência de caracteres.
@@ -538,6 +583,70 @@ Fundamentos
                 . Exemplo:
             
                     let bigInt = 1234567890123456789012345678901234567890n;        
+
+
+        . Além dos tipos de variáveis apresentados, podemos precisar trabalhar com variáveis do tipo data.
+
+            . Existem várias bibliotecas JavaScript populares para trabalhar com datas. Aqui estão algumas 
+                das principais:
+
+                . Moment.js:    É uma das bibliotecas mais populares e amplamente utilizadas para trabalhar 
+                                com datas em JavaScript. Oferece uma variedade de funcionalidades, incluindo 
+                                formatação de datas, cálculos de datas, manipulação de fusos horários, etc.
+
+                    . Exemplos de uso da biblioteca Moment.js:
+
+                        <!-- Importar a biblioteca moment.js em uma página HTML -->
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+                        <script>
+                            // Criar um momento atual
+                            let now = moment();
+
+                            // Criar um momento com base em uma string
+                            let date = moment('1995-12-25');
+
+                            // Criar um momento com base em um objeto Date
+                            let date2 = moment(new Date(1995, 11, 25));
+
+                            // Adicionar 7 dias ao momento atual
+                            let afterSevenDays = moment().add(7, 'days');
+
+                            // Subtrair 3 meses do momento atual
+                            let beforeThreeMonths = moment().subtract(3, 'months');
+
+                            // Calcular a diferença de tempo entre dois momentos
+                            let duration = moment.duration(afterSevenDays.diff(beforeThreeMonths));
+
+                            // Formatando um momento com um padrão
+                            let formattedDate = moment().format('DD/MM/YYYY');
+                        </script>
+
+                . Day.js:       É uma biblioteca mais leve e moderna que oferece funcionalidades semelhantes 
+                                à Moment.js, mas com uma sintaxe mais simples e uma pegada menor.
+
+                    <script src="https://unpkg.com/dayjs"></script>
+                    <script>
+                        const data = dayjs();
+                        console.log(data.toString()); // Saída: "2023-02-20T14:30:00.000Z"
+
+                        const data2 = dayjs();
+                        console.log(data2.format('DD/MM/YYYY')); // Saída: "2024-09-22"
+
+                        const data3 = dayjs();
+                        console.log(data3.add(3, 'days').toString()); // Saída: "2023-02-23T14:30:00.000Z"
+                        console.log(data3.subtract(2, 'hours').toString()); // Saída: "2023-02-20T12:30:00.000Z"
+                    </script>
+
+                . Luxon:        É uma biblioteca de datas moderna e poderosa que oferece uma variedade de 
+                                funcionalidades, incluindo formatação de datas, cálculos de datas, manipulação 
+                                de fusos horários, etc.
+
+                . Date-fns:     É uma biblioteca de funções de datas que oferece uma variedade de funcionalidades, 
+                                incluindo formatação de datas, cálculos de datas, manipulação de fusos horários, etc.
+
+                . js-joda:      É uma implementação JavaScript da biblioteca Joda-Time, que é uma biblioteca de 
+                                datas popular em Java.
 
         . Tipos de Referência
         
