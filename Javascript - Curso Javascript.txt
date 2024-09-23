@@ -3455,8 +3455,107 @@ Browser: Document, Eventos e Interfaces
 
             </html>
 
+        . IMPORTANTE: Nem sempre o retorno de um atributo é uma string:
+
+            . Exemplo 1 - Retornando valor em branco
+
+                <input id="input" type="checkbox" checked> checkbox
+
+                <script>
+                    alert(input.getAttribute('checked'));   // the attribute value is: empty string
+                    alert(input.checked);                   // the property value is: true
+                </script>
+
+            . Exemplo 2 - Retorno de um objeto
+
+                <div id="div" style="color:red;font-size:120%">Hello</div>
+
+                <script>
+                    // string
+                    alert(div.getAttribute('style'));       // color:red;font-size:120%
+
+                    // object
+                    alert(div.style);                       // [object CSSStyleDeclaration]
+                    alert(div.style.color);                 // red
+                </script>
+
+            . Exemplo 3 - Retornando a URL completa, ou resumida
+
+                <a id="a" href="#hello">link</a>
+
+                <script>
+                    // attribute
+                    alert(a.getAttribute('href'));          // #hello
+
+                    // property
+                    alert(a.href );                         // full URL in the form http://site.com/page#hello
+                </script>
+
+        . Atributos despadrozinados
+
+            . As tags HTML tem atributos padronizados, como: id, width, name, value, etc. Porém existem situações
+                que podemos adicionar tags fora desses padrões:
+
+                <!-- mark the div to show "name" here -->
+                <div show-info="name"></div>
+                        |
+                        +-----> atributo fora dos padrões
+
+            . Exemplo 1
+
+                <!-- mark the div to show "name" here -->
+                <div show-info="name"></div>
+
+                <!-- and age here -->
+                <div show-info="age"></div>
+
+                <script>
+                    // the code finds an element with the mark and shows what's requested
+                    let user = {
+                        name: "Pete",
+                        age: 25
+                    };
+
+                    for(let div of document.querySelectorAll('[show-info]')) {
+                        // insert the corresponding info into the field
+                        let field = div.getAttribute('show-info');
+                
+                        div.innerHTML = user[field]; // first Pete into "name", then 25 into "age"
+                    }
+                </script>
+
+            . Exemplo 2
+
+                <div class="order" order-state="new">
+                    A new order.
+                </div>
+
+                <div class="order" order-state="pending">
+                    A pending order.
+                </div>
+
+                <div class="order" order-state="canceled">
+                    A canceled order.
+                </div>
+
+                <style>
+                    /* styles rely on the custom attribute "order-state" */
+                    .order[order-state="new"] {
+                        color: green;
+                    }
+
+                    .order[order-state="pending"] {
+                        color: blue;
+                    }
+
+                    .order[order-state="canceled"] {
+                        color: red;
+                    }
+                </style>
+
+    . Modificando HTML
 
 
 
-# Parei no "DOM properties are typed"
-https://javascript.info/dom-attributes-and-properties
+
+https://javascript.info/modifying-document
