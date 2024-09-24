@@ -3276,7 +3276,19 @@ Browser: Document, Eventos e Interfaces
                                                         uma coleção, diferente do "getElementById" que
                                                         retorna um único elemento.         
 
-    . innerHTML - É uma propriedade de leitura e escrita que permite acessar ou modificar o conteúdo HTML interno de um elemento HTML.
+    . innerHTML e innerText - É uma propriedade de leitura e escrita que permite acessar ou modificar o conteúdo HTML interno de um elemento HTML.
+
+        . Diferença entre innerHTML e innerText:
+
+            . Tanto innerHTML, quanto innerText, se for atualizar o conteúdo realizam o mesmo procedimento, alteram o conteúdo. Porém:
+
+                innerHtml respeita as tags de formatação (bold, tamanho, etc) e apresenta o texto formatado.
+                innerText não respeita as tags e apresenta o texto com as tags na página, por exemplo: "Olá, <span>mundo!</span>"
+
+            . Se for para consultar o conteúdo:
+
+                innerHTML obtém o conteúdo com as tags HTML 
+                innerText obtém somente o conteúdo se as tags
 
         . Exemplo 1: Acessando o conteúdo HTML interno
 
@@ -3285,7 +3297,8 @@ Browser: Document, Eventos e Interfaces
 
             // Código Javascript
             const div = document.getElementById('meu-div');
-            console.log(div.innerHTML); // Saída: "Olá, <span>mundo!</span>"
+            console.log(div.innerHTML);                         // Saída: "Olá, <span>mundo!</span>"
+            console.log(div.innerText);                         // Saída: "Olá, mundo!"
 
         . Exemplo 2: Modificando o conteúdo HTML interno
 
@@ -3294,8 +3307,12 @@ Browser: Document, Eventos e Interfaces
 
             // Código Javascript
             const div = document.getElementById('meu-div');
+
+            // Na página o conteúdo ficará 
             div.innerHTML = 'Olá, <strong>mundo!</strong>';
             console.log(div.innerHTML); // Saída: "Olá, <strong>mundo!</strong>"
+
+            div.i
 
     . outerHTML - É uma propriedade de leitura e escrita que permite acessar ou modificar todo o conteúdo HTML de um elemento, 
                     incluindo o próprio elemento.
@@ -3555,7 +3572,111 @@ Browser: Document, Eventos e Interfaces
 
     . Modificando HTML
 
+        . Criando um elemento na página
+
+            . createElement     - O método createElement é um método do objeto document em JavaScript, que permite criar um novo elemento HTML.
+
+                let div = document.createElement('div');
+
+            . appendChild       - O método appendChild é usado para adicionar um novo elemento HTML a um elemento existente no documento HTML.
+
+                document.getElementById("btnForm").addEventListener("click", () => {
+                    const container = document.getElementById('container');
+
+                    
+                    const newDiv = document.createElement('div');
+                    newDiv.innerHTML = 'Hello World';
+
+                    document.getElementById('container').appendChild(newDiv);
+                });
 
 
+            . append            - permite adicionar um ou mais nós (elementos ou texto) ao final de uma lista de nós existente.
 
-https://javascript.info/modifying-document
+                document.getElementById("btnForm").addEventListener("click", () => {
+                    const container = document.getElementById('container');
+            
+                    const newDiv = document.createElement('div');
+                    newDiv.innerHTML = 'Hello World';
+            
+                    container.append(newDiv);
+                });
+
+            . replaceWith       - permite substituir um elemento por outro.
+
+                div.innerHTML = "<h1>Hello, World!</h1>";
+
+                document.getElementById('container').replaceWith( div );
+
+            . remove       - permite remover um elemento da página
+
+                const container = document.getElementById("container");
+
+                container.remove();
+
+            . ClassList         - permite modificar as classes CSS de um elemento.
+
+                const elemento = document.getElementById('meuElemento');
+
+                elemento.classList.add('nova-classe');
+
+                elemento.classList.remove('classe-antiga');
+
+
+            . style             - permite modificar os estilos CSS de um elemento.
+
+                const elemento = document.getElementById('meuElemento');
+
+                elemento.style.color = 'azul';
+
+                elemento.style.fontSize = '20px';
+
+            . cloneNode         - permite clonar um nó (elemento ou texto) em um documento HTML.
+
+                document.getElementById("btnForm").addEventListener("click", () => {
+                    const container = document.getElementById('container');
+            
+                    //                      +------->  nó que você deseja clonar.
+                    //                      |               
+                    //                      |                   +---->  true, o clone incluirá todos os filhos do nó original. 
+                    //                      |                   |       false, o clone será feito apenas do nó original, sem incluir seus filhos
+                    const novoContainer = container.cloneNode(true);
+            
+                    document.body.appendChild(novoContainer);
+                });
+
+
+            . Exemplo:
+
+                <html>
+
+                <body>
+                    <div id="container"></div>
+
+                    <script>
+                        // 1. Create <div> element
+                        let div = document.createElement('div');
+
+                        // 2. Set its class to "alert"
+                        div.className = "alert";
+
+                        // 3. Fill it with the content
+                        div.innerHTML = "<strong>Hi there!</strong> You've read an important message.";
+                        // div.textContent = "<strong>Hi there!</strong> You've read an important message.";
+
+                        // 4. Insert element created in the page
+                        document.getElementById('container').appendChild(div);
+                        // document.body.appendChild(div);
+                        // document.getElementById('container').replaceWith(div);
+                    </script>
+                </body>
+
+                </html>
+
+        .
+
+    . Estilos e classes
+
+
+    
+https://javascript.info/styles-and-classes
