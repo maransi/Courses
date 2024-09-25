@@ -3614,26 +3614,10 @@ Browser: Document, Eventos e Interfaces
 
                 container.remove();
 
-            . ClassList         - permite modificar as classes CSS de um elemento.
-
-                const elemento = document.getElementById('meuElemento');
-
-                elemento.classList.add('nova-classe');
-
-                elemento.classList.remove('classe-antiga');
-
-
-            . style             - permite modificar os estilos CSS de um elemento.
-
-                const elemento = document.getElementById('meuElemento');
-
-                elemento.style.color = 'azul';
-
-                elemento.style.fontSize = '20px';
-
             . cloneNode         - permite clonar um nó (elemento ou texto) em um documento HTML.
 
                 document.getElementById("btnForm").addEventListener("click", () => {
+
                     const container = document.getElementById('container');
             
                     //                      +------->  nó que você deseja clonar.
@@ -3654,6 +3638,7 @@ Browser: Document, Eventos e Interfaces
                     <div id="container"></div>
 
                     <script>
+
                         // 1. Create <div> element
                         let div = document.createElement('div');
 
@@ -3677,6 +3662,216 @@ Browser: Document, Eventos e Interfaces
 
     . Estilos e classes
 
+        . Podemos acessar o valor do atributo "class" de duas formas:
 
-    
-https://javascript.info/styles-and-classes
+            . Exemplo - Através do nó do DOM "document.body.className":
+
+                <body class="velha-classe">
+                    <input type="button" value="Click" id="btnForm">
+
+                    <script>
+
+                        document.getElementById("btnForm").addEventListener("click", () => {
+                            alert( document.body.className );                                   // Através do nó
+                        });
+                    </script>
+                </body>
+
+            . Exemplo - Através do elemento especifico:
+
+                <body class="velha-classe">
+                    <input type="button" value="Click" id="btnForm">
+
+                    <script>
+
+                        document.getElementById("btnForm").addEventListener("click", () => {
+                            const elemento = document.querySelector('body');
+
+                            alert( elemento.className );                                        // Através do elemento
+                        });
+                    </script>
+                </body>
+
+        . classList         - permite modificar as classes CSS de um elemento.
+
+            . Exemplo:
+
+                <body class="velha-classe">
+                    <input type="button" value="Click" id="btnForm">
+
+                    <script>
+
+                        document.getElementById("btnForm").addEventListener("click", () => {
+                            const elemento = document.querySelector('body');
+
+                            alert( elemento.className );                                        
+
+                            elemento.classList.remove("velha-classe");
+
+                            alert( elemento.className );                                        
+
+                            elemento.classList.add("nova-classe");
+
+                            alert( elemento.className );                                        
+                        });
+                    </script>
+                </body>
+
+            . Métodos do "classList":
+
+                . elemento.classList.add/remove("class")  – adds/removes the class.
+
+                . elemento.classList.toggle("class")      – adds the class if it doesn’t exist, otherwise removes it.
+
+                . elemento.classList.contains("class")    – checks for the given class, returns true/false.
+
+        . style             - permite modificar os estilos CSS de um elemento.
+
+            . Exemplo:
+
+                const elemento = document.getElementById('meuElemento');
+
+                elemento.style.color = 'azul';
+
+                elemento.style.fontSize = '20px';
+
+            . Métodos do "style":
+
+                elemento.style.removeProperty("color");
+
+                document.body.removeProperty("display");
+
+            . style.cssText - Ao invés de alterar estilo por estilo, podemos usar essa propriedade para alterar um conjunto de estilos:
+
+                <body>
+                    <input type="button" value="Click" id="btnForm">
+
+                    <script>
+
+                        document.getElementById("btnForm").addEventListener("click", () => {
+                            const documentoBody = document.querySelector("body");
+
+                            documentoBody.style.cssText = `color: red !important;
+                                                            background-color: yellow;
+                                                            width: 100px;
+                                                            text-align: center;
+                                                        `;
+                        });
+
+
+                    </script>
+                </body>
+
+        . Unidades de medida:
+
+            . Unidades mais comuns:
+
+                . px (pixels): unidade absoluta, representa o tamanho em pixels.
+                
+                . em: unidade relativa, representa o tamanho em relação ao tamanho da fonte do elemento pai.
+                
+                . rem: unidade relativa, representa o tamanho em relação ao tamanho da fonte do elemento raiz (html).
+
+                . %: unidade relativa, representa o tamanho em relação ao tamanho do elemento pai.
+
+                . vw (viewport width): unidade relativa, representa o tamanho em relação à largura da viewport (área visível da página).
+
+                . vh (viewport height): unidade relativa, representa o tamanho em relação à altura da viewport (área visível da página).
+
+                . vmin (viewport minimum): unidade relativa, representa o tamanho em relação ao menor valor entre a largura e a altura da viewport.
+
+                . vmax (viewport maximum): unidade relativa, representa o tamanho em relação ao maior valor entre a largura e a altura da viewport.
+
+                . cm (centímetros): unidade absoluta, representa o tamanho em centímetros.
+
+                . mm (milímetros): unidade absoluta, representa o tamanho em milímetros.
+
+                . in (polegadas): unidade absoluta, representa o tamanho em polegadas.
+
+                . pt (pontos): unidade absoluta, representa o tamanho em pontos.
+
+                . pc (picas): unidade absoluta, representa o tamanho em picas.
+
+            . Exemplo:
+
+                elemento.style.width = '500px';
+
+                elemento.style.height = '300px';
+
+                elemento.style.fontSize = '18px';
+
+                elemento.style.padding = '20px';
+
+                elemento.style.margin = '10px';
+
+                elemento.style.border = '1px solid #000';
+
+            . Alguns cuidados a serem tomados:
+
+                . Use unidades relativas: Em vez de usar unidades absolutas como px, use unidades relativas como em, rem, % ou vw. 
+                    Isso permite que os elementos se adaptem melhor ao tamanho da tela e ao dispositivo.
+
+                . Entenda a diferença entre em e rem: em é relativo ao tamanho da fonte do elemento pai, enquanto rem é relativo ao 
+                    tamanho da fonte do elemento raiz (html). Use rem para definir tamanhos que precisam ser consistentes em toda a página.
+
+                . Use % com cuidado: % é relativo ao tamanho do elemento pai, mas pode causar problemas se o pai tiver um tamanho fixo. 
+                    Além disso, % pode ser afetado por outros estilos, como padding e border.
+
+                . Evite usar px para tamanhos de fonte: Embora px seja uma unidade comum para tamanhos de fonte, é melhor usar em ou rem 
+                    para permitir que os usuários ajustem o tamanho da fonte de acordo com suas preferências.
+
+                . Use vw e vh com cuidado: vw e vh são unidades relativas ao tamanho da viewport (área visível da página). No entanto, 
+                    podem causar problemas se a página tiver um layout complexo ou se o usuário tiver um dispositivo com uma resolução 
+                    não padrão.
+
+                . Teste em diferentes dispositivos e tamanhos de tela: É fundamental testar seu layout em diferentes dispositivos e 
+                    tamanhos de tela para garantir que as unidades de medida estejam funcionando corretamente.
+
+                . Use ferramentas de desenvolvimento para ajudar: Ferramentas como o Chrome DevTools ou o Firefox Developer Edition 
+                    podem ajudar a identificar problemas de layout e unidades de medida.
+
+                . Documente suas escolhas: Se você estiver trabalhando em um projeto com outros desenvolvedores, é importante documentar 
+                    as escolhas de unidades de medida para evitar confusões e garantir a consistência do layout.
+
+        . getComputedStyle  - É uma função do JavaScript que retorna o estilo computado de um elemento HTML. Ela é usada para obter o valor 
+                                de uma propriedade de estilo de um elemento, levando em consideração as regras de estilo aplicadas a ele, 
+                                incluindo as regras de estilo definidas em folhas de estilo externas, internas e inline.
+
+                            IMPORTANTE: Algumas vezes as propriedades do style ficam em branco, exemplo: quando são definidas num bloco <style>...</style>,
+                                        nesse caso o uso da função "getComputedStyle" é a solução:
+
+            . Exemplo:
+
+                <html>
+                    <style>
+                        body {
+                            background-color: red;
+                            margin: 5px
+                        }
+                    </style>
+
+                    <body>
+                        <input type="button" value="Click" id="btnForm">
+
+                        <script>
+
+                            document.getElementById("btnForm").addEventListener("click", () => {
+                                const documentoBody = document.querySelector("body");
+                                const documentoBody2 = getComputedStyle(documentoBody);
+
+                                console.log(documentoBody.style.backgroundColor);       // Saída: Empty
+                                console.log(documentoBody2.backgroundColor);            // Saída: 'rgb(255, 0, 0)'
+                                
+                            });
+
+
+                        </script>
+                    </body>
+                </html>
+
+    . Tamanho dos elementos e scroll
+
+
+
+
+https://javascript.info/size-and-scroll
