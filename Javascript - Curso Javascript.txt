@@ -10,6 +10,9 @@ https://www.java5cript.com/
 https://github.com/trekhleb/javascrip...
 https://www.jsv9000.app/
 
+# Criando uma web com html, javascript e css
+https://www.youtube.com/watch?v=-0e-mLEn_ck&list=PLMbclvogjXZWgHgQcY5H4MvKtEW8q53cC
+
 Fundamentos
 -----------
 
@@ -3869,9 +3872,269 @@ Browser: Document, Eventos e Interfaces
                     </body>
                 </html>
 
-    . Tamanho dos elementos e scroll
+    . Tamanho dos elementos e rolagem
+
+        . O tamanho do elemento se refere às dimensões de um elemento HTML, incluindo sua largura e altura. Existem várias 
+            propriedades que podem ser usadas para obter ou definir o tamanho de um elemento:
+
+            . offsetWidth e offsetHeight: essas propriedades retornam a largura e altura de um elemento, incluindo padding, bordas e margens.
+
+            . clientWidth e clientHeight: essas propriedades retornam a largura e altura de um elemento, excluindo bordas e margens.
+
+            . scrollWidth e scrollHeight: essas propriedades retornam a largura e altura de um elemento, incluindo o conteúdo 
+                que está fora da visão.
+
+            . width e height: essas propriedades podem ser usadas para definir a largura e altura de um elemento. Só podem ser usadas para
+                                definir, para obter a informação não funciona, temos que usar a função "getComputedStyle(elemento).width"
+
+            . clientTop/Left: É o tamanho da borda
+
+            . clientWidth/Height:  É definida como a largura do conteúdo de um elemento, incluindo o padding, mas excluindo as bordas e 
+                                    margens. Ela é calculada como a soma da largura do conteúdo e do padding esquerdo e direito.
+
+        . Exemplo:
+
+            <!DOCTYPE html>
+            <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+                <style>
+                    #example {
+                        width: 100px;
+                        height: 110px;
+                        border: 1px solid #E8C48F;
+                        padding: 20px;
+                        overflow: auto;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <div id="example">
+                    Mussum Ipsum, cacilds vidis litro abertis. Paisis, filhis, espiritis santis. Praesent malesuada urna nisi, quis
+                    volutpat erat hendrerit non. Nam vulputate dapibus. Si u mundo tá muito paradis? Toma um mé que o mundo vai
+                    girarzis! Nulla id gravida magna, ut semper sapien.
+                </div>
+
+                <!--
+                    +-------------------------------------------+           ^
+                    | border: 1px                               |           |
+                    |   +-----------------------------------+   |           |
+                    |   | padding: 20px                     |   |           |
+                    |   |   +---------------------------+   |   |           |
+                    | 1 | 20| width: 100px height: 110px|   |   |   --------+
+                    | p | px+---------------------------+   |   |
+                    | x |                                   |   |
+                    |   +-----------------------------------+   |
+                    |                                           |
+                    +-------------------------------------------+
+                -->
+
+                <br>
+
+                <div>
+                    <input type="button" value="ClickMe" id="btnForm">
+                </div>
+                <script>
+                    document.getElementById("btnForm").addEventListener("click", () => {
+                        const elemento = document.getElementById("example");
+
+                        console.log(elemento.offsetWidth); //   142 = largura do elemento, incluindo padding, bordas e margens
+                        console.log(elemento.clientHeight); //  152 = altura do elemento, excluindo padding, bordas e margens
+                        console.log(elemento.scrollWidth); //   121 = largura do elemento, incluindo o conteúdo que está fora da visão
+                        console.log(elemento.scrollHeight); //  588 =altura do elemento, incluindo o conteúdo que está fora da visão    
+                        console.log(elemento.clientTop);    //  1 = tamanho da borda     
+                        console.log(elemento.clientWidth);  //  121 = tamanho da borda     
+                        console.log(elemento.clientHeight);  // 150 = tamanho da borda     
+                           
+                    });
+                </script>
+            </body>
+
+            </html>
+
+14. Introdução a eventos
+------------------------
+
+    . Um evento no browser é uma ação ou ocorrência que é disparada pelo usuário ou pelo próprio browser, e que pode 
+        ser capturada e tratada por um script JavaScript.
+
+    . Exemplos de eventos
+
+        . click: disparado quando o usuário clica em um elemento.
+
+        . mouseover/mouseout: disparado quando o usuário move o mouse sobre um elemento.
+
+        . keydown/keyup: disparado quando o usuário pressiona uma tecla.
+
+        . scroll: disparado quando o usuário rola a página ou um elemento.
+
+        . load: disparado quando uma página ou um recurso é carregado.
+
+        . error: disparado quando ocorre um erro no carregamento de uma página ou recurso.
+
+        . change: disparado quando o valor de um elemento é alterado.
+
+        . contextmenu: Quando o click direito do mouse é acionado.
+
+        . mousedown / mouseup – when the mouse button is pressed / released over an element.
+
+        . mousemove – when the mouse is moved.
+
+        . submit – when the visitor submits a <form>.
+
+        . focus – when the visitor focuses on an element, e.g. on an <input>.
+
+        . blur - Evento ocorre quando um elemento perde o foco
+
+    . addEventListener - Captura eventos do navegador:
+
+        Sintaxe: element.addEventListener(event, handler, [options]);
+
+            event: Event name, e.g. "click".
+
+            handler: The handler function.
+
+            options: An additional optional object with properties:
+            
+                once:       if true, then the listener is automatically removed after it triggers.
+
+                capture:    the phase where to handle the event. For historical reasons, options can also be false/true, 
+                            that’s the same as {capture: false/true}.
+
+                passive:    if true, then the handler will not call preventDefault(), 
+
+        Exemplo:
+
+            // Capturando um evento de clique
+            document.getElementById('meuBotao').addEventListener('click', function() {
+                console.log('O usuário clicou no botão!');
+            });
+
+            // Capturando um evento de teclado
+            document.addEventListener('keydown', function(event) {
+                console.log('O usuário pressionou a tecla ' + event.key);
+            });
+
+    . Evento do objeto:
+
+        <input type="button" value="Click me" id="elem">
+
+        <script>
+            elem.onclick = function(event) {
+                // show event type, element and coordinates of the click
+                alert(event.type + " at " + event.currentTarget);
+                alert("Coordinates: " + event.clientX + ":" + event.clientY);
+        };
+        </script>
 
 
+    . handleEvent
+
+        . Exemplo 1
+
+            <button id="elem">Click me</button>
+
+            <script>
+                const elemento = document.getElementById('btnForm');
+
+                let obj = {
+                    handleEvent(event) {
+                        alert(event.type + " at " + event.currentTarget);
+                    }
+                };
+
+                elemento.addEventListener('click', obj);
+            </script>
+
+        . Exemplo 2
+
+            <input type="button" value="ClickMe" id="btnForm">
+
+            <script>
+                const elemento = document.getElementById('btnForm');
+
+                class Menu {
+                    handleEvent(event) {
+                        // mousedown -> onMousedown
+                        let method = 'on' + event.type[0].toUpperCase() + event.type.slice(1);
+                        this[method](event);
+                    }
+
+                    onMousedown() {
+                        console.log("Mouse button pressed");
+                    }
+
+                    onMouseup() {
+                        console.log("...and released.");
+                    }
+
+                    onClick() {
+                        console.log("Mouse button clicked");
+                    }
+
+                    onFocus() {
+                        console.log("Focus");
+                    }
+                }
+
+                let menu = new Menu();
+
+                elemento.addEventListener('mousedown', menu);
+                elemento.addEventListener('mouseup', menu);    
+                elemento.addEventListener('click', menu);    
+                elemento.addEventListener('focus', menu);    
+            </script>
+
+15 . Ações Padrões do Navegador
+-------------------------------
+
+    . event.preventDefault() -  é uma função que pode ser chamada em um evento para prevenir o comportamento padrão do navegador. 
+                                Em outras palavras, ele impede que o navegador execute a ação que normalmente seria executada 
+                                quando um evento é disparado.
+
+        . O método event.preventDefault() é útil em situações onde você deseja:
+
+            . Prevenir que um link seja seguido e, em vez disso, executar uma ação personalizada.
+
+            . Impedir que um formulário seja enviado e, em vez disso, validar os dados ou executar uma ação personalizada.
+
+            . Prevenir que um botão de envio seja ativado e, em vez disso, executar uma ação personalizada.
+
+        . Quando um evento é disparado, o navegador executa a ação padrão associada a esse evento. No entanto, se você 
+            chamar o método event.preventDefault() dentro da função de tratamento de eventos, o navegador não executará a ação padrão.
+            Em vez disso, o navegador continuará a executar a função de tratamento de eventos, permitindo que você execute ações personalizadas.
+
+        . Exemplos:
+
+            . Prevenir que um link seja seguido:
+
+                document.getElementById('meuLink').addEventListener('click', function(event) {
+                    event.preventDefault();
+                    console.log('O link não foi seguido!');
+                });
+
+            . Impedir que um formulário seja enviado:
+
+                document.getElementById('meuFormulario').addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    console.log('O formulário não foi enviado!');
+                });
+
+            . Prevenir que um botão de envio seja ativado:
+
+                document.getElementById('meuBotao').addEventListener('click', function(event) {
+                    event.preventDefault();
+                    console.log('O botão não foi ativado!');
+                });
+
+16. Page: DOMContentLoaded, load, beforeunload, unload
+------------------------------------------------------
 
 
-https://javascript.info/size-and-scroll
+https://javascript.info/onload-ondomcontentloaded
+
+
