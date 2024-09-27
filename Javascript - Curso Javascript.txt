@@ -4134,7 +4134,275 @@ Browser: Document, Eventos e Interfaces
 16. Page: DOMContentLoaded, load, beforeunload, unload
 ------------------------------------------------------
 
+    . Ciclo de vida das páginas HTML:
 
-https://javascript.info/onload-ondomcontentloaded
+        Fase 1: Carregamento (Loading)
+
+            O usuário solicita a página HTML digitando a URL no navegador ou clicando em um link.
+            O navegador envia uma solicitação HTTP para o servidor web que hospeda a página.
+            O servidor web responde com a página HTML, que é enviada para o navegador.
+
+        Fase 2: Parseamento (Parsing)
+
+            O navegador recebe a página HTML e começa a parseá-la, ou seja, a analisar a estrutura da página e identificar os elementos HTML.
+            O navegador cria um modelo de objeto de documento (DOM) da página, que é uma representação da estrutura da página em forma de árvore.
+
+        Fase 3: Renderização (Rendering)
+
+            O navegador usa o DOM para renderizar a página, ou seja, para criar a representação visual da página.
+            O navegador aplica os estilos CSS e as folhas de estilo para definir a aparência da página.
+            O navegador carrega os scripts JavaScript para adicionar interatividade à página.
+
+        Fase 4: Carregamento de Recursos (Resource Loading)
+
+            O navegador carrega os recursos necessários para a página, como imagens, vídeos, áudio e fontes.
+            O navegador pode carregar recursos em paralelo ou em sequência, dependendo da configuração do navegador.
+
+        Fase 5: Execução de Scripts (Script Execution)
+
+            O navegador executa os scripts JavaScript que foram carregados durante a fase de renderização.
+            Os scripts podem ser executados em ordem sequencial ou em paralelo, dependendo da configuração do navegador.
+
+        Fase 6: Atualização (Update)
+
+            O navegador atualiza a página em resposta a eventos, como cliques, digitação e rolagem.
+            O navegador pode atualizar a página inteira ou apenas partes dela, dependendo da natureza do evento.
+
+        Fase 7: Descarregamento (Unloading)
+
+            O usuário fecha a página ou navega para outra página.
+            O navegador descarrega a página e libera os recursos associados a ela.
+
+    . Evento DOMContentLoaded   -  é um evento do DOM (Document Object Model) que é disparado quando "quase todo" o conteúdo 
+                                    de uma página HTML é completamente carregado e o DOM é construído:
+
+        . É disparado quando:
+
+            . O conteúdo da página HTML é completamente carregado.
+
+            . O DOM é construído e está pronto para ser manipulado.
+
+            . Os scripts JavaScript são carregados e executados.
+
+            . As imagens e outros recursos são carregados, mas não necessariamente completamente renderizados        
+
+
+        . Exemplo
+
+
+            <!-- Crie o arquivo style.css na raiz com o conteúdo -->
+            <!-- body {     margin-top: 50px;  }                 -->
+            <link rel="stylesheet" type="text/css" href="style.css">
+
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    alert("DOMContentLoaded: " + getComputedStyle(document.body).marginTop);
+                });
+            </script>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.3.0/lodash.js"></script>
+
+            <script>
+                alert("Library loaded, inline script executed");
+            </script>
+
+        . É importante notar que o evento DOMContentLoaded é disparado antes do evento "load". Isso significa que se você 
+            precisar executar um script que depende da carga de recursos, como imagens e vídeos, você deve usar o evento 
+            "load" em vez de "DOMContentLoaded".
+
+            . Além disso, o evento "DOMContentLoaded" é disparado apenas uma vez, quando o conteúdo da página é completamente 
+                carregado. Se você precisar executar um script em resposta a mudanças no conteúdo da página, você deve usar 
+                outros eventos, como "mutation" ou "resize".
+
+    . Evento "load" -  é um evento do objeto window que é disparado quando todos os recursos da página, incluindo imagens, 
+                        vídeos e scripts, foram completamente carregados.
+
+        . Exemplo
+
+            <body>
+                <img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0">
+
+                <script>
+                    // Mensagem 1
+                    document.addEventListener("DOMContentLoaded", () => {
+                        alert(`DOMContentLoaded -> Image size: ${img.offsetWidth}x${img.offsetHeight}`);
+                    });
+                    
+                    // Mensagem 2
+                    window.addEventListener("load", () => {
+                        alert(`Load -> Image size: ${img.offsetWidth}x${img.offsetHeight}`);
+                    });
+                </script>
+            </body>
+
+    . readystate    - É uma propriedade do objeto document que indica o estado atual do documento HTML. Ele é usado para determinar 
+                        se o documento está pronto para ser manipulado ou se ainda está sendo carregado.
+
+        . O readyState pode ter os seguintes valores:
+
+            . loading:      O documento está sendo carregado e não está pronto para ser manipulado.
+
+            . interactive:  O documento está sendo carregado, mas já está pronto para ser manipulado. 
+                            Isso significa que o DOM está disponível, mas as imagens e outros recursos ainda podem estar sendo carregados.
+
+            . complete:     O documento está completamente carregado e pronto para ser manipulado.
+
+        . Exemplo
+
+            <body>
+                <img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0">
+
+                <script>
+                    // Mensagem 1
+                    document.addEventListener("DOMContentLoaded", () => {
+                        alert(`DOMContentLoaded -> Image size: ${img.offsetWidth}x${img.offsetHeight}`);
+                    });
+                    
+                    // Mensagem 2
+                    window.addEventListener("load", () => {
+                        alert(`Load -> Image size: ${img.offsetWidth}x${img.offsetHeight}`);
+                    });
+
+                    document.addEventListener('readystatechange', function () {
+                        if (document.readyState === 'interactive' || document.readyState === 'complete') {
+                            alert('O documento está pronto para ser manipulado! *** ' + document.readyState + ' ***');
+                            // Código a ser executado quando o documento está pronto para ser manipulado
+                        }
+                    });
+                </script>
+            </body>
+
+17. Popups e métodos Window
+---------------------------
+
+    . window.open   - É um método do objeto window que permite abrir uma nova janela ou aba no navegador.
+
+        . Sintaxe:
+
+            window.open(url, name, params);
+
+            url: é a URL da página que será aberta na nova janela ou aba.
+
+            name: é o nome da janela ou aba que será aberta. Se o nome for omitido, o navegador usará um nome padrão.
+
+            params: são as especificações da janela ou aba que será aberta, como largura, altura, localização, etc.
+
+        . Exemplos
+
+            //  Abrir uma nova aba com uma URL
+            window.open('https://www.google.com', '_blank');
+
+            //  Abrir a URL na aba atual
+            window.open('https://www.google.com', '_self');
+
+            //  Abrir uma nova janela com especificações
+            window.open('https://www.google.com', 'minha_janela', 'width=400,height=300');
+
+            //   Abrir uma nova janela sem barra de ferramenta
+            window.open('https://www.google.com', 'minha_janela', 'toolbar=no');
+
+        . Configurações dos parâmetros:
+
+            . Position
+
+                left/top (numeric)      – coordinates of the window top-left corner on the screen. There is a limitation: 
+                                            a new window cannot be positioned offscreen.
+                width/height (numeric)  – width and height of a new window. There is a limit on minimal width/height, so it’s 
+                                            impossible to create an invisible window.
+
+            . Window features
+
+                menubar (yes/no)        – shows or hides the browser menu on the new window.
+
+                toolbar (yes/no)        – shows or hides the browser navigation bar (back, forward, reload etc) on the new window.
+
+                location (yes/no)       – shows or hides the URL field in the new window. FF and IE don’t allow to hide it by default.
+
+                status (yes/no)         – shows or hides the status bar. Again, most browsers force it to show.
+
+                resizable (yes/no)      – allows to disable the resize for the new window. Not recommended.
+
+                scrollbars (yes/no)     – allows to disable the scrollbars for the new window. Not recommended.
+
+        . Importante notar que o window.open() pode ser bloqueado por alguns navegadores ou extensões de segurança, especialmente se a 
+            janela for aberta sem a interação do usuário. Além disso, o window.open() pode ter comportamentos diferentes em diferentes 
+            navegadores e dispositivos.
+
+    . Manipulando o Popup
+
+        Exemplo 1: Abrir e fechar o popup
+
+            // Abrir o popup
+            const popup = window.open('https://www.example.com/popup', 'popup', 'width=400,height=300');
+            
+            // Fechar o popup
+            popup.close();
+
+        Exemplo 2: Redimensionar o popup
+
+            // Redimensionar o popup para 500x400
+            popup.resizeTo(500, 400);
+            
+            // Redimensionar o popup em 100x100 pixels
+            popup.resizeBy(100, 100);
+
+        Exemplo 3: Mover o popup
+
+            // Mover o popup para a posição (100, 100)
+            popup.moveTo(100, 100);
+            
+            // Mover o popup em 50x50 pixels
+            popup.moveBy(50, 50);
+
+        Exemplo 4:  Definir o foco do popup
+
+            // Definir o foco do popup
+            popup.focus();
+
+        Exemplo 5: Fechar o popup automaticamente
+
+            // Fechar o popup após 5 segundos
+            setTimeout(() => {
+                popup.close();
+            }, 5000);
+
+        Exemplo 6: Manipular o conteúdo do popup
+
+            // Escrever conteúdo no popup
+            popup.document.write('Olá, mundo!');
+            
+            // Definir o conteúdo do corpo do popup
+            popup.document.body.innerHTML = 'Olá, mundo!';
+
+        Exemplo 7: Manipulando os elementos do popup
+
+            <script>
+                document.getElementById('btnForm').addEventListener('click', () => {
+                    let win = window.open('', '_blank', 'left=300,top=100,width=400,height=300');
+
+
+                    win.document.write("<label for=nome>Nome</label><input type=text id=nome value='PALMEIRAS'>");
+
+                    const elemento = win.document.getElementById('nome');
+
+                    elemento.value = 'PALESTRA ITÁLIA';
+                    elemento.select();
+                    elemento.focus();
+
+                    // win.document.body.childNodes[1].value = 'MARCO ANTONIO DA SILVA';
+                    // win.document.body.childNodes[1].select();
+                    // win.document.body.childNodes[1].focus();
+
+                    setTimeout(() => {
+                        win.close();
+                    }, 5000);
+                });
+
+            </script>
+
+
+
+
+https://javascript.info/cross-window-communication
 
 
