@@ -4400,6 +4400,213 @@ Browser: Document, Eventos e Interfaces
 
             </script>
 
+18. Cookies
+-----------
+
+    . Cookies são pequenos arquivos de texto que são armazenados no navegador do usuário e são usados para armazenar 
+        informações sobre o usuário, como preferências, sessões de login, etc. No JavaScript, os cookies são usados 
+        para armazenar e recuperar essas informações.
+
+    . Como funciona:
+
+        1. O servidor envia um cookie: Quando um usuário visita um site, o servidor pode enviar um cookie para o navegador 
+            do usuário. O cookie é um arquivo de texto que contém informações como o nome do cookie, o valor do cookie e a 
+            data de expiração.
+
+            Exemplo:
+
+                using Microsoft.AspNetCore.Mvc;
+                using Microsoft.AspNetCore.Http;
+
+                namespace MeuProjeto.Controllers
+                {
+                    [ApiController]
+                    [Route("api/[controller]")]
+                    public class CookieController : ControllerBase
+                    {
+                        [HttpGet]
+                        public IActionResult GetCookie()
+                        {
+                            // Defina o nome e o valor do cookie
+                            string cookieName = "meuCookie";
+                            string cookieValue = "Valor do meu cookie";
+
+                            // Defina a data de expiração do cookie
+                            DateTime expires = DateTime.Now.AddDays(30);
+
+                            // Crie o cookie
+                            CookieOptions options = new CookieOptions
+                            {
+                                Expires = expires,
+                                SameSite = SameSiteMode.Strict,
+                                Secure = true,
+                                HttpOnly = true
+                            };
+
+                            // Adicione o cookie à resposta
+                            Response.Cookies.Append(cookieName, cookieValue, options);
+
+                            // Retorne uma resposta HTTP 200 (OK)
+                            return Ok("Cookie adicionado com sucesso!");
+                        }
+                    }
+                }
+
+
+        2. O navegador armazena o cookie: O navegador do usuário armazena o cookie em um arquivo de texto no disco rígido 
+            do usuário.
+
+            Exemplo: 
+
+            // Função para fazer uma requisição à API
+            function fazerRequisicaoApi() {
+                const url = 'https://api.meusite.com/meuendpoint';
+
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: headers
+                })
+                .then(response => {
+                    // Lê o cookie da resposta
+                    const cookie = response.headers.get('Set-Cookie');
+                    
+                    if (cookie) {
+                        const cookieNome = cookie.split(';')[0].split('=')[0];
+                        const cookieValor = cookie.split(';')[0].split('=')[1];
+                        console.log(`Cookie ${cookieNome} = ${cookieValor}`);
+                    } else {
+                        console.log('Nenhum cookie foi devolvido');
+                    }
+                })
+                .catch(error => {
+                        console.error('Erro ao fazer requisição à API:', error);
+                });
+            }
+
+            // Chama a função para fazer a requisição à API
+            fazerRequisicaoApi();
+
+        3. O navegador envia o cookie de volta para o servidor: Quando o usuário visita o site novamente, o navegador envia 
+            o cookie de volta para o servidor.
+
+            Exemplo:
+
+                // Função para fazer uma requisição à API
+                function fazerRequisicaoApi() {
+                    const url = 'https://api.meusite.com/meuendpoint';
+
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'Cookie': 'meuCookie=meuValor' // envia o cookie para o servidor
+                    };
+
+                    fetch(url, {
+                        method: 'GET',
+                        headers: headers
+                    })
+                    .then(response => {
+                        console.log('Resposta da API:', response);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao fazer requisição à API:', error);
+                    });
+                }
+
+                // Chama a função para fazer a requisição à API
+                fazerRequisicaoApi();
+
+        4. O servidor lê o cookie: O servidor lê o cookie e usa as informações armazenadas para personalizar a experiência 
+            do usuário.
+
+            Exemplo:
+
+                using Microsoft.AspNetCore.Mvc;
+
+                namespace MeuProjeto.Controllers
+                {
+                    [ApiController]
+                    [Route("api/[controller]")]
+                    public class MeuController : ControllerBase
+                    {
+                        [HttpGet]
+                        public IActionResult Get()
+                        {
+                            // Lê o cookie enviado
+                            var cookie = Request.Cookies["meuCookie"];
+
+                            if (cookie != null)
+                            {
+                                Console.WriteLine($"Cookie: {cookie}");
+                                // Faça algo com o valor do cookie
+                            }
+                            else
+                            {
+                                Console.WriteLine("Nenhum cookie foi enviado");
+                            }
+
+                            return Ok();
+                        }
+                    }
+                }
+
+    . Existem dois tipos principais de cookies:
+
+        1. Cookies de sessão: Esses cookies são armazenados apenas na memória do navegador e são excluídos quando o usuário 
+            fecha o navegador.
+
+        2. Cookies persistentes: Esses cookies são armazenados no disco rígido do usuário e permanecem lá até que expirem 
+            ou sejam excluídos.
+
+    . Aqui estão algumas funções de cookie que você pode usar no JavaScript:
+
+        . setCookie(nome, valor, dias) :    Define um novo cookie com o nome e valor especificados e expira em um número de 
+                                            dias especificado.
+
+        . getCookie(nome) :                 Recupera o valor de um cookie com o nome especificado.
+
+        . deleteCookie(nome) :              Exclui um cookie com o nome especificado.
+
+        Exemplos:
+
+            setCookie("nome", "João", 30);  // define um cookie que expira em 30 dias
+
+            var nome = getCookie("nome");   // recupera o valor de um cookie
+
+            deleteCookie("nome");           // exclui um cookie
+
+    . Os Cookies possuem atributos, que são informações armazenadas nele e que são usadas para controlar o seu comportamento:
+
+        Name:       É o nome do cookie, que é usado para identificá-lo.
+
+        Value:      É o valor do cookie, que pode ser uma string, um número ou um objeto.
+
+        Expires:    É a data e hora em que o cookie expira. Se o cookie não tiver uma data de expiração definida, ele será 
+                    considerado um cookie de sessão e será apagado quando o navegador for fechado.
+
+        Path:       É o caminho do cookie, que define a URL para a qual o cookie é válido. Se o caminho for definido como "/", 
+                    o cookie será válido para todas as URLs do site.
+
+        Domain:     É o domínio do cookie, que define o domínio para o qual o cookie é válido. Se o domínio for definido 
+                    como "example.com", o cookie será válido para todas as URLs do site "example.com".
+
+        Secure:     É um atributo que define se o cookie deve ser enviado apenas sobre conexões seguras (HTTPS). Se o 
+                    atributo for definido como "true", o cookie será enviado apenas sobre conexões seguras.
+
+        HttpOnly:   É um atributo que define se o cookie pode ser acessado apenas pelo servidor ou também pelo cliente 
+                    (JavaScript). Se o atributo for definido como "true", o cookie não poderá ser acessado pelo cliente.
+
+        SameSite:   É um atributo que define se o cookie deve ser enviado apenas em requisições do mesmo site ou também em 
+                    requisições de outros sites. Se o atributo for definido como "Lax", o cookie será enviado apenas em 
+                    requisições do mesmo site, exceto em requisições GET que sejam feitas a partir de um link ou um formulário.
+
+        Exemplo:
+
+            "Set-Cookie: nome=valor; Expires=Wed, 21-Jan-2026 07:28:00 GMT; Path=/; Domain=example.com; Secure; HttpOnly; SameSite=Lax"
+
 
 
 
