@@ -4407,6 +4407,14 @@ Browser: Document, Eventos e Interfaces
         informações sobre o usuário, como preferências, sessões de login, etc. No JavaScript, os cookies são usados 
         para armazenar e recuperar essas informações.
 
+        . São enviados para o servidor a cada requisição
+
+        . Têm um tamanho limite de 4KB
+
+        . São armazenados no navegador do usuário
+
+        . Podem ser configurados para expirar após um período de tempo
+
     . Como funciona:
 
         1. O servidor envia um cookie: Quando um usuário visita um site, o servidor pode enviar um cookie para o navegador 
@@ -4590,7 +4598,153 @@ Browser: Document, Eventos e Interfaces
 
             "Set-Cookie: nome=valor; Expires=Wed, 21-Jan-2026 07:28:00 GMT; Path=/; Domain=example.com; Secure; HttpOnly; SameSite=Lax"
 
-    . Aqui estão algumas funções de cookie que você pode usar no JavaScript:
+    . IMPORTANTE: Para acessar os cookies no navegador, acesse:
+
+        1. DevTools do navegador
+
+        2. Na barra de ferramentas, vá até "Application"
+
+        3. Na barra lateral, vá em "Storage -> Cookies"
+
+    . Aqui estão algumas funções de cookie que podemos usar no JavaScript:
+
+        // Criar um cookie sem expiração, nesse caso um cookie de sessão
+        document.cookie = 'firstName=Marco';
+
+        // Criar um cookie com expiração, nesse caso um cookie persistente
+        document.cookie = 'middleName=Antonio; Expires=' + new Date(2030, 0, 1).toUTCString();
+
+        // Para ler todos os cookies armazenados no navegador
+        console.log( document.cookie );
+
+        document.cookie.split('; ').forEach(cookie => {
+            const [nome, valor] = cookie.split('=');
+            console.log(nome + '=' + valor);                            
+        });
+
+        // Para apagar um cookie, basta definir o seu valor como vazio e colocar uma data de expiração abaixo da data atual
+        document.cookie = "firstName=; " + new Date( 2000, 0, 1 ).toUTCString();
+
+
+        . Observações:
+
+            . É importante notar que a data de expiração deve ser especificada como uma data no passado para que o cookie seja apagado.
+
+            . Se o cookie tiver um caminho ou domínio especificado, é importante incluir esses parâmetros ao apagar o cookie.
+
+                document.cookie = "nome_do_cookie=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=example.com";
+
+            . A função document.cookie pode ser usada para apagar cookies, mas também pode ser usada para criar ou atualizar cookies.
+
+
+19. Local Storage e Session Storage
+-----------------------------------
+
+    . Local Storage é uma tecnologia que permite armazenar dados no navegador do usuário de forma persistente. Os dados são armazenados 
+        em um objeto chamado localStorage e podem ser acessados usando JavaScript.
+
+        . Os dados são armazenados no navegador do usuário
+
+        . Não são enviados para o servidor a cada requisição
+
+        . Têm um tamanho limite de 5MB (varia de acordo com o navegador)
+
+        . São armazenados de forma persistente, ou seja, não expiram após um período de tempo
+
+    . Funções para utilizar "local storage" no navegador:
+
+        // Criando um dado
+        localStorage.setItem("nome", "João");
+
+        // Criando um objeto
+        const usuario = {
+          nome: "João",
+          idade: 30,
+          cidade: "São Paulo"
+        };
+        
+        localStorage.setItem("usuario", JSON.stringify(usuario));
+
+        // Criando um array
+        const frutas = ["maçã", "banana", "laranja"];
+        
+        localStorage.setItem("frutas", JSON.stringify(frutas));
+
+        // Para acessar um dado
+        localStorage.getItem("usuario");
+
+        // Para remover um dado
+        localStorage.removeItem("usuario");
+
+        // Para remover todos os dados da local storage
+        localStorage.clear();
+
+        // Usando um loop para iterar sobre os índices da Local Storage e 
+        // recuperar os nomes e valores dos dados usando as funções key() e getItem().
+        for (let i = 0; i < localStorage.length; i++) {
+          const nome = localStorage.key(i);
+          const valor = localStorage.getItem(nome);
+          console.log(`Nome: ${nome}, Valor: ${valor}`);
+        }
+
+        // Usamos a função Object.keys() para recuperar os nomes dos dados da Local Storage e, em seguida, 
+        // usamos a função map() para criar um array de objetos com os nomes e valores dos dados
+        const dados = Object.keys(localStorage).map(nome => ({
+          nome,
+          valor: localStorage.getItem(nome)
+        }));
+        console.log(dados);
+
+
+20. Session Storage
+-------------------
+
+    . Session Storage é uma tecnologia que permite armazenar dados no navegador do usuário de forma temporária. Os dados são 
+        armazenados em um objeto chamado sessionStorage e podem ser acessados usando JavaScript.
+
+        . Os dados são armazenados no navegador do usuário
+
+        . Não são enviados para o servidor a cada requisição
+
+        . Têm um tamanho limite de 5MB (varia de acordo com o navegador)
+
+        . São armazenados de forma temporária, ou seja, expiram quando o usuário fecha o navegador ou a sessão é encerrada
+
+    . As Funções para utilizar "session storage" no navegador são as mesmas utilizadas na "local storage":
+
+        . sessionStorage.setItem(nome, valor): cria um dado com o nome e valor especificados.
+
+        . sessionStorage.getItem(nome): recupera o valor do dado com o nome especificado.
+
+        . sessionStorage.removeItem(nome): remove o dado com o nome especificado.
+
+        . sessionStorage.clear(): remove todos os dados da Session Storage.
+
+
+21. Diferenças entre Cookies, Local Storage e Session Storage:
+--------------------------------------------------------------
+
+
+                            Cookies                     Local Storage                   Session Storage
+                            -------                     -------------                   ---------------
+
+            Capacidade      4KB                         10Mb                            5Mb
+
+            Navegadores     HTML4 / HTML5               HTML5                           HTML5
+
+            Acessível de    Qualquer Window             Qualquer Window                 Mesma Tab
+
+            Expira          Definido manualmente        nunca                           Ao fechar a Tab 
+
+            Local           No navegador e no           Somente no navegador            Somente no navegador
+            Armazenamento   Servidor
+
+            Enviado c/a     Sim                         Não                             Não
+            Requisição
+
+
+
+
 
 // Colocar aqui formas de trabalhar com cookie de acordo com video https://www.youtube.com/watch?v=GihQAC1I39Q&list=WL&index=2&t=25s
 
