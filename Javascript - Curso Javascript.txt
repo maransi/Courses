@@ -46,8 +46,6 @@ Fundamentos
         node -v
         npm -v
 
-
-
     . Instalação do VSCode:
 
         . Acessar a pagina de download da microsoft:
@@ -158,6 +156,35 @@ Fundamentos
                     }
             . Acesse Configurações -> Profile -> Import Profile 
                 . Informe o link "https://vscode.dev/profile/github/12bd0215e34ffe344361b7dcf767842b" para resgatar as configurações para desenvolvimento em .NET
+
+    . Instalação do JSon Server
+
+        # Instalação do JSon Server
+        npm install json-server
+
+        # Crie o arquivo json abaixo com o nome de db.json
+        {
+            "posts": [
+                { "id": "1", "title": "a title", "views": 100 },
+                { "id": "2", "title": "another title", "views": 200 }
+            ],
+            "comments": [
+                { "id": "1", "text": "a comment about post 1", "postId": "1" },
+                { "id": "2", "text": "another comment about post 1", "postId": "1" }
+            ],
+            "profile": {
+                "name": "typicode"
+            }
+        }
+
+
+        # Execute o comando abaixo
+        npx json-server db.json
+
+        # Testando as rotas
+        curl http://localhost:3000/posts/1
+
+        curl http://localhost:3000/posts
 
 2. Começando
 ------------
@@ -4742,7 +4769,7 @@ Browser: Document, Eventos e Interfaces
             Enviado c/a     Sim                         Não                             Não
             Requisição
 
-22. IndexDDB - Banco de dados dentro do navegador
+22. IndexedDB - Banco de dados dentro do navegador
 -------------------------------------------------
 
 
@@ -4753,8 +4780,391 @@ https://javascript.info/indexeddb
 Requisições de Rede
 -------------------
 
+24. XMLHttpRequest
+------------------
+
+    . É uma API nativa do JavaScript que permite fazer requisições HTTP assíncronas. Ele é uma das primeiras 
+        APIs de requisição HTTP disponíveis no JavaScript e é suportado pela maioria dos navegadores.
+
+    . O objeto XMLHttpRequest é usado para fazer requisições HTTP para um servidor, como GET, POST, PUT, DELETE, 
+        entre outros. Ele permite que você envie dados para o servidor e receba uma resposta.
+
+    . O objeto XMLHttpRequest é assíncrono, o que significa que a execução do código não é bloqueada enquanto a 
+        requisição é processada.
+
+    . Métodos úteis
+
+        open(method, url, async): abre uma conexão para a URL especificada.
+
+            xhr.open(method, URL, [async, user, password])
+                                    |
+                                    +--->   false = synchronously   \___ É o que define se o comando aguardará a resposta, ou não, do servidor
+                                            true = assynchronously  /
+
+        send(data): envia a requisição com o corpo da requisição especificado.
+
+            xhr.send([body])
+                        |
+                        +----> The optional body parameter contains the request body.
+
+
+        setRequestHeader(header, value): define um cabeçalho para a requisição.
+
+        getResponseHeader(header): obtém o valor de um cabeçalho da resposta.
+
+        getAllResponseHeaders(): obtém todos os cabeçalhos da resposta.
+
+    . Propriedades úteis
+
+        readyState: o estado atual da requisição (0: não inicializado, 1: carregando, 2: carregado, 3: interativo, 4: completo).
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 3) {
+                    // loading
+                }
+                if (xhr.readyState == 4) {
+                    // request finished
+                }
+            };
+
+        status: o código de status da resposta.
+
+        statusText: o texto do código de status da resposta.
+
+        responseText: o corpo da resposta como uma string.
+
+        responseXML: o corpo da resposta como um objeto XML.
+
+    . Eventos Úteis
+
+        . load – Disparado quando a requisição é concluída com sucesso e o servidor retorna uma resposta.
+
+            xhr.onload = function() {
+                alert(`Loaded: ${xhr.status} ${xhr.response}`);
+            };
+
+        . error – Disparado quando ocorre um erro durante a requisição.
+
+            xhr.onerror = function() { // only triggers if the request couldn't be made at all
+                alert(`Network Error`);
+            };
+
+        . progress – Disparado periodicamente durante o carregamento da requisição, permitindo que você monitore o progresso.
+
+            xhr.onprogress = function(event) { // triggers periodically
+                // event.loaded - how many bytes downloaded
+                // event.lengthComputable = true if the server sent Content-Length header
+                // event.total - total number of bytes (if lengthComputable)
+                alert(`Received ${event.loaded} of ${event.total}`);
+            };
+
+        . readystatechange: Disparado quando o estado da requisição muda. O estado é representado pela propriedade readyState, 
+                            que pode ter os seguintes valores: 
+                            * 0: não inicializado * 1: carregando * 2: carregado * 3: interativo * 4: completo
+
+        . abort: Disparado quando a requisição é cancelada.
+
+        . timeout: Disparado quando a requisição excede o tempo limite estabelecido.
+
+        . loadstart: Disparado quando a requisição começa a ser carregada.
+
+        . loadend: Disparado quando a requisição é concluída, independentemente do resultado.
+
+    . Para esse tutorial precisaremos que o JSon Server esteja devidamente instalado. Vide aula "1. Instalações"
+
+    . Exemplos
+    
+        . Utilizando o metodo GET
+
+            <body>
+                <div>
+                    <button type="button" id="btnForm" value="ClickMe">ClickMe</button>
+                    <br>
+                    <div id="resultado"></div>
+                </div>
+
+                <script>
+                    document.getElementById('btnForm').addEventListener('click', () => {
+                        const xhr = new XMLHttpRequest();
+
+                        xhr.open('GET', 'http://localhost:3000/posts/1', true);
+
+                        xhr.onload = function () {
+                            if (xhr.status === 200) {
+                                console.log(xhr.responseText);
+                                
+                                const responseText = xhr.responseText;
+                                const jsonData = JSON.parse(responseText);
+
+                                for ( const key in jsonData ){
+                                    console.log(key, jsonData[key]);
+                                }
+                                
+                                document.getElementById('resultado').innerHTML = xhr.responseText
+                            }
+                        };
+
+                        xhr.send();
+                    });
+                </script>
+
+            </body>
+
+        . Utilizando o método POST ( Inclusão de um novo item )
+
+            <body>
+                <div>
+                    <button type="button" id="btnForm" value="ClickMe">ClickMe</button>
+                    <br>
+                    <div id="resultado"></div>
+                </div>
+
+                <script>
+                    document.getElementById('btnForm').addEventListener('click', () => {
+                        const xhr = new XMLHttpRequest();
+
+                        xhr.open('POST', 'http://localhost:3000/posts/', true);
+
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+
+                        xhr.onload = function () {
+                            if (xhr.status === 200) {
+                                console.log(xhr.responseText);
+                                
+                                const responseText = xhr.responseText;
+                                const jsonData = JSON.parse(responseText);
+
+                                for ( const key in jsonData ){
+                                    console.log(key, jsonData[key]);
+                                }
+                                
+                                document.getElementById('resultado').innerHTML = xhr.responseText
+                            }
+                        };
+
+                        const post = {
+                            id: 3,
+                            title: 'Test Title',
+                            views: 100
+                        };
+
+                        xhr.send(JSON.stringify(post));
+                    });
+                </script>
+
+            </body>
+
+        . Mais um exemplo do método POST, pegando o conteúdo dos campos do formulário com "FormData"
+
+            <!DOCTYPE html>
+            <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+                <style>
+                    /* Add some basic styling to make the form look decent */
+                    body {
+                        font-family: Arial, sans-serif;
+                    }
+
+                    form {
+                        width: 50%;
+                        margin: 40px auto;
+                        padding: 20px;
+                        border: 1px solid #ccc;
+                        border-radius: 10px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+
+                    label {
+                        display: block;
+                        margin-bottom: 10px;
+                    }
+
+                    input,
+                    select {
+                        width: 90%;
+                        margin-bottom: 20px;
+                        padding: 10px;
+                        border: 1px solid #ccc;
+                    }
+
+                    button {
+                        background-color: #4CAF50;
+                        color: #fff;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                    }
+
+                    button:hover {
+                        background-color: #3e8e41;
+                    }
+                </style>
+
+            </head>
+
+            <body>
+                <form name="formTitle" id="formTitle">
+                    <label for="id">Id</label>
+                    <input type="text" id="id" name="id" value="9">
+                    <br>
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" value="Testando Title">
+                    <br>
+                    <label for="views">Views</label>
+                    <input type="text" id="views" name="views" value="100">
+                    <br>
+                    <button type="button" id="btnForm" value="ClickMe">ClickMe</button>
+                    <br>
+                    <div id="resultado"></div>
+                </form>
+
+                <script>
+                    document.getElementById('btnForm').addEventListener('click', () => {
+                        const xhr = new XMLHttpRequest();
+
+                        xhr.open('POST', 'http://localhost:3000/posts/', true);
+
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+
+
+                        const formDataPost = document.getElementById("formTitle");
+
+                        let postData = new FormData(formDataPost);
+
+                        // const form = document.getElementById("formTitle");
+                        // const formData = new FormData(form);
+
+                        // for (const [key, value] of formData) {
+                        //     console.log(`${key}: ${value}`);
+                        // }
+
+
+                        const dados = {};
+                        for (const pair of postData.entries()) {
+                            dados[pair[0]] = pair[1];
+                        }
+
+                        xhr.send(JSON.stringify(dados));
+
+                        xhr.onload = function () {
+                            if ( (xhr.status === 200) || ( xhr.status === 201)) {
+                                console.log(xhr.responseText);
+
+                                const responseText = xhr.responseText;
+                                const jsonData = JSON.parse(responseText);
+
+                                for (const key in jsonData) {
+                                    console.log(key, jsonData[key]);
+                                }
+
+                                document.getElementById('resultado').innerHTML = xhr.responseText
+                            } else {
+                                console.log( xhr.responseText);
+                                
+                            }
+                        };
+                    });
+
+                </script>
+
+            </body>
+
+            </html>
+
+
+
+
+        . Utilizando o método PUT ( Atualização )
+
+            <body>
+                <div>
+                    <button type="button" id="btnForm" value="ClickMe">ClickMe</button>
+                    <br>
+                    <div id="resultado"></div>
+                </div>
+
+                <script>
+                    document.getElementById('btnForm').addEventListener('click', () => {
+                        const xhr = new XMLHttpRequest();
+
+                        xhr.open('PUT', 'http://localhost:3000/posts/3', true);
+
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+
+                        xhr.onload = function () {
+                            if (xhr.status === 200) {
+                                console.log(xhr.responseText);
+                                
+                                const responseText = xhr.responseText;
+                                const jsonData = JSON.parse(responseText);
+
+                                for ( const key in jsonData ){
+                                    console.log(key, jsonData[key]);
+                                }
+                                
+                                document.getElementById('resultado').innerHTML = xhr.responseText
+                            }
+                        };
+
+                        const post = {
+                            title: 'Titulo Teste',
+                            views: 1000
+                        };
+
+                        // xhr.send();
+                        xhr.send(JSON.stringify(post));
+                    });
+                </script>
+
+            </body>
+
+        . Utilizando o método DELETE
+
+            <body>
+                <div>
+                    <button type="button" id="btnForm" value="ClickMe">ClickMe</button>
+                    <br>
+                    <div id="resultado"></div>
+                </div>
+
+                <script>
+                    document.getElementById('btnForm').addEventListener('click', () => {
+                        const xhr = new XMLHttpRequest();
+
+                        xhr.open('DELETE', 'http://localhost:3000/posts/3', true);
+                        xhr.onload = function () {
+                            if (xhr.status === 200) {
+                                console.log(xhr.responseText);
+                                
+                                const responseText = xhr.responseText;
+                                const jsonData = JSON.parse(responseText);
+
+                                for ( const key in jsonData ){
+                                    console.log(key, jsonData[key]);
+                                }
+                                
+                                document.getElementById('resultado').innerHTML = xhr.responseText
+                            }
+                        };
+
+                        xhr.send();
+                    });
+                </script>
+
+            </body>
+
+        . 
+
+
 23. Fetch
 ---------
+
+    . 
 
 https://javascript.info/fetch
 
