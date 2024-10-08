@@ -2457,59 +2457,6 @@ Fundamentos
             
             f();        
 
-        . Se for usar "await", é recomendado o uso de um bloco try...catch ao fazer uso do "await", 
-            principalmente quando a função não é "async".
-
-            // Exemplo 1
-            document.getElementById("btnForm").addEventListener("click", async () => {
-                try {
-                    let response = await fetch('http://localhost:3000/comments');
-
-                    if (response.ok) { // if HTTP-status is 200-299
-                    // get the response body (the method explained below)
-                    let json = await response.json();
-                    
-                    console.log(json);
-                    
-                    } else {
-                    alert("HTTP-Error: " + response.status);
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-            });
-
-
-            // Exemplo 2 - Mesmo a função sendo "async" é interessante usar bloco try...catch
-            async function fazerRequisicao() {
-                try {
-                    const resposta = await fetch('https://api.example.com/dados');
-                    const dados = await resposta.json();
-                    console.log(dados);
-                } catch (erro) {
-                    console.error('Erro:', erro);
-                }
-            }
-
-
-            . Tratamento de erros: Quando você usa await, você está esperando que uma promessa seja resolvida ou rejeitada. 
-                Se a promessa for rejeitada, o erro será lançado e precisará ser tratado. O try...catch permite que você 
-                capture e trate o erro de forma adequada.
-
-            . Evitar que o programa crash: Se você não usar try...catch e a promessa for rejeitada, o erro será lançado
-                e o programa pode crashar. Isso pode ser ruim para a experiência do usuário e pode causar perda de dados.
-
-            . Propagar erros: Se você não usar try...catch e a promessa for rejeitada, o erro não será propagado para a 
-                chamada de função anterior. Isso significa que o erro pode ser perdido e não será possível tratá-lo de 
-                forma adequada.
-
-            . Melhorar a legibilidade do código: O uso de try...catch pode tornar o código mais legível, pois permite que 
-                você separe o código que pode gerar erros do código que trata os erros.
-
-
-
-
-
 11. ES6 Modules
 ---------------
 
@@ -5357,10 +5304,25 @@ Requisições de Rede
 
         Exemplo 5 - Request Header
 
-            let response = fetch(protectedUrl, {
+            let promise = fetch(url, {
+                method: "GET", // POST, PUT, DELETE, etc.
                 headers: {
-                    Authentication: 'secret'
-                }
+                    // the content type header value is usually auto-set
+                    // depending on the request body
+                    "Content-Type": "text/plain;charset=UTF-8"
+                },
+                body: undefined, // string, FormData, Blob, BufferSource, or URLSearchParams
+                referrer: "about:client", // or "" to send no Referer header,
+                // or an url from the current origin
+                referrerPolicy: "strict-origin-when-cross-origin", // no-referrer-when-downgrade, no-referrer, origin, same-origin...
+                mode: "cors", // same-origin, no-cors
+                credentials: "same-origin", // omit, include
+                cache: "default", // no-store, reload, no-cache, force-cache, or only-if-cached
+                redirect: "follow", // manual, error
+                integrity: "", // a hash, like "sha256-abcdef1234567890"
+                keepalive: false, // true
+                signal: undefined, // AbortController to abort request
+                window: window // null
             });
 
             /*  Lista de "forbidden HTTP headers"
@@ -5405,6 +5367,145 @@ Requisições de Rede
             let result = await response.json();
 
             alert(result.message);
+
+    . Parâmetros utilizados no "options" - fetch(url, [options])
+
+        . referrer               URL de referência é a URL da página que fez a requisição ao servidor.
+
+            fetch('http://localhost:3000/comments', {
+                referrer: 'http://localhost:3000/'
+            })
+
+        . referrerPolicy        utilizado para especificar a política de referência que deve ser utilizada. 
+                                A política de referência define como o navegador deve lidar com a URL de 
+                                referência. São eles:
+
+            O uso de referrer e referrerPolicy é importante para controlar como as informações de referência 
+            são enviadas para o servidor e proteger a privacidade e a segurança dos usuários.
+
+            no-referrer:                não enviar a URL de referência.
+
+            no-referrer-when-downgrade: não enviar a URL de referência se a requisição for feita para um 
+                                        servidor com um protocolo de segurança inferior 
+                                        (por exemplo, de HTTPS para HTTP).
+
+            same-origin:                enviar a URL de referência apenas se a requisição for feita para o 
+                                        mesmo domínio.
+
+            origin:                     enviar a URL de referência, mas sem incluir o caminho ou a consulta.
+            
+            strict-origin:              enviar a URL de referência, mas sem incluir o caminho ou a consulta, 
+                                        e apenas se a requisição for feita para o mesmo domínio.
+            
+            strict-origin-when-cross-origin: enviar a URL de referência, mas sem incluir o caminho ou a consulta, 
+                                             e apenas se a requisição for feita para um domínio diferente.
+
+
+            fetch('https://api.example.com/dados', {
+                referrerPolicy: 'same-origin'
+            })
+
+        . mode           define como o navegador deve lidar com a requisição. São eles:
+
+            cors:           habilita o modo CORS (Cross-Origin Resource Sharing) para a requisição. Isso permite que a 
+                            requisição seja feita para um servidor que não é o mesmo domínio da página que fez a requisição.
+
+            no-cors:        desabilita o modo CORS para a requisição. Isso significa que a requisição só pode ser feita 
+                            para o mesmo domínio da página que fez a requisição.
+
+            same-origin:    habilita o modo de requisição para o mesmo domínio. Isso significa que a requisição só pode 
+                            ser feita para o mesmo domínio da página que fez a requisição.
+
+            navigate:       habilita o modo de navegação para a requisição. Isso significa que a requisição pode ser feita 
+                            para um servidor que não é o mesmo domínio da página que fez a requisição, mas o navegador 
+                            irá navegar para a URL da resposta.
+
+
+            fetch('https://api.example.com/dados', {
+                mode: 'no-cors'
+            })
+
+        . credentials       Utilizado para especificar como as credenciais de autenticação devem ser enviadas com a requisição. 
+                            As credenciais de autenticação incluem cookies, tokens de autenticação e outros dados de autenticação
+
+
+            omit: não enviar credenciais de autenticação.
+
+            same-origin: enviar credenciais de autenticação apenas se a requisição for feita para o mesmo domínio.
+
+            include: enviar credenciais de autenticação para todos os domínios.
+
+
+            fetch('https://api.example.com/dados', {
+                credentials: 'include'
+            })
+
+        . cache             Utilizado para especificar como o navegador deve lidar com o cache para a requisição. O cache é 
+                            um mecanismo que armazena cópias de recursos solicitados anteriormente, para que possam ser 
+                            recuperados mais rapidamente em requisições subsequente
+
+            default: o navegador usa o cache padrão, que é definido pelo servidor.
+
+            no-store: o navegador não armazena a resposta no cache.
+
+            reload: o navegador sempre recarrega a resposta do servidor, ignorando o cache.
+
+            no-cache: o navegador sempre verifica se a resposta está atualizada no servidor, antes de usar o cache.
+
+            force-cache: o navegador sempre usa o cache, mesmo que a resposta esteja desatualizada.
+
+            only-if-cached: o navegador só usa o cache se a resposta estiver disponível no cache.
+
+
+            fetch('https://api.example.com/dados', {
+                cache: 'no-cache'
+            })
+
+
+
+        . redirect          utilizado para especificar como o navegador deve lidar com redirecionamentos de URL 
+                            durante uma requisição fetch.
+
+            follow: o navegador segue o redirecionamento de URL e faz uma nova requisição para o URL redirecionado.
+
+            error:  o navegador retorna um erro se um redirecionamento de URL for detectado.
+
+            manual: o navegador não segue o redirecionamento de URL e retorna a resposta original, permitindo que 
+                    o aplicativo lidere com o redirecionamento manualmente.
+
+
+            fetch('https://api.example.com/dados', {
+                redirect: 'error'
+            })
+
+        . integrity         Utilizado para especificar uma soma de verificação (hash) para a resposta da requisição fetch. 
+                            Isso permite que o navegador verifique se a resposta recebida é autêntica e não foi modificada 
+                            durante a transmissão.
+
+            . O valor de integrity é uma string que contém a soma de verificação da resposta, geralmente no formato de um 
+                hash SHA-256 ou SHA-384.    
+
+                fetch('https://api.example.com/dados', {
+                    integrity: 'sha256-abc123def456ghi789jkl012'
+                })
+
+            . Tipos de somas
+
+                sha256: soma de verificação SHA-256.
+                sha384: soma de verificação SHA-384.
+                sha512: soma de verificação SHA-512.
+
+            . A soma de verificação pode ser gerada usando ferramentas como openssl ou hashlib. Por exemplo:
+
+                # Isso gerará a soma de verificação SHA-256 do arquivo dados.txt usando a chave secreta segredo.
+                openssl dgst -sha256 -hmac "segredo" dados.txt
+
+        . keepalive         Utilizado para especificar se a conexão HTTP deve ser mantida ativa após a requisição 
+                            fetch ser concluída.
+
+            fetch('https://api.example.com/dados', {
+                keepalive: true
+            })
 
 
 
