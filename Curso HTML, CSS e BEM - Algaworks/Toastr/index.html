@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Toastr Example</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.css">
+</head>
+<body>
+  <h1>Toastr Example</h1>
+  <button id="alert-button">Emitir Alerta</button>
+  <button id="success-button">Emitir Sucesso</button>
+  <button id="error-button">Emitir Erro</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+  <script>
+    // Configuração básica da Toastr
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    };
+
+    // Emitir alerta quando o botão for clicado
+    $('#alert-button').on('click', function() {
+      toastr.info('Este é um alerta!');
+    });
+
+    // Emitir sucesso quando o botão for clicado
+    $('#success-button').on('click', function() {
+      toastr.success('Operação realizada com sucesso!');
+    });
+
+    // Emitir erro quando o botão for clicado
+    $('#error-button').on('click', function() {
+      toastr.error('Erro ao realizar a operação!');
+    });
+  </script>
+</body>
+</html>
