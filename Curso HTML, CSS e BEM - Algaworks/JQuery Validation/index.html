@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/localization/messages_pt_BR.min.js"></script>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>My Form</h1>
+        <form action="" name="registration">
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="firstname">First Name</label>
+                        <input type="text"
+                                name="firstname"
+                                id="firstname"
+                                class="form-control form-control-sm"
+                                placeholder="Name">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="middlename">Middle Name</label>
+                        <input type="text"
+                                name="middlename"
+                                id="middlename"
+                                class="form-control form-control-sm"
+                                placeholder="Middle name">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="lastname">Last Name</label>
+                        <input type="text"
+                                name="lastname"
+                                id="lastname"
+                                class="form-control form-control-sm"
+                                placeholder="Lastname">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email"
+                                name="email"
+                                id="email"
+                                class="form-control form-control-sm"
+                                placeholder="example@exp.com">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password"
+                                name="password"
+                                id="password"
+                                class="form-control form-control-sm"
+                                placeholder="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label for="dataNascimento">Data de Nascimento</label>
+                            <input type="date"
+                                    name="dataNascimento"
+                                    id="dataNascimento"
+                                    class="form-control form-control-sm"
+                                    placeholder="Informe a data de nascimento">
+                        </div>
+                    </div>
+                    <div class="col-9">
+                        <div class="form-group">
+                            <label for="site">Site</label>
+                            <input type="text" name="site" id="site" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("form[name='registration']").validate({
+                rules: {
+                    firstname: "required",
+                    middlename: "required",
+                    lastname: "required",
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    password: {
+                        required: true,
+                        minlength: 6
+                    },
+                    dataNascimento: {
+                        required: true,
+                        date: true
+                    },
+                    site: {
+                        required: true,
+                        url: true
+                    }
+                },
+                messages: {
+                    firstname: "* Favor entrar com o seu primeiro nome",
+                    middlename: "* Favor entrar com o nome do meio",
+                    lastname: "* Favor entrar com o seu último nome",
+                    email: {
+                        required: "Preenchimento obrigatório",
+                        email: "Favor entrar com um email válido"
+                    },
+                    password: {
+                        required: "Favor fornecer uma senha",
+                        minlength: "A senha não pode ser inferior a 6 dígitos"
+                    },
+                    dataNascimento: {
+                        required: "Preenchimento obrigatório!!",
+                        date: "Data Inválida"
+                    },
+                    site: {
+                        required: "Preenchimento obrigatório",
+                        url: "URL inválida!!"
+                    }
+                },
+                submitHandler: function (form) {
+                    form.submit();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
