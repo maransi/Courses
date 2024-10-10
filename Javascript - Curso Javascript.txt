@@ -5663,7 +5663,6 @@ Bibliotecas para Desenvolvimento Web
 
         </html>
 
-
 25. JQuery Mask Money
 ---------------------
 
@@ -5850,7 +5849,188 @@ Bibliotecas para Desenvolvimento Web
             </body>
         </html>
 
-28. JQuery Form
+28. JQuery Validate
+-------------------
 
-https://javascript.info/fetch-api
+    . É uma biblioteca para validar os elementos de entrada de um formulário HTML.
+
+    . Mais informações no link abaixo:
+
+        https://jqueryvalidation.org/
+
+    . Abaixo a relação de atributos para validação na tag HTML:
+
+        Regra	            Validação
+        ------              ---------
+        email	            Se definido como true, o campo só aceitará e-mails válidos;
+        required	        Se definido como true, o campo é de preenchimento obrigatório;
+        min	                Define um número ou valor mínimo válido. Por exemplo, se definimos como 4, o usuário só poderá 
+                            informar um número maior igual a 4. Abaixo disso a informação é inválida;
+        max	                Define um número ou valor máximo válido. Por exemplo, se definimos como 10, o usuário só poderá 
+                            informar um número que seja menor ou igual a 10. Acima disso a informação é inválida;
+        range	            Determina um intervalo, contendo um valor mínimo e máximo válido. Por exemplo, se definirmos 
+                            como [10, 20], o usuário só poderá informar um número que seja maior ou igual a 10 e menor ou 
+                            igual a 20;
+        minlength	        Determina uma quantidade mínima de caracteres. Por exemplo, se definirmos como 10, o usuário só 
+                            poderá informar um valor com no mínimo 10 caracteres. Abaixo disso a informação é inválida;
+        maxlength	        Define uma quantidade máxima de caracteres. Por exemplo, se definirmos como 5, o usuário só 
+                            poderá informar um valor com no máximo 5 caracteres. Acima disso a informação é inválida;
+        rangelength	        Define um intervalo, contendo uma quantidade mínima e máxima de caracteres válidos. Por exemplo, 
+                            se definirmos como [2, 6], o usuário só poderá informar um valor com nomínimo 2 e no máximo 6 
+                            caracteres;
+        url	                Se definido como true, o campo só aceitará URLs válidas;
+        date	            Se definido como true, o campo só aceitará datas válidas;
+        dateISO	            Caso definido como true, o input só aceitará datas no formato ISO;
+        number	            Caso definido como true, o input só aceitará números inteiros ou decimais;
+        digits	            Caso definido como true, o input só permitirá dígitos;
+        creditcard	        Se definido como true, o input só permitirá número de cartão de crédito válido;
+        remote	            Caso defina uma URL de verificação, por exemplo “verificar_se_existe_cpf.php”. Então o Validation 
+                            realiza uma verificação remota com a url e com o valor informado no campo, assim, se a resposta para 
+                            a requisição de validação for false, então o Validation entende que a informação no campo não é válida, 
+                            agora caso a resposta for true então a informação é válida. Por exemplo: verificar se o CFP já existe 
+                            na aplicação;
+        equalTo	            Verifica se o valor dois campos são iguais. Por exemplo: Verificar se as senhas são iguais, no cenário 
+                            de inserir uma senha e repetir a senha novamente.
+        accept	            Esta regra é utilizada para o campo “input= file” para upload de arquivo, onde podemos definir quais 
+                            mime-types são permitidos. Por exemplo, se definimos esta regra com o valor “audio/*”, então estamos 
+                            dizendo ao Validation que só é permitido apenas arquivos de áudio;
+        extension	        Nesta regra podemos definir uma certa extensão de arquivo que poderá ser aceito;
+        phoneUs	            Se definido como true, o campo só aceitará valor de telefone válido dos EUA
+        require_from_group  Garante que pelo o menos um campo deve ser válido dentro de um grupo de campos.
+
+    . Declarações obrigatória:
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+    . Exemplo:
+
+        <!DOCTYPE html>
+        <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" />
+
+                <style>
+                    .error {
+                        color: red;
+                    }
+                </style>
+
+
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+                <script
+                    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/localization/messages_pt_BR.min.js"></script>
+            </head>
+
+            <body>
+                <div class="container">
+                    <h1>My Form</h1>
+                    <form action="" name="registration">
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="firstname">First Name</label>
+                                    <input type="text" 
+                                            name="firstname" 
+                                            id="firstname" 
+                                            class="form-control form-control-sm" 
+                                            placeholder="Name">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="middlename">Middle Name</label>
+                                    <input type="text" 
+                                            name="middlename" 
+                                            id="middlename"  
+                                            class="form-control form-control-sm" 
+                                            placeholder="Middle name">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="lastname">Last Name</label>
+                                    <input type="text" 
+                                            name="lastname" 
+                                            id="lastname"  
+                                            class="form-control form-control-sm" 
+                                            placeholder="Lastname">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" 
+                                            name="email" 
+                                            id="email"  
+                                            class="form-control form-control-sm" 
+                                            placeholder="example@exp.com">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" 
+                                            name="password" 
+                                            id="password"   
+                                            class="form-control form-control-sm"  
+                                            placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Register</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <script>
+                    $(document).ready(function () {
+                        $("form[name='registration']").validate({
+                            rules: {
+                                firstname: "required",
+                                lastname: "required",
+                                email: {
+                                    required: true,
+                                    email: true
+                                },
+                                password: {
+                                    required: true,
+                                    minlength: 6
+                                }
+                            },
+                            messages: {
+                                firstname: "Favor entrar com o seu primeiro nome",
+                                lastname: "Favor entrar com o seu último nome",
+                                email: {
+                                    required: "Preenchimento obrigatório",
+                                    email: "Favor entrar com um email válido"
+                                },
+                                password: {
+                                    required: "Favor fornecer uma senha",
+                                    minlength: "A senha não pode ser inferior a 6 dígitos"
+                                },
+                            },
+                            submitHandler: function (form) {
+                                form.submit();
+                            }
+                        });
+                    });
+                </script>
+            </body>
+
+        </html>
+
 
