@@ -1,0 +1,586 @@
+Angular - Formação Angular 17 Udemy
+-----------------------------------
+
+1. Configurando o ambiente de desenvolvimento
+---------------------------------------------
+
+    . Instalação do Nodejs
+
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | $SHELL
+        nvm --version
+
+        # Para instalar a versão lts mais recente
+        nvm install --lts
+
+        # Se quiser instalar uma versão especifica, utilize:
+        # nvm install 18.20.4
+
+        # Se quiser listar as versões do node disponivel no repositorio remoto
+        # nvm ls-remote
+
+        # Se quiser listar as versões instalada na máquina atual
+        # nvm ls
+
+        # Para usar uma versão instalada na máquina atual
+        # nvm use 20.17.0
+
+        # Para desinstalar uma versão do node js
+        # nvm uninstall 18.20.4
+
+        node -v
+        npm -v
+
+    . Instalação do VSCode:
+
+        . Acessar a pagina de download da microsoft:
+
+            https://code.visualstudio.com/download
+
+        . Baixar o arquivo .deb 
+
+        . Abrir o terminal e acessar a pasta Downloads
+
+        . Executar o comando abaixo:
+
+            sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+        . Atalhos
+
+            Alt + 1, 2, 3, 4, ...	Posiona na aba no.
+            Ctrl + b				Ativar o menu lateral esquerdo 
+            Ctrl + Alt + P			Para ativar a linha de comandos 
+            Ctrl + P 				Localiza um determinado arquivo
+            Ctrl + W				Fecha a aba corrente
+            Ctrl + Shift + W		Fecha todas as abas abertas
+
+            Ctrl + Rolagem do Mouse	
+                    sobre as abas 
+                    abertas			Faz a rolagem das abas.
+
+            Ctrl + K + C ou 
+            Ctrl + /				Comenta linha atual, ou bloco selecionado
+
+            Ctrl + K + U ou
+            Ctrl + /				Descomenta linha, ou bloco selecionado.
+
+            Ctrl + Shift + 
+                    Acento Agudo	Abre o terminal na parte inferior
+
+            Ctrl + X				Apaga linha
+            Ctrl + H				Localiza e atualiza uma expressão
+            Ctrl + F2				Selecione um texto e pressionando Ctrl + F2 
+                                    muda todos os textos equivalente a medida
+                                    que vai se digitando
+            Alt + Arrow(up/Down)    Move a linha para cima, ou para baixo.
+            Ctrl + Shift + O		Abre a lista de funções/métodos da classe atual
+            Ctrl + G				Posicionar na linha No. que for digitado
+            Alt + Backspace			Apaga palavra inteira a esquerda
+            Ctrl + Shift + .		Mostra os métodos da classe
+            Ctrl + Shift + L		Altera dinamicamente em todo o arquivo a palavra que está sendo alterada
+            Ctrl + M				Para cercar um conjunto de tags numa página HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
+            cTRL + Ctrl + -			Para apagar uma tag que abraça um conjunto de tags HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
+
+        . Instale as seguinte Extensões:
+
+            . Angular Extension Pack
+            . Material Icon
+
+        . Configurações:
+
+            . Digite Ctrl K+S, localize o item "Delete Line" e configure Ctrl + D
+            . Acesse View / Minimap para retirar o scroll de código da direita
+            . Acessar configurações, ir em "Settings", Text editors, Sugestions:
+                . Na opção "Accept Suggestion On Enter" deixar como off
+                . Na opção "Suggest: Insert Mode" deixar como replace
+                . Na opção "Quick Suggestions Delay" deixar como 1000
+            . Acesse "Keyboard Shortcuts" em configurações:
+                . Digite "Emmet: Wrap..." e altere o "Keybinding" para "Alt + M"
+                    . De agora em diante, ao editar uma página HTML e quiser cercar um bloco de tags com uma outra, 
+                        basta:
+                        . Selecionar o bloco
+                        . Digitar "Alt + M"
+                        . Informar a tag que deseja colocar, somente a identificação sem "<>", por exemplo: "div"
+                . Digite "Emmet: Remove Tag" e altere o "Keybinding" para "Alt+Shift+-", o "-" deve ser do bloco numerico
+                    . De agora em diante, se precisar apagar uma tag HTML que cerca um conjunto de outras tags, basta posicioinar
+                        o cursor sobre a "TAg" que deseja apagar e pressionar "Ctrl+Shift+-"
+            . Digite "Ctrl+Shift+P" e digite "Preference: Open User Settings (JSON)"
+                . Digite a configuração abaixo:
+
+                    ...
+                    "editor.linkedEditing": true,
+                    "html.format.unformatted": "input",
+                    "workbench.tree.indent": 20,
+                    "workbench.tree.renderIndentGuides": "always",
+                    "workbench.colorCustomizations": {
+                        "tree.indentGuidesStroke": "#c8e0be"
+                    }
+            . Acesse Configurações -> Profile -> Import Profile 
+                . Informe o link "https://vscode.dev/profile/github/12bd0215e34ffe344361b7dcf767842b" para resgatar as configurações para desenvolvimento em .NET
+
+    . Instalação do JSon Server
+
+        # Instalação do JSon Server
+        npm install json-server
+
+        # Crie o arquivo json abaixo com o nome de db.json
+        {
+            "posts": [
+                { "id": "1", "title": "a title", "views": 100 },
+                { "id": "2", "title": "another title", "views": 200 }
+            ],
+            "comments": [
+                { "id": "1", "text": "a comment about post 1", "postId": "1" },
+                { "id": "2", "text": "another comment about post 1", "postId": "1" }
+            ],
+            "profile": {
+                "name": "typicode"
+            }
+        }
+
+
+        # Execute o comando abaixo
+        npx json-server db.json
+
+        # Testando as rotas
+        curl http://localhost:3000/posts/1
+
+        curl http://localhost:3000/posts
+
+
+6. Gerando nosso projeto
+------------------------
+
+    . Demo
+
+        . Crie um projeto com os comandos abaixo:
+
+            # No questionamento "Would you like to add Angular routing?" Responda "Y"
+            ng new weather-app
+            
+            cd weather-app/
+
+            # Opção ao comando abaixo seria "ng s --open", ou "npm start"
+            ng serve --open
+            
+    . Acesse a pasta do projeto criado no VSCode.
+
+    . Estrutura de pastas dos projetos Angular:
+
+        +----node_modules --------------------------->  Dependências do Node.JS necessárias no projeto.                  
+        +----src
+            +----app      --------------------------->  Encontram-se todos os arquivos do projeto, como: componentes, diretivas, filtros e módulos da aplicação
+                +----app.routing.module.ts
+                +----app.component.css / app.component.scss
+                +----app.component.html
+                +----app.component.spec.ts
+                +----app.component.ts
+                +----app.module.ts
+            +----assets   --------------------------->  Recursos externos do projeto, como CSS, imagens, bibliotecas JavaScript, etc.
+            +----index.html
+            +----main.ts
+        +----.angular-cli.json
+
+
+
+    . Arquivos da pasta src/app:
+
+        . app.routing.app:              Módulo que configura as rotas para navegar entre as diferentes páginas ou componentes da aplicação
+
+        . app.component.css/.scss:      Arquivo responsável pelo estilo do nosso módulo. Com o Angular nós trabalhamos 
+                                        com os estilos separados para cada componente, assim conseguimos ter um desacoplamento de estilos. 
+                                        Nesse exemplo nós criamos um projeto com a extensão .css, mas também temos a possibilidade de 
+                                        trabalhar com arquivos Sass. Para que possamos alterar, basta executar o comando ng set 
+                                        defaults.styleExt scss, ele irá configurar para que os próximos componentes sejam criados 
+                                        com a extensão do .scss.
+
+        . app.component.html:           Arquivo HTML do nosso componente App, segue o mesmo pensamento que os arquivos de estilo.
+
+        . app.component.spec.ts:        Arquivo de teste do nosso componente.
+
+        . app.component.ts:             É o componente principal da aplicação. Ele é responsável por definir a estrutura e o comportamento da 
+                                        aplicação.
+
+            . Definir a estrutura do componente principal da aplicação
+
+            . Definir o template HTML e o estilo CSS do componente
+
+            . Definir as propriedades e métodos do componente
+
+        . app.module.ts:                O Angular é um framework modular, ele precisa de um ou mais módulos para que possamos 
+                                        gerenciar os nossos componentes, esse módulo acaba sendo um default, mas podemos criar outros modules e 
+                                        chamar eles dentro dele.
+
+    . Arquivos da pasta src:
+
+        . index.html:                   Esse seria o nosso arquivo root, dentro dele rodamos a nossa SPA (Single Page Application).
+
+        . main.ts:                      É o ponto de entrada da aplicação. Ele é responsável por iniciar a aplicação e configurar o ambiente de execução
+
+        . styles.css/.scss:             Como todos os nossos componentes tem o seu próprio arquivo .css ou .scss, nós podemos 
+                                        utilizar esse arquivo para criar algo global como variáveis para nossa aplicação.
+
+
+    . Pasta raiz do projeto:
+
+        . tsconfig.app.json e 
+            tsconfig.spec.json:         são os nossos arquivos de configuração do TypeScript.
+
+        . .gitignore:                   Arquivo do git que utilizamos para o gerenciamento dos arquivos que serão ignorados no momento do 
+                                        nosso commit.
+
+        . package.json:                 Esse arquivo é o responsável por gerenciar as dependências do nosso projeto, quando executamos o comando  
+                                        npm install [biblioteca] --save, ele verifica os pacotes que estão dentro desse arquivo e 
+                                        baixa para o nosso diretório node_modules conforme foi visto no passo anterior. O parâmetro --save é para deixar
+                                        registrado a dependência da biblioteca no arquivo package.json.
+
+        . README.md:                    Arquivo Markdown para documentação da nossa aplicação.
+
+        . tsconfig.json:                Arquivo de configuração do TypeScript.
+
+        . tslint.json:                  O tslint fica verificando se estamos escrevendo o nosso código corretamente, ele verifica a 
+                                        sintaxe do nosso projeto em tempo de execução e em caso de algum erro ou warning ele lança uma exception 
+                                        no console.    
+
+7. Adicionando estilos e importações
+------------------------------------
+
+    . Sequência de execução do Angular:
+
+        . O inicio do projeto ocorrerá pelo componente src/main.ts:
+
+            import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+            import { AppModule } from './app/app.module';       // Importação do modulo para iniciar a aplicação
+
+
+            platformBrowserDynamic().bootstrapModule(AppModule)
+                .catch(err => console.error(err));
+
+
+            . Identificará o arquivo src/app/app.module.ts para iniciar a construção da página principal.
+
+        . O arquivo src/app/app.module.ts faz a associação com os componentes principais da página principal:
+
+            import { BrowserModule } from '@angular/platform-browser';
+            import { NgModule } from '@angular/core';
+
+            import { AppComponent } from './app.component';     // abrirá o arquivo src/app/app.component.ts
+
+            @NgModule({
+                declarations: [
+                    AppComponent                    
+                ],
+                imports: [
+                    BrowserModule
+                ],
+                providers: [],
+                bootstrap: [AppComponent]       // Componente principal que iniciará a aplicação 
+            })
+
+            export class AppModule { }
+
+            . Observe que é feito a importação do arquivo "./app.component" que iniciará a construção da página inicial:
+
+            . Propriedades do arquivo app.module.ts
+
+                . declarations: The components, directives, and pipes that belong to this NgModule.
+
+                . exports: The subset of declarations that should be visible and usable in the component 
+                            templates of other NgModules.
+
+                . imports: Other modules whose exported classes are needed by component templates declared in this NgModule.
+
+                . providers: Creators of services that this NgModule contributes to the global collection of services;
+                            they become accessible in all parts of the application. (You can also specify providers at the component level.)
+
+                . bootstrap: The main application view, called the root component, which hosts all other application views.
+                            Only the root NgModule should set the bootstrap property.
+
+        . A partir da definição do componente principal o framework do angular abrirá o arquivo src/app/app.component.ts
+
+            import { Component } from '@angular/core';
+
+            @Component({
+                selector: 'app-root',
+                templateUrl: './app.component.html',
+                styleUrls: ['./app.component.scss']
+            })
+            export class AppComponent {
+                title = 'weather-app';
+            }
+
+        . O app.component.ts irá vincular com o template src/app/app.component.html
+
+        . Onde criará a página index.html fazendo a substituição da tag <app-root>
+
+        . Fluxo de execução
+
+                +-------------------+
+                |   src/main.ts     |   import { AppModule } from './app/app.module'; 
+                +-------------------+
+                        |
+                        |
+                        V
+            +---------------------------+
+            |   src/app/app.module.ts   |   import { AppComponent } from './app.component'
+            +---------------------------+   ... bootstrap: [AppComponent]
+                        |                   export class AppModule { }
+                        |
+                        |
+                        V                       @Component({
+            +-------------------------------+       selector: 'app-root',
+            |   src/app/app.component.ts    |       templateUrl: './app.component.html', 
+            +-------------------------------+       styleUrls: ['./app.component.scss'] 
+                        |                       })
+                        |
+                        V
+            +-------------------------------+
+            |   src/app/app.component.html  |
+            +-------------------------------+
+                        |
+                        |
+                        V
+                +---------------+
+                |   index.html  |           <app-root></app-root>
+                +---------------+
+
+    . O arquivo "app.component.ts" é o componente principal da aplicação:
+
+        import { Component } from '@angular/core';
+
+        @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.scss']
+        })
+        export class AppComponent {
+            title = 'weather-app';
+        }
+
+        . Aqui está o que cada parte desse código faz:
+
+            import { Component } from '@angular/core';:     Importa a classe Component do módulo @angular/core. Essa 
+                                                            classe é usada para definir um componente Angular.
+
+            @Component({...}):                              Define o componente AppComponent com as seguintes propriedades:
+
+                selector: 'app-root':                       Define o seletor do componente, que é usado para identificar o 
+                                                            componente no HTML.
+
+                templateUrl: './app.component.html':        Define o arquivo HTML que será usado como template para o componente.
+
+                styleUrls: ['./app.component.css']:         Define o arquivo CSS que será usado para estilizar o componente.
+
+            export class AppComponent { ... }:              Define a classe AppComponent que será exportada e usada como componente.
+
+            title = 'weather-app';:                         Define uma propriedade title com o valor 'my-app'. Essa propriedade pode 
+                                                            ser usada no template HTML para exibir o título da aplicação.
+
+    . Demo
+
+        . Substitua o código do arquivo "app.component.html" pelo abaixo:
+
+            <router-outlet><router-outlet>
+
+        . Substitua o código do arquivo "styles.scss" pelo abaixo:
+
+            /* You can add global styles to this file, and also import other style files */
+            :root {
+            --blue-1: #2242c2;
+            --blue-2: #0368ec;
+            --white: #fff;
+            --grey-1: #ededed;
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            --shadow-light: rgba(255, 255, 255, 0.277);
+            }
+
+            * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            }
+
+            body {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 16px;
+            width: 100%;
+            height: 100%;
+            background-color: var(--blue-1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            }
+
+            fa-icon {
+            color: #ffffff;
+            }
+
+            .container {
+            width: 500px;
+            height: 80vh;
+            background-color: var(--blue-2);
+            border-radius: 20px;
+            box-shadow: 10px 10px 10px var(--shadow-dark);
+            margin-top: 3rem;
+            }
+
+            .upper-data {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 50%;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            }
+
+            .lower-data {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 50%;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            }
+
+            .upper-data img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            }
+
+            .weather-data {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            background-color: var(--shadow-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            }
+
+            .location {
+            color: var(--white);
+            text-align: center;
+            font-size: 1.2em;
+            }
+
+            .temperature {
+            color: var(--white);
+            font-size: 4em;
+            text-align: center;
+            font-weight: 900;
+            }
+
+            .more-info-label {
+            color: var(--white);
+            font-size: 1.9em;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 0.5rem;
+            }
+
+            .more-info-container {
+            flex: 1;
+            background-color: var(--shadow-dark);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            margin-left: 1em;
+            margin-right: 1em;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            }
+
+            .info-block {
+            width: 50%;
+            display: flex;
+            flex-direction: row;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            }
+
+            .info-block-label {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            }
+
+            .info-block-label span {
+            color: var(--white);
+            font-size: 0.8em;
+            margin-top: 0.4em;
+            }
+
+            .info-block-value {
+            width: 50%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            color: var(--white);
+            }
+
+            .search {
+            margin-top: 2em;
+            text-align: center;
+            }
+
+            .search input {
+            background-color: var(--shadow-dark);
+            outline: none;
+            border: none;
+            border-radius: 20px;
+            padding: 1em;
+            color: #fff;
+            font-size: 0.8em;
+            text-align: center;
+            width: 70%;
+            }
+            .search-icon {
+            margin-left: 1em;
+            }
+
+        . Insira as linhas abaixo no arquivo app.module.ts
+
+            import { NgModule } from '@angular/core';
+            import { BrowserModule } from '@angular/platform-browser';
+
+            import { AppRoutingModule } from './app-routing.module';
+            import { AppComponent } from './app.component';
+
+            import { BrowserAnimationsModule } from '@angular/platform-browser/animations';        // Linha inserida
+            import{ HttpClientModule } from '@angular/common/http';                                 // Linha inserida
+            import { FormsModule } from '@angular/forms';                                           // Linha inserida
+
+            @NgModule({
+                declarations: [
+                    AppComponent
+                ],
+                imports: [
+                    BrowserModule,
+                    AppRoutingModule,
+                    BrowserAnimationsModule,                                                        // Linha inserida                                        
+                    HttpClientModule,                                                               // Linha inserida
+                    FormsModule                                                                     // Linha inserida
+                ],
+                providers: [],
+                bootstrap: [AppComponent]
+            })
+            export class AppModule { }
+
+8. Instalando a biblioteca de icones
+------------------------------------
+
