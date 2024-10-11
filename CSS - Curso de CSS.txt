@@ -1,0 +1,153 @@
+CSS - Curso de CSS
+------------------
+
+1. Unidades de medida css
+-------------------------
+
+    . vh (viewport height) é igual a 1% da altura da viewport.
+        
+        height: 100vh significa que a altura do elemento será igual à altura da viewport.
+        height: 50vh significa que a altura do elemento será igual à metade da altura da viewport.
+
+    . vw (viewport width) é igual a 1% da largura da viewport.
+
+        width: 100vw significa que a largura do elemento será igual à largura da viewport.
+        width: 25vw significa que a largura do elemento será igual a um quarto da largura da viewport.
+
+
+    . vmin e vmax: viewport minimum e viewport maximum. Definem um tamanho em relação ao menor ou maior 
+        tamanho da viewport. Por exemplo, width: 50vmin define a largura de um elemento como 50% do 
+        menor tamanho da viewport.
+
+    . "%" Define um tamanho em relação ao tamanho do elemento pai. Por exemplo, width: 50%.
+
+    . "px" unidade absoluta que define um tamanho fixo em pixels. Por exemplo, width: 200px;
+
+    . "em": unidade relativa baseada no tamanho de fonte do elemento pai. Por exemplo, font-size: 1.2em 
+            define o tamanho da fonte do elemento como 1,2 vezes o tamanho da fonte do elemento pai.
+
+    . "rem": unidade relativa baseada no tamanho de fonte do elemento raiz (normalmente o <html>). 
+                Por exemplo, font-size: 1.2rem define o tamanho da fonte do elemento como 1,2 vezes o 
+                tamanho da fonte do elemento raiz.
+
+    . Existem muitas outras pouco utilizadas: mm (milimetros), cm (centimetos), in (polegadas), pt (pontos) e
+        pc (picas)
+
+1. Height e Width
+-----------------
+
+    . As propriedades height e width são usadas para definir a altura e largura de um elemento. 
+        No caso da tag body, é recomendável deixar as propriedades height e width como "auto", pois 
+        o tamanho do body é determinado pelo tamanho do conteúdo dentro dele.
+
+        . Valores possíveis:
+
+            auto
+            length
+            initial
+            inherit
+
+
+             o navegador irá calcular automaticamente a altura do elemento com base no conteúdo e no tamanho do elemento pai. Em outras palavras, o navegador irá ajustar a altura do elemento para que ele possa conter todo o conteúdo sem precisar definir uma altura explícita.
+length: O valor length é um valor numérico que define a altura do elemento em uma unidade de medida específica, como px, em, rem, etc. Por exemplo, height: 200px define a altura do elemento como 200 pixels.
+initial: O valor initial redefine a altura do elemento para o seu valor inicial, que é o valor padrão definido pelo navegador. Em outras palavras, initial é como "reiniciar" a altura do elemento para o seu valor original.
+inherit: O valor inherit herda a altura do elemento pai. Em outras palavras, se o elemento pai tiver uma altura definida, o elemento filho irá herdar essa altura. Se o elemento pai não tiver uma altura definida, o navegador irá calcular automaticamente a altura do elemento filho.
+
+
+
+    . A primeira "div" (container) dentro da tag "body" deverá ter a propriedade "height" com a unidade "vh", ou "auto", nunca "%"
+
+        /* Css */
+        body {
+            height:  100vh;     /* auto; Também pode "auto" no lugar das medidas relativas */
+            width: 100vw;       /* auto; */
+            background-color: yellow;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            border: 1px solid black;
+            width: 50%;
+            height: 50vh;
+            background-color: white;
+        }
+
+        <!-- HTML -->
+        <body>
+            <div class="container">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </body>
+
+    . As "divs" dentro da "div container" podem fazer uso de "%" a vontade.
+
+    . Recomendações:
+
+        . Se o seu site for responsivo, é melhor deixar as propriedades height e width do "body" como "auto". Isso 
+            permitirá que o body se ajuste automaticamente ao tamanho do conteúdo em diferentes dispositivos.
+
+        . Se o seu site não for responsivo e você deseja definir um tamanho fixo para o body, é recomendável 
+            definir uma altura e largura que sejam compatíveis com a maioria das telas de desktop. 
+            
+            . Por exemplo, você pode definir a altura do body como 100vh (100% da altura da viewport) e a 
+                largura como 100vw (100% da largura da viewport). Isso garantirá que o body se ajuste ao 
+                tamanho da tela do usuário.
+
+    . Demo
+
+        . Crie o arquivo "index.html" abaixo:
+
+            <!DOCTYPE html>
+            <html lang="en">
+
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Document</title>
+                    <link href="site.css" type="text/css" rel="stylesheet">
+                    </link>
+                </head>
+
+                <body>
+                    <div class="container">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </body>
+
+            </html>
+
+        . Crie o arquivo "site.css" abaixo:
+
+            body {
+                height: auto; /* 100vh; */
+                width: auto; /* 100vw; */
+                background-color: yellow;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                border: 1px solid black;
+                width: 50%;
+                height: 50vh;
+                background-color: white;
+            }
+
+            .container>div {
+                width: 30%;
+                height: 10%;
+                border: 1px solid black;
+                background-color: green;
+                margin: 10px;
+            }
+
+        . Execute a página "index.html" e veja seu comportamento.
+
+        . Altere "height" do container para "50%" e veja seu comportamento.
