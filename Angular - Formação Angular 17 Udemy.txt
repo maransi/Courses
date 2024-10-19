@@ -146,6 +146,23 @@ Angular - Formação Angular 17 Udemy
 
         curl http://localhost:3000/posts
 
+    . Instalação do do Angular
+
+        # Instalação do Angular
+        sudo npm install -g @angular/cli@15
+
+        # Verificação da versão do Angular
+        ng version
+
+
+        # Para desinstalar
+        # npm uninstall -g @angular/cli
+        # npm cache clean --force
+
+        # Para atualizar
+        # sudo npm install --save-dev @angular/cli@latest
+
+
 
 6. Gerando nosso projeto
 ------------------------
@@ -155,6 +172,7 @@ Angular - Formação Angular 17 Udemy
         . Crie um projeto com os comandos abaixo:
 
             # No questionamento "Would you like to add Angular routing?" Responda "Y"
+            # No questionamento " Which stylesheet format would you like to use? " Responda "SCSS"
             ng new weather-app
             
             cd weather-app/
@@ -386,171 +404,171 @@ Angular - Formação Angular 17 Udemy
 
             /* You can add global styles to this file, and also import other style files */
             :root {
-            --blue-1: #2242c2;
-            --blue-2: #0368ec;
-            --white: #fff;
-            --grey-1: #ededed;
-            --shadow-dark: rgba(0, 0, 0, 0.3);
-            --shadow-light: rgba(255, 255, 255, 0.277);
+                --blue-1: #2242c2;
+                --blue-2: #0368ec;
+                --white: #fff;
+                --grey-1: #ededed;
+                --shadow-dark: rgba(0, 0, 0, 0.3);
+                --shadow-light: rgba(255, 255, 255, 0.277);
             }
 
             * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
 
             body {
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            font-size: 16px;
-            width: 100%;
-            height: 100%;
-            background-color: var(--blue-1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                font-size: 16px;
+                width: 100%;
+                height: 100%;
+                background-color: var(--blue-1);
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             fa-icon {
-            color: #ffffff;
+                color: #ffffff;
             }
 
             .container {
-            width: 500px;
-            height: 80vh;
-            background-color: var(--blue-2);
-            border-radius: 20px;
-            box-shadow: 10px 10px 10px var(--shadow-dark);
-            margin-top: 3rem;
+                width: 500px;
+                height: 80vh;
+                background-color: var(--blue-2);
+                border-radius: 20px;
+                box-shadow: 10px 10px 10px var(--shadow-dark);
+                margin-top: 3rem;
             }
 
             .upper-data {
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            height: 50%;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+                position: relative;
+                overflow: hidden;
+                width: 100%;
+                height: 50%;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
             }
 
             .lower-data {
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            height: 50%;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            display: flex;
-            flex-direction: column;
+                position: relative;
+                overflow: hidden;
+                width: 100%;
+                height: 50%;
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                display: flex;
+                flex-direction: column;
             }
 
             .upper-data img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
             }
 
             .weather-data {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            height: 100%;
-            background-color: var(--shadow-dark);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+                position: relative;
+                z-index: 1;
+                width: 100%;
+                height: 100%;
+                background-color: var(--shadow-dark);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
             }
 
             .location {
-            color: var(--white);
-            text-align: center;
-            font-size: 1.2em;
+                color: var(--white);
+                text-align: center;
+                font-size: 1.2em;
             }
 
             .temperature {
-            color: var(--white);
-            font-size: 4em;
-            text-align: center;
-            font-weight: 900;
+                color: var(--white);
+                font-size: 4em;
+                text-align: center;
+                font-weight: 900;
             }
 
             .more-info-label {
-            color: var(--white);
-            font-size: 1.9em;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-top: 0.5rem;
+                color: var(--white);
+                font-size: 1.9em;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin-top: 0.5rem;
             }
 
             .more-info-container {
-            flex: 1;
-            background-color: var(--shadow-dark);
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            margin-top: 1em;
-            margin-bottom: 1em;
-            margin-left: 1em;
-            margin-right: 1em;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
+                flex: 1;
+                background-color: var(--shadow-dark);
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+                margin-top: 1em;
+                margin-bottom: 1em;
+                margin-left: 1em;
+                margin-right: 1em;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
             }
 
             .info-block {
-            width: 50%;
-            display: flex;
-            flex-direction: row;
-            margin-top: 1em;
-            margin-bottom: 1em;
+                width: 50%;
+                display: flex;
+                flex-direction: row;
+                margin-top: 1em;
+                margin-bottom: 1em;
             }
 
             .info-block-label {
-            width: 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+                width: 50%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
             }
 
             .info-block-label span {
-            color: var(--white);
-            font-size: 0.8em;
-            margin-top: 0.4em;
+                color: var(--white);
+                font-size: 0.8em;
+                margin-top: 0.4em;
             }
 
             .info-block-value {
-            width: 50%;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            color: var(--white);
+                width: 50%;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                color: var(--white);
             }
 
             .search {
-            margin-top: 2em;
-            text-align: center;
+                margin-top: 2em;
+                text-align: center;
             }
 
             .search input {
-            background-color: var(--shadow-dark);
-            outline: none;
-            border: none;
-            border-radius: 20px;
-            padding: 1em;
-            color: #fff;
-            font-size: 0.8em;
-            text-align: center;
-            width: 70%;
+                background-color: var(--shadow-dark);
+                outline: none;
+                border: none;
+                border-radius: 20px;
+                padding: 1em;
+                color: #fff;
+                font-size: 0.8em;
+                text-align: center;
+                width: 70%;
             }
             .search-icon {
-            margin-left: 1em;
+                margin-left: 1em;
             }
 
         . Insira as linhas abaixo no arquivo app.module.ts
@@ -561,8 +579,8 @@ Angular - Formação Angular 17 Udemy
             import { AppRoutingModule } from './app-routing.module';
             import { AppComponent } from './app.component';
 
-            import { BrowserAnimationsModule } from '@angular/platform-browser/animations';        // Linha inserida
-            import{ HttpClientModule } from '@angular/common/http';                                 // Linha inserida
+            import { BrowserAnimationsModule } from '@angular/platform-browser/animations';         // Linha inserida
+            import { HttpClientModule } from '@angular/common/http';                                 // Linha inserida
             import { FormsModule } from '@angular/forms';                                           // Linha inserida
 
             @NgModule({
@@ -581,6 +599,151 @@ Angular - Formação Angular 17 Udemy
             })
             export class AppModule { }
 
+        . Bibliotecas utilizadas
+
+            . Bibliotecas criadas automaticamente na criação do projeto:
+
+                . NgModule
+
+                    . Um módulo é definido usando o decorator @NgModule, que recebe um objeto com várias propriedades:
+    
+                        . declarations: lista de componentes, diretivas e pipes que fazem parte do módulo
+                        . imports: lista de módulos que são importados pelo módulo atual
+                        . providers: lista de serviços que são fornecidos pelo módulo
+                        . bootstrap: lista de componentes que são carregados inicialmente quando o módulo é iniciado
+
+                    . A biblioteca NgModule serve para:
+
+                        . Organizar a aplicação em módulos independentes e reutilizáveis
+                        . Fornecer uma forma de gerenciar as dependências entre os componentes e serviços
+                        . Habilitar a funcionalidade de lazy loading, que permite carregar módulos apenas quando necessário
+
+                . BrowserModule
+
+                    . Fornece o mecanismo de renderização para o navegador
+
+                    . Habilita a funcionalidade de roteamento
+
+                    . Fornece serviços para trabalhar com o DOM (Document Object Model)
+
+                    . Habilita a funcionalidade de eventos do navegador
+
+                . AppRoutingModule
+
+                    . O AppRoutingModule é um módulo que contém as configurações de roteamento da aplicação. 
+                        Ele é responsável por:
+    
+                        . Definir as rotas da aplicação
+
+                        . Associar URLs a componentes específicos
+
+                        . Configurar parâmetros de rota
+
+                        . Habilitar a navegação entre as rotas
+
+            . Bibliotecas adicionais
+
+                . BrowserAnimationsModule
+
+                    . Fornece as funcionalidades de animação para os componentes da aplicação
+
+                    . Habilita as animações de transição entre as vistas da aplicação
+
+                    . Permiti que os desenvolvedores criem efeitos de transição personalizados
+
+                    . Com a BrowserAnimationsModule, os desenvolvedores podem criar animações de transição 
+                        para os componentes da aplicação, como:
+
+                        . Animações de entrada e saída de componentes
+
+                        . Animações de transição entre as vistas da aplicação
+
+                        . Animações de mudança de estado dos componentes
+
+                . HttpClientModule -  serve para fazer requisições HTTP a partir da aplicação
+
+                    . Fornece uma API simples e fácil de usar para fazer requisições HTTP
+
+                    . Faz requisições HTTP para APIs externas ou para APIs dentro da própria aplicação
+
+                    . Manipula os dados recebidos das requisições HTTP
+
+                    . Trata erros e exceções relacionadas às requisições HTTP
+
+                . FormsModule -  serve para fornecer funcionalidades de formulários para a aplicação
+
+                    . Fornece diretivas para criar e gerenciar formulários
+
+                    . Permiti a validação de dados de formulário
+
+                    . Fornece funcionalidades de binding de dados para formulários
+
+                    . Fornece diretivas, como:
+
+                        . ngModel: diretiva para criar um binding de dados entre um formulário e um componente
+
+                        . ngForm: diretiva para criar um formulário e gerenciar os dados de formulário
+
+                        . ngFormGroup: diretiva para criar um grupo de formulários e gerenciar os dados de formulário
+
+                        . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário
+
+                        . ngFormArray: diretiva para criar um array de formulários e gerenciar os dados de formulário                
+
 8. Instalando a biblioteca de icones
 ------------------------------------
+
+    . Usada no Angular para integrar os ícones do FontAwesome em uma aplicação Angular.
+
+    . É uma biblioteca de ícones populares que fornece uma ampla variedade de ícones que 
+        podem ser usados em aplicações web e móveis.
+
+    . Exemplos:
+
+        <i class="fa fa-user"></i>
+
+        <fa-icon [icon]="['fas', 'user']"></fa-icon>
+
+    . Demo
+
+        . Execute os comandos abaixo na pasta raiz do projeto:
+
+            npm install @fortawesome/fontawesome-svg-core
+
+            npm install @fortawesome/free-solid-svg-icons
+
+            # Verifique a versão do angular do projeto é utilize no lugar da tag <version>
+            # Acesse o link "https://www.npmjs.com/package/@fortawesome/angular-fontawesome" para encontrar a "version"
+            # npm install @fontawesome/angular-fontawesome@<version>
+            npm install @fortawesome/angular-fontawesome@0.12.x
+
+        . Insira as linhas abaixo no arquivo "app.module.ts"
+
+                import { NgModule } from '@angular/core';
+                import { BrowserModule } from '@angular/platform-browser';
+
+                import { AppRoutingModule } from './app-routing.module';
+                import { AppComponent } from './app.component';
+
+                import { BrowserAnimationsModule } from '@angular/platform-browser/animations';         
+                import { HttpClientModule } from '@angular/common/http';                                
+                import { FormsModule } from '@angular/forms';                                           
+                import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';           // Linha inserida
+
+                @NgModule({
+                declarations: [
+                    AppComponent
+                ],
+                imports: [
+                    BrowserModule,
+                    AppRoutingModule,
+                    BrowserAnimationsModule,                                                                                                
+                    HttpClientModule,                                                               
+                    FormsModule,
+                    FontAwesomeModule                                                           // Linha inserida
+                ],
+                providers: [],
+                bootstrap: [AppComponent]
+                })
+                export class AppModule { }
 
