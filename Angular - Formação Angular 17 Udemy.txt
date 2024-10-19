@@ -162,8 +162,6 @@ Angular - Formação Angular 17 Udemy
         # Para atualizar
         # sudo npm install --save-dev @angular/cli@latest
 
-
-
 6. Gerando nosso projeto
 ------------------------
 
@@ -394,6 +392,19 @@ Angular - Formação Angular 17 Udemy
             title = 'weather-app';:                         Define uma propriedade title com o valor 'my-app'. Essa propriedade pode 
                                                             ser usada no template HTML para exibir o título da aplicação.
 
+    . A tage "<router-outlet>" age como um marcador para onde a rota carregada deve ser exibida na interface. Basicamente, 
+        é uma área reservada no DOM que indica ao Angular Router onde ele deve renderizar os componentes com base nas rotas 
+        configuradas. 
+
+        . Com base na URL e na configuração da URL vs componente associado, o angular irá renderizar o conteúdo no lugar 
+            da tag <router-outlet>. Por exemplo:
+
+                                        Apontar para                            Associado ao html
+            http:///localhome:4200/     ------------->  WeatherHomeComponent    ------------------>     weather-home.component.html
+                    |                                                                                               ^
+                    V                                                                                               |
+                Quando essa URL é chamada o <router-outlet> renderizará a página -----------------------------------+
+            
     . Demo
 
         . Substitua o código do arquivo "app.component.html" pelo abaixo:
@@ -599,96 +610,100 @@ Angular - Formação Angular 17 Udemy
             })
             export class AppModule { }
 
-        . Bibliotecas utilizadas
+        . Execute o projeto e veja o resultado no navegador
 
-            . Bibliotecas criadas automaticamente na criação do projeto:
+            ng server --open
 
-                . NgModule
+    . Bibliotecas utilizadas
 
-                    . Um módulo é definido usando o decorator @NgModule, que recebe um objeto com várias propriedades:
-    
-                        . declarations: lista de componentes, diretivas e pipes que fazem parte do módulo
-                        . imports: lista de módulos que são importados pelo módulo atual
-                        . providers: lista de serviços que são fornecidos pelo módulo
-                        . bootstrap: lista de componentes que são carregados inicialmente quando o módulo é iniciado
+        . Bibliotecas criadas automaticamente na criação do projeto:
 
-                    . A biblioteca NgModule serve para:
+            . NgModule
 
-                        . Organizar a aplicação em módulos independentes e reutilizáveis
-                        . Fornecer uma forma de gerenciar as dependências entre os componentes e serviços
-                        . Habilitar a funcionalidade de lazy loading, que permite carregar módulos apenas quando necessário
+                . Um módulo é definido usando o decorator @NgModule, que recebe um objeto com várias propriedades:
 
-                . BrowserModule
+                    . declarations: lista de componentes, diretivas e pipes que fazem parte do módulo
+                    . imports: lista de módulos que são importados pelo módulo atual
+                    . providers: lista de serviços que são fornecidos pelo módulo
+                    . bootstrap: lista de componentes que são carregados inicialmente quando o módulo é iniciado
 
-                    . Fornece o mecanismo de renderização para o navegador
+                . A biblioteca NgModule serve para:
 
-                    . Habilita a funcionalidade de roteamento
+                    . Organizar a aplicação em módulos independentes e reutilizáveis
+                    . Fornecer uma forma de gerenciar as dependências entre os componentes e serviços
+                    . Habilitar a funcionalidade de lazy loading, que permite carregar módulos apenas quando necessário
 
-                    . Fornece serviços para trabalhar com o DOM (Document Object Model)
+            . BrowserModule
 
-                    . Habilita a funcionalidade de eventos do navegador
+                . Fornece o mecanismo de renderização para o navegador
 
-                . AppRoutingModule
+                . Habilita a funcionalidade de roteamento
 
-                    . O AppRoutingModule é um módulo que contém as configurações de roteamento da aplicação. 
-                        Ele é responsável por:
-    
-                        . Definir as rotas da aplicação
+                . Fornece serviços para trabalhar com o DOM (Document Object Model)
 
-                        . Associar URLs a componentes específicos
+                . Habilita a funcionalidade de eventos do navegador
 
-                        . Configurar parâmetros de rota
+            . AppRoutingModule
 
-                        . Habilitar a navegação entre as rotas
+                . O AppRoutingModule é um módulo que contém as configurações de roteamento da aplicação. 
+                    Ele é responsável por:
 
-            . Bibliotecas adicionais
+                    . Definir as rotas da aplicação
 
-                . BrowserAnimationsModule
+                    . Associar URLs a componentes específicos
 
-                    . Fornece as funcionalidades de animação para os componentes da aplicação
+                    . Configurar parâmetros de rota
 
-                    . Habilita as animações de transição entre as vistas da aplicação
+                    . Habilitar a navegação entre as rotas
 
-                    . Permiti que os desenvolvedores criem efeitos de transição personalizados
+        . Bibliotecas adicionais
 
-                    . Com a BrowserAnimationsModule, os desenvolvedores podem criar animações de transição 
-                        para os componentes da aplicação, como:
+            . BrowserAnimationsModule
 
-                        . Animações de entrada e saída de componentes
+                . Fornece as funcionalidades de animação para os componentes da aplicação
 
-                        . Animações de transição entre as vistas da aplicação
+                . Habilita as animações de transição entre as vistas da aplicação
 
-                        . Animações de mudança de estado dos componentes
+                . Permiti que os desenvolvedores criem efeitos de transição personalizados
 
-                . HttpClientModule -  serve para fazer requisições HTTP a partir da aplicação
+                . Com a BrowserAnimationsModule, os desenvolvedores podem criar animações de transição 
+                    para os componentes da aplicação, como:
 
-                    . Fornece uma API simples e fácil de usar para fazer requisições HTTP
+                    . Animações de entrada e saída de componentes
 
-                    . Faz requisições HTTP para APIs externas ou para APIs dentro da própria aplicação
+                    . Animações de transição entre as vistas da aplicação
 
-                    . Manipula os dados recebidos das requisições HTTP
+                    . Animações de mudança de estado dos componentes
 
-                    . Trata erros e exceções relacionadas às requisições HTTP
+            . HttpClientModule -  serve para fazer requisições HTTP a partir da aplicação
 
-                . FormsModule -  serve para fornecer funcionalidades de formulários para a aplicação
+                . Fornece uma API simples e fácil de usar para fazer requisições HTTP
 
-                    . Fornece diretivas para criar e gerenciar formulários
+                . Faz requisições HTTP para APIs externas ou para APIs dentro da própria aplicação
 
-                    . Permiti a validação de dados de formulário
+                . Manipula os dados recebidos das requisições HTTP
 
-                    . Fornece funcionalidades de binding de dados para formulários
+                . Trata erros e exceções relacionadas às requisições HTTP
 
-                    . Fornece diretivas, como:
+            . FormsModule -  serve para fornecer funcionalidades de formulários para a aplicação
 
-                        . ngModel: diretiva para criar um binding de dados entre um formulário e um componente
+                . Fornece diretivas para criar e gerenciar formulários
 
-                        . ngForm: diretiva para criar um formulário e gerenciar os dados de formulário
+                . Permiti a validação de dados de formulário
 
-                        . ngFormGroup: diretiva para criar um grupo de formulários e gerenciar os dados de formulário
+                . Fornece funcionalidades de binding de dados para formulários
 
-                        . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário
+                . Fornece diretivas, como:
 
-                        . ngFormArray: diretiva para criar um array de formulários e gerenciar os dados de formulário                
+                    . ngModel: diretiva para criar um binding de dados entre um formulário e um componente
+
+                    . ngForm: diretiva para criar um formulário e gerenciar os dados de formulário
+
+                    . ngFormGroup: diretiva para criar um grupo de formulários e gerenciar os dados de formulário
+
+                    . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário
+
+                    . ngFormArray: diretiva para criar um array de formulários e gerenciar os dados de formulário                
 
 8. Instalando a biblioteca de icones
 ------------------------------------
@@ -719,34 +734,144 @@ Angular - Formação Angular 17 Udemy
 
         . Insira as linhas abaixo no arquivo "app.module.ts"
 
-                import { NgModule } from '@angular/core';
-                import { BrowserModule } from '@angular/platform-browser';
+            import { NgModule } from '@angular/core';
+            import { BrowserModule } from '@angular/platform-browser';
 
-                import { AppRoutingModule } from './app-routing.module';
-                import { AppComponent } from './app.component';
+            import { AppRoutingModule } from './app-routing.module';
+            import { AppComponent } from './app.component';
 
-                import { BrowserAnimationsModule } from '@angular/platform-browser/animations';         
-                import { HttpClientModule } from '@angular/common/http';                                
-                import { FormsModule } from '@angular/forms';                                           
-                import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';           // Linha inserida
+            import { BrowserAnimationsModule } from '@angular/platform-browser/animations';         
+            import { HttpClientModule } from '@angular/common/http';                                
+            import { FormsModule } from '@angular/forms';                                           
+            import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';           // Linha inserida
 
-                @NgModule({
-                declarations: [
-                    AppComponent
-                ],
-                imports: [
-                    BrowserModule,
-                    AppRoutingModule,
-                    BrowserAnimationsModule,                                                                                                
-                    HttpClientModule,                                                               
-                    FormsModule,
-                    FontAwesomeModule                                                           // Linha inserida
-                ],
-                providers: [],
+            @NgModule({
+            declarations: [
+                AppComponent
+            ],
+            imports: [
+                BrowserModule,
+                AppRoutingModule,
+                BrowserAnimationsModule,                                                                                                
+                HttpClientModule,                                                               
+                FormsModule,
+                FontAwesomeModule                                                           // Linha inserida
+            ],
+            providers: [],
                 bootstrap: [AppComponent]
-                })
-                export class AppModule { }
+            })
+
+            export class AppModule { }
+
+        . Execute o projeto e veja o resultado no navegador
+
+            ng server --open
 
 9. Criando nosso primeiro componente e rota
 -------------------------------------------
+
+    . Verifique mais detalhes no tópico "Criando um componente com o AngularCli" do 
+        "Curso Fullstack Angular e Spring - Algaworks"
+
+    . Para gerar um componente um componente no Angular podemos utilizar o comando
+
+        ng generate component [Nome do Componente]
+
+        ou
+
+        ng g c [Nome do Componente]
+
+    . Se adicionarmos o parâmetro "--spec=false" ao comando, indicará que não
+        desejamos user o arquivo de teste "*.component.spec.ts" para o componente .
+
+    . Uma boa prática seria criar uma pasta dentro do projeto para criar nosso módulos, com 
+        nome de "modules" e dentro dela uma subpasta para colocar nossos componentes 
+        "[nome componente]/page"
+
+    . Demo
+
+        . Dentro da pasta "src/app" crie a pasta "modules/weather/page"
+
+        . Dentro da pasta criada crie o componente "weather-home" com o comando abaixo:
+
+            ng generate component weather-home
+
+        . Acesse o arquivo do componente criado "weather-home.component.ts" e apague a 
+            referência feita ao arquivo de estilos criado dentro do novo componente 
+            "weather-home.component.scss", porque utilizaremos o arquivo de estilo global
+            "src/styles.scss"
+
+            // weather-home.component.ts
+            import { Component } from '@angular/core';
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                // styleUrls: ['./weather-home.component.scss']     // Linha substituida pela abaixo
+                styleUrls: []                                       // Linha alterada, retirada da refêrencia ao arquivo de estilo
+            })
+            export class WeatherHomeComponent {
+
+            }
+
+        . Apague o arquivo de estilo criado dentro do componente criado "weather-home.component.scss"
+
+        . Altere o conteúdo do arquivo "app.component.html" pelo abaixo:
+
+            <app-weather-home></app-weather-home>
+
+        . Execute o projeto e veja o resultado no navegador
+
+            ng server --open
+
+    . Como dito anterior sobre a "<router-outlet>", podemos utilizar as configurações de rotas para renderizar 
+        o conteúdo da página. Basta configurar as rotas, no arquivo "app.modules.ts", ou no arquivo de rotas
+        "app-routing.module.ts".
+
+        . Para mais detalhes, acesse o curso "Curso Fullstack Angular e Spring - Algawork", aulas "18.1. Introdução a rotas"
+            até "Aula 18.14. Criando um Routing Module para o módulo de funcionalidade". 
+
+    . Demo
+
+        . Insira as linhas abaixo no arquivo "app-routing.module.ts"
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+
+            // Linha inserida
+            import { WeatherHomeComponent } from './modules/weather/page/weather-home/weather-home.component';
+
+            // Objeto alterado
+            const routes: Routes = [
+                {
+                    path: '',
+                    redirectTo: 'weather',
+                    pathMatch: 'full'
+                },
+                { 
+                    path: 'weather',
+                    component: 'WeatherHomeComponent'
+                }
+            ];
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+
+            export class AppRoutingModule { }
+
+        . Insira o conteúdo abaixo no arquivo "app.component.html"
+
+            <router-outlet></router-outlet>
+
+        . Execute o projeto e veja o resultado no navegador
+
+            ng server --open
+
+        . Altere o pathname da URL para http://localhost:4200/ e veja o resultado apresentado na 
+            URL do navegador
+
+10. Criando conta Open Weather Map
+----------------------------------
 
