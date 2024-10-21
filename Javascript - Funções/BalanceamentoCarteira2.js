@@ -186,7 +186,7 @@ let saldoCarteiraInicial = carteira.saldo.oportunidade +
     carteira.saldo.acoes +
     carteira.saldo.risco;
 
-let aporte = 2500;
+let aporte = 1681;
 
 console.log("Aporte");
 console.log(aporte);
