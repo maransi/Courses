@@ -885,4 +885,100 @@ Angular - Formação Angular 17 Udemy
 11. Entendendo o conceito - Observables
 ---------------------------------------
 
+    . Um Observable é um objeto que emite valores ao longo do tempo e pode ser observado por outros 
+        objetos. Em Angular, os Observables são usados para lidar com dados assíncronos, 
+        como requisições HTTP, eventos de usuário e atualizações de estado.
+
+    . Um Observable é como um fluxo de dados que pode ser inscrito por outros objetos, chamados de 
+        Observers. Quando um Observable emite um valor, todos os Observers inscritos recebem esse valor.
+
+    . Os Observables são úteis em Angular porque permitem que você:
+
+        . Lide com dados assíncronos de forma eficiente
+
+        . Seja notificado quando os dados mudam
+
+        . Faça requisições HTTP de forma assíncrona
+
+        . Lide com eventos de usuário de forma assíncrona
+
+    . Em Angular, os Observables são implementados usando a biblioteca RxJS (Reactive Extensions for JavaScript).
+
+        . A biblioteca RxJS (Reactive Extensions for JavaScript) é uma biblioteca de programação reativa para 
+            JavaScript que permite lidar com fluxos de dados assíncronos de forma eficiente.
+
+        . Como a biblioteca "rxjs" funciona:
+
+            . Observables
+
+                Um Observable é um objeto que emite valores ao longo do tempo e pode ser observado por outros objetos. 
+                No Angular, os Observables são usados para lidar com dados assíncronos.
+
+            . Observers
+
+                Um Observer é um objeto que se inscreve em um Observable para receber os valores emitidos por ele. 
+                No Angular, os Observers são usados para lidar com os dados recebidos de um Observable.
+
+            . Subscription
+
+                Um Subscription é um objeto que representa a inscrição de um Observer em um Observable. 
+                No Angular, os Subscriptions são usados para gerenciar as inscrições dos Observers nos Observables.
+
+            . Operadores
+
+                Os operadores são funções que podem ser usadas para transformar, filtrar e combinar Observables. 
+                No Angular, os operadores são usados para manipular os dados recebidos de um Observable.
+
+            . Exemplo
+
+                import { Observable } from 'rxjs';
+
+                const meuObservable = new Observable(observer => {
+                    // Faz algo assíncrono aqui, como uma requisição HTTP
+                    setTimeout(() => {
+                        observer.next('Dados carregados!');
+                        observer.complete();
+                    }, 2000);
+                });
+
+                meuObservable.subscribe(dados => {
+                    console.log(dados); // Imprime "Dados carregados!"
+                });
+
+        . Exemplos
+
+            . Lidar com requisições HTTP assíncronas:
+
+                import { HttpClient } from '@angular/common/http';
+                import { Observable } from 'rxjs';
+
+                const httpClient = new HttpClient();
+                const observable = httpClient.get('https://api.example.com/data');
+
+                observable.subscribe(data => {
+                    console.log(data);
+                });
+
+            . Lidar com eventos de usuário:
+
+                import { fromEvent } from 'rxjs';
+
+                const button = document.getElementById('myButton');
+                const observable = fromEvent(button, 'click');
+
+                observable.subscribe(event => {
+                    console.log('Botão clicado!');
+                });
+
+            . Lidar com atualizações de estado:
+
+                import { BehaviorSubject } from 'rxjs';
+
+                const estado = new BehaviorSubject('inicial');
+
+                estado.subscribe(estadoAtual => {
+                    console.log(estadoAtual);
+                });
+
+                estado.next('novo estado');
 
