@@ -982,3 +982,48 @@ Angular - Formação Angular 17 Udemy
 
                 estado.next('novo estado');
 
+
+
+
+
+Teste o exemplo abaixo:
+
+
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-exemplo',
+  template: '<p>Resultado: {{ resultado }}</p>'
+})
+export class ExemploComponent implements OnInit {
+  resultado: string;
+
+  constructor(private http: HttpClient) { }
+
+  ngOnInit(): void {
+    this.executarApi();
+  }
+
+  executarApi(): void {
+    const url = 'https://api.example.com/dados';
+    const observable = this.http.get(url);
+
+    observable.subscribe(
+      (response: any) => {
+        this.resultado = response.data;
+      },
+      (error: any) => {
+        console.error(error);
+      },
+      () => {
+        console.log('Requisição finalizada');
+      }
+    );
+  }
+}
+
+
+12. Criando o serviço de previsão do tempo
+------------------------------------------
