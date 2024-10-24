@@ -872,6 +872,91 @@ Angular - Formação Angular 17 Udemy
         . Altere o pathname da URL para http://localhost:4200/ e veja o resultado apresentado na 
             URL do navegador
 
+    . Modularizando o projeto
+
+        . A medida que a aplicação for crescendo, o AppModule ficará muito grande. Neste
+            caso seria interessante criar "features modules", ou modulos de funcionalidades
+            para organizar melhor o nosso projeto.
+
+            . Para criar um módulo de funcionalidade: acesse o terminal, acesse a pasta raiz do projeto e 
+                digite o comando abaixo:
+
+                ng g m [Nome do Módulo]
+
+                Exemplo:
+
+                ng g m curso
+
+                . Este comando criará uma pasta com o nome do módulo e um arquivo dentro dela com o nome [nome modulo].module.ts:
+
+                    import { NgModule } from '@angular/core';
+                    import { CommonModule } from '@angular/common';
+
+                    @NgModule({
+                        imports: [
+                            CommonModule
+                        ],
+                        declarations: []
+                    })
+                    export class CursoModule { }
+
+                    . A diferença entre o módulo de funcionalidade e o de raiz seria que: o de funcionalidade é bem reduzido e somente
+                        importa o "CommonModule".
+
+        . Demo
+
+            . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+                # Irá criar a pasta "contabilidade" dentro da pasta "./src/app"
+                ng g m contabilidade
+
+                # Irá criar a pasta "ativo" dentro da pasta "./src/app/contabilidade"
+                ng g c ./contabilidade/ativo --module=contabilidade
+
+            . Acesse o ./src/app/contabilidade/contabilidade.module.ts e faça a declaração do componente curso:
+
+                import { NgModule } from '@angular/core';
+                import { CommonModule } from '@angular/common';
+                import { AtivoComponent } from './ativo/ativo.component';       // Observe que foi feito o import do componente
+
+                @NgModule({
+                    imports: [
+                        CommonModule
+                    ],
+                    declarations: [
+                        AtivoComponent                                          // Observe que foi feito a declaração do componente
+                    ],
+                    exports : [ 
+                        AtivoComponent                                          // Insira o bloco "exports"
+                    ]
+                })
+                export class ContabilidadeModule { }
+
+            . Acesse a classe src/app/app.module.ts, insira dentro do metadado "imports" o "ContabilidadeModule" e faça o import.
+
+                ...
+                import { ContabilidadeModule } from './contabilidade/contabilidade.module';     // Insira o import do module
+
+                @NgModule({
+                    ...
+                    imports: [
+                        BrowserModule,
+                        ContabilidadeModule                                                     // Insira o import do module
+                    ],
+                    ...
+                })
+                export class AppModule { }
+
+            . Acesse o arquivo src/app/app.component.html e inclua a tag abaixo:
+
+                <app-ativo></app-ativo>
+
+            . Execute o projeto e verifique se a modularização deu certo:
+
+                ng serve --open
+
+            . Verifique se a página exibida saiu a mensagem do "Ativo"
+
 10. Criando conta Open Weather Map
 ----------------------------------
 
@@ -985,3 +1070,4 @@ Angular - Formação Angular 17 Udemy
 
 12. Criando o serviço de previsão do tempo
 ------------------------------------------
+
