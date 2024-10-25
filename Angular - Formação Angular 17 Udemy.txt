@@ -1310,15 +1310,18 @@ Angular - Formação Angular 17 Udemy
             //
             export class WeatherHomeComponent implements OnInit {
                 initialCityName = 'São Paulo';
+
+                // O simbolo de "!" significa que a propriedade sempre terá um valor não nulo
+                // Se fosse "?" significaria que a propriedade poderá ter valor nulo
                 weatherDatas!: WeatherDatas;
 
                 constructor(private weatherService: WeatherService) {}
 
                 ngOnInit(): void {
-                    this.getWheatherDatas(this.initialCityName);
+                    this.getWeatherDatas(this.initialCityName);
                 }
 
-                getWheatherDatas(cityName: string): void {
+                getWeatherDatas(cityName: string): void {
                     this.weatherService.getWeatherDatas(cityName).subscribe({
                         next: (response) => {
                             response && (this.weatherDatas = response);
