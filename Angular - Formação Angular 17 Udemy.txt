@@ -1067,7 +1067,6 @@ Angular - Formação Angular 17 Udemy
 
                 estado.next('novo estado');
 
-
 12. Criando o serviço de previsão do tempo
 ------------------------------------------
 
@@ -1238,7 +1237,6 @@ Angular - Formação Angular 17 Udemy
 
         . Verifique se compilou com sucesso a aplicação
 
-
 13. Adicionando imagens na aplicação e consumindo serviço de previsão do tempo
 ------------------------------------------------------------------------------
 
@@ -1294,7 +1292,6 @@ Angular - Formação Angular 17 Udemy
         
         . AfterViewChecked: chamado após a verificação da view do componente ou diretivas
 
-// Parei aqui, implementar no projeto
     . Demo
 
         . Copie as imagens, contidas no arquivo de imagens dos Recursos da aula na plataforma da Udemy,
@@ -1302,38 +1299,34 @@ Angular - Formação Angular 17 Udemy
 
         . Acesse o componente "weather-home.component.ts" e realize as alterações abaixo:
 
-            import { Component, OnInit } from '@angular/core';
+            import { Component, Inject, OnInit } from '@angular/core';
             import { WeatherService } from '../../services/weather.service';
-            import { WeatherDatas } from 'src/app/models/interfaces/WeatherDatas';      // Linha Inserida
 
             @Component({
                 selector: 'app-weather-home',
                 templateUrl: './weather-home.component.html',
-                styleUrls: [],
+                styleUrls: ['./weather-home.component.scss']
             })
 
             // Inclua/Altere todas as linhas do corpo da classe
             //
-            export class WeatherHomeComponent implements OnInit {
+            export class WeatherHomeComponent implements OnInit  {
                 initialCityName = 'São Paulo';
 
-                // O simbolo de "!" significa que a propriedade sempre terá um valor não nulo
-                // Se fosse "?" significaria que a propriedade poderá ter valor nulo
-                weatherDatas!: WeatherDatas;
 
-                constructor(private weatherService: WeatherService) {}
+                constructor(private weatherService: WeatherService) { 
 
+                }
                 ngOnInit(): void {
                     this.getWeatherDatas(this.initialCityName);
                 }
 
-                getWeatherDatas(cityName: string): void {
-                    this.weatherService.getWeatherDatas(cityName).subscribe({
+                getWeatherDatas( cityName: string ): void {
+                    this.weatherService.getWeatherDatas( cityName).subscribe( {
                         next: (response) => {
-                            response && (this.weatherDatas = response);
-                            console.log(this.weatherDatas)
-                        },
-                        error: (error) => console.log(error),
+                        console.log(response);
+                    },
+                        error: ( error) => console.error(error)
                     });
                 }
             }
@@ -1344,5 +1337,102 @@ Angular - Formação Angular 17 Udemy
 
         . Verifique o resultado da execução da página na console do navegador.
 
+        . Execute o comando abaixo na pasta raiz do projeto:
 
-        
+            ng g i ./models/interfaces/WeatherDatas 
+
+        . Acesse a interface criada e altere o código pelo conteúdo abaixo:
+
+            export interface WeatherDatas {
+                coord: {
+                    lon: number;
+                    lat: number;
+                };
+
+                weather: [
+                    {
+                        id: number;
+                        main: string;
+                        description: string;
+                        icon: string;
+                    }
+                ];
+
+                base: string;
+                main: {
+                    temp: number;
+                    feels_like: number;
+                    temp_min: number;
+                    temp_max: number;
+                    pressure: number;
+                    humidity: number;
+                };
+                visibility: number;
+                wind: {
+                    speed: number;
+                    deg: number;
+                };
+                clouds: {
+                    all: number;
+                };
+                dt: number;
+                sys: {
+                    type: number;
+                    id: number;
+                    country: string;
+                    sunrise: number;
+                    sunset: number;
+                };
+                timezone: number;
+                id: number;
+                name: string;
+                cod: number;
+            }
+
+        . Insira a linha abaixo no componente "weather-home.component.ts" para armazenar as informações capturadas da consulta API:
+
+            import { Component, Inject, OnInit } from '@angular/core';
+            import { WeatherService } from '../../services/weather.service';
+            import { WeatherDatas } from 'src/app/models/interfaces/weather-datas';     // Linha inserida
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                styleUrls: ['./weather-home.component.scss']
+            })
+
+            export class WeatherHomeComponent implements OnInit  {
+                initialCityName = 'São Paulo';
+
+                // O simbolo de "!" significa que a propriedade sempre terá um valor não nulo
+                // Se fosse "?" significaria que a propriedade poderá ter valor nulo
+                weatherDatas!: WeatherDatas;
+                        |
+                        +---> Linha inserida
+                ....
+
+                getWeatherDatas( cityName: string ): void {
+                    this.weatherService.getWeatherDatas( cityName).subscribe( {
+                        next: (response) => {
+                            // console.log( response );                     // Linha apagada
+                            response && (this.weatherDatas = response);     // Linha inserida
+                                      |
+                                      +---->    checks if response is truthy (not null, undefined, 0, etc.), 
+                                                and if so, assigns its value to this.weatherDatas
+
+                            console.log(this.weatherDatas);                 // Linha inserida
+                        },
+                        error: ( error) => console.error(error)
+                    });
+                }
+            }
+
+        . Execute o projeto e verifique se a modularização deu certo:
+
+            ng serve --open
+
+        . Verifique o resultado da execução da página na console do navegador.
+
+14. Implementando formulário de pesquisa
+----------------------------------------
+
