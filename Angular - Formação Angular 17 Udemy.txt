@@ -1071,3 +1071,263 @@ Angular - Formação Angular 17 Udemy
 12. Criando o serviço de previsão do tempo
 ------------------------------------------
 
+    . Componentes "Services"
+
+        . São unidades de interface do usuário que podem ser reutilizadas em diferentes partes de uma 
+            aplicação. Eles definem a aparência e o comportamento de uma interface de usuário 
+            específica. Componentes são responsáveis por exibir dados, lidar com interações do usuário e 
+            gerenciar a lógica de negócios.
+
+        . Fornecem funcionalidades compartilhadas entre diferentes componentes. Eles podem ser usados 
+            para:
+            
+            . Realizar tarefas como busca de dados;
+            
+            . Manipular de dados;
+
+                @Injectable({
+                    providedIn: 'root'
+                })
+                export class DataService {
+
+                    private products: any[] = [
+                        { id: 1, name: 'Produto 1' },
+                        { id: 2, name: 'Produto 2' },
+                        { id: 3, name: 'Produto 3' }
+                    ];
+
+                    getProducts(): any[] {
+                        return this.products;
+                    }
+                }
+
+            . Comunicação com APIs;
+            
+                @Injectable({
+                    providedIn: 'root'
+                })
+                export class ApiDataService {
+                    private apiUrl = 'https://api.example.com';
+
+                    getData(): Observable<any> {
+                        return this.http.get(`${this.apiUrl}/data`);
+                    }
+                }
+
+
+            . Gerenciamento de estado, entre outras. 
+
+                @Injectable({
+                    providedIn: 'root'
+                })
+                export class StateService {
+                    private selectedItem: any;
+
+                    setSelectedItem(item: any): void {
+                        this.selectedItem = item;
+                    }
+
+                    getSelectedItem(): any {
+                        return this.selectedItem;
+                    }
+                }
+            
+        . Serviços são injetados em componentes para que eles possam acessar e usar suas funcionalidades.
+
+            . Service
+                
+                import { Injectable } from '@angular/core';
+
+                @Injectable({           // Informa que  o componente pode ser injetada em outros componentes ou 
+                    providedIn:  'root'  // serviços usando o sistema de injeção de dependência do Angular.
+                })            //    |
+                              //    +----->  Indica que o serviço deve ser injetado no nível raiz da aplicação. 
+                              //             compartilhada entre todos os componentes da aplicação
+
+                export class MyService {
+                    constructor() { }
+                }
+
+
+            . Componente
+
+                import { Component, Inject } from '@angular/core';
+                import { MyService } from './my.service';           // Não se esqueça de importar o service
+                
+                @Component({
+                    selector: 'app-my-component',
+                    template: '<p>My Component</p>'
+                })
+                export class MyComponent {
+                    constructor(    @Inject(MyService) private myService: MyService) { }
+                }           //                  |
+                            //                  +---> Como é feita a injeção
+
+
+            . Existem quatro formas de configuração da injeção no "provideIn":
+
+                'root':     Como mencionado anteriormente, isso injeta o serviço no nível raiz da aplicação, 
+                            criando uma única instância que é compartilhada entre todos os componentes.
+                
+                'platform': Isso injeta o serviço no nível da plataforma, criando uma instância que é compartilhada 
+                            entre todos os componentes da plataforma.
+                
+                'any':      Isso injeta o serviço em qualquer lugar da aplicação, criando uma nova instância para 
+                            cada componente que o solicita.
+                
+                NgModule:   Isso injeta o serviço em um módulo específico, criando uma instância que é compartilhada 
+                            entre todos os componentes desse módulo. por exemplo:
+
+                            Inclua no "providers:[ MyComponent ]" do componente de modulo "app.module.ts", ou do module desejado
+
+                                ...
+                                // Importe do service
+                                import { MyService } from './modules/weather/services/my.service';
+
+                                @NgModule({
+                                    declarations: [
+                                        ...
+                                    ],
+                                    imports: [
+                                        ...
+                                    ],
+                                    providers: [ MyService ],   // declaração do service
+                                    bootstrap: [AppComponent]
+                                })
+
+                                export class AppModule { }
+
+    . Demo
+
+        . Dentro da pasta raiz do projeto, crie o service "weather"
+
+            # "./modules/weather/services/weather" criará a pasta "./src/app/modules/weather/services/" e 
+            # dentro dela o arquivo "weather.service.ts"
+            ng g s ./modules/weather/services/weather --spec=false
+
+
+        . Acesse a classe criada e insira as linhas abaixo:
+
+            import { Injectable } from '@angular/core';                 
+            import { HttpClient } from '@angular/common/http';          // Linha inserida
+            import { Observable } from 'rxjs';                          // Linha inserida
+
+            @Injectable({
+                providedIn: 'root',
+            })
+
+            export class WeatherService {
+                private apiKey = '95a7a0d51b475c9d2fa23d4192ddfbbd';    // Linha inserida, utilize a API-KEY do cadastramento no 
+                                                                        // site "https://openweathermap.org/", veja a aula 10
+
+                constructor(private http: HttpClient) {}                // Linha alterada
+
+                // Metodo inserido
+                //
+                getWeatherDatas(cityName: string): Observable<any> {
+                    return this.http.get(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=metric&mode=json&appid=${this.apiKey}`,
+                    {}
+                    );
+                }
+            }
+
+
+13. Adicionando imagens na aplicação e consumindo serviço de previsão do tempo
+------------------------------------------------------------------------------
+
+    . Interface "OnInit"
+
+        . É uma interface do Angular que é usada para marcar um componente ou diretiva como tendo 
+            um ciclo de vida inicial. Quando um componente ou diretiva implementa a interface OnInit, 
+            o Angular chama o método ngOnInit() após a criação do componente ou diretiva.
+
+        . O método "ngOnInit()" é chamado após a criação do componente ou diretiva, mas antes de ser 
+            renderizado na tela. Isso significa que você pode usar esse método para realizar tarefas 
+            de inicialização, como:
+
+            . Carregar dados de uma API
+
+            . Inicializar variáveis
+
+            . Configurar componentes ou diretivas filhas
+
+            . Realizar tarefas de inicialização específicas do componente ou diretiva
+
+        . Exemplo
+
+            import { Component, OnInit } from '@angular/core';
+
+            @Component({
+                selector: 'app-my-component',
+                template: '<p>My Component</p>'
+            })
+                                         //         +---------> Implementação da interface    
+                                         //         |           OnInit
+            export class MyComponent implements OnInit {
+                constructor() { }
+
+                //  +---------------------> Método implementado da interface "OnInit".
+                //  |                       chamado após a criação do componente ou diretiva, mas antes de ser 
+                //  |                       renderizado na tela
+                ngOnInit(): void {
+                    console.log('Componente inicializado!');
+                    // código de inicialização aqui
+                }
+            }
+
+    . Aqui está uma lista das interfaces do ciclo de vida do Angular:
+
+        . OnInit: chamado após a criação do componente ou diretiva
+        
+        . OnChanges: chamado quando os dados de entrada do componente ou diretiva mudam
+        
+        . OnDestroy: chamado antes da destruição do componente ou diretiva
+        
+        . AfterViewInit: chamado após a criação da view do componente ou diretiva
+        
+        . AfterViewChecked: chamado após a verificação da view do componente ou diretivas
+
+// Parei aqui, implementar no projeto
+    . Demo
+
+        . Copie as imagens, contidas no arquivo de imagens dos Recursos da aula na plataforma da Udemy,
+            na pasta "assets" do projeto.
+
+        . Acesse o componente "weather-home.component.ts" e realize as alterações abaixo:
+
+            import { Component, OnInit } from '@angular/core';
+            import { WeatherService } from '../../services/weather.service';
+            import { WeatherDatas } from 'src/app/models/interfaces/WeatherDatas';      // Linha Inserida
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                styleUrls: [],
+            })
+
+            // Inclua/Altere todas as linhas do corpo da classe
+            //
+            export class WeatherHomeComponent implements OnInit {
+                initialCityName = 'São Paulo';
+                weatherDatas!: WeatherDatas;
+
+                constructor(private weatherService: WeatherService) {}
+
+                ngOnInit(): void {
+                    this.getWheatherDatas(this.initialCityName);
+                }
+
+                getWheatherDatas(cityName: string): void {
+                    this.weatherService.getWeatherDatas(cityName).subscribe({
+                        next: (response) => {
+                            response && (this.weatherDatas = response);
+                            console.log(this.weatherDatas)
+                        },
+                        error: (error) => console.log(error),
+                    });
+                }
+            }
+
+
+        
