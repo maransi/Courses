@@ -1597,4 +1597,58 @@ Angular - Formação Angular 17 Udemy
                     this.destroy$.complete();
                 }                
             }
+
+        . Execute o projeto e verifique se a compilação não deu erro e o app foi levantando com sucesso:
+
+            ng serve --open
+
+
+        
  5.36
+
+
+
+fazer teste utilizando firstValueFrom() ou lastValueFrom()
+
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
+constructor(private http: HttpClient) {}
+
+async getData() {
+  const result = await firstValueFrom(this.http.get('url-da-api'));
+  console.log(result);
+}
+
+
+
+
+
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
+constructor(private http: HttpClient) {}
+
+async getData() {
+  return await firstValueFrom(this.http.get('url-da-api'));
+}
+
+
+
+
+
+Você
+qual é o mais utilizado para chamadas http firstValueFrom() ou objetos observables
+
+Copilot
+Em Angular, tanto firstValueFrom() quanto Observable têm seus usos, mas Observable é frequentemente mais utilizado para chamadas HTTP. Os Observables permitem um manuseio mais avançado, como operações reativas, cancelamento de requisições e transformações de dados em tempo real, que são difíceis de alcançar com Promises simples.
+
+Por exemplo, se você quiser responder a dados em tempo real ou lidar com streams contínuos de dados, os Observables são a escolha certa. Promises, por outro lado, são mais simples e adequadas para operações que se resolvem apenas uma vez, sem a necessidade de operações reativas.
+
+Resumo:
+
+Observable: Mais flexível, ideal para operações reativas e streams contínuos.
+
+firstValueFrom(): Útil para obter uma única resposta, transformando um Observable em uma Promise.
+
+Depende da complexidade e das necessidades específicas da sua aplicação!
