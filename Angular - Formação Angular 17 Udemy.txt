@@ -1436,3 +1436,165 @@ Angular - Formação Angular 17 Udemy
 14. Implementando formulário de pesquisa
 ----------------------------------------
 
+    . Sempre que nos subscrevemos num objeto com "subscribe" precisamos desinscrever o objeto.
+
+    . Se não nos desinscrevermos de um subscribe em Angular, podemos enfrentar problemas de vazamento de 
+        memória (memory leak). Aqui estão alguns dos problemas que podem ocorrer:
+
+        . Vazamento de memória: Quando um componente é destruído, mas o subscribe não é desinscrito, o 
+            componente continua a manter uma referência ao observable, impedindo que o garbage collector 
+            libere a memória. Isso pode levar a um aumento gradual da memória utilizada pela aplicação.
+
+        . Componentes não são destruídos: Se um componente não é destruído corretamente devido a um subscribe 
+            não desinscrito, ele pode continuar a receber atualizações e a executar código, mesmo que não 
+            esteja mais visível na tela.
+
+        . Problemas de performance: Com o tempo, a memória utilizada pela aplicação pode aumentar, levando a 
+            problemas de performance, como lentidão, travamentos e até mesmo crashes.
+
+        . Dificuldade em depurar: Vazamentos de memória podem ser difíceis de depurar, pois não há um erro 
+            claro ou uma exceção que indique o problema.
+
+        . Problemas com a rotação de tela: Se um componente não é destruído corretamente, ele pode continuar 
+            a receber atualizações quando a tela é rotacionada, o que pode levar a problemas de layout e 
+            renderização.
+
+    . Podemos nos desinscrever de subscrições usando métodos como unsubscribe() ou takeUntil().
+
+        . unsubscribe()
+
+            import { Subscription } from 'rxjs';
+            
+            // ...
+            
+            private subscription: Subscription;
+            
+            // ...
+            
+            this.subscription = this.observable.subscribe(
+                (data) => {
+                    // process data
+                },
+                (error) => {
+                    // handle error
+                }
+            );
+            
+            // ...
+            
+            ngOnDestroy() {
+                this.subscription.unsubscribe();
+            }
+
+        . takeUntil()
+
+            import { takeUntil } from 'rxjs/operators';
+
+            // ...
+
+            private ngUnsubscribe = new Subject();
+
+            // ...
+
+            this.observable
+                .pipe( takeUntil(this.ngUnsubscribe) )
+                .subscribe(
+                    (data) => {
+                        // process data
+                    },
+                    (error) => {
+                        // handle error
+                    }
+                );
+
+            // ...
+
+            ngOnDestroy() {
+                this.ngUnsubscribe.next();
+                this.ngUnsubscribe.complete();
+            }
+
+            . o método "pipe"  é usado para criar uma cadeia de operações que são aplicadas sequencialmente ao 
+                fluxo de dados de um observable. 
+
+            . O método "takeUntil"  é frequentemente usado para cancelar observáveis quando um componente é destruído
+
+            . Sempre que se subscrever em um "observable" utilize ".pipe( takeUntil(...) )" dessa forma para fazer a 
+                desinscrição do subscribe.
+
+        . Para fazer a desinscreção podemos fazer isso na destruição do componente no evento "ngOnDestroy":
+
+            . Implementar a interface "OnDestroy" e adicionar o método "ngOnDestroy" no componente da subscrição:
+
+                import { Component, OnDestroy } from '@angular/core';
+                            //          |
+                            //          +---> importe a biblioteca que contém a interface
+
+                @Component({
+                    selector: 'app-exemplo',
+                    template: '<p>Exemplo de componente</p>'
+                })
+                            //                              +---------> implemente a interface "OnDestroy"
+                            //                              |
+                export class ExemploComponent implements OnDestroy {
+                    
+                    // Adicione o método "ngOnDestroy"
+                    ngOnDestroy(): void {                
+                        console.log('Componente destruído!');
+                    }
+                }
+
+    . Demo
+
+        . Realize as alterações abaixo na classe "weather-home.component.ts" para fazer a desinscrição do "subsribe":
+
+            // Importe a biblioteca "OnDestroy"
+            import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+            import { WeatherService } from '../../services/weather.service';
+            import { WeatherDatas } from 'src/app/models/interfaces/weather-datas';
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                styleUrls: ['./weather-home.component.scss']
+            })
+
+            // Adicionado a interface "OnDestroy"
+            //
+            export class WeatherHomeComponent implements OnInit, OnDestroy  {
+
+                // Crie a propriedade abaixo
+                private readonly destroy$: Subject<void> = new Subject();
+
+                initialCityName = 'São Paulo';
+                weatherDatas!: WeatherDatas;
+
+
+                constructor(private weatherService: WeatherService) { 
+
+                }
+
+                ngOnInit(): void {
+                    this.getWeatherDatas(this.initialCityName);
+                }
+
+                getWeatherDatas( cityName: string ): void {
+                    this.weatherService
+                        .getWeatherDatas( cityName)
+                        .pipe(takeUntil(this.destroy$))         // Linha inserida
+                        .subscribe( {
+                            next: (response) => {
+                                response && (this.weatherDatas = response);
+                                console.log(this.weatherDatas);
+                            },
+                            error: ( error) => console.error(error)
+                        });
+                }
+
+                // Método inserido
+                ngOnDestroy(): void {
+                    this.destroy$.next();
+                    this.destroy$.complete();
+                }                
+            }
+ 5.36
