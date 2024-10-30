@@ -1,6 +1,12 @@
 CSS - Curso de CSS
 ------------------
 
+Playlist
+--------
+
+    https://www.youtube.com/watch?v=t8TMQPS_7sc&list=PL-u8JWLN6xasK6rdmAu4YYofbKVashSVT
+
+
 1. Configurações do VSCode
 
     . Criando snippets dentro do VSCode
@@ -85,6 +91,10 @@ CSS - Curso de CSS
 3. Height e Width
 -----------------
 
+    . Baseado no vídeo:
+
+        https://www.youtube.com/watch?v=EA9sFMJXk6E&t=182s
+
     . As propriedades height e width são usadas para definir a altura e largura de um elemento. 
         No caso da tag body, é recomendável deixar as propriedades height e width como "auto", pois 
         o tamanho do body é determinado pelo tamanho do conteúdo dentro dele.
@@ -149,7 +159,7 @@ CSS - Curso de CSS
         . Crie o arquivo "index.html" abaixo:
 
             <!DOCTYPE html>
-            <html lang="en">
+            <html lang="pt_BR">
 
                 <head>
                     <meta charset="UTF-8">
@@ -198,3 +208,125 @@ CSS - Curso de CSS
         . Execute a página "index.html" e veja seu comportamento.
 
         . Altere "height" do container para "50%" e veja seu comportamento.
+
+4. Propriedade max-height CSS3 - Definindo altura máxima de um elemento
+-----------------------------------------------------------------------
+
+    . Baseado no vídeo:
+
+        https://www.youtube.com/watch?v=S32qeAwUefM&list=PL-u8JWLN6xasK6rdmAu4YYofbKVashSVT&index=3
+
+
+    . Define a altura máxima dos elementos. Se o conteúdo for maior que a altura máxima, ele irá 
+        gerar um overflow e o conteúdo sairá dos limites definidos; se a altura máxima for menor
+        o elemento se adequará e ficará com o tamanho necessário para caber o conteúdo.
+
+    . Aqui estão os valores possíveis para a propriedade max-height:
+
+        . none: não define uma altura máxima para o elemento.
+
+        . auto: a altura máxima é calculada automaticamente com base no conteúdo do elemento.
+
+        . length: define a altura máxima em unidades de comprimento, como px, em, rem, cm, mm, in, pt, pc.
+
+        . percentage: define a altura máxima como um percentual da altura do elemento pai.
+
+    . Exemplo
+
+        <div id="meuElemento" style="height: 200px; max-height: 500px;">Conteúdo</div>
+    
+    . Aqui estão as palavras reservadas possíveis de ser usadas na propriedade max-height:
+
+        . none: não define uma altura máxima para o elemento.
+
+        . auto: a altura máxima é calculada automaticamente com base no conteúdo do elemento.
+
+        . max-content: a altura máxima é definida como o conteúdo máximo do elemento.
+
+        . min-content: a altura máxima é definida como o conteúdo mínimo do elemento.
+
+        . fit-content: a altura máxima é definida como o conteúdo ajustado do elemento.
+
+        . fill-available: a altura máxima é definida como o espaço disponível no elemento pai.
+
+    . Veremos essas propriedades mais a frente detalhadamente.
+
+    . Demo
+
+        . Altere a página "index.html" conforme abaixo:
+
+            ...
+            <body>
+            <div class="container">
+                
+                <!-- Conteúdo das divs alterado -->
+
+                <div>Mussum Ipsum, cacilds vidis litro abertis. Nullam volutpat risus nec leo commodo, ut</div>
+                <div>interdum diam laoreet. Sed non consequat odio. Não sou faixa preta cumpadi, sou preto inteiris, inteiris.</div>
+                <div>eu sit. Vide electram sadipscing et per.</div>
+                <div>
+                    Mussum Ipsum, cacilds vidis litro abertis. Nullam volutpat risus nec leo commodo, ut
+                    interdum diam laoreet. Sed non consequat odio. Não sou faixa preta cumpadi, sou preto inteiris, inteiris.
+                    Diuretics paradis num copo é motivis de denguis. Admodum accumsan disputationi
+                    eu sit. Vide electram sadipscing et per.
+                    Nulla id gravida magna, ut semper sapien. Bota 1 metro de cachacis aí pra
+                </div>
+
+                <!-- Fim da alteração -->
+            </div>
+            </body>
+
+        . Altere o arquivo css "site.css" conforme abaixo:
+
+            ...
+            .container>div {
+                width: 50%;                 /* Linha alterada */
+                /* height: 10%;                Linha apagada */      
+                max-height: 20%;            /* Linha inserida */
+                border: 1px solid black;
+                background-color: green;
+                margin: 10px;
+            }
+
+        . Execute a página "index.html", redimensione a página e veja seu comportamento.
+
+5. Propriedade min-height CSS3 - Definindo altura mínima
+--------------------------------------------------------
+
+    . Baseado no vídeo:
+
+        https://www.youtube.com/watch?v=PPjn17AC-M8&list=PL-u8JWLN6xasK6rdmAu4YYofbKVashSVT&index=4
+
+    . Usada para definir a altura mínima de um elemento. Ela é usada para garantir que o elemento tenha uma 
+        altura mínima, mesmo que o conteúdo seja menor do que essa altura.
+
+        . Se o conteúdo for menor que o elemento com a altura minima, o elemento ficará com a altura configura na 
+            propriedade "min-height". Caso for maior, o elemento expandirá seu tamanho para caber o conteúdo.
+
+            min-height: valor;
+
+    . Demo
+
+        . Altere o arquivo "site.css" como abaixo:
+
+            ...
+
+            .container>div {
+                width: 50%;
+                /* max-height: 20%;             Linha apagada */
+                min-height: 20%;            /* Linha inserida */
+                border: 1px solid black;
+                background-color: green;
+                margin: 10px;
+            }
+
+        . Execute a página "index.html", redimensione a página e veja seu comportamento.
+
+6. Conheça a propriedade width CSS3. Defina a largura do elemento.
+------------------------------------------------------------------
+
+    . Baseado no vídeo:
+
+        https://www.youtube.com/watch?v=qM4dMEKojW8&list=PL-u8JWLN6xasK6rdmAu4YYofbKVashSVT&index=5
+
+    .
