@@ -708,6 +708,8 @@ Angular - Formação Angular 17 Udemy
 8. Instalando a biblioteca de icones
 ------------------------------------
 
+    https://www.tutorialspoint.com/web_icons/index.htm
+
     . Usada no Angular para integrar os ícones do FontAwesome em uma aplicação Angular.
 
     . É uma biblioteca de ícones populares que fornece uma ampla variedade de ícones que 
@@ -1604,12 +1606,372 @@ Angular - Formação Angular 17 Udemy
 
             ng serve --open
 
+    . Data Binding
 
-        
- 5.36
+        . Fonte de pesquisa:
+
+            https://www.tutorialspoint.com/angular8/angular8_data_binding.htm
+
+        . É uma técnica fundamental no Angular que permite ligar os dados do componente à view, de forma que os 
+            dados sejam atualizados automaticamente quando o componente é atualizado.
+
+        . Vantagens
+
+            . Atualização automática
+
+            . Redução de código
+
+            . Melhoria na manutenção.
+
+        . Desvantagens
+
+            . Complexidade
+
+            . Desempenho, se for utilizado incorretamente.
+
+        . O data binding pode ser feito de duas forma:
+
+            . One-way - É uma interação unidirecional entre o componente e seu modelo. Se você executar qualquer 
+                        alteração em seu componente, ele refletirá os elementos HTML.
+
+            . Two-way - É uma interação bidirecional, os dados fluem em ambas as direções (do componente para as 
+                        visualizações e das visualizações para o componente)
+
+        . One-way Data Binding
+
+            . Interpolação: {{nome}} - onde nome é uma propriedade do componente, entre {{ }}
+
+                // *.component.ts
+                export class TestComponent implements OnInit { 
+                    appName = "My first app in Angular 4"; 
+                }
+
+                // *.component.html 
+                <h1>{{appName}}</h1>            
+
+                // app.component.html
+                <app-test></app-test>
+
+            . Event Binding: (evento)="função do componente Angular", onde o evento é nome do evento do elemento 
+                             HTML: click(), hover(), doubleClick(), etc, que será associado ao método do componente Angular:
+
+                // *.component.ts
+                export class TestComponent { 
+                    showData($event: any){ 
+                        console.log("button is clicked!"); if($event) { 
+                            console.log($event.target); 
+                            console.log($event.target.value); 
+                        } 
+                    } 
+                }
+
+                // *.component.html
+                <h2>Event Binding</h2> 
+                <button (click)="showData($event)">Click here</button>
+
+
+                // ou podemos utilizar o prefixo "on" + o nome do evento
+
+                <button on-click="showData($event)">Click here</button>
+
+            . Property binding: [property]="valor propriedade" - utilizado para ligar o dado de uma propriedade de um componente para 
+                                o elemento DOM, onde "property" seria a propriedade do elemento: disabled, autocomplete, required, etc; e
+                                o "valor da propriedade" seria o valor necessário da propriedade: true/false, 50, etc.
+
+                // *.component.ts
+                export class TestComponent { 
+                    userName:string = "Peter"; 
+                }
+
+                // *.component.html
+                // userName property is bind to an attribute of a DOM element <input> tag
+                <input type="text" [value]="userName" [disabled]="true" >
+
+            . Attribute binding: [attr:attribute name]="Nome da Propriedade do Componente" - é usado para ligar o dado de um componente para o 
+                                atributo HTML:
+
+                // *.component.ts
+                import { Component } from '@angular/core';  // Obrigatório importação do "Component"
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+
+                export class AppComponent {
+
+                    // Declaração das propriedade para ser usado nos Attribute Binding
+                    titulo = 'Este é um exemplo de Attribute Binding';
+                    isDisabled = true;
+                    placeholder = 'Digite seu nome';
+                    estilo = 'color: blue; font-size: 24px;';
+                    classe = 'exemplo-classe';
+
+                    acao() {
+                        console.log('Botão clicado!');
+                    }
+                }
+
+                // *.component.html
+                <div [attr.title]="titulo">Este é um exemplo de Attribute Binding</div>
+
+                <button (click)="acao()" [attr.disabled]="isDisabled">Clique aqui</button>
+
+                <input [attr.placeholder]="placeholder" type="text">
+
+                <div [attr.style]="estilo">Este é um exemplo de Attribute Binding</div>
+
+                <div [attr.class]="classe">Este é um exemplo de Attribute Binding</div>
+
+            . Class binding é usado para ligar o dado do componente para a propriedade class do HTML:
+
+                // *.component.ts
+                export class TestComponent { 
+                    myCSSClass = "red"; 
+                    applyCSSClass = false; 
+                }
+
+                // *.component.html
+                <p [class]="myCSSClass">This paragraph class comes from *myClass* property </p> 
+                <p [class.blue]="applyCSSClass">This paragraph class does not apply</p>
+
+            . Style binding  é usado para ligar o dado do componente para a propriedade de estilo do HTML:
+
+                // *.component.ts
+                export class TestComponent { 
+                    myColor = 'brown';
+                }
+
+                // *.component.html
+                <p [style.color]="myColor">Text color is styled using style binding</p>            
+
+        . Two-way data binding
+
+            . ngModel -  permite a vinculação bidirecional de dados entre o modelo e a view
+
+                . Para utilizar o "ngModel" é necessário importar a biblioteca "FormsModule" no componente responsável 
+                    pelo módulo, por exemplo: "app.module.ts"
+
+                    import { FormsModule } from '@angular/forms';  // Importação aqui
+
+                    @NgModule({ 
+                        imports: [ 
+                            BrowserModule, 
+                            FormsModule                             // e aqui
+                        ] 
+                    }) 
+                    export class AppModule { }                    
+
+
+                Exemplo 1
+
+                    // *.component.ts
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        nome = 'João';
+                    }
+
+                    // *.component.html
+                    <input type="text" [(ngModel)]="nome">
+                    <p>Olá, {{ nome }}!</p>
+
+                Exemplo 2
+
+                    // *.component.ts
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        cor = 'azul';
+                    }
+
+
+                    // *.component.html
+                    <select [(ngModel)]="cor">
+                        <option value="vermelho">Vermelho</option>
+                        <option value="azul">Azul</option>
+                        <option value="verde">Verde</option>
+                    </select>
+                    <p>A cor selecionada é: {{ cor }}</p>
+
+                Exemplo 3
+
+                    // *.component.ts
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        aceito = false;
+                    }
+
+
+                    // *.component.html
+                    <input type="checkbox" [(ngModel)]="aceito">
+                    <p>Você aceitou os termos? {{ aceito }}</p>
+
+                Exemplo 4
+
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        opcao = 'opcao1';
+                    }
+
+                    <input type="radio" [(ngModel)]="opcao" value="opcao1"> Opção 1
+                    <input type="radio" [(ngModel)]="opcao" value="opcao2"> Opção 2
+                    <p>A opção selecionada é: {{ opcao }}</p>
+
+    . Demo
+
+        . Realize as alteração abaixo no componente "weather-home.component.ts":
+
+            import { Component, OnDestroy, OnInit } from '@angular/core';
+            import { Subject, takeUntil } from 'rxjs';
+            import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';      // Linha inserida
+            import { WeatherService } from '../../services/weather.service';
+            import { WeatherDatas } from 'src/app/models/interfaces/WeatherDatas';
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                styleUrls: [],
+            })
+
+            export class WeatherHomeComponent implements OnInit, OnDestroy {
+                private readonly destroy$: Subject<void> = new Subject();
+                initialCityName = 'São Paulo';
+                weatherDatas!: WeatherDatas;
+
+                searchIcon = faMagnifyingGlass;                             // Linha inserida
+
+                constructor(private weatherService: WeatherService) {}
+
+                ngOnInit(): void {
+                    this.getWheatherDatas(this.initialCityName);
+                }
+
+                getWheatherDatas(cityName: string): void {
+                    this.weatherService
+                    .getWeatherDatas(cityName)
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
+                        next: (response) => {
+                        response && (this.weatherDatas = response);
+                        console.log(this.weatherDatas);
+                        },
+                        error: (error) => console.log(error),
+                    });
+                }
+
+                // Método criado
+                onSubmit(): void {
+                    this.getWheatherDatas(this.initialCityName);
+                    console.log('CHAMOU A FUNÇÃO');
+                    this.initialCityName = '';
+                }
+
+                ngOnDestroy(): void {
+                    this.destroy$.next();
+                    this.destroy$.complete();
+                }
+            }
+
+        . Altere a página "weather-home.component.html" como abaixo:
+
+            <div class="search">
+                <form #form="ngForm" (submit)="onSubmit()">
+                    <input type="text"
+                            placeholder="Buscar localização"
+                            name="city"
+                            [(ngModel)]="initialCityName"/>
+
+                    <span (click)="onSubmit()">
+                        <fa-icon
+                            animation="fade"
+                            style="--fa-animation-duration: 5s; cursor: pointer"
+                            size="lg"
+                            class="search-icon"
+                            [icon]="searchIcon">
+                        </fa-icon>
+                    </span>
+                </form>
+            </div>
 
 
 
+
+
+
+
+
+--------------------------------------------------------------
+A diretiva `ngForm` do Angular é uma parte fundamental do sistema de formulários, especialmente no contexto de formulários baseados em templates (Template Driven Forms). Ela permite que o Angular gerencie o estado e a validação de um formulário de forma eficiente. Aqui estão os principais aspectos da diretiva `ngForm`:
+
+## Funções Principais da Diretiva `ngForm`
+
+1. **Gerenciamento de Formulário**: A diretiva `ngForm` atua como um controlador para o formulário, permitindo que o Angular rastreie o estado dos campos, como se eles estão válidos ou inválidos, sujos ou limpos, e se foram tocados ou não. Isso é essencial para a validação e manipulação dos dados do formulário[1][2].
+
+2. **Referência ao Formulário**: Quando você usa `ngForm` em um elemento `<form>`, pode criar uma referência local a ele usando a sintaxe `#nomeDaVariavel="ngForm"`. Isso permite acessar propriedades do formulário diretamente no template, como `valid`, `invalid`, `dirty`, e `pristine`[2][4].
+
+3. **Submissão de Formulário**: A diretiva facilita a submissão do formulário através do evento `(ngSubmit)`, que é disparado quando o formulário é enviado. Você pode vincular esse evento a um método no seu componente para processar os dados do formulário[1][3].
+
+4. **Integração com ngModel**: A diretiva `ngForm` trabalha em conjunto com a diretiva `ngModel`, que é utilizada para criar controles de entrada vinculados ao modelo de dados. Cada campo de entrada que utiliza `ngModel` será automaticamente registrado no controlador de formulário gerenciado pelo `ngForm`, permitindo que os dados sejam coletados e validados facilmente[1][2].
+
+## Exemplo Prático
+
+Aqui está um exemplo básico de como usar a diretiva `ngForm` em um formulário Angular:
+
+```html
+<form #meuFormulario="ngForm" (ngSubmit)="onSubmit(meuFormulario.value)">
+  <input type="text" name="nome" ngModel required>
+  <input type="email" name="email" ngModel required>
+  <button type="submit" [disabled]="!meuFormulario.valid">Enviar</button>
+</form>
+```
+
+Neste exemplo:
+- O formulário é referenciado como `meuFormulario`.
+- O evento `(ngSubmit)` chama o método `onSubmit()` passando os valores do formulário.
+- O botão de envio é habilitado apenas se o formulário for válido, utilizando a propriedade `valid` da referência do formulário[2][3].
+
+## Conclusão
+
+A diretiva `ngForm` é essencial para a criação de formulários dinâmicos e responsivos no Angular, permitindo um gerenciamento eficaz do estado e da validação dos dados inseridos pelos usuários. Combinada com outras diretivas como `ngModel`, ela proporciona uma experiência robusta para desenvolvedores que trabalham com formulários em aplicações Angular.
+
+Citations:
+[1] https://demoiselle.gitbooks.io/documentacao-frontend/content/formularios.html
+[2] https://consolelog.com.br/validacao-formulario-ngmodel-angular/
+[3] https://www.youtube.com/watch?v=x07zc2UqSuU
+[4] https://vidafullstack.com.br/angular/o-que-sao-diretivas-angular/
+[5] https://angular.io/api/forms/NgForm
+[6] https://cursos.alura.com.br/forum/topico-ngform-e-uma-directive-105269
+[7] https://www.programicio.com/web/angular/formularios/diretiva-ngfrom
+
+
+
+
+
+--------------------------------------------------------------------------
 fazer teste utilizando firstValueFrom() ou lastValueFrom()
 
 import { firstValueFrom } from 'rxjs';
