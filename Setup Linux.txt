@@ -684,16 +684,15 @@ https://www.foxitsoftware.com/pt-br/downloads/
 9. Instalação do Google Chrome:
 -------------------------------
 
-. Acesse a página de Download do Google Chrome e realizar o download:
+. Execute o comando abaixo para baixar o arquivo de instalação do Chrome:
 
-https://www.google.pt/intl/pt-PT/chrome/?brand=CHBD&gclid=CjwKCAjwtajrBRBVEiwA8w2Q8LMLXaxT25WX8kLko_sxgV3UlwFkvO1IKlCtmYXEjk8TItXZGLx0wRoCCRYQAvD_BwE&gclsrc=aw.ds
-
-. Abrir o Terminal e acessar a pasta de Downloads.
+	wget  https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 
 . Executar os comandos abaixo:
 
 	sudo dpkg -i google-chrome-stable_current_amd64.deb
-
+	sudo apt install -f
+	google-chrome-stable
 
 10. Aplicativo instalador de pacotes, concorrente do "sudo install"
 
@@ -1495,3 +1494,63 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 41. Instalar o controlador de ventuinha da placa de vídeo AMD (CoreCtrl)
 
 	sudo add-apt-repository ppa:ernstp/mesarc && sudo apt update && sudo apt install corectrl
+
+42. Instalação do Rider da JetBrains
+
+	. Se estiver no WSL, execute a instalação como mostrado aqui no passo "9. Instalação do Google Chrome:"
+
+		. Após instalação, execute o Chrome pelo prompt do terminal com o comando abaixo:
+
+			google-chrome-stable
+
+	. Acesse a pagina de Download da JetBrains e baixe o "rider" para linux:
+
+		https://www.jetbrains.com/pt-br/rider/download/#section=Linux
+
+	. Acesse a pasta do "Download" que encontra-se o arquivo baixado e execute o comando abaixo:
+
+		sudo tar -xvzf Rider*.tar.gz -C /opt
+
+	. Acesse a pasta "/opt" e execute o comando abaixo:
+
+		sudo mv Rider* Rider
+
+	. Crie o link para o rider com o comando abaixo:
+
+		sudo ln -s /opt/Rider/bin/rider.sh /usr/bin/rider
+
+	. Execute o comando abaixo no prompt do Terminal
+
+		rider
+
+	. Acesse a área de lincença "Community" e faça o login de autenticação para conseguir a licença.
+
+		. utilize o login "dotnetndelphi@..."
+
+43. Instalação do WebStorm da JetBrains
+
+	. Se estiver no WSL, execute a instalação como mostrado aqui no passo "9. Instalação do Google Chrome:"
+
+		. Após instalação, execute o Chrome pelo prompt do terminal com o comando abaixo:
+
+			google-chrome-stable
+
+	. Acesse a pagina de Download da JetBrains e baixe o "WebStorm" para linux:
+
+		https://www.jetbrains.com/webstorm/download/#section=linux
+
+	. Acesse a pasta do "Download" que encontra-se o arquivo baixado e execute o comando abaixo:
+
+		sudo tar -xvzf WebStorm*.tar.gz -C /opt
+
+	. Acesse a pasta "/opt" e execute o comando abaixo:
+
+		sudo mv WebStorm* WebStorm
+
+	. Crie o link para o rider com o comando abaixo:
+
+		sudo ln -s /opt/WebStorm/bin/rider.sh /usr/bin/webstorm
+
+	. Execute o comando abaixo no prompt do Terminal
+
+		webstorm
