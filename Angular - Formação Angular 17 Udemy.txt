@@ -817,67 +817,119 @@ Angular - Formação Angular 17 Udemy
 8. Instalando a biblioteca de icones
 ------------------------------------
 
+    . fontawesome
 
-    https://www.tutorialspoint.com/web_icons/index.htm
+        https://www.tutorialspoint.com/web_icons/index.htm
 
-    . Usada no Angular para integrar os ícones do FontAwesome em uma aplicação Angular.
+        . Usada no Angular para integrar os ícones do FontAwesome em uma aplicação Angular.
 
-    . É uma biblioteca de ícones populares que fornece uma ampla variedade de ícones que 
-        podem ser usados em aplicações web e móveis.
+        . É uma biblioteca de ícones populares que fornece uma ampla variedade de ícones que 
+            podem ser usados em aplicações web e móveis.
 
-    . Exemplos:
+            https://docs.fontawesome.com/web/setup/get-started
 
-        <i class="fa fa-user"></i>
+        . Existe a versão paga e a versão Free:
 
-        <fa-icon [icon]="['fas', 'user']"></fa-icon>
+            https://fontawesome.com/search?o=r&m=free
 
-    . Demo
+        . A documentação de como usá-la pode ser encontrada no link abaixo:
 
-        . Execute os comandos abaixo na pasta raiz do projeto:
+            https://github.com/FortAwesome/angular-fontawesome
 
-            npm install @fortawesome/fontawesome-svg-core
+        . Exemplos:
 
-            npm install @fortawesome/free-solid-svg-icons
+            <i class="fa fa-user"></i>
 
-            # Verifique a versão do angular do projeto é utilize no lugar da tag <version>
-            # Acesse o link "https://www.npmjs.com/package/@fortawesome/angular-fontawesome" para encontrar a "version"
-            # npm install @fontawesome/angular-fontawesome@<version>
-            npm install @fortawesome/angular-fontawesome@0.12.x
+            <fa-icon [icon]="['fas', 'user']"></fa-icon>
 
-        . Insira as linhas abaixo no arquivo "app.module.ts"
+        . Demo
 
-            import { NgModule } from '@angular/core';
-            import { BrowserModule } from '@angular/platform-browser';
+            . Execute os comandos abaixo na pasta raiz do projeto:
 
-            import { AppRoutingModule } from './app-routing.module';
-            import { AppComponent } from './app.component';
+                npm install @fortawesome/fontawesome-svg-core
 
-            import { BrowserAnimationsModule } from '@angular/platform-browser/animations';         
-            import { HttpClientModule } from '@angular/common/http';                                
-            import { FormsModule } from '@angular/forms';                                           
-            import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';           // Linha inserida
+                npm install @fortawesome/free-solid-svg-icons
 
-            @NgModule({
-            declarations: [
-                AppComponent
-            ],
-            imports: [
-                BrowserModule,
-                AppRoutingModule,
-                BrowserAnimationsModule,                                                                                                
-                HttpClientModule,                                                               
-                FormsModule,
-                FontAwesomeModule                                                           // Linha inserida
-            ],
-            providers: [],
-                bootstrap: [AppComponent]
-            })
+                # Verifique a versão do angular do projeto é utilize no lugar da tag <version>
+                # Acesse o link "https://www.npmjs.com/package/@fortawesome/angular-fontawesome" para encontrar a "version"
+                # npm install @fontawesome/angular-fontawesome@<version>
+                npm install @fortawesome/angular-fontawesome@0.12.x
 
-            export class AppModule { }
+            . Insira as linhas abaixo no arquivo "app.module.ts"
 
-        . Execute o projeto e veja o resultado no navegador
+                import { NgModule } from '@angular/core';
+                import { BrowserModule } from '@angular/platform-browser';
 
-            ng serve --open
+                import { AppRoutingModule } from './app-routing.module';
+                import { AppComponent } from './app.component';
+
+                import { BrowserAnimationsModule } from '@angular/platform-browser/animations';         
+                import { HttpClientModule } from '@angular/common/http';                                
+                import { FormsModule } from '@angular/forms';                                           
+                import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';           // Linha inserida
+                import {faCoffee, faMask, faSpinner} from "@fortawesome/free-solid-svg-icons";  // Linha inserida
+
+                @NgModule({
+                declarations: [
+                    AppComponent
+                ],
+                imports: [
+                    BrowserModule,
+                    AppRoutingModule,
+                    BrowserAnimationsModule,                                                                                                
+                    HttpClientModule,                                                               
+                    FormsModule,
+                    FontAwesomeModule                                                           // Linha inserida
+                ],
+                providers: [],
+                    bootstrap: [AppComponent]
+                })
+
+                export class AppModule { 
+                    constructor(library: FaIconLibrary) {                                       // Insira o construtor
+                        library.addIcons( faCoffee, faMask, faSpinner );
+                    }
+
+                }
+
+            . Altere o conteúdo do componente "app.component.html" com as linhas abaixo:
+
+                <div class="container">
+                    <div class="jumbotron">
+                        <h1 class="display-4">Hello, world!</h1>
+                        <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+                        <hr class="my-4">
+                        <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+                        <a class="btn btn-primary btn-lg" href="#" role="button">
+                            <fa-icon [icon]="['fas', 'mask']" size="lg"></fa-icon>&nbsp;Learn more           <!-- Uso do Icone -->
+                        </a>
+                    </div>
+                </div>
+
+
+            . Execute o projeto e veja o resultado no navegador
+
+                ng serve --open
+
+    . Bootstrap Icons
+
+        https://icons.getbootstrap.com/
+
+        . Instale o Bootstrap Icons: Você pode instalar os ícones do Bootstrap via npm:
+
+            npm install bootstrap-icons
+
+        . Adicione os ícones ao seu projeto: No arquivo angular.json, adicione o caminho para os ícones na seção de estilos:
+
+            ...
+            "styles": [
+                "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+                "src/styles.css"
+            ]
+
+        . Use os ícones no seu template "*.component.html": 
+
+            <i class="bi bi-alarm">
 
 9. Criando nosso primeiro componente e rota
 -------------------------------------------
