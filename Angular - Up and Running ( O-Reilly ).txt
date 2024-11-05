@@ -664,53 +664,215 @@ Angular - Up and Running ( O-Reilly )
 
     . One-way Data Binding
 
-        . Interpolação: {{nome}} - onde nome é uma propriedade do componente, entre {{ }}
-
-            // *.component.ts
-            export class TestComponent implements OnInit { 
-                appName = "My first app in Angular 4"; 
-            }
-
-            // *.component.html 
-            <h1>{{appName}}</h1>            
-
-            // app.component.html
-            <app-test></app-test>
-
-        . Event Binding: (evento)="função do componente Angular", onde o evento é nome do evento do elemento 
-                            HTML: click(), hover(), doubleClick(), etc, que será associado ao método do componente Angular:
-
-            // *.component.ts
-            export class TestComponent { 
-                showData(event: any){ 
-                    console.log("button is clicked!"); if(event) { 
-                        console.log(event.target); 
-                        console.log(event.target.value); 
-                    } 
-                } 
-            }
-
-            // *.component.html
-            <h2>Event Binding</h2> 
-            <button (click)="showData($event)">Click here</button>
-
-
-            // ou podemos utilizar o prefixo "on" + o nome do evento
-
-            <button on-click="showData($event)">Click here</button>
 
         . Property binding: [property]="valor propriedade" - utilizado para ligar o dado de uma propriedade de um componente para 
                             o elemento DOM, onde "property" seria a propriedade do elemento: disabled, autocomplete, required, etc; e
                             o "valor da propriedade" seria o valor necessário da propriedade: true/false, 50, etc.
 
-            // *.component.ts
-            export class TestComponent { 
-                userName:string = "Peter"; 
-            }
+            . Exemplo
 
-            // *.component.html
-            // userName property is bind to an attribute of a DOM element <input> tag
-            <input type="text" [value]="userName" [disabled]="true" >
+                // *.component.ts
+                export class TestComponent { 
+                    userName:string = "Peter"; 
+                }
+
+                // *.component.html
+                // userName property is bind to an attribute of a DOM element <input> tag
+                <input type="text" [value]="userName" [disabled]="true" >
+
+            . Interpolação: {{nome}} - onde nome é uma propriedade do componente, entre {{ }}
+
+                // *.component.ts
+                export class TestComponent implements OnInit { 
+                    appName = "My first app in Angular 4"; 
+                }
+
+                // *.component.html 
+                <h1>{{appName}}</h1>            
+
+                // app.component.html
+                <app-test></app-test>
+
+            . Class binding é usado para ligar o dado do componente para a propriedade class do HTML:
+
+                // *.component.ts
+                export class TestComponent { 
+                    myCSSClass = "red"; 
+                    applyCSSClass = false; 
+                }
+
+                // *.component.html
+                <p [class]="myCSSClass">This paragraph class comes from *myClass* property </p> 
+                <p [class.blue]="applyCSSClass">This paragraph class does not apply</p>
+
+            . Style binding  é usado para ligar o dado do componente para a propriedade de estilo do HTML:
+
+                // *.component.ts
+                export class TestComponent { 
+                    myColor = 'brown';
+                }
+
+                // *.component.html
+                <p [style.color]="myColor">Text color is styled using style binding</p>            
+
+            . Demo - Property Bind
+
+                . Altere o componenete "stock-item.component.ts" como abaixo:
+
+                    import { Component, OnInit } from '@angular/core';
+                        @Component({
+                            selector: 'app-stock-item',
+                            templateUrl: './stock-item.component.html',
+                            styleUrls: ['./stock-item.component.css']
+                        })
+
+                        export class StockItemComponent implements OnInit {
+                            public name!: string;
+                            public code!: string;
+                            public price!: number;
+                            public previousPrice!: number;
+                            public positiveChange!: boolean;                 // Linha inserida
+
+                            constructor() { }
+
+                            ngOnInit() {
+                                this.name = 'Test Stock Company';
+                                this.code = 'TSC';
+                                this.price = 85;
+                                this.previousPrice = 80;
+                                this.positiveChange = this.price >= this.previousPrice;     // Linha inserida
+                            }
+                    }        
+
+                . Insira as linhas abaixo no arquivo "stock-item.component.css":
+
+                    ...
+                    .positive {
+                        color: green;
+                    } 
+                    .negative {
+                        color: red;
+                    }
+
+                . Insira as linhas abaixo no arquivo "stock-item.component.html"
+
+                    <div class="stock-container">
+                        <div class="name">
+                            <h3>{{name}}</h3> - <h4>({{code}})</h4>
+                        </div>
+                        <div class="price">$ {{price}}</div>
+
+                            <!-- DIV alterada -->
+                            <div class="price"
+                                [class]="positiveChange ? 'positive' : 'negative'">$40{{price}}
+                            </div>
+                            <!-- Fim da alteração -->
+                        </div>            
+                    </div>            
+
+                . Execute o projeto e veja o resultado:
+
+                    ng s -o
+
+        . Event Binding: (evento)="função do componente Angular", onde o evento é nome do evento do elemento 
+                            HTML: click(), hover(), doubleClick(), etc, que será associado ao método do componente Angular:
+
+            . Exemplo
+
+                // *.component.ts
+                export class TestComponent { 
+                    showData(event: any){ 
+                        console.log("button is clicked!"); if(event) { 
+                            console.log(event.target); 
+                            console.log(event.target.value); 
+                        } 
+                    } 
+                }
+
+                // *.component.html
+                <h2>Event Binding</h2> 
+                <button (click)="showData($event)">Click here</button>
+
+
+                // ou podemos utilizar o prefixo "on" + o nome do evento
+
+                <button on-click="showData($event)">Click here</button>
+
+            . Demo - Property Event
+
+                . Crie as linhas abaixo na classe "stock-item.component.ts"
+
+
+                    export class StockItemComponent implements OnInit {
+                        ...
+                        public favorite: boolean;           // Propriedade criada
+                        
+                        constructor() { }
+                        ...
+
+                        // Método criado
+                        toggleFavorite() {
+                            console.log('We are toggling the favorite state for this stock');
+                            this.favorite = !this.favorite;
+                        }
+                    }
+
+                . Crie as linhas abaixo na no arquivo "stock-item.component.html"
+
+                    <div class="stock-container">
+                        <div class="name">{{name + ' (' + code + ')'}}</div>
+                            <div    class="price"
+                                    [class]="positiveChange ? 'positive' : 'negative'">
+                                $ {{price}}
+                            </div>
+
+                            <!-- Button Criado -->
+                            <button (click)="toggleFavorite()"
+                                    [disabled]="favorite">
+                                Add to Favorite
+                            </button>
+                    </div>        
+
+                . Execute o projeto e veja o resultado:
+
+                    ng s -o
+
+                . Envio do evento disparado
+
+                    . Inclua o envio do evento como abaixo na classe "stock-item.component.ts"
+
+                        export class StockItemComponent implements OnInit {
+                            ...
+                            public favorite: boolean;           // Propriedade criada
+                            
+                            constructor() { }
+                            ...
+
+                            // Inclua na assinatura do método o parâmetro "evento"
+                            toggleFavorite( event: any ) {
+                                console.log('We are toggling the favorite state for this stock', event);       // Altere a linha
+                                this.favorite = !this.favorite;
+                            }
+                        }
+
+                    . Crie as linhas abaixo na no arquivo "stock-item.component.html"
+
+                        <div class="stock-container">
+                            <div class="name">{{name + ' (' + code + ')'}}</div>
+                                <div    class="price"
+                                        [class]="positiveChange ? 'positive' : 'negative'">
+                                    $ {{price}}
+                                </div>
+
+                                <!-- Adicione o parâmetro $event na chamada do método -->
+                                <button (click)="toggleFavorite( $event )"
+                                        [disabled]="favorite">
+                                    Add to Favorite
+                                </button>
+                        </div>        
+
+
+. Página 49. Using Models for Cleaner Code
 
 
         . ngModel - uando você usa ngModel sem o símbolo [] ou () em torno dele, ele funciona de forma unidirecional. Isso significa que o 
@@ -788,27 +950,6 @@ Angular - Up and Running ( O-Reilly )
 
             <div [attr.class]="classe">Este é um exemplo de Attribute Binding</div>
 
-        . Class binding é usado para ligar o dado do componente para a propriedade class do HTML:
-
-            // *.component.ts
-            export class TestComponent { 
-                myCSSClass = "red"; 
-                applyCSSClass = false; 
-            }
-
-            // *.component.html
-            <p [class]="myCSSClass">This paragraph class comes from *myClass* property </p> 
-            <p [class.blue]="applyCSSClass">This paragraph class does not apply</p>
-
-        . Style binding  é usado para ligar o dado do componente para a propriedade de estilo do HTML:
-
-            // *.component.ts
-            export class TestComponent { 
-                myColor = 'brown';
-            }
-
-            // *.component.html
-            <p [style.color]="myColor">Text color is styled using style binding</p>            
 
     . Two-way data binding
 
@@ -905,142 +1046,10 @@ Angular - Up and Running ( O-Reilly )
                 <input type="radio" [(ngModel)]="opcao" value="opcao2"> Opção 2
                 <p>A opção selecionada é: {{ opcao }}</p>
 
-    . Demo - Property Bind
-
-        . Altere o componenete "stock-item.component.ts" como abaixo:
-
-            import { Component, OnInit } from '@angular/core';
-                @Component({
-                    selector: 'app-stock-item',
-                    templateUrl: './stock-item.component.html',
-                    styleUrls: ['./stock-item.component.css']
-                })
-
-                export class StockItemComponent implements OnInit {
-                    public name!: string;
-                    public code!: string;
-                    public price!: number;
-                    public previousPrice!: number;
-                    public positiveChange!: boolean;                 // Linha inserida
-
-                    constructor() { }
-
-                    ngOnInit() {
-                        this.name = 'Test Stock Company';
-                        this.code = 'TSC';
-                        this.price = 85;
-                        this.previousPrice = 80;
-                        this.positiveChange = this.price >= this.previousPrice;     // Linha inserida
-                    }
-            }        
-
-        . Insira as linhas abaixo no arquivo "stock-item.component.css":
-
-            ...
-            .positive {
-                color: green;
-            } 
-            .negative {
-                color: red;
-            }
-
-        . Insira as linhas abaixo no arquivo "stock-item.component.html"
-
-            <div class="stock-container">
-                <div class="name">
-                    <h3>{{name}}</h3> - <h4>({{code}})</h4>
-                </div>
-                <div class="price">$ {{price}}</div>
-
-                    <!-- DIV alterada -->
-                    <div class="price"
-                        [class]="positiveChange ? 'positive' : 'negative'">$40{{price}}
-                    </div>
-                    <!-- Fim da alteração -->
-                </div>            
-            </div>            
-
-        . Execute o projeto e veja o resultado:
-
-            ng s -o
-
-    . Demo - Property Event
-
-        . Crie as linhas abaixo na classe "stock-item.component.ts"
 
 
-            export class StockItemComponent implements OnInit {
-                ...
-                public favorite: boolean;           // Propriedade criada
-                
-                constructor() { }
-                ...
-
-                // Método criado
-                toggleFavorite() {
-                    console.log('We are toggling the favorite state for this stock');
-                    this.favorite = !this.favorite;
-                }
-            }
-
-        . Crie as linhas abaixo na no arquivo "stock-item.component.html"
-
-            <div class="stock-container">
-                <div class="name">{{name + ' (' + code + ')'}}</div>
-                    <div    class="price"
-                            [class]="positiveChange ? 'positive' : 'negative'">
-                        $ {{price}}
-                    </div>
-
-                    <!-- Button Criado -->
-                    <button (click)="toggleFavorite()"
-                            [disabled]="favorite">
-                        Add to Favorite
-                    </button>
-            </div>        
-
-        . Execute o projeto e veja o resultado:
-
-            ng s -o
-
-        . Envio do evento disparado
-
-            . Inclua o envio do evento como abaixo na classe "stock-item.component.ts"
-
-                export class StockItemComponent implements OnInit {
-                    ...
-                    public favorite: boolean;           // Propriedade criada
-                    
-                    constructor() { }
-                    ...
-
-                    // Inclua na assinatura do método o parâmetro "evento"
-                    toggleFavorite( event: any ) {
-                        console.log('We are toggling the favorite state for this stock', event);       // Altere a linha
-                        this.favorite = !this.favorite;
-                    }
-                }
-
-            . Crie as linhas abaixo na no arquivo "stock-item.component.html"
-
-                <div class="stock-container">
-                    <div class="name">{{name + ' (' + code + ')'}}</div>
-                        <div    class="price"
-                                [class]="positiveChange ? 'positive' : 'negative'">
-                            $ {{price}}
-                        </div>
-
-                        <!-- Adicione o parâmetro $event na chamada do método -->
-                        <button (click)="toggleFavorite( $event )"
-                                [disabled]="favorite">
-                            Add to Favorite
-                        </button>
-                </div>        
-
-. Página 49. Using Models for Cleaner Code
 
 
-página 47
 
 
 
