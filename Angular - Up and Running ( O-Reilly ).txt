@@ -1,0 +1,1157 @@
+Angular - Up and Running ( O-Reilly )
+-------------------------------------
+
+1. Configurando o ambiente de desenvolvimento
+---------------------------------------------
+
+    . Instalação do Nodejs
+
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | $SHELL
+        nvm --version
+
+        # Para instalar a versão lts mais recente
+        nvm install --lts
+
+        # Se quiser instalar uma versão especifica, utilize:
+        # nvm install 18.20.4
+
+        # Se quiser listar as versões do node disponivel no repositorio remoto
+        # nvm ls-remote
+
+        # Se quiser listar as versões instalada na máquina atual
+        # nvm ls
+
+        # Para usar uma versão instalada na máquina atual
+        # nvm use 20.17.0
+
+        # Para desinstalar uma versão do node js
+        # nvm uninstall 18.20.4
+
+        node -v
+        npm -v
+
+    . Instalação do VSCode:
+
+        . Acessar a pagina de download da microsoft:
+
+            https://code.visualstudio.com/download
+
+        . Baixar o arquivo .deb 
+
+        . Abrir o terminal e acessar a pasta Downloads
+
+        . Executar o comando abaixo:
+
+            sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+        . Atalhos
+
+            Alt + 1, 2, 3, 4, ...	Posiona na aba no.
+            Ctrl + b				Ativar o menu lateral esquerdo 
+            Ctrl + Alt + P			Para ativar a linha de comandos 
+            Ctrl + P 				Localiza um determinado arquivo
+            Ctrl + W				Fecha a aba corrente
+            Ctrl + Shift + W		Fecha todas as abas abertas
+
+            Ctrl + Rolagem do Mouse	
+                    sobre as abas 
+                    abertas			Faz a rolagem das abas.
+
+            Ctrl + K + C ou 
+            Ctrl + /				Comenta linha atual, ou bloco selecionado
+
+            Ctrl + K + U ou
+            Ctrl + /				Descomenta linha, ou bloco selecionado.
+
+            Ctrl + Shift + 
+                    Acento Agudo	Abre o terminal na parte inferior
+
+            Ctrl + X				Apaga linha
+            Ctrl + H				Localiza e atualiza uma expressão
+            Ctrl + F2				Selecione um texto e pressionando Ctrl + F2 
+                                    muda todos os textos equivalente a medida
+                                    que vai se digitando
+            Alt + Arrow(up/Down)    Move a linha para cima, ou para baixo.
+            Ctrl + Shift + O		Abre a lista de funções/métodos da classe atual
+            Ctrl + G				Posicionar na linha No. que for digitado
+            Alt + Backspace			Apaga palavra inteira a esquerda
+            Ctrl + Shift + .		Mostra os métodos da classe
+            Ctrl + Shift + L		Altera dinamicamente em todo o arquivo a palavra que está sendo alterada
+            Ctrl + M				Para cercar um conjunto de tags numa página HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
+            cTRL + Ctrl + -			Para apagar uma tag que abraça um conjunto de tags HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
+
+        . Instale as seguinte Extensões:
+
+            . Angular Extension Pack
+            . Material Icon
+
+        . Configurações:
+
+            . Digite Ctrl K+S, localize o item "Delete Line" e configure Ctrl + D
+            . Acesse View / Minimap para retirar o scroll de código da direita
+            . Acessar configurações, ir em "Settings", Text editors, Sugestions:
+                . Na opção "Accept Suggestion On Enter" deixar como off
+                . Na opção "Suggest: Insert Mode" deixar como replace
+                . Na opção "Quick Suggestions Delay" deixar como 1000
+            . Acesse "Keyboard Shortcuts" em configurações:
+                . Digite "Emmet: Wrap..." e altere o "Keybinding" para "Alt + M"
+                    . De agora em diante, ao editar uma página HTML e quiser cercar um bloco de tags com uma outra, 
+                        basta:
+                        . Selecionar o bloco
+                        . Digitar "Alt + M"
+                        . Informar a tag que deseja colocar, somente a identificação sem "<>", por exemplo: "div"
+                . Digite "Emmet: Remove Tag" e altere o "Keybinding" para "Alt+Shift+-", o "-" deve ser do bloco numerico
+                    . De agora em diante, se precisar apagar uma tag HTML que cerca um conjunto de outras tags, basta posicioinar
+                        o cursor sobre a "TAg" que deseja apagar e pressionar "Ctrl+Shift+-"
+            . Digite "Ctrl+Shift+P" e digite "Preference: Open User Settings (JSON)"
+                . Digite a configuração abaixo:
+
+                    ...
+                    "editor.linkedEditing": true,
+                    "html.format.unformatted": "input",
+                    "workbench.tree.indent": 20,
+                    "workbench.tree.renderIndentGuides": "always",
+                    "workbench.colorCustomizations": {
+                        "tree.indentGuidesStroke": "#c8e0be"
+                    }
+            . Acesse Configurações -> Profile -> Import Profile 
+                . Informe o link "https://vscode.dev/profile/github/12bd0215e34ffe344361b7dcf767842b" para resgatar as configurações para desenvolvimento em .NET
+
+    . Instalação do JSon Server
+
+        # Instalação do JSon Server
+        npm install json-server
+
+        # Crie o arquivo json abaixo com o nome de db.json
+        {
+            "posts": [
+                { "id": "1", "title": "a title", "views": 100 },
+                { "id": "2", "title": "another title", "views": 200 }
+            ],
+            "comments": [
+                { "id": "1", "text": "a comment about post 1", "postId": "1" },
+                { "id": "2", "text": "another comment about post 1", "postId": "1" }
+            ],
+            "profile": {
+                "name": "typicode"
+            }
+        }
+
+
+        # Execute o comando abaixo
+        npx json-server db.json
+
+        # Testando as rotas
+        curl http://localhost:3000/posts/1
+
+        curl http://localhost:3000/posts
+
+    . Instalação do do Angular
+
+        # Instalação do Angular
+        sudo npm install -g @angular/cli@15
+
+        # Verificação da versão do Angular
+        ng version
+
+
+        # Para desinstalar
+        # npm uninstall -g @angular/cli
+        # npm cache clean --force
+
+        # Para atualizar
+        # sudo npm install --save-dev @angular/cli@latest
+
+2. Gerando o Projeto
+--------------------
+
+    . Criando um componente com o AngularCli
+
+        . O comando "ng" é um atalho para o Angular CLI (Command Line Interface), que é uma ferramenta de linha de comando para 
+            desenvolver aplicativos Angular. O Angular CLI fornece uma série de comandos que permitem executar tarefas comuns, 
+            como criar novos componentes, executar testes, construir aplicativos, entre outros.
+
+            . Uso do comando "ng"
+
+                # cria um novo projeto Angular com o nome especificado.
+                ng new nome-do-projetos
+
+                # gera um novo componente Angular com o nome especificado.
+                ng generate component nome-do-componente
+
+                # inicia um servidor de desenvolvimento local para o projeto Angular atual.
+                ng serve
+
+                # executa os testes unitários do projeto Angular atual.
+                ng test
+
+                # constrói o projeto Angular atual para produção.
+                ng build
+
+                # inicia um servidor de desenvolvimento local para o projeto Angular atual em modo de produção.
+                ng serve --prod
+
+            . Abreviações do comando "ng"
+
+                # Abreviação para ng new, cria um novo projeto Angular.
+                ng n
+
+                # Abreviação para ng generate, gera um novo componente, diretiva, pipe, serviço, etc.
+                ng g
+
+                # Abreviação para ng serve, inicia um servidor de desenvolvimento local para o projeto Angular atual.
+                ng s
+
+                # Abreviação para ng test, executa os testes unitários do projeto Angular atual.
+                ng t
+
+                # Abreviação para ng build, constrói o projeto Angular atual para produção.
+                ng b
+
+                # Abreviação para ng update, atualiza as dependências do projeto Angular atual.
+                ng update
+
+                # Abreviação para ng add, adiciona uma nova dependência ao projeto Angular atual.
+                ng add
+
+            . Abreviações par os tipos de arquivos que podem ser criados com o comand "ng"
+
+                # Abreviação para ng g component, gera um novo componente Angular.
+                ng g c
+                
+                # Abreviação para ng g directive, gera uma nova diretiva Angular.
+                ng g d
+                
+                # Abreviação para ng g pipe, gera um novo pipe Angular.
+                ng g p
+                
+                # Abreviação para ng g service, gera um novo serviço Angular.
+                ng g s
+                
+                # Abreviação para ng g module, gera um novo módulo Angular.
+                ng g m
+
+            . Exemplo
+
+                ng generate component bem-vindo --spec=false
+
+                # ou
+
+                $ ng g c bem-vindo --spec=false
+
+            . O comando do exemplo acima criará o componente "src/bem-vindo/bem-vindo.component.ts"
+
+                import { Component } from '@angular/core'
+
+                @Component({
+                    selector : 'app-bem-vindo',
+                    templateUrl : './bem-vindo.component.html',
+                    styleUrls : ['./bem-vindo.component.css']
+                })
+
+                export class BemVindoComponent{
+
+                }
+            
+            . Para utilizar o componente acima, basta acessarmos o html "app.componente.html" e inserir a linha abaixo
+
+                    <app-bem-vindo></app-bem-vindo>
+
+            . Ao levantarmo o projeto com o comando abaixo, a página renderizada apresentará o conteúdo da página "bem-vindo.component.html"
+
+                ng serve --open
+
+                ou
+
+                ng s -o
+
+    . Demo
+
+        . Crie um projeto com os comandos abaixo:
+
+            # No questionamento "Would you like to add Angular routing?" Responda "Y"
+            # No questionamento " Which stylesheet format would you like to use? " Responda "CSS"
+            ng new stock-market
+            
+            cd stock-market/
+
+            # Opção ao comando abaixo seria "ng s --open", ou "npm start"
+            ng serve --open
+
+    . Estrutura de pastas dos projetos Angular:
+
+        +----node_modules --------------------------->  Dependências do Node.JS necessárias no projeto.                  
+        +----src
+            +----app      --------------------------->  Encontram-se todos os arquivos do projeto, como: componentes, diretivas, filtros e módulos da aplicação
+                +----app.routing.module.ts
+                +----app.component.css / app.component.scss
+                +----app.component.html
+                +----app.component.spec.ts
+                +----app.component.ts
+                +----app.module.ts
+            +----assets   --------------------------->  Recursos externos do projeto, como CSS, imagens, bibliotecas JavaScript, etc.
+            +----index.html
+            +----main.ts
+        +----.angular-cli.json
+
+        . Arquivos da pasta src/app:
+
+            . app.routing.app:              Módulo que configura as rotas para navegar entre as diferentes páginas ou componentes da aplicação
+
+            . app.component.css/.scss:      Arquivo responsável pelo estilo do nosso módulo. Com o Angular nós trabalhamos 
+                                            com os estilos separados para cada componente, assim conseguimos ter um desacoplamento de estilos. 
+                                            Nesse exemplo nós criamos um projeto com a extensão .css, mas também temos a possibilidade de 
+                                            trabalhar com arquivos Sass. Para que possamos alterar, basta executar o comando ng set 
+                                            defaults.styleExt scss, ele irá configurar para que os próximos componentes sejam criados 
+                                            com a extensão do .scss.
+
+            . app.component.html:           Arquivo HTML do nosso componente App, segue o mesmo pensamento que os arquivos de estilo.
+
+            . app.component.spec.ts:        Arquivo de teste do nosso componente.
+
+            . app.component.ts:             É o componente principal da aplicação. Ele é responsável por definir a estrutura e o comportamento da 
+                                            aplicação.
+
+                . Definir a estrutura do componente principal da aplicação
+
+                . Definir o template HTML e o estilo CSS do componente
+
+                . Definir as propriedades e métodos do componente
+
+            . app.module.ts:                O Angular é um framework modular, ele precisa de um ou mais módulos para que possamos 
+                                            gerenciar os nossos componentes, esse módulo acaba sendo um default, mas podemos criar outros modules e 
+                                            chamar eles dentro dele.
+
+        . Arquivos da pasta src:
+
+            . index.html:                   Esse seria o nosso arquivo root, dentro dele rodamos a nossa SPA (Single Page Application).
+
+            . main.ts:                      É o ponto de entrada da aplicação. Ele é responsável por iniciar a aplicação e configurar o ambiente de execução
+
+            . styles.css/.scss:             Como todos os nossos componentes tem o seu próprio arquivo .css ou .scss, nós podemos 
+                                            utilizar esse arquivo para criar algo global como variáveis para nossa aplicação.
+
+        . Pasta raiz do projeto:
+
+            . tsconfig.app.json e 
+                tsconfig.spec.json:         são os nossos arquivos de configuração do TypeScript.
+
+            . .gitignore:                   Arquivo do git que utilizamos para o gerenciamento dos arquivos que serão ignorados no momento do 
+                                            nosso commit.
+
+            . package.json:                 Esse arquivo é o responsável por gerenciar as dependências do nosso projeto, quando executamos o comando  
+                                            npm install [biblioteca] --save, ele verifica os pacotes que estão dentro desse arquivo e 
+                                            baixa para o nosso diretório node_modules conforme foi visto no passo anterior. O parâmetro --save é para deixar
+                                            registrado a dependência da biblioteca no arquivo package.json.
+
+            . README.md:                    Arquivo Markdown para documentação da nossa aplicação.
+
+            . tsconfig.json:                Arquivo de configuração do TypeScript.
+
+            . tslint.json:                  O tslint fica verificando se estamos escrevendo o nosso código corretamente, ele verifica a 
+                                            sintaxe do nosso projeto em tempo de execução e em caso de algum erro ou warning ele lança uma exception 
+                                            no console.    
+
+    . Sequência de execução do Angular:
+
+        . O inicio do projeto ocorrerá pelo componente src/main.ts:
+
+            import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+            import { AppModule } from './app/app.module';       // Importação do modulo para iniciar a aplicação
+
+
+            platformBrowserDynamic().bootstrapModule(AppModule)
+                .catch(err => console.error(err));
+
+
+            . Identificará o arquivo src/app/app.module.ts para iniciar a construção da página principal.
+
+        . O arquivo src/app/app.module.ts faz a associação com os componentes principais da página principal:
+
+            import { BrowserModule } from '@angular/platform-browser';
+            import { NgModule } from '@angular/core';
+
+            import { AppComponent } from './app.component';     // abrirá o arquivo src/app/app.component.ts
+
+            @NgModule({
+                declarations: [
+                    AppComponent                    
+                ],
+                imports: [
+                    BrowserModule
+                ],
+                providers: [],
+                bootstrap: [AppComponent]       // Componente principal que iniciará a aplicação 
+            })
+
+            export class AppModule { }
+
+            . Observe que é feito a importação do arquivo "./app.component" que iniciará a construção da página inicial:
+
+            . Propriedades do arquivo app.module.ts
+
+                . declarations: The components, directives, and pipes that belong to this NgModule.
+
+                . exports: The subset of declarations that should be visible and usable in the component 
+                            templates of other NgModules.
+
+                . imports: Other modules whose exported classes are needed by component templates declared in this NgModule.
+
+                . providers: Creators of services that this NgModule contributes to the global collection of services;
+                            they become accessible in all parts of the application. (You can also specify providers at the component level.)
+
+                . bootstrap: The main application view, called the root component, which hosts all other application views.
+                            Only the root NgModule should set the bootstrap property.
+
+        . A partir da definição do componente principal o framework do angular abrirá o arquivo src/app/app.component.ts
+
+            import { Component } from '@angular/core';
+
+            @Component({
+                selector: 'app-root',
+                templateUrl: './app.component.html',
+                styleUrls: ['./app.component.scss']
+            })
+            export class AppComponent {
+                title = 'weather-app';
+            }
+
+        . O arquivo "app.component.ts" é o componente principal da aplicação:
+
+            import { Component } from '@angular/core';
+
+            @Component({
+                selector: 'app-root',
+                templateUrl: './app.component.html',
+                styleUrls: ['./app.component.scss']
+            })
+            export class AppComponent {
+                title = 'stock-app';
+            }
+
+            . Aqui está o que cada parte desse código faz:
+
+                import { Component } from '@angular/core';:     Importa a classe Component do módulo @angular/core. Essa 
+                                                                classe é usada para definir um componente Angular.
+
+                @Component({...}):                              Define o componente AppComponent com as seguintes propriedades:
+
+                    selector: 'app-root':                       Define o seletor do componente, que é usado para identificar o 
+                                                                componente no HTML.
+
+                    templateUrl: './app.component.html':        Define o arquivo HTML que será usado como template para o componente.
+
+                    styleUrls: ['./app.component.css']:         Define o arquivo CSS que será usado para estilizar o componente.
+
+                export class AppComponent { ... }:              Define a classe AppComponent que será exportada e usada como componente.
+
+                title = 'stock-app';:                           Define uma propriedade title com o valor 'my-app'. Essa propriedade pode 
+                                                                ser usada no template HTML para exibir o título da aplicação.
+
+        . O app.component.ts irá vincular com o template src/app/app.component.html
+
+        . Onde criará a página index.html fazendo a substituição da tag <app-root>
+
+        . Fluxo de execução
+
+                +-------------------+
+                |   src/main.ts     |   import { AppModule } from './app/app.module'; 
+                +-------------------+
+                        |
+                        |
+                        V
+            +---------------------------+
+            |   src/app/app.module.ts   |   import { AppComponent } from './app.component'
+            +---------------------------+   ... bootstrap: [AppComponent]
+                        |                   export class AppModule { }
+                        |
+                        |
+                        V                       @Component({
+            +-------------------------------+       selector: 'app-root',
+            |   src/app/app.component.ts    |       templateUrl: './app.component.html', 
+            +-------------------------------+       styleUrls: ['./app.component.scss'] 
+                        |                       })
+                        |
+                        V
+            +-------------------------------+
+            |   src/app/app.component.html  |
+            +-------------------------------+
+                        |
+                        |
+                        V
+                +---------------+
+                |   index.html  |           <app-root></app-root>
+                +---------------+
+
+     . A criação de um componente no projeto é feito através do comando:
+
+        ng generate component [nome do componente]
+
+        ou
+
+        ng g c [nome do componente]
+        
+    . Demo
+
+        . Crie o componente "stock-item" de acordo com a linha abaixo:
+
+            ng generate component stock/stock-item            
+
+            # O comando angularCli apresentará o seguinte resultado na tela
+            # CREATE src/app/stock/stock-item/stock-item.component.css (0 bytes)
+            # CREATE src/app/stock/stock-item/stock-item.component.html (25 bytes)
+            # CREATE src/app/stock/stock-item/stock-item.component.spec.ts (621 bytes)
+            # CREATE src/app/stock/stock-item/stock-item.component.ts (217 bytes)
+            # UPDATE src/app/app.module.ts (495 bytes)
+
+        . Altere o componente "stock-item.component.ts" como abaixo:
+
+            import { Component, OnInit } from '@angular/core';      // Acrescente no import a interface "OnInit"
+
+            @Component({
+                selector: 'app-stock-item',
+                templateUrl: './stock-item.component.html',
+                styleUrls: ['./stock-item.component.css']
+            })
+
+            export class StockItemComponent implements OnInit {     // Implemente a interface "OnInit"
+                public name!: string;                               // Implemente as propriedades
+                public code!: string;                               // Implemente as propriedades
+                public price!: number;                              // Implemente as propriedades
+                public previousPrice!: number;                      // Implemente as propriedades
+
+                ngOnInit(): void {                                  // Crie o método "ngOnInit" da interface "OnInit"
+                    this.name = "Test Stock Company";               // Atualize os valores das propriedades
+                    this.code = "TSC"                               // Atualize os valores das propriedades
+                    this.price = 85;                                // Atualize os valores das propriedades
+                    this.previousPrice = 80;                        // Atualize os valores das propriedades
+                }
+            }
+
+        . Altere o conteúdo do componente "stock-item.component.html" com o conteúdo abaixo:
+
+            <h1>Welcome to app!</h1>
+            <div class="stock-container">
+                <div class="name">
+                    <h3>{{name}}</h3> - <h4>({{code}})</h4>
+                </div>
+                <div class="price">$ {{price}}</div>
+            </div>
+
+        . Atualize o conteúdo do componente "stock-item.component.css" com o conteúdo abaixo:
+
+            .stock-container {
+                border: 1px solid black;
+                border-radius: 5px;
+                display: inline-block;
+                padding: 10px;
+            }
+
+            .stock-container .name h3,
+            .stock-container .name h4 {
+                display: inline-block;
+            }
+
+        . Atualize o conteúdo do componente "app.component.ts" com a linha abaixo:
+
+            <app-stock-item></app-stock-item>
+
+        . Execute o projeto com o comando abaixo:
+
+            ng s -o       
+
+    . Mudanças feitas no arquivo "app.module.ts" automaticamente, após a geranção do componentes "stock-item":
+
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+        import { StockItemComponent } from './stock/stock-item/stockitem.component';    // Linha inserida
+
+        @NgModule({
+            declarations: [
+                AppComponent,
+                StockItemComponent                                                      // Linha inserida
+            ],
+            imports: [
+                BrowserModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+        })
+
+        export class AppModule { }
+
+    . Entendimento do que foi feito:
+
+        . Componente criado "stock-item.component.ts"
+
+        import { Component, OnInit } from '@angular/core';
+
+        @Component({
+            selector: 'app-stock-item',                         //  seletor do componente, utilizado para identificar o componente no HTML.
+            templateUrl: './stock-item.component.html',
+            styleUrls: ['./stock-item.component.css']
+        })
+
+        export class StockItemComponent implements OnInit {
+            constructor() { }
+            
+            ngOnInit() {
+            }
+        }
+
+        . Bibliotecas utilizadas
+
+            . Bibliotecas criadas automaticamente na criação do projeto:
+
+                . NgModule
+
+                    . Um módulo é definido usando o decorator @NgModule, que recebe um objeto com várias propriedades:
+
+                        . declarations: lista de componentes, diretivas e pipes que fazem parte do módulo
+                        . imports: lista de módulos que são importados pelo módulo atual
+                        . providers: lista de serviços que são fornecidos pelo módulo
+                        . bootstrap: lista de componentes que são carregados inicialmente quando o módulo é iniciado
+
+                    . A biblioteca NgModule serve para:
+
+                        . Organizar a aplicação em módulos independentes e reutilizáveis
+                        . Fornecer uma forma de gerenciar as dependências entre os componentes e serviços
+                        . Habilitar a funcionalidade de lazy loading, que permite carregar módulos apenas quando necessário
+
+                . BrowserModule
+
+                    . Fornece o mecanismo de renderização para o navegador
+
+                    . Habilita a funcionalidade de roteamento
+
+                    . Fornece serviços para trabalhar com o DOM (Document Object Model)
+
+                    . Habilita a funcionalidade de eventos do navegador
+
+3. Data Binding
+----------------
+
+    . Fonte de pesquisa:
+
+        https://www.tutorialspoint.com/angular8/angular8_data_binding.htm
+
+    . É uma técnica fundamental no Angular que permite ligar os dados do componente à view, de forma que os 
+        dados sejam atualizados automaticamente quando o componente é atualizado.
+
+    . Vantagens
+
+        . Atualização automática
+
+        . Redução de código
+
+        . Melhoria na manutenção.
+
+    . Desvantagens
+
+        . Complexidade
+
+        . Desempenho, se for utilizado incorretamente.
+
+    . O data binding pode ser feito de duas forma:
+
+        . One-way - É uma interação unidirecional entre o componente e seu modelo. Se você executar qualquer 
+                    alteração em seu componente, ele refletirá os elementos HTML.
+
+        . Two-way - É uma interação bidirecional, os dados fluem em ambas as direções (do componente para as 
+                    visualizações e das visualizações para o componente)
+
+    . One-way Data Binding
+
+        . Interpolação: {{nome}} - onde nome é uma propriedade do componente, entre {{ }}
+
+            // *.component.ts
+            export class TestComponent implements OnInit { 
+                appName = "My first app in Angular 4"; 
+            }
+
+            // *.component.html 
+            <h1>{{appName}}</h1>            
+
+            // app.component.html
+            <app-test></app-test>
+
+        . Event Binding: (evento)="função do componente Angular", onde o evento é nome do evento do elemento 
+                            HTML: click(), hover(), doubleClick(), etc, que será associado ao método do componente Angular:
+
+            // *.component.ts
+            export class TestComponent { 
+                showData(event: any){ 
+                    console.log("button is clicked!"); if(event) { 
+                        console.log(event.target); 
+                        console.log(event.target.value); 
+                    } 
+                } 
+            }
+
+            // *.component.html
+            <h2>Event Binding</h2> 
+            <button (click)="showData($event)">Click here</button>
+
+
+            // ou podemos utilizar o prefixo "on" + o nome do evento
+
+            <button on-click="showData($event)">Click here</button>
+
+        . Property binding: [property]="valor propriedade" - utilizado para ligar o dado de uma propriedade de um componente para 
+                            o elemento DOM, onde "property" seria a propriedade do elemento: disabled, autocomplete, required, etc; e
+                            o "valor da propriedade" seria o valor necessário da propriedade: true/false, 50, etc.
+
+            // *.component.ts
+            export class TestComponent { 
+                userName:string = "Peter"; 
+            }
+
+            // *.component.html
+            // userName property is bind to an attribute of a DOM element <input> tag
+            <input type="text" [value]="userName" [disabled]="true" >
+
+
+        . ngModel - uando você usa ngModel sem o símbolo [] ou () em torno dele, ele funciona de forma unidirecional. Isso significa que o 
+                    valor do elemento de formulário é atualizado automaticamente na propriedade do componente, mas o valor da propriedade do 
+                    componente não é atualizado automaticamente no elemento de formulário.
+
+            <input type="text" ngModel="nome">
+            
+            <!-- 
+                Nesse caso, quando o usuário digita algo no formulário, o valor é atualizado automaticamente na propriedade nome do componente. 
+                 No entanto, se você atualizar a propriedade nome do componente em algum lugar do seu código, o valor não será atualizado 
+                 automaticamente no formulário.
+            --!>
+
+        . Variáveis de referência - são usadas para vincular um elemento do template a uma variável no componente. Isso permite que você acesse o 
+                                    elemento do template no componente e faça operações com ele.
+
+            . As variáveis de referência são definidas no template usando o símbolo # seguido do nome da variável. Por exemplo:
+
+                <input #nome type="text">
+
+            . A variável de referência nome é definida e vinculada ao elemento input do tipo text.
+
+                . No componente, você pode acessar a variável de referência usando o nome da variável. Por exemplo:
+
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-example',
+                        template: `
+                                <input #nome type="text">
+                                <button (click)="mostrarValor(nome.value)">Mostrar valor</button>
+                            `
+                    })
+                    export class ExampleComponent {
+                        mostrarValor(valor: string) {
+                            console.log(valor);
+                        }
+                    }
+
+        . Attribute binding: [attr:attribute name]="Nome da Propriedade do Componente" - é usado para ligar o dado de um componente para o 
+                            atributo HTML:
+
+            // *.component.ts
+            import { Component } from '@angular/core';  // Obrigatório importação do "Component"
+
+            @Component({
+                selector: 'app-root',
+                templateUrl: './app.component.html',
+                styleUrls: ['./app.component.css']
+            })
+
+            export class AppComponent {
+
+                // Declaração das propriedade para ser usado nos Attribute Binding
+                titulo = 'Este é um exemplo de Attribute Binding';
+                isDisabled = true;
+                placeholder = 'Digite seu nome';
+                estilo = 'color: blue; font-size: 24px;';
+                classe = 'exemplo-classe';
+
+                acao() {
+                    console.log('Botão clicado!');
+                }
+            }
+
+            // *.component.html
+            <div [attr.title]="titulo">Este é um exemplo de Attribute Binding</div>
+
+            <button (click)="acao()" [attr.disabled]="isDisabled">Clique aqui</button>
+
+            <input [attr.placeholder]="placeholder" type="text">
+
+            <div [attr.style]="estilo">Este é um exemplo de Attribute Binding</div>
+
+            <div [attr.class]="classe">Este é um exemplo de Attribute Binding</div>
+
+        . Class binding é usado para ligar o dado do componente para a propriedade class do HTML:
+
+            // *.component.ts
+            export class TestComponent { 
+                myCSSClass = "red"; 
+                applyCSSClass = false; 
+            }
+
+            // *.component.html
+            <p [class]="myCSSClass">This paragraph class comes from *myClass* property </p> 
+            <p [class.blue]="applyCSSClass">This paragraph class does not apply</p>
+
+        . Style binding  é usado para ligar o dado do componente para a propriedade de estilo do HTML:
+
+            // *.component.ts
+            export class TestComponent { 
+                myColor = 'brown';
+            }
+
+            // *.component.html
+            <p [style.color]="myColor">Text color is styled using style binding</p>            
+
+    . Two-way data binding
+
+        . [(ngModel)] -  permite a vinculação bidirecional dos dados entre o modelo e a view
+
+            . Para utilizar o "ngModel" é necessário importar a biblioteca "FormsModule" no componente responsável 
+                pelo módulo, por exemplo: "app.module.ts"
+
+                import { FormsModule } from '@angular/forms';  // Importação aqui
+
+                @NgModule({ 
+                    imports: [ 
+                        BrowserModule, 
+                        FormsModule                             // e aqui
+                    ] 
+                }) 
+                export class AppModule { }                    
+
+
+            Exemplo 1
+
+                // *.component.ts
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+                export class AppComponent {
+                    nome = 'João';
+                }
+
+                // *.component.html
+                <input type="text" [(ngModel)]="nome">
+                <p>Olá, {{ nome }}!</p>
+
+            Exemplo 2
+
+                // *.component.ts
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+                export class AppComponent {
+                    cor = 'azul';
+                }
+
+
+                // *.component.html
+                <select [(ngModel)]="cor">
+                    <option value="vermelho">Vermelho</option>
+                    <option value="azul">Azul</option>
+                    <option value="verde">Verde</option>
+                </select>
+                <p>A cor selecionada é: {{ cor }}</p>
+
+            Exemplo 3
+
+                // *.component.ts
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+                export class AppComponent {
+                    aceito = false;
+                }
+
+
+                // *.component.html
+                <input type="checkbox" [(ngModel)]="aceito">
+                <p>Você aceitou os termos? {{ aceito }}</p>
+
+            Exemplo 4
+
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+                export class AppComponent {
+                    opcao = 'opcao1';
+                }
+
+                <input type="radio" [(ngModel)]="opcao" value="opcao1"> Opção 1
+                <input type="radio" [(ngModel)]="opcao" value="opcao2"> Opção 2
+                <p>A opção selecionada é: {{ opcao }}</p>
+
+    . Demo - Property Bind
+
+        . Altere o componenete "stock-item.component.ts" como abaixo:
+
+            import { Component, OnInit } from '@angular/core';
+                @Component({
+                    selector: 'app-stock-item',
+                    templateUrl: './stock-item.component.html',
+                    styleUrls: ['./stock-item.component.css']
+                })
+
+                export class StockItemComponent implements OnInit {
+                    public name!: string;
+                    public code!: string;
+                    public price!: number;
+                    public previousPrice!: number;
+                    public positiveChange!: boolean;                 // Linha inserida
+
+                    constructor() { }
+
+                    ngOnInit() {
+                        this.name = 'Test Stock Company';
+                        this.code = 'TSC';
+                        this.price = 85;
+                        this.previousPrice = 80;
+                        this.positiveChange = this.price >= this.previousPrice;     // Linha inserida
+                    }
+            }        
+
+        . Insira as linhas abaixo no arquivo "stock-item.component.css":
+
+            ...
+            .positive {
+                color: green;
+            } 
+            .negative {
+                color: red;
+            }
+
+        . Insira as linhas abaixo no arquivo "stock-item.component.html"
+
+            <div class="stock-container">
+                <div class="name">
+                    <h3>{{name}}</h3> - <h4>({{code}})</h4>
+                </div>
+                <div class="price">$ {{price}}</div>
+
+                    <!-- DIV alterada -->
+                    <div class="price"
+                        [class]="positiveChange ? 'positive' : 'negative'">$40{{price}}
+                    </div>
+                    <!-- Fim da alteração -->
+                </div>            
+            </div>            
+
+        . Execute o projeto e veja o resultado:
+
+            ng s -o
+
+    . Demo - Property Event
+
+        . Crie as linhas abaixo na classe "stock-item.component.ts"
+
+
+            export class StockItemComponent implements OnInit {
+                ...
+                public favorite: boolean;           // Propriedade criada
+                
+                constructor() { }
+                ...
+
+                // Método criado
+                toggleFavorite() {
+                    console.log('We are toggling the favorite state for this stock');
+                    this.favorite = !this.favorite;
+                }
+            }
+
+        . Crie as linhas abaixo na no arquivo "stock-item.component.html"
+
+            <div class="stock-container">
+                <div class="name">{{name + ' (' + code + ')'}}</div>
+                    <div    class="price"
+                            [class]="positiveChange ? 'positive' : 'negative'">
+                        $ {{price}}
+                    </div>
+
+                    <!-- Button Criado -->
+                    <button (click)="toggleFavorite()"
+                            [disabled]="favorite">
+                        Add to Favorite
+                    </button>
+            </div>        
+
+        . Execute o projeto e veja o resultado:
+
+            ng s -o
+
+        . Envio do evento disparado
+
+            . Inclua o envio do evento como abaixo na classe "stock-item.component.ts"
+
+                export class StockItemComponent implements OnInit {
+                    ...
+                    public favorite: boolean;           // Propriedade criada
+                    
+                    constructor() { }
+                    ...
+
+                    // Inclua na assinatura do método o parâmetro "evento"
+                    toggleFavorite( event: any ) {
+                        console.log('We are toggling the favorite state for this stock', event);       // Altere a linha
+                        this.favorite = !this.favorite;
+                    }
+                }
+
+            . Crie as linhas abaixo na no arquivo "stock-item.component.html"
+
+                <div class="stock-container">
+                    <div class="name">{{name + ' (' + code + ')'}}</div>
+                        <div    class="price"
+                                [class]="positiveChange ? 'positive' : 'negative'">
+                            $ {{price}}
+                        </div>
+
+                        <!-- Adicione o parâmetro $event na chamada do método -->
+                        <button (click)="toggleFavorite( $event )"
+                                [disabled]="favorite">
+                            Add to Favorite
+                        </button>
+                </div>        
+
+. Página 49. Using Models for Cleaner Code
+
+
+página 47
+
+
+
+
+
+
+
+
+    . A tag "<router-outlet>" age como um marcador para onde a rota carregada deve ser exibida na interface. Basicamente, 
+        é uma área reservada no DOM que indica ao Angular Router onde ele deve renderizar os componentes com base nas rotas 
+        configuradas. 
+
+        . Com base na URL e na configuração da URL vs componente associado, o angular irá renderizar o conteúdo no lugar 
+            da tag <router-outlet>. Por exemplo:
+
+                                        Apontar para                            Associado ao html
+            http:///localhome:4200/     ------------->  WeatherHomeComponent    ------------------>     weather-home.component.html
+                    |                                                                                               ^
+                    V                                                                                               |
+                Quando essa URL é chamada o <router-outlet> renderizará a página -----------------------------------+
+
+    . Bibliotecas utilizadas
+
+        . Bibliotecas criadas automaticamente na criação do projeto:
+
+            . NgModule
+
+                . Um módulo é definido usando o decorator @NgModule, que recebe um objeto com várias propriedades:
+
+                    . declarations: lista de componentes, diretivas e pipes que fazem parte do módulo
+                    . imports: lista de módulos que são importados pelo módulo atual
+                    . providers: lista de serviços que são fornecidos pelo módulo
+                    . bootstrap: lista de componentes que são carregados inicialmente quando o módulo é iniciado
+
+                . A biblioteca NgModule serve para:
+
+                    . Organizar a aplicação em módulos independentes e reutilizáveis
+                    . Fornecer uma forma de gerenciar as dependências entre os componentes e serviços
+                    . Habilitar a funcionalidade de lazy loading, que permite carregar módulos apenas quando necessário
+
+            . BrowserModule
+
+                . Fornece o mecanismo de renderização para o navegador
+
+                . Habilita a funcionalidade de roteamento
+
+                . Fornece serviços para trabalhar com o DOM (Document Object Model)
+
+                . Habilita a funcionalidade de eventos do navegador
+
+            . AppRoutingModule
+
+                . O AppRoutingModule é um módulo que contém as configurações de roteamento da aplicação. 
+                    Ele é responsável por:
+
+                    . Definir as rotas da aplicação
+
+                    . Associar URLs a componentes específicos
+
+                    . Configurar parâmetros de rota
+
+                    . Habilitar a navegação entre as rotas
+
+        . Bibliotecas adicionais
+
+            . BrowserAnimationsModule
+
+                . Fornece as funcionalidades de animação para os componentes da aplicação
+
+                . Habilita as animações de transição entre as vistas da aplicação
+
+                . Permiti que os desenvolvedores criem efeitos de transição personalizados
+
+                . Com a BrowserAnimationsModule, os desenvolvedores podem criar animações de transição 
+                    para os componentes da aplicação, como:
+
+                    . Animações de entrada e saída de componentes
+
+                    . Animações de transição entre as vistas da aplicação
+
+                    . Animações de mudança de estado dos componentes
+
+            . HttpClientModule -  serve para fazer requisições HTTP a partir da aplicação
+
+                . Fornece uma API simples e fácil de usar para fazer requisições HTTP
+
+                . Faz requisições HTTP para APIs externas ou para APIs dentro da própria aplicação
+
+                . Manipula os dados recebidos das requisições HTTP
+
+                . Trata erros e exceções relacionadas às requisições HTTP
+
+            . FormsModule -  serve para fornecer funcionalidades de formulários para a aplicação
+
+                . Fornece diretivas para criar e gerenciar formulários
+
+                . Permiti a validação de dados de formulário
+
+                . Fornece funcionalidades de binding de dados para formulários
+
+                . Fornece diretivas, como:
+
+                    . ngModel: diretiva para criar um binding de dados entre um formulário e um componente
+
+                    . ngForm: diretiva para criar um formulário e gerenciar os dados de formulário
+
+                    . ngFormGroup: diretiva para criar um grupo de formulários e gerenciar os dados de formulário
+
+                    . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário
+
+                    . ngFormArray: diretiva para criar um array de formulários e gerenciar os dados de formulário                
+
+    . Demo
+
