@@ -693,17 +693,9 @@ Angular - Up and Running ( O-Reilly )
                 // app.component.html
                 <app-test></app-test>
 
-            . Class binding é usado para ligar o dado do componente para a propriedade class do HTML:
 
-                // *.component.ts
-                export class TestComponent { 
-                    myCSSClass = "red"; 
-                    applyCSSClass = false; 
-                }
 
-                // *.component.html
-                <p [class]="myCSSClass">This paragraph class comes from *myClass* property </p> 
-                <p [class.blue]="applyCSSClass">This paragraph class does not apply</p>
+
 
             . Style binding  é usado para ligar o dado do componente para a propriedade de estilo do HTML:
 
@@ -872,7 +864,202 @@ Angular - Up and Running ( O-Reilly )
                         </div>        
 
 
+PAREI AQUI - Desenvolver o ponto abaixo
+
 . Página 49. Using Models for Cleaner Code
+
+
+        . Diretivas de atributos
+
+            . [ngClass] e [class] binding é usado para ligar o dado do componente para a propriedade class do HTML:
+
+                . ngClass
+
+                    . Usada para adicionar ou remover classes CSS dinamicamente em um elemento HTML com base em uma condição ou expressão.
+
+                        // *.component.html
+                        <div [ngClass]="{'ativo': isAtivo, 'desabilitado': isDesabilitado}">
+                          <p>Texto do componente</p>
+                          <button (click)="toggleAtivo()">Toggle Ativo</button>
+                          <button (click)="toggleDesabilitado()">Toggle Desabilitado</button>
+                        </div>
+
+                        // *.component.css
+                        .ativo {
+                          background-color: #007bff;
+                          color: #fff;
+                          padding: 10px 20px;
+                        }
+                        
+                        .desabilitado {
+                          background-color: #6c757d;
+                          color: #fff;
+                          padding: 10px 20px;
+                          opacity: 0.5;
+                        }
+
+                        // *.component.ts
+                        import { Component } from '@angular/core';
+                        
+                        @Component({
+                          selector: 'app-ngclass-example',
+                          templateUrl: './ngclass-example.component.html',
+                          styleUrls: ['./ngclass-example.component.css']
+                        })
+                        export class NgClassExampleComponent {
+                          isAtivo = true;
+                          isDesabilitado = false;
+                        
+                          toggleAtivo() {
+                            this.isAtivo = !this.isAtivo;
+                          }
+                        
+                          toggleDesabilitado() {
+                            this.isDesabilitado = !this.isDesabilitado;
+                          }
+                        }
+
+                        // app.component.html 
+                        <app-ngclass-example></app-ngclass-example>
+
+                    . Nesse exemplo, temos um componente que possui uma div com a diretiva ngClass que aplica as classes 
+                        CSS ativo e desabilitado com base nas propriedades isAtivo e isDesabilitado. Quando o botão 
+                        "Toggle Ativo" é clicado, a propriedade isAtivo é alternada e a classe CSS ativo é aplicada 
+                        ou removida. Da mesma forma, quando o botão "Toggle Desabilitado" é clicado, a propriedade 
+                        isDesabilitado é alternada e a classe CSS desabilitado é aplicada ou removida.
+
+
+                                                                                                // *.component.ts
+                                                                                                import { Component } from '@angular/core';
+                                                                                                ...
+                                                                                                export class NgClassExampleComponent {
+                                                                                                    isAtivo = true;
+                                                +---------------------------+-------------->        isDesabilitado = false;
+                                                |                           |                        ...
+                                                |                           |                   }
+                                                |                           |
+                                                |                           |
+                        [ngClass]="{'ativo': isAtivo, 'desabilitado': isDesabilitado}">
+                                        |                   |
+                                        +-------------------+------------------------------>    // *.component.css
+                                                                                                .ativo {
+                                                                                                    ...
+                                                                                                }
+                                                                                                
+                                                                                                .desabilitado {
+                                                                                                    ...
+                                                                                                }
+
+                . class
+
+                    . Usada para adicionar ou remover classes CSS de um elemento HTML. Ela é uma diretiva de ligação de propriedade 
+                        que permite vincular uma expressão a uma classe CSS.
+
+                        // *.component.css
+                        .ativo {
+                          background-color: #ccc;
+                          color: #333;
+                        }
+
+                        // *.component.html
+                        <div [class]="ativo ? 'ativo' : ''">Este é um elemento</div>
+
+                        // *.component.ts
+                        import { Component } from '@angular/core';
+                        
+                        @Component({
+                          selector: 'app-exemplo',
+                          templateUrl: './exemplo.component.html',
+                          styleUrls: ['./exemplo.component.css']
+                        })
+                        export class ExemploComponent {
+                          ativo = true;
+                        }
+
+                . A diferença entre as diretivas [class] e [ngClass] é que:
+
+                    . [class] - depende somente de uma condição para adicionar/remover um estilo css. Como se fosse um IF/ELSE
+
+                    . [ngClass] - Utiliza um case/switch de opções para encontrar o estilo, como se fosse um CASE/WHEN, ou um SWITCH
+
+                . Use class quando você precisa adicionar ou remover apenas uma classe CSS e a lógica é simples.
+
+                . Use ngClass quando você precisa adicionar ou remover várias classes CSS com base em condições 
+                    diferentes ou quando a lógica é mais complexa.
+
+                . Demo
+
+                    . Adicione as linhas abaixo no stock-item.component.css
+
+                        ...
+                        .large-change {
+                            font-size: 1.2em;
+                        } 
+
+                        .small-change {
+                            font-size: 0.8em;
+                        }   
+
+                    . Adicione as linhas abaixo no stock-item.component.html
+
+                        <div class="stock-container">
+                                <div class="name">{{stock.name + ' (' + stock.code + ')'}}</div>
+                                
+                                <div    class="price"
+                                        [ngClass]="stockClasses">
+                                    $ {{stock.price}}
+                                </div>
+                                
+                                <button (click)="toggleFavorite($event)"
+                                        [disabled]="stock.favorite">
+                                    Add to Favorite
+                                </button>
+                        </div>
+
+                    . Adicione as linhas abaixo no stock-item.component.ts
+
+                        import { Component, OnInit } from '@angular/core';
+                        import { Stock } from '../../model/stock';
+
+                        @Component({
+                            selector: 'app-stock-item',
+                            templateUrl: './stock-item.component.html',
+                            styleUrls: ['./stock-item.component.css']
+                        })
+
+                        export class StockItemComponent implements OnInit {
+                            public stock: Stock;
+                            public stockClasses;        // Linha inserida
+
+                            constructor() { }
+
+                            ngOnInit() {
+                                this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);
+
+                                let diff = (this.stock.price / this.stock.previousPrice) - 1;   // Linha inserida
+                                let largeChange = Math.abs(diff) > 0.01;                        // Linha inserida
+                                this.stockClasses = {                                           // Linha/objeto inserido
+                                    "positive": this.stock.isPositiveChange(),
+                                    "negative": !this.stock.isPositiveChange(),
+                                    "large-change": largeChange,
+                                    "small-change": !largeChange
+                                };
+
+                            } 
+                            toggleFavorite(event) {
+                                console.log('We are toggling the favorite state for this stock', event);
+                                this.stock.favorite = !this.stock.favorite;
+                            }
+                        }                    
+
+
+PAREI AQUI - Desenvolver o ponto abaixo
+            . [ngStyle], [attr...]  
+
+        . Diretivas estruturais
+
+
+
 
 
         . ngModel - uando você usa ngModel sem o símbolo [] ou () em torno dele, ele funciona de forma unidirecional. Isso significa que o 
