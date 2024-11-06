@@ -664,23 +664,24 @@ Angular - Up and Running ( O-Reilly )
 
     . One-way Data Binding
 
+        . Data binding é uma técnica, onde o dado fica sincronizado entre o componente e a visão.
 
-        . Property binding: [property]="valor propriedade" - utilizado para ligar o dado de uma propriedade de um componente para 
-                            o elemento DOM, onde "property" seria a propriedade do elemento: disabled, autocomplete, required, etc; e
-                            o "valor da propriedade" seria o valor necessário da propriedade: true/false, 50, etc.
+        . Essa técnica é dividida em 6 grupos:
 
-            . Exemplo
+            . Property binding: [property]="valor propriedade" - utilizado para ligar o dado de uma propriedade de um componente para 
+                                o elemento DOM, onde "property" seria a propriedade do elemento: disabled, autocomplete, required, etc; e
+                                o "valor da propriedade" seria o valor necessário da propriedade: true/false, 50, etc.
 
-                // *.component.ts
-                export class TestComponent { 
-                    userName:string = "Peter"; 
-                }
+                    // *.component.ts
+                    export class TestComponent { 
+                        userName:string = "Peter"; 
+                    }
 
-                // *.component.html
-                // userName property is bind to an attribute of a DOM element <input> tag
-                <input type="text" [value]="userName" [disabled]="true" >
+                    // *.component.html
+                    // userName property is bind to an attribute of a DOM element <input> tag
+                    <input type="text" [value]="userName" [disabled]="true" >
 
-            . Interpolação: {{nome}} - onde nome é uma propriedade do componente, entre {{ }}
+            . String Interpolação: {{nome}} - onde nome é uma propriedade do componente, entre {{ }}
 
                 // *.component.ts
                 export class TestComponent implements OnInit { 
@@ -693,10 +694,6 @@ Angular - Up and Running ( O-Reilly )
                 // app.component.html
                 <app-test></app-test>
 
-
-
-
-
             . Style binding  é usado para ligar o dado do componente para a propriedade de estilo do HTML:
 
                 // *.component.ts
@@ -707,7 +704,78 @@ Angular - Up and Running ( O-Reilly )
                 // *.component.html
                 <p [style.color]="myColor">Text color is styled using style binding</p>            
 
-            . Demo - Property Bind
+            . Event Binding: (evento)="função do componente Angular", onde o evento é nome do evento do elemento 
+                                HTML: click(), hover(), doubleClick(), etc, que será associado ao método do componente Angular:
+
+                // *.component.ts
+                export class TestComponent { 
+                    showData(event: any){ 
+                        console.log("button is clicked!"); if(event) { 
+                            console.log(event.target); 
+                            console.log(event.target.value); 
+                        } 
+                    } 
+                }
+
+                // *.component.html
+                <h2>Event Binding</h2> 
+                <button (click)="showData($event)">Click here</button>
+
+
+                // ou podemos utilizar o prefixo "on" + o nome do evento
+
+                <button on-click="showData($event)">Click here</button>
+
+            . Class binding é usado para ligar o dado do componente para a propriedade class do HTML:
+
+                // *.component.ts
+                export class TestComponent { 
+                    myCSSClass = "red"; 
+                    applyCSSClass = false; 
+                }
+
+                // *.component.html
+                <p [class]="myCSSClass">This paragraph class comes from *myClass* property </p> 
+                <p [class.blue]="applyCSSClass">This paragraph class does not apply</p>
+
+            . Attribute binding: [attr:attribute name]="Nome da Propriedade do Componente" - é usado para ligar o dado de um componente para o 
+                                atributo HTML:
+
+                // *.component.ts
+                import { Component } from '@angular/core';  // Obrigatório importação do "Component"
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+
+                export class AppComponent {
+
+                    // Declaração das propriedade para ser usado nos Attribute Binding
+                    titulo = 'Este é um exemplo de Attribute Binding';
+                    isDisabled = true;
+                    placeholder = 'Digite seu nome';
+                    estilo = 'color: blue; font-size: 24px;';
+                    classe = 'exemplo-classe';
+
+                    acao() {
+                        console.log('Botão clicado!');
+                    }
+                }
+
+                // *.component.html
+                <div [attr.title]="titulo">Este é um exemplo de Attribute Binding</div>
+
+                <button (click)="acao()" [attr.disabled]="isDisabled">Clique aqui</button>
+
+                <input [attr.placeholder]="placeholder" type="text">
+
+                <div [attr.style]="estilo">Este é um exemplo de Attribute Binding</div>
+
+                <div [attr.class]="classe">Este é um exemplo de Attribute Binding</div>
+
+        . Demo - Property Binding
 
                 . Altere o componenete "stock-item.component.ts" como abaixo:
 
@@ -766,34 +834,48 @@ Angular - Up and Running ( O-Reilly )
 
                     ng s -o
 
-        . Event Binding: (evento)="função do componente Angular", onde o evento é nome do evento do elemento 
-                            HTML: click(), hover(), doubleClick(), etc, que será associado ao método do componente Angular:
+        . Demo - Event Binding
 
-            . Exemplo
+            . Crie as linhas abaixo na classe "stock-item.component.ts"
 
-                // *.component.ts
-                export class TestComponent { 
-                    showData(event: any){ 
-                        console.log("button is clicked!"); if(event) { 
-                            console.log(event.target); 
-                            console.log(event.target.value); 
-                        } 
-                    } 
+
+                export class StockItemComponent implements OnInit {
+                    ...
+                    public favorite: boolean;           // Propriedade criada
+                    
+                    constructor() { }
+                    ...
+
+                    // Método criado
+                    toggleFavorite() {
+                        console.log('We are toggling the favorite state for this stock');
+                        this.favorite = !this.favorite;
+                    }
                 }
 
-                // *.component.html
-                <h2>Event Binding</h2> 
-                <button (click)="showData($event)">Click here</button>
+            . Crie as linhas abaixo na no arquivo "stock-item.component.html"
 
+                <div class="stock-container">
+                    <div class="name">{{name + ' (' + code + ')'}}</div>
+                        <div    class="price"
+                                [class]="positiveChange ? 'positive' : 'negative'">
+                            $ {{price}}
+                        </div>
 
-                // ou podemos utilizar o prefixo "on" + o nome do evento
+                        <!-- Button Criado -->
+                        <button (click)="toggleFavorite()"
+                                [disabled]="favorite">
+                            Add to Favorite
+                        </button>
+                </div>        
 
-                <button on-click="showData($event)">Click here</button>
+            . Execute o projeto e veja o resultado:
 
-            . Demo - Property Event
+                ng s -o
 
-                . Crie as linhas abaixo na classe "stock-item.component.ts"
+            . Envio do evento disparado
 
+                . Inclua o envio do evento como abaixo na classe "stock-item.component.ts"
 
                     export class StockItemComponent implements OnInit {
                         ...
@@ -802,9 +884,9 @@ Angular - Up and Running ( O-Reilly )
                         constructor() { }
                         ...
 
-                        // Método criado
-                        toggleFavorite() {
-                            console.log('We are toggling the favorite state for this stock');
+                        // Inclua na assinatura do método o parâmetro "evento"
+                        toggleFavorite( event: any ) {
+                            console.log('We are toggling the favorite state for this stock', event);       // Altere a linha
                             this.favorite = !this.favorite;
                         }
                     }
@@ -818,52 +900,14 @@ Angular - Up and Running ( O-Reilly )
                                 $ {{price}}
                             </div>
 
-                            <!-- Button Criado -->
-                            <button (click)="toggleFavorite()"
+                            <!-- Adicione o parâmetro $event na chamada do método -->
+                            <button (click)="toggleFavorite( $event )"
                                     [disabled]="favorite">
                                 Add to Favorite
                             </button>
                     </div>        
 
-                . Execute o projeto e veja o resultado:
-
-                    ng s -o
-
-                . Envio do evento disparado
-
-                    . Inclua o envio do evento como abaixo na classe "stock-item.component.ts"
-
-                        export class StockItemComponent implements OnInit {
-                            ...
-                            public favorite: boolean;           // Propriedade criada
-                            
-                            constructor() { }
-                            ...
-
-                            // Inclua na assinatura do método o parâmetro "evento"
-                            toggleFavorite( event: any ) {
-                                console.log('We are toggling the favorite state for this stock', event);       // Altere a linha
-                                this.favorite = !this.favorite;
-                            }
-                        }
-
-                    . Crie as linhas abaixo na no arquivo "stock-item.component.html"
-
-                        <div class="stock-container">
-                            <div class="name">{{name + ' (' + code + ')'}}</div>
-                                <div    class="price"
-                                        [class]="positiveChange ? 'positive' : 'negative'">
-                                    $ {{price}}
-                                </div>
-
-                                <!-- Adicione o parâmetro $event na chamada do método -->
-                                <button (click)="toggleFavorite( $event )"
-                                        [disabled]="favorite">
-                                    Add to Favorite
-                                </button>
-                        </div>        
-
-        . Classe Models no desenvolvimento 
+        . Models Class no desenvolvimento 
 
             . A utilização de "Models Class" auxilia na clareza do código.
 
@@ -910,99 +954,100 @@ Angular - Up and Running ( O-Reilly )
                 . Polimorfismo: As classes modelos podem ser polimórficas, o que permite que as mesmas propriedades e métodos 
                     sejam utilizados de forma diferente em diferentes contextos.
 
-            . Demo
+        . Demo (Models Class)
 
-                . Execute o comando abaixo na pasta raiz do projeto
+            . Execute o comando abaixo na pasta raiz do projeto
 
-                    ng generate class model/stock
+                ng generate class model/stock
 
-                . Adapte a classe model criada conforme abaixo:
+            . Adapte a classe model criada conforme abaixo:
 
-                    export class Stock {
-                        favorite: boolean = false;
-                        constructor(public name: string,
-                        public code: string,
-                        public price: number,
-                        
-                        public previousPrice: number) {}
-                            isPositiveChange(): boolean {
-                            return this.price >= this.previousPrice;
-                        }
+                export class Stock {
+                    favorite: boolean = false;
+
+                    constructor(public name: string,
+                                public code: string,
+                                public price: number,
+                                public previousPrice: number) {}
+
+                    isPositiveChange(): boolean {
+                        return this.price >= this.previousPrice;
                     }
+                }
 
-                . Altere o código do componente "stock-item.component.ts" como abaixo:
+            . Altere o código do componente "stock-item.component.ts" como abaixo:
 
-                    import { Component, OnInit } from '@angular/core';
-                    import { Stock } from '../../model/stock';                  // Linha inserida
+                import { Component, OnInit } from '@angular/core';
+                import { Stock } from '../../model/stock';                  // Linha inserida
 
-                    @Component({
-                        selector: 'app-stock-item',
-                        templateUrl: './stock-item.component.html',
-                        styleUrls: ['./stock-item.component.css']
-                    })
+                @Component({
+                    selector: 'app-stock-item',
+                    templateUrl: './stock-item.component.html',
+                    styleUrls: ['./stock-item.component.css']
+                })
 
-                    export class StockItemComponent implements OnInit {
-                        /*                                                      Linhas eliminadas
-                            public name!: string;
-                            public code!: string;
-                            public price!: number;
-                            public previousPrice!: number;
-                            public positiveChange!: boolean;                 
-                            public favorite!: boolean;                       
+                export class StockItemComponent implements OnInit {
+                    /*                                                      Linhas eliminadas
+                        public name!: string;
+                        public code!: string;
+                        public price!: number;
+                        public previousPrice!: number;
+                        public positiveChange!: boolean;                 
+                        public favorite!: boolean;                       
+                    */
+
+                    public stock!: Stock;                                           // Linha Inserida
+
+                    constructor() { }
+                    
+                    ngOnInit() {
+                        /*                                                          Linhas eliminadas
+                            this.name = "Test Stock Company";
+                            this.code = "TSC"
+                            this.price = 85;
+                            this.previousPrice = 80;
+                            this.positiveChange = this.price >= this.previousPrice;     // Linha inserida
                         */
 
-                        public stock!: Stock;                                           // Linha Inserida
-
-                        constructor() { }
-                        
-                        ngOnInit() {
-                            /*                                                          Linhas eliminadas
-                                this.name = "Test Stock Company";
-                                this.code = "TSC"
-                                this.price = 85;
-                                this.previousPrice = 80;
-                                this.positiveChange = this.price >= this.previousPrice;     // Linha inserida
-                            */
-
-                            this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);    // Linha inserida
-                        } 
-                        
-                        toggleFavorite(event) {
-                            console.log('We are toggling the favorite state for this stock', event);
-
-                            // this.favorite = !this.favorite;                              // Linha eliminada
-
-
-                            this.stock.favorite = !this.stock.favorite;                     // Linha inserida
-                        }
-                    }
-
-                . Altere o código do componente "stock-item.component.html" como abaixo:
-
-                    <div class="stock-container">
-                        <div class="name">
-                            {{stock.name + ' (' + stock.code + ')'}}            <!-- Linha alterada -->
-                        </div>
+                        this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);    // Linha inserida
+                    } 
                     
-                        <!-- Div inteira alterada -->
-                        <div class="price"                                      
-                            [class]="stock.isPositiveChange() ? 'positive' :
-                                                                'negative'">    
-                            $ {{stock.price}}
-                        </div>
+                    toggleFavorite(event) {
+                        console.log('We are toggling the favorite state for this stock', event);
 
-                        <!-- Div alterada -->
-                        <button (click)="toggleFavorite($event)"
-                                [disabled]="stock.favorite">
-                            Add to Favorite
-                        </button>
+                        // this.favorite = !this.favorite;                              // Linha eliminada
+
+
+                        this.stock.favorite = !this.stock.favorite;                     // Linha inserida
+                    }
+                }
+
+            . Altere o código do componente "stock-item.component.html" como abaixo:
+
+                <div class="stock-container">
+                    <div class="name">
+                        {{stock.name + ' (' + stock.code + ')'}}            <!-- Linha alterada -->
+                    </div>
+                
+                    <!-- Div inteira alterada -->
+                    <div class="price"                                      
+                        [class]="stock.isPositiveChange() ? 'positive' :
+                                                            'negative'">    
+                        $ {{stock.price}}
                     </div>
 
-                . Execute o projeto e veja o resultado está funcionando como antes:
+                    <!-- Div alterada -->
+                    <button (click)="toggleFavorite($event)"
+                            [disabled]="stock.favorite">
+                        Add to Favorite
+                    </button>
+                </div>
 
-                    ng s -o
+            . Execute o projeto e veja o resultado está funcionando como antes:
 
-        . Diretivas de atributos
+                ng s -o
+
+        . Class Binding
 
             . [ngClass] e [class] binding é usado para ligar o dado do componente para a propriedade class do HTML:
 
@@ -1012,44 +1057,44 @@ Angular - Up and Running ( O-Reilly )
 
                         // *.component.html
                         <div [ngClass]="{'ativo': isAtivo, 'desabilitado': isDesabilitado}">
-                          <p>Texto do componente</p>
-                          <button (click)="toggleAtivo()">Toggle Ativo</button>
-                          <button (click)="toggleDesabilitado()">Toggle Desabilitado</button>
+                            <p>Texto do componente</p>
+                            <button (click)="toggleAtivo()">Toggle Ativo</button>
+                            <button (click)="toggleDesabilitado()">Toggle Desabilitado</button>
                         </div>
 
                         // *.component.css
                         .ativo {
-                          background-color: #007bff;
-                          color: #fff;
-                          padding: 10px 20px;
+                            background-color: #007bff;
+                            color: #fff;
+                            padding: 10px 20px;
                         }
                         
                         .desabilitado {
-                          background-color: #6c757d;
-                          color: #fff;
-                          padding: 10px 20px;
-                          opacity: 0.5;
+                            background-color: #6c757d;
+                            color: #fff;
+                            padding: 10px 20px;
+                            opacity: 0.5;
                         }
 
                         // *.component.ts
                         import { Component } from '@angular/core';
                         
                         @Component({
-                          selector: 'app-ngclass-example',
-                          templateUrl: './ngclass-example.component.html',
-                          styleUrls: ['./ngclass-example.component.css']
+                            selector: 'app-ngclass-example',
+                            templateUrl: './ngclass-example.component.html',
+                            styleUrls: ['./ngclass-example.component.css']
                         })
                         export class NgClassExampleComponent {
-                          isAtivo = true;
-                          isDesabilitado = false;
+                            isAtivo = true;
+                            isDesabilitado = false;
                         
-                          toggleAtivo() {
+                            toggleAtivo() {
                             this.isAtivo = !this.isAtivo;
-                          }
+                            }
                         
-                          toggleDesabilitado() {
+                            toggleDesabilitado() {
                             this.isDesabilitado = !this.isDesabilitado;
-                          }
+                            }
                         }
 
                         // app.component.html 
@@ -1090,8 +1135,8 @@ Angular - Up and Running ( O-Reilly )
 
                         // *.component.css
                         .ativo {
-                          background-color: #ccc;
-                          color: #333;
+                            background-color: #ccc;
+                            color: #333;
                         }
 
                         // *.component.html
@@ -1101,12 +1146,12 @@ Angular - Up and Running ( O-Reilly )
                         import { Component } from '@angular/core';
                         
                         @Component({
-                          selector: 'app-exemplo',
-                          templateUrl: './exemplo.component.html',
-                          styleUrls: ['./exemplo.component.css']
+                            selector: 'app-exemplo',
+                            templateUrl: './exemplo.component.html',
+                            styleUrls: ['./exemplo.component.css']
                         })
                         export class ExemploComponent {
-                          ativo = true;
+                            ativo = true;
                         }
 
                 . A diferença entre as diretivas [class] e [ngClass] é que:
@@ -1120,75 +1165,117 @@ Angular - Up and Running ( O-Reilly )
                 . Use ngClass quando você precisa adicionar ou remover várias classes CSS com base em condições 
                     diferentes ou quando a lógica é mais complexa.
 
-                . Demo
+        . Demo - Class Binding "ngClass e class"
 
-                    . Adicione as linhas abaixo no stock-item.component.css
+            . Adicione as linhas abaixo no stock-item.component.css
 
-                        ...
-                        .large-change {
-                            font-size: 1.2em;
-                        } 
+                ...
+                .large-change {
+                    font-size: 1.2em;
+                } 
 
-                        .small-change {
-                            font-size: 0.8em;
-                        }   
+                .small-change {
+                    font-size: 0.8em;
+                }   
 
-                    . Adicione as linhas abaixo no stock-item.component.html
+            . Adicione as linhas abaixo no stock-item.component.html
 
-                        <div class="stock-container">
-                                <div class="name">{{stock.name + ' (' + stock.code + ')'}}</div>
-                                
-                                <div    class="price"
-                                        [ngClass]="stockClasses">           <!-- Div alterada -->
-                                    $ {{stock.price}}
-                                </div>
-                                
-                                <button (click)="toggleFavorite($event)"
-                                        [disabled]="stock.favorite">
-                                    Add to Favorite
-                                </button>
+                <div class="stock-container">
+                        <div class="name">{{stock.name + ' (' + stock.code + ')'}}</div>
+                        
+                        <div    class="price"
+                                [ngClass]="stockClasses">           <!-- Div alterada -->
+                            $ {{stock.price}}
                         </div>
+                        
+                        <button (click)="toggleFavorite($event)"
+                                [disabled]="stock.favorite">
+                            Add to Favorite
+                        </button>
+                </div>
 
-                    . Adicione as linhas abaixo no stock-item.component.ts
+            . Adicione as linhas abaixo no stock-item.component.ts
 
-                        import { Component, OnInit } from '@angular/core';
-                        import { Stock } from '../../model/stock';
+                import { Component, OnInit } from '@angular/core';
+                import { Stock } from '../../model/stock';
 
-                        @Component({
-                            selector: 'app-stock-item',
-                            templateUrl: './stock-item.component.html',
-                            styleUrls: ['./stock-item.component.css']
-                        })
+                @Component({
+                    selector: 'app-stock-item',
+                    templateUrl: './stock-item.component.html',
+                    styleUrls: ['./stock-item.component.css']
+                })
 
-                        export class StockItemComponent implements OnInit {
-                            public stock: Stock;
-                            public stockClasses! = any;        // Linha inserida
+                export class StockItemComponent implements OnInit {
+                    public stock: Stock;
+                    public stockClasses! = any;        // Linha inserida
 
-                            constructor() { }
+                    constructor() { }
 
-                            ngOnInit() {
-                                this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);
+                    ngOnInit() {
+                        this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);
 
-                                let diff = (this.stock.price / this.stock.previousPrice) - 1;   // Linha inserida
-                                let largeChange = Math.abs(diff) > 0.01;                        // Linha inserida
-                                this.stockClasses = {                                           // Linha/objeto inserido
-                                    "positive": this.stock.isPositiveChange(),
-                                    "negative": !this.stock.isPositiveChange(),
-                                    "large-change": largeChange,
-                                    "small-change": !largeChange
-                                };
+                        let diff = (this.stock.price / this.stock.previousPrice) - 1;   // Linha inserida
+                        let largeChange = Math.abs(diff) > 0.01;                        // Linha inserida
+                        this.stockClasses = {                                           // Linha/objeto inserido
+                            "positive": this.stock.isPositiveChange(),
+                            "negative": !this.stock.isPositiveChange(),
+                            "large-change": largeChange,
+                            "small-change": !largeChange
+                        };
 
-                            } 
+                    } 
 
-                            toggleFavorite(event) {
-                                console.log('We are toggling the favorite state for this stock', event);
-                                this.stock.favorite = !this.stock.favorite;
-                            }
-                        }                    
+                    toggleFavorite(event) {
+                        console.log('We are toggling the favorite state for this stock', event);
+                        this.stock.favorite = !this.stock.favorite;
+                    }
+                }                    
 
-                    . Execute o projeto e veja o resultado está funcionando como antes:
+            . Execute o projeto e veja o resultado está funcionando como antes:
 
-                        ng s -o
+                ng s -o
+
+            . Altere o código do componente "stock-item.component.html" com o conteúdo abaixo:
+
+                <div class="stock-container">
+                    <div class="name">
+                        {{stock.name + ' (' + stock.code + ')'}} 
+                    </div>
+
+                                        <!--                Atributo alterado                   -->
+                    <div class="price"  [class]="stock.isPositiveChange() ? 'positive' : 'negative'"> 
+                        $ {{stock.price}}
+                    </div>
+
+                    <button (click)="toggleFavorite($event)" [disabled]="stock.favorite">
+                        Add to Favorite
+                    </button>
+
+                </div>
+
+            . Execute o projeto e veja o resultado está funcionando como antes:
+
+                ng s -o
+
+            . Altere o código do componente "stock-item.component.html" com o conteúdo abaixo:
+
+                <div class="stock-container">
+                    <div class="name">
+                        {{stock.name + ' (' + stock.code + ')'}} 
+                    </div>
+
+                                        <!--                Atributo alterado                   -->
+                    <div class="price"  [class.positive]="stock.isPositiveChange()" [class.negative]="!stock.isPositiveChange()"  >  <!-- [ngStyle]="stockStyles"> --> <!-- Div alterada -->
+                        $ {{stock.price}}
+                    </div>
+
+                    <button (click)="toggleFavorite($event)" [disabled]="stock.favorite">
+                        Add to Favorite
+                    </button>
+
+                </div>
+
+        . Style Binding
 
             . [ngStyle], [attr...]  
 
@@ -1200,98 +1287,211 @@ Angular - Up and Running ( O-Reilly )
 
                     <div [ngStyle]="objStyle">...</div>
 
-                . Demo
+        . Demo - Style Binding "ngStyle"
 
-                    . Altere o arquivo "stock-item.component.ts" como abaixo:
+            . Altere o arquivo "stock-item.component.ts" como abaixo:
 
-                        import { Component, OnInit } from '@angular/core';
-                        import { Stock } from '../../model/stock';
+                import { Component, OnInit } from '@angular/core';
+                import { Stock } from '../../model/stock';
 
-                        @Component({
-                            selector: 'app-stock-item',
-                            templateUrl: './stock-item.component.html',
-                            styleUrls: ['./stock-item.component.css']
-                        })
+                @Component({
+                    selector: 'app-stock-item',
+                    templateUrl: './stock-item.component.html',
+                    styleUrls: ['./stock-item.component.css']
+                })
 
-                        export class StockItemComponent implements OnInit {
-                            public stock!: Stock;
-                            public stockStyles!: any;                                              // Linha inserida
+                export class StockItemComponent implements OnInit {
+                    public stock!: Stock;
+                    public stockStyles!: any;                                              // Linha inserida
 
-                            constructor() { }
+                    constructor() { }
 
-                            ngOnInit() {
-                                this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);
-                                let diff = (this.stock.price / this.stock.previousPrice) - 1;
-                                let largeChange = Math.abs(diff) > 0.01;
+                    ngOnInit() {
+                        this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);
+                        let diff = (this.stock.price / this.stock.previousPrice) - 1;
+                        let largeChange = Math.abs(diff) > 0.01;
 
-                                this.stockClasses = {                                           
-                                    "positive": this.stock.isPositiveChange(),
-                                    "negative": !this.stock.isPositiveChange(),
-                                    "large-change": largeChange,
-                                    "small-change": !largeChange
-                                };
-
-
-                                this.stockStyles = {                                                // Objeto inserido
-                                    "color": this.stock.isPositiveChange() ? "green" : "red",
-                                    "font-size": largeChange ? "1.2em" : "0.8em"
-                                };
-                            } 
-
-                            toggleFavorite(event) {
-                                console.log('We are toggling the favorite state for this stock',
-                                event);
-                                this.stock.favorite = !this.stock.favorite;
-                            }
-                        }
+                        this.stockClasses = {                                           
+                            "positive": this.stock.isPositiveChange(),
+                            "negative": !this.stock.isPositiveChange(),
+                            "large-change": largeChange,
+                            "small-change": !largeChange
+                        };
 
 
-                    . Altere o componente "stock-item.component.html" como abaixo:
+                        this.stockStyles = {                                                // Objeto inserido
+                            "color": this.stock.isPositiveChange() ? "green" : "red",
+                            "font-size": largeChange ? "1.2em" : "0.8em"
+                        };
+                    } 
 
-                        <div class="stock-container">
-                            <div class="name">
-                                {{stock.name + ' (' + stock.code + ')'}}
-                            </div>
+                    toggleFavorite(event) {
+                        console.log('We are toggling the favorite state for this stock',
+                        event);
+                        this.stock.favorite = !this.stock.favorite;
+                    }
+                }
 
-                            <div    class="price"
-                                    [ngStyle]="stockStyles">            <!-- Div alterada -->
-                                $ {{stock.price}}
-                            </div>
+
+            . Altere o componente "stock-item.component.html" como abaixo:
+
+                <div class="stock-container">
+                    <div class="name">
+                        {{stock.name + ' (' + stock.code + ')'}}
+                    </div>
+
+                    <div    class="price"
+                            [ngStyle]="stockStyles">            <!-- Div alterada -->
+                        $ {{stock.price}}
+                    </div>
+
+                    <button (click)="toggleFavorite($event)"
+                            [disabled]="stock.favorite">
+                        Add to Favorite
+                    </button>
+                </div>
+
+            . Execute o projeto e veja o resultado está funcionando como antes:
+
+                ng s -o
+
+    . Two-way Data Binding
+
+        . ngModel 
+
+            . Forma One-Way:
+
+                <input type="text" 
+                    class="form-control"
+                    (input)="alterarNome($event)"
+                    [value]="nome">
+
+            . Forma Two-Way:
+
+                <input type="text"
+                        class="form-control"
+                        [(ngModel)]="nome">
+
+            . Usada para criar uma ligação bidirecional entre o formulário e o modelo de dados, permitindo que 
+                    os dados sejam atualizados automaticamente quando o usuário interage com o formulário.
+
+                <input type="text" [(ngModel)]="nome">
+
+                <!-- 
+                    . Quando o usuário digita algo no campo, o modelo de dados é atualizado automaticamente.
+                    . Quando o modelo de dados é atualizado, o campo de formulário é atualizado automaticamente.
+                -->
+
+            . Quando usamos o "ngModel" sem o símbolo "[()]" em torno dele, ele funciona de forma unidirecional. Isso significa que o 
+                valor do elemento de formulário é atualizado automaticamente na propriedade do componente, mas o valor da propriedade do 
+                componente não é atualizado automaticamente no elemento de formulário.
+
+                <input type="text" ngModel="nome">
                 
-                            <button (click)="toggleFavorite($event)"
-                                    [disabled]="stock.favorite">
-                                Add to Favorite
-                            </button>
-                        </div>
+                <!-- 
+                    Nesse caso, quando o usuário digita algo no formulário, o valor é atualizado automaticamente na propriedade nome do componente. 
+                    No entanto, se você atualizar a propriedade nome do componente em algum lugar do seu código, o valor não será atualizado 
+                    automaticamente no formulário.
+                --!>
 
-                    . Execute o projeto e veja o resultado está funcionando como antes:
+            . Para trabalhar com ngModel é necessário importar o pacote "FormsModule" dentro do componente "app.module.ts":
 
-                        ng s -o
+                ...
+                import { FormsModule } from '@angular/forms';
+                ...
+                imports :[
+                    ...
+                    FormsModule
+                ]
+
+            . Exemplos
+
+                Exemplo 1
+
+                    // *.component.ts
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        nome = 'João';
+                    }
+
+                    // *.component.html
+                    <input type="text" [(ngModel)]="nome">
+                    <p>Olá, {{ nome }}!</p>
+
+                Exemplo 2
+
+                    // *.component.ts
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        cor = 'azul';
+                    }
 
 
+                    // *.component.html
+                    <select [(ngModel)]="cor">
+                        <option value="vermelho">Vermelho</option>
+                        <option value="azul">Azul</option>
+                        <option value="verde">Verde</option>
+                    </select>
+                    <p>A cor selecionada é: {{ cor }}</p>
 
-PAREI AQUI, na página 61
+                Exemplo 3
 
-        . Diretivas estruturais
+                    // *.component.ts
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        aceito = false;
+                    }
 
 
+                    // *.component.html
+                    <input type="checkbox" [(ngModel)]="aceito">
+                    <p>Você aceitou os termos? {{ aceito }}</p>
+
+                Exemplo 4
+
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        opcao = 'opcao1';
+                    }
+
+                    <input type="radio" [(ngModel)]="opcao" value="opcao1"> Opção 1
+                    <input type="radio" [(ngModel)]="opcao" value="opcao2"> Opção 2
+                    <p>A opção selecionada é: {{ opcao }}</p>
+
+        . Demo - ngModel
 
 
+PAREI AQUI, na pagina 140, fazer o demo desta página
 
-        . ngModel - uando você usa ngModel sem o símbolo [] ou () em torno dele, ele funciona de forma unidirecional. Isso significa que o 
-                    valor do elemento de formulário é atualizado automaticamente na propriedade do componente, mas o valor da propriedade do 
-                    componente não é atualizado automaticamente no elemento de formulário.
-
-            <input type="text" ngModel="nome">
-            
-            <!-- 
-                Nesse caso, quando o usuário digita algo no formulário, o valor é atualizado automaticamente na propriedade nome do componente. 
-                 No entanto, se você atualizar a propriedade nome do componente em algum lugar do seu código, o valor não será atualizado 
-                 automaticamente no formulário.
-            --!>
-
-        . Variáveis de referência - são usadas para vincular um elemento do template a uma variável no componente. Isso permite que você acesse o 
-                                    elemento do template no componente e faça operações com ele.
+        . Variáveis de referência 
+        
+            . São usadas para vincular um elemento do template a uma variável no componente. Isso permite que você acesse o 
+              elemento do template no componente e faça operações com ele.
 
             . As variáveis de referência são definidas no template usando o símbolo # seguido do nome da variável. Por exemplo:
 
@@ -1316,138 +1516,21 @@ PAREI AQUI, na página 61
                         }
                     }
 
-        . Attribute binding: [attr:attribute name]="Nome da Propriedade do Componente" - é usado para ligar o dado de um componente para o 
-                            atributo HTML:
-
-            // *.component.ts
-            import { Component } from '@angular/core';  // Obrigatório importação do "Component"
-
-            @Component({
-                selector: 'app-root',
-                templateUrl: './app.component.html',
-                styleUrls: ['./app.component.css']
-            })
-
-            export class AppComponent {
-
-                // Declaração das propriedade para ser usado nos Attribute Binding
-                titulo = 'Este é um exemplo de Attribute Binding';
-                isDisabled = true;
-                placeholder = 'Digite seu nome';
-                estilo = 'color: blue; font-size: 24px;';
-                classe = 'exemplo-classe';
-
-                acao() {
-                    console.log('Botão clicado!');
-                }
-            }
-
-            // *.component.html
-            <div [attr.title]="titulo">Este é um exemplo de Attribute Binding</div>
-
-            <button (click)="acao()" [attr.disabled]="isDisabled">Clique aqui</button>
-
-            <input [attr.placeholder]="placeholder" type="text">
-
-            <div [attr.style]="estilo">Este é um exemplo de Attribute Binding</div>
-
-            <div [attr.class]="classe">Este é um exemplo de Attribute Binding</div>
 
 
-    . Two-way data binding
-
-        . [(ngModel)] -  permite a vinculação bidirecional dos dados entre o modelo e a view
-
-            . Para utilizar o "ngModel" é necessário importar a biblioteca "FormsModule" no componente responsável 
-                pelo módulo, por exemplo: "app.module.ts"
-
-                import { FormsModule } from '@angular/forms';  // Importação aqui
-
-                @NgModule({ 
-                    imports: [ 
-                        BrowserModule, 
-                        FormsModule                             // e aqui
-                    ] 
-                }) 
-                export class AppModule { }                    
 
 
-            Exemplo 1
-
-                // *.component.ts
-                import { Component } from '@angular/core';
-
-                @Component({
-                    selector: 'app-root',
-                    templateUrl: './app.component.html',
-                    styleUrls: ['./app.component.css']
-                })
-                export class AppComponent {
-                    nome = 'João';
-                }
-
-                // *.component.html
-                <input type="text" [(ngModel)]="nome">
-                <p>Olá, {{ nome }}!</p>
-
-            Exemplo 2
-
-                // *.component.ts
-                import { Component } from '@angular/core';
-
-                @Component({
-                    selector: 'app-root',
-                    templateUrl: './app.component.html',
-                    styleUrls: ['./app.component.css']
-                })
-                export class AppComponent {
-                    cor = 'azul';
-                }
 
 
-                // *.component.html
-                <select [(ngModel)]="cor">
-                    <option value="vermelho">Vermelho</option>
-                    <option value="azul">Azul</option>
-                    <option value="verde">Verde</option>
-                </select>
-                <p>A cor selecionada é: {{ cor }}</p>
-
-            Exemplo 3
-
-                // *.component.ts
-                import { Component } from '@angular/core';
-
-                @Component({
-                    selector: 'app-root',
-                    templateUrl: './app.component.html',
-                    styleUrls: ['./app.component.css']
-                })
-                export class AppComponent {
-                    aceito = false;
-                }
 
 
-                // *.component.html
-                <input type="checkbox" [(ngModel)]="aceito">
-                <p>Você aceitou os termos? {{ aceito }}</p>
 
-            Exemplo 4
 
-                import { Component } from '@angular/core';
 
-                @Component({
-                    selector: 'app-root',
-                    templateUrl: './app.component.html',
-                    styleUrls: ['./app.component.css']
-                })
-                export class AppComponent {
-                    opcao = 'opcao1';
-                }
 
-                <input type="radio" [(ngModel)]="opcao" value="opcao1"> Opção 1
-                <input type="radio" [(ngModel)]="opcao" value="opcao2"> Opção 2
-                <p>A opção selecionada é: {{ opcao }}</p>
+
+
+
 
 
 
