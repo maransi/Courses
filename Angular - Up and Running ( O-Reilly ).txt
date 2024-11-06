@@ -863,11 +863,144 @@ Angular - Up and Running ( O-Reilly )
                                 </button>
                         </div>        
 
+        . Classe Models no desenvolvimento 
 
-PAREI AQUI - Desenvolver o ponto abaixo
+            . A utilização de "Models Class" auxilia na clareza do código.
 
-. Página 49. Using Models for Cleaner Code
+            . As principais vantagens são:
 
+                . Separação de Concerns: As classes modelos permitem separar a lógica de negócios da lógica de apresentação, 
+                    tornando o código mais organizado e fácil de manter.
+
+                . Reutilização de Código: As classes modelos podem ser reutilizadas em diferentes componentes e serviços, 
+                    reduzindo a duplicação de código e melhorando a eficiência.
+
+                . Tipagem Forte: As classes modelos permitem a utilização de tipagem forte, o que ajuda a evitar erros de 
+                    tipo e melhora a segurança do código.
+
+                . Legibilidade: As classes modelos tornam o código mais legível, pois as propriedades e métodos são claramente 
+                    definidos e organizados.
+
+                . Manutenção: As classes modelos facilitam a manutenção do código, pois as alterações podem ser feitas em um 
+                    único local, sem afetar outras partes do sistema.
+
+                . Testabilidade: As classes modelos tornam o código mais testável, pois as propriedades e métodos podem ser 
+                    facilmente isolados e testados.
+
+                . Escalabilidade: As classes modelos permitem que o sistema seja escalado de forma mais fácil, pois as classes 
+                    podem ser adicionadas ou removidas sem afetar a estrutura geral do sistema.
+
+                . Integração com Outros Componentes: As classes modelos podem ser facilmente integradas com outros componentes e 
+                    serviços, tornando a comunicação entre eles mais fácil e eficiente.
+
+                . Melhoria da Performance: As classes modelos podem ajudar a melhorar a performance do sistema, pois as propriedades e 
+                    métodos podem ser otimizados para reduzir a carga de processamento.
+
+                . Conformidade com Padrões: As classes modelos permitem que o sistema seja desenvolvido de acordo com padrões e 
+                    convenções estabelecidas, o que ajuda a garantir a qualidade e a manutenibilidade do código.
+
+            . Além disso, as classes modelos também permitem a utilização de recursos como:
+
+                . Injeção de Dependências: As classes modelos podem ser injetadas com dependências, o que torna a criação de 
+                    instâncias mais fácil e flexível.
+
+                . Herança: As classes modelos podem herdar propriedades e métodos de outras classes, o que permite a criação de 
+                    hierarquias de classes mais complexas.
+
+                . Polimorfismo: As classes modelos podem ser polimórficas, o que permite que as mesmas propriedades e métodos 
+                    sejam utilizados de forma diferente em diferentes contextos.
+
+            . Demo
+
+                . Execute o comando abaixo na pasta raiz do projeto
+
+                    ng generate class model/stock
+
+                . Adapte a classe model criada conforme abaixo:
+
+                    export class Stock {
+                        favorite: boolean = false;
+                        constructor(public name: string,
+                        public code: string,
+                        public price: number,
+                        
+                        public previousPrice: number) {}
+                            isPositiveChange(): boolean {
+                            return this.price >= this.previousPrice;
+                        }
+                    }
+
+                . Altere o código do componente "stock-item.component.ts" como abaixo:
+
+                    import { Component, OnInit } from '@angular/core';
+                    import { Stock } from '../../model/stock';                  // Linha inserida
+
+                    @Component({
+                        selector: 'app-stock-item',
+                        templateUrl: './stock-item.component.html',
+                        styleUrls: ['./stock-item.component.css']
+                    })
+
+                    export class StockItemComponent implements OnInit {
+                        /*                                                      Linhas eliminadas
+                            public name!: string;
+                            public code!: string;
+                            public price!: number;
+                            public previousPrice!: number;
+                            public positiveChange!: boolean;                 
+                            public favorite!: boolean;                       
+                        */
+
+                        public stock!: Stock;                                           // Linha Inserida
+
+                        constructor() { }
+                        
+                        ngOnInit() {
+                            /*                                                          Linhas eliminadas
+                                this.name = "Test Stock Company";
+                                this.code = "TSC"
+                                this.price = 85;
+                                this.previousPrice = 80;
+                                this.positiveChange = this.price >= this.previousPrice;     // Linha inserida
+                            */
+
+                            this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);    // Linha inserida
+                        } 
+                        
+                        toggleFavorite(event) {
+                            console.log('We are toggling the favorite state for this stock', event);
+
+                            // this.favorite = !this.favorite;                              // Linha eliminada
+
+
+                            this.stock.favorite = !this.stock.favorite;                     // Linha inserida
+                        }
+                    }
+
+                . Altere o código do componente "stock-item.component.html" como abaixo:
+
+                    <div class="stock-container">
+                        <div class="name">
+                            {{stock.name + ' (' + stock.code + ')'}}            <!-- Linha alterada -->
+                        </div>
+                    
+                        <!-- Div inteira alterada -->
+                        <div class="price"                                      
+                            [class]="stock.isPositiveChange() ? 'positive' :
+                                                                'negative'">    
+                            $ {{stock.price}}
+                        </div>
+
+                        <!-- Div alterada -->
+                        <button (click)="toggleFavorite($event)"
+                                [disabled]="stock.favorite">
+                            Add to Favorite
+                        </button>
+                    </div>
+
+                . Execute o projeto e veja o resultado está funcionando como antes:
+
+                    ng s -o
 
         . Diretivas de atributos
 
@@ -1006,7 +1139,7 @@ PAREI AQUI - Desenvolver o ponto abaixo
                                 <div class="name">{{stock.name + ' (' + stock.code + ')'}}</div>
                                 
                                 <div    class="price"
-                                        [ngClass]="stockClasses">
+                                        [ngClass]="stockClasses">           <!-- Div alterada -->
                                     $ {{stock.price}}
                                 </div>
                                 
@@ -1029,7 +1162,7 @@ PAREI AQUI - Desenvolver o ponto abaixo
 
                         export class StockItemComponent implements OnInit {
                             public stock: Stock;
-                            public stockClasses;        // Linha inserida
+                            public stockClasses! = any;        // Linha inserida
 
                             constructor() { }
 
@@ -1046,15 +1179,98 @@ PAREI AQUI - Desenvolver o ponto abaixo
                                 };
 
                             } 
+
                             toggleFavorite(event) {
                                 console.log('We are toggling the favorite state for this stock', event);
                                 this.stock.favorite = !this.stock.favorite;
                             }
                         }                    
 
+                    . Execute o projeto e veja o resultado está funcionando como antes:
 
-PAREI AQUI - Desenvolver o ponto abaixo
+                        ng s -o
+
             . [ngStyle], [attr...]  
+
+                . [ngStyle] - Trabalha de forma parecida do [ngClass] 
+
+                    <div [ngStyle]="{'background-color': 'red', 'color': 'white'}">...</div>
+
+                    <div [ngStyle]="{'background-color': isActive ? 'red' : '', 'color': isActive ? 'white' : ''}">...</div>
+
+                    <div [ngStyle]="objStyle">...</div>
+
+                . Demo
+
+                    . Altere o arquivo "stock-item.component.ts" como abaixo:
+
+                        import { Component, OnInit } from '@angular/core';
+                        import { Stock } from '../../model/stock';
+
+                        @Component({
+                            selector: 'app-stock-item',
+                            templateUrl: './stock-item.component.html',
+                            styleUrls: ['./stock-item.component.css']
+                        })
+
+                        export class StockItemComponent implements OnInit {
+                            public stock!: Stock;
+                            public stockStyles!: any;                                              // Linha inserida
+
+                            constructor() { }
+
+                            ngOnInit() {
+                                this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);
+                                let diff = (this.stock.price / this.stock.previousPrice) - 1;
+                                let largeChange = Math.abs(diff) > 0.01;
+
+                                this.stockClasses = {                                           
+                                    "positive": this.stock.isPositiveChange(),
+                                    "negative": !this.stock.isPositiveChange(),
+                                    "large-change": largeChange,
+                                    "small-change": !largeChange
+                                };
+
+
+                                this.stockStyles = {                                                // Objeto inserido
+                                    "color": this.stock.isPositiveChange() ? "green" : "red",
+                                    "font-size": largeChange ? "1.2em" : "0.8em"
+                                };
+                            } 
+
+                            toggleFavorite(event) {
+                                console.log('We are toggling the favorite state for this stock',
+                                event);
+                                this.stock.favorite = !this.stock.favorite;
+                            }
+                        }
+
+
+                    . Altere o componente "stock-item.component.html" como abaixo:
+
+                        <div class="stock-container">
+                            <div class="name">
+                                {{stock.name + ' (' + stock.code + ')'}}
+                            </div>
+
+                            <div    class="price"
+                                    [ngStyle]="stockStyles">            <!-- Div alterada -->
+                                $ {{stock.price}}
+                            </div>
+                
+                            <button (click)="toggleFavorite($event)"
+                                    [disabled]="stock.favorite">
+                                Add to Favorite
+                            </button>
+                        </div>
+
+                    . Execute o projeto e veja o resultado está funcionando como antes:
+
+                        ng s -o
+
+
+
+PAREI AQUI, na página 61
 
         . Diretivas estruturais
 
