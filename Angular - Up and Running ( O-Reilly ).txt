@@ -1372,7 +1372,10 @@ https://www.tutorialspoint.com/angular8/index.htm
 
                 <input type="text"
                         class="form-control"
+                        name="nome"
                         [(ngModel)]="nome">
+
+            . Para utilizar [(ngModel)] é obrigatório informar o atributo "name" na tag HTML
 
             . Usada para criar uma ligação bidirecional entre o formulário e o modelo de dados, permitindo que 
                     os dados sejam atualizados automaticamente quando o usuário interage com o formulário.
@@ -1487,8 +1490,108 @@ https://www.tutorialspoint.com/angular8/index.htm
 
         . Demo - ngModel
 
+            . Execute a linha abaixo na raiz do projeto
 
-PAREI AQUI, na pagina 140, fazer o demo desta página
+                ng g component stock/create-stock            
+
+            . Altere o componente "create-stock.component.ts" com o conteúdo abaixo:
+
+                import { Component, OnInit } from '@angular/core';
+                import { Stock } from 'src/app/model/stock';                    // Linha inserida
+
+                @Component({
+                    selector: 'app-create-stock',
+                    templateUrl: './create-stock.component.html',
+                    styleUrls: ['./create-stock.component.css']
+                })
+
+                export class CreateStockComponent {
+                    public stock: Stock;                                    // Linha inserida
+
+                    constructor() {                                         // Construtor e conteúdo inserido
+                        this.stock = new Stock('test', '', 0, 0);
+                    }
+                }
+
+            . Altere o conteúdo do componente "create-stock.component​.html" com as linhas abaixo:
+
+                <h2>Create Stock Form</h2>
+
+                <div class="form-group">
+                    <form>
+                        <div class="stock-name">
+                            <input type="text"
+                                    placeholder="Stock Name"
+                                    [value]="stock.name"
+                                    (input)="stock.name=$any($event.target).value">
+
+                                    <!--    Poderiamos fazer desta forma também 
+                                            (input)="onInputName($event)"> 
+                                    -->
+                                    <!--                    
+                                            onInputName(event: any) {
+                                                this.stock.name = event.target.value;
+                                            }
+                                    -->
+                        </div>
+                    </form>
+                    <button (click)="stock.name='test'">Reset stock name</button>
+                </div>
+
+                <h4>Stock Name is {{stock.name}}</h4>
+
+            . Altere o conteúdo do componente "app.component.html" com o conteúdo abaixo:
+
+                <app-create-stock></app-create-stock>
+
+            . Execute o projeto e veja se o resultado saiu conforme o esperado
+
+                ng s -o
+
+            . Altere o componente "app.modules.ts" como abaixo:
+
+                ...
+                import { FormsModule } from '@angular/forms';       // Linha inserida
+
+                @NgModule({
+                    declarations: [
+                        ...
+                    ],
+                    imports: [
+                        ...,
+                        FormsModule                                 // Linha inserida
+                    ],
+                    providers: [],
+                    bootstrap: [AppComponent]
+                })
+                export class AppModule { }
+
+
+            . Altere o componente "create-stock.component.html" como abaixo:
+
+                <h2>Create Stock Form</h2>
+
+                <div class="form-group">
+                    <form>
+
+                        <!-- Inclusão do atributo "name" é a diretiva [(ngModel)] -->
+
+                        <div class="stock-name">
+                            <input type="text"
+                                    placeholder="Stock Name"
+                                    name="stockName"
+                                    [(ngModel)]="stock.name">
+                        </div>
+                    </form>
+                    <button (click)="stock.name='test'">Reset stock name</button>
+                </div>
+
+                <h4>Stock Name is {{stock.name}}</h4>
+
+
+https://consolelog.com.br/validacao-formulario-ngmodel-angular/
+
+PAREI AQUI, na pagina 142, fazer o demo desta página
 
         . Variáveis de referência 
         
