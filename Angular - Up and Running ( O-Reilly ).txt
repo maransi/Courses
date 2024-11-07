@@ -1427,6 +1427,28 @@ https://www.tutorialspoint.com/angular8/index.htm
                     automaticamente no formulário.
                 --!>
 
+            . "ngModel" encontra-se no pacote "FormsModule":
+
+                . FormsModule -  Um pacote que serve para fornecer funcionalidades de formulários para a aplicação
+
+                    . Fornece diretivas para criar e gerenciar formulários
+
+                    . Permiti a validação de dados de formulário
+
+                    . Fornece funcionalidades de binding de dados para formulários
+
+                    . Fornece diretivas, como:
+
+                        . ngModel: diretiva para criar um binding de dados entre um formulário e um componente
+
+                        . ngForm: diretiva para criar um formulário e gerenciar os dados de formulário
+
+                        . ngFormGroup: diretiva para criar um grupo de formulários e gerenciar os dados de formulário
+
+                        . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário
+
+                        . ngFormArray: diretiva para criar um array de formulários e gerenciar os dados de formulário                
+
             . Para trabalhar com ngModel é necessário importar o pacote "FormsModule" dentro do componente "app.module.ts":
 
                 ...
@@ -1909,6 +1931,7 @@ https://www.tutorialspoint.com/angular8/index.htm
                     onSave() {
                         console.log('We are saving the stock', this.stock);
                         this.stock = new Stock('', '', 0, 0, '');
+                        this.onInitStock();
                         this.saved=true;
                     }
                 }
@@ -1995,12 +2018,256 @@ https://www.tutorialspoint.com/angular8/index.htm
 
                 ng s -o
 
+            . Insira o trecho abaixo no componente "stock-item.component.htnl"
+
+                <div class="container">
+                    <div class="alert alert-success" role="alert" *ngIf="!saved">
+                        Product Name : <strong> {{stock.name}} </strong>
+                    </div>
+
+                    <div class="row">
+                        ...
+                    </div>
+
+                    <div class="row mt-2">
+                        ...
+                    </div>
+
+                    <!-- Div inserida -->
+                    <div class="row" style="margin-top: 20px;" >
+                        <div class="col-6" 
+                            style="padding-top: 10px; padding-bottom: 10px; border: 1px solid black;"
+                            *ngFor="let p of productsStock" >
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Code</p>
+                                        <p class="fs-6">{{p.code}}</p>
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Name</p>
+                                        <p class="fs-6">{{p.name}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Price</p>
+                                        <p class="fs-6">{{p.price}}</p>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Previous Price</p>
+                                        <p class="fs-6">{{p.previousPrice}}</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Exchange</p>
+                                        <p class="fs-6">{{p.exchange}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            . Execute o projeto e verifique através da console do navegador se as informações estão chegando corretamente 
+                no componente.
+
+                ng s -o
+
+            . Altere o componente "stock-item.component.ts" com o conteúdo abaixo:
+
+                import { Component, OnInit } from '@angular/core';
+                import { Stock } from 'src/app/model/stock';
+
+                @Component({
+                    selector: 'app-stock-item',
+                    templateUrl: './stock-item.component.html',
+                    styleUrls: ['./stock-item.component.css']
+                })
+                export class StockItemComponent implements OnInit {
+                    ...
+                    public saved: boolean = false;    
+
+                    // public productsStock: Stock[] = [];               
+                    public productsStock: Array<Stock> = [];        // Linha inserida
+
+                    ngOnInit(): void {
+                        ...
+                    }
+
+                    onInitStock() {
+                        ...
+                    }
+
+                    toggleFavorite(event: any, index: number) {     // Parametro incluido
 
 
+                        console.log('We are toggling the favorite state for this stock event.target ', event.target);
+                        console.log('We are toggling the favorite state for this stock event.target.value ', event.target.value);
+                        console.log('We are toggling the favorite state for this stock index ', index);                             // Linha inserida
+                        console.log('We are toggling the favorite state for this stock ', this.productsStock[index]);               // Linha inserida
+                    }
+
+                    onSave() {
+                        console.log('We are saving the stock', this.stock);
+                        this.productsStock.push(this.stock);                // Linha inserida
+                        this.onInitStock();
+                        this.saved=true;
+
+                    }
+                }
+
+            . Insira o trecho abaixo no componente "stock-item.component.htnl"
+
+                <div class="container">
+                    <div class="alert alert-success" role="alert" *ngIf="!saved">
+                        Product Name : <strong> {{stock.name}} </strong>
+                    </div>
+
+                    <div class="row">
+                        ...
+                    </div>
+
+                    <div class="row mt-2">
+                        ...
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;" >
+                        <div class="col-6" 
+                            style="padding-top: 10px; padding-bottom: 10px; border: 1px solid black;"
+                            *ngFor="let p of productsStock" >
+                            <div class="row">
+                                ...
+                            </div>
+                            <div class="row">
+                                ...
+                            </div>
+
+
+                            <!-- Div inserido -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-primary" 
+                                            (click)="toggleFavorite($event, i)" >
+                                        Choice Item to See Values
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+        . É possivel utilizar ngFor e ngIf juntos:
+
+            <div *ngFor="let stock of stocks" *ngIf="stock.active">
+                <!-- Show stock details here if stock is active -->
+            </div>
+
+            <div *ngFor="let stock of stocks" *ngIf="stocks.length > 2">
+                <!-- Show stock details here if more than 2 stocks present -->
+            </div>
+
+4. Modularizando projetos
+
+    . A medida que a aplicação for crescendo, o AppModule ficará muito grande. Neste
+        caso seria interessante criar "features modules", ou modulos de funcionalidades
+        para organizar melhor o nosso projeto.
+
+        . Para criar um módulo de funcionalidade: acesse o terminal, acesse a pasta raiz do projeto e 
+            digite o comando abaixo:
+
+            ng g m [Nome do Módulo]
+
+            Exemplo:
+
+                ng g m curso
+
+            . Este comando criará uma pasta com o nome do módulo e um arquivo dentro dela com o nome [nome modulo].module.ts:
+
+                import { NgModule } from '@angular/core';
+                import { CommonModule } from '@angular/common';
+
+                @NgModule({
+                    imports: [
+                        CommonModule
+                    ],
+                    declarations: []
+                })
+                export class CursoModule { }
+
+                . A diferença entre o módulo de funcionalidade e o de raiz seria que: o de funcionalidade é bem reduzido e somente
+                    importa o "CommonModule".
+
+    . Demo
+
+        . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+            # Irá criar a pasta "contabilidade" dentro da pasta "./src/app"
+            ng g m contabilidade
+
+            # Irá criar a pasta "ativo" dentro da pasta "./src/app/contabilidade"
+            ng g c ./contabilidade/ativo --module=contabilidade
+
+        . Acesse o ./src/app/contabilidade/contabilidade.module.ts e faça a declaração do componente curso:
+
+            import { NgModule } from '@angular/core';
+            import { CommonModule } from '@angular/common';
+            import { AtivoComponent } from './ativo/ativo.component';       // Observe que foi feito o import do componente
+
+            @NgModule({
+                imports: [
+                    CommonModule
+                ],
+                declarations: [
+                    AtivoComponent                                          // Observe que foi feito a declaração do componente
+                ],
+                exports : [ 
+                    AtivoComponent                                          // Insira o bloco "exports"
+                ]
+            })
+            export class ContabilidadeModule { }
+
+        . Acesse a classe src/app/app.module.ts, insira dentro do metadado "imports" o "ContabilidadeModule" e faça o import.
+
+            ...
+            import { ContabilidadeModule } from './contabilidade/contabilidade.module';     // Insira o import do module
+
+            @NgModule({
+                ...
+                imports: [
+                    BrowserModule,
+                    ContabilidadeModule                                                     // Insira o import do module
+                ],
+                ...
+            })
+            export class AppModule { }
+
+        . Acesse o arquivo src/app/app.component.html e inclua a tag abaixo:
+
+            <app-ativo></app-ativo>
+
+        . Execute o projeto e verifique se a modularização deu certo:
+
+            ng serve --open
+
+        . Verifique se a página exibida saiu a mensagem do "Ativo"
+
+5. Input e Output
+
+PAREI AQUI, PÁGINA 87
 
 https://consolelog.com.br/validacao-formulario-ngmodel-angular/
 
-PAREI AQUI, na pagina 142, fazer o demo desta página
 
         . Variáveis de referência 
         
