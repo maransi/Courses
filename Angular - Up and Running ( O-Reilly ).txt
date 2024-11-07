@@ -632,6 +632,34 @@ https://www.tutorialspoint.com/angular8/index.htm
 
                     . Habilita a funcionalidade de eventos do navegador
 
+    . Instalando a biblioteca CSS do Bootstrap
+
+        . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
+
+            $ npm install bootstrap@5.3.3 --save
+
+        . Acesse o arquivo angular.json da pasta raiz do projeto, localize o atributo "styles" e inclua a configuração do 
+            bootstrap como abaixo:
+
+            ...
+            "styles": [
+                /* "styles.css",  apague esse linha */
+                "./node_modules/bootstrap/dist/css/bootstrap.css"
+            ],
+            ...
+
+        . Acesse o arquivo app.component.html da pasta raiz e substitua pelo código abaixo:
+
+            <div class="container">
+                <div class="jumbotron">
+                    <h1 class="display-4">Hello, world!</h1>
+                    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+                    <hr class="my-4">
+                    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+                    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+                </div>
+            </div>
+
 3. Data Binding
 ----------------
 
@@ -1566,7 +1594,6 @@ https://www.tutorialspoint.com/angular8/index.htm
                 })
                 export class AppModule { }
 
-
             . Altere o componente "create-stock.component.html" como abaixo:
 
                 <h2>Create Stock Form</h2>
@@ -1587,6 +1614,388 @@ https://www.tutorialspoint.com/angular8/index.htm
                 </div>
 
                 <h4>Stock Name is {{stock.name}}</h4>
+
+        . ngModelChange
+
+            . É um evento do Angular que é disparado quando o valor de um campo de formulário é alterado. Ele é utilizado em 
+                conjunto com a diretiva ngModel para criar uma ligação bidirecional entre o campo de formulário e o modelo de dados.
+
+                <!-- HTML -->
+                <input type="text" [ngModel]="nome" (ngModelChange)="onNomeChange($event)">
+
+                // Typescript
+                onNomeChange(event: any) {
+                    console.log('Nome alterado:', event);
+                    this.nome = event;
+                }
+
+        . ngSubmit
+
+            . É um evento do Angular que é disparado quando um formulário é submetido.
+
+                <!-- HTML -->
+                <form (ngSubmit)="onSubmit()">
+                    <input type="text" name="nome">
+                    <input type="text" name="sobrenome">
+                    <button type="submit">Enviar</button>
+                </form>
+
+
+                // Typescript
+                @Component({
+                    selector: 'app-exemplo',
+                    templateUrl: './exemplo.component.html',
+                    styleUrls: ['./exemplo.component.css']
+                })
+
+                export class ExemploComponent {
+                    onSubmit() {
+                        console.log('Formulário submetido');
+                        // Processar os dados do formulário
+                    }
+                }
+
+        . Demo - ngModelChange e ngSubmit
+
+            . Altere o model "stock.ts" com o abaixo:
+
+                export class Stock {
+                    favorite = false;
+
+                    constructor(public name: string,
+                        public code: string,
+                        public price: number,
+                        public previousPrice: number,
+                        public exchange: string) {}             // Parâmetro incluido
+
+                    isPositiveChange(): boolean {
+                        return this.price >= this.previousPrice;
+                    }
+                }
+
+
+
+            . Altere o componente "create-stock.component.ts" conforme abaixo:
+
+                import { Component, OnInit } from '@angular/core';
+                import { Stock } from 'app/model/stock';
+
+                @Component({
+                    selector: 'app-create-stock',
+                    templateUrl: './create-stock.component.html',
+                    styleUrls: ['./create-stock.component.css']
+                })
+
+                export class CreateStockComponent {
+                    public stock: Stock;
+                    public confirmed = false;                                   // Linha inserida
+
+                    constructor() {
+                        this.stock = new Stock('test', '', 0, 0, 'NASDAQ');     // Linha alterada
+                    } 
+                    
+                    setStockPrice(price: any) {                                      // Método criado
+                        this.stock.price = price;
+                        this.stock.previousPrice = price;
+                    } 
+                    
+                    createStock() {                                             // Método criado
+                        console.log('Creating stock ', this.stock);
+                    }
+                }
+
+            . Altere todo conteúdo do coomponente "create-stock.component.html" com o conteúdo abaixo:
+
+                <h2>Create Stock Form</h2>
+                <div class="form-group">
+                    <form (ngSubmit)="createStock()">
+                        <div class="stock-name">
+                            <input type="text" 
+                                    placeholder="Stock Name"
+                                    name="stockName" 
+                                    [(ngModel)]="stock.name">
+                        </div>
+
+                        <div class="stock-code">
+                            <input type="text" 
+                                    placeholder="Stock Code"
+                                    name="stockCode" 
+                                    [(ngModel)]="stock.code">
+                        </div>
+
+                        <div class="stock-code">
+                            <input type="number" 
+                                    placeholder="Stock Price"
+                                    name="stockPrice" 
+                                    [ngModel]="stock.price"
+                                    (ngModelChange)="setStockPrice($event)">
+                        </div>
+
+                        <div class="stock-exchange">
+                            <div>
+                                <input type="radio" 
+                                        name="stockExchange"
+                                        [(ngModel)]="stock.exchange" 
+                                        value="NYSE">NYSE
+                            </div>
+                            
+                            <div>
+                                <input type="radio" 
+                                        name="stockExchange"
+                                        [(ngModel)]="stock.exchange" 
+                                        value="NASDAQ">NASDAQ
+                            </div>
+
+                            <div>
+                                <input type="radio" 
+                                        name="stockExchange"
+                                        [(ngModel)]="stock.exchange" 
+                                        value="OTHER">OTHER
+                            </div>
+                        </div>
+                        <div class="stock-confirm">
+                            <input type="checkbox" 
+                                    name="stockConfirm"
+                                    [(ngModel)]="confirmed">
+                            I confirm that the information provided above is accurate!
+                        </div>
+
+                        <button [disabled]="!confirmed" type="submit">Create</button>
+                    </form>
+                </div>
+
+                <h4>Stock Name is {{stock | json}}</h4>
+                <br>
+                <h4>confirmed is {{confirmed}}</h4>
+
+            . Execute o projeto e verifique na console do navegador as informações:
+
+                ng s -o
+
+    . Diretivas 
+
+        . Diretivas são instruções que passamos para os templates.
+
+        . Existem 3 tipos de diretivas:
+
+            Componente - que passamos para o template:
+
+                <app-curso></app-curso>
+
+            Estrutural - Podem ser anexadas a elementos DOM (e componentes, pois são elementos DOM) para modificar a estrutura do DOM.
+
+                <h2 *ngIf="logado">Olá {{nome}}</h2>
+
+                <ul>
+                    <li *ngFor="let item of itens">{{ item.nome }}</li>
+                </ul>
+
+            Atributo - Podem ser anexadas a elementos DOM (e componentes, pois são elementos DOM) para modificar a aparência 
+                        ou o comportamento de um elemento e não altera a estrutura do DOM.
+
+                <h2 [style.color]="'red'">{{nome}}</h2>
+
+                <div [ngStyle]="{'background-color': 'red', 'color': 'white'}">...</div>
+
+                <div [ngClass]="{'ativo': isAtivo, 'desabilitado': isDesabilitado}">
+                    <p>Texto do componente</p>
+                    <button (click)="toggleAtivo()">Toggle Ativo</button>
+                    <button (click)="toggleDesabilitado()">Toggle Desabilitado</button>
+                </div>
+
+        . ngIf
+
+            . É uma diretiva do Angular que permite controlar a exibição de elementos HTML com base em uma condição.
+
+            . Quando utilizamos a diretiva ngIf, podemos especificar uma expressão que será avaliada. Se a expressão for 
+                avaliada como verdadeira, o elemento HTML associado à diretiva será exibido. Se a expressão for avaliada 
+                como falsa, o elemento HTML não será exibido.
+
+                <!-- HTML -->
+                <div *ngIf="condicao">
+                    Este elemento será exibido se a condição for verdadeira.
+                </div>
+
+                // Typescript
+                @Component({
+                    selector: 'app-exemplo',
+                    templateUrl: './exemplo.component.html',
+                    styleUrls: ['./exemplo.component.css']
+                })
+    
+                export class ExemploComponent {
+                    condicao = true;
+                }
+
+        . Demo - ngIf
+
+            . Altere o conteúdo do arquivo "stock-item.component.html" com o conteúdo abaixo:
+
+                <div class="stock-container">
+                    <div class="name">{{stock.name + ' (' + stock.code + ')'}}</div>
+                    <div class="price" 
+                            [class]="stock.isPositiveChange() ? 'positive' : 'negative'">
+                        $ {{stock.price}}
+                    </div>
+                    <button (click)="toggleFavorite($event)" 
+                            *ngIf="!stock.favorite">
+                        Add to Favorite
+                    </button>
+                </div>
+
+            . Altere o conteúdo do componente "app.component.html" pelo abaixo:
+
+                <app-stock-item></app-stock-item>
+
+            . Execute o projeto e verifique o resultado se ao clicar no botão "Add to Favorite" irá desaparecer.
+
+                ng s -o
+
+        . ngFor
+
+            . É uma diretiva do Angular que permite iterar sobre uma coleção de dados e exibir seus elementos em HTML.
+
+                <!-- HTML -->
+                <ul>
+                    <li *ngFor="let item of itens">{{ item.nome }}</li>
+                </ul>
+
+                // Typescript
+                @Component({
+                  selector: 'app-exemplo',
+                  templateUrl: './exemplo.component.html',
+                  styleUrls: ['./exemplo.component.css']
+                })
+                export class ExemploComponent {
+                  itens = [
+                    { nome: 'Item 1' },
+                    { nome: 'Item 2' },
+                    { nome: 'Item 3' }
+                  ];
+                }
+
+        . Demo - ngFor
+
+            . Altere o componente "stock-item.component.ts" com o conteúdo abaixo:
+
+                import { Component, OnInit } from '@angular/core';
+                import { Stock } from 'src/app/model/stock';
+
+                @Component({
+                    selector: 'app-stock-item',
+                    templateUrl: './stock-item.component.html',
+                    styleUrls: ['./stock-item.component.css']
+                })
+                export class StockItemComponent implements OnInit {
+                    ...
+                    public saved: boolean = false;    // Linha inserida
+
+                    ngOnInit(): void {
+                        // this.stock = new Stock('Test Stock Company', 'TSC', 85, 80, '');   // Linha eliminida
+
+                        this.onInitStock();                                                     // Linha inserida
+
+                        ...
+                    }
+
+                    // Método inserido
+                    onInitStock() {
+                        this.stock = new Stock('', '', 0, 0, '');
+                    }
+
+                    ...
+
+                    // Método inserido
+                    onSave() {
+                        console.log('We are saving the stock', this.stock);
+                        this.stock = new Stock('', '', 0, 0, '');
+                        this.saved=true;
+                    }
+                }
+
+            . Atualize o componente "stock-item.component.html" com o conteúdo abaixo:
+
+                <div class="container">
+                    <div class="alert alert-success" role="alert" *ngIf="!saved">
+                        Product Name : <strong> {{stock.name}} </strong>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+                                <input type="text" 
+                                        class="form-control form-control-sm" 
+                                        id="stockCode" name="stockCode" 
+                                        [(ngModel)]="stock.code"
+                                        (focus)="saved=false">
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="clienteNome">Stock Name</label>
+                                <input type="text" 
+                                        class="form-control form-control-sm" 
+                                        id="stockName" 
+                                        name="stockName" 
+                                        [(ngModel)]="stock.name">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+                                <input type="number" 
+                                        class="form-control form-control-sm" 
+                                        id="stockPrice" 
+                                        name="stockPrice" 
+                                        [(ngModel)]="stock.price">
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice">Stock Previous Price</label>
+                                <input type="number"
+                                        class="form-control form-control-sm"
+                                        id="stockPreviousPrice"
+                                        name="stockPreviousPrice"
+                                        [(ngModel)]="stock.previousPrice">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockExchange">Stock Exchange</label>
+                                <select class="form-select form-select-sm" 
+                                        id="stockExchange" 
+                                        name="stockExchange" 
+                                        [(ngModel)]="stock.exchange">
+                                    <option value="NYSE" selected>NYSE</option>
+                                    <option value="NASDAQ">NASDAQ</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <button type="button" 
+                                    class="btn btn-primary" 
+                                    (click)="onSave()"
+                                    [disabled]="stock.name.length == 0 || stock.code.length == 0">
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            . Execute o projeto e verifique através da console do navegador se as informações estão chegando corretamente 
+                no componente.
+
+                ng s -o
+
+
 
 
 https://consolelog.com.br/validacao-formulario-ngmodel-angular/
