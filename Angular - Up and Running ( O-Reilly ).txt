@@ -235,11 +235,11 @@ https://www.tutorialspoint.com/angular8/index.htm
 
             . Exemplo
 
-                ng generate component bem-vindo --spec=false
+                ng generate component bem-vindo --skipTests
 
                 # ou
 
-                $ ng g c bem-vindo --spec=false
+                $ ng g c bem-vindo --skipTests
 
             . O comando do exemplo acima criará o componente "src/bem-vindo/bem-vindo.component.ts"
 
@@ -2263,8 +2263,207 @@ https://www.tutorialspoint.com/angular8/index.htm
         . Verifique se a página exibida saiu a mensagem do "Ativo"
 
 5. Input e Output
+-----------------
 
-PAREI AQUI, PÁGINA 87
+    . Input
+
+        . Representado pelo decorator @Input
+
+        . É usado para passar dados de um componente pai para um componente filho. Ele permite que você defina uma 
+            propriedade no componente filho que pode ser atualizada pelo componente pai.
+
+            // componente-pai.component.ts
+            import { Component } from '@angular/core';
+            
+            @Component({
+              selector: 'app-componente-pai',
+              template: `
+                <app-componente-filho [nome]="nomePai"></app-componente-filho>
+              `
+            })
+            export class ComponentePai {
+              nomePai = 'João';
+            }
+
+
+            // componente-filho.component.ts
+            import { Component, Input } from '@angular/core';
+            
+            @Component({
+              selector: 'app-componente-filho',
+              template: `
+                <p>Olá, meu nome é {{ nome }}!</p>
+              `
+            })
+            export class ComponenteFilho {
+              @Input() nome: string;
+            }
+
+        . Algumas coisas importantes a saber sobre o @Input:
+
+            . O @Input é usado para passar dados de um componente pai para um componente filho.
+
+            . A propriedade decorada com @Input deve ser pública.
+
+            . O valor da propriedade pode ser atualizado pelo componente pai a qualquer momento.
+
+            . O componente filho pode usar a propriedade decorada com @Input em sua template ou em seu código TypeScript.
+
+        . Também é possível usar o @Input com alias, o que permite que você defina um nome diferente para a propriedade no 
+            componente filho.
+
+            // componente-pai.component.ts
+            import { Component } from '@angular/core';
+            
+            @Component({
+              selector: 'app-componente-pai',
+              template: `
+                <app-componente-filho [nomePai]="nomePai"></app-componente-filho>
+              `
+            })
+            export class ComponentePai {
+              nomePai = 'João';
+            }
+
+
+
+            // componente-filho.component.ts
+            import { Component, Input } from '@angular/core';
+            
+            @Component({
+              selector: 'app-componente-filho',
+              template: `
+                <p>Olá, meu nome é {{ nome }}!</p>
+              `
+            })
+            export class ComponenteFilho {
+              @Input('nomePai') nome: string;
+            }     
+
+        . Demo
+
+            . Acesse a raiz do projeto e execute o comando abaixo no prompt do SO:
+
+                ng g c stock-card --skipTests
+
+            . Altere o componente "stock-card.component.ts" com o conteúdo abaixo:
+
+                import { Component, Input } from '@angular/core';
+                import { Stock } from '../model/stock';         // Linha inserida
+
+                @Component({
+                    selector: 'app-stock-card',
+                    templateUrl: './stock-card.component.html',
+                    styleUrls: ['./stock-card.component.css']
+                })
+                export class StockCardComponent {
+
+                    @Input()                                    // Linha inserida
+                    public stockItem!: Stock;                       // Linha inserida
+                }
+
+            . Cópie o código HTML abaixo para o arquivo src/app/stock-card/stock-card.component.html
+
+                <div class="card">
+                    <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg">
+                    <div class="card-body">
+                        {{stockItem.name}}
+                    </div>
+                </div>  
+
+            . Altere o código HTML abaixo no arquivo "stock-item.component.html":
+
+                <div class="container">
+                    <div class="alert alert-success" role="alert" *ngIf="!saved">
+                        ...
+                    </div> 
+
+                    <div class="row">
+                        ..
+                    </div>
+
+                    <div class="row mt-2">
+                        ...
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;" >
+                        <!--                                        Trecho eliminado
+                        <div class="col-6" 
+                            style="padding-top: 10px; padding-bottom: 10px; border: 1px solid black;"
+                            *ngFor="let p of productsStock; index as i" >           
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Code</p>
+                                        <p class="fs-6">{{p.code}}</p>
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Name</p>
+                                        <p class="fs-6">{{p.name}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Price</p>
+                                        <p class="fs-6">{{p.price}}</p>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Previous Price</p>
+                                        <p class="fs-6">{{p.previousPrice}}</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <p class="fw-bold">Exchange</p>
+                                        <p class="fs-6">{{p.exchange}}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-primary" 
+                                            (click)="toggleFavorite($event, i)" >
+                                        Choice Item to See Values
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+
+                        <!-- Trecho adicionado -->
+                        <div class="card" style="width: 18rem;">
+                            <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg" 
+                                class="card-img-top" 
+                                style="width: 100%; height: auto;">
+                            
+                            <div class="card-body">
+                                <h5 class="card-title">{{stockItem.name}}</h5>
+                                <p class="card-text">
+                                    R$ {{stockItem.price}}
+                                </p>
+                            </div>
+                        </div>  
+
+                    </div>
+                </div>
+
+            . Execute o projeto e verifique se a modularização deu certo:
+
+                ng serve --open
+
+
+    . Output
+
+
+PAREI AQUI, PÁGINA 90
 
 https://consolelog.com.br/validacao-formulario-ngmodel-angular/
 
