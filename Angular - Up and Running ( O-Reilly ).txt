@@ -2439,19 +2439,11 @@ https://www.tutorialspoint.com/angular8/index.htm
                         -->
 
                         <!-- Trecho adicionado -->
-                        <div class="card">
-                            <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg" 
-                                class="card-img-top" 
-                                style="width: 100%; height: auto;">
-                            
-                            <div class="card-body">
-                                <h5 class="card-title">{{stockItem.name}}</h5>
-                                <p class="card-text">
-                                    R$ {{stockItem.price}}
-                                </p>
-                            </div>
-                        </div>  
-
+                        <div class="col-2" 
+                            style="padding-top: 10px; padding-bottom: 10px; "
+                            *ngFor="let p of productsStock; index as i" >           
+                            <app-stock-card [stockItem]="p"></app-stock-card>
+                        </div>
                     </div>
                 </div>
 
@@ -2548,7 +2540,172 @@ https://www.tutorialspoint.com/angular8/index.htm
                 +---------------+
 
 
+        . Demo
 
+            . Altere o conteúdo do arquivo "create-stock.component.ts" com o conteúdo abaixo:
+
+                import { Component, EventEmitter, Output } from '@angular/core';      // Linha alterada
+                import { Stock } from 'src/app/model/stock';
+
+                @Component({
+                    selector: 'app-create-stock',
+                    templateUrl: './create-stock.component.html',
+                    styleUrls: ['./create-stock.component.css']
+                })
+                export class CreateStockComponent {
+                    public stock: Stock;                                    
+                    public confirmed = false;                                   
+
+                    @Output()                                                // Linha inserida
+                    public eventoEmitido = new EventEmitter<Stock>();
+
+                    constructor() {                                         
+                        this.stock = new Stock('test', '', 0, 0, 'NASDAQ');     
+
+                    }
+
+                    onSubmit() {
+                        console.log(this.stock.name);
+                    }
+
+                    onChangeName(event: any) {
+                        this.stock.name = event.target.value;
+                    }
+                    setStockPrice(price: any) {                                      
+                        this.stock.price = price;
+                        this.stock.previousPrice = price;
+                    }
+
+                    createStock() {                                             
+                        console.log('Creating stock ', this.stock);
+                    }
+
+                    emitirEvento(valor: any) {                          // Método adicionado
+                        this.eventoEmitido.emit(valor);    
+                        console.log(valor);
+                        this.stock = new Stock('test', '', 0, 0, 'NASDAQ');     
+                    }
+
+
+                }
+
+            . Altere o conteúdo do arquivo "create-stock.component.html" conforme abaixo:
+
+                <h2>Create Stock Form</h2>
+                <div class="form-group">
+                    <!--                                         Linha alterada
+                    <form (ngSubmit)="createStock()">
+                    -->
+                    <form>                                  <!-- Linha alterada -->
+                        <div class="stock-name">
+                            <input type="text" 
+                                    placeholder="Stock Name"
+                                    name="stockName" 
+                                    [(ngModel)]="stock.name">
+                        </div>
+
+                        <div class="stock-code">
+                            <input type="text" 
+                                    placeholder="Stock Code"
+                                    name="stockCode" 
+                                    [(ngModel)]="stock.code">
+                        </div>
+
+                        <div class="stock-code">
+                            <input type="number" 
+                                    placeholder="Stock Price"
+                                    name="stockPrice" 
+                                    [ngModel]="stock.price"
+                                    (ngModelChange)="setStockPrice($event)">
+                        </div>
+
+                        <div class="stock-exchange">
+                            <div>
+                                <input type="radio" 
+                                        name="stockExchange"
+                                        [(ngModel)]="stock.exchange" 
+                                        value="NYSE">NYSE
+                            </div>
+                            
+                            <div>
+                                <input type="radio" 
+                                        name="stockExchange"
+                                        [(ngModel)]="stock.exchange" 
+                                        value="NASDAQ">NASDAQ
+                            </div>
+
+                            <div>
+                                <input type="radio" 
+                                        name="stockExchange"
+                                        [(ngModel)]="stock.exchange" 
+                                        value="OTHER">OTHER
+                            </div>
+                        </div>
+                        <div class="stock-confirm">
+                            <input type="checkbox" 
+                                    name="stockConfirm"
+                                    [(ngModel)]="confirmed">
+                            I confirm that the information provided above is accurate!
+                        </div>
+
+                        <!-- Tag alterada - alterado o método (click) -->
+
+                        <!-- Tag alterada - alterado o método (click) -->
+                        <button [disabled]="!confirmed" 
+                                (click)="emitirEvento(stock)"
+                                type="submit">
+                            Create
+                        </button>
+                    </form>
+                </div>
+
+                <h4>Stock Name is {{stock | json }}</h4>
+                <br>
+                <h4>confirmed is {{confirmed}}</h4>
+
+            . Altere o componente "app.component.html" com o conteúdo abaixo:
+
+                <app-create-stock></app-create-stock>
+
+            . Execute o projeto e verifique se o model "stock" está chegando com sucesso no objeto "create-stock.component.ts":
+
+                ng serve --open
+
+            . Execute o comando abaixo na pasta raiz do projeto:
+
+                ng g c stock/create-stock-item --skip-tests
+
+            . Altere o conteúdo do componente "create-stock-item.component.ts" conforme abaixo:
+
+                import { Component } from '@angular/core';
+                import { Stock } from 'src/app/model/stock';
+
+                @Component({
+                    selector: 'app-create-stock-item',
+                    templateUrl: './create-stock-item.component.html',
+                    styleUrls: ['./create-stock-item.component.css']
+                })
+
+                export class CreateStockItemComponent  {
+                    public stocksItem: Array<Stock> = [];
+
+                    onSave(stock: Stock) {
+                        console.log('We are saving the stock', stock);
+                        this.stocksItem.push(stock);
+                    }
+                }
+
+            . Altere o conteúdo do arquivo "create-stock-item.component.html" com o conteúdo abaixo:
+
+                <app-create-stock (eventoEmitido)="onSave($event)"></app-create-stock>
+
+            . Altere o conteúdo do componente "app.component.ts" pelo conteúdo abaixo:
+
+                <app-create-stock-item></app-create-stock-item>
+
+            . Execute o projeto e verifique se o model "stock" está chegando com sucesso no objeto "create-stock-item.component.ts":
+
+                ng serve --open
 
 
 PAREI AQUI, PÁGINA 90
