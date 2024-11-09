@@ -235,11 +235,11 @@ https://www.tutorialspoint.com/angular8/index.htm
 
             . Exemplo
 
-                ng generate component bem-vindo --skipTests
+                ng generate component bem-vindo --skip-tests
 
                 # ou
 
-                $ ng g c bem-vindo --skipTests
+                $ ng g c bem-vindo --skip-tests
 
             . O comando do exemplo acima criará o componente "src/bem-vindo/bem-vindo.component.ts"
 
@@ -2344,7 +2344,7 @@ https://www.tutorialspoint.com/angular8/index.htm
 
             . Acesse a raiz do projeto e execute o comando abaixo no prompt do SO:
 
-                ng g c stock-card --skipTests
+                ng g c stock-card --skip-tests
 
             . Altere o componente "stock-card.component.ts" com o conteúdo abaixo:
 
@@ -2439,7 +2439,7 @@ https://www.tutorialspoint.com/angular8/index.htm
                         -->
 
                         <!-- Trecho adicionado -->
-                        <div class="card" style="width: 18rem;">
+                        <div class="card">
                             <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg" 
                                 class="card-img-top" 
                                 style="width: 100%; height: auto;">
@@ -2461,6 +2461,94 @@ https://www.tutorialspoint.com/angular8/index.htm
 
 
     . Output
+
+        . É um decorador do Angular que permite que um componente emita eventos para os seus pais ou outros componentes. 
+            Ele é usado para criar uma comunicação entre componentes, permitindo que um componente notifique outros 
+            componentes sobre mudanças ou ações que ocorreram.
+
+                // Componente filho
+                import { Component, Output, EventEmitter } from '@angular/core';
+
+                @Component({
+                    selector: 'app-filho',
+                    template: `
+                        <select (change)="emitirEvento($event)">    <!-- 1 -->
+                        <option value="opcao1">Opção 1</option>
+                        <option value="opcao2">Opção 2</option>
+                        <option value="opcao3">Opção 3</option>
+                        </select>
+                    `
+                })
+                export class FilhoComponent {
+                    @Output() eventoEmitido = new EventEmitter();
+
+                    emitirEvento(valor: any) {
+                        this.eventoEmitido.emit(valor.target.value);    // 1
+                        console.log(valor);
+                        
+                    }
+                }
+
+
+                // Componente pai
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-pai',
+                    template: `
+                        <app-filho (eventoEmitido)="tratarEvento($event)"></app-filho>
+                    `
+                })
+                export class PaiComponent {
+                    tratarEvento(evento: string) {
+                        console.log(evento);
+                    }
+                }
+
+
+            . Quando o método this.eventoEmitido.emit(valor); é executado, o seguinte fluxo de eventos ocorre:
+
+                1. Emissão do evento: O método emit() é chamado no objeto eventoEmitido, que é uma instância de EventEmitter. 
+                    Isso faz com que o evento seja emitido para os ouvintes registrados.
+                
+                2. Notificação dos ouvintes: O EventEmitter notifica todos os ouvintes registrados que o evento foi emitido. 
+                    Nesse caso, o ouvinte é o componente pai que tem um método tratarEvento() que foi registrado para ouvir o evento.
+                
+                3. Chamada do método de tratamento: O método tratarEvento() é chamado no componente pai, passando o valor 
+                    do evento como parâmetro. Nesse caso, o valor do evento é o valor que foi passado como parâmetro para o método emit().
+                
+                4. Execução do método de tratamento: O método tratarEvento() é executado no componente pai, processando o 
+                    valor do evento e realizando as ações necessárias.
+
+                +------------------+
+                |  FilhoComponent  |
+                +------------------+
+                       |
+                       |  emitirEvento()
+                       |  this.eventoEmitido.emit(valor)
+                       |
+                       v
+                +----------------+
+                |  EventEmitter  |
+                +----------------+
+                       |
+                       |  notificar ouvintes
+                       |
+                       v
+                +----------------+
+                |  PaiComponent  |
+                +----------------+
+                       |
+                       |  tratarEvento()
+                       |  processar valor do evento
+                       |
+                       v
+                +---------------+
+                |  Resultado    |
+                +---------------+
+
+
+
 
 
 PAREI AQUI, PÁGINA 90
