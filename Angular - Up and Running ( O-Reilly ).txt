@@ -3,6 +3,10 @@ Angular - Up and Running ( O-Reilly )
 
 https://www.tutorialspoint.com/angular8/index.htm
 
+# What´s new between versions 2 and 17 
+https://www.calibraint.com/blog/the-evolution-of-angular-versions
+
+
 1. Configurando o ambiente de desenvolvimento
 ---------------------------------------------
 
@@ -853,8 +857,8 @@ https://www.tutorialspoint.com/angular8/index.htm
                         <div class="price">$ {{price}}</div>
 
                             <!-- DIV alterada -->
-                            <div class="price"
-                                [class]="positiveChange ? 'positive' : 'negative'">$40{{price}}
+                            <div [class]="positiveChange ? 'positive' : 'negative'">
+                                $ {{price}}
                             </div>
                             <!-- Fim da alteração -->
                         </div>            
@@ -886,20 +890,22 @@ https://www.tutorialspoint.com/angular8/index.htm
             . Crie as linhas abaixo na no arquivo "stock-item.component.html"
 
                 <div class="stock-container">
-                    <div class="name">{{name + ' (' + code + ')'}}</div>
-                        <div    class="price"
-                                [class]="positiveChange ? 'positive' : 'negative'">
-                            $ {{price}}
-                        </div>
+                    <div class="name">
+                        {{name + ' (' + code + ')'}}
+                    </div>
 
-                        <!-- Button Criado -->
-                        <button (click)="toggleFavorite()"
-                                [disabled]="favorite">
-                            Add to Favorite
-                        </button>
+                    <div [class]="positiveChange ? 'positive' : 'negative'">
+                        $ {{price}}
+                    </div>
+
+                    <!-- Button Criado -->
+                    <button (click)="toggleFavorite()"
+                            [disabled]="favorite">
+                        Add to Favorite
+                    </button>
                 </div>        
 
-            . Execute o projeto e veja o resultado:
+            . Execute o projeto e veja se o resultado foi o botão desabilitado quando é clicado:
 
                 ng s -o
 
@@ -917,6 +923,7 @@ https://www.tutorialspoint.com/angular8/index.htm
                         // Inclua na assinatura do método o parâmetro "evento"
                         toggleFavorite( event: any ) {
                             console.log('We are toggling the favorite state for this stock', event);       // Altere a linha
+                            console.log('We are toggling the favorite state for this stock', event.targe);       // Altere a linha
                             this.favorite = !this.favorite;
                         }
                     }
@@ -925,8 +932,7 @@ https://www.tutorialspoint.com/angular8/index.htm
 
                     <div class="stock-container">
                         <div class="name">{{name + ' (' + code + ')'}}</div>
-                            <div    class="price"
-                                    [class]="positiveChange ? 'positive' : 'negative'">
+                            <div  [class]="positiveChange ? 'positive' : 'negative'">
                                 $ {{price}}
                             </div>
 
@@ -936,6 +942,11 @@ https://www.tutorialspoint.com/angular8/index.htm
                                 Add to Favorite
                             </button>
                     </div>        
+
+            . Execute o projeto e veja o resultado no console do navegador
+
+                ng s -o
+
 
         . Models Class no desenvolvimento 
 
@@ -988,7 +999,7 @@ https://www.tutorialspoint.com/angular8/index.htm
 
             . Execute o comando abaixo na pasta raiz do projeto
 
-                ng generate class model/stock
+                ng generate class model/stock --skip-tests
 
             . Adapte a classe model criada conforme abaixo:
 
@@ -1194,7 +1205,7 @@ https://www.tutorialspoint.com/angular8/index.htm
 
                 . Use ngClass quando você precisa adicionar ou remover várias classes CSS com base em condições 
                     diferentes ou quando a lógica é mais complexa.
-
+PAREI AQUI
         . Demo - Class Binding "ngClass e class"
 
             . Adicione as linhas abaixo no stock-item.component.css
