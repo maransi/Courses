@@ -2910,19 +2910,237 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
             ng s -o
 
-        
+7. Mecânismos para se trabalhar com formulários no Angular
+----------------------------------------------------------
+
+    . Existem dois mecanismos principais para trabalhar com formulários no Angular: Template-Driven Forms e Reactive Forms.
+
+        . Template-Driven Forms
+
+            . Nesse mecanismo, os formulários são criados usando diretivas no template HTML. As diretivas são usadas para vincular os campos do formulário a propriedades do componente.
+
+                . Vantagens:
+
+                    . Fácil de usar e entender
+
+                    . Não requer conhecimento de Observables ou RxJS
+
+                    . Pode ser usado com validação de formulário
+
+
+                . Desvantagens:
+
+                    . Não é tão flexível quanto os Reactive Forms
+
+                    . Não é possível usar validação de formulário personalizada
+
+                    . Não é possível usar formulários aninhados
+
+            . Exemplo
+
+                <!-- HTML -->
+                <form #form="ngForm" (ngSubmit)="submitForm(form)">
+                    <div>
+                        <label for="nome">Nome:</label>
+                        <input  type="text" 
+                                id="nome" 
+                                name="nome" 
+                                [(ngModel)]="usuario.nome" 
+                                required 
+                                minlength="3" 
+                                maxlength="50">
+
+                        <div *ngIf="form.controls.nome?.invalid && (form.controls.nome?.dirty || form.controls.nome?.touched)">
+                            <div *ngIf="form.controls.nome?.errors?.required">
+                                O nome é obrigatório.
+                            </div>
+                            <div *ngIf="form.controls.nome?.errors?.minlength">
+                                O nome deve ter pelo menos 3 caracteres.
+                            </div>
+                            <div *ngIf="form.controls.nome?.errors?.maxlength">
+                                O nome deve ter no máximo 50 caracteres.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email">E-mail:</label>
+                        <input  type="email" 
+                                id="email" 
+                                name="email" 
+                                [(ngModel)]="usuario.email" 
+                                required 
+                                email>
+                        <div *ngIf="form.controls.email?.invalid && (form.controls.email?.dirty || form.controls.email?.touched)">
+                            <div *ngIf="form.controls.email?.errors?.required">
+                                O e-mail é obrigatório.
+                            </div>
+                            <div *ngIf="form.controls.email?.errors?.email">
+                                O e-mail deve ser válido.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" [disabled]="!form.valid">Enviar</button>
+                </form>
 
 
 
-PAREI AQUI, PÁGINA 148
+                // Typescript
+                import { Component } from '@angular/core';
+                
+                @Component({
+                selector: 'app-exemplo',
+                templateUrl: './componente.html'
+                })
+                export class ExemploComponent {
+                usuario = {
+                    nome: '',
+                    email: ''
+                };
+                
+                submitForm(form: any) {
+                    if (form.valid) {
+                    console.log('Formulário válido:', form.value);
+                    } else {
+                    console.log('Formulário inválido:', form.value);
+                    }
+                }
+                }
 
-https://consolelog.com.br/validacao-formulario-ngmodel-angular/
+        . Reactive Forms
 
+            . Nesse mecanismo, os formulários são criados usando classes e métodos no componente. As classes são usadas para criar formulários reativos que podem ser manipulados programaticamente.
+
+            . Vantagens:
+
+                . Mais flexível do que os Template-Driven Forms
+
+                . Permite validação de formulário personalizada
+
+                . Permite formulários aninhados
+
+                . Pode ser usado com Observables e RxJS
+
+
+            . Desvantagens:
+
+                . Mais complexo do que os Template-Driven Forms
+
+                . Requer conhecimento de Observables e RxJS
+
+                . Pode ser mais difícil de usar para desenvolvedores iniciantes
+
+            . Exemplo
+
+                import { FormGroup, FormControl, Validators } from '@angular/forms';
+
+                @Component({
+                    selector: 'app-exemplo',
+                    template: `
+                        <form [formGroup]="form">
+                            <input type="text" formControlName="nome">
+                            <input type="email" formControlName="email">
+                            <button type="submit">Enviar</button>
+                        </form>
+                    `
+                })
+
+                export class ExemploComponent {
+                    form = new FormGroup({
+                        nome: new FormControl('', Validators.required),
+                        email: new FormControl('', Validators.email)
+                    });
+                }
+
+    . Template-Driven Forms
+
+        . Diretiva "ngForm"
+
+            . É uma diretiva do Angular que é usada para criar um formulário que pode ser validado e enviado. Ela é parte 
+                do módulo FormsModule do Angular.
+
+            . Quando você usa a diretiva ngForm em um formulário, o Angular cria um objeto FormGroup que representa o 
+                formulário e seus campos. Esse objeto pode ser usado para validar o formulário e enviar os dados p
+                ara o servidor.
+
+            . Gerenciamento de Formulário**: A diretiva `ngForm` atua como um controlador para o formulário, permitindo que 
+                o Angular rastreie o estado dos campos, como se eles estão válidos ou inválidos, sujos ou limpos, e se foram 
+                tocados ou não. Isso é essencial para a validação e manipulação dos dados do formulário.
+
+            . Referência ao Formulário**: Quando você usa `ngForm` em um elemento `<form>`, pode criar uma referência local a 
+                ele usando a sintaxe `#nomeDaVariavel="ngForm"`. Isso permite acessar propriedades do formulário diretamente 
+                no template, como `valid`, `invalid`, `dirty`, e `pristine`.
+
+            . Submissão de Formulário**: A diretiva facilita a submissão do formulário através do evento `(ngSubmit)`, que é 
+                disparado quando o formulário é enviado. Você pode vincular esse evento a um método no seu componente para 
+                processar os dados do formulário.
+
+            . Integração com ngModel**: A diretiva `ngForm` trabalha em conjunto com a diretiva `ngModel`, que é utilizada 
+                para criar controles de entrada vinculados ao modelo de dados. Cada campo de entrada que utiliza `ngModel` 
+                será automaticamente registrado no controlador de formulário gerenciado pelo `ngForm`, permitindo que os 
+                dados sejam coletados e validados facilmente.
+
+            . A diretiva faz parte da biblioteca "FormsModule", portanto é preciso importa-la no módulo do formulário que
+                pretendemos utilizar a diretiva "NgForm". Vide ponto abaixo como fazer:
+                
+                . "ngModel" encontra-se no pacote "FormsModule":"
+
+            . Exemplo
+
+                // *.component.html
+                <form #form="ngForm" (ngSubmit)="onSubmit()" >
+                    <input type="text"
+                            name="cpfCnpj"
+                            [(ngModel)]="cpfCnpj"
+                            [required]="true"
+                            placeholder="Informe o CPF do cliente">
+                    <br>
+                    <input type="text"
+                            name="nome"
+                            [(ngModel)]="nome"
+                            [required]="true"
+                            placeholder="Informe o nome do cliente">
+                    <br>
+                    <button type="submit" [disabled]="!form.valid">Enviar</button>
+                    <!-- <button type="submit" >Enviar</button> -->
+                </form>
+
+                // *.component.ts
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-acordo',
+                    templateUrl: './acordo.component.html',
+                    styleUrls: ['./acordo.component.scss']
+                })
+                export class AcordoComponent {
+                    cpfCnpj = '';
+                    nome = '';
+
+                    onSubmit() {
+                        console.log(this.cpfCnpj);
+                        console.log(this.nome);
+                    }
+                }
+
+                // *.modules.ts
+                ...
+                import { FormsModule } from '@angular/forms';   // Declaração do FormsModule
+
+                @NgModule({
+                    ...
+                    imports: [
+                        FormsModule                             // Importação do FormsModule
+                    ],
+                    ...
+                })
+                export class FinanceiroModule { }
 
         . Variáveis de referência 
         
             . São usadas para vincular um elemento do template a uma variável no componente. Isso permite que você acesse o 
-              elemento do template no componente e faça operações com ele.
+                elemento do template no componente e faça operações com ele.
 
             . As variáveis de referência são definidas no template usando o símbolo # seguido do nome da variável. Por exemplo:
 
@@ -2946,6 +3164,142 @@ https://consolelog.com.br/validacao-formulario-ngmodel-angular/
                             console.log(valor);
                         }
                     }
+
+    . Demo
+
+        . Altere o componente "stock-item.component.html" com o conteúdo abaixo:
+
+            <h1>Welcome to stock-item</h1>
+
+            <div class="container">
+                <div class="alert alert-success" role="alert" *ngIf="!saved">
+                    Product Name : <strong> {{stock.name}} </strong>
+                </div>
+
+                <!-- Tag <form. inserida -->
+
+                <form #stockForm="ngForm" (ngSubmit)="onSave()">
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+
+                                <!-- Atribute [required] inserido -->
+                                <input type="text"
+                                        class="form-control form-control-sm"
+                                        id="stockCode" name="stockCode"
+                                        [required]="true"
+                                        [(ngModel)]="stock.code"
+                                        (focus)="saved=false">
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="clienteNome">Stock Name</label>
+
+                                <!-- Atribute [required] inserido -->
+                                <input type="text"
+                                        class="form-control form-control-sm"
+                                        id="stockName"
+                                        name="stockName"
+                                        required 
+                                        minlength="3" 
+                                        maxlength="15"
+                                        [(ngModel)]="stock.name">
+                            </div>
+                        </div>
+
+                        <!-- Atribute [required, min ] inserido -->
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+                                <input type="number"
+                                        class="form-control form-control-sm"
+                                        id="stockPrice"
+                                        name="stockPrice"
+                                        min="1"
+                                        required
+                                        [(ngModel)]="stock.price">
+                            </div>
+                        </div>
+
+                        <!-- Atribute [required, min ] inserido -->
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice">Stock Previous Price</label>
+                                <input type="number"
+                                        class="form-control form-control-sm"
+                                        id="stockPreviousPrice"
+                                        name="stockPreviousPrice"
+                                        min="1"
+                                        required
+                                        [(ngModel)]="stock.previousPrice">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockExchange">Stock Exchange</label>
+                                <select class="form-select form-select-sm" id="stockExchange" name="stockExchange"
+                                    [(ngModel)]="stock.exchange">
+                                    <option value="NYSE" selected>NYSE</option>
+                                    <option value="NASDAQ">NASDAQ</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-12">
+
+                            <!-- Tag button eliminado -->
+                            <!--
+                            <button type="button" class="btn btn-primary" (click)="onSave()"
+                                [disabled]="stock.name.length == 0 || stock.code.length == 0">
+                            -->
+
+                            <!-- Tag button submit inserida -->
+                            <button type="submit"
+                                    class="btn btn-primary"
+                                    [disabled]="stockForm.invalid">
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-2" style="padding-top: 10px; padding-bottom: 10px; "
+                            *ngFor="let p of productsStock; index as i">
+                            <app-stock-card [stockItem]="p"></app-stock-card>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        . Inseri a tag abaixo no componente "app.component.ts"
+
+            <app-stock-item></app-stock-item>
+
+        . Execute a aplicação e verifique se o botão ficará habilitado caso as validações dos campos sejam atendidas:
+
+            ng s -o
+
+. Criar as validações com variaveis de referencia
+
+. Criar as msgs customizadas para cada campo
+
+
+        
+
+
+
+PAREI AQUI, PÁGINA 148
+
+https://consolelog.com.br/validacao-formulario-ngmodel-angular/
+https://www.toptal.com/angular-js/angular-4-forms-validation
+
+
 
 
 
@@ -3078,6 +3432,4 @@ https://consolelog.com.br/validacao-formulario-ngmodel-angular/
                     . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário
 
                     . ngFormArray: diretiva para criar um array de formulários e gerenciar os dados de formulário                
-
-    . Demo
 
