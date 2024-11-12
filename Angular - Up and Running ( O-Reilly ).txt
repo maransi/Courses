@@ -1742,58 +1742,74 @@ https://www.calibraint.com/blog/the-evolution-of-angular-versions
                 <h2>Create Stock Form</h2>
                 <div class="form-group">
                     <form (ngSubmit)="createStock()">
-                        <div class="stock-name">
-                            <input type="text" 
-                                    placeholder="Stock Name"
-                                    name="stockName" 
-                                    [(ngModel)]="stock.name">
-                        </div>
-
-                        <div class="stock-code">
-                            <input type="text" 
-                                    placeholder="Stock Code"
-                                    name="stockCode" 
-                                    [(ngModel)]="stock.code">
-                        </div>
-
-                        <div class="stock-code">
-                            <input type="number" 
+                        <div class="row">
+                            <div class="col-3">
+                                <label for="stockName">Stock Name</label>
+                                <input type="text"
+                                        placeholder="Stock Name"
+                                        name="stockName"
+                                        id="stockName"
+                                        class="form-control form-control-sm"
+                                        [(ngModel)]="stock.name">
+                            </div>
+                            <div class="col-3">
+                                <label for="stockCode">Stock Code</label>
+                                <input type="text"
+                                            placeholder="Stock Code"
+                                            name="stockCode"
+                                            id="stockCode"
+                                            class="form-control form-control-sm"
+                                            [(ngModel)]="stock.code">
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="stockPrice">Stock Price</label>
+                                    <input type="number"
                                     placeholder="Stock Price"
-                                    name="stockPrice" 
+                                    name="stockPrice"
+                                    id="stockPrice"
+                                    class="form-control form-control-sm"
                                     [ngModel]="stock.price"
                                     (ngModelChange)="setStockPrice($event)">
-                        </div>
+                                </div>
+                            </div>
 
-                        <div class="stock-exchange">
-                            <div>
-                                <input type="radio" 
+                            <div class="col-3 mt-4">
+                                <div class="form-group">
+                                    <label for="stockExchange">Stock Change:&nbsp;&nbsp;</label>
+                                    <input type="radio"
                                         name="stockExchange"
-                                        [(ngModel)]="stock.exchange" 
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
                                         value="NYSE">NYSE
-                            </div>
-                            
-                            <div>
-                                <input type="radio" 
+                                    <input type="radio"
                                         name="stockExchange"
-                                        [(ngModel)]="stock.exchange" 
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
                                         value="NASDAQ">NASDAQ
-                            </div>
-
-                            <div>
-                                <input type="radio" 
+                                    <input type="radio"
                                         name="stockExchange"
-                                        [(ngModel)]="stock.exchange" 
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
                                         value="OTHER">OTHER
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <input type="checkbox"
+                                    name="stockConfirm"
+                                    class="form-check-input"
+                                    [(ngModel)]="confirmed">
+                                    I confirm that the information provided above is accurate!
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding: 10px;">
+                                <div class="col-2">
+                                    <button [disabled]="!confirmed" class="btn btn-primary" type="submit">Create</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="stock-confirm">
-                            <input type="checkbox" 
-                                    name="stockConfirm"
-                                    [(ngModel)]="confirmed">
-                            I confirm that the information provided above is accurate!
-                        </div>
-
-                        <button [disabled]="!confirmed" type="submit">Create</button>
                     </form>
                 </div>
 
@@ -1859,6 +1875,7 @@ https://www.calibraint.com/blog/the-evolution-of-angular-versions
                 export class ExemploComponent {
                     condicao = true;
                 }
+PAREI AQUI
 
         . Demo - ngIf
 
