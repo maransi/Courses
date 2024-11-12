@@ -6,6 +6,8 @@ https://www.tutorialspoint.com/angular8/index.htm
 # What´s new between versions 2 and 17 
 https://www.calibraint.com/blog/the-evolution-of-angular-versions
 
+# Introdução ao Angular 17
+https://consolelog.com.br/introducao-ao-angular-17/
 
 1. Configurando o ambiente de desenvolvimento
 ---------------------------------------------
@@ -1875,7 +1877,6 @@ https://www.calibraint.com/blog/the-evolution-of-angular-versions
                 export class ExemploComponent {
                     condicao = true;
                 }
-PAREI AQUI
 
         . Demo - ngIf
 
@@ -1887,6 +1888,8 @@ PAREI AQUI
                             [class]="stock.isPositiveChange() ? 'positive' : 'negative'">
                         $ {{stock.price}}
                     </div>
+
+                    <!-- Button Alterado -->
                     <button (click)="toggleFavorite($event)" 
                             *ngIf="!stock.favorite">
                         Add to Favorite
@@ -1958,13 +1961,14 @@ PAREI AQUI
                     // Método inserido
                     onSave() {
                         console.log('We are saving the stock', this.stock);
-                        this.stock = new Stock('', '', 0, 0, '');
                         this.onInitStock();
                         this.saved=true;
                     }
                 }
 
             . Atualize o componente "stock-item.component.html" com o conteúdo abaixo:
+
+                <h1>Welcome to stock-item</h1>
 
                 <div class="container">
                     <div class="alert alert-success" role="alert" *ngIf="!saved">
@@ -2046,7 +2050,50 @@ PAREI AQUI
 
                 ng s -o
 
-            . Insira o trecho abaixo no componente "stock-item.component.htnl"
+            . Altere o componente "stock-item.component.ts" com o conteúdo abaixo:
+
+                import { Component, OnInit } from '@angular/core';
+                import { Stock } from 'src/app/model/stock';
+
+                @Component({
+                    selector: 'app-stock-item',
+                    templateUrl: './stock-item.component.html',
+                    styleUrls: ['./stock-item.component.css']
+                })
+                export class StockItemComponent implements OnInit {
+                    ...
+                    public saved: boolean = false;    
+
+                    // public productsStock: Stock[] = [];               
+                    public productsStock: Array<Stock> = [];        // Linha inserida
+
+                    ngOnInit(): void {
+                        ...
+                    }
+
+                    onInitStock() {
+                        ...
+                    }
+
+                    toggleFavorite(event: any, index: number) {     // Parametro incluido
+
+
+                        console.log('We are toggling the favorite state for this stock event.target ', event.target);
+                        console.log('We are toggling the favorite state for this stock event.target.value ', event.target.value);
+                        console.log('We are toggling the favorite state for this stock index ', index);                             // Linha inserida
+                        console.log('We are toggling the favorite state for this stock ', this.productsStock[index]);               // Linha inserida
+                    }
+
+                    onSave() {
+                        console.log('We are saving the stock', this.stock);
+                        this.productsStock.push(this.stock);                // Linha inserida
+                        this.onInitStock();
+                        this.saved=true;
+
+                    }
+                }
+
+            . Insira o trecho abaixo no componente "stock-item.component.html"
 
                 <div class="container">
                     <div class="alert alert-success" role="alert" *ngIf="!saved">
@@ -2111,50 +2158,7 @@ PAREI AQUI
 
                 ng s -o
 
-            . Altere o componente "stock-item.component.ts" com o conteúdo abaixo:
-
-                import { Component, OnInit } from '@angular/core';
-                import { Stock } from 'src/app/model/stock';
-
-                @Component({
-                    selector: 'app-stock-item',
-                    templateUrl: './stock-item.component.html',
-                    styleUrls: ['./stock-item.component.css']
-                })
-                export class StockItemComponent implements OnInit {
-                    ...
-                    public saved: boolean = false;    
-
-                    // public productsStock: Stock[] = [];               
-                    public productsStock: Array<Stock> = [];        // Linha inserida
-
-                    ngOnInit(): void {
-                        ...
-                    }
-
-                    onInitStock() {
-                        ...
-                    }
-
-                    toggleFavorite(event: any, index: number) {     // Parametro incluido
-
-
-                        console.log('We are toggling the favorite state for this stock event.target ', event.target);
-                        console.log('We are toggling the favorite state for this stock event.target.value ', event.target.value);
-                        console.log('We are toggling the favorite state for this stock index ', index);                             // Linha inserida
-                        console.log('We are toggling the favorite state for this stock ', this.productsStock[index]);               // Linha inserida
-                    }
-
-                    onSave() {
-                        console.log('We are saving the stock', this.stock);
-                        this.productsStock.push(this.stock);                // Linha inserida
-                        this.onInitStock();
-                        this.saved=true;
-
-                    }
-                }
-
-            . Insira o trecho abaixo no componente "stock-item.component.htnl"
+            . Insira o trecho abaixo no componente "stock-item.component.html"
 
                 <div class="container">
                     <div class="alert alert-success" role="alert" *ngIf="!saved">
@@ -2172,7 +2176,7 @@ PAREI AQUI
                     <div class="row" style="margin-top: 20px;" >
                         <div class="col-6" 
                             style="padding-top: 10px; padding-bottom: 10px; border: 1px solid black;"
-                            *ngFor="let p of productsStock" >
+                            *ngFor="let p of productsStock; index as i" >                               <!-- Incluido "index as i" -->
                             <div class="row">
                                 ...
                             </div>
@@ -2194,6 +2198,11 @@ PAREI AQUI
                         </div>
                     </div>
                 </div>
+
+            . Execute o projeto e verifique através da console do navegador se as informações estão chegando corretamente 
+                no componente.
+
+                ng s -o
 
         . É possivel utilizar ngFor e ngIf juntos:
 
@@ -2372,12 +2381,12 @@ PAREI AQUI
 
             . Acesse a raiz do projeto e execute o comando abaixo no prompt do SO:
 
-                ng g c stock-card --skip-tests
+                ng g c stock/stock-card --skip-tests
 
             . Altere o componente "stock-card.component.ts" com o conteúdo abaixo:
 
                 import { Component, Input } from '@angular/core';
-                import { Stock } from '../model/stock';         // Linha inserida
+                import { Stock } from 'src/app/model/stock';        // Linha inserida
 
                 @Component({
                     selector: 'app-stock-card',
@@ -2393,9 +2402,16 @@ PAREI AQUI
             . Cópie o código HTML abaixo para o arquivo src/app/stock-card/stock-card.component.html
 
                 <div class="card">
-                    <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg">
+                    <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg" 
+                        class="card-img-top" 
+                        style="width: 100%; height: auto;">
+                    
                     <div class="card-body">
-                        {{stockItem.name}}
+                        <h5 class="card-title">{{stockItem.name}}</h5>
+                        <p class="card-text">
+                            R$ {{stockItem.price}} <br>
+                            {{ stockItem.exchange}} 
+                        </p>
                     </div>
                 </div>  
 
@@ -2679,11 +2695,16 @@ PAREI AQUI
                         <!-- Tag alterada - alterado o método (click) -->
 
                         <!-- Tag alterada - alterado o método (click) -->
-                        <button [disabled]="!confirmed" 
-                                (click)="emitirEvento(stock)"
-                                type="submit">
-                            Create
-                        </button>
+                        <div class="row" style="padding: 10px;">
+                            <div class="col-2">
+                                <button [disabled]="!confirmed" 
+                                        (click)="emitirEvento(stock)"
+                                        class="btn btn-primary" 
+                                        type="submit">
+                                    Create
+                                </button>
+                            </div>
+                        </div>
                     </form>
                 </div>
 
@@ -2695,7 +2716,8 @@ PAREI AQUI
 
                 <app-create-stock></app-create-stock>
 
-            . Execute o projeto e verifique se o model "stock" está chegando com sucesso no objeto "create-stock.component.ts":
+            . Execute o projeto e verifique se o model "stock" está chegando com sucesso no objeto "create-stock.component.ts" na
+                console do navegador:
 
                 ng serve --open
 
@@ -2735,8 +2757,164 @@ PAREI AQUI
 
                 ng serve --open
 
+6. Ciclo de vida dos componentes do Angular
+-------------------------------------------
 
-PAREI AQUI, PÁGINA 90
+    . O Angular primeiro chamará o construtor para qualquer componente e, em seguida, as
+        várias etapas mencionadas anteriormente em ordem. Algumas delas, como OnInit
+        e AfterContentInit (basicamente, qualquer método/evento do ciclo de vida terminando com Init)
+        são chamadas apenas uma vez, quando um componente é inicializado, enquanto as outras são
+        chamadas sempre que qualquer conteúdo muda. O gancho OnDestroy também é chamado
+        apenas uma vez para um componente.
+
+    . Cada uma dessas etapas do ciclo de vida vem com uma interface que deve ser
+        implementada quando um componente se importa com aquele ciclo de vida específico, e
+        cada interface fornece uma função começando com ng que precisa ser
+        implementada. 
+        
+        . Por exemplo, a etapa do ciclo de vida OnInit precisa de uma função
+            chamada ngOnInit para ser implementada no componente e assim por diante.
+
+    . É um conjunto de métodos que são chamados em diferentes estágios do ciclo de vida de um componente. Aqui está uma visão 
+        geral dos principais métodos do ciclo de vida:
+
+        . ngOnChanges: Chamado quando as propriedades de entrada do componente são atualizadas.
+
+        . ngOnInit: Chamado após a inicialização do componente, quando as propriedades de entrada estão disponíveis.
+
+        . ngDoCheck: Chamado após a inicialização do componente e após cada atualização das propriedades de entrada.
+
+        . ngAfterContentInit: Chamado após a inicialização do conteúdo do componente.
+
+        . ngAfterViewInit: Chamado após a inicialização da view do componente.
+
+        . ngAfterViewChecked: Chamado após a verificação da view do componente.
+
+        . ngOnDestroy: Chamado antes da destruição do componente.
+
+    . Representação visual da sequência de execução
+
+        +---------------+
+        |  Constructor  |
+        +---------------+
+            |
+            |
+            v
+        +---------------+
+        |  ngOnChanges  |
+        +---------------+
+            |
+            |
+            v
+        +---------------+
+        |  ngOnInit     |
+        +---------------+
+            |
+            |
+            v
+        +---------------+
+        |  ngDoCheck    |
+        +---------------+
+            |
+            |
+            v
+        +--------------------+
+        | ngAfterContentInit |
+        +--------------------+
+            |
+            |
+            v
+        +------------------+
+        | ngAfterViewInit  |
+        +------------------+
+            |
+            |
+            v
+        +--------------------+
+        | ngAfterViewChecked |
+        +--------------------+
+            |
+            |
+            v
+        +---------------+
+        |  ngOnDestroy  |
+        +---------------+
+
+    . Demo - Ciclo de vida dos componentes do Angular
+
+        . Implemente todo o conteúdo do componente  "app.component.ts" pelo abaixo:
+
+            import {
+                Component, SimpleChanges, OnInit, OnChanges, OnDestroy,
+                DoCheck, AfterViewChecked, AfterViewInit,
+                AfterContentChecked,
+                AfterContentInit
+            } from '@angular/core';                                 
+
+            import { Stock } from './model/stock';
+
+            @Component({
+                selector: 'app-root',
+                templateUrl: './app.component.html',
+                styleUrls: ['./app.component.css']
+            })
+
+            export class AppComponent implements OnInit, OnChanges, OnDestroy,
+                DoCheck, AfterContentChecked,
+                AfterContentInit,
+                AfterViewChecked,
+                AfterViewInit {
+
+                title = 'app works!';
+                public stock!: Stock;
+
+                onToggleFavorite(stock: Stock) {
+                    console.log('Favorite for stock ', stock, ' was triggered');
+                    this.stock.favorite = !this.stock.favorite;
+                }
+                ngOnInit(): void {
+                    this.stock = new Stock('Test Stock Company', 'TSC', 85, 80, '');
+                    console.log('App Component - On Init');
+                } 
+                
+                ngAfterViewInit(): void {
+                    console.log('App Component - After View Init');
+                } 
+                
+                ngAfterViewChecked(): void {
+                    console.log('App Component - After View Checked');
+                } 
+                
+                ngAfterContentInit(): void {
+                    console.log('App Component - After Content Init');
+                } 
+                
+                ngAfterContentChecked(): void {
+                    console.log('App Component - After Content Checked');
+                } 
+                
+                ngDoCheck(): void {
+                    console.log('App Component - Do Check');
+                } 
+                
+                ngOnDestroy(): void {
+                    console.log('App Component - On Destroy');
+                } 
+                
+                ngOnChanges(changes: SimpleChanges): void {
+                    console.log('App Component - On Changes - ', changes);
+                }
+            }
+
+        . Execute o projeto e vejo o log de execução na console do navegador:
+
+            ng s -o
+
+        
+
+
+
+PAREI AQUI, PÁGINA 148
 
 https://consolelog.com.br/validacao-formulario-ngmodel-angular/
 
