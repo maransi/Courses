@@ -3285,6 +3285,135 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
             ng s -o
 
+
+    . Controle de estados do formulário:
+
+        . Através do "ngForm" e "ngModel" podemos integrar a validação de formulário do HTML com o Angular.
+
+        . Abaixo a relação de validações permitidas no HTML:
+
+            Regra	            Validação
+            ------              ---------
+            email	            Se definido como true, o campo só aceitará e-mails válidos;
+            required	        Se definido como true, o campo é de preenchimento obrigatório;
+            min	                Define um número ou valor mínimo válido. Por exemplo, se definimos como 4, o usuário só poderá 
+                                informar um número maior igual a 4. Abaixo disso a informação é inválida;
+            max	                Define um número ou valor máximo válido. Por exemplo, se definimos como 10, o usuário só poderá 
+                                informar um número que seja menor ou igual a 10. Acima disso a informação é inválida;
+            range	            Determina um intervalo, contendo um valor mínimo e máximo válido. Por exemplo, se definirmos 
+                                como [10, 20], o usuário só poderá informar um número que seja maior ou igual a 10 e menor ou 
+                                igual a 20;
+            minlength	        Determina uma quantidade mínima de caracteres. Por exemplo, se definirmos como 10, o usuário só 
+                                poderá informar um valor com no mínimo 10 caracteres. Abaixo disso a informação é inválida;
+            maxlength	        Define uma quantidade máxima de caracteres. Por exemplo, se definirmos como 5, o usuário só 
+                                poderá informar um valor com no máximo 5 caracteres. Acima disso a informação é inválida;
+            rangelength	        Define um intervalo, contendo uma quantidade mínima e máxima de caracteres válidos. Por exemplo, 
+                                se definirmos como [2, 6], o usuário só poderá informar um valor com nomínimo 2 e no máximo 6 
+                                caracteres;
+            url	                Se definido como true, o campo só aceitará URLs válidas;
+            date	            Se definido como true, o campo só aceitará datas válidas;
+            dateISO	            Caso definido como true, o input só aceitará datas no formato ISO;
+            number	            Caso definido como true, o input só aceitará números inteiros ou decimais;
+            digits	            Caso definido como true, o input só permitirá dígitos;
+            creditcard	        Se definido como true, o input só permitirá número de cartão de crédito válido;
+            remote	            Caso defina uma URL de verificação, por exemplo “verificar_se_existe_cpf.php”. Então o Validation 
+                                realiza uma verificação remota com a url e com o valor informado no campo, assim, se a resposta para 
+                                a requisição de validação for false, então o Validation entende que a informação no campo não é válida, 
+                                agora caso a resposta for true então a informação é válida. Por exemplo: verificar se o CFP já existe 
+                                na aplicação;
+            equalTo	            Verifica se o valor dois campos são iguais. Por exemplo: Verificar se as senhas são iguais, no cenário 
+                                de inserir uma senha e repetir a senha novamente.
+            accept	            Esta regra é utilizada para o campo “input= file” para upload de arquivo, onde podemos definir quais 
+                                mime-types são permitidos. Por exemplo, se definimos esta regra com o valor “audio/*”, então estamos 
+                                dizendo ao Validation que só é permitido apenas arquivos de áudio;
+            extension	        Nesta regra podemos definir uma certa extensão de arquivo que poderá ser aceito;
+            phoneUs	            Se definido como true, o campo só aceitará valor de telefone válido dos EUA
+            require_from_group  Garante que pelo o menos um campo deve ser válido dentro de um grupo de campos.
+
+        . Além do "ngForm" e "ngModel", também faremos uso das variáveis de referência para realizar validações mais amigáveis.
+
+        . Há dois aspectos nisso:
+
+            . O estado, que nos permite espiar o estado do controle de formulário, se o usuário o visitou, se o usuário o
+                alterou e, finalmente, se ele está em um estado válido.
+
+            . A validade, que nos diz se um controle do formulário é válido ou não, e se não for válido, o motivo subjacente 
+                (ou motivos) pelo qual o elemento de formulário é inválido.
+
+        . Quando você usa o ngModel em um campo de formulário, o Angular cria um objeto FormControl que representa o campo de 
+            formulário. Esse objeto FormControl tem propriedades que permitem que você verifique se o campo de formulário é 
+            válido ou não.
+
+        . Aqui estão algumas das propriedades do objeto FormControl que são usadas para validação:
+
+            . valid: indica se o campo de formulário é válido ou não.
+
+            . invalid: indica se o campo de formulário é inválido ou não.
+
+            . dirty: indica se o campo de formulário foi modificado pelo usuário ou não.
+
+            . touched: indica se o campo de formulário foi tocado pelo usuário ou não.
+
+            . errors: retorna um objeto com as mensagens de erro para o campo de formulário.
+
+        . O ngModel pode alterar o CSS dos elementos HTML na validação usando as seguintes técnicas:
+
+            . Classes de validação: O ngModel adiciona classes de validação aos elementos HTML quando eles são válidos ou inválidos. 
+                                    As classes de validação mais comuns são:
+
+                . ng-valid: adicionada quando o elemento é válido.
+
+                . ng-invalid: adicionada quando o elemento é inválido.
+
+                . ng-dirty: adicionada quando o elemento foi modificado pelo usuário.
+
+                . ng-touched: adicionada quando o elemento foi tocado pelo usuário.
+
+        . Estilos condicionais: O ngModel pode ser usado para aplicar estilos condicionais aos elementos HTML com base na validação. 
+
+            <!-- HTML -->
+            <input type="text" [(ngModel)]="nome" required>
+            <div [class.ng-invalid]="nome.invalid && nome.dirty">O nome é obrigatório.</div>
+
+
+            <input type="text" [(ngModel)]="nome" required>
+            <div [ngClass]="{'ng-invalid': nome.invalid && nome.dirty}">O nome é obrigatório.</div>
+
+
+            /* CSS */
+            .ng-invalid {
+              border: 1px solid red;
+              background-color: #f2dede;
+            }
+            
+            .ng-valid {
+              border: 1px solid green;
+              background-color: #dff0d8;
+            }
+
+        . Exemplo
+
+            <form #form="ngForm">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" [(ngModel)]="nome" required minlength="3" maxlength="50">
+                
+                <div *ngIf="nome.invalid && (nome.dirty || nome.touched)">
+                    <div *ngIf="nome.errors.required">
+                        O nome é obrigatório.
+                    </div>
+
+                    <div *ngIf="nome.errors.minlength">
+                        O nome deve ter pelo menos 3 caracteres.
+                    </div>
+
+                    <div *ngIf="nome.errors.maxlength">
+                        O nome deve ter no máximo 50 caracteres.
+                    </div>
+                </div>
+            </form>
+
+
+
 . Criar as validações com variaveis de referencia
 
 . Criar as msgs customizadas para cada campo
@@ -3294,7 +3423,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
 
 
-PAREI AQUI, PÁGINA 148
+PAREI AQUI, PÁGINA 149
 
 https://consolelog.com.br/validacao-formulario-ngmodel-angular/
 https://www.toptal.com/angular-js/angular-4-forms-validation
