@@ -3413,6 +3413,367 @@ https://consolelog.com.br/introducao-ao-angular-17/
             </form>
 
 
+    . Demo
+
+        . Insira as linhas abaixo no arquivo "create-stock.component.css":
+
+            .error-message {
+                color: red;
+                font-size: 12px;
+                margin-top: 5px;
+            }
+
+        . Insira as linhas abaixo no arquivo "stock-create.component.html":
+
+            <h2>Create Stock Form</h2>
+            <div class="form-group">
+                <form>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="stockName">Stock Name</label>
+
+                            <!-- Atributo "required" inserido -->
+
+                            <input type="text"
+                                    placeholder="Stock Name"
+                                    name="stockName"
+                                    id="stockName"
+                                    required
+                                    class="form-control form-control-sm"
+                                    [(ngModel)]="stock.name">
+
+                            <!-- Div inserida --> 
+                            <div>
+                                The following element changes from green to red
+                                when it has been modified
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label for="stockCode">Stock Code</label>
+                            <input type="text"
+                                        placeholder="Stock Code"
+                                        name="stockCode"
+                                        id="stockCode"
+                                        class="form-control form-control-sm"
+                                        [(ngModel)]="stock.code">
+
+                            <!-- Div inserida --> 
+                            <div>
+                                The following element changes from green to red
+                                when it has been modified
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+                                <input type="number"
+                                        placeholder="Stock Price"
+                                        name="stockPrice"
+                                        id="stockPrice"
+                                        class="form-control form-control-sm"
+                                        [ngModel]="stock.price"
+                                        (ngModelChange)="setStockPrice($event)">
+
+                                <!-- Div inserida --> 
+                                <div>
+                                    The following element changes from green to red
+                                    when it has been modified
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3 mt-4">
+                            <div class="form-group">
+                                <label for="stockExchange">Stock Change:&nbsp;&nbsp;</label>
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="NYSE">NYSE
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="NASDAQ">NASDAQ
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="OTHER">OTHER
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <input type="checkbox"
+                                        name="stockConfirm"
+                                        class="form-check-input"
+                                        [(ngModel)]="confirmed">
+                                I confirm that the information provided above is accurate!
+                            </div>
+                        </div>
+
+                        <div class="row" style="padding: 10px;">
+                            <div class="col-2">
+                                <button [disabled]="!confirmed" 
+                                        (click)="emitirEvento(stock)"
+                                        class="btn btn-primary" 
+                                        type="submit">
+                                    Create
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <h4>Stock Name is {{stock | json}}</h4>
+            <br>
+            <h4>confirmed is {{confirmed}}</h4>
+
+        . Altere o conteúdo do arquivo "app.component.html" pelo abaixo:
+
+            <app-create-stock></app-create-stock>
+
+        . Execute o projeto e verifique o resultado:
+
+            ng s -o
+
+        . FAças as alterações abaixo no arquivo "stock-create.component.html":
+
+            <h2>Create Stock Form</h2>
+            <div class="form-group">
+
+                <form  #stockForm="ngForm">
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="stockName">Stock Name</label>
+
+                            <!-- #stockName variável de referencia inserido -->
+                            <!-- required e minlength inseridos -->
+                            <input type="text"
+                                    placeholder="Stock Name"
+                                    name="stockName"
+                                    autocomplete="off"
+                                    required
+                                    minlength="3"
+                                    #stockName="ngModel"
+                                    class="form-control form-control-sm"
+                                    [(ngModel)]="stock.name">
+
+                            <!-- div eliminada 
+                            <div>
+                                The following element changes from green to red
+                                when it has been modified
+                            </div>
+                            -->
+
+                            <!-- div inserida no lugar da alterada -->
+                            <div *ngIf="stockName.errors && stockName.errors['required']">
+                                Stock Name is Mandatory
+                            </div>                 
+
+                            <!-- div inserida no lugar da alterada -->
+                            <div *ngIf="stockName.errors && stockName.errors['minlength']">
+                                Tamanho minimo 3
+                            </div>                 
+                        </div>
+                        <div class="col-3">
+                            <label for="stockCode">Stock Code</label>
+                            <input type="text"
+                                        placeholder="Stock Code"
+                                        name="stockCode"
+                                        id="stockCode"
+                                        class="form-control form-control-sm"
+                                        [(ngModel)]="stock.code">
+
+                            <div>
+                                The following element changes from green to red
+                                when it has been modified
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+                                <input type="number"
+                                        placeholder="Stock Price"
+                                        name="stockPrice"
+                                        id="stockPrice"
+                                        class="form-control form-control-sm"
+                                        [ngModel]="stock.price"
+                                        (ngModelChange)="setStockPrice($event)">
+
+                                <div>
+                                    The following element changes from green to red
+                                    when it has been modified
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3 mt-4">
+                            <div class="form-group">
+                                <label for="stockExchange">Stock Change:&nbsp;&nbsp;</label>
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="NYSE">NYSE
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="NASDAQ">NASDAQ
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="OTHER">OTHER
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <input type="checkbox"
+                                        name="stockConfirm"
+                                        class="form-check-input"
+                                        [(ngModel)]="confirmed">
+                                I confirm that the information provided above is accurate!
+                            </div>
+                        </div>
+
+                        <div class="row" style="padding: 10px;">
+                            <div class="col-2">
+                                <button [disabled]="!confirmed" 
+                                        (click)="emitirEvento(stock)"
+                                        class="btn btn-primary" 
+                                        type="submit">
+                                    Create
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <h4>Stock Name is {{stock | json}}</h4>
+            <br>
+            <h4>confirmed is {{confirmed}}</h4>
+
+        . Execute o projeto e verifique o resultado:
+
+            ng s -o
+
+        . Faça as alterações abaixo no arquivo "stock-create.component.html":
+
+            <h2>Create Stock Form</h2>
+            <div class="form-group">
+
+                <form  #stockForm="ngForm">
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="stockName">Stock Name</label>
+
+                            <input type="text"
+                                    placeholder="Stock Name"
+                                    name="stockName"
+                                    autocomplete="off"
+                                    required
+                                    minlength="3"
+                                    #stockName="ngModel"
+                                    class="form-control form-control-sm"
+                                    [(ngModel)]="stock.name">
+
+                            <!-- Div inserida para exibir os erros -->
+                            <div *ngIf="stockName.invalid && (stockName.dirty || stockName.touched)"
+                                    [ngClass]="{'error-message': true}">
+                                <div *ngIf="stockName.errors && stockName.errors['required']">
+                                    Stock Name is Mandatory
+                                </div>                 
+
+                                <div *ngIf="stockName.errors && stockName.errors['minlength']">
+                                    Tamanho minimo 3
+                                </div>                 
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label for="stockCode">Stock Code</label>
+                            <input type="text"
+                                        placeholder="Stock Code"
+                                        name="stockCode"
+                                        id="stockCode"
+                                        class="form-control form-control-sm"
+                                        [(ngModel)]="stock.code">
+
+                            <div>
+                                The following element changes from green to red
+                                when it has been modified
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+                                <input type="number"
+                                        placeholder="Stock Price"
+                                        name="stockPrice"
+                                        id="stockPrice"
+                                        class="form-control form-control-sm"
+                                        [ngModel]="stock.price"
+                                        (ngModelChange)="setStockPrice($event)">
+
+                                <div>
+                                    The following element changes from green to red
+                                    when it has been modified
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3 mt-4">
+                            <div class="form-group">
+                                <label for="stockExchange">Stock Change:&nbsp;&nbsp;</label>
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="NYSE">NYSE
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="NASDAQ">NASDAQ
+                                <input type="radio"
+                                        name="stockExchange"
+                                        class="form-check-input"
+                                        [(ngModel)]="stock.exchange"
+                                        value="OTHER">OTHER
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <input type="checkbox"
+                                        name="stockConfirm"
+                                        class="form-check-input"
+                                        [(ngModel)]="confirmed">
+                                I confirm that the information provided above is accurate!
+                            </div>
+                        </div>
+
+                        <div class="row" style="padding: 10px;">
+                            <div class="col-2">
+                                <button [disabled]="!confirmed" 
+                                        (click)="emitirEvento(stock)"
+                                        class="btn btn-primary" 
+                                        type="submit">
+                                    Create
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <h4>Stock Name is {{stock | json}}</h4>
+            <br>
+            <h4>confirmed is {{confirmed}}</h4>
+
+
 
 . Criar as validações com variaveis de referencia
 
