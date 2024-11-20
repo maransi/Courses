@@ -3076,15 +3076,8 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 disparado quando o formulário é enviado. Você pode vincular esse evento a um método no seu componente para 
                 processar os dados do formulário.
 
-            . Integração com ngModel**: A diretiva `ngForm` trabalha em conjunto com a diretiva `ngModel`, que é utilizada 
-                para criar controles de entrada vinculados ao modelo de dados. Cada campo de entrada que utiliza `ngModel` 
-                será automaticamente registrado no controlador de formulário gerenciado pelo `ngForm`, permitindo que os 
-                dados sejam coletados e validados facilmente.
-
             . A diretiva faz parte da biblioteca "FormsModule", portanto é preciso importa-la no módulo do formulário que
                 pretendemos utilizar a diretiva "NgForm". Vide ponto abaixo como fazer:
-                
-                . "ngModel" encontra-se no pacote "FormsModule":"
 
             . Exemplo
 
@@ -3137,6 +3130,58 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 })
                 export class FinanceiroModule { }
 
+        . Diretiva "ngModel"
+
+            . Integração com ngModel**: A diretiva `ngForm` trabalha em conjunto com a diretiva `ngModel`, que é utilizada 
+                para criar controles de entrada vinculados ao modelo de dados. Cada campo de entrada que utiliza `ngModel` 
+                será automaticamente registrado no controlador de formulário gerenciado pelo `ngForm`, permitindo que os 
+                dados sejam coletados e validados facilmente.
+
+            . A diretiva "ngModel" faz parte da biblioteca "FormsModule", portanto é preciso importa-la no módulo do formulário que
+                pretendemos utilizar a diretiva. 
+                
+            . A diretiva "ngModel" irá configurar o estado do objeto, dizendo se ele está válido, ou inválido, de acordo com suas
+                validações (required, minlength, range, etc.)
+
+                . Aqui estão algumas das propriedades dos elementos do formulário (inputs) que são usadas para validação:
+
+                    . valid: indica se o campo de formulário é válido ou não.
+
+                    . invalid: indica se o campo de formulário é inválido ou não.
+
+                    . dirty: indica se o campo de formulário foi modificado pelo usuário ou não.
+
+                    . touched: indica se o campo de formulário foi tocado pelo usuário ou não.
+
+                    . errors: retorna um objeto com as mensagens de erro para o campo de formulário.
+
+            . Sempre que utilizarmos a diretiva "ngModel" precisamos ter identificar o elemento com o atributo "name=...".
+
+            . Exemplo
+
+                // *.component.html
+                <form #form="ngForm" (ngSubmit)="onSubmit()" >
+                    <input type="text"
+                            name="cpfCnpj"
+                            ngModel
+                            [(ngModel)]="cpfCnpj"
+                            [required]="true"
+                            placeholder="Informe o CPF do cliente">
+                    <br>
+                    <input type="text"
+                            name="nome"
+                            ngModel
+                            [(ngModel)]="nome"
+                            [required]="true"
+                            ngModel
+                            placeholder="Informe o nome do cliente">
+                    <br>
+                    <button type="submit" [disabled]="!form.valid">Enviar</button>
+                    <!-- <button type="submit" >Enviar</button> -->
+                </form>
+
+
+
         . Variáveis de referência 
         
             . São usadas para vincular um elemento do template a uma variável no componente. Isso permite que você acesse o 
@@ -3165,567 +3210,568 @@ https://consolelog.com.br/introducao-ao-angular-17/
                         }
                     }
 
+        . Demo "Template-Driven Forms"
+
+            . Altere o componente "stock-item.component.html" com o conteúdo abaixo:
+
+                <h1>Welcome to stock-item</h1>
+
+                <div class="container">
+                    <div class="alert alert-success" role="alert" *ngIf="!saved">
+                        Product Name : <strong> {{stock.name}} </strong>
+                    </div>
+
+                    <!-- Tag <form. inserida -->
+
+                    <form #stockForm="ngForm" (ngSubmit)="onSave()">
+                        <div class="row">
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="stockCode">Stock Code</label>
+
+                                    <!-- Atribute [required] inserido -->
+                                    <input type="text"
+                                            class="form-control form-control-sm"
+                                            id="stockCode" name="stockCode"
+                                            [required]="true"
+                                            [(ngModel)]="stock.code"
+                                            (focus)="saved=false">
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="clienteNome">Stock Name</label>
+
+                                    <!-- Atribute [required] inserido -->
+                                    <input type="text"
+                                            class="form-control form-control-sm"
+                                            id="stockName"
+                                            name="stockName"
+                                            required 
+                                            minlength="3" 
+                                            maxlength="15"
+                                            [(ngModel)]="stock.name">
+                                </div>
+                            </div>
+
+                            <!-- Atribute [required, min ] inserido -->
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="stockPrice">Stock Price</label>
+                                    <input type="number"
+                                            class="form-control form-control-sm"
+                                            id="stockPrice"
+                                            name="stockPrice"
+                                            min="1"
+                                            required
+                                            [(ngModel)]="stock.price">
+                                </div>
+                            </div>
+
+                            <!-- Atribute [required, min ] inserido -->
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="stockPreviousPrice">Stock Previous Price</label>
+                                    <input type="number"
+                                            class="form-control form-control-sm"
+                                            id="stockPreviousPrice"
+                                            name="stockPreviousPrice"
+                                            min="1"
+                                            required
+                                            [(ngModel)]="stock.previousPrice">
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="stockExchange">Stock Exchange</label>
+                                    <select class="form-select form-select-sm" id="stockExchange" name="stockExchange"
+                                        [(ngModel)]="stock.exchange">
+                                        <option value="NYSE" selected>NYSE</option>
+                                        <option value="NASDAQ">NASDAQ</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-12">
+
+                                <!-- Tag button eliminado -->
+                                <!--
+                                <button type="button" class="btn btn-primary" (click)="onSave()"
+                                    [disabled]="stock.name.length == 0 || stock.code.length == 0">
+                                -->
+
+                                <!-- Tag button submit inserida -->
+                                <button type="submit"
+                                        class="btn btn-primary"
+                                        [disabled]="stockForm.invalid">
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-2" style="padding-top: 10px; padding-bottom: 10px; "
+                                *ngFor="let p of productsStock; index as i">
+                                <app-stock-card [stockItem]="p"></app-stock-card>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            . Inseri a tag abaixo no componente "app.component.ts"
+
+                <app-stock-item></app-stock-item>
+
+            . Execute a aplicação e verifique se o botão ficará habilitado caso as validações dos campos sejam atendidas:
+
+                ng s -o
+
+        . Validação de Formulários:
+
+            . Recordando, abaixo a relação de validações permitidas no HTML:
+
+                Regra	            Validação
+                ------              ---------
+                email	            Se definido como true, o campo só aceitará e-mails válidos;
+                required	        Se definido como true, o campo é de preenchimento obrigatório;
+                min	                Define um número ou valor mínimo válido. Por exemplo, se definimos como 4, o usuário só poderá 
+                                    informar um número maior igual a 4. Abaixo disso a informação é inválida;
+                max	                Define um número ou valor máximo válido. Por exemplo, se definimos como 10, o usuário só poderá 
+                                    informar um número que seja menor ou igual a 10. Acima disso a informação é inválida;
+                range	            Determina um intervalo, contendo um valor mínimo e máximo válido. Por exemplo, se definirmos 
+                                    como [10, 20], o usuário só poderá informar um número que seja maior ou igual a 10 e menor ou 
+                                    igual a 20;
+                minlength	        Determina uma quantidade mínima de caracteres. Por exemplo, se definirmos como 10, o usuário só 
+                                    poderá informar um valor com no mínimo 10 caracteres. Abaixo disso a informação é inválida;
+                maxlength	        Define uma quantidade máxima de caracteres. Por exemplo, se definirmos como 5, o usuário só 
+                                    poderá informar um valor com no máximo 5 caracteres. Acima disso a informação é inválida;
+                rangelength	        Define um intervalo, contendo uma quantidade mínima e máxima de caracteres válidos. Por exemplo, 
+                                    se definirmos como [2, 6], o usuário só poderá informar um valor com nomínimo 2 e no máximo 6 
+                                    caracteres;
+                url	                Se definido como true, o campo só aceitará URLs válidas;
+                date	            Se definido como true, o campo só aceitará datas válidas;
+                dateISO	            Caso definido como true, o input só aceitará datas no formato ISO;
+                number	            Caso definido como true, o input só aceitará números inteiros ou decimais;
+                digits	            Caso definido como true, o input só permitirá dígitos;
+                creditcard	        Se definido como true, o input só permitirá número de cartão de crédito válido;
+                remote	            Caso defina uma URL de verificação, por exemplo “verificar_se_existe_cpf.php”. Então o Validation 
+                                    realiza uma verificação remota com a url e com o valor informado no campo, assim, se a resposta para 
+                                    a requisição de validação for false, então o Validation entende que a informação no campo não é válida, 
+                                    agora caso a resposta for true então a informação é válida. Por exemplo: verificar se o CFP já existe 
+                                    na aplicação;
+                equalTo	            Verifica se o valor dois campos são iguais. Por exemplo: Verificar se as senhas são iguais, no cenário 
+                                    de inserir uma senha e repetir a senha novamente.
+                accept	            Esta regra é utilizada para o campo “input= file” para upload de arquivo, onde podemos definir quais 
+                                    mime-types são permitidos. Por exemplo, se definimos esta regra com o valor “audio/*”, então estamos 
+                                    dizendo ao Validation que só é permitido apenas arquivos de áudio;
+                extension	        Nesta regra podemos definir uma certa extensão de arquivo que poderá ser aceito;
+                phoneUs	            Se definido como true, o campo só aceitará valor de telefone válido dos EUA
+                require_from_group  Garante que pelo o menos um campo deve ser válido dentro de um grupo de campos.
+
+            . Através do "ngForm" e "ngModel" podemos integrar a validação de formulário do HTML com o Angular.
+
+            . "noPropertyAccessFromIndexSignature": essa propriedade encontra-se no arquivo "tsconfig.json", é usada para controlar como o 
+                TypeScript lida com a acessibilidade de propriedades em objetos que têm uma assinatura de índice (index signature).
+                Quando essa propriedade é definida como true, o TypeScript não permite que você acesse propriedades em objetos que têm uma 
+                assinatura de índice usando a sintaxe de ponto (.). Em vez disso, você precisa usar a sintaxe de colchetes ([]) para acessar 
+                as propriedades.
+
+
+                <!-- Como utilizar as propriedade dos objetos quando estiver configurado "noPropertyAccessFromIndexSignature: true" -->
+                <div *ngIf="stockName.errors && stockName.errors['required']">
+                    Stock Name is Mandatory
+                </div>                 
+
+
+                <!-- Como utilizar as propriedade dos objetos quando estiver configurado "noPropertyAccessFromIndexSignature: false" -->
+                <div *ngIf="stockName?.errors?.required">
+                    Stock Name is Mandatory
+                </div>                 
+
+            . No "Template-Driven Forms" definimos as propriedades do formulário no modelo HTML e o Angular cuida da validação e do 
+                gerenciamento dos dados:
+
+                <form #form="ngForm" (ngSubmit)="submitForm(form)">
+                <label>Nome:</label>                  
+                <input type="text" name="nome" ngModel required>  <!-- atributo de validação "required" -->
+
+                <!-- "form.controls.nome?.invalid" -> Valida o estado do controle do formulário -->
+                <!-- "form.controls.nome?.dirty" e "form.controls.nome?.touched" -> Valida o estdo do controle -->
+                <!-- "form.controle.nome?.errors?.required" valida o conteúdo do controle do formulário -->
+
+                <div *ngIf="form.controls.nome?.invalid && (form.controls.nome?.dirty || form.controls.nome?.touched)">
+                    <div *ngIf="form.controls.nome?.errors?.required">
+                    O nome é obrigatório.
+                    </div>
+                </div>
+
+                <!-- "!form.valid" -> Valida o estado do formulário -->
+                <button type="submit" [disable]="!form.valid">Enviar</button>
+                </form>
+
+            . No "Reactive Forms" utilizamos o "FormControl" e o "FormGroup" para criar formulários. Você define as propriedades do formulário 
+                no componente e o Angular cuida da validação e do gerenciamento dos dados.
+
+                import { Component } from '@angular/core';
+                import { FormGroup, FormControl, Validators } from '@angular/forms';
+                
+                @Component({
+                selector: 'app-form',
+                template: `
+                    <form [formGroup]="form" (ngSubmit)="submitForm()">
+                    <label>Nome:</label>
+                    <input formControlName="nome" type="text">
+                    <button type="submit" [disabled]="!form.valid">Enviar</button>
+                    </form>
+                `
+                })
+                export class FormComponent {
+
+                    // Objetos FormControl e FormGroup para gerenciar os estados dos formulários
+                    // associado com a diretiva do formulário "[formGroup]='form'"
+                    form = new FormGroup({
+                        nome: new FormControl('', Validators.required)
+                    });
+                    
+                    submitForm() {
+                        if (this.form.valid) {              // Verifica o estado do formulário.
+                        // código para enviar o formulário
+                        }
+                    }
+                }
+
+            . O ngModel pode alterar o CSS dos elementos HTML na validação usando as seguintes técnicas:
+
+                . Classes de validação: O ngModel adiciona classes de validação aos elementos HTML quando eles são válidos ou inválidos. 
+                                        As classes de validação mais comuns são:
+
+                    . ng-valid: adicionada quando o elemento é válido.
+
+                    . ng-invalid: adicionada quando o elemento é inválido.
+
+                    . ng-dirty: adicionada quando o elemento foi modificado pelo usuário.
+
+                    . ng-touched: adicionada quando o elemento foi tocado pelo usuário.
+
+            . Estilos condicionais: O ngModel pode ser usado para aplicar estilos condicionais aos elementos HTML com base na validação. 
+
+                <!-- HTML -->
+                <input type="text" [(ngModel)]="nome" required>
+                <div [class.ng-invalid]="nome.invalid && nome.dirty">O nome é obrigatório.</div>
+
+
+                <input type="text" [(ngModel)]="nome" required>
+                <div [ngClass]="{'ng-invalid': nome.invalid && nome.dirty}">O nome é obrigatório.</div>
+
+
+                /* CSS */
+                .ng-invalid {
+                border: 1px solid red;
+                background-color: #f2dede;
+                }
+                
+                .ng-valid {
+                border: 1px solid green;
+                background-color: #dff0d8;
+                }
+
+            . Exemplo - Template-Driven Forms
+
+                <form #form="ngForm">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" [(ngModel)]="nome" required minlength="3" maxlength="50">
+                    
+                    <div *ngIf="nome.invalid && (nome.dirty || nome.touched)">
+                        <div *ngIf="nome.errors.required">
+                            O nome é obrigatório.
+                        </div>
+
+                        <div *ngIf="nome.errors.minlength">
+                            O nome deve ter pelo menos 3 caracteres.
+                        </div>
+
+                        <div *ngIf="nome.errors.maxlength">
+                            O nome deve ter no máximo 50 caracteres.
+                        </div>
+                    </div>
+                </form>
+
+        . Demo - Template-Driven Forms
+
+            . Insira as linhas abaixo no arquivo "create-stock.component.html":
+
+                <h2>Create Stock Form</h2>
+                <div class="form-group">
+                    <form #form="ngForm" (ngSubmit)="createStock(form)">               <!-- Tag form alterada -->
+                        <div class="row">
+                            <div class="col-3">
+                                <label for="stockName">Stock Name</label>
+
+                                <!-- Atributo "required" inserido -->
+
+                                <input type="text"
+                                        placeholder="Stock Name"
+                                        name="stockName"
+                                        id="stockName"
+                                        required
+                                        minlength="3"
+                                        autocomplete="off"
+                                        class="form-control form-control-sm"
+                                        [(ngModel)]="stock.name">
+                            </div>
+                            <div class="col-3">
+                                ...
+                            </div>
+                            <div class="col-3">
+                                ...
+                            </div>
+
+                            <div class="col-3 mt-4">
+                                ...
+                            </div>
+                            <div class="row">
+                                ...
+                            </div>
+
+                            <div class="row" style="padding: 10px;">
+                                <div class="col-2">
+
+                                    <!-- diretiva "[disabled]" alterada e event binding "(click)" alterado
+                                    <button [disabled]="!form.valid" 
+                                            class="btn btn-primary" 
+                                            type="submit">
+                                        Create
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <h4>Stock Name is {{stock | json}}</h4>
+                <br>
+                <h4>confirmed is {{confirmed}}</h4>
+
+            . Altere o componente "create-stock.component.ts" como abaixo:
+
+                // Método alterado
+                createStock( form: any){
+                    console.log("Stock Form: ", form);
+                    console.log("Stock Name: ", form.controls.stockName.value);
+                }
+
+            . Altere o conteúdo do arquivo "app.component.html" pelo abaixo:
+
+                <app-create-stock></app-create-stock>
+
+            . Execute o projeto e verifique se o formulário está validando o estado do formulário em função da obrigatoriedade do 
+                preenchimento do campo "Stock Name". Verifique o resultado apresentado na console do navegador:
+
+                ng s -o
+
+            . Altere a propriedade "noPropertyAccessFromIndexSignature" para "false" no arquivo "tsconfig.json":
+
+                {
+                    ...
+                    "noPropertyAccessFromIndexSignature": false,
+                    ...
+                },
+                ...
+
+            . Insira as linhas abaixo no arquivo "create-stock.component.html":
+
+                <h2>Create Stock Form</h2>
+                <div class="form-group">
+                    <form #form="ngForm"  (ngSubmit)="createStock(form)>    
+                        <div class="row">
+                            <div class="col-3">
+                                <label for="stockName">Stock Name</label>
+                                <input type="text"
+                                        placeholder="Stock Name"
+                                        name="stockName"
+                                        id="stockName"
+                                        required
+                                        minlength="3"
+                                        autocomplete="off"
+                                        class="form-control form-control-sm"
+                                        [(ngModel)]="stock.name">
+
+                            <!-- div inserida no lugar da alterada -->  
+                            <div *ngIf="stockName.errors?.required">
+                                Stock Name is Mandatory
+                            </div>                 
+
+                            <!-- div inserida no lugar da alterada -->
+                            <div *ngIf="stockName.errors?.minlength">
+                                Minimum length Stock Name will be 3 characteres
+                            </div>                 
+
+                            </div>
+                            <div class="col-3">
+                                ...
+                            </div>
+                            <div class="col-3">
+                                ...
+                            </div>
+
+                            <div class="col-3 mt-4">
+                                ...
+                            </div>
+                            <div class="row">
+                                ...
+                            </div>
+
+                            <div class="row" style="padding: 10px;">
+                                <div class="col-2">
+                                    <button [disabled]="!form.valid" 
+                                            class="btn btn-primary" 
+                                            type="submit">
+                                        Create
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <h4>Stock Name is {{stock | json}}</h4>
+                <br>
+                <h4>confirmed is {{confirmed}}</h4>
+
+            . Execute o projeto e verifique se as mensagems informativas de validação estão aparecendo 
+
+                ng s -o
+
+        . Controle de estado dos elementos de entrada do formulário
+
+            . O estado, que nos permite espiar o estado do controle de formulário, se o usuário o visitou, se o usuário o
+                alterou e, finalmente, se ele está em um estado válido.
+
+                . valid: indica se o campo de formulário é válido ou não.
+
+                . invalid: indica se o campo de formulário é inválido ou não.
+
+                . dirty: indica se o campo de formulário foi modificado pelo usuário ou não.
+
+                . touched: indica se o campo de formulário foi tocado pelo usuário ou não.
+
+                . errors: retorna um objeto com as mensagens de erro para o campo de formulário.
+
+            . A validade, que nos diz se um controle do formulário é válido ou não, e se não for válido, o motivo subjacente 
+                (ou motivos) pelo qual o elemento de formulário é inválido.
+
+        . Demo - Template-Driven Forms
+
+            . Insira as linhas abaixo no arquivo "create-stock.component.css":
+
+                .error-message {
+                    color: red;
+                    font-size: 12px;
+                    margin-top: 5px;
+                }
+
+                input.invalid {
+                    border: 1px solid #f00;
+                }
+
+            . Faça as alteração abaixo no componente "create-stock.component.html"
+
+                <h2>Create Stock Form</h2>
+                <div class="form-group">
+                    <form #form="ngForm"  (ngSubmit)="createStock(form)>               
+                        <div class="row">
+                            <div class="col-3">
+                                <label for="stockName">Stock Name</label>
+
+                                <!-- Inserido o diretiva de class [ngClass] -->
+
+                                <input type="text"
+                                        placeholder="Stock Name"
+                                        name="stockName"
+                                        id="stockName"
+                                        name="stockName"
+                                        required
+                                        minlength="3"
+                                        ngModel
+                                        #stockName="ngModel"
+                                        [ngClass]="{'invalid': stockName.invalid && (stockName.dirty || stockName.touched), 'form-control.form-control-sm': stockName.valid}"
+                                        class="form-control form-control-sm"
+                                        autocomplete="off"
+                                        [(ngModel)]="stock.name"> 
+
+                                <!-- Div inserida -->
+                                <div *ngIf="stockName.invalid && (stockName.dirty || stockName.touched)"
+                                        [ngClass]="{'error-message': stockName.invalid && (stockName.dirty || stockName.touched) }">
+                                    <div *ngIf="stockName.errors?.required">
+                                        * Stock Name is Mandatory
+                                    </div>                 
+
+                                    <div *ngIf="stockName.errors?.minlength">
+                                        * Minimum length Stock Name will be 3 characteres
+                                    </div>     
+                                </div>            
+                            </div>
+                            <div class="col-3">
+                                ...
+                            </div>
+                            <div class="col-3">
+                                ...
+                            </div>
+
+                            <div class="col-3 mt-4">
+                                ...
+                            </div>
+                            <div class="row">
+                                ...
+                            </div>
+
+                            <div class="row" style="padding: 10px;">
+                                <div class="col-2">
+                                    <button [disabled]="!form.valid" 
+                                            class="btn btn-primary" 
+                                            type="submit">
+                                        Create
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <h4>Stock Name is {{stock | json}}</h4>
+                <br>
+                <h4>confirmed is {{confirmed}}</h4>
+
+            . Execute o projeto e verifique se as mensagems informativas de validação estão aparecendo, 
+                verifique o a caixa de entrada ficou em destaque
+
+                ng s -o
 
     . Reactive Forms ( Desenvolver )
 
+        . formGroup:        é usada para criar um grupo de formulários. Ela permite que o Angular crie um objeto FormGroup que 
+                            contém todos os controles do formulário.
 
+        . formControl:      é usada para criar um controle individual. Ela permite que o Angular crie um objeto FormControl 
+                            que contém o valor do campo de entrada.
 
+        . formArray:        é usada para criar um array de formulários. Ela permite que o Angular crie um objeto FormArray 
+                            que contém vários objetos FormGroup.
 
-    . Demo "Template-Driven Forms"
+        . formGroupName:    é usada para vincular um grupo de formulários a um elemento HTML. Ela permite que o Angular 
+                            crie um objeto FormGroup e o vincule a um elemento HTML.
 
-        . Altere o componente "stock-item.component.html" com o conteúdo abaixo:
+        . formControlName:  é usada para vincular um controle individual a um elemento HTML. Ela permite que o Angular crie 
+                            um objeto FormControl e o vincule a um elemento HTML.
 
-            <h1>Welcome to stock-item</h1>
+        . formArrayName:    é usada para vincular um array de formulários a um elemento HTML. Ela permite que o Angular crie 
+                            um objeto FormArray e o vincule a um elemento HTML.
 
-            <div class="container">
-                <div class="alert alert-success" role="alert" *ngIf="!saved">
-                    Product Name : <strong> {{stock.name}} </strong>
-                </div>
 
-                <!-- Tag <form. inserida -->
-
-                <form #stockForm="ngForm" (ngSubmit)="onSave()">
-                    <div class="row">
-                        <div class="col-2">
-                            <div class="form-group">
-                                <label for="stockCode">Stock Code</label>
-
-                                <!-- Atribute [required] inserido -->
-                                <input type="text"
-                                        class="form-control form-control-sm"
-                                        id="stockCode" name="stockCode"
-                                        [required]="true"
-                                        [(ngModel)]="stock.code"
-                                        (focus)="saved=false">
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label for="clienteNome">Stock Name</label>
-
-                                <!-- Atribute [required] inserido -->
-                                <input type="text"
-                                        class="form-control form-control-sm"
-                                        id="stockName"
-                                        name="stockName"
-                                        required 
-                                        minlength="3" 
-                                        maxlength="15"
-                                        [(ngModel)]="stock.name">
-                            </div>
-                        </div>
-
-                        <!-- Atribute [required, min ] inserido -->
-                        <div class="col-2">
-                            <div class="form-group">
-                                <label for="stockPrice">Stock Price</label>
-                                <input type="number"
-                                        class="form-control form-control-sm"
-                                        id="stockPrice"
-                                        name="stockPrice"
-                                        min="1"
-                                        required
-                                        [(ngModel)]="stock.price">
-                            </div>
-                        </div>
-
-                        <!-- Atribute [required, min ] inserido -->
-                        <div class="col-2">
-                            <div class="form-group">
-                                <label for="stockPreviousPrice">Stock Previous Price</label>
-                                <input type="number"
-                                        class="form-control form-control-sm"
-                                        id="stockPreviousPrice"
-                                        name="stockPreviousPrice"
-                                        min="1"
-                                        required
-                                        [(ngModel)]="stock.previousPrice">
-                            </div>
-                        </div>
-
-                        <div class="col-2">
-                            <div class="form-group">
-                                <label for="stockExchange">Stock Exchange</label>
-                                <select class="form-select form-select-sm" id="stockExchange" name="stockExchange"
-                                    [(ngModel)]="stock.exchange">
-                                    <option value="NYSE" selected>NYSE</option>
-                                    <option value="NASDAQ">NASDAQ</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-2">
-                        <div class="col-12">
-
-                            <!-- Tag button eliminado -->
-                            <!--
-                            <button type="button" class="btn btn-primary" (click)="onSave()"
-                                [disabled]="stock.name.length == 0 || stock.code.length == 0">
-                            -->
-
-                            <!-- Tag button submit inserida -->
-                            <button type="submit"
-                                    class="btn btn-primary"
-                                    [disabled]="stockForm.invalid">
-                                Salvar
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="row" style="margin-top: 20px;">
-                        <div class="col-2" style="padding-top: 10px; padding-bottom: 10px; "
-                            *ngFor="let p of productsStock; index as i">
-                            <app-stock-card [stockItem]="p"></app-stock-card>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-        . Inseri a tag abaixo no componente "app.component.ts"
-
-            <app-stock-item></app-stock-item>
-
-        . Execute a aplicação e verifique se o botão ficará habilitado caso as validações dos campos sejam atendidas:
-
-            ng s -o
-
-    . Validação de Formulários:
-
-        . Recordando, abaixo a relação de validações permitidas no HTML:
-
-            Regra	            Validação
-            ------              ---------
-            email	            Se definido como true, o campo só aceitará e-mails válidos;
-            required	        Se definido como true, o campo é de preenchimento obrigatório;
-            min	                Define um número ou valor mínimo válido. Por exemplo, se definimos como 4, o usuário só poderá 
-                                informar um número maior igual a 4. Abaixo disso a informação é inválida;
-            max	                Define um número ou valor máximo válido. Por exemplo, se definimos como 10, o usuário só poderá 
-                                informar um número que seja menor ou igual a 10. Acima disso a informação é inválida;
-            range	            Determina um intervalo, contendo um valor mínimo e máximo válido. Por exemplo, se definirmos 
-                                como [10, 20], o usuário só poderá informar um número que seja maior ou igual a 10 e menor ou 
-                                igual a 20;
-            minlength	        Determina uma quantidade mínima de caracteres. Por exemplo, se definirmos como 10, o usuário só 
-                                poderá informar um valor com no mínimo 10 caracteres. Abaixo disso a informação é inválida;
-            maxlength	        Define uma quantidade máxima de caracteres. Por exemplo, se definirmos como 5, o usuário só 
-                                poderá informar um valor com no máximo 5 caracteres. Acima disso a informação é inválida;
-            rangelength	        Define um intervalo, contendo uma quantidade mínima e máxima de caracteres válidos. Por exemplo, 
-                                se definirmos como [2, 6], o usuário só poderá informar um valor com nomínimo 2 e no máximo 6 
-                                caracteres;
-            url	                Se definido como true, o campo só aceitará URLs válidas;
-            date	            Se definido como true, o campo só aceitará datas válidas;
-            dateISO	            Caso definido como true, o input só aceitará datas no formato ISO;
-            number	            Caso definido como true, o input só aceitará números inteiros ou decimais;
-            digits	            Caso definido como true, o input só permitirá dígitos;
-            creditcard	        Se definido como true, o input só permitirá número de cartão de crédito válido;
-            remote	            Caso defina uma URL de verificação, por exemplo “verificar_se_existe_cpf.php”. Então o Validation 
-                                realiza uma verificação remota com a url e com o valor informado no campo, assim, se a resposta para 
-                                a requisição de validação for false, então o Validation entende que a informação no campo não é válida, 
-                                agora caso a resposta for true então a informação é válida. Por exemplo: verificar se o CFP já existe 
-                                na aplicação;
-            equalTo	            Verifica se o valor dois campos são iguais. Por exemplo: Verificar se as senhas são iguais, no cenário 
-                                de inserir uma senha e repetir a senha novamente.
-            accept	            Esta regra é utilizada para o campo “input= file” para upload de arquivo, onde podemos definir quais 
-                                mime-types são permitidos. Por exemplo, se definimos esta regra com o valor “audio/*”, então estamos 
-                                dizendo ao Validation que só é permitido apenas arquivos de áudio;
-            extension	        Nesta regra podemos definir uma certa extensão de arquivo que poderá ser aceito;
-            phoneUs	            Se definido como true, o campo só aceitará valor de telefone válido dos EUA
-            require_from_group  Garante que pelo o menos um campo deve ser válido dentro de um grupo de campos.
-
-        . Através do "ngForm" e "ngModel" podemos integrar a validação de formulário do HTML com o Angular.
-
-        . "noPropertyAccessFromIndexSignature": essa propriedade encontra-se no arquivo "tsconfig.json", é usada para controlar como o 
-            TypeScript lida com a acessibilidade de propriedades em objetos que têm uma assinatura de índice (index signature).
-            Quando essa propriedade é definida como true, o TypeScript não permite que você acesse propriedades em objetos que têm uma 
-            assinatura de índice usando a sintaxe de ponto (.). Em vez disso, você precisa usar a sintaxe de colchetes ([]) para acessar 
-            as propriedades.
-
-
-            <!-- Como utilizar as propriedade dos objetos quando estiver configurado "noPropertyAccessFromIndexSignature: true" -->
-            <div *ngIf="stockName.errors && stockName.errors['required']">
-                Stock Name is Mandatory
-            </div>                 
-
-
-            <!-- Como utilizar as propriedade dos objetos quando estiver configurado "noPropertyAccessFromIndexSignature: false" -->
-            <div *ngIf="stockName?.errors?.required">
-                Stock Name is Mandatory
-            </div>                 
-
-        . No "Template-Driven Forms" definimos as propriedades do formulário no modelo HTML e o Angular cuida da validação e do 
-            gerenciamento dos dados:
-
-            <form #form="ngForm" (ngSubmit)="submitForm(form)">
-              <label>Nome:</label>                  
-              <input type="text" name="nome" ngModel required>  <!-- atributo de validação "required" -->
-
-              <!-- "form.controls.nome?.invalid" -> Valida o estado do controle do formulário -->
-              <!-- "form.controls.nome?.dirty" e "form.controls.nome?.touched" -> Valida o estdo do controle -->
-              <!-- "form.controle.nome?.errors?.required" valida o conteúdo do controle do formulário -->
-
-              <div *ngIf="form.controls.nome?.invalid && (form.controls.nome?.dirty || form.controls.nome?.touched)">
-                <div *ngIf="form.controls.nome?.errors?.required">
-                  O nome é obrigatório.
-                </div>
-              </div>
-
-              <!-- "!form.valid" -> Valida o estado do formulário -->
-              <button type="submit" [disable]="!form.valid">Enviar</button>
-            </form>
-
-        . No "Reactive Forms" utilizamos o "FormControl" e o "FormGroup" para criar formulários. Você define as propriedades do formulário 
-            no componente e o Angular cuida da validação e do gerenciamento dos dados.
-
-            import { Component } from '@angular/core';
-            import { FormGroup, FormControl, Validators } from '@angular/forms';
-            
-            @Component({
-              selector: 'app-form',
-              template: `
-                <form [formGroup]="form" (ngSubmit)="submitForm()">
-                  <label>Nome:</label>
-                  <input formControlName="nome" type="text">
-                  <button type="submit" [disabled]="!form.valid">Enviar</button>
-                </form>
-              `
-            })
-            export class FormComponent {
-
-                // Objetos FormControl e FormGroup para gerenciar os estados dos formulários
-                // associado com a diretiva do formulário "[formGroup]='form'"
-                form = new FormGroup({
-                    nome: new FormControl('', Validators.required)
-                });
-                
-                submitForm() {
-                    if (this.form.valid) {              // Verifica o estado do formulário.
-                    // código para enviar o formulário
-                    }
-                }
-            }
-
-        . Aqui estão algumas das propriedades do objeto "Form" que são usadas para validação:
-
-            . valid: indica se o campo de formulário é válido ou não.
-
-            . invalid: indica se o campo de formulário é inválido ou não.
-
-            . dirty: indica se o campo de formulário foi modificado pelo usuário ou não.
-
-            . touched: indica se o campo de formulário foi tocado pelo usuário ou não.
-
-            . errors: retorna um objeto com as mensagens de erro para o campo de formulário.
-
-        . O ngModel pode alterar o CSS dos elementos HTML na validação usando as seguintes técnicas:
-
-            . Classes de validação: O ngModel adiciona classes de validação aos elementos HTML quando eles são válidos ou inválidos. 
-                                    As classes de validação mais comuns são:
-
-                . ng-valid: adicionada quando o elemento é válido.
-
-                . ng-invalid: adicionada quando o elemento é inválido.
-
-                . ng-dirty: adicionada quando o elemento foi modificado pelo usuário.
-
-                . ng-touched: adicionada quando o elemento foi tocado pelo usuário.
-
-        . Estilos condicionais: O ngModel pode ser usado para aplicar estilos condicionais aos elementos HTML com base na validação. 
-
-            <!-- HTML -->
-            <input type="text" [(ngModel)]="nome" required>
-            <div [class.ng-invalid]="nome.invalid && nome.dirty">O nome é obrigatório.</div>
-
-
-            <input type="text" [(ngModel)]="nome" required>
-            <div [ngClass]="{'ng-invalid': nome.invalid && nome.dirty}">O nome é obrigatório.</div>
-
-
-            /* CSS */
-            .ng-invalid {
-              border: 1px solid red;
-              background-color: #f2dede;
-            }
-            
-            .ng-valid {
-              border: 1px solid green;
-              background-color: #dff0d8;
-            }
-
-        . Exemplo - Template-Driven Forms
-
-            <form #form="ngForm">
-                <label for="nome">Nome:</label>
-                <input type="text" id="nome" name="nome" [(ngModel)]="nome" required minlength="3" maxlength="50">
-                
-                <div *ngIf="nome.invalid && (nome.dirty || nome.touched)">
-                    <div *ngIf="nome.errors.required">
-                        O nome é obrigatório.
-                    </div>
-
-                    <div *ngIf="nome.errors.minlength">
-                        O nome deve ter pelo menos 3 caracteres.
-                    </div>
-
-                    <div *ngIf="nome.errors.maxlength">
-                        O nome deve ter no máximo 50 caracteres.
-                    </div>
-                </div>
-            </form>
-
-    . Demo - Template-Driven Forms
-
-        . Insira as linhas abaixo no arquivo "create-stock.component.html":
-
-            <h2>Create Stock Form</h2>
-            <div class="form-group">
-                <form #form="ngForm">               <!-- Tag form alterada -->
-                    <div class="row">
-                        <div class="col-3">
-                            <label for="stockName">Stock Name</label>
-
-                            <!-- Atributo "required" inserido -->
-
-                            <input type="text"
-                                    placeholder="Stock Name"
-                                    name="stockName"
-                                    id="stockName"
-                                    required
-                                    minlength="3"
-                                    autocomplete="off"
-                                    class="form-control form-control-sm"
-                                    [(ngModel)]="stock.name">
-                        </div>
-                        <div class="col-3">
-                            ...
-                        </div>
-                        <div class="col-3">
-                            ...
-                        </div>
-
-                        <div class="col-3 mt-4">
-                            ...
-                        </div>
-                        <div class="row">
-                            ...
-                        </div>
-
-                        <div class="row" style="padding: 10px;">
-                            <div class="col-2">
-
-                                <!-- diretiva "[disabled]" alterada e event binding "(click)" alterado
-                                <button [disabled]="!form.valid" 
-                                        (click)="createStock(form)"
-                                        class="btn btn-primary" 
-                                        type="submit">
-                                    Create
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <h4>Stock Name is {{stock | json}}</h4>
-            <br>
-            <h4>confirmed is {{confirmed}}</h4>
-
-        . Altere o componente "create-stock.component.ts" como abaixo:
-
-            // Método alterado
-            createStock( form: any){
-                console.log("Stock Form: ", form);
-                console.log("Stock Name: ", form.controls.stockName.value);
-            }
-
-        . Altere o conteúdo do arquivo "app.component.html" pelo abaixo:
-
-            <app-create-stock></app-create-stock>
-
-        . Execute o projeto e verifique se o formulário está validando o estado do formulário em função da obrigatoriedade do 
-            preenchimento do campo "Stock Name". Verifique o resultado apresentado na console do navegador:
-
-            ng s -o
-
-        . Altere a propriedade "noPropertyAccessFromIndexSignature" para "false" no arquivo "tsconfig.json":
-
-            {
-                ...
-                "noPropertyAccessFromIndexSignature": false,
-                ...
-            },
-            ...
-
-        . Insira as linhas abaixo no arquivo "create-stock.component.html":
-
-            <h2>Create Stock Form</h2>
-            <div class="form-group">
-                <form #form="ngForm">    
-                    <div class="row">
-                        <div class="col-3">
-                            <label for="stockName">Stock Name</label>
-                            <input type="text"
-                                    placeholder="Stock Name"
-                                    name="stockName"
-                                    id="stockName"
-                                    required
-                                    minlength="3"
-                                    autocomplete="off"
-                                    class="form-control form-control-sm"
-                                    [(ngModel)]="stock.name">
-
-                        <!-- div inserida no lugar da alterada -->  
-                        <div *ngIf="stockName.errors?.required">
-                            Stock Name is Mandatory
-                        </div>                 
-
-                        <!-- div inserida no lugar da alterada -->
-                        <div *ngIf="stockName.errors?.minlength">
-                            Minimum length Stock Name will be 3 characteres
-                        </div>                 
-
-                        </div>
-                        <div class="col-3">
-                            ...
-                        </div>
-                        <div class="col-3">
-                            ...
-                        </div>
-
-                        <div class="col-3 mt-4">
-                            ...
-                        </div>
-                        <div class="row">
-                            ...
-                        </div>
-
-                        <div class="row" style="padding: 10px;">
-                            <div class="col-2">
-                                <button [disabled]="!form.valid" 
-                                        (click)="createStock(form)"
-                                        class="btn btn-primary" 
-                                        type="submit">
-                                    Create
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <h4>Stock Name is {{stock | json}}</h4>
-            <br>
-            <h4>confirmed is {{confirmed}}</h4>
-
-        . Execute o projeto e verifique se as mensagems informativas de validação estão aparecendo 
-
-            ng s -o
-
-    . Controle de estado dos elementos de entrada do formulário
-
-        . O estado, que nos permite espiar o estado do controle de formulário, se o usuário o visitou, se o usuário o
-            alterou e, finalmente, se ele está em um estado válido.
-
-            . valid: indica se o campo de formulário é válido ou não.
-
-            . invalid: indica se o campo de formulário é inválido ou não.
-
-            . dirty: indica se o campo de formulário foi modificado pelo usuário ou não.
-
-            . touched: indica se o campo de formulário foi tocado pelo usuário ou não.
-
-            . errors: retorna um objeto com as mensagens de erro para o campo de formulário.
-
-        . A validade, que nos diz se um controle do formulário é válido ou não, e se não for válido, o motivo subjacente 
-            (ou motivos) pelo qual o elemento de formulário é inválido.
-
-    . Demo - Template-Driven Forms
-
-        . Insira as linhas abaixo no arquivo "create-stock.component.css":
-
-            .error-message {
-                color: red;
-                font-size: 12px;
-                margin-top: 5px;
-            }
-
-            input.invalid {
-                border: 1px solid #f00;
-            }
-
-        . Faça as alteração abaixo no componente "create-stock.component.html"
-
-            <h2>Create Stock Form</h2>
-            <div class="form-group">
-                <form #form="ngForm">               
-                    <div class="row">
-                        <div class="col-3">
-                            <label for="stockName">Stock Name</label>
-
-                            <!-- Inserido o diretiva de class [ngClass] -->
-
-                            <input type="text"
-                                    placeholder="Stock Name"
-                                    name="stockName"
-                                    id="stockName"
-                                    name="stockName"
-                                    required
-                                    minlength="3"
-                                    ngModel
-                                    #stockName="ngModel"
-                                    [ngClass]="{'invalid': stockName.invalid && (stockName.dirty || stockName.touched), 'form-control.form-control-sm': stockName.valid}"
-                                    class="form-control form-control-sm"
-                                    autocomplete="off"
-                                    [(ngModel)]="stock.name"> 
-
-                            <!-- Div inserida -->
-                            <div *ngIf="stockName.invalid && (stockName.dirty || stockName.touched)"
-                                    [ngClass]="{'error-message': stockName.invalid && (stockName.dirty || stockName.touched) }">
-                                <div *ngIf="stockName.errors?.required">
-                                    * Stock Name is Mandatory
-                                </div>                 
-
-                                <div *ngIf="stockName.errors?.minlength">
-                                    * Minimum length Stock Name will be 3 characteres
-                                </div>     
-                            </div>            
-                        </div>
-                        <div class="col-3">
-                            ...
-                        </div>
-                        <div class="col-3">
-                            ...
-                        </div>
-
-                        <div class="col-3 mt-4">
-                            ...
-                        </div>
-                        <div class="row">
-                            ...
-                        </div>
-
-                        <div class="row" style="padding: 10px;">
-                            <div class="col-2">
-                                <button [disabled]="!form.valid" 
-                                        (click)="createStock(form)"
-                                        class="btn btn-primary" 
-                                        type="submit">
-                                    Create
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <h4>Stock Name is {{stock | json}}</h4>
-            <br>
-            <h4>confirmed is {{confirmed}}</h4>
-
-        . Execute o projeto e verifique se as mensagems informativas de validação estão aparecendo, 
-            verifique o a caixa de entrada ficou em destaque
-
-            ng s -o
 
 
 
