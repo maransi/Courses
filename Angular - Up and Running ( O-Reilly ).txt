@@ -2917,24 +2917,25 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
         . Template-Driven Forms
 
-            . Nesse mecanismo, os formulários são criados usando diretivas no template HTML. As diretivas são usadas para vincular os campos do formulário a propriedades do componente.
+            . Nesse mecanismo, os formulários são criados usando diretivas no template HTML. As diretivas são usadas para vincular os 
+                campos do formulário a propriedades do componente.
 
-                . Vantagens:
+            . Vantagens:
 
-                    . Fácil de usar e entender
+                . Fácil de usar e entender
 
-                    . Não requer conhecimento de Observables ou RxJS
+                . Não requer conhecimento de Observables ou RxJS
 
-                    . Pode ser usado com validação de formulário
+                . Pode ser usado com validação de formulário
 
 
-                . Desvantagens:
+            . Desvantagens:
 
-                    . Não é tão flexível quanto os Reactive Forms
+                . Não é tão flexível quanto os Reactive Forms
 
-                    . Não é possível usar validação de formulário personalizada
+                . Não é possível usar validação de formulário personalizada
 
-                    . Não é possível usar formulários aninhados
+                . Não é possível usar formulários aninhados
 
             . Exemplo
 
@@ -3751,13 +3752,562 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
                 ng s -o
 
-    . Reactive Forms ( Desenvolver )
+    . Reactive Forms 
 
-        . formGroup:        é usada para criar um grupo de formulários. Ela permite que o Angular crie um objeto FormGroup que 
-                            contém todos os controles do formulário.
+        . Diferentemente do mecanismo Template-Driven Forms, nos formulários reativos podemos definir
+            a árvore inteira de objetos das entradas do formulário no código do seu componente
+            e então os vincula-los aos componentes do formulário nativo. 
 
-        . formControl:      é usada para criar um controle individual. Ela permite que o Angular crie um objeto FormControl 
-                            que contém o valor do campo de entrada.
+        . Como você cria toda a árvore de controle de formulário no componente, você tem acesso a ela imediatamente e
+            não precisa lidar com o ciclo de vida assíncrono do Angular
+
+        . Primeira coisa a ser feita para trabalharmos com Reactive Forms e importar a biblioteca "ReactiveFormsModule"
+            no componente "app.module.ts"
+
+            ...
+            // Importação da biblioteca
+            import { ReactiveFormsModule } from '@angular/forms';
+            ...
+
+            @NgModule({
+            declarations: [
+                AppComponent,
+                StockItemComponent,
+                CreateStockComponent
+            ],
+            imports: [
+                    BrowserModule,
+                    ReactiveFormsModule,            // Importação da biblioteca
+                ],
+                providers: [],
+                bootstrap: [AppComponent]
+            })
+            export class AppModule { }
+
+        . Form Control
+
+            . [formControl] é uma diretiva que permite vincular um controle de formulário a um elemento HTML. Ela é usada para 
+                criar um controle de formulário que pode ser usado para coletar dados do usuário e validar esses dados.
+
+                <input [formControl]="nomeFormControl">
+
+            . A classe "FormControl" é usada para criar um controle de formulário individual. Mais a frente veremos que essa classe
+                servirá principalmente para vincular o objeto de entrada com suas validações.           
+
+                ...
+                export class ExemploComponent {
+                    nomeFormControl = new FormControl('');
+                }
+
+            . A diferença entre a diretiva [formControl] e a classe FormControl é que a diretiva [formControl] é usada para vincular 
+                um controle de formulário a um elemento HTML, enquanto a classe FormControl é usada para criar um controle de 
+                formulário individual.
+
+        . Demo
+
+            . Execute o comando abaixo na pasta raiz do projeto:
+
+                 ng g c stock/create-product-item --skip-tests  
+
+            . Insira as linhas abaixo no arquivo "app.module.ts"
+
+                import { NgModule } from '@angular/core';
+                import { BrowserModule } from '@angular/platform-browser';
+
+                import { AppRoutingModule } from './app-routing.module';
+                import { AppComponent } from './app.component';
+                import { StockItemComponent } from './stock/stock-item/stock-item.component';
+                import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+                import { FormsModule } from '@angular/forms';
+                import { StockCardComponent } from './stock/stock-card/stock-card.component';
+                import { CreateStockItemComponent } from './stock/create-stock-item/create-stock-item.component';
+
+                // Insira a linha abaixo
+                import { ReactiveFormsModule } from '@angular/forms';   
+
+                @NgModule({
+                    declarations: [
+                        AppComponent,
+                        StockItemComponent,
+                        CreateStockComponent,
+                        StockCardComponent,
+                        CreateStockItemComponent
+                    ],
+                    imports: [
+                        BrowserModule,
+                        AppRoutingModule,
+                        FormsModule,
+                        ReactiveFormsModule                 // Linha Inserida
+                    ],
+                    providers: [],
+                    bootstrap: [AppComponent]
+                })
+                export class AppModule { }
+
+            . Atualize todo o código do componente "create-product-item.component.html" pelo conteúdo abaixo:
+
+                <div class="container">
+                    <form>
+                        <h2>Create Product Item Form</h2>
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockCode"
+                                    name="stockCode"
+                                    autocomplete="off"
+                                    [formControl]="formProductItemStockCode">        <!-- Uso do [formControl] no lugar do [ngModel] -->
+                            </div>
+                            </div>
+
+                            <div class="col-6">
+                            <div class="form-group">
+                                <label for="stockName">Stock Name</label>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockName"
+                                    name="stockName"
+                                    autocomplete="off"
+                                    [formControl]="formProductItemStockName">            <!-- Uso do [formControl] no lugar do [ngModel] -->
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPrice"
+                                    name="stockPrice"
+                                    autocomplete="off"
+                                    [formControl]="formProductItemStockPrice">               <!-- Uso do [formControl] no lugar do [ngModel] -->
+
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice">Stock Previous Price</label>
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPreviousPrice"
+                                    name="stockPreviousPrice"
+                                    autocomplete="off"
+                                    [formControl]="formProductItemStockPreviousPrice">             <!-- Uso do [formControl] no lugar do [ngModel] -->
+
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice"></label>
+                                <select name="stockExchange"
+                                        id="stockExchange"
+                                        class="form-select form-select-sm"
+                                        autocomplete="off"
+                                        [formControl]="formProductItemStockExchange">                       <!-- Uso do [formControl] no lugar do [ngModel] -->
+
+                                <option value="NYSE" selected>NYSE</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="OTHER">OTHER</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2 mt-3">
+                            <button class="btn btn-primary"
+                                    type="submit"
+                                    (click)="onSubmit()">Save</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <p>Form Control value: {{ formProductItemStockCode.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control valid: {{ formProductItemStockCode.valid | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockName.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockPrice.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockPreviousPrice.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockExchange.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+
+                </div>
+
+
+            . Atualize todo o código do componente "create-stock.component.ts" com o conteúdo abaixo:
+
+                import { Component } from '@angular/core';
+                import {FormControl} from "@angular/forms";                     // Linha inserida
+
+                @Component({
+                    selector: 'app-create-product-item',
+                    templateUrl: './create-product-item.component.html',
+                    styleUrls: ['./create-product-item.component.css']
+                })
+
+                export class CreateProductItemComponent {
+                    public formProductItemStockCode = new FormControl();                                    // Linha inserida
+                    public formProductItemStockName = new FormControl();                                    // Linha inserida
+                    public formProductItemStockPrice = new FormControl();                                   // Linha inserida
+                    public formProductItemStockPreviousPrice = new FormControl();                           // Linha inserida
+                    public formProductItemStockExchange = new FormControl();                                // Linha inserida
+
+                    constructor() {}
+
+                    onSubmit(){
+                        console.log('Name Control Value', this.formProductItemStockCode.value );            // Linha inserida
+                        console.log('Name Control Value', this.formProductItemStockName.value );            // Linha inserida
+                        console.log('Name Control Value', this.formProductItemStockPrice.value );           // Linha inserida
+                        console.log('Name Control Value', this.formProductItemStockPreviousPrice.value );   // Linha inserida
+                        console.log('Name Control Value', this.formProductItemStockExchange.value );        // Linha inserida
+                    }
+                }
+
+            . Altere o conteúdo do componente "app.component.html" pelo abaixo:
+
+                <app-create-product-item></app-create-product-item>
+
+            . Execute o projeto e verifique se o resultado de cada campo está sendo apresentado, tanto no formulário, quanto na console do navegador:
+
+                ng serve --open
+
+            . Altere o arquivo "create-product-item.component.ts" conforme abaixo:
+
+                ...
+                export class CreateProductItemComponent {
+                    public formProductItemStockCode = new FormControl('10', Validators.required);       // Linha alterada
+                    ...
+                }
+                ...
+
+            . Execute o projeto e verifique se o comportamento do campo "formProductItemStockCode"
+
+                ng serve --open
+
+        . formGroup
+            
+            . É usado para criar um grupo de formulários. Ela permite que o Angular crie um objeto FormGroup que 
+                contém todos os controles do formulário.
+
+            . É usado em conjunto com a classe FormGroup para criar um grupo de formulários. O objeto FormGroup é um 
+                objeto que contém todos os controles do formulário, bem como suas validações.
+
+            . Exemplo
+
+                import { Component } from '@angular/core';
+                import { FormGroup, FormControl } from '@angular/forms';
+                
+                @Component({
+                  selector: 'app-exemplo',
+                  template: `
+                    <form [formGroup]="produtoForm">
+                      <div formGroupName="produto">
+                        <label>Nome do Produto:</label>
+                        <input formControlName="nome" type="text">
+                      </div>
+                      <div formGroupName="produto">
+                        <label>Descrição do Produto:</label>
+                        <textarea formControlName="descricao" type="text"></textarea>
+                      </div>
+                      <div formGroupName="produto">
+                        <label>Preço do Produto:</label>
+                        <input formControlName="preco" type="number">
+                      </div>
+                      <button type="submit" [disabled]="!produtoForm.valid">Salvar</button>
+                    </form>
+                  `
+                })
+                export class ExemploComponent {
+                  produtoForm: FormGroup;
+                
+                  constructor() {
+                    this.produtoForm = new FormGroup({
+                      produto: new FormGroup({
+                        nome: new FormControl(''),
+                        descricao: new FormControl(''),
+                        preco: new FormControl('')
+                      })
+                    });
+                  }
+                
+                  onSubmit() {
+                    if (this.produtoForm.valid) {
+                      console.log(this.produtoForm.value);
+                      // código para salvar o produto
+                    }
+                  }
+                }
+
+            . A diretiva formGroup permite que o Angular crie um objeto FormGroup que contém todos os controles do 
+                formulário. Isso permite que o Angular faça a validação dos campos e permite que o Angular acesse os 
+                valores dos campos.
+
+        . Demo
+
+            . Altere o conteúdo do arquivo "create-product-item.component.html" para retorno a posição inicial conforme abaixo:
+
+                <div class="container">
+                    <form>
+                        <h2>Create Product Item Form</h2>
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockCode"
+                                    name="stockCode"
+                                    autocomplete="off">
+                                    <!-- [formControl]="formProductItemStockCode">        Linha apagada -->
+                            </div>
+                            </div>
+
+                            <div class="col-6">
+                            <div class="form-group">
+                                <label for="stockName">Stock Name</label>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockName"
+                                    name="stockName">
+                                    <!-- [formControl]="formProductItemStockName">        Linha apagada -->
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPrice"
+                                    name="stockPrice"
+                                    autocomplete="off">
+                                    <!-- [formControl]="formProductItemStockPrice">        Linha apagada -->
+
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice">Stock Previous Price</label>
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPreviousPrice"
+                                    name="stockPreviousPrice"
+                                    autocomplete="off">
+                                    <!-- [formControl]="formProductItemStockPreviousPrice">        Linha apagada -->
+
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice"></label>
+                                <select name="stockExchange"
+                                        id="stockExchange"
+                                        class="form-select form-select-sm"
+                                        autocomplete="off">
+                                        <!-- [formControl]="formProductItemStockExchange">        Linha apagada -->
+
+                                <option value="NYSE" selected>NYSE</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="OTHER">OTHER</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2 mt-3">
+                            <button class="btn btn-primary"
+                                    type="submit"
+                                    (click)="onSubmit()">Save</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Trecho abaixo apagado -->
+
+                    <p>Form Control value: {{ formProductItemStockCode.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control valid: {{ formProductItemStockCode.valid | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockName.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockPrice.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockPreviousPrice.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockExchange.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    
+                    <!-- Fim da Eliminação -->
+
+                </div>
+
+            . Altere o conteúdo do arquivo "create-product-item.component.ts" conforme abaixo:
+
+                import { Component } from '@angular/core';
+                import {FormControl, FormGroup, Validators} from "@angular/forms";      // Import acrescentado com "FormGroup"
+
+                @Component({
+                    selector: 'app-create-product-item',
+                    templateUrl: './create-product-item.component.html',
+                    styleUrls: ['./create-product-item.component.css']
+                })
+
+                export class CreateProductItemComponent {
+                    
+                    /*      Trecho apagado
+                        public formProductItemStockCode = new FormControl('10', Validators.required);
+                        public formProductItemStockName = new FormControl();
+                        public formProductItemStockPrice = new FormControl();
+                        public formProductItemStockPreviousPrice = new FormControl();
+                        public formProductItemStockExchange = new FormControl();
+                    */
+
+
+                    // Propriedade inserida
+                    public stockForm: FormGroup = new FormGroup( {
+                        stockCode: new FormControl('', [Validators.required]),
+                        stockName: new FormControl('', [ Validators.required, Validators.minLength(3) ] ),
+                        stockPrice: new FormControl('', [Validators.required]),
+                        stockPreviousPrice: new FormControl('', [Validators.required]),
+                        stockExchange: new FormControl('', [Validators.required])
+                    });
+
+
+                    constructor() {}
+
+                    onSubmit(){
+                        /*          Trecho apagado
+                            console.log('Name Control Value', this.formProductItemStockCode.value );
+                            console.log('Name Control Valid', this.formProductItemStockCode.valid );
+                            console.log('Name Control Value', this.formProductItemStockName.value );
+                            console.log('Name Control Value', this.formProductItemStockPrice.value );
+                            console.log('Name Control Value', this.formProductItemStockPreviousPrice.value );
+                            console.log('Name Control Value', this.formProductItemStockExchange.value );
+                        */
+
+                        console.log(this.stockForm.value);        // Linha inserida
+                        console.log(this.stockForm.valid);        // Linha inserida
+
+                    }
+                }
+
+            . Altere o conteúdo do arquivo "create-product-item.component.html" conform abaixo:
+
+                <div class="container">
+
+                    <!-- Diretiva [formGroup] inserida e event binding (ngSubmit) inserido -->
+                    <form [formGroup]="stockForm"
+                            (ngSubmit)="onSubmit()">
+                        <h2>Create Product Item Form</h2>
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+
+                                <!-- Atributo "formControlName" inserido -->
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockCode"
+                                    name="stockCode"
+                                    formControlName="stockCode"
+                                    autocomplete="off">
+                            </div>
+                            </div>
+
+                            <div class="col-6">
+                            <div class="form-group">
+                                <label for="stockName">Stock Name</label>
+
+                                <!-- Atributo "formControlName" inserido -->
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockName"
+                                    formControlName="stockName"
+                                    autocomplete="off"
+                                    name="stockName">
+                                    <!-- [formControl]="formProductItemStockName">        Linha apagada -->
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+
+                                <!-- Atributo "formControlName" inserido -->
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPrice"
+                                    name="stockPrice"
+                                    formControlName="stockPrice"
+                                    autocomplete="off">
+
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice">Stock Previous Price</label>
+
+                                <!-- Atributo "formControlName" inserido -->
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPreviousPrice"
+                                    name="stockPreviousPrice"
+                                    formControlName="stockPreviousPrice"
+                                    autocomplete="off">
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice"></label>
+
+                                <!-- Atributo "formControlName" inserido -->
+                                <select name="stockExchange"
+                                        id="stockExchange"
+                                        class="form-select form-select-sm"
+                                        formControlName="stockExchange"
+                                        autocomplete="off">
+
+                                <option value="NYSE" selected>NYSE</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="OTHER">OTHER</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2 mt-3">
+
+                            <!-- Atribute Binding [disabled] inserido -->
+                            <button class="btn btn-primary"
+                                    [disabled]="!stockForm.valid"
+                                    type="submit">
+                                    <!-- (click)="onSubmit()"   Event Binding eliminado -->
+                                Save
+                            </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Trecho HTML inserido -->
+                    <p>Form Control value: {{ stockForm.value | json }}</p>
+                    <p>Form Control status: {{ stockForm.status | json }}</p>
+                    <!-- fim da inserção -->
+
+                </div>
+
+VERIFICAR PORQUE A MSG DE VALIDAÇÃO DO COMPONENTE "create-product-item.component.html" NAO ESTA FUNCIONANDO 
+QDO ABRE A TELA E TENTO SUBMETER SEM PASSAR POR NENHUM CAMPO.
+
+
+        . formBuilder
+
+
+
+                            
+
+
+
+
+
 
         . formArray:        é usada para criar um array de formulários. Ela permite que o Angular crie um objeto FormArray 
                             que contém vários objetos FormGroup.
