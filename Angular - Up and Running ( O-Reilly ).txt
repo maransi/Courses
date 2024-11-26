@@ -3936,7 +3936,6 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
                 </div>
 
-
             . Atualize todo o código do componente "create-stock.component.ts" com o conteúdo abaixo:
 
                 import { Component } from '@angular/core';
@@ -4296,14 +4295,524 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
                 </div>
 
-VERIFICAR PORQUE A MSG DE VALIDAÇÃO DO COMPONENTE "create-product-item.component.html" NAO ESTA FUNCIONANDO 
-QDO ABRE A TELA E TENTO SUBMETER SEM PASSAR POR NENHUM CAMPO.
+            . Execute o projeto e verifique se o botão está sendo habilitado somente quando a formulário estiver validado:
 
+                ng s -o
+
+            . Insira a linha abaixo no componente "create-product-item.component.ts"
+
+                ...
+                export class CreateProductItemComponent {
+
+                    ...
+                    public submitedForm: Boolean = false;                   // Linha inserida
+                    ...
+
+                    onSubmit(){
+
+                        // if alterado
+                        if (this.stockForm.valid) {
+                            console.log(this.stockForm.value);        
+                            console.log(this.stockForm.valid);        
+
+                            this.stockForm.reset();
+
+
+                            this.submitedForm = false;
+                        } 
+                        else
+                        {
+                            this.submitedForm = true;
+                        }
+                    }
+
+                }
+
+
+            . Implemente as linhas das mensagens de validação abaixo no componente "create-product-item.component.html":
+
+                <div class="container">
+                    <form [formGroup]="stockForm"
+                            (ngSubmit)="onSubmit()">
+                        <h2>Create Product Item Form</h2>
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockCode"
+                                    name="stockCode"
+                                    formControlName="stockCode"
+                                    autocomplete="off">
+                            </div>
+                            </div>
+
+                            <div class="col-6">
+                            <div class="form-group">
+                                <label for="stockName">Stock Name</label>
+
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockName"
+                                    formControlName="stockName"
+                                    autocomplete="off"
+                                    name="stockName">
+
+                                <div *ngIf="stockForm.get('stockName')?.invalid &&
+                                            ( stockForm.get('stockName')?.dirty ||
+                                                stockForm.get('stockName')?.touched ||
+                                                submitedForm)"
+                                    [ngClass]="{'error-message': stockForm.get('stockName')?.invalid &&
+                                                    ( stockForm.get('stockName')?.dirty ||
+                                                    stockForm.get('stockName')?.touched ||
+                                                    submitedForm)}">
+                                <div *ngIf="stockForm.get('stockName')?.errors?.required">
+                                    * Stock Name is Mandatory
+                                </div>
+
+                                <div *ngIf="stockForm.get('stockName')?.errors?.minlength">
+                                    * Minimum length Stock Name will be 3 characteres
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPrice"
+                                    name="stockPrice"
+                                    formControlName="stockPrice"
+                                    autocomplete="off">
+
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice">Stock Previous Price</label>
+
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPreviousPrice"
+                                    name="stockPreviousPrice"
+                                    formControlName="stockPreviousPrice"
+                                    autocomplete="off">
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice"></label>
+
+                                <select name="stockExchange"
+                                        id="stockExchange"
+                                        class="form-select form-select-sm"
+                                        formControlName="stockExchange"
+                                        autocomplete="off">
+
+                                <option value="NYSE" selected>NYSE</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="OTHER">OTHER</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2 mt-3">
+
+                            <button class="btn btn-primary"
+                                    type="submit">
+                                Save
+                            </button>
+
+                            </div>
+
+
+                        </div>
+                    </form>
+
+                    <p>Form Control value: {{ stockForm.get('stockName')?.value | json }}</p>
+                    <p>Form Control invalid {{ stockForm.get('stockName')?.invalid | json }}</p>
+                    <p>Form Control dirty {{ stockForm.get('stockName')?.dirty | json }}</p>
+                    <p>Form Control touched {{ stockForm.get('stockName')?.touched | json }}</p>
+
+                    <p>Form Control status: {{ stockForm.status | json }}</p>
+                </div>
+
+            . Execute o projeto e verifique se as mensagens de validação estão aparecendo
+
+                ng s -o
 
         . formBuilder
 
+            . O FormBuilder é uma classe do Angular que ajuda a criar formulários de forma mais fácil e eficiente. Ele fornece 
+                métodos para criar formulários, grupos de formulários e controles de formulário de forma mais simples e legível.
+
+            . Com o FormBuilder, você pode criar formulários de forma mais declarativa, sem precisar criar manualmente os objetos 
+                FormGroup, FormControl e FormArray.
+
+            . Aqui estão alguns dos principais benefícios do uso do FormBuilder:
+
+                . Criação de formulários de forma mais simples: O FormBuilder fornece métodos para criar formulários de 
+                    forma mais simples e legível, sem precisar criar manualmente os objetos FormGroup, FormControl e FormArray.
+
+                . Definição de validações de forma mais fácil: O FormBuilder permite que você defina validações de forma mais 
+                    fácil e legível, utilizando métodos como required, minLength, maxLength, etc.
+
+            . Exemplo
+
+                import { Component } from '@angular/core';
+                import { FormBuilder, FormGroup, Validators } from '@angular/forms';    // 1. Faça o import da biblioteca
+                
+                @Component({
+                  selector: 'app-exemplo',
+                  template: `
+                    <form [formGroup]="produtoForm" (Submit)="onSubmit()">
+                      <div formGroupName="produto">
+                        <label>Nome do Produto:</label>
+                        <input formControlName="nome" type="text">                      <!-- 7. Utilizar o formulário no template -->
+                      </div>
+                      <div formGroupName="produto">
+                        <label>Descrição do Produto:</label>
+                        <textarea formControlName="descricao" type="text"></textarea>   <!-- 7. Utilizar o formulário no template -->
+                      </div>
+                      <button type="submit" [disabled]="!produtoForm.valid">Salvar</button>
+                    </form>
+                  `
+                })
+                export class ExemploComponent {
+                  produtoForm: FormGroup;                                               // 4. Crie o objeto do FormBuilder
+                
+                  constructor(private formBuilder: FormBuilder) {                       // 3. Crie uma instância do FormBuilder no seu componente:
+                    this.produtoForm = this.formBuilder.group({                         // 4. Criar um formulário com o FormBuilder
+                        nome: ['', Validators.required],                                // 6. Definir validações
+                        descricao: ['', Validators.required]
+                    });
+
+                    onSubmit() {                                                        // 8. Tratar o envio do formulário
+                      if (this.produtoForm.valid) {
+                        console.log(this.produtoForm.value);
+                        // código para salvar o produto
+                      }
+                    }
+                  }
+                }
+
+        . Demo
+            
+            . Retorne o conteúdo do componente "create-product-item.component.ts" para a versão da criação conforme abaixo:
+
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-create-product-item',
+                    templateUrl: './create-product-item.component.html',
+                    styleUrls: ['./create-product-item.component.css']
+                })
+
+                export class CreateProductItemComponent {
+
+                    constructor() {}
+
+                }
+
+            . Insira as linha abaixo no componente "create-product-item.component.ts"
 
 
+                import { Component } from '@angular/core';
+                import { FormBuilder, FormGroup, Validators } from '@angular/forms';    // Linha inserida
+
+                @Component({
+                    selector: 'app-create-product-item',
+                    templateUrl: './create-product-item.component.html',
+                    styleUrls: ['./create-product-item.component.css']
+                })
+
+                export class CreateProductItemComponent {
+                    productForm: FormGroup;                                             // Linha inserida
+
+
+                    constructor(private formBuilder: FormBuilder) {
+                        onCreateForm();                                                 // Linha inserida
+                    }
+
+                    onCreateForm(){                                                     // Método inserida
+                        this.productForm = this.formBuilder.group( {
+                            stockCode: [null, Validators.required ],
+                            stockName: [null, [ Validators.required, Validators.minlength(3) ] ],
+                            stockPrice: [null, [ Validators.required, Validators.min(0)] ],
+                            stockPreviousPrice: [null, [ Validators.required, Validators.min(0)] ],
+                            stockExchange: ['NYSE', Validators.required]
+                        });
+                    }
+
+                    onSubmit() {                                                        // Método inserido
+                      if (this.productForm.valid) {
+                        console.log(this.produtoForm.value);
+                      }
+                    }
+                }
+
+            . Retorne o conteúdo do componente "create-product-item.component.html" para a versão inicial conforma abaixo:
+
+                <div class="container">
+                    <form>
+                        <h2>Create Product Item Form</h2>
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockCode"
+                                    name="stockCode"
+                                    autocomplete="off"
+                                    [formControl]="formProductItemStockCode">        <!-- Uso do [formControl] no lugar do [ngModel] -->
+                            </div>
+                            </div>
+
+                            <div class="col-6">
+                            <div class="form-group">
+                                <label for="stockName">Stock Name</label>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockName"
+                                    name="stockName"
+                                    autocomplete="off"
+                                    [formControl]="formProductItemStockName">            <!-- Uso do [formControl] no lugar do [ngModel] -->
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPrice">Stock Price</label>
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPrice"
+                                    name="stockPrice"
+                                    autocomplete="off"
+                                    [formControl]="formProductItemStockPrice">               <!-- Uso do [formControl] no lugar do [ngModel] -->
+
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice">Stock Previous Price</label>
+                                <input type="number"
+                                    class="form-control form-control-sm"
+                                    id="stockPreviousPrice"
+                                    name="stockPreviousPrice"
+                                    autocomplete="off"
+                                    [formControl]="formProductItemStockPreviousPrice">             <!-- Uso do [formControl] no lugar do [ngModel] -->
+
+                            </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="form-group">
+                                <label for="stockPreviousPrice"></label>
+                                <select name="stockExchange"
+                                        id="stockExchange"
+                                        class="form-select form-select-sm"
+                                        autocomplete="off"
+                                        [formControl]="formProductItemStockExchange">                       <!-- Uso do [formControl] no lugar do [ngModel] -->
+
+                                <option value="NYSE" selected>NYSE</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="OTHER">OTHER</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2 mt-3">
+                            <button class="btn btn-primary"
+                                    type="submit"
+                                    (click)="onSubmit()">Save</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <p>Form Control value: {{ formProductItemStockCode.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control valid: {{ formProductItemStockCode.valid | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockName.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockPrice.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockPreviousPrice.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+                    <p>Form Control value: {{ formProductItemStockExchange.value | json }}</p>           <!-- Acessando o valor atual da formulário -->
+
+                </div>
+
+            . Não será necessário alterar o componente "create-product-item.component.html", porque o "formBuilder" trabalha com 
+                o atributo "formControlName" e ele já está aderente com a versão anterior.
+
+                <div class="container">
+                    <form [formGroup]="stockForm" (ngSubmit)="onSubmit()">
+                        <h2>Create Product Item Form</h2>
+                        <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                            <label for="stockCode">Stock Code</label>
+
+                            <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockCode"
+                                    name="stockCode"
+                                    formControlName="stockCode"
+                                    autocomplete="off">
+
+                            <!-- Div inserida -->
+                            <div *ngIf="stockForm.get('stockCode')?.invalid &&
+                                            ( stockForm.get('stockCode')?.dirty ||
+                                                stockForm.get('stockCode')?.touched ||
+                                                submitedForm)" 
+                                    [ngClass]="{'error-message': stockForm.get('stockName')?.invalid &&
+                                        ( stockForm.get('stockCode')?.dirty ||
+                                        stockForm.get('stockCode')?.touched ||
+                                        submitedForm)}">
+                                <div *ngIf="stockForm.get('stockCode')?.errors?.required">
+                                * Stock Code is Mandatory
+                                </div>
+                            </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                            <label for="stockName">Stock Name</label>
+
+                            <input type="text"
+                                    class="form-control form-control-sm"
+                                    id="stockName"
+                                    formControlName="stockName"
+                                    autocomplete="off"
+                                    name="stockName">
+
+                            <!-- Div inserida -->
+                            <div *ngIf="stockForm.get('stockName')?.invalid &&
+                                            ( stockForm.get('stockName')?.dirty ||
+                                                stockForm.get('stockName')?.touched ||
+                                                submitedForm)" 
+                                    [ngClass]="{'error-message': stockForm.get('stockName')?.invalid &&
+                                    ( stockForm.get('stockName')?.dirty ||
+                                        stockForm.get('stockName')?.touched ||
+                                        submitedForm)}">
+                                <div *ngIf="stockForm.get('stockName')?.errors?.required">
+                                * Stock Name is Mandatory
+                                </div>
+
+                                <div *ngIf="stockForm.get('stockName')?.errors?.minlength">
+                                * Minimum length Stock Name will be 3 characteres
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                            <label for="stockPrice">Stock Price</label>
+                        
+                            <input type="number"
+                                            class="form-control form-control-sm"
+                                            id="stockPrice"
+                                            name="stockPrice"
+                                            formControlName="stockPrice"
+                                            autocomplete="off">
+                        
+                            <!-- Div inserida -->
+                            <div *ngIf="stockForm.get('stockPrice')?.invalid &&
+                                                    ( stockForm.get('stockPrice')?.dirty ||
+                                                        stockForm.get('stockPrice')?.touched ||
+                                                        submitedForm)" [ngClass]="{'error-message': stockForm.get('stockPrice')?.invalid &&
+                                                    ( stockForm.get('stockPrice')?.dirty ||
+                                                    stockForm.get('stockPrice')?.touched ||
+                                                    submitedForm)}">
+                                <div *ngIf="stockForm.get('stockPrice')?.errors?.required">
+                                * Stock Price is Mandatory
+                                </div>
+                            </div>
+                        
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                            <label for="stockPreviousPrice">Stock Previous Price</label>
+                        
+                            <input type="number"
+                                            class="form-control form-control-sm"
+                                            id="stockPreviousPrice"
+                                            name="stockPreviousPrice"
+                                            formControlName="stockPreviousPrice"
+                                            autocomplete="off">
+                        
+                            <!-- Div inserida -->
+                            <div *ngIf="stockForm.get('stockPreviousPrice')?.invalid &&
+                                                    ( stockForm.get('stockPreviousPrice')?.dirty ||
+                                                        stockForm.get('stockPreviousPrice')?.touched ||
+                                                        submitedForm)" [ngClass]="{'error-message': stockForm.get('stockPreviousPrice')?.invalid &&
+                                        ( stockForm.get('stockPreviousPrice')?.dirty ||
+                                            stockForm.get('stockPreviousPrice')?.touched ||
+                                            submitedForm)}">
+                                <div *ngIf="stockForm.get('stockPreviousPrice')?.errors?.required">
+                                * Stock Previous Price is Mandatory
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                            <label for="stockExchange">Exchange</label>
+                        
+                            <select name="stockExchange" id="stockExchange" class="form-select form-select-sm" formControlName="stockExchange"
+                                autocomplete="off">
+                        
+                                <option value="NYSE" selected>NYSE</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="OTHER">OTHER</option>
+                            </select>
+                            </div>
+                        </div>
+                        </div>
+                        
+                        <div class="row">
+                        <div class="col-2 mt-3">
+                        
+                            <!-- Event Binding eliminado -->
+                            <button class="btn btn-primary" type="submit">
+                            Save
+                            </button>
+                        
+                        </div>
+                        </div>
+                    </form>
+
+                    <!-- Trecho HTML inserido -->
+                    <p>Form Control value: {{ stockForm.get('stockName')?.value | json }}</p>
+                    <p>Form Control invalid {{ stockForm.get('stockName')?.invalid | json }}</p>
+                    <p>Form Control dirty {{ stockForm.get('stockName')?.dirty | json }}</p>
+                    <p>Form Control touched {{ stockForm.get('stockName')?.touched | json }}</p>
+
+                    <p>Form Control status: {{ stockForm.status | json }}</p>
+                    <!-- fim da inserção -->
+                </div>
+
+            . Execute o projeto e verifique se as mensagens de validação estão aparecendo
+
+                ng s -o
+
+        . formArray
+
+
+Página 185
                             
 
 
