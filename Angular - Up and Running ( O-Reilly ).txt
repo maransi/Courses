@@ -360,6 +360,97 @@ https://consolelog.com.br/introducao-ao-angular-17/
                                             sintaxe do nosso projeto em tempo de execução e em caso de algum erro ou warning ele lança uma exception 
                                             no console.    
 
+    . Obrigatoriedade de conteúdo das variáveis:
+
+        . Existem várias configurações possíveis que permitem declarar uma propriedade sem ter que inicializá-la em um componente Angular. 
+            Aqui estão algumas delas:
+
+            . Usar o tipo "any", ou "undefined"
+            
+                . Podemos declarar uma propriedade com o tipo any, permitirá que a propriedade seja inicializada posteriormente.
+
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-exemplo',
+                        template: '<p>Exemplo</p>'
+                    })
+
+                    export class ExemploComponent {
+                        name: any;                  // <----------- Tipo any
+                        description: undefined;     // <----------- Tipo undefined
+                    }
+
+            . Usar o operador "?", ou "!":
+
+                . Podemos usar o operador "?", ou "!", para declarar uma propriedade que pode ser null ou undefined.
+
+                . O simbolo de "!" significa que a propriedade sempre terá um valor não nulo
+
+                . O simbolo de "?" significa que a propriedade poderá ter valor nulo
+
+                . Exemplo
+
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-exemplo',
+                        template: '<p>Exemplo</p>'
+                    })
+
+                    export class ExemploComponent {
+                        name?: string;                  // <----------- Operador "!"
+                        description!: string;           // <----------- Operador "?"
+                    }
+
+            . Podemos adicionar a seguinte configuração ao arquivo tsconfig.json para permitir declarar propriedades sem inicializá-las:
+
+                // tsconfig.json
+                {
+                    ...
+                    "compilerOptions": {
+                        "strictPropertyInitialization": false,
+                        ...
+                    }
+                    ...
+                }
+
+                . Exemplo
+
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-exemplo',
+                        template: '<p>Exemplo</p>'
+                    })
+
+                    export class ExemploComponent {
+                        name: string;
+                        description: string; 
+                    }
+
+                . Essa configuração desativa a verificação de inicialização de propriedades estritas, permitindo que você declare 
+                    propriedades sem inicializá-las.
+
+            . Podemos utilizar o método construtor para iniciar o valor:
+
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-exemplo',
+                    template: '<p>Exemplo</p>'
+                })
+
+                export class ExemploComponent {
+                    name: string;
+                    description: string; 
+
+                    constructor() {
+                        name = "Bill Gates";                // Inicialização pelo método construtor
+                        description = "Microsoft";
+                    }
+                }
+
     . Sequência de execução do Angular:
 
         . O inicio do projeto ocorrerá pelo componente src/main.ts:
@@ -2775,8 +2866,8 @@ https://consolelog.com.br/introducao-ao-angular-17/
         . Por exemplo, a etapa do ciclo de vida OnInit precisa de uma função
             chamada ngOnInit para ser implementada no componente e assim por diante.
 
-    . É um conjunto de métodos que são chamados em diferentes estágios do ciclo de vida de um componente. Aqui está uma visão 
-        geral dos principais métodos do ciclo de vida:
+    . É um conjunto de métodos que são chamados em diferentes estágios do ciclo de vida de um componente, conhecidas como "Hook". 
+        Aqui está uma visão geral dos principais Hooks/métodos do ciclo de vida:
 
         . ngOnChanges: Chamado quando as propriedades de entrada do componente são atualizadas.
 
@@ -4840,45 +4931,111 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
         . formArray
 
+8. Componentes Service
+----------------------
 
-Página 185
-                            
+    A finalidade dos componentes Service no Angular é:
+
+        . Compartilhar dados:               Podem ser usados para compartilhar dados entre diferentes componentes da aplicação. 
+                                            Isso é especialmente útil quando você precisa acessar dados em diferentes partes da 
+                                            aplicação.
+
+        . Fornecer funcionalidades:         Podem ser usados para fornecer funcionalidades que podem ser utilizadas por 
+                                            diferentes componentes da aplicação. Especialmente útil quando precisamos realizar 
+                                            operações complexas que envolvem múltiplos componentes.
+
+        . Gerenciar estado:                 Podem ser usados para gerenciar o estado da aplicação. Isso é especialmente 
+                                            útil quando precisamos manter um estado consistente em diferentes partes da aplicação.
+
+        . Realizar operações assíncronas:   Podem ser usados para realizar operações assíncronas, como chamadas à API ou 
+                                            leitura de dados de um banco de dados.
+
+        . Fornecer uma camada de abstração: Podem ser usados para fornecer uma camada de abstração entre os componentes 
+                                            da aplicação e as operações que eles realizam. Isso é especialmente útil quando você 
+                                            precisa mudar a implementação de uma operação sem afetar os componentes que a utilizam.
+
+    . Os "Services" no Angular são projetados para serem utilizados em conjunto com os componentes da aplicação. Eles são injetados 
+        nos componentes que os necessitam e podem ser utilizados para fornecer dados e funcionalidades.
+
+    . Como os serviços podem ser utilizados no Angular:
+
+        . Serviço de autenticação: Um serviço de autenticação pode ser utilizado para gerenciar o processo de autenticação do usuário 
+            e fornecer informações sobre o usuário autenticado.
+
+        . Serviço de dados: Um serviço de dados pode ser utilizado para fornecer dados para os componentes da aplicação e gerenciar 
+            a leitura e escrita de dados no banco de dados.
+
+        . Serviço de notificação: Um serviço de notificação pode ser utilizado para fornecer notificações para os usuários e gerenciar 
+            a exibição de notificações na aplicação.
+
+    . Exemplo
+
+        // Service
+        import { Injectable } from '@angular/core';
+        
+        @Injectable({                                                   // 2. ProvidedIn
+          providedIn: 'root'
+        })
+        export class MeuServicoService {
+        
+          constructor() { }
+        
+          obterDados(): string {
+            return 'Dados do serviço';
+          }
+        
+        }
+
+
+        // Component              
+        import { Component, OnInit } from '@angular/core';
+        import { MeuServicoService } from './meu-servico.service';
+        
+        @Component({
+          selector: 'app-meus-dados',
+          template: '<p>Meus dados: {{ dados }}</p>'
+        })
+        export class MeusDadosComponent implements OnInit {
+        
+          dados: string;
+        
+            // O serviço MeuServicoService é injetado no componente 
+            // MeusDadosComponent através do construtor  
+          constructor(private meuServico: MeuServicoService) { }            // 1. Injeção de dependência
+        
+          ngOnInit(): void {
+            this.dados = this.meuServico.obterDados();                      // 3. Uso do serviço
+          }
+        
+        }
+
+        1. Injeção de dependência
+
+            . A injeção de dependência é feita através do construtor do componente, onde o 
+                serviço é passado como um parâmetro. O Angular então se encarrega de criar 
+                uma instância do serviço e a passar para o componente.
+
+        2. ProvidedIn
+
+            . O @Injectable decorator é utilizado para marcar o serviço como injetável. O providedIn é utilizado 
+                para especificar onde o serviço deve ser criado. Nesse caso, o serviço é criado na raiz da 
+                aplicação ('root').
+
+        3. Uso do serviço
+
+            . O serviço é então utilizado no componente para obter os dados que são exibidos no template. 
+                O método obterDados() do serviço é chamado no ngOnInit do componente para obter os dados.
+
+
+    . Demo
 
 
 
 
 
 
-
-. Existe alguma configuração possível de ser feita nos arquivos do projeto:
-
-Sim, existem várias configurações possíveis que podem ser feitas nos arquivos do projeto para permitir declarar uma propriedade sem ter que inicializá-la em um componente Angular.
-
-Aqui estão algumas opções:
-
-Configurar o arquivo tsconfig.json:
-Você pode adicionar a seguinte configuração ao arquivo tsconfig.json para permitir declarar propriedades sem inicializá-las:
-
-json
-{
-  "compilerOptions": {
-    "strictPropertyInitialization": false
-  }
-}
-Essa configuração desativa a verificação de inicialização de propriedades estritas, permitindo que você declare propriedades sem inicializá-las.
-
-
-
-
-
-
-        . formArray:        é usada para criar um array de formulários. Ela permite que o Angular crie um objeto FormArray 
-                            que contém vários objetos FormGroup.
-
-
-
-        . formArrayName:    é usada para vincular um array de formulários a um elemento HTML. Ela permite que o Angular crie 
-                            um objeto FormArray e o vincule a um elemento HTML.
+https://www.tektutorialshub.com/angular/angular-services/
+https://www.tektutorialshub.com/angular/angular-dependency-injection/
 
 
 
@@ -4888,6 +5045,8 @@ https://www.fabricadecodigo.com/criar-formulario-reactive-forms/
 https://medium.com/@zeeshankhan8838/reactive-forms-in-angular-848d709cfba4
 https://www.digitalocean.com/community/tutorials/angular-reactive-forms-introduction
 https://www.telerik.com/blogs/angular-basics-what-reactive-forms-when-use-them
+
+Aula 16.2. Instalando e testando o json-server
 
 
 
