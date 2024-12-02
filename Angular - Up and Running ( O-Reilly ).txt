@@ -3994,6 +3994,15 @@ https://consolelog.com.br/introducao-ao-angular-17/
             . É usado em conjunto com a classe FormGroup para criar um grupo de formulários. O objeto FormGroup é um 
                 objeto que contém todos os controles do formulário, bem como suas validações.
 
+            . formControlName é usada para vincular um controle individual a um elemento HTML. Ela permite que o Angular crie 
+                um objeto FormControl e o vincule a um elemento HTML.
+
+            . formGroupName é usada para vincular um grupo de formulários a um elemento HTML. Ela permite que o Angular 
+                crie um objeto FormGroup e o vincule a um elemento HTML.
+
+
+
+
             . Exemplo
 
                 import { Component } from '@angular/core';
@@ -4002,7 +4011,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 @Component({
                   selector: 'app-exemplo',
                   template: `
-                    <form [formGroup]="produtoForm">
+                    <form [formGroup]="produtoForm" (ngSubmit)="onSubmit()">
                       <div formGroupName="produto">
                         <label>Nome do Produto:</label>
                         <input formControlName="nome" type="text">
@@ -4034,8 +4043,11 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 
                   onSubmit() {
                     if (this.produtoForm.valid) {
-                      console.log(this.produtoForm.value);
-                      // código para salvar o produto
+                        console.log(this.produtoForm.value);
+                        
+                        // código para salvar o produto
+
+                        this.productForm.reset();
                     }
                   }
                 }
@@ -4043,6 +4055,23 @@ https://consolelog.com.br/introducao-ao-angular-17/
             . A diretiva formGroup permite que o Angular crie um objeto FormGroup que contém todos os controles do 
                 formulário. Isso permite que o Angular faça a validação dos campos e permite que o Angular acesse os 
                 valores dos campos.
+
+            . O método "reset" de um objeto FormGroup no Angular é utilizado para resetar o formulário para o seu estado 
+                inicial.
+
+                . Quando você chama o método reset em um objeto FormGroup, o seguinte ocorre:
+
+                    . Todos os controles de formulário são resetados: Os valores dos controles de formulário são resetados 
+                        para o seu valor inicial.
+
+                    . As validações são redefinidas: As validações dos controles de formulário são redefinidas para o seu 
+                        estado inicial.
+
+                    . O estado do formulário é resetado: O estado do formulário é resetado para o seu estado inicial, 
+                        incluindo a propriedade dirty e touched.
+
+                    . O método reset é útil quando você deseja limpar o formulário e reiniciar o processo de edição ou 
+                        quando você deseja cancelar as alterações feitas no formulário
 
         . Demo
 
@@ -4315,7 +4344,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
                             console.log(this.stockForm.value);        
                             console.log(this.stockForm.valid);        
 
-                            this.stockForm.reset();
+                            this.stockForm.reset();     // Para limpar o formulário
 
 
                             this.submitedForm = false;
@@ -4820,14 +4849,33 @@ Página 185
 
 
 
+
+. Existe alguma configuração possível de ser feita nos arquivos do projeto:
+
+Sim, existem várias configurações possíveis que podem ser feitas nos arquivos do projeto para permitir declarar uma propriedade sem ter que inicializá-la em um componente Angular.
+
+Aqui estão algumas opções:
+
+Configurar o arquivo tsconfig.json:
+Você pode adicionar a seguinte configuração ao arquivo tsconfig.json para permitir declarar propriedades sem inicializá-las:
+
+json
+{
+  "compilerOptions": {
+    "strictPropertyInitialization": false
+  }
+}
+Essa configuração desativa a verificação de inicialização de propriedades estritas, permitindo que você declare propriedades sem inicializá-las.
+
+
+
+
+
+
         . formArray:        é usada para criar um array de formulários. Ela permite que o Angular crie um objeto FormArray 
                             que contém vários objetos FormGroup.
 
-        . formGroupName:    é usada para vincular um grupo de formulários a um elemento HTML. Ela permite que o Angular 
-                            crie um objeto FormGroup e o vincule a um elemento HTML.
 
-        . formControlName:  é usada para vincular um controle individual a um elemento HTML. Ela permite que o Angular crie 
-                            um objeto FormControl e o vincule a um elemento HTML.
 
         . formArrayName:    é usada para vincular um array de formulários a um elemento HTML. Ela permite que o Angular crie 
                             um objeto FormArray e o vincule a um elemento HTML.
