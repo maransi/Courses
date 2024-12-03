@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Notify.js Example</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/themes/alertify.min.css" />
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
+</head>
+
+<body>
+  <h1>Notify.js Example</h1>
+  <button id="alert-button">Emitir Alerta</button>
+  <button id="success-button">Emitir Sucesso</button>
+  <button id="error-button">Emitir Erro</button>
+
+  <script>
+    // Configuração básica da Notify.js
+    $.notify.defaults({
+      position: 'top right',
+      autoHide: true,
+      autoHideDelay: 3000
+    });
+
+    document.getElementById("alert-button").addEventListener("click", () => {
+      $.notify('Este é um alerta!', 'alert');
+    });
+
+    document.getElementById("success-button").addEventListener("click", () => {
+      $.notify('Operação realizada com sucesso!', 'success');
+    });
+
+    document.getElementById("error-button").addEventListener("click", () => {
+      $.notify('Erro ao realizar a operação!', 'error');
+    });
+  </script>
+</body>
+
+</html>

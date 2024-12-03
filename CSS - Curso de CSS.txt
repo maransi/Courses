@@ -1,0 +1,332 @@
+CSS - Curso de CSS
+------------------
+
+Playlist
+--------
+
+    https://www.youtube.com/watch?v=t8TMQPS_7sc&list=PL-u8JWLN6xasK6rdmAu4YYofbKVashSVT
+
+
+1. Configurações do VSCode
+
+    . Criando snippets dentro do VSCode
+    ------------------------------------
+
+        . Baseado no vídeo abaixo:
+        
+            https://www.youtube.com/watch?v=t8TMQPS_7sc
+
+        . No VSCode acesse: "Preferences / Snippets"
+
+        . Escolha na opção "New Global Snippets"
+
+        . Dê o nome de "mhtml"
+
+        . No arquivo "mhtml.code-snippets" que será aberto coloque o código abaixo:
+
+            {
+                "Print to console": {
+                    "scope": "html",
+                    "prefix": "marco:mhtml",
+                    "body": [
+                        "<!DOCTYPE html>",
+                        "<html lang=\"pt-br\">",
+                        "<head>",
+                        "    <meta charset=\"UTF-8\">",
+                        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+                        "    <title>Document</title>",
+                        "    <style type=\"text/css\">",
+                        "        $1",
+                        "    </style>",
+                        "</head>",
+                        "<body>",
+                        "",
+                        "    ",
+                        "    $2",
+                        "",
+                        "    ",
+                        "    <script>",
+                        "",
+                        "        ",
+                        "    </script>    ",
+                        "</body>",
+                        "</html>",
+                    ],
+                    "description": "Log output to console"
+                }
+            }
+
+2. Unidades de medida css
+-------------------------
+
+    . vh (viewport height) é igual a 1% da altura da viewport.
+        
+        height: 100vh significa que a altura do elemento será igual à altura da viewport.
+        height: 50vh significa que a altura do elemento será igual à metade da altura da viewport.
+
+    . vw (viewport width) é igual a 1% da largura da viewport.
+
+        width: 100vw significa que a largura do elemento será igual à largura da viewport.
+        width: 25vw significa que a largura do elemento será igual a um quarto da largura da viewport.
+
+
+    . vmin e vmax: viewport minimum e viewport maximum. Definem um tamanho em relação ao menor ou maior 
+        tamanho da viewport. Por exemplo, width: 50vmin define a largura de um elemento como 50% do 
+        menor tamanho da viewport.
+
+    . "%" Define um tamanho em relação ao tamanho do elemento pai. Por exemplo, width: 50%.
+
+    . "px" unidade absoluta que define um tamanho fixo em pixels. Por exemplo, width: 200px;
+
+    . "em": unidade relativa baseada no tamanho de fonte do elemento pai. Por exemplo, font-size: 1.2em 
+            define o tamanho da fonte do elemento como 1,2 vezes o tamanho da fonte do elemento pai.
+
+    . "rem": unidade relativa baseada no tamanho de fonte do elemento raiz (normalmente o <html>). 
+                Por exemplo, font-size: 1.2rem define o tamanho da fonte do elemento como 1,2 vezes o 
+                tamanho da fonte do elemento raiz.
+
+    . Existem muitas outras pouco utilizadas: mm (milimetros), cm (centimetos), in (polegadas), pt (pontos) e
+        pc (picas)
+
+3. Height e Width
+-----------------
+
+    . Baseado no vídeo:
+
+        https://www.youtube.com/watch?v=EA9sFMJXk6E&t=182s
+
+    . As propriedades height e width são usadas para definir a altura e largura de um elemento. 
+        No caso da tag body, é recomendável deixar as propriedades height e width como "auto", pois 
+        o tamanho do body é determinado pelo tamanho do conteúdo dentro dele.
+
+        . Valores possíveis: auto, length, initial e inherit
+
+            height: auto; /* O navegador irá calcular automaticamente a altura do elemento com base 
+                             no conteúdo e no tamanho do elemento pai. */
+            
+            height: 200px; /* A altura do elemento é definida como 200 pixels. */
+            
+            height: initial; /* A altura do elemento é redefinida para o seu valor inicial, que é o 
+                                valor padrão definido pelo navegador. */
+            
+            height: inherit; /* A altura do elemento é herdada do elemento pai. Se o elemento pai tiver 
+                                uma altura definida, o elemento filho irá herdar essa altura. */
+
+    . A primeira "div" (container) dentro da tag "body" deverá ter a propriedade "height" com a unidade "vh", ou "auto", nunca "%"
+
+        /* Css */
+        body {
+            height:  100vh;     /* auto; Também pode "auto" no lugar das medidas relativas */
+            width: 100vw;       /* auto; */
+            background-color: yellow;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            border: 1px solid black;
+            width: 50%;
+            height: 50vh;
+            background-color: white;
+        }
+
+        <!-- HTML -->
+        <body>
+            <div class="container">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </body>
+
+    . As "divs" dentro da "div container" podem fazer uso de "%" a vontade.
+
+    . Recomendações:
+
+        . Se o seu site for responsivo, é melhor deixar as propriedades height e width do "body" como "auto". Isso 
+            permitirá que o body se ajuste automaticamente ao tamanho do conteúdo em diferentes dispositivos.
+
+        . Se o seu site não for responsivo e você deseja definir um tamanho fixo para o body, é recomendável 
+            definir uma altura e largura que sejam compatíveis com a maioria das telas de desktop. 
+            
+            . Por exemplo, você pode definir a altura do body como 100vh (100% da altura da viewport) e a 
+                largura como 100vw (100% da largura da viewport). Isso garantirá que o body se ajuste ao 
+                tamanho da tela do usuário.
+
+    . Demo
+
+        . Crie o arquivo "index.html" abaixo:
+
+            <!DOCTYPE html>
+            <html lang="pt_BR">
+
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Document</title>
+                    <link href="site.css" type="text/css" rel="stylesheet">
+                    </link>
+                </head>
+
+                <body>
+                    <div class="container">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </body>
+
+            </html>
+
+        . Crie o arquivo "site.css" abaixo:
+
+            body {
+                height: auto; /* 100vh; */
+                width: auto; /* 100vw; */
+                background-color: yellow;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                border: 1px solid black;
+                width: 50%;
+                height: 50vh;
+                background-color: white;
+            }
+
+            .container>div {
+                width: 30%;
+                height: 10%;
+                border: 1px solid black;
+                background-color: green;
+                margin: 10px;
+            }
+
+        . Execute a página "index.html" e veja seu comportamento.
+
+        . Altere "height" do container para "50%" e veja seu comportamento.
+
+4. Propriedade max-height CSS3 - Definindo altura máxima de um elemento
+-----------------------------------------------------------------------
+
+    . Baseado no vídeo:
+
+        https://www.youtube.com/watch?v=S32qeAwUefM&list=PL-u8JWLN6xasK6rdmAu4YYofbKVashSVT&index=3
+
+
+    . Define a altura máxima dos elementos. Se o conteúdo for maior que a altura máxima, ele irá 
+        gerar um overflow e o conteúdo sairá dos limites definidos; se a altura máxima for menor
+        o elemento se adequará e ficará com o tamanho necessário para caber o conteúdo.
+
+    . Aqui estão os valores possíveis para a propriedade max-height:
+
+        . none: não define uma altura máxima para o elemento.
+
+        . auto: a altura máxima é calculada automaticamente com base no conteúdo do elemento.
+
+        . length: define a altura máxima em unidades de comprimento, como px, em, rem, cm, mm, in, pt, pc.
+
+        . percentage: define a altura máxima como um percentual da altura do elemento pai.
+
+    . Exemplo
+
+        <div id="meuElemento" style="height: 200px; max-height: 500px;">Conteúdo</div>
+    
+    . Aqui estão as palavras reservadas possíveis de ser usadas na propriedade max-height:
+
+        . none: não define uma altura máxima para o elemento.
+
+        . auto: a altura máxima é calculada automaticamente com base no conteúdo do elemento.
+
+        . max-content: a altura máxima é definida como o conteúdo máximo do elemento.
+
+        . min-content: a altura máxima é definida como o conteúdo mínimo do elemento.
+
+        . fit-content: a altura máxima é definida como o conteúdo ajustado do elemento.
+
+        . fill-available: a altura máxima é definida como o espaço disponível no elemento pai.
+
+    . Veremos essas propriedades mais a frente detalhadamente.
+
+    . Demo
+
+        . Altere a página "index.html" conforme abaixo:
+
+            ...
+            <body>
+            <div class="container">
+                
+                <!-- Conteúdo das divs alterado -->
+
+                <div>Mussum Ipsum, cacilds vidis litro abertis. Nullam volutpat risus nec leo commodo, ut</div>
+                <div>interdum diam laoreet. Sed non consequat odio. Não sou faixa preta cumpadi, sou preto inteiris, inteiris.</div>
+                <div>eu sit. Vide electram sadipscing et per.</div>
+                <div>
+                    Mussum Ipsum, cacilds vidis litro abertis. Nullam volutpat risus nec leo commodo, ut
+                    interdum diam laoreet. Sed non consequat odio. Não sou faixa preta cumpadi, sou preto inteiris, inteiris.
+                    Diuretics paradis num copo é motivis de denguis. Admodum accumsan disputationi
+                    eu sit. Vide electram sadipscing et per.
+                    Nulla id gravida magna, ut semper sapien. Bota 1 metro de cachacis aí pra
+                </div>
+
+                <!-- Fim da alteração -->
+            </div>
+            </body>
+
+        . Altere o arquivo css "site.css" conforme abaixo:
+
+            ...
+            .container>div {
+                width: 50%;                 /* Linha alterada */
+                /* height: 10%;                Linha apagada */      
+                max-height: 20%;            /* Linha inserida */
+                border: 1px solid black;
+                background-color: green;
+                margin: 10px;
+            }
+
+        . Execute a página "index.html", redimensione a página e veja seu comportamento.
+
+5. Propriedade min-height CSS3 - Definindo altura mínima
+--------------------------------------------------------
+
+    . Baseado no vídeo:
+
+        https://www.youtube.com/watch?v=PPjn17AC-M8&list=PL-u8JWLN6xasK6rdmAu4YYofbKVashSVT&index=4
+
+    . Usada para definir a altura mínima de um elemento. Ela é usada para garantir que o elemento tenha uma 
+        altura mínima, mesmo que o conteúdo seja menor do que essa altura.
+
+        . Se o conteúdo for menor que o elemento com a altura minima, o elemento ficará com a altura configura na 
+            propriedade "min-height". Caso for maior, o elemento expandirá seu tamanho para caber o conteúdo.
+
+            min-height: valor;
+
+    . Demo
+
+        . Altere o arquivo "site.css" como abaixo:
+
+            ...
+
+            .container>div {
+                width: 50%;
+                /* max-height: 20%;             Linha apagada */
+                min-height: 20%;            /* Linha inserida */
+                border: 1px solid black;
+                background-color: green;
+                margin: 10px;
+            }
+
+        . Execute a página "index.html", redimensione a página e veja seu comportamento.
+
+6. Conheça a propriedade width CSS3. Defina a largura do elemento.
+------------------------------------------------------------------
+
+    . Baseado no vídeo:
+
+        https://www.youtube.com/watch?v=qM4dMEKojW8&list=PL-u8JWLN6xasK6rdmAu4YYofbKVashSVT&index=5
+
+    .

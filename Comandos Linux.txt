@@ -247,9 +247,23 @@ sudo snap remove <snapname>
 
 17. Comando para descobrir o IP da máquina
 
-    hostname -I
-    ifconfig
-    ip a
+    . Instala o "net-tools":
+
+        sudo apt install net-tools
+
+    . Comandos para encontrar endereços TCP/IP:
+
+        hostname -I
+        ifconfig
+        ip a | grep inet
+
+    . Comando para encontrar portas TCP/IP:
+
+        netstat -nlnt | grep [porta]            
+        ou
+        netstat -pnltu
+       
+        lsof -i
 
 18. Como inserir uma variavel ambiental
 
@@ -305,8 +319,13 @@ sudo snap remove <snapname>
         # Mostra resumo do espaço em disco
         df -h .
 
+    
+
         # Apresenta o tamanho das pastas ocultas
         du -h --max-depth=1 | sort -hr
+
+        # Mostra tamanho usado em cada pasta
+        du -sh *
 
         # Ordenado pelo tamanho do arquivo crescente
         sudo du -sh * printf "%s\t%p\n" | sort -nr
@@ -425,3 +444,20 @@ sudo snap remove <snapname>
 
     # Substituir o sdb1 pelo apresentado na consulta acima
     sudo mount -t vfat /dev/sdb1 /media/usbstick 
+
+24. Como saber o local que está o arquivo executável:
+
+    which [comando/executável]
+
+    which ls
+
+25. Como saber as configurações da máquina
+
+    sudo apt-get install neofetch
+
+    neofetch
+
+26. Comando para executar um shell, ou comando, sem bloquear o terminal
+
+    # Atenção ao "&" no final do comando
+    nohup [shell/comando]&

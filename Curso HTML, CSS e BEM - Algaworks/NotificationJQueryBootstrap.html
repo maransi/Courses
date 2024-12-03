@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificação com Bootstrap e jQuery</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/css/bootstrap.min.css"/>
+
+    <style>
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="mb-3">
+            <label for="message" class="form-label">Mensagem da Notificação:</label>
+            <input type="text" id="message" class="form-control" placeholder="Digite sua mensagem aqui">
+        </div>
+        <button id="notifyBtn" class="btn btn-primary">Emitir Notificação</button>
+    </div>
+
+    <div id="notification" class="alert alert-success" role="alert">
+        Esta é uma notificação!
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#notifyBtn').click(function() {
+                var message = $('#message').val();
+                $('#notification').text(message).fadeIn(500, function() {
+                    setTimeout(function() {
+                        $('#notification').fadeOut(500);
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

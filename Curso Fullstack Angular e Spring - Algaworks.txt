@@ -5129,7 +5129,7 @@ https://www.tutorialspoint.com/angular8/angular8_data_binding.htm
 
             ou
 
-            <button on-click = "showData()">Click here</button>
+            <button on-click = "showData($event)">Click here</button>
 
 
         . Property binding, utilizado para ligar o dado de uma propriedade de um componente para 
@@ -5471,7 +5471,6 @@ Aula 09.10. Usando two-way data binding
 
     . Para trabalhar com ngModel é necessário importar o pacote "FormsModule" dentro do componente "app.module.ts":
 
-
         ...
         import { FormsModule } from '@angular/forms';
         ...
@@ -5615,6 +5614,41 @@ Aula 09.13. Iterando com a diretiva ngFor
 
         https://www.guidgenerator.com/online-guid-generator.aspx
         https://www.uuidgenerator.net/guid#google_vignette
+
+    . Site gerador de massa de dados para testes, excelente quando estiver desenvolvendo novas aplicações:
+
+        https://www.mockaroo.com/
+
+    . Site de emails temporário:
+
+        https://temp-mail.org/pt/
+
+    . Site de bibliotecas JQuery:
+
+        https://www.jqueryscript.net/
+        https://plugins.jquery.com/
+
+
+    . Site de APIs Fake
+
+        https://reqres.in/
+
+        https://www.npmjs.com/package/json-server
+
+        https://www.anselme.com.br/2022/12/14/7-apis-publicas-gratuitas-e-de-qualidade/
+
+        https://dummyjson.com/
+
+        https://fakestoreapi.com/
+
+        https://jsonplaceholder.typicode.com/
+
+        # Tem Auth JWT
+        https://fakeapi.platzi.com/
+
+        https://beeceptor.com/crud-api/
+
+        https://fake-coffee-api.vercel.app/docs
 
     . Acesse o template src/app/cliente/cliente.component.html e insira o código abaixo:
 
@@ -9946,7 +9980,7 @@ Aula 16.4. Fazendo requisição com POST
         ...
         adicionar( cidades: any): Promise<any>{
 
-            return this.http.post()'http://localhost:3000/cidades', cidade )      // O segund parâmetro representa o body da request
+            return this.http.post('http://localhost:3000/cidades', cidade )      // O segund parâmetro representa o body da request
                         .toPromise()
                         .then(response => response.json() );
 

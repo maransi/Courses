@@ -1,0 +1,2304 @@
+# CRUD PrimeNG DataTable
+https://stackblitz.com/edit/primeng-tablecrud-demo?file=README.md
+
+# Angular PrimeNG App with Authenticação
+https://www.youtube.com/watch?v=ePiCdLl64j0&list=PLlVkYWGRhwk8enYx4rxnS0QfdfTfANELw
+
+# Crud TODO
+https://www.youtube.com/watch?v=0u6Ih2hO13Q&list=PLlVkYWGRhwk_Fsyy1rlPkeYhn6ruc2O0N
+
+Angular - Formação Angular 17 Udemy
+-----------------------------------
+
+1. Configurando o ambiente de desenvolvimento
+---------------------------------------------
+
+    . Instalação do Nodejs
+
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | $SHELL
+        nvm --version
+
+        # Para instalar a versão lts mais recente
+        nvm install --lts
+
+        # Se quiser instalar uma versão especifica, utilize:
+        # nvm install 18.20.4
+
+        # Se quiser listar as versões do node disponivel no repositorio remoto
+        # nvm ls-remote
+
+        # Se quiser listar as versões instalada na máquina atual
+        # nvm ls
+
+        # Para usar uma versão instalada na máquina atual
+        # nvm use 20.17.0
+
+        # Para desinstalar uma versão do node js
+        # nvm uninstall 18.20.4
+
+        node -v
+        npm -v
+
+    . Instalação do VSCode:
+
+        . Acessar a pagina de download da microsoft:
+
+            https://code.visualstudio.com/download
+
+        . Baixar o arquivo .deb 
+
+        . Abrir o terminal e acessar a pasta Downloads
+
+        . Executar o comando abaixo:
+
+            sudo dpkg -i code_1.37.1-1565886362_amd64.deb
+
+        . Atalhos
+
+            Alt + 1, 2, 3, 4, ...	Posiona na aba no.
+            Ctrl + b				Ativar o menu lateral esquerdo 
+            Ctrl + Alt + P			Para ativar a linha de comandos 
+            Ctrl + P 				Localiza um determinado arquivo
+            Ctrl + W				Fecha a aba corrente
+            Ctrl + Shift + W		Fecha todas as abas abertas
+
+            Ctrl + Rolagem do Mouse	
+                    sobre as abas 
+                    abertas			Faz a rolagem das abas.
+
+            Ctrl + K + C ou 
+            Ctrl + /				Comenta linha atual, ou bloco selecionado
+
+            Ctrl + K + U ou
+            Ctrl + /				Descomenta linha, ou bloco selecionado.
+
+            Ctrl + Shift + 
+                    Acento Agudo	Abre o terminal na parte inferior
+
+            Ctrl + X				Apaga linha
+            Ctrl + H				Localiza e atualiza uma expressão
+            Ctrl + F2				Selecione um texto e pressionando Ctrl + F2 
+                                    muda todos os textos equivalente a medida
+                                    que vai se digitando
+            Alt + Arrow(up/Down)    Move a linha para cima, ou para baixo.
+            Ctrl + Shift + O		Abre a lista de funções/métodos da classe atual
+            Ctrl + G				Posicionar na linha No. que for digitado
+            Alt + Backspace			Apaga palavra inteira a esquerda
+            Ctrl + Shift + .		Mostra os métodos da classe
+            Ctrl + Shift + L		Altera dinamicamente em todo o arquivo a palavra que está sendo alterada
+            Ctrl + M				Para cercar um conjunto de tags numa página HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
+            cTRL + Ctrl + -			Para apagar uma tag que abraça um conjunto de tags HTML ( Precisa de configurar, verifique como fazer em "Configurações" logo abaixo)
+
+        . Instale as seguinte Extensões:
+
+            . Angular Extension Pack
+            . Material Icon
+
+        . Configurações:
+
+            . Digite Ctrl K+S, localize o item "Delete Line" e configure Ctrl + D
+            . Acesse View / Minimap para retirar o scroll de código da direita
+            . Acessar configurações, ir em "Settings", Text editors, Sugestions:
+                . Na opção "Accept Suggestion On Enter" deixar como off
+                . Na opção "Suggest: Insert Mode" deixar como replace
+                . Na opção "Quick Suggestions Delay" deixar como 1000
+            . Acesse "Keyboard Shortcuts" em configurações:
+                . Digite "Emmet: Wrap..." e altere o "Keybinding" para "Alt + M"
+                    . De agora em diante, ao editar uma página HTML e quiser cercar um bloco de tags com uma outra, 
+                        basta:
+                        . Selecionar o bloco
+                        . Digitar "Alt + M"
+                        . Informar a tag que deseja colocar, somente a identificação sem "<>", por exemplo: "div"
+                . Digite "Emmet: Remove Tag" e altere o "Keybinding" para "Alt+Shift+-", o "-" deve ser do bloco numerico
+                    . De agora em diante, se precisar apagar uma tag HTML que cerca um conjunto de outras tags, basta posicioinar
+                        o cursor sobre a "TAg" que deseja apagar e pressionar "Ctrl+Shift+-"
+            . Digite "Ctrl+Shift+P" e digite "Preference: Open User Settings (JSON)"
+                . Digite a configuração abaixo:
+
+                    ...
+                    "editor.linkedEditing": true,
+                    "html.format.unformatted": "input",
+                    "workbench.tree.indent": 20,
+                    "workbench.tree.renderIndentGuides": "always",
+                    "workbench.colorCustomizations": {
+                        "tree.indentGuidesStroke": "#c8e0be"
+                    }
+            . Acesse Configurações -> Profile -> Import Profile 
+                . Informe o link "https://vscode.dev/profile/github/12bd0215e34ffe344361b7dcf767842b" para resgatar as configurações para desenvolvimento em .NET
+
+    . Instalação do JSon Server
+
+        # Instalação do JSon Server
+        npm install json-server
+
+        # Crie o arquivo json abaixo com o nome de db.json
+        {
+            "posts": [
+                { "id": "1", "title": "a title", "views": 100 },
+                { "id": "2", "title": "another title", "views": 200 }
+            ],
+            "comments": [
+                { "id": "1", "text": "a comment about post 1", "postId": "1" },
+                { "id": "2", "text": "another comment about post 1", "postId": "1" }
+            ],
+            "profile": {
+                "name": "typicode"
+            }
+        }
+
+
+        # Execute o comando abaixo
+        npx json-server db.json
+
+        # Testando as rotas
+        curl http://localhost:3000/posts/1
+
+        curl http://localhost:3000/posts
+
+    . Instalação do do Angular
+
+        # Instalação do Angular
+        sudo npm install -g @angular/cli@15
+
+        # Verificação da versão do Angular
+        ng version
+
+
+        # Para desinstalar
+        # npm uninstall -g @angular/cli
+        # npm cache clean --force
+
+        # Para atualizar
+        # sudo npm install --save-dev @angular/cli@latest
+
+6. Gerando nosso projeto
+------------------------
+
+    . Criando um componente com o AngularCli
+
+        . O comando "ng" é um atalho para o Angular CLI (Command Line Interface), que é uma ferramenta de linha de comando para 
+            desenvolver aplicativos Angular. O Angular CLI fornece uma série de comandos que permitem executar tarefas comuns, 
+            como criar novos componentes, executar testes, construir aplicativos, entre outros.
+
+            . Uso do comando "ng"
+
+                # cria um novo projeto Angular com o nome especificado.
+                ng new nome-do-projetos
+
+                # gera um novo componente Angular com o nome especificado.
+                ng generate component nome-do-componente
+
+                # inicia um servidor de desenvolvimento local para o projeto Angular atual.
+                ng serve
+
+                # executa os testes unitários do projeto Angular atual.
+                ng test
+
+                # constrói o projeto Angular atual para produção.
+                ng build
+
+                # inicia um servidor de desenvolvimento local para o projeto Angular atual em modo de produção.
+                ng serve --prod
+
+            . Abreviações do comando "ng"
+
+                # Abreviação para ng new, cria um novo projeto Angular.
+                ng n
+
+                # Abreviação para ng generate, gera um novo componente, diretiva, pipe, serviço, etc.
+                ng g
+
+                # Abreviação para ng serve, inicia um servidor de desenvolvimento local para o projeto Angular atual.
+                ng s
+
+                # Abreviação para ng test, executa os testes unitários do projeto Angular atual.
+                ng t
+
+                # Abreviação para ng build, constrói o projeto Angular atual para produção.
+                ng b
+
+                # Abreviação para ng update, atualiza as dependências do projeto Angular atual.
+                ng update
+
+                # Abreviação para ng add, adiciona uma nova dependência ao projeto Angular atual.
+                ng add
+
+            . Abreviações par os tipos de arquivos que podem ser criados com o comand "ng"
+
+                # Abreviação para ng g component, gera um novo componente Angular.
+                ng g c
+                
+                # Abreviação para ng g directive, gera uma nova diretiva Angular.
+                ng g d
+                
+                # Abreviação para ng g pipe, gera um novo pipe Angular.
+                ng g p
+                
+                # Abreviação para ng g service, gera um novo serviço Angular.
+                ng g s
+                
+                # Abreviação para ng g module, gera um novo módulo Angular.
+                ng g m
+
+            . Exemplo
+
+                ng generate component bem-vindo --spec=false
+
+                # ou
+
+                $ ng g c bem-vindo --spec=false
+
+            . O comando do exemplo acima criará o componente "src/bem-vindo/bem-vindo.component.ts"
+
+                import { Component } from '@angular/core'
+
+                @Component({
+                    selector : 'app-bem-vindo',
+                    templateUrl : './bem-vindo.component.html',
+                    styleUrls : ['./bem-vindo.component.css']
+                })
+
+                export class BemVindoComponent{
+
+                }
+            
+            . Para utilizar o componente acima, basta acessarmos o html "app.componente.html" e inserir a linha abaixo
+
+                    <app-bem-vindo></app-bem-vindo>
+
+            . Ao levantarmo o projeto com o comando abaixo, a página renderizada apresentará o conteúdo da página "bem-vindo.component.html"
+
+                ng serve --open
+
+                ou
+
+                ng s -o
+
+    . Demo
+
+        . Crie um projeto com os comandos abaixo:
+
+            # No questionamento "Would you like to add Angular routing?" Responda "Y"
+            # No questionamento " Which stylesheet format would you like to use? " Responda "SCSS"
+            ng new weather-app
+            
+            cd weather-app/
+
+            # Opção ao comando abaixo seria "ng s --open", ou "npm start"
+            ng serve --open
+            
+    . Acesse a pasta do projeto criado no VSCode.
+
+    . Estrutura de pastas dos projetos Angular:
+
+        +----node_modules --------------------------->  Dependências do Node.JS necessárias no projeto.                  
+        +----src
+            +----app      --------------------------->  Encontram-se todos os arquivos do projeto, como: componentes, diretivas, filtros e módulos da aplicação
+                +----app.routing.module.ts
+                +----app.component.css / app.component.scss
+                +----app.component.html
+                +----app.component.spec.ts
+                +----app.component.ts
+                +----app.module.ts
+            +----assets   --------------------------->  Recursos externos do projeto, como CSS, imagens, bibliotecas JavaScript, etc.
+            +----index.html
+            +----main.ts
+        +----.angular-cli.json
+
+
+
+    . Arquivos da pasta src/app:
+
+        . app.routing.app:              Módulo que configura as rotas para navegar entre as diferentes páginas ou componentes da aplicação
+
+        . app.component.css/.scss:      Arquivo responsável pelo estilo do nosso módulo. Com o Angular nós trabalhamos 
+                                        com os estilos separados para cada componente, assim conseguimos ter um desacoplamento de estilos. 
+                                        Nesse exemplo nós criamos um projeto com a extensão .css, mas também temos a possibilidade de 
+                                        trabalhar com arquivos Sass. Para que possamos alterar, basta executar o comando ng set 
+                                        defaults.styleExt scss, ele irá configurar para que os próximos componentes sejam criados 
+                                        com a extensão do .scss.
+
+        . app.component.html:           Arquivo HTML do nosso componente App, segue o mesmo pensamento que os arquivos de estilo.
+
+        . app.component.spec.ts:        Arquivo de teste do nosso componente.
+
+        . app.component.ts:             É o componente principal da aplicação. Ele é responsável por definir a estrutura e o comportamento da 
+                                        aplicação.
+
+            . Definir a estrutura do componente principal da aplicação
+
+            . Definir o template HTML e o estilo CSS do componente
+
+            . Definir as propriedades e métodos do componente
+
+        . app.module.ts:                O Angular é um framework modular, ele precisa de um ou mais módulos para que possamos 
+                                        gerenciar os nossos componentes, esse módulo acaba sendo um default, mas podemos criar outros modules e 
+                                        chamar eles dentro dele.
+
+    . Arquivos da pasta src:
+
+        . index.html:                   Esse seria o nosso arquivo root, dentro dele rodamos a nossa SPA (Single Page Application).
+
+        . main.ts:                      É o ponto de entrada da aplicação. Ele é responsável por iniciar a aplicação e configurar o ambiente de execução
+
+        . styles.css/.scss:             Como todos os nossos componentes tem o seu próprio arquivo .css ou .scss, nós podemos 
+                                        utilizar esse arquivo para criar algo global como variáveis para nossa aplicação.
+
+
+    . Pasta raiz do projeto:
+
+        . tsconfig.app.json e 
+            tsconfig.spec.json:         são os nossos arquivos de configuração do TypeScript.
+
+        . .gitignore:                   Arquivo do git que utilizamos para o gerenciamento dos arquivos que serão ignorados no momento do 
+                                        nosso commit.
+
+        . package.json:                 Esse arquivo é o responsável por gerenciar as dependências do nosso projeto, quando executamos o comando  
+                                        npm install [biblioteca] --save, ele verifica os pacotes que estão dentro desse arquivo e 
+                                        baixa para o nosso diretório node_modules conforme foi visto no passo anterior. O parâmetro --save é para deixar
+                                        registrado a dependência da biblioteca no arquivo package.json.
+
+        . README.md:                    Arquivo Markdown para documentação da nossa aplicação.
+
+        . tsconfig.json:                Arquivo de configuração do TypeScript.
+
+        . tslint.json:                  O tslint fica verificando se estamos escrevendo o nosso código corretamente, ele verifica a 
+                                        sintaxe do nosso projeto em tempo de execução e em caso de algum erro ou warning ele lança uma exception 
+                                        no console.    
+
+7. Adicionando estilos e importações
+------------------------------------
+
+    . Sequência de execução do Angular:
+
+        . O inicio do projeto ocorrerá pelo componente src/main.ts:
+
+            import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+            import { AppModule } from './app/app.module';       // Importação do modulo para iniciar a aplicação
+
+
+            platformBrowserDynamic().bootstrapModule(AppModule)
+                .catch(err => console.error(err));
+
+
+            . Identificará o arquivo src/app/app.module.ts para iniciar a construção da página principal.
+
+        . O arquivo src/app/app.module.ts faz a associação com os componentes principais da página principal:
+
+            import { BrowserModule } from '@angular/platform-browser';
+            import { NgModule } from '@angular/core';
+
+            import { AppComponent } from './app.component';     // abrirá o arquivo src/app/app.component.ts
+
+            @NgModule({
+                declarations: [
+                    AppComponent                    
+                ],
+                imports: [
+                    BrowserModule
+                ],
+                providers: [],
+                bootstrap: [AppComponent]       // Componente principal que iniciará a aplicação 
+            })
+
+            export class AppModule { }
+
+            . Observe que é feito a importação do arquivo "./app.component" que iniciará a construção da página inicial:
+
+            . Propriedades do arquivo app.module.ts
+
+                . declarations: The components, directives, and pipes that belong to this NgModule.
+
+                . exports: The subset of declarations that should be visible and usable in the component 
+                            templates of other NgModules.
+
+                . imports: Other modules whose exported classes are needed by component templates declared in this NgModule.
+
+                . providers: Creators of services that this NgModule contributes to the global collection of services;
+                            they become accessible in all parts of the application. (You can also specify providers at the component level.)
+
+                . bootstrap: The main application view, called the root component, which hosts all other application views.
+                            Only the root NgModule should set the bootstrap property.
+
+        . A partir da definição do componente principal o framework do angular abrirá o arquivo src/app/app.component.ts
+
+            import { Component } from '@angular/core';
+
+            @Component({
+                selector: 'app-root',
+                templateUrl: './app.component.html',
+                styleUrls: ['./app.component.scss']
+            })
+            export class AppComponent {
+                title = 'weather-app';
+            }
+
+        . O app.component.ts irá vincular com o template src/app/app.component.html
+
+        . Onde criará a página index.html fazendo a substituição da tag <app-root>
+
+        . Fluxo de execução
+
+                +-------------------+
+                |   src/main.ts     |   import { AppModule } from './app/app.module'; 
+                +-------------------+
+                        |
+                        |
+                        V
+            +---------------------------+
+            |   src/app/app.module.ts   |   import { AppComponent } from './app.component'
+            +---------------------------+   ... bootstrap: [AppComponent]
+                        |                   export class AppModule { }
+                        |
+                        |
+                        V                       @Component({
+            +-------------------------------+       selector: 'app-root',
+            |   src/app/app.component.ts    |       templateUrl: './app.component.html', 
+            +-------------------------------+       styleUrls: ['./app.component.scss'] 
+                        |                       })
+                        |
+                        V
+            +-------------------------------+
+            |   src/app/app.component.html  |
+            +-------------------------------+
+                        |
+                        |
+                        V
+                +---------------+
+                |   index.html  |           <app-root></app-root>
+                +---------------+
+
+    . O arquivo "app.component.ts" é o componente principal da aplicação:
+
+        import { Component } from '@angular/core';
+
+        @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.scss']
+        })
+        export class AppComponent {
+            title = 'weather-app';
+        }
+
+        . Aqui está o que cada parte desse código faz:
+
+            import { Component } from '@angular/core';:     Importa a classe Component do módulo @angular/core. Essa 
+                                                            classe é usada para definir um componente Angular.
+
+            @Component({...}):                              Define o componente AppComponent com as seguintes propriedades:
+
+                selector: 'app-root':                       Define o seletor do componente, que é usado para identificar o 
+                                                            componente no HTML.
+
+                templateUrl: './app.component.html':        Define o arquivo HTML que será usado como template para o componente.
+
+                styleUrls: ['./app.component.css']:         Define o arquivo CSS que será usado para estilizar o componente.
+
+            export class AppComponent { ... }:              Define a classe AppComponent que será exportada e usada como componente.
+
+            title = 'weather-app';:                         Define uma propriedade title com o valor 'my-app'. Essa propriedade pode 
+                                                            ser usada no template HTML para exibir o título da aplicação.
+
+    . A tage "<router-outlet>" age como um marcador para onde a rota carregada deve ser exibida na interface. Basicamente, 
+        é uma área reservada no DOM que indica ao Angular Router onde ele deve renderizar os componentes com base nas rotas 
+        configuradas. 
+
+        . Com base na URL e na configuração da URL vs componente associado, o angular irá renderizar o conteúdo no lugar 
+            da tag <router-outlet>. Por exemplo:
+
+                                        Apontar para                            Associado ao html
+            http:///localhome:4200/     ------------->  WeatherHomeComponent    ------------------>     weather-home.component.html
+                    |                                                                                               ^
+                    V                                                                                               |
+                Quando essa URL é chamada o <router-outlet> renderizará a página -----------------------------------+
+            
+    . Demo
+
+        . Substitua o código do arquivo "app.component.html" pelo abaixo:
+
+            <router-outlet><router-outlet>
+
+        . Substitua o código do arquivo "styles.scss" pelo abaixo:
+
+            /* You can add global styles to this file, and also import other style files */
+            :root {
+                --blue-1: #2242c2;
+                --blue-2: #0368ec;
+                --white: #fff;
+                --grey-1: #ededed;
+                --shadow-dark: rgba(0, 0, 0, 0.3);
+                --shadow-light: rgba(255, 255, 255, 0.277);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                font-size: 16px;
+                width: 100%;
+                height: 100%;
+                background-color: var(--blue-1);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            fa-icon {
+                color: #ffffff;
+            }
+
+            .container {
+                width: 500px;
+                height: 80vh;
+                background-color: var(--blue-2);
+                border-radius: 20px;
+                box-shadow: 10px 10px 10px var(--shadow-dark);
+                margin-top: 3rem;
+            }
+
+            .upper-data {
+                position: relative;
+                overflow: hidden;
+                width: 100%;
+                height: 50%;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+            }
+
+            .lower-data {
+                position: relative;
+                overflow: hidden;
+                width: 100%;
+                height: 50%;
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .upper-data img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .weather-data {
+                position: relative;
+                z-index: 1;
+                width: 100%;
+                height: 100%;
+                background-color: var(--shadow-dark);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .location {
+                color: var(--white);
+                text-align: center;
+                font-size: 1.2em;
+            }
+
+            .temperature {
+                color: var(--white);
+                font-size: 4em;
+                text-align: center;
+                font-weight: 900;
+            }
+
+            .more-info-label {
+                color: var(--white);
+                font-size: 1.9em;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin-top: 0.5rem;
+            }
+
+            .more-info-container {
+                flex: 1;
+                background-color: var(--shadow-dark);
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+                margin-top: 1em;
+                margin-bottom: 1em;
+                margin-left: 1em;
+                margin-right: 1em;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .info-block {
+                width: 50%;
+                display: flex;
+                flex-direction: row;
+                margin-top: 1em;
+                margin-bottom: 1em;
+            }
+
+            .info-block-label {
+                width: 50%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .info-block-label span {
+                color: var(--white);
+                font-size: 0.8em;
+                margin-top: 0.4em;
+            }
+
+            .info-block-value {
+                width: 50%;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                color: var(--white);
+            }
+
+            .search {
+                margin-top: 2em;
+                text-align: center;
+            }
+
+            .search input {
+                background-color: var(--shadow-dark);
+                outline: none;
+                border: none;
+                border-radius: 20px;
+                padding: 1em;
+                color: #fff;
+                font-size: 0.8em;
+                text-align: center;
+                width: 70%;
+            }
+            .search-icon {
+                margin-left: 1em;
+            }
+
+        . Insira as linhas abaixo no arquivo app.module.ts
+
+            import { NgModule } from '@angular/core';
+            import { BrowserModule } from '@angular/platform-browser';
+
+            import { AppRoutingModule } from './app-routing.module';
+            import { AppComponent } from './app.component';
+
+            import { BrowserAnimationsModule } from '@angular/platform-browser/animations';         // Linha inserida
+            import { HttpClientModule } from '@angular/common/http';                                 // Linha inserida
+            import { FormsModule } from '@angular/forms';                                           // Linha inserida
+
+            @NgModule({
+                declarations: [
+                    AppComponent
+                ],
+                imports: [
+                    BrowserModule,
+                    AppRoutingModule,
+                    BrowserAnimationsModule,                                                        // Linha inserida                                        
+                    HttpClientModule,                                                               // Linha inserida
+                    FormsModule                                                                     // Linha inserida
+                ],
+                providers: [],
+                bootstrap: [AppComponent]
+            })
+            export class AppModule { }
+
+        . Execute o projeto e veja o resultado no navegador
+
+            ng serve --open
+
+    . Bibliotecas utilizadas
+
+        . Bibliotecas criadas automaticamente na criação do projeto:
+
+            . NgModule
+
+                . Um módulo é definido usando o decorator @NgModule, que recebe um objeto com várias propriedades:
+
+                    . declarations: lista de componentes, diretivas e pipes que fazem parte do módulo
+                    . imports: lista de módulos que são importados pelo módulo atual
+                    . providers: lista de serviços que são fornecidos pelo módulo
+                    . bootstrap: lista de componentes que são carregados inicialmente quando o módulo é iniciado
+
+                . A biblioteca NgModule serve para:
+
+                    . Organizar a aplicação em módulos independentes e reutilizáveis
+                    . Fornecer uma forma de gerenciar as dependências entre os componentes e serviços
+                    . Habilitar a funcionalidade de lazy loading, que permite carregar módulos apenas quando necessário
+
+            . BrowserModule
+
+                . Fornece o mecanismo de renderização para o navegador
+
+                . Habilita a funcionalidade de roteamento
+
+                . Fornece serviços para trabalhar com o DOM (Document Object Model)
+
+                . Habilita a funcionalidade de eventos do navegador
+
+            . AppRoutingModule
+
+                . O AppRoutingModule é um módulo que contém as configurações de roteamento da aplicação. 
+                    Ele é responsável por:
+
+                    . Definir as rotas da aplicação
+
+                    . Associar URLs a componentes específicos
+
+                    . Configurar parâmetros de rota
+
+                    . Habilitar a navegação entre as rotas
+
+        . Bibliotecas adicionais
+
+            . BrowserAnimationsModule
+
+                . Fornece as funcionalidades de animação para os componentes da aplicação
+
+                . Habilita as animações de transição entre as vistas da aplicação
+
+                . Permiti que os desenvolvedores criem efeitos de transição personalizados
+
+                . Com a BrowserAnimationsModule, os desenvolvedores podem criar animações de transição 
+                    para os componentes da aplicação, como:
+
+                    . Animações de entrada e saída de componentes
+
+                    . Animações de transição entre as vistas da aplicação
+
+                    . Animações de mudança de estado dos componentes
+
+            . HttpClientModule -  serve para fazer requisições HTTP a partir da aplicação
+
+                . Fornece uma API simples e fácil de usar para fazer requisições HTTP
+
+                . Faz requisições HTTP para APIs externas ou para APIs dentro da própria aplicação
+
+                . Manipula os dados recebidos das requisições HTTP
+
+                . Trata erros e exceções relacionadas às requisições HTTP
+
+            . FormsModule -  serve para fornecer funcionalidades de formulários para a aplicação
+
+                . Fornece diretivas para criar e gerenciar formulários
+
+                . Permiti a validação de dados de formulário
+
+                . Fornece funcionalidades de binding de dados para formulários
+
+                . Fornece diretivas, como:
+
+                    . ngModel: diretiva para criar um binding de dados entre um formulário e um componente
+
+                    . ngForm: diretiva para criar um formulário e gerenciar os dados de formulário
+
+                    . ngFormGroup: diretiva para criar um grupo de formulários e gerenciar os dados de formulário
+
+                    . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário
+
+                    . ngFormArray: diretiva para criar um array de formulários e gerenciar os dados de formulário                
+
+8. Instalando a biblioteca de icones
+------------------------------------
+
+    . fontawesome
+
+        https://www.tutorialspoint.com/web_icons/index.htm
+
+        . Usada no Angular para integrar os ícones do FontAwesome em uma aplicação Angular.
+
+        . É uma biblioteca de ícones populares que fornece uma ampla variedade de ícones que 
+            podem ser usados em aplicações web e móveis.
+
+            https://docs.fontawesome.com/web/setup/get-started
+
+        . Existe a versão paga e a versão Free:
+
+            https://fontawesome.com/search?o=r&m=free
+
+        . A documentação de como usá-la pode ser encontrada no link abaixo:
+
+            https://github.com/FortAwesome/angular-fontawesome
+
+        . Exemplos:
+
+            <i class="fa fa-user"></i>
+
+            <fa-icon [icon]="['fas', 'user']"></fa-icon>
+
+        . Demo
+
+            . Execute os comandos abaixo na pasta raiz do projeto:
+
+                npm install @fortawesome/fontawesome-svg-core
+
+                npm install @fortawesome/free-solid-svg-icons
+
+                # Verifique a versão do angular do projeto é utilize no lugar da tag <version>
+                # Acesse o link "https://www.npmjs.com/package/@fortawesome/angular-fontawesome" para encontrar a "version"
+                # npm install @fontawesome/angular-fontawesome@<version>
+                npm install @fortawesome/angular-fontawesome@0.12.x
+
+            . Insira as linhas abaixo no arquivo "app.module.ts"
+
+                import { NgModule } from '@angular/core';
+                import { BrowserModule } from '@angular/platform-browser';
+
+                import { AppRoutingModule } from './app-routing.module';
+                import { AppComponent } from './app.component';
+
+                import { BrowserAnimationsModule } from '@angular/platform-browser/animations';         
+                import { HttpClientModule } from '@angular/common/http';                                
+                import { FormsModule } from '@angular/forms';                                           
+                import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';           // Linha inserida
+                import {faCoffee, faMask, faSpinner} from "@fortawesome/free-solid-svg-icons";  // Linha inserida
+
+                @NgModule({
+                declarations: [
+                    AppComponent
+                ],
+                imports: [
+                    BrowserModule,
+                    AppRoutingModule,
+                    BrowserAnimationsModule,                                                                                                
+                    HttpClientModule,                                                               
+                    FormsModule,
+                    FontAwesomeModule                                                           // Linha inserida
+                ],
+                providers: [],
+                    bootstrap: [AppComponent]
+                })
+
+                export class AppModule { 
+                    constructor(library: FaIconLibrary) {                                       // Insira o construtor
+                        library.addIcons( faCoffee, faMask, faSpinner );
+                    }
+
+                }
+
+            . Altere o conteúdo do componente "app.component.html" com as linhas abaixo:
+
+                <div class="container">
+                    <div class="jumbotron">
+                        <h1 class="display-4">Hello, world!</h1>
+                        <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+                        <hr class="my-4">
+                        <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+                        <a class="btn btn-primary btn-lg" href="#" role="button">
+                            <fa-icon [icon]="['fas', 'mask']" size="lg"></fa-icon>&nbsp;Learn more           <!-- Uso do Icone -->
+                        </a>
+                    </div>
+                </div>
+
+
+            . Execute o projeto e veja o resultado no navegador
+
+                ng serve --open
+
+    . Bootstrap Icons
+
+        https://icons.getbootstrap.com/
+
+        . Instale o Bootstrap Icons: Você pode instalar os ícones do Bootstrap via npm:
+
+            npm install bootstrap-icons
+
+        . Adicione os ícones ao seu projeto: No arquivo angular.json, adicione o caminho para os ícones na seção de estilos:
+
+            ...
+            "styles": [
+                "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+                "src/styles.css"
+            ]
+
+        . Use os ícones no seu template "*.component.html": 
+
+            <i class="bi bi-alarm">
+
+9. Criando nosso primeiro componente e rota
+-------------------------------------------
+
+    . Verifique mais detalhes no tópico "Criando um componente com o AngularCli" do 
+        "Curso Fullstack Angular e Spring - Algaworks"
+
+    . Para gerar um componente um componente no Angular podemos utilizar o comando
+
+        ng generate component [Nome do Componente]
+
+        ou
+
+        ng g c [Nome do Componente]
+
+    . Se adicionarmos o parâmetro "--spec=false" ao comando, indicará que não
+        desejamos user o arquivo de teste "*.component.spec.ts" para o componente .
+
+    . Uma boa prática seria criar uma pasta dentro do projeto para criar nosso módulos, com 
+        nome de "modules" e dentro dela uma subpasta para colocar nossos componentes 
+        "[nome componente]/page"
+
+    . Demo
+
+        . Dentro da pasta "src/app" crie a pasta "modules/weather/page"
+
+        . Dentro da pasta criada crie o componente "weather-home" com o comando abaixo:
+
+            ng generate component weather-home
+
+        . Acesse o arquivo do componente criado "weather-home.component.ts" e apague a 
+            referência feita ao arquivo de estilos criado dentro do novo componente 
+            "weather-home.component.scss", porque utilizaremos o arquivo de estilo global
+            "src/styles.scss"
+
+            // weather-home.component.ts
+            import { Component } from '@angular/core';
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                // styleUrls: ['./weather-home.component.scss']     // Linha substituida pela abaixo
+                styleUrls: []                                       // Linha alterada, retirada da refêrencia ao arquivo de estilo
+            })
+            export class WeatherHomeComponent {
+
+            }
+
+        . Apague o arquivo de estilo criado dentro do componente criado "weather-home.component.scss"
+
+        . Altere o conteúdo do arquivo "app.component.html" pelo abaixo:
+
+            <app-weather-home></app-weather-home>
+
+        . Execute o projeto e veja o resultado no navegador
+
+            ng serve --open
+
+    . Como dito anterior sobre a "<router-outlet>", podemos utilizar as configurações de rotas para renderizar 
+        o conteúdo da página. Basta configurar as rotas, no arquivo "app.modules.ts", ou no arquivo de rotas
+        "app-routing.module.ts".
+
+        . Para mais detalhes, acesse o curso "Curso Fullstack Angular e Spring - Algawork", aulas "18.1. Introdução a rotas"
+            até "Aula 18.14. Criando um Routing Module para o módulo de funcionalidade". 
+
+    . Demo
+
+        . Insira as linhas abaixo no arquivo "app-routing.module.ts"
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+
+            // Linha inserida
+            import { WeatherHomeComponent } from './modules/weather/page/weather-home/weather-home.component';
+
+            // Objeto alterado
+            const routes: Routes = [
+                {
+                    path: '',
+                    redirectTo: 'weather',
+                    pathMatch: 'full'
+                },
+                { 
+                    path: 'weather',
+                    component: 'WeatherHomeComponent'
+                }
+            ];
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+
+            export class AppRoutingModule { }
+
+        . Insira o conteúdo abaixo no arquivo "app.component.html"
+
+            <router-outlet></router-outlet>
+
+        . Execute o projeto e veja o resultado no navegador
+
+            ng serve --open
+
+        . Altere o pathname da URL para http://localhost:4200/ e veja o resultado apresentado na 
+            URL do navegador
+
+    . Modularizando o projeto
+
+        . A medida que a aplicação for crescendo, o AppModule ficará muito grande. Neste
+            caso seria interessante criar "features modules", ou modulos de funcionalidades
+            para organizar melhor o nosso projeto.
+
+            . Para criar um módulo de funcionalidade: acesse o terminal, acesse a pasta raiz do projeto e 
+                digite o comando abaixo:
+
+                ng g m [Nome do Módulo]
+
+                Exemplo:
+
+                    ng g m curso
+
+                . Este comando criará uma pasta com o nome do módulo e um arquivo dentro dela com o nome [nome modulo].module.ts:
+
+                    import { NgModule } from '@angular/core';
+                    import { CommonModule } from '@angular/common';
+
+                    @NgModule({
+                        imports: [
+                            CommonModule
+                        ],
+                        declarations: []
+                    })
+                    export class CursoModule { }
+
+                    . A diferença entre o módulo de funcionalidade e o de raiz seria que: o de funcionalidade é bem reduzido e somente
+                        importa o "CommonModule".
+
+        . Demo
+
+            . Acesse a pasta raiz do projeto e digite o comando abaixo:
+
+                # Irá criar a pasta "contabilidade" dentro da pasta "./src/app"
+                ng g m contabilidade
+
+                # Irá criar a pasta "ativo" dentro da pasta "./src/app/contabilidade"
+                ng g c ./contabilidade/ativo --module=contabilidade
+
+            . Acesse o ./src/app/contabilidade/contabilidade.module.ts e faça a declaração do componente curso:
+
+                import { NgModule } from '@angular/core';
+                import { CommonModule } from '@angular/common';
+                import { AtivoComponent } from './ativo/ativo.component';       // Observe que foi feito o import do componente
+
+                @NgModule({
+                    imports: [
+                        CommonModule
+                    ],
+                    declarations: [
+                        AtivoComponent                                          // Observe que foi feito a declaração do componente
+                    ],
+                    exports : [ 
+                        AtivoComponent                                          // Insira o bloco "exports"
+                    ]
+                })
+                export class ContabilidadeModule { }
+
+            . Acesse a classe src/app/app.module.ts, insira dentro do metadado "imports" o "ContabilidadeModule" e faça o import.
+
+                ...
+                import { ContabilidadeModule } from './contabilidade/contabilidade.module';     // Insira o import do module
+
+                @NgModule({
+                    ...
+                    imports: [
+                        BrowserModule,
+                        ContabilidadeModule                                                     // Insira o import do module
+                    ],
+                    ...
+                })
+                export class AppModule { }
+
+            . Acesse o arquivo src/app/app.component.html e inclua a tag abaixo:
+
+                <app-ativo></app-ativo>
+
+            . Execute o projeto e verifique se a modularização deu certo:
+
+                ng serve --open
+
+            . Verifique se a página exibida saiu a mensagem do "Ativo"
+
+10. Instalando a biblioteca CSS do Bootstrap
+--------------------------------------------
+
+    . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
+
+        $ npm install bootstrap@5.3.3 --save
+
+    . Acesse o arquivo angular.json da pasta raiz do projeto, localize o atributo "styles" e inclua a configuração do 
+        bootstrap como abaixo:
+
+        ...
+        "styles": [
+            /* "styles.css",  apague esse linha */
+            "./node_modules/bootstrap/dist/css/bootstrap.css"
+        ],
+        ...
+
+    . Acesse o arquivo app.component.html da pasta raiz e substitua pelo código abaixo:
+
+        <div class="container">
+            <div class="jumbotron">
+                <h1 class="display-4">Hello, world!</h1>
+                <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+                <hr class="my-4">
+                <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+                <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+            </div>
+        </div>
+
+
+11. Data Binding
+----------------
+
+    . Fonte de pesquisa:
+
+        https://www.tutorialspoint.com/angular8/angular8_data_binding.htm
+
+    . É uma técnica fundamental no Angular que permite ligar os dados do componente à view, de forma que os 
+        dados sejam atualizados automaticamente quando o componente é atualizado.
+
+    . Vantagens
+
+        . Atualização automática
+
+        . Redução de código
+
+        . Melhoria na manutenção.
+
+    . Desvantagens
+
+        . Complexidade
+
+        . Desempenho, se for utilizado incorretamente.
+
+    . O data binding pode ser feito de duas forma:
+
+        . One-way - É uma interação unidirecional entre o componente e seu modelo. Se você executar qualquer 
+                    alteração em seu componente, ele refletirá os elementos HTML.
+
+        . Two-way - É uma interação bidirecional, os dados fluem em ambas as direções (do componente para as 
+                    visualizações e das visualizações para o componente)
+
+    . One-way Data Binding
+
+        . Interpolação: {{nome}} - onde nome é uma propriedade do componente, entre {{ }}
+
+            // *.component.ts
+            export class TestComponent implements OnInit { 
+                appName = "My first app in Angular 4"; 
+            }
+
+            // *.component.html 
+            <h1>{{appName}}</h1>            
+
+            // app.component.html
+            <app-test></app-test>
+
+        . Event Binding: (evento)="função do componente Angular", onde o evento é nome do evento do elemento 
+                            HTML: click(), hover(), doubleClick(), etc, que será associado ao método do componente Angular:
+
+            // *.component.ts
+            export class TestComponent { 
+                showData($event: any){ 
+                    console.log("button is clicked!"); if($event) { 
+                        console.log($event.target); 
+                        console.log($event.target.value); 
+                    } 
+                } 
+            }
+
+            // *.component.html
+            <h2>Event Binding</h2> 
+            <button (click)="showData($event)">Click here</button>
+
+
+            // ou podemos utilizar o prefixo "on" + o nome do evento
+
+            <button on-click="showData($event)">Click here</button>
+
+        . Property binding: [property]="valor propriedade" - utilizado para ligar o dado de uma propriedade de um componente para 
+                            o elemento DOM, onde "property" seria a propriedade do elemento: disabled, autocomplete, required, etc; e
+                            o "valor da propriedade" seria o valor necessário da propriedade: true/false, 50, etc.
+
+            // *.component.ts
+            export class TestComponent { 
+                userName:string = "Peter"; 
+            }
+
+            // *.component.html
+            // userName property is bind to an attribute of a DOM element <input> tag
+            <input type="text" [value]="userName" [disabled]="true" >
+
+
+        . ngModel - uando você usa ngModel sem o símbolo [] ou () em torno dele, ele funciona de forma unidirecional. Isso significa que o 
+                    valor do elemento de formulário é atualizado automaticamente na propriedade do componente, mas o valor da propriedade do 
+                    componente não é atualizado automaticamente no elemento de formulário.
+
+            <input type="text" ngModel="nome">
+            
+            <!-- 
+                Nesse caso, quando o usuário digita algo no formulário, o valor é atualizado automaticamente na propriedade nome do componente. 
+                 No entanto, se você atualizar a propriedade nome do componente em algum lugar do seu código, o valor não será atualizado 
+                 automaticamente no formulário.
+            --!>
+
+        . Variáveis de referência - são usadas para vincular um elemento do template a uma variável no componente. Isso permite que você acesse o 
+                                    elemento do template no componente e faça operações com ele.
+
+            . As variáveis de referência são definidas no template usando o símbolo # seguido do nome da variável. Por exemplo:
+
+                <input #nome type="text">
+
+            . A variável de referência nome é definida e vinculada ao elemento input do tipo text.
+
+                . No componente, você pode acessar a variável de referência usando o nome da variável. Por exemplo:
+
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-example',
+                        template: `
+                                <input #nome type="text">
+                                <button (click)="mostrarValor(nome.value)">Mostrar valor</button>
+                            `
+                    })
+                    export class ExampleComponent {
+                        mostrarValor(valor: string) {
+                            console.log(valor);
+                        }
+                    }
+
+        . Attribute binding: [attr:attribute name]="Nome da Propriedade do Componente" - é usado para ligar o dado de um componente para o 
+                            atributo HTML:
+
+            // *.component.ts
+            import { Component } from '@angular/core';  // Obrigatório importação do "Component"
+
+            @Component({
+                selector: 'app-root',
+                templateUrl: './app.component.html',
+                styleUrls: ['./app.component.css']
+            })
+
+            export class AppComponent {
+
+                // Declaração das propriedade para ser usado nos Attribute Binding
+                titulo = 'Este é um exemplo de Attribute Binding';
+                isDisabled = true;
+                placeholder = 'Digite seu nome';
+                estilo = 'color: blue; font-size: 24px;';
+                classe = 'exemplo-classe';
+
+                acao() {
+                    console.log('Botão clicado!');
+                }
+            }
+
+            // *.component.html
+            <div [attr.title]="titulo">Este é um exemplo de Attribute Binding</div>
+
+            <button (click)="acao()" [attr.disabled]="isDisabled">Clique aqui</button>
+
+            <input [attr.placeholder]="placeholder" type="text">
+
+            <div [attr.style]="estilo">Este é um exemplo de Attribute Binding</div>
+
+            <div [attr.class]="classe">Este é um exemplo de Attribute Binding</div>
+
+        . Class binding é usado para ligar o dado do componente para a propriedade class do HTML:
+
+            // *.component.ts
+            export class TestComponent { 
+                myCSSClass = "red"; 
+                applyCSSClass = false; 
+            }
+
+            // *.component.html
+            <p [class]="myCSSClass">This paragraph class comes from *myClass* property </p> 
+            <p [class.blue]="applyCSSClass">This paragraph class does not apply</p>
+
+        . Style binding  é usado para ligar o dado do componente para a propriedade de estilo do HTML:
+
+            // *.component.ts
+            export class TestComponent { 
+                myColor = 'brown';
+            }
+
+            // *.component.html
+            <p [style.color]="myColor">Text color is styled using style binding</p>            
+
+    . Two-way data binding
+
+        . [(ngModel)] -  permite a vinculação bidirecional dos dados entre o modelo e a view
+
+            . Para utilizar o "ngModel" é necessário importar a biblioteca "FormsModule" no componente responsável 
+                pelo módulo, por exemplo: "app.module.ts"
+
+                import { FormsModule } from '@angular/forms';  // Importação aqui
+
+                @NgModule({ 
+                    imports: [ 
+                        BrowserModule, 
+                        FormsModule                             // e aqui
+                    ] 
+                }) 
+                export class AppModule { }                    
+
+
+            Exemplo 1
+
+                // *.component.ts
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+                export class AppComponent {
+                    nome = 'João';
+                }
+
+                // *.component.html
+                <input type="text" [(ngModel)]="nome">
+                <p>Olá, {{ nome }}!</p>
+
+            Exemplo 2
+
+                // *.component.ts
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+                export class AppComponent {
+                    cor = 'azul';
+                }
+
+
+                // *.component.html
+                <select [(ngModel)]="cor">
+                    <option value="vermelho">Vermelho</option>
+                    <option value="azul">Azul</option>
+                    <option value="verde">Verde</option>
+                </select>
+                <p>A cor selecionada é: {{ cor }}</p>
+
+            Exemplo 3
+
+                // *.component.ts
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+                export class AppComponent {
+                    aceito = false;
+                }
+
+
+                // *.component.html
+                <input type="checkbox" [(ngModel)]="aceito">
+                <p>Você aceitou os termos? {{ aceito }}</p>
+
+            Exemplo 4
+
+                import { Component } from '@angular/core';
+
+                @Component({
+                    selector: 'app-root',
+                    templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+                })
+                export class AppComponent {
+                    opcao = 'opcao1';
+                }
+
+                <input type="radio" [(ngModel)]="opcao" value="opcao1"> Opção 1
+                <input type="radio" [(ngModel)]="opcao" value="opcao2"> Opção 2
+                <p>A opção selecionada é: {{ opcao }}</p>
+
+12. Diretiva "ngForm"
+--------------------
+
+    . É uma diretiva do Angular que é usada para criar um formulário que pode ser validado e enviado. Ela é parte 
+        do módulo FormsModule do Angular.
+
+    . Quando você usa a diretiva ngForm em um formulário, o Angular cria um objeto FormGroup que representa o 
+        formulário e seus campos. Esse objeto pode ser usado para validar o formulário e enviar os dados p
+        ara o servidor.
+
+    . Gerenciamento de Formulário**: A diretiva `ngForm` atua como um controlador para o formulário, permitindo que 
+        o Angular rastreie o estado dos campos, como se eles estão válidos ou inválidos, sujos ou limpos, e se foram 
+        tocados ou não. Isso é essencial para a validação e manipulação dos dados do formulário.
+
+    . Referência ao Formulário**: Quando você usa `ngForm` em um elemento `<form>`, pode criar uma referência local a 
+        ele usando a sintaxe `#nomeDaVariavel="ngForm"`. Isso permite acessar propriedades do formulário diretamente 
+        no template, como `valid`, `invalid`, `dirty`, e `pristine`.
+
+    . Submissão de Formulário**: A diretiva facilita a submissão do formulário através do evento `(ngSubmit)`, que é 
+        disparado quando o formulário é enviado. Você pode vincular esse evento a um método no seu componente para 
+        processar os dados do formulário.
+
+    . Integração com ngModel**: A diretiva `ngForm` trabalha em conjunto com a diretiva `ngModel`, que é utilizada 
+        para criar controles de entrada vinculados ao modelo de dados. Cada campo de entrada que utiliza `ngModel` 
+        será automaticamente registrado no controlador de formulário gerenciado pelo `ngForm`, permitindo que os 
+        dados sejam coletados e validados facilmente.
+
+    . Exemplo
+
+        // *.component.html
+        <form #form="ngForm" (ngSubmit)="onSubmit()" >
+            <input type="text"
+                    name="cpfCnpj"
+                    [(ngModel)]="cpfCnpj"
+                    [required]="true"
+                    placeholder="Informe o CPF do cliente">
+            <br>
+            <input type="text"
+                    name="nome"
+                    [(ngModel)]="nome"
+                    [required]="true"
+                    placeholder="Informe o nome do cliente">
+            <br>
+            <button type="submit" [disabled]="!form.valid">Enviar</button>
+            <!-- <button type="submit" >Enviar</button> -->
+        </form>
+
+        // *.component.ts
+        import { Component } from '@angular/core';
+
+        @Component({
+            selector: 'app-acordo',
+            templateUrl: './acordo.component.html',
+            styleUrls: ['./acordo.component.scss']
+        })
+        export class AcordoComponent {
+            cpfCnpj = '';
+            nome = '';
+
+            onSubmit() {
+                console.log(this.cpfCnpj);
+                console.log(this.nome);
+            }
+        }
+
+        // *.modules.ts
+        ...
+        import { FormsModule } from '@angular/forms';   // Declaração do FormsModule
+
+        @NgModule({
+            ...
+            imports: [
+                FormsModule                             // Importação do FormsModule
+            ],
+            ...
+        })
+        export class FinanceiroModule { }
+
+Aula 12.07
+https://www.toptal.com/angular-js/angular-4-forms-validation
+
+
+10. Criando conta Open Weather Map
+----------------------------------
+
+    . Acesse a URL abaixo e crie um usuário
+
+        https://openweathermap.org/
+
+    . Faça o login e resgate o código da "API Keys". Essa chave será utilizada para fazer nossas
+        chamadas http
+
+11. Entendendo o conceito - Observables
+---------------------------------------
+
+    . Um Observable é um objeto que emite valores ao longo do tempo e pode ser observado por outros 
+        objetos. Em Angular, os Observables são usados para lidar com dados assíncronos, 
+        como requisições HTTP, eventos de usuário e atualizações de estado.
+
+    . Um Observable é como um fluxo de dados que pode ser inscrito por outros objetos, chamados de 
+        Observers. Quando um Observable emite um valor, todos os Observers inscritos recebem esse valor.
+
+    . Os Observables são úteis em Angular porque permitem que você:
+
+        . Lide com dados assíncronos de forma eficiente
+
+        . Seja notificado quando os dados mudam
+
+        . Faça requisições HTTP de forma assíncrona
+
+        . Lide com eventos de usuário de forma assíncrona
+
+    . Em Angular, os Observables são implementados usando a biblioteca RxJS (Reactive Extensions for JavaScript).
+
+        . A biblioteca RxJS (Reactive Extensions for JavaScript) é uma biblioteca de programação reativa para 
+            JavaScript que permite lidar com fluxos de dados assíncronos de forma eficiente.
+
+        . Como a biblioteca "rxjs" funciona:
+
+            . Observables
+
+                Um Observable é um objeto que emite valores ao longo do tempo e pode ser observado por outros objetos. 
+                No Angular, os Observables são usados para lidar com dados assíncronos.
+
+            . Observers
+
+                Um Observer é um objeto que se inscreve em um Observable para receber os valores emitidos por ele. 
+                No Angular, os Observers são usados para lidar com os dados recebidos de um Observable.
+
+            . Subscription
+
+                Um Subscription é um objeto que representa a inscrição de um Observer em um Observable. 
+                No Angular, os Subscriptions são usados para gerenciar as inscrições dos Observers nos Observables.
+
+            . Operadores
+
+                Os operadores são funções que podem ser usadas para transformar, filtrar e combinar Observables. 
+                No Angular, os operadores são usados para manipular os dados recebidos de um Observable.
+
+            . Exemplo
+
+                import { Observable } from 'rxjs';
+
+                const meuObservable = new Observable(observer => {
+                    // Faz algo assíncrono aqui, como uma requisição HTTP
+                    setTimeout(() => {
+                        observer.next('Dados carregados!');
+                        observer.complete();
+                    }, 2000);
+                });
+
+                meuObservable.subscribe(dados => {
+                    console.log(dados); // Imprime "Dados carregados!"
+                });
+
+        . Exemplos
+
+            . Lidar com requisições HTTP assíncronas:
+
+                import { HttpClient } from '@angular/common/http';
+                import { Observable } from 'rxjs';
+
+                const httpClient = new HttpClient();
+                const observable = httpClient.get('https://api.example.com/data');
+
+                observable.subscribe(data => {
+                    console.log(data);
+                });
+
+            . Lidar com eventos de usuário:
+
+                import { fromEvent } from 'rxjs';
+
+                const button = document.getElementById('myButton');
+                const observable = fromEvent(button, 'click');
+
+                observable.subscribe(event => {
+                    console.log('Botão clicado!');
+                });
+
+            . Lidar com atualizações de estado:
+
+                import { BehaviorSubject } from 'rxjs';
+
+                const estado = new BehaviorSubject('inicial');
+
+                estado.subscribe(estadoAtual => {
+                    console.log(estadoAtual);
+                });
+
+                estado.next('novo estado');
+
+12. Criando o serviço de previsão do tempo
+------------------------------------------
+
+    . Componentes "Services"
+
+        . São unidades de interface do usuário que podem ser reutilizadas em diferentes partes de uma 
+            aplicação. Eles definem a aparência e o comportamento de uma interface de usuário 
+            específica. Componentes são responsáveis por exibir dados, lidar com interações do usuário e 
+            gerenciar a lógica de negócios.
+
+        . Fornecem funcionalidades compartilhadas entre diferentes componentes. Eles podem ser usados 
+            para:
+            
+            . Realizar tarefas como busca de dados;
+            
+            . Manipular de dados;
+
+                @Injectable({
+                    providedIn: 'root'
+                })
+                export class DataService {
+
+                    private products: any[] = [
+                        { id: 1, name: 'Produto 1' },
+                        { id: 2, name: 'Produto 2' },
+                        { id: 3, name: 'Produto 3' }
+                    ];
+
+                    getProducts(): any[] {
+                        return this.products;
+                    }
+                }
+
+            . Comunicação com APIs;
+            
+                @Injectable({
+                    providedIn: 'root'
+                })
+                export class ApiDataService {
+                    private apiUrl = 'https://api.example.com';
+
+                    getData(): Observable<any> {
+                        return this.http.get(`${this.apiUrl}/data`);
+                    }
+                }
+
+
+            . Gerenciamento de estado, entre outras. 
+
+                @Injectable({
+                    providedIn: 'root'
+                })
+                export class StateService {
+                    private selectedItem: any;
+
+                    setSelectedItem(item: any): void {
+                        this.selectedItem = item;
+                    }
+
+                    getSelectedItem(): any {
+                        return this.selectedItem;
+                    }
+                }
+            
+        . Serviços são injetados em componentes para que eles possam acessar e usar suas funcionalidades.
+
+            . Service
+                
+                import { Injectable } from '@angular/core';
+
+                @Injectable({           // Informa que  o componente pode ser injetada em outros componentes ou 
+                    providedIn:  'root'  // serviços usando o sistema de injeção de dependência do Angular.
+                })            //    |
+                              //    +----->  Indica que o serviço deve ser injetado no nível raiz da aplicação. 
+                              //             compartilhada entre todos os componentes da aplicação
+
+                export class MyService {
+                    constructor() { }
+                }
+
+
+            . Componente
+
+                import { Component, Inject } from '@angular/core';
+                import { MyService } from './my.service';           // Não se esqueça de importar o service
+                
+                @Component({
+                    selector: 'app-my-component',
+                    template: '<p>My Component</p>'
+                })
+                export class MyComponent {
+                    constructor(    @Inject(MyService) private myService: MyService) { }
+                }           //                  |
+                            //                  +---> Como é feita a injeção
+
+
+            . Existem quatro formas de configuração da injeção no "provideIn":
+
+                'root':     Como mencionado anteriormente, isso injeta o serviço no nível raiz da aplicação, 
+                            criando uma única instância que é compartilhada entre todos os componentes.
+                
+                'platform': Isso injeta o serviço no nível da plataforma, criando uma instância que é compartilhada 
+                            entre todos os componentes da plataforma.
+                
+                'any':      Isso injeta o serviço em qualquer lugar da aplicação, criando uma nova instância para 
+                            cada componente que o solicita.
+                
+                NgModule:   Isso injeta o serviço em um módulo específico, criando uma instância que é compartilhada 
+                            entre todos os componentes desse módulo. por exemplo:
+
+                            Inclua no "providers:[ MyComponent ]" do componente de modulo "app.module.ts", ou do module desejado
+
+                                ...
+                                // Importe do service
+                                import { MyService } from './modules/weather/services/my.service';
+
+                                @NgModule({
+                                    declarations: [
+                                        ...
+                                    ],
+                                    imports: [
+                                        ...
+                                    ],
+                                    providers: [ MyService ],   // declaração do service
+                                    bootstrap: [AppComponent]
+                                })
+
+                                export class AppModule { }
+
+    . Demo
+
+        . Dentro da pasta raiz do projeto, crie o service "weather"
+
+            # "./modules/weather/services/weather" criará a pasta "./src/app/modules/weather/services/" e 
+            # dentro dela o arquivo "weather.service.ts"
+            ng g s ./modules/weather/services/weather --spec=false
+
+
+        . Acesse a classe criada e insira as linhas abaixo:
+
+            import { Injectable } from '@angular/core';                 
+            import { HttpClient } from '@angular/common/http';          // Linha inserida
+            import { Observable } from 'rxjs';                          // Linha inserida
+
+            @Injectable({
+                providedIn: 'root',
+            })
+
+            export class WeatherService {
+                private apiKey = '95a7a0d51b475c9d2fa23d4192ddfbbd';    // Linha inserida, utilize a API-KEY do cadastramento no 
+                                                                        // site "https://openweathermap.org/", veja a aula 10
+
+                constructor(private http: HttpClient) {}                // Linha alterada
+
+                // Metodo inserido
+                //
+                getWeatherDatas(cityName: string): Observable<any> {
+                    return this.http.get(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=metric&mode=json&appid=${this.apiKey}`,
+                    {}
+                    );
+                }
+            }
+
+        . Execute o projeto e verifique se a modularização deu certo:
+
+            ng serve --open
+
+        . Verifique se compilou com sucesso a aplicação
+
+13. Adicionando imagens na aplicação e consumindo serviço de previsão do tempo
+------------------------------------------------------------------------------
+
+    . Interface "OnInit"
+
+        . É uma interface do Angular que é usada para marcar um componente ou diretiva como tendo 
+            um ciclo de vida inicial. Quando um componente ou diretiva implementa a interface OnInit, 
+            o Angular chama o método ngOnInit() após a criação do componente ou diretiva.
+
+        . O método "ngOnInit()" é chamado após a criação do componente ou diretiva, mas antes de ser 
+            renderizado na tela. Isso significa que você pode usar esse método para realizar tarefas 
+            de inicialização, como:
+
+            . Carregar dados de uma API
+
+            . Inicializar variáveis
+
+            . Configurar componentes ou diretivas filhas
+
+            . Realizar tarefas de inicialização específicas do componente ou diretiva
+
+        . Exemplo
+
+            import { Component, OnInit } from '@angular/core';
+
+            @Component({
+                selector: 'app-my-component',
+                template: '<p>My Component</p>'
+            })
+                                         //         +---------> Implementação da interface    
+                                         //         |           OnInit
+            export class MyComponent implements OnInit {
+                constructor() { }
+
+                //  +---------------------> Método implementado da interface "OnInit".
+                //  |                       chamado após a criação do componente ou diretiva, mas antes de ser 
+                //  |                       renderizado na tela
+                ngOnInit(): void {
+                    console.log('Componente inicializado!');
+                    // código de inicialização aqui
+                }
+            }
+
+    . Aqui está uma lista das interfaces do ciclo de vida do Angular:
+
+        . OnInit: chamado após a criação do componente ou diretiva
+        
+        . OnChanges: chamado quando os dados de entrada do componente ou diretiva mudam
+        
+        . OnDestroy: chamado antes da destruição do componente ou diretiva
+        
+        . AfterViewInit: chamado após a criação da view do componente ou diretiva
+        
+        . AfterViewChecked: chamado após a verificação da view do componente ou diretivas
+
+    . Demo
+
+        . Copie as imagens, contidas no arquivo de imagens dos Recursos da aula na plataforma da Udemy,
+            na pasta "assets" do projeto.
+
+        . Acesse o componente "weather-home.component.ts" e realize as alterações abaixo:
+
+            import { Component, Inject, OnInit } from '@angular/core';
+            import { WeatherService } from '../../services/weather.service';
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                styleUrls: ['./weather-home.component.scss']
+            })
+
+            // Inclua/Altere todas as linhas do corpo da classe
+            //
+            export class WeatherHomeComponent implements OnInit  {
+                initialCityName = 'São Paulo';
+
+
+                constructor(private weatherService: WeatherService) { 
+
+                }
+                ngOnInit(): void {
+                    this.getWeatherDatas(this.initialCityName);
+                }
+
+                getWeatherDatas( cityName: string ): void {
+                    this.weatherService.getWeatherDatas( cityName).subscribe( {
+                        next: (response) => {
+                        console.log(response);
+                    },
+                        error: ( error) => console.error(error)
+                    });
+                }
+            }
+
+        . Execute o projeto e verifique se a modularização deu certo:
+
+            ng serve --open
+
+        . Verifique o resultado da execução da página na console do navegador.
+
+        . Execute o comando abaixo na pasta raiz do projeto:
+
+            ng g i ./models/interfaces/WeatherDatas 
+
+        . Acesse a interface criada e altere o código pelo conteúdo abaixo:
+
+            export interface WeatherDatas {
+                coord: {
+                    lon: number;
+                    lat: number;
+                };
+
+                weather: [
+                    {
+                        id: number;
+                        main: string;
+                        description: string;
+                        icon: string;
+                    }
+                ];
+
+                base: string;
+                main: {
+                    temp: number;
+                    feels_like: number;
+                    temp_min: number;
+                    temp_max: number;
+                    pressure: number;
+                    humidity: number;
+                };
+                visibility: number;
+                wind: {
+                    speed: number;
+                    deg: number;
+                };
+                clouds: {
+                    all: number;
+                };
+                dt: number;
+                sys: {
+                    type: number;
+                    id: number;
+                    country: string;
+                    sunrise: number;
+                    sunset: number;
+                };
+                timezone: number;
+                id: number;
+                name: string;
+                cod: number;
+            }
+
+        . Insira a linha abaixo no componente "weather-home.component.ts" para armazenar as informações capturadas da consulta API:
+
+            import { Component, Inject, OnInit } from '@angular/core';
+            import { WeatherService } from '../../services/weather.service';
+            import { WeatherDatas } from 'src/app/models/interfaces/weather-datas';     // Linha inserida
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                styleUrls: ['./weather-home.component.scss']
+            })
+
+            export class WeatherHomeComponent implements OnInit  {
+                initialCityName = 'São Paulo';
+
+                // O simbolo de "!" significa que a propriedade sempre terá um valor não nulo
+                // Se fosse "?" significaria que a propriedade poderá ter valor nulo
+                weatherDatas!: WeatherDatas;
+                        |
+                        +---> Linha inserida
+                ....
+
+                getWeatherDatas( cityName: string ): void {
+                    this.weatherService.getWeatherDatas( cityName).subscribe( {
+                        next: (response) => {
+                            // console.log( response );                     // Linha apagada
+                            response && (this.weatherDatas = response);     // Linha inserida
+                                      |
+                                      +---->    checks if response is truthy (not null, undefined, 0, etc.), 
+                                                and if so, assigns its value to this.weatherDatas
+
+                            console.log(this.weatherDatas);                 // Linha inserida
+                        },
+                        error: ( error) => console.error(error)
+                    });
+                }
+            }
+
+        . Execute o projeto e verifique se a modularização deu certo:
+
+            ng serve --open
+
+        . Verifique o resultado da execução da página na console do navegador.
+
+14. Implementando formulário de pesquisa
+----------------------------------------
+
+    . Sempre que nos subscrevemos num objeto com "subscribe" precisamos desinscrever o objeto.
+
+    . Se não nos desinscrevermos de um subscribe em Angular, podemos enfrentar problemas de vazamento de 
+        memória (memory leak). Aqui estão alguns dos problemas que podem ocorrer:
+
+        . Vazamento de memória: Quando um componente é destruído, mas o subscribe não é desinscrito, o 
+            componente continua a manter uma referência ao observable, impedindo que o garbage collector 
+            libere a memória. Isso pode levar a um aumento gradual da memória utilizada pela aplicação.
+
+        . Componentes não são destruídos: Se um componente não é destruído corretamente devido a um subscribe 
+            não desinscrito, ele pode continuar a receber atualizações e a executar código, mesmo que não 
+            esteja mais visível na tela.
+
+        . Problemas de performance: Com o tempo, a memória utilizada pela aplicação pode aumentar, levando a 
+            problemas de performance, como lentidão, travamentos e até mesmo crashes.
+
+        . Dificuldade em depurar: Vazamentos de memória podem ser difíceis de depurar, pois não há um erro 
+            claro ou uma exceção que indique o problema.
+
+        . Problemas com a rotação de tela: Se um componente não é destruído corretamente, ele pode continuar 
+            a receber atualizações quando a tela é rotacionada, o que pode levar a problemas de layout e 
+            renderização.
+
+    . Podemos nos desinscrever de subscrições usando métodos como unsubscribe() ou takeUntil().
+
+        . unsubscribe()
+
+            import { Subscription } from 'rxjs';
+            
+            // ...
+            
+            private subscription!: Subscription;
+            
+            // ...
+            
+            this.subscription = this.observable.subscribe(
+                (data) => {
+                    // process data
+                },
+                (error) => {
+                    // handle error
+                }
+            );
+            
+            // ...
+            
+            ngOnDestroy() {
+                this.subscription.unsubscribe();
+            }
+
+        . takeUntil()
+
+            import { takeUntil } from 'rxjs/operators';
+
+            // ...
+
+            private ngUnsubscribe = new Subject();
+
+            // ...
+
+            this.observable
+                .pipe( takeUntil(this.ngUnsubscribe) )
+                .subscribe(
+                    (data) => {
+                        // process data
+                    },
+                    (error) => {
+                        // handle error
+                    }
+                );
+
+            // ...
+
+            ngOnDestroy() {
+                this.ngUnsubscribe.next();
+                this.ngUnsubscribe.complete();
+            }
+
+            . o método "pipe"  é usado para criar uma cadeia de operações que são aplicadas sequencialmente ao 
+                fluxo de dados de um observable. 
+
+            . O método "takeUntil"  é frequentemente usado para cancelar observáveis quando um componente é destruído
+
+            . Sempre que se subscrever em um "observable" utilize ".pipe( takeUntil(...) )" dessa forma para fazer a 
+                desinscrição do subscribe.
+
+        . Para fazer a desinscreção podemos fazer isso na destruição do componente no evento "ngOnDestroy":
+
+            . Implementar a interface "OnDestroy" e adicionar o método "ngOnDestroy" no componente da subscrição:
+
+                import { Component, OnDestroy } from '@angular/core';
+                            //          |
+                            //          +---> importe a biblioteca que contém a interface
+
+                @Component({
+                    selector: 'app-exemplo',
+                    template: '<p>Exemplo de componente</p>'
+                })
+                            //                              +---------> implemente a interface "OnDestroy"
+                            //                              |
+                export class ExemploComponent implements OnDestroy {
+                    
+                    // Adicione o método "ngOnDestroy"
+                    ngOnDestroy(): void {                
+                        console.log('Componente destruído!');
+                    }
+                }
+
+    . Demo
+
+        . Realize as alterações abaixo na classe "weather-home.component.ts" para fazer a desinscrição do "subsribe":
+
+            // Importe a biblioteca "OnDestroy"
+            import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+            import { WeatherService } from '../../services/weather.service';
+            import { WeatherDatas } from 'src/app/models/interfaces/weather-datas';
+
+            import { takeUntil } from 'rxjs/operators';                 // Linha inserida
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                styleUrls: ['./weather-home.component.scss']
+            })
+
+            // Adicionado a interface "OnDestroy"
+            //
+            export class WeatherHomeComponent implements OnInit, OnDestroy  {
+
+                // Crie a propriedade abaixo
+                private readonly destroy$: Subject<void> = new Subject();
+
+                initialCityName = 'São Paulo';
+                weatherDatas!: WeatherDatas;
+
+
+                constructor(private weatherService: WeatherService) { 
+
+                }
+
+                ngOnInit(): void {
+                    this.getWeatherDatas(this.initialCityName);
+                }
+
+                getWeatherDatas( cityName: string ): void {
+                    this.weatherService
+                        .getWeatherDatas( cityName)
+                        .pipe(takeUntil(this.destroy$))         // Linha inserida
+                        .subscribe( {
+                            next: (response) => {
+                                response && (this.weatherDatas = response);
+                                console.log(this.weatherDatas);
+                            },
+                            error: ( error) => console.error(error)
+                        });
+                }
+
+                // Método inserido
+                ngOnDestroy(): void {
+                    this.destroy$.next();
+                    this.destroy$.complete();
+                }                
+            }
+
+        . Execute o projeto e verifique se a compilação não deu erro e o app foi levantando com sucesso:
+
+            ng serve --open
+
+
+
+
+    . Demo
+
+        . Realize as alteração abaixo no componente "weather-home.component.ts":
+
+            import { Component, OnDestroy, OnInit } from '@angular/core';
+            import { Subject, takeUntil } from 'rxjs';
+            import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';      // Linha inserida
+            import { WeatherService } from '../../services/weather.service';
+            import { WeatherDatas } from 'src/app/models/interfaces/WeatherDatas';
+
+            @Component({
+                selector: 'app-weather-home',
+                templateUrl: './weather-home.component.html',
+                styleUrls: [],
+            })
+
+            export class WeatherHomeComponent implements OnInit, OnDestroy {
+                private readonly destroy$: Subject<void> = new Subject();
+                initialCityName = 'São Paulo';
+                weatherDatas!: WeatherDatas;
+
+                searchIcon = faMagnifyingGlass;                             // Linha inserida
+
+                constructor(private weatherService: WeatherService) {}
+
+                ngOnInit(): void {
+                    this.getWheatherDatas(this.initialCityName);
+                }
+
+                getWheatherDatas(cityName: string): void {
+                    this.weatherService
+                    .getWeatherDatas(cityName)
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
+                        next: (response) => {
+                        response && (this.weatherDatas = response);
+                        console.log(this.weatherDatas);
+                        },
+                        error: (error) => console.log(error),
+                    });
+                }
+
+                // Método criado
+                onSubmit(): void {
+                    this.getWheatherDatas(this.initialCityName);
+                    console.log('CHAMOU A FUNÇÃO');
+                    this.initialCityName = '';
+                }
+
+                ngOnDestroy(): void {
+                    this.destroy$.next();
+                    this.destroy$.complete();
+                }
+            }
+
+        . Altere a página "weather-home.component.html" como abaixo:
+
+            <div class="search">
+                <form #form="ngForm" (submit)="onSubmit()">
+                    <input type="text"
+                            placeholder="Buscar localização"
+                            name="city"
+                            [(ngModel)]="initialCityName"/>
+
+                    <span (click)="onSubmit()">
+                        <fa-icon
+                            animation="fade"
+                            style="--fa-animation-duration: 5s; cursor: pointer"
+                            size="lg"
+                            class="search-icon"
+                            [icon]="searchIcon">
+                        </fa-icon>
+                    </span>
+                </form>
+            </div>
+
+
+
+
+
+
+
+
+--------------------------------------------------------------
+A diretiva `ngForm` do Angular é uma parte fundamental do sistema de formulários, especialmente no contexto de formulários baseados em templates (Template Driven Forms). Ela permite que o Angular gerencie o estado e a validação de um formulário de forma eficiente. Aqui estão os principais aspectos da diretiva `ngForm`:
+
+
+Citations:
+[1] https://demoiselle.gitbooks.io/documentacao-frontend/content/formularios.html
+[2] https://consolelog.com.br/validacao-formulario-ngmodel-angular/
+[3] https://www.youtube.com/watch?v=x07zc2UqSuU
+[4] https://vidafullstack.com.br/angular/o-que-sao-diretivas-angular/
+[5] https://angular.io/api/forms/NgForm
+[6] https://cursos.alura.com.br/forum/topico-ngform-e-uma-directive-105269
+[7] https://www.programicio.com/web/angular/formularios/diretiva-ngfrom
+
+
+
+
+
+--------------------------------------------------------------------------
+fazer teste utilizando firstValueFrom() ou lastValueFrom()
+
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
+constructor(private http: HttpClient) {}
+
+async getData() {
+  const result = await firstValueFrom(this.http.get('url-da-api'));
+  console.log(result);
+}
+
+
+
+
+
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
+constructor(private http: HttpClient) {}
+
+async getData() {
+  return await firstValueFrom(this.http.get('url-da-api'));
+}
+
+
+
+
+Você
+qual é o mais utilizado para chamadas http firstValueFrom() ou objetos observables
+
+Copilot
+Em Angular, tanto firstValueFrom() quanto Observable têm seus usos, mas Observable é frequentemente mais utilizado para chamadas HTTP. Os Observables permitem um manuseio mais avançado, como operações reativas, cancelamento de requisições e transformações de dados em tempo real, que são difíceis de alcançar com Promises simples.
+
+Por exemplo, se você quiser responder a dados em tempo real ou lidar com streams contínuos de dados, os Observables são a escolha certa. Promises, por outro lado, são mais simples e adequadas para operações que se resolvem apenas uma vez, sem a necessidade de operações reativas.
+
+Resumo:
+
+Observable: Mais flexível, ideal para operações reativas e streams contínuos.
+
+firstValueFrom(): Útil para obter uma única resposta, transformando um Observable em uma Promise.
+
+Depende da complexidade e das necessidades específicas da sua aplicação!

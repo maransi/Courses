@@ -18,21 +18,21 @@ Aula 5. Instalando o Docker
 
 	. Instalação nas distribuições Ubuntu
 
+        # Add Docker's official GPG key:
         sudo apt-get update
-        sudo apt-get install \
-            ca-certificates \
-            curl \
-            gnupg \
-            lsb-release
+        sudo apt-get install ca-certificates curl gnupg
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
+        # Add the repository to Apt sources:
         echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt-get update
-        sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
         sudo docker --version
 
         sudo groupadd docker
@@ -61,6 +61,15 @@ Aula 5. Instalando o Docker
 
         docker --version
 
+    . Instalando no BigLinux
+
+        . Acesse a "Big Store", localize "biglinux-docker-config" e faça a instalação
+
+        ou
+
+        . Execute o comando: 
+        
+            sudo pacman -Sy biglinux-docker-config
 
     . Instalando o MySQL
 
@@ -308,6 +317,8 @@ Aula 11. Criando Contêineres - II
         # Elimnando container
         docker container rm <container ID ou container name>
 
+        # Eliminando image
+        docker image rm <Image Id ou Repository Name:Tag>
 
 Aula 13. Container - Mapeando pastas
 ------------------------------------
@@ -1873,3 +1884,28 @@ Aula 43. Criando o serviço para o contêinere MVC
         docker-compose down -v
 
     
+Complemento
+-----------
+
+Docker Multistage Build: Como enxugar suas imagens de containers
+----------------------------------------------------------------
+
+https://www.youtube.com/watch?v=zP4lInIwfXg&t=11s
+
+
+Erros comuns ao iniciar no Docker
+---------------------------------
+
+https://www.youtube.com/watch?v=va7iPpAyuAs&list=TLPQMjgwNjIwMjRXtqMs2omkXA&index=2
+
+
+Como definir CPU e Memória em containers Docker
+-----------------------------------------------
+
+https://www.youtube.com/watch?v=oap6A7VxtDs&list=TLPQMjgwNjIwMjRXtqMs2omkXA&index=3
+
+
+O ambiente de desenvolvimento perfeito com devcontainers
+--------------------------------------------------------
+
+https://www.youtube.com/watch?v=wPG77WhhVQ0&list=TLPQMjgwNjIwMjRXtqMs2omkXA&index=4

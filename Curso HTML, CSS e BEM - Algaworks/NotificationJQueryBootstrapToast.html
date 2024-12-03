@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificações com Bootstrap Toast</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilizando o toast para aparecer no canto superior direito */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1055;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h1>Notificações com Bootstrap Toast</h1>
+        <button class="btn btn-warning mt-3" onclick="showToast('Aviso', 'Esta é uma notificação de aviso!', 'warning')">Mostrar Aviso</button>
+        <button class="btn btn-success mt-3" onclick="showToast('Sucesso', 'Operação realizada com sucesso!', 'success')">Mostrar Sucesso</button>
+        <button class="btn btn-danger mt-3" onclick="showToast('Erro', 'Ocorreu um erro na operação!', 'danger')">Mostrar Erro</button>
+    </div>
+
+    <div class="toast-container">
+        <!-- Toast Aviso -->
+        <div id="toast-warning" class="toast align-items-center text-bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <!-- O conteúdo será preenchido dinamicamente -->
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        <!-- Toast Sucesso -->
+        <div id="toast-success" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <!-- O conteúdo será preenchido dinamicamente -->
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        <!-- Toast Erro -->
+        <div id="toast-danger" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <!-- O conteúdo será preenchido dinamicamente -->
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showToast(title, message, type) {
+            const toastId = `toast-${type}`;
+            const toastElement = document.getElementById(toastId);
+            const toastBody = toastElement.querySelector('.toast-body');
+            
+            // Preenchendo o conteúdo do toast
+            toastBody.innerHTML = `<strong>${title}</strong><br>${message}`;
+            
+            // Mostrando o toast
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    </script>
+</body>
+</html>
