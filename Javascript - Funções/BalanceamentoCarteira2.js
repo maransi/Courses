@@ -156,10 +156,10 @@ const carteiraAtual = {
 }
 */
 const carteiraAtual = {
-    oportunidade: 23818,             // 9.20
-    fundoImobiliario: 154293,        // 60
-    acoes: 47337,                       // 20
-    risco: 25861                        // 10.8
+    oportunidade: 25257,             // 9.20
+    fundoImobiliario: 150808,        // 60
+    acoes: 51145,                       // 20
+    risco: 35158                        // 10.8
 
 }
 /*
@@ -186,7 +186,7 @@ let saldoCarteiraInicial = carteira.saldo.oportunidade +
     carteira.saldo.acoes +
     carteira.saldo.risco;
 
-let aporte = 1681;
+let aporte = 5600;
 
 console.log("Aporte");
 console.log(aporte);
