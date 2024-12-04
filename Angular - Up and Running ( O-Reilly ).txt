@@ -4934,7 +4934,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
 8. Componentes Service
 ----------------------
 
-    A finalidade dos componentes Service no Angular é:
+    . A finalidade dos componentes Service no Angular é:
 
         . Compartilhar dados:               Podem ser usados para compartilhar dados entre diferentes componentes da aplicação. 
                                             Isso é especialmente útil quando você precisa acessar dados em diferentes partes da 
@@ -5029,8 +5029,171 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
     . Demo
 
+        . Execute o comando abaixo na pasta raiz do projeto:
 
-Teste
+            ng g s services/product-item --skip-tests
+            ng g class model/product-item --skip-tests
+        
+        . Altere a classe "product-item.ts" com o conteúdo abaixo:
+
+            export class ProductItem {
+
+                // Construtor inserido
+                constructor(public stockCode: string,
+                    public stockName: string,
+                    public stockPrice: number,
+                    public stockPreviousPrice: number,
+                    public stockExchange: string) {
+
+                }
+
+            }
+
+        . Altere a clase "product-item.service.ts" com o conteúdo abaixo:
+
+            import { Injectable } from '@angular/core';
+            import { ProductItem } from '../model/product-item';
+
+            @Injectable({
+                providedIn: 'root'
+            })
+            export class ProductItemService {
+
+                // Insira a linha abaixo
+                public products: ProductItem[];
+
+                constructor() { 
+                    this.products = [];
+                }
+
+                // Insira o método abaixo
+                public addProduct( product: ProductItem ) {
+                    this.products.push( product );
+                }
+            }
+
+        . Insira as linhas abaixo no arquivo "create-product-item.component.ts":
+
+            import { Component } from '@angular/core';
+            import {FormControl, FormGroup, Validators} from "@angular/forms";
+            import { isEmpty } from 'rxjs';
+            import { ProductItem } from 'src/app/model/product-item';
+            import { ProductItemService } from 'src/app/services/product-item.service';
+
+            @Component({
+                selector: 'app-create-product-item',
+                templateUrl: './create-product-item.component.html',
+                styleUrls: ['./create-product-item.component.css']
+            })
+
+            export class CreateProductItemComponent  {
+
+                public stockForm: FormGroup = new FormGroup( {
+                    stockCode: new FormControl('', [Validators.required]),
+                    stockName: new FormControl('', [ Validators.required, Validators.minLength(3) ] ),
+                    stockPrice: new FormControl('', [Validators.required]),
+                    stockPreviousPrice: new FormControl('', [Validators.required]),
+                    stockExchange: new FormControl('NYSE', [Validators.required])
+                });
+
+                public submitedForm: Boolean = false;
+
+                public notablePeople: string;
+
+                // Assinatura do constructor alterada
+                constructor( public productItemService: ProductItemService ) {
+                    this.notablePeople = "Bill Gates";
+                }
+
+
+
+                onSubmit(){
+                    if (this.stockForm.valid) {
+                        // console.log(this.stockForm.value);        // Linha Eliminada
+                        // console.log(this.stockForm.valid);        // Linha Eliminada
+
+                        // Insira a linha abaixo
+                        this.productItemService.addProduct( new ProductItem(
+                            this.stockForm.value.stockCode,
+                            this.stockForm.value.stockName, 
+                            this.stockForm.value.stockPrice,
+                            this.stockForm.value.stockPreviousPrice,
+                            this.stockForm.value.stockExchange
+                        ));
+
+                        this.stockForm.reset();
+
+
+                        this.submitedForm = false;
+                    } 
+                    else
+                    {
+                        this.submitedForm = true;
+                    }
+                
+                }
+            }
+
+        . Faça as alterações abaixo no arquivo "create-product-item.component.html":
+
+            <div class="container">
+                <form [formGroup]="stockForm" (ngSubmit)="onSubmit()">
+                    ...
+                </form>
+
+                <!-- Trecho HTML Eliminado -->
+                <!--
+                <p>Form Control value: {{ stockForm.get('stockName')?.value | json }}</p>
+                <p>Form Control invalid {{ stockForm.get('stockName')?.invalid | json }}</p>
+                <p>Form Control dirty {{ stockForm.get('stockName')?.dirty | json }}</p>
+                <p>Form Control touched {{ stockForm.get('stockName')?.touched | json }}</p>
+
+                <p>Form Control status: {{ stockForm.status | json }}</p>
+                -->
+                <!-- fim da Eliminação -->
+
+                <!-- Trecho HTML Inserido -->
+                <div class="mt-3" style="padding-top: 10px; padding-bottom: 10px; border: 1px solid black;">
+                    <div class="row" style="padding: 10px;">
+                    <div class="col-2">
+                        Stock Code
+                    </div>
+                    <div class="col-3">
+                        Stock Name
+                    </div>
+                    <div class="col-2">
+                        Stock Price
+                    </div>
+                    <div class="col-2">
+                        Stock Previous Price
+                    </div>
+                    <div class="col-3">
+                        Stock Exchange
+                    </div>
+                    </div>
+                    <div *ngFor="let p of productItemService.products; index as i" style="padding: 10px;">
+                    <div class="row">
+                        <div class="col-2">
+                        {{ p.stockCode }}
+                        </div>
+                        <div class="col-3">
+                        {{ p.stockName }}
+                        </div>
+                        <div class="col-2">
+                        {{ p.stockPrice }}
+                        </div>
+                        <div class="col-2">
+                        {{ p.stockPreviousPrice }}
+                        </div>
+                        <div class="col-3">
+                        {{ p.stockExchange }}
+                        </div>
+                    </div>
+                    </div>
+                    <!-- Fim da Inserção -->
+                </div>
+            </div>        
+
 
 
 
