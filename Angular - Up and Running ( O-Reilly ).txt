@@ -5194,23 +5194,260 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 </div>
             </div>        
 
-
-https://www.tektutorialshub.com/angular/angular-services/
-https://www.tektutorialshub.com/angular/angular-dependency-injection/
+    https://www.tektutorialshub.com/angular/angular-services/
+    https://www.tektutorialshub.com/angular/angular-dependency-injection/
 
 
 
 09. HTTP
 --------
 
-https://www.tektutorialshub.com/angular/angular-httpclient/
-https://www.tektutorialshub.com/angular/angular-http-get-example-using-httpclient/
+    https://www.tutorialspoint.com/angular/angular-http-client.htm
+    https://www.tektutorialshub.com/angular/angular-httpclient/
+    https://www.tektutorialshub.com/angular/angular-http-get-example-using-httpclient/
 
 
+    . Observables
 
+        . Um Observable é um objeto que emite valores ao longo do tempo e pode ser observado por outros 
+            objetos. Em Angular, os Observables são usados para lidar com dados assíncronos, 
+            como requisições HTTP, eventos de usuário e atualizações de estado.
 
+        . Um Observable é como um fluxo de dados que pode ser inscrito por outros objetos, chamados de 
+            Observers. Quando um Observable emite um valor, todos os Observers inscritos recebem esse valor.
 
+        . Os Observables são úteis em Angular porque permitem que você:
 
+            . Lide com dados assíncronos de forma eficiente
+
+            . Seja notificado quando os dados mudam
+
+            . Faça requisições HTTP de forma assíncrona
+
+            . Lide com eventos de usuário de forma assíncrona
+
+        . Em Angular, os Observables são implementados usando a biblioteca RxJS (Reactive Extensions for JavaScript).
+
+            . A biblioteca RxJS (Reactive Extensions for JavaScript) é uma biblioteca de programação reativa para 
+                JavaScript que permite lidar com fluxos de dados assíncronos de forma eficiente.
+
+            . Como a biblioteca "rxjs" funciona:
+
+                . Observables
+
+                    Um Observable é um objeto que emite valores ao longo do tempo e pode ser observado por outros objetos. 
+                    No Angular, os Observables são usados para lidar com dados assíncronos.
+
+                . Observers
+
+                    Um Observer é um objeto que se inscreve em um Observable para receber os valores emitidos por ele. 
+                    No Angular, os Observers são usados para lidar com os dados recebidos de um Observable.
+
+                . Subscription
+
+                    Um Subscription é um objeto que representa a inscrição de um Observer em um Observable. 
+                    No Angular, os Subscriptions são usados para gerenciar as inscrições dos Observers nos Observables.
+
+                . Operadores
+
+                    Os operadores são funções que podem ser usadas para transformar, filtrar e combinar Observables. 
+                    No Angular, os operadores são usados para manipular os dados recebidos de um Observable.
+
+                . Exemplo
+
+                    import { Observable } from 'rxjs';
+
+                    const meuObservable = new Observable(observer => {
+                        // Faz algo assíncrono aqui, como uma requisição HTTP
+                        setTimeout(() => {
+                            observer.next('Dados carregados!');
+                            observer.complete();
+                        }, 2000);
+                    });
+
+                    meuObservable.subscribe(dados => {
+                        console.log(dados); // Imprime "Dados carregados!"
+                    });
+
+            . Exemplos
+
+                . Lidar com requisições HTTP assíncronas:
+
+                    import { HttpClient } from '@angular/common/http';
+                    import { Observable } from 'rxjs';
+
+                    const httpClient = new HttpClient();
+                    const observable = httpClient.get('https://api.example.com/data');
+
+                    observable.subscribe(data => {
+                        console.log(data);
+                    });
+
+                . Lidar com eventos de usuário:
+
+                    import { fromEvent } from 'rxjs';
+
+                    const button = document.getElementById('myButton');
+                    const observable = fromEvent(button, 'click');
+
+                    observable.subscribe(event => {
+                        console.log('Botão clicado!');
+                    });
+
+                . Lidar com atualizações de estado:
+
+                    import { BehaviorSubject } from 'rxjs';
+
+                    const estado = new BehaviorSubject('inicial');
+
+                    estado.subscribe(estadoAtual => {
+                        console.log(estadoAtual);
+                    });
+
+                    estado.next('novo estado');
+
+    . HttpClient
+
+        . Chamadas HTTP no Angular são feitas utilizando o módulo HttpClient que é parte do Angular, localizado no pacote
+            "@angular/common/http".
+
+            . Para fazer uso desta biblioteca é necessário realizar o import do "HttpModule" dentro do "AppComponent":
+
+                import { HttpClientModule } from '@angular/common/http';        // Import
+                ...
+
+                @NgModule({ 
+                imports: [ 
+                    BrowserModule, 
+                    // import HttpClientModule after BrowserModule. 
+                    HttpClientModule,                                           // Import
+                ] 
+                }) 
+                export class AppModule {}
+
+        . Para usarmos a classe HttpClient precisar fazer a injeção do objeto "http" dela no método "constructor" do componente:
+
+            import { Component, OnInit } from '@angular/core';
+            import { HttpClient } from '@angular/common/http';          // Import da biblioteca no componente
+            
+            @Component({
+              selector: 'app-exemplo',
+              template: '<p>Resposta: {{ resposta }}</p>'
+            })
+            export class ExemploComponent implements OnInit {
+              resposta: string;
+                                      +---------------> Injeção do objeto http 
+                                      |
+                          |----------------------|              
+              constructor(private http: HttpClient) { }
+            
+              ngOnInit(): void {
+                this.http.get('https://api.exemplo.com/dados')
+                  .subscribe(resposta => {
+                    this.resposta = resposta;
+                  });
+              }
+            }
+
+        . O HttpClient é uma classe que fornece métodos para fazer requisições HTTP, como: get, post, put, delete, 
+            entre outros.
+
+        . Quando fazemos uma chamada HTTP no Angular, o seguinte fluxo ocorre:
+
+            . Você cria uma instância do HttpClient e chama o método correspondente à requisição que você deseja fazer 
+                (por exemplo, get, post, etc.).
+
+            . O HttpClient cria uma requisição HTTP e a envia para o servidor.
+
+            . O servidor processa a requisição e retorna uma resposta.
+
+            . A resposta é recebida pelo HttpClient e é convertida em um objeto JavaScript.
+
+            . O objeto JavaScript é retornado para o componente que fez a chamada.
+
+        . Observables
+
+            . São utilizados para lidar com as respostas das chamadas HTTP. Um Observable é um objeto que emite 
+                valores ao longo do tempo. No caso das chamadas HTTP, o Observable emite a resposta do servidor.
+
+        . Quando uma chamada HTTP é feita no Angular, o HttpClient retorna um Observable que emite a resposta do 
+            servidor. Você pode então subscrever esse Observable para receber a resposta e processá-la.
+
+            import { Component, OnInit } from '@angular/core';
+            import { HttpClient } from '@angular/common/http';
+            
+            @Component({
+              selector: 'app-exemplo',
+              template: '<p>Resposta: {{ resposta }}</p>'
+            })
+            export class ExemploComponent implements OnInit {
+              resposta: string;
+            
+              constructor(private http: HttpClient) { }
+            
+              ngOnInit(): void {
+                this.http.get('https://api.exemplo.com/dados')
+                  .subscribe(resposta => {                          // Subscrição ao observable retornado pela objeto http
+                    this.resposta = resposta;
+                  });
+              }
+            }
+
+        . O HttpClient fornece vários métodos para fazer requisições HTTP, cada um desses métodos retorna um Observable, 
+            que emite a resposta do servido:
+
+            . get: faz uma requisição HTTP GET
+
+            . post: faz uma requisição HTTP POST
+
+            . put: faz uma requisição HTTP PUT
+
+            . delete: faz uma requisição HTTP DELETE
+
+            . patch: faz uma requisição HTTP PATCH
+
+            . head: faz uma requisição HTTP HEAD
+
+            . options: faz uma requisição HTTP OPTIONS
+
+        . HttpClient utiliza diversos argumetos/parâmetros para fazer a requisão: 
+
+            . URL solicitada
+
+                https://api.exemplo.com/dados
+
+            . Objeto json com argumentos opcionais :
+
+                {
+                    headers?: HttpHeaders | {[header: string]: string | string[]},
+                    observe?: 'body' | 'events' | 'response',
+
+                    params?: HttpParams|{[param: string]: string | string[]},
+                    reportProgress?: boolean,
+                    responseType?: 'arraybuffer'|'blob'|'json'|'text',
+                    withCredentials?: boolean,
+                }
+
+                . headers: HTTP Headers of the request, either as string, array of string or array of HttpHeaders.
+
+                . observe: Process the response and return the specific content of the response. Possible values are body, response and events. The default option of observer is body.
+
+                . params: HTTP parameters of the request, either as string, array of string or array of HttpParams.
+
+                . reportProgress: Whether to report the progress of the process or not (true or false).
+
+                . responseType: Refers the format of the response. Possible values are arraybuffer, blob, json and text.
+
+                . withCredentials: Whether the request has credentials or not (true or false).            
+
+            . Exemplo:
+
+                httpClient.get(url, options) 
+                    .subscribe( (data) => console.log(data) );
+
+    . Demo
+
+    
 
 https://www.tektutorialshub.com/angular/angular-forms-fundamentals/
 https://www.fabricadecodigo.com/criar-formulario-reactive-forms/
