@@ -5319,8 +5319,8 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 @NgModule({ 
                 imports: [ 
                     BrowserModule, 
-                    // import HttpClientModule after BrowserModule. 
-                    HttpClientModule,                                           // Import
+                    ...
+                    HttpClientModule,                                           // import HttpClientModule depois do  BrowserModule. 
                 ] 
                 }) 
                 export class AppModule {}
@@ -5447,7 +5447,220 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
     . Demo
 
-    
+        . Insira as linhas abaixo no arquivo "app.module.ts"
+
+            import { HttpClientModule } from '@angular/common/http';        // Import
+            ...
+
+            @NgModule({ 
+            imports: [ 
+                BrowserModule, 
+                ...
+                HttpClientModule,                                           // import HttpClientModule depois do  BrowserModule. 
+            ] 
+            }) 
+            export class AppModule {}
+
+        . Faça as alterações abaixo no arquivo "stock-item.component.ts":
+
+            import { HttpClient } from '@angular/common/http';              // Linha inserida
+
+            import { Component, OnInit } from '@angular/core';
+            import { Stock } from 'src/app/model/stock';
+
+            @Component({
+                selector: 'app-stock-item',
+                templateUrl: './stock-item.component.html',
+                styleUrls: ['./stock-item.component.css']
+            })
+            export class StockItemComponent implements OnInit {
+
+                public stock!: Stock;
+                public stockClasses!: any;
+                public stockStyles!: any;
+                public saved: boolean = false;
+                public productsStock: Array<Stock> = [];
+                
+                constructor( private http: HttpClient ) { }                 // Construtor alterado
+
+                ngOnInit(): void {
+
+                    this.onInitStock();
+
+                    let diff = (this.stock.price / this.stock.previousPrice) - 1;
+                    let largeChange = Math.abs(diff) > 0.01;
+                    this.stockClasses = {
+                        'positive': this.stock.isPositiveChange(),
+                        'negative': !this.stock.isPositiveChange(),
+                        'large-change': largeChange,
+                        'small-change': !largeChange
+                    };
+
+                    this.stockStyles = {
+                        'color': this.stock.isPositiveChange() ? 'green' : 'red',
+                        'font-size': largeChange ? '1.2em' : '0.8em'
+                    };
+                }
+
+                toggleFavorite( event: any, index: number ) {
+                    console.log('We are toggling the favorite state for this stock event.target ', event.target);
+                    console.log('We are toggling the favorite state for this stock event.target.value ', event.target.value);
+                    console.log('We are toggling the favorite state for this stock index ', index);                             // Linha inserida
+                    console.log('We are toggling the favorite state for this stock ', this.productsStock[index]);               // Linha inserida
+                }
+
+                onInitStock() {
+                    this.stock = new Stock('', '', 0, 0, '');
+                }
+
+                onSave(){
+                    console.log('We are saving the stock', this.stock);
+                    // this.stock = new Stock('', '', 0, 0, '');
+                    this.productsStock.push(this.stock);
+                    this.onInitStock();
+                    this.saved=true;
+                }
+
+            }
+
+        . Substitua o conteúdo do arquivo "app.component.html" com o conteúdo abaixo:
+
+            <app-stock-item></app-stock-item>
+
+        . Levante a aplicação e verifique se deu tudo certo
+
+            ng s -o
+
+        . Crie o arquivo "db.json" na pasta raiz do projeto com o conteúdo abaixo:
+
+            {
+                "stocks": [ 
+                    {
+                        "id": "10",
+                        "code": "10",
+                        "name": "Apple Inc.",
+                        "price": 150,
+                        "previousPrice": 140,
+                        "exchange": "NYSE"
+                    },
+                    {
+                        "id": "20",
+                        "code": "20",
+                        "name": "Microsoft Corp.",
+                        "price": 100,
+                        "previousPrice": 90,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "30",
+                        "code": "30",
+                        "name": "Google Inc.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NYSE"
+                    },
+                    {
+                        "id": "40",
+                        "code": "40",
+                        "name": "Oracle Corp.",
+                        "price": 200,
+                        "previousPrice": 190,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "50",
+                        "code": "50",
+                        "name": "IBM Corp.",
+                        "price": 300,
+                        "previousPrice": 290,
+                        "exchange": "NYSE"
+                    }
+                ]
+            }
+
+        . Abra outro terminal e execute o comando abaixo na raiz do projeto:
+
+            json-server db.json
+
+
+        . Faça as alterações abaixo no arquivo "create-product-item.component.ts":
+
+            import { HttpClient } from '@angular/common/http';              
+
+            import { Component, OnInit } from '@angular/core';
+            import { Stock } from 'src/app/model/stock';
+
+            @Component({
+                selector: 'app-stock-item',
+                templateUrl: './stock-item.component.html',
+                styleUrls: ['./stock-item.component.css']
+            })
+            export class StockItemComponent implements OnInit {
+
+                public stock!: Stock;
+                public stockClasses!: any;
+                public stockStyles!: any;
+                public saved: boolean = false;
+                public productsStock: Array<Stock> = [];
+                public response: any;                                            // Linha inserida
+                
+                constructor( private http: HttpClient ) { }                 
+
+                ...
+
+                onQueryProduct(){                                                  // Método inserido
+                    this.http.get('http://localhost:3000/stocks/' + this.stock.code)
+                    .subscribe(resposta => {
+                        console.log(resposta);
+                        this.response = resposta;
+                        this.stock.code = this.response.code;
+                        this.stock.name = this.response.name;
+                        this.stock.price = this.response.price;
+                        this.stock.previousPrice = this.response.previousPrice;
+                        this.stock.exchange = this.response.exchange;
+                    });
+                }
+            }
+
+        . Faça as alterações abaixo no arquivo "stock-item.component.html":
+
+            <h1>Welcome to stock-item</h1>
+
+            <div class="container">
+                <div class="alert alert-success" role="alert" *ngIf="!saved">
+                    Product Name : <strong> {{stock.name}} </strong>
+                </div>
+
+                <form #stockForm="ngForm" 
+                        (ngSubmit)="onSave()">
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+
+                                <input type="text"
+                                        class="form-control form-control-sm"
+                                        id="stockCode" name="stockCode"
+                                        [required]="true"
+                                        [(ngModel)]="stock.code"
+                                        (focus)="saved=false"
+                                        (blur)="onQueryProduct()">                  <!-- Linha inserida -->
+                            </div>
+                        </div>
+
+                        ...
+                    </div>
+
+                    ...
+                </form>
+            </div>
+
+        . Levante a aplicação, digite código válidos de produtos e verifique se deu tudo certo
+
+            ng s -o
+
+
+
 
 https://www.tektutorialshub.com/angular/angular-forms-fundamentals/
 https://www.fabricadecodigo.com/criar-formulario-reactive-forms/
