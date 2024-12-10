@@ -4934,7 +4934,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
 8. Componentes Service
 ----------------------
 
-    A finalidade dos componentes Service no Angular é:
+    . A finalidade dos componentes Service no Angular é:
 
         . Compartilhar dados:               Podem ser usados para compartilhar dados entre diferentes componentes da aplicação. 
                                             Isso é especialmente útil quando você precisa acessar dados em diferentes partes da 
@@ -5029,14 +5029,635 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
     . Demo
 
+        . Execute o comando abaixo na pasta raiz do projeto:
 
-Teste
+            ng g s services/product-item --skip-tests
+            ng g class model/product-item --skip-tests
+        
+        . Altere a classe "product-item.ts" com o conteúdo abaixo:
+
+            export class ProductItem {
+
+                // Construtor inserido
+                constructor(public stockCode: string,
+                    public stockName: string,
+                    public stockPrice: number,
+                    public stockPreviousPrice: number,
+                    public stockExchange: string) {
+
+                }
+
+            }
+
+        . Altere a clase "product-item.service.ts" com o conteúdo abaixo:
+
+            import { Injectable } from '@angular/core';
+            import { ProductItem } from '../model/product-item';
+
+            @Injectable({
+                providedIn: 'root'
+            })
+            export class ProductItemService {
+
+                // Insira a linha abaixo
+                public products: ProductItem[];
+
+                constructor() { 
+                    this.products = [];
+                }
+
+                // Insira o método abaixo
+                public addProduct( product: ProductItem ) {
+                    this.products.push( product );
+                }
+            }
+
+        . Insira as linhas abaixo no arquivo "create-product-item.component.ts":
+
+            import { Component } from '@angular/core';
+            import {FormControl, FormGroup, Validators} from "@angular/forms";
+            import { isEmpty } from 'rxjs';
+            import { ProductItem } from 'src/app/model/product-item';
+            import { ProductItemService } from 'src/app/services/product-item.service';
+
+            @Component({
+                selector: 'app-create-product-item',
+                templateUrl: './create-product-item.component.html',
+                styleUrls: ['./create-product-item.component.css']
+            })
+
+            export class CreateProductItemComponent  {
+
+                public stockForm: FormGroup = new FormGroup( {
+                    stockCode: new FormControl('', [Validators.required]),
+                    stockName: new FormControl('', [ Validators.required, Validators.minLength(3) ] ),
+                    stockPrice: new FormControl('', [Validators.required]),
+                    stockPreviousPrice: new FormControl('', [Validators.required]),
+                    stockExchange: new FormControl('NYSE', [Validators.required])
+                });
+
+                public submitedForm: Boolean = false;
+
+                public notablePeople: string;
+
+                // Assinatura do constructor alterada
+                constructor( public productItemService: ProductItemService ) {
+                    this.notablePeople = "Bill Gates";
+                }
 
 
 
+                onSubmit(){
+                    if (this.stockForm.valid) {
+                        // console.log(this.stockForm.value);        // Linha Eliminada
+                        // console.log(this.stockForm.valid);        // Linha Eliminada
 
-https://www.tektutorialshub.com/angular/angular-services/
-https://www.tektutorialshub.com/angular/angular-dependency-injection/
+                        // Insira a linha abaixo
+                        this.productItemService.addProduct( new ProductItem(
+                            this.stockForm.value.stockCode,
+                            this.stockForm.value.stockName, 
+                            this.stockForm.value.stockPrice,
+                            this.stockForm.value.stockPreviousPrice,
+                            this.stockForm.value.stockExchange
+                        ));
+
+                        this.stockForm.reset();
+
+
+                        this.submitedForm = false;
+                    } 
+                    else
+                    {
+                        this.submitedForm = true;
+                    }
+                
+                }
+            }
+
+        . Faça as alterações abaixo no arquivo "create-product-item.component.html":
+
+            <div class="container">
+                <form [formGroup]="stockForm" (ngSubmit)="onSubmit()">
+                    ...
+                </form>
+
+                <!-- Trecho HTML Eliminado -->
+                <!--
+                <p>Form Control value: {{ stockForm.get('stockName')?.value | json }}</p>
+                <p>Form Control invalid {{ stockForm.get('stockName')?.invalid | json }}</p>
+                <p>Form Control dirty {{ stockForm.get('stockName')?.dirty | json }}</p>
+                <p>Form Control touched {{ stockForm.get('stockName')?.touched | json }}</p>
+
+                <p>Form Control status: {{ stockForm.status | json }}</p>
+                -->
+                <!-- fim da Eliminação -->
+
+                <!-- Trecho HTML Inserido -->
+                <div class="mt-3" style="padding-top: 10px; padding-bottom: 10px; border: 1px solid black;">
+                    <div class="row" style="padding: 10px;">
+                    <div class="col-2">
+                        Stock Code
+                    </div>
+                    <div class="col-3">
+                        Stock Name
+                    </div>
+                    <div class="col-2">
+                        Stock Price
+                    </div>
+                    <div class="col-2">
+                        Stock Previous Price
+                    </div>
+                    <div class="col-3">
+                        Stock Exchange
+                    </div>
+                    </div>
+                    <div *ngFor="let p of productItemService.products; index as i" style="padding: 10px;">
+                    <div class="row">
+                        <div class="col-2">
+                        {{ p.stockCode }}
+                        </div>
+                        <div class="col-3">
+                        {{ p.stockName }}
+                        </div>
+                        <div class="col-2">
+                        {{ p.stockPrice }}
+                        </div>
+                        <div class="col-2">
+                        {{ p.stockPreviousPrice }}
+                        </div>
+                        <div class="col-3">
+                        {{ p.stockExchange }}
+                        </div>
+                    </div>
+                    </div>
+                    <!-- Fim da Inserção -->
+                </div>
+            </div>        
+
+    https://www.tektutorialshub.com/angular/angular-services/
+    https://www.tektutorialshub.com/angular/angular-dependency-injection/
+
+
+
+09. HTTP
+--------
+
+    https://www.tutorialspoint.com/angular/angular-http-client.htm
+    https://www.tektutorialshub.com/angular/angular-httpclient/
+    https://www.tektutorialshub.com/angular/angular-http-get-example-using-httpclient/
+
+
+    . Observables
+
+        . Um Observable é um objeto que emite valores ao longo do tempo e pode ser observado por outros 
+            objetos. Em Angular, os Observables são usados para lidar com dados assíncronos, 
+            como requisições HTTP, eventos de usuário e atualizações de estado.
+
+        . Um Observable é como um fluxo de dados que pode ser inscrito por outros objetos, chamados de 
+            Observers. Quando um Observable emite um valor, todos os Observers inscritos recebem esse valor.
+
+        . Os Observables são úteis em Angular porque permitem que você:
+
+            . Lide com dados assíncronos de forma eficiente
+
+            . Seja notificado quando os dados mudam
+
+            . Faça requisições HTTP de forma assíncrona
+
+            . Lide com eventos de usuário de forma assíncrona
+
+        . Em Angular, os Observables são implementados usando a biblioteca RxJS (Reactive Extensions for JavaScript).
+
+            . A biblioteca RxJS (Reactive Extensions for JavaScript) é uma biblioteca de programação reativa para 
+                JavaScript que permite lidar com fluxos de dados assíncronos de forma eficiente.
+
+            . Como a biblioteca "rxjs" funciona:
+
+                . Observables
+
+                    Um Observable é um objeto que emite valores ao longo do tempo e pode ser observado por outros objetos. 
+                    No Angular, os Observables são usados para lidar com dados assíncronos.
+
+                . Observers
+
+                    Um Observer é um objeto que se inscreve em um Observable para receber os valores emitidos por ele. 
+                    No Angular, os Observers são usados para lidar com os dados recebidos de um Observable.
+
+                . Subscription
+
+                    Um Subscription é um objeto que representa a inscrição de um Observer em um Observable. 
+                    No Angular, os Subscriptions são usados para gerenciar as inscrições dos Observers nos Observables.
+
+                . Operadores
+
+                    Os operadores são funções que podem ser usadas para transformar, filtrar e combinar Observables. 
+                    No Angular, os operadores são usados para manipular os dados recebidos de um Observable.
+
+                . Exemplo
+
+                    import { Observable } from 'rxjs';
+
+                    const meuObservable = new Observable(observer => {
+                        // Faz algo assíncrono aqui, como uma requisição HTTP
+                        setTimeout(() => {
+                            observer.next('Dados carregados!');
+                            observer.complete();
+                        }, 2000);
+                    });
+
+                    meuObservable.subscribe(dados => {
+                        console.log(dados); // Imprime "Dados carregados!"
+                    });
+
+            . Exemplos
+
+                . Lidar com requisições HTTP assíncronas:
+
+                    import { HttpClient } from '@angular/common/http';
+                    import { Observable } from 'rxjs';
+
+                    const httpClient = new HttpClient();
+                    const observable = httpClient.get('https://api.example.com/data');
+
+                    observable.subscribe(data => {
+                        console.log(data);
+                    });
+
+                . Lidar com eventos de usuário:
+
+                    import { fromEvent } from 'rxjs';
+
+                    const button = document.getElementById('myButton');
+                    const observable = fromEvent(button, 'click');
+
+                    observable.subscribe(event => {
+                        console.log('Botão clicado!');
+                    });
+
+                . Lidar com atualizações de estado:
+
+                    import { BehaviorSubject } from 'rxjs';
+
+                    const estado = new BehaviorSubject('inicial');
+
+                    estado.subscribe(estadoAtual => {
+                        console.log(estadoAtual);
+                    });
+
+                    estado.next('novo estado');
+
+    . HttpClient
+
+        . Chamadas HTTP no Angular são feitas utilizando o módulo HttpClient que é parte do Angular, localizado no pacote
+            "@angular/common/http".
+
+            . Para fazer uso desta biblioteca é necessário realizar o import do "HttpModule" dentro do "AppComponent":
+
+                import { HttpClientModule } from '@angular/common/http';        // Import
+                ...
+
+                @NgModule({ 
+                imports: [ 
+                    BrowserModule, 
+                    ...
+                    HttpClientModule,                                           // import HttpClientModule depois do  BrowserModule. 
+                ] 
+                }) 
+                export class AppModule {}
+
+        . Para usarmos a classe HttpClient precisar fazer a injeção do objeto "http" dela no método "constructor" do componente:
+
+            import { Component, OnInit } from '@angular/core';
+            import { HttpClient } from '@angular/common/http';          // Import da biblioteca no componente
+            
+            @Component({
+              selector: 'app-exemplo',
+              template: '<p>Resposta: {{ resposta }}</p>'
+            })
+            export class ExemploComponent implements OnInit {
+              resposta: string;
+                                      +---------------> Injeção do objeto http 
+                                      |
+                          |----------------------|              
+              constructor(private http: HttpClient) { }
+            
+              ngOnInit(): void {
+                this.http.get('https://api.exemplo.com/dados')
+                  .subscribe(resposta => {
+                    this.resposta = resposta;
+                  });
+              }
+            }
+
+        . O HttpClient é uma classe que fornece métodos para fazer requisições HTTP, como: get, post, put, delete, 
+            entre outros.
+
+        . Quando fazemos uma chamada HTTP no Angular, o seguinte fluxo ocorre:
+
+            . Você cria uma instância do HttpClient e chama o método correspondente à requisição que você deseja fazer 
+                (por exemplo, get, post, etc.).
+
+            . O HttpClient cria uma requisição HTTP e a envia para o servidor.
+
+            . O servidor processa a requisição e retorna uma resposta.
+
+            . A resposta é recebida pelo HttpClient e é convertida em um objeto JavaScript.
+
+            . O objeto JavaScript é retornado para o componente que fez a chamada.
+
+        . Observables
+
+            . São utilizados para lidar com as respostas das chamadas HTTP. Um Observable é um objeto que emite 
+                valores ao longo do tempo. No caso das chamadas HTTP, o Observable emite a resposta do servidor.
+
+        . Quando uma chamada HTTP é feita no Angular, o HttpClient retorna um Observable que emite a resposta do 
+            servidor. Você pode então subscrever esse Observable para receber a resposta e processá-la.
+
+            import { Component, OnInit } from '@angular/core';
+            import { HttpClient } from '@angular/common/http';
+            
+            @Component({
+              selector: 'app-exemplo',
+              template: '<p>Resposta: {{ resposta }}</p>'
+            })
+            export class ExemploComponent implements OnInit {
+              resposta: string;
+            
+              constructor(private http: HttpClient) { }
+            
+              ngOnInit(): void {
+                this.http.get('https://api.exemplo.com/dados')
+                  .subscribe(resposta => {                          // Subscrição ao observable retornado pela objeto http
+                    this.resposta = resposta;
+                  });
+              }
+            }
+
+        . O HttpClient fornece vários métodos para fazer requisições HTTP, cada um desses métodos retorna um Observable, 
+            que emite a resposta do servido:
+
+            . get: faz uma requisição HTTP GET
+
+            . post: faz uma requisição HTTP POST
+
+            . put: faz uma requisição HTTP PUT
+
+            . delete: faz uma requisição HTTP DELETE
+
+            . patch: faz uma requisição HTTP PATCH
+
+            . head: faz uma requisição HTTP HEAD
+
+            . options: faz uma requisição HTTP OPTIONS
+
+        . HttpClient utiliza diversos argumetos/parâmetros para fazer a requisão: 
+
+            . URL solicitada
+
+                https://api.exemplo.com/dados
+
+            . Objeto json com argumentos opcionais :
+
+                {
+                    headers?: HttpHeaders | {[header: string]: string | string[]},
+                    observe?: 'body' | 'events' | 'response',
+
+                    params?: HttpParams|{[param: string]: string | string[]},
+                    reportProgress?: boolean,
+                    responseType?: 'arraybuffer'|'blob'|'json'|'text',
+                    withCredentials?: boolean,
+                }
+
+                . headers: HTTP Headers of the request, either as string, array of string or array of HttpHeaders.
+
+                . observe: Process the response and return the specific content of the response. Possible values are body, response and events. The default option of observer is body.
+
+                . params: HTTP parameters of the request, either as string, array of string or array of HttpParams.
+
+                . reportProgress: Whether to report the progress of the process or not (true or false).
+
+                . responseType: Refers the format of the response. Possible values are arraybuffer, blob, json and text.
+
+                . withCredentials: Whether the request has credentials or not (true or false).            
+
+            . Exemplo:
+
+                httpClient.get(url, options) 
+                    .subscribe( (data) => console.log(data) );
+
+    . Demo
+
+        . Insira as linhas abaixo no arquivo "app.module.ts"
+
+            import { HttpClientModule } from '@angular/common/http';        // Import
+            ...
+
+            @NgModule({ 
+            imports: [ 
+                BrowserModule, 
+                ...
+                HttpClientModule,                                           // import HttpClientModule depois do  BrowserModule. 
+            ] 
+            }) 
+            export class AppModule {}
+
+        . Faça as alterações abaixo no arquivo "stock-item.component.ts":
+
+            import { HttpClient } from '@angular/common/http';              // Linha inserida
+
+            import { Component, OnInit } from '@angular/core';
+            import { Stock } from 'src/app/model/stock';
+
+            @Component({
+                selector: 'app-stock-item',
+                templateUrl: './stock-item.component.html',
+                styleUrls: ['./stock-item.component.css']
+            })
+            export class StockItemComponent implements OnInit {
+
+                public stock!: Stock;
+                public stockClasses!: any;
+                public stockStyles!: any;
+                public saved: boolean = false;
+                public productsStock: Array<Stock> = [];
+                
+                constructor( private http: HttpClient ) { }                 // Construtor alterado
+
+                ngOnInit(): void {
+
+                    this.onInitStock();
+
+                    let diff = (this.stock.price / this.stock.previousPrice) - 1;
+                    let largeChange = Math.abs(diff) > 0.01;
+                    this.stockClasses = {
+                        'positive': this.stock.isPositiveChange(),
+                        'negative': !this.stock.isPositiveChange(),
+                        'large-change': largeChange,
+                        'small-change': !largeChange
+                    };
+
+                    this.stockStyles = {
+                        'color': this.stock.isPositiveChange() ? 'green' : 'red',
+                        'font-size': largeChange ? '1.2em' : '0.8em'
+                    };
+                }
+
+                toggleFavorite( event: any, index: number ) {
+                    console.log('We are toggling the favorite state for this stock event.target ', event.target);
+                    console.log('We are toggling the favorite state for this stock event.target.value ', event.target.value);
+                    console.log('We are toggling the favorite state for this stock index ', index);                             // Linha inserida
+                    console.log('We are toggling the favorite state for this stock ', this.productsStock[index]);               // Linha inserida
+                }
+
+                onInitStock() {
+                    this.stock = new Stock('', '', 0, 0, '');
+                }
+
+                onSave(){
+                    console.log('We are saving the stock', this.stock);
+                    // this.stock = new Stock('', '', 0, 0, '');
+                    this.productsStock.push(this.stock);
+                    this.onInitStock();
+                    this.saved=true;
+                }
+
+            }
+
+        . Substitua o conteúdo do arquivo "app.component.html" com o conteúdo abaixo:
+
+            <app-stock-item></app-stock-item>
+
+        . Levante a aplicação e verifique se deu tudo certo
+
+            ng s -o
+
+        . Crie o arquivo "db.json" na pasta raiz do projeto com o conteúdo abaixo:
+
+            {
+                "stocks": [ 
+                    {
+                        "id": "10",
+                        "code": "10",
+                        "name": "Apple Inc.",
+                        "price": 150,
+                        "previousPrice": 140,
+                        "exchange": "NYSE"
+                    },
+                    {
+                        "id": "20",
+                        "code": "20",
+                        "name": "Microsoft Corp.",
+                        "price": 100,
+                        "previousPrice": 90,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "30",
+                        "code": "30",
+                        "name": "Google Inc.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NYSE"
+                    },
+                    {
+                        "id": "40",
+                        "code": "40",
+                        "name": "Oracle Corp.",
+                        "price": 200,
+                        "previousPrice": 190,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "50",
+                        "code": "50",
+                        "name": "IBM Corp.",
+                        "price": 300,
+                        "previousPrice": 290,
+                        "exchange": "NYSE"
+                    }
+                ]
+            }
+
+        . Abra outro terminal e execute o comando abaixo na raiz do projeto:
+
+            json-server db.json
+
+
+        . Faça as alterações abaixo no arquivo "create-product-item.component.ts":
+
+            import { HttpClient } from '@angular/common/http';              
+
+            import { Component, OnInit } from '@angular/core';
+            import { Stock } from 'src/app/model/stock';
+
+            @Component({
+                selector: 'app-stock-item',
+                templateUrl: './stock-item.component.html',
+                styleUrls: ['./stock-item.component.css']
+            })
+            export class StockItemComponent implements OnInit {
+
+                public stock!: Stock;
+                public stockClasses!: any;
+                public stockStyles!: any;
+                public saved: boolean = false;
+                public productsStock: Array<Stock> = [];
+                public response: any;                                            // Linha inserida
+                
+                constructor( private http: HttpClient ) { }                 
+
+                ...
+
+                onQueryProduct(){                                                  // Método inserido
+                    this.http.get('http://localhost:3000/stocks/' + this.stock.code)
+                    .subscribe(resposta => {
+                        console.log(resposta);
+                        this.response = resposta;
+                        this.stock.code = this.response.code;
+                        this.stock.name = this.response.name;
+                        this.stock.price = this.response.price;
+                        this.stock.previousPrice = this.response.previousPrice;
+                        this.stock.exchange = this.response.exchange;
+                    });
+                }
+            }
+
+        . Faça as alterações abaixo no arquivo "stock-item.component.html":
+
+            <h1>Welcome to stock-item</h1>
+
+            <div class="container">
+                <div class="alert alert-success" role="alert" *ngIf="!saved">
+                    Product Name : <strong> {{stock.name}} </strong>
+                </div>
+
+                <form #stockForm="ngForm" 
+                        (ngSubmit)="onSave()">
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="stockCode">Stock Code</label>
+
+                                <input type="text"
+                                        class="form-control form-control-sm"
+                                        id="stockCode" name="stockCode"
+                                        [required]="true"
+                                        [(ngModel)]="stock.code"
+                                        (focus)="saved=false"
+                                        (blur)="onQueryProduct()">                  <!-- Linha inserida -->
+                            </div>
+                        </div>
+
+                        ...
+                    </div>
+
+                    ...
+                </form>
+            </div>
+
+        . Levante a aplicação, digite código válidos de produtos e verifique se deu tudo certo
+
+            ng s -o
 
 
 
