@@ -847,7 +847,7 @@ Aula 17. Criando um registro
 
     . Crie o método abaixo na classe "HomeController":
 
-        []
+        [Post]
         public TodoModel Post( [FromServices] AppDbContext context, [FromBody] TodoModel model){
             context.Todos.Add(model);
 
@@ -1492,9 +1492,9 @@ Aula 27.  Async e Await
                 [HttpGet("v1/[controller]")]
                 public async Task<IActionResult> GetAsync([FromServices] BlogDataContext context){
 
-                    try
-                    {
-                        var categories = await context.Categories.ToList();
+                    try                                                 +-----> Tem que chamar um método Async                         
+                    {                                                   |
+                        var categories = await context.Categories.ToListAsync();
                                         |
                                         +--> Informa ao .NET para aguardar o fim da execução do método assincrono 
                                                 para dar o retorno abaixo. Caso tivemos outras chamadas assincronas,
@@ -2085,7 +2085,7 @@ Aula 38.  Padronizando o BadRequest
     . Faça o seguinte teste:
 
         ...
-        HttpPost("v1/categories")]
+        [HttpPost("v1/categories")]
         public async Task<IActionResult> PostAsync(
             [FromBody] EditorCategoryViewModel model,
             [FromServices] BlogDataContext context)
