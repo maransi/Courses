@@ -652,7 +652,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 display: inline-block;
             }
 
-        . Atualize o conteúdo do componente "app.component.ts" com a linha abaixo:
+        . Atualize o conteúdo do componente "app.component.html" com a linha abaixo:
 
             <app-stock-item></app-stock-item>
 
@@ -729,7 +729,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
                     . Habilita a funcionalidade de eventos do navegador
 
-    . Instalando a biblioteca CSS do Bootstrap
+    . Demo - Instalando a biblioteca CSS do Bootstrap
 
         . No prompt do terminal, acesse a pasta raiz do projeto e instale o bootstrap com o comando abaixo:
 
@@ -947,15 +947,22 @@ https://consolelog.com.br/introducao-ao-angular-17/
                         <div class="name">
                             <h3>{{name}}</h3> - <h4>({{code}})</h4>
                         </div>
+                        
+                        <!-- DIV alterada 
+                        
                         <div class="price">$ {{price}}</div>
+                        
+                        Fim da alteração -->
 
-                            <!-- DIV alterada -->
-                            <div [class]="positiveChange ? 'positive' : 'negative'">
-                                $ {{price}}
-                            </div>
-                            <!-- Fim da alteração -->
+                        <div [class]="positiveChange ? 'positive' : 'negative'">
+                            $ {{price}}
+                        </div>
                         </div>            
                     </div>            
+
+                . Altere o conteúdo do arquivo "stock-item.component.html" pelo abaixo:
+
+                    <app-stock-item></app-stock-item>
 
                 . Execute o projeto e veja o resultado:
 
@@ -992,8 +999,9 @@ https://consolelog.com.br/introducao-ao-angular-17/
                     </div>
 
                     <!-- Button Criado -->
-                    <button (click)="toggleFavorite()"
-                            [disabled]="favorite">
+                    <button (click)="toggleFavorite()" 
+                            [disabled]="favorite"
+                            class="btn btn-primary">
                         Add to Favorite
                     </button>
                 </div>        
@@ -1008,15 +1016,15 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
                     export class StockItemComponent implements OnInit {
                         ...
-                        public favorite: boolean;           // Propriedade criada
+                        public favorite: boolean;      
                         
                         constructor() { }
                         ...
 
-                        // Inclua na assinatura do método o parâmetro "evento"
+                        // Inclua na assinatura do método o parâmetro "evento". 
                         toggleFavorite( event: any ) {
                             console.log('We are toggling the favorite state for this stock', event);       // Altere a linha
-                            console.log('We are toggling the favorite state for this stock', event.targe);       // Altere a linha
+                            console.log('We are toggling the favorite state for this stock', event.target);       // Altere a linha
                             this.favorite = !this.favorite;
                         }
                     }
@@ -1172,7 +1180,8 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
                     <!-- Div alterada -->
                     <button (click)="toggleFavorite($event)"
-                            [disabled]="stock.favorite">
+                            [disabled]="stock.favorite"
+                            class="btn btn-primary">
                         Add to Favorite
                     </button>
                 </div>
@@ -1488,7 +1497,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
             . Execute o projeto e veja o resultado está funcionando como antes:
 
                 ng s -o
-
+PAREI AQUI
     . Two-way Data Binding
 
         . ngModel 
