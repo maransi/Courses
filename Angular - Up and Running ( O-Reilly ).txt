@@ -2097,7 +2097,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
                         <div class="col-4">
                             <div class="form-group">
-                                <label for="clienteNome">Stock Name</label>
+                                <label for="stockName">Stock Name</label>
                                 <input type="text" 
                                         class="form-control form-control-sm" 
                                         id="stockName" 
@@ -2157,7 +2157,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 no componente.
 
                 ng s -o
-PAREI AQUI
+
             . Altere o componente "stock-item.component.ts" com o conteúdo abaixo:
 
                 import { Component, OnInit } from '@angular/core';
@@ -2314,13 +2314,13 @@ PAREI AQUI
 
         . É possivel utilizar ngFor e ngIf juntos:
 
-            <div *ngFor="let stock of stocks" *ngIf="stock.active">
-                <!-- Show stock details here if stock is active -->
+            <div *ngFor="let stock of stocks">
+                <div *ngIf="stock.active">
+                    {{ stock.favorite }}
+                </div>
             </div>
 
-            <div *ngFor="let stock of stocks" *ngIf="stocks.length > 2">
-                <!-- Show stock details here if more than 2 stocks present -->
-            </div>
+
 
 4. Modularizando projetos
 
@@ -3352,7 +3352,7 @@ PAREI AQUI
 
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="clienteNome">Stock Name</label>
+                                    <label for="stockName">Stock Name</label>
 
                                     <!-- Atribute [required] inserido -->
                                     <input type="text"
