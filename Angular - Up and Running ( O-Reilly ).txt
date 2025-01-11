@@ -1497,7 +1497,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
             . Execute o projeto e veja o resultado está funcionando como antes:
 
                 ng s -o
-PAREI AQUI
+
     . Two-way Data Binding
 
         . ngModel 
@@ -1554,11 +1554,12 @@ PAREI AQUI
 
                         . ngModel: diretiva para criar um binding de dados entre um formulário e um componente
 
-                        . ngForm: diretiva para criar um formulário e gerenciar os dados de formulário
+                        . ngForm: diretiva para criar um formulário. Fornece uma forma de gerenciar os dados de formulário e 
+                                    realizar validações de forma automática.
 
                         . ngFormGroup: diretiva para criar um grupo de formulários e gerenciar os dados de formulário
 
-                        . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário
+                        . ngFormControl: diretiva para criar um controle de formulário e gerenciar os dados de formulário 
 
                         . ngFormArray: diretiva para criar um array de formulários e gerenciar os dados de formulário                
 
@@ -1750,6 +1751,11 @@ PAREI AQUI
 
                 <h4>Stock Name is {{stock.name}}</h4>
 
+            . Execute o projeto e veja se o resultado saiu conforme o esperado
+
+                ng s -o
+
+
         . ngModelChange
 
             . É um evento do Angular que é disparado quando o valor de um campo de formulário é alterado. Ele é utilizado em 
@@ -1845,7 +1851,7 @@ PAREI AQUI
                 <div class="form-group">
                     <form (ngSubmit)="createStock()">
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-4">
                                 <label for="stockName">Stock Name</label>
                                 <input type="text"
                                         placeholder="Stock Name"
@@ -1854,7 +1860,7 @@ PAREI AQUI
                                         class="form-control form-control-sm"
                                         [(ngModel)]="stock.name">
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
                                 <label for="stockCode">Stock Code</label>
                                 <input type="text"
                                             placeholder="Stock Code"
@@ -1863,7 +1869,7 @@ PAREI AQUI
                                             class="form-control form-control-sm"
                                             [(ngModel)]="stock.code">
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="stockPrice">Stock Price</label>
                                     <input type="number"
@@ -1875,8 +1881,9 @@ PAREI AQUI
                                     (ngModelChange)="setStockPrice($event)">
                                 </div>
                             </div>
-
-                            <div class="col-3 mt-4">
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mt-2">
                                 <div class="form-group">
                                     <label for="stockExchange">Stock Change:&nbsp;&nbsp;</label>
                                     <input type="radio"
@@ -1896,22 +1903,23 @@ PAREI AQUI
                                         value="OTHER">OTHER
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-4">
-                                    <input type="checkbox"
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mt-2">
+                                <input type="checkbox"
                                     name="stockConfirm"
                                     class="form-check-input"
                                     [(ngModel)]="confirmed">
                                     I confirm that the information provided above is accurate!
-                                </div>
-                            </div>
-
-                            <div class="row" style="padding: 10px;">
-                                <div class="col-2">
-                                    <button [disabled]="!confirmed" class="btn btn-primary" type="submit">Create</button>
-                                </div>
                             </div>
                         </div>
+
+                        <div class="row" style="padding: 10px;">
+                            <div class="col-2">
+                                <button [disabled]="!confirmed" class="btn btn-primary" type="submit">Create</button>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
 
@@ -2149,7 +2157,7 @@ PAREI AQUI
                 no componente.
 
                 ng s -o
-
+PAREI AQUI
             . Altere o componente "stock-item.component.ts" com o conteúdo abaixo:
 
                 import { Component, OnInit } from '@angular/core';
