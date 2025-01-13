@@ -3017,7 +3017,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
         . Execute o projeto e vejo o log de execução na console do navegador:
 
             ng s -o
-PAREI AQUI
+
 7. Mecânismos para se trabalhar com formulários no Angular
 ----------------------------------------------------------
 
@@ -3397,7 +3397,10 @@ PAREI AQUI
                             <div class="col-2">
                                 <div class="form-group">
                                     <label for="stockExchange">Stock Exchange</label>
-                                    <select class="form-select form-select-sm" id="stockExchange" name="stockExchange"
+                                    <select class="form-select form-select-sm" 
+                                        id="stockExchange" 
+                                        name="stockExchange"
+                                        [required]="true"
                                         [(ngModel)]="stock.exchange">
                                         <option value="NYSE" selected>NYSE</option>
                                         <option value="NASDAQ">NASDAQ</option>
@@ -3440,7 +3443,7 @@ PAREI AQUI
             . Execute a aplicação e verifique se o botão ficará habilitado caso as validações dos campos sejam atendidas:
 
                 ng s -o
-
+PAREI AQUI
         . Validação de Formulários:
 
             . Recordando, abaixo a relação de validações permitidas no HTML:
