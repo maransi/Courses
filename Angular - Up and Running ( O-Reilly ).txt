@@ -3443,7 +3443,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
             . Execute a aplicação e verifique se o botão ficará habilitado caso as validações dos campos sejam atendidas:
 
                 ng s -o
-PAREI AQUI
+
         . Validação de Formulários:
 
             . Recordando, abaixo a relação de validações permitidas no HTML:
@@ -3690,8 +3690,11 @@ PAREI AQUI
             . Altere a propriedade "noPropertyAccessFromIndexSignature" para "false" no arquivo "tsconfig.json":
 
                 {
-                    ...
-                    "noPropertyAccessFromIndexSignature": false,
+                    ...,
+                    "compilerOptions": {
+                        "noPropertyAccessFromIndexSignature": false,
+                        ...
+                    }
                     ...
                 },
                 ...
@@ -3704,12 +3707,15 @@ PAREI AQUI
                         <div class="row">
                             <div class="col-3">
                                 <label for="stockName">Stock Name</label>
+
+                                <!-- Atributo "#stockName="ngModel" inserido -->
                                 <input type="text"
                                         placeholder="Stock Name"
                                         name="stockName"
                                         id="stockName"
                                         required
                                         minlength="3"
+                                        #stockName="ngModel"
                                         autocomplete="off"
                                         class="form-control form-control-sm"
                                         [(ngModel)]="stock.name">
@@ -3759,7 +3765,7 @@ PAREI AQUI
             . Execute o projeto e verifique se as mensagems informativas de validação estão aparecendo 
 
                 ng s -o
-
+PAREI AQUI
         . Controle de estado dos elementos de entrada do formulário
 
             . O estado, que nos permite espiar o estado do controle de formulário, se o usuário o visitou, se o usuário o
