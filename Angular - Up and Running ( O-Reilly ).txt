@@ -3807,7 +3807,7 @@ PAREI AQUI
                             <div class="col-3">
                                 <label for="stockName">Stock Name</label>
 
-                                <!-- Inserido o diretiva de class [ngClass] -->
+                                <!-- Inserido o diretiva de class [ngClass], id, ngModel e placeholder-->
 
                                 <input type="text"
                                         placeholder="Stock Name"
@@ -4053,7 +4053,7 @@ PAREI AQUI
 
                 </div>
 
-            . Atualize todo o código do componente "create-stock.component.ts" com o conteúdo abaixo:
+            . Atualize todo o código do componente "create-product-item.component.ts" com o conteúdo abaixo:
 
                 import { Component } from '@angular/core';
                 import {FormControl} from "@angular/forms";                     // Linha inserida
@@ -4496,33 +4496,36 @@ PAREI AQUI
                             </div>
 
                             <div class="col-6">
-                            <div class="form-group">
-                                <label for="stockName">Stock Name</label>
+                                <div class="form-group">
+                                    <label for="stockName">Stock Name</label>
 
-                                <input type="text"
-                                    class="form-control form-control-sm"
-                                    id="stockName"
-                                    formControlName="stockName"
-                                    autocomplete="off"
-                                    name="stockName">
+                                    <input type="text"
+                                        class="form-control form-control-sm"
+                                        id="stockName"
+                                        formControlName="stockName"
+                                        autocomplete="off"
+                                        name="stockName">
 
-                                <div *ngIf="stockForm.get('stockName')?.invalid &&
-                                            ( stockForm.get('stockName')?.dirty ||
-                                                stockForm.get('stockName')?.touched ||
-                                                submitedForm)"
-                                    [ngClass]="{'error-message': stockForm.get('stockName')?.invalid &&
-                                                    ( stockForm.get('stockName')?.dirty ||
+                                    <!-- Div inserida -->
+                                    <div *ngIf="stockForm.get('stockName')?.invalid &&
+                                                ( stockForm.get('stockName')?.dirty ||
                                                     stockForm.get('stockName')?.touched ||
-                                                    submitedForm)}">
-                                <div *ngIf="stockForm.get('stockName')?.errors?.required">
-                                    * Stock Name is Mandatory
-                                </div>
+                                                    submitedForm)"
+                                        [ngClass]="{'error-message': stockForm.get('stockName')?.invalid &&
+                                                        ( stockForm.get('stockName')?.dirty ||
+                                                        stockForm.get('stockName')?.touched ||
+                                                        submitedForm)}">
+                                        <div *ngIf="stockForm.get('stockName')?.errors?.required">
+                                            * Stock Name is Mandatory
+                                        </div>
 
-                                <div *ngIf="stockForm.get('stockName')?.errors?.minlength">
-                                    * Minimum length Stock Name will be 3 characteres
+                                        <div *ngIf="stockForm.get('stockName')?.errors?.minlength">
+                                            * Minimum length Stock Name will be 3 characteres
+                                        </div>
+                                    </div>
+                                    <!-- Fim da Inserção -->
+
                                 </div>
-                                </div>
-                            </div>
                             </div>
                         </div>
 
@@ -4583,11 +4586,14 @@ PAREI AQUI
                         </div>
                     </form>
 
+                    <!-- Trecho INserido -->
                     <p>Form Control value: {{ stockForm.get('stockName')?.value | json }}</p>
                     <p>Form Control invalid {{ stockForm.get('stockName')?.invalid | json }}</p>
                     <p>Form Control dirty {{ stockForm.get('stockName')?.dirty | json }}</p>
                     <p>Form Control touched {{ stockForm.get('stockName')?.touched | json }}</p>
+                    <!-- Fim da inserção -->
 
+                    <p>Form Control value: {{ stockForm.value | json }}</p>
                     <p>Form Control status: {{ stockForm.status | json }}</p>
                 </div>
 
@@ -4595,6 +4601,7 @@ PAREI AQUI
 
                 ng s -o
 
+PAREI AQUI
         . formBuilder
 
             . O FormBuilder é uma classe do Angular que ajuda a criar formulários de forma mais fácil e eficiente. Ele fornece 
