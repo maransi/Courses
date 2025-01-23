@@ -4970,7 +4970,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 ng s -o
 
         . formArray
-PAREI AQUI
+
 8. Componentes Service
 ----------------------
 
@@ -5092,33 +5092,51 @@ PAREI AQUI
         . Altere a clase "product-item.service.ts" com o conteúdo abaixo:
 
             import { Injectable } from '@angular/core';
-            import { ProductItem } from '../model/product-item';
+            import {ProductItem} from "../model/product-item";
 
             @Injectable({
                 providedIn: 'root'
             })
             export class ProductItemService {
 
-                // Insira a linha abaixo
-                public products: ProductItem[];
-
-                constructor() { 
+            public products: ProductItem[];
+                constructor() {
                     this.products = [];
                 }
 
-                // Insira o método abaixo
-                public addProduct( product: ProductItem ) {
-                    this.products.push( product );
+                public post( product: ProductItem ){
+                    this.products.push(product);
                 }
+
+                public put( stockCode: string, product: ProductItem ){
+
+                }
+
+                public delete( stockCode: string ){
+
+                }
+
+                public getById( stockCode: string ){
+
+                }
+
+                public getAll(): ProductItem[] {
+                    return this.products;
+                }
+
+                public update( product: ProductItem ){
+PAREI AQUI
+                }
+
+
             }
 
         . Insira as linhas abaixo no arquivo "create-product-item.component.ts":
 
             import { Component } from '@angular/core';
-            import {FormControl, FormGroup, Validators} from "@angular/forms";
-            import { isEmpty } from 'rxjs';
-            import { ProductItem } from 'src/app/model/product-item';
-            import { ProductItemService } from 'src/app/services/product-item.service';
+            import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+            import {ProductItemService} from "../../services/product-item.service";
+            import {ProductItem} from "../../model/product-item";    // Linha inserida
 
             @Component({
                 selector: 'app-create-product-item',
@@ -5126,9 +5144,11 @@ PAREI AQUI
                 styleUrls: ['./create-product-item.component.css']
             })
 
-            export class CreateProductItemComponent  {
+            export class CreateProductItemComponent {
+                public submitedForm: Boolean = false;                   // Linha inserida
+                public notablePeople: string;
 
-                public stockForm: FormGroup = new FormGroup( {
+                public productForm: FormGroup = new FormGroup( {
                     stockCode: new FormControl('', [Validators.required]),
                     stockName: new FormControl('', [ Validators.required, Validators.minLength(3) ] ),
                     stockPrice: new FormControl('', [Validators.required]),
@@ -5136,42 +5156,36 @@ PAREI AQUI
                     stockExchange: new FormControl('NYSE', [Validators.required])
                 });
 
-                public submitedForm: Boolean = false;
 
-                public notablePeople: string;
-
-                // Assinatura do constructor alterada
                 constructor( public productItemService: ProductItemService ) {
                     this.notablePeople = "Bill Gates";
                 }
 
-
-
                 onSubmit(){
-                    if (this.stockForm.valid) {
-                        // console.log(this.stockForm.value);        // Linha Eliminada
-                        // console.log(this.stockForm.valid);        // Linha Eliminada
+                    if (this.productForm.valid) {
+                    // console.log(this.stockForm.value);        // Linha Eliminada
+                    // console.log(this.stockForm.valid);        // Linha Eliminada
 
-                        // Insira a linha abaixo
-                        this.productItemService.addProduct( new ProductItem(
-                            this.stockForm.value.stockCode,
-                            this.stockForm.value.stockName, 
-                            this.stockForm.value.stockPrice,
-                            this.stockForm.value.stockPreviousPrice,
-                            this.stockForm.value.stockExchange
-                        ));
+                    // Insira a linha abaixo
+                    this.productItemService.update( new ProductItem(
+                        this.productForm.value.stockCode,
+                        this.productForm.value.stockName,
+                        this.productForm.value.stockPrice,
+                        this.productForm.value.stockPreviousPrice,
+                        this.productForm.value.stockExchange
+                    ));
 
-                        this.stockForm.reset();
+                    this.productForm.reset();
 
-
-                        this.submitedForm = false;
-                    } 
+                    this.submitedForm = false;
+                    }
                     else
                     {
-                        this.submitedForm = true;
+                    this.submitedForm = true;
                     }
-                
+
                 }
+
             }
 
         . Faça as alterações abaixo no arquivo "create-product-item.component.html":
