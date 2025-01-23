@@ -1,0 +1,245 @@
+Angular HTTP Playbook
+---------------------
+
+01. Entendendo o HTTP Client
+
+    . HTTP (Hypertext Transfer Protocol) é um protocolo de comunicação utilizado para transferir 
+        dados entre dispositivos em uma rede, como a internet. Ele é o protocolo padrão para a 
+        comunicação entre clientes e servidores na web.
+
+    . O HTTP é um protocolo de solicitação-resposta, o que significa que um cliente 
+        (como um navegador web) envia uma solicitação para um servidor e o servidor responde 
+        com os dados solicitados.
+
+    . Aqui está uma visão geral de como o HTTP funciona:
+
+        . Solicitação: O cliente envia uma solicitação para o servidor, especificando o recurso 
+                        que deseja acessar (como uma página web ou um arquivo).
+        . Requisição: O servidor recebe a solicitação e processa-a.
+        . Resposta: O servidor envia uma resposta para o cliente, contendo os dados solicitados.
+        . Recebimento: O cliente recebe a resposta e a processa.
+
+    . O HTTP utiliza uma variedade de métodos para realizar diferentes ações, como:
+
+        . GET: Solicita que o servidor retorne um recurso específico.
+        . POST: Envia dados para o servidor para criar um novo recurso.
+        . PUT: Atualiza um recurso existente no servidor.
+        . DELETE: Exclui um recurso existente no servidor.
+
+    . O HTTP também utiliza cabeçalhos (headers) para fornecer informações adicionais sobre a 
+        solicitação e a resposta, como:
+
+        . Host: O nome do servidor que está sendo acessado.
+        . Accept: O tipo de dado que o cliente pode aceitar.
+        . Content-Type: O tipo de dado que está sendo enviado.
+
+    . Além disso, o HTTP utiliza status codes para indicar o resultado da solicitação, como:
+
+        . 200 OK: A solicitação foi processada com sucesso.
+        . 404 Not Found: O recurso solicitado não foi encontrado.
+        . 500 Internal Server Error: O servidor encontrou um erro interno.    
+
+    . O Angular trabalha com o HTTP utilizando o módulo HttpClient que é parte do framework. O HttpClient é 
+        uma classe que fornece métodos para realizar requisições HTTP para servidores web.
+
+    . Aqui estão os principais métodos do HttpClient:
+
+        . get: Realiza uma requisição GET para obter dados de um servidor.
+        . post: Realiza uma requisição POST para enviar dados para um servidor.
+        . put: Realiza uma requisição PUT para atualizar dados em um servidor.
+        . delete: Realiza uma requisição DELETE para excluir dados de um servidor.
+
+    . Para utilizar o HttpClient no Angular, você precisa importar o módulo HttpClientModule no seu módulo 
+        principal (geralmente app.module.ts) e injetar o serviço HttpClient no seu componente ou serviço.        
+
+        // app.module.ts
+        import { HttpClientModule } from '@angular/common/http';
+        
+        @NgModule({
+          declarations: [AppComponent],
+          imports: [HttpClientModule],    ---------------> Import do HttpClientModule
+          providers: [],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule {}
+
+
+
+
+        // Component
+        import { Component, OnInit } from '@angular/core';
+        import { HttpClient } from '@angular/common/http';      ---> Importe da biblioteca
+        
+        @Component({
+          selector: 'app-exemplo',
+          template: `
+            <div>
+              {{ dados }}
+            </div>
+          `
+        })
+        export class ExemploComponent implements OnInit {
+          dados: any;
+                                        +-------------> Injeção de dependência
+                                        |
+                                        +
+          constructor(private http: HttpClient) { }
+        
+          ngOnInit(): void {
+            this.http.get('https://api.example.com/dados')
+              .subscribe(response => {
+                this.dados = response;
+              });
+          }
+        }
+
+    . O HttpClient também fornece métodos para lidar com erros e exceções, como catchError e throwError. 
+        Além disso, você pode utilizar o HttpClient com observáveis para lidar com requisições assíncronas.
+
+        import { Component, OnInit } from '@angular/core';
+        import { HttpClient } from '@angular/common/http';
+        import { Observable } from 'rxjs';
+        
+        @Component({
+          selector: 'app-exemplo',
+          template: `
+            <div>
+              {{ dados }}
+            </div>
+          `
+        })
+        export class ExemploComponent implements OnInit {
+          dados: any;
+        
+          constructor(private http: HttpClient) { }
+        
+          ngOnInit(): void {
+            this.http.get('https://api.example.com/dados')
+              .pipe(
+                catchError(error => {    ----> Tratamento de erros e exceções
+                  console.error(error);
+                  return throwError(error);
+                })
+              )
+              .subscribe(response => {
+                this.dados = response;
+              });
+          }
+        }
+
+    . Método ".subscribe"
+
+        . O método subscribe é um método do tipo Observable que é retornado pelo método http.get do serviço 
+            HttpClient no Angular.
+
+        . Quando você chama o método http.get, ele retorna um Observable que representa a requisição HTTP. 
+            O Observable é um objeto que emite eventos ao longo do tempo, e no caso do http.get, ele emite 
+            eventos quando a requisição é concluída e os dados são retornados.
+
+            ... 
+            constructor( private http: HttpClient){}
+
+            getCoffees(): Observable<Coffee[]>{
+                return this.http.get<Coffee[]>(coffeeUrl);
+            }
+            ....
+
+        . O método subscribe é usado para se inscrever nos eventos emitidos pelo Observable. Quando você 
+            chama o método subscribe, você está dizendo ao Observable que você deseja receber notificações 
+            quando os eventos forem emitidos.
+
+        . No caso do http.get, o método subscribe é usado para receber a resposta da requisição HTTP. 
+            Quando a requisição é concluída e os dados são retornados, o Observable emite um evento com a 
+            resposta, e o método subscribe é chamado com a resposta como argumento.
+
+    . Demo
+    
+8.40
+
+
+
+
+  . Formas de passar parâmetros no Header da chamada:
+
+    . Existem várias formas de passar parâmetros de header em uma chamada HttpClient no Angular. Aqui estão algumas delas:
+
+      . Utilizando o método setHeaders
+
+        . Você pode utilizar o método setHeaders para adicionar cabeçalhos à sua requisição HTTP.
+
+          import { HttpClient, HttpHeaders } from '@angular/common/http';
+          
+          const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer seu_token'
+          });
+          
+          this.http.get('https://api.example.com/dados', { headers })
+            .subscribe(response => {
+              console.log(response);
+            });
+
+      . Utilizando o método append
+
+        . Você pode utilizar o método append para adicionar cabeçalhos à sua requisição HTTP.
+
+          import { HttpClient, HttpHeaders } from '@angular/common/http';
+          
+          const headers = new HttpHeaders();
+          
+          headers.append('Content-Type', 'application/json');
+          headers.append('Authorization', 'Bearer seu_token');
+          
+          this.http.get('https://api.example.com/dados', { headers })
+            .subscribe(response => {
+              console.log(response);
+            });
+
+      . Utilizando o método set
+
+        . Você pode utilizar o método set para substituir um cabeçalho existente ou adicionar um novo.
+
+          import { HttpClient, HttpHeaders } from '@angular/common/http';
+          
+          const headers = new HttpHeaders();
+          
+          headers.set('Content-Type', 'application/json');
+          headers.set('Authorization', 'Bearer seu_token');
+          
+          this.http.get('https://api.example.com/dados', { headers })
+            .subscribe(response => {
+              console.log(response);
+            });
+
+      . Utilizando o objeto HttpParams
+
+        . Você pode utilizar o objeto HttpParams para adicionar parâmetros de consulta à sua requisição HTTP.
+
+          import { HttpClient, HttpParams } from '@angular/common/http';
+          
+          const params = new HttpParams()
+            .set('param1', 'valor1')
+            .set('param2', 'valor2');
+          
+          this.http.get('https://api.example.com/dados', { params })
+            .subscribe(response => {
+              console.log(response);
+            });
+
+      
+      . Utilizando o objeto HttpHeaders com o método fromObject
+
+        . Você pode utilizar o objeto HttpHeaders com o método fromObject para criar um objeto de cabeçalhos a 
+          partir de um objeto JavaScript.
+
+          import { HttpClient, HttpHeaders } from '@angular/common/http';
+          
+          const headers = HttpHeaders.fromObject({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer seu_token'
+          });
+          
+          this.http.get('https://api.example.com/dados', { headers })
+            .subscribe(response => {
+              console.log(response);
+            });
