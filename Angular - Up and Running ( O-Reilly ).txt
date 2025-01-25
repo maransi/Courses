@@ -5125,7 +5125,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
                 }
 
                 public update( product: ProductItem ){
-PAREI AQUI
+
                 }
 
 
@@ -5163,25 +5163,25 @@ PAREI AQUI
 
                 onSubmit(){
                     if (this.productForm.valid) {
-                    // console.log(this.stockForm.value);        // Linha Eliminada
-                    // console.log(this.stockForm.valid);        // Linha Eliminada
+                        // console.log(this.stockForm.value);        // Linha Eliminada
+                        // console.log(this.stockForm.valid);        // Linha Eliminada
 
-                    // Insira a linha abaixo
-                    this.productItemService.update( new ProductItem(
-                        this.productForm.value.stockCode,
-                        this.productForm.value.stockName,
-                        this.productForm.value.stockPrice,
-                        this.productForm.value.stockPreviousPrice,
-                        this.productForm.value.stockExchange
-                    ));
+                        // Insira a linha abaixo
+                        this.productItemService.post( new ProductItem(
+                            this.productForm.value.stockCode,
+                            this.productForm.value.stockName,
+                            this.productForm.value.stockPrice,
+                            this.productForm.value.stockPreviousPrice,
+                            this.productForm.value.stockExchange
+                        ));
 
-                    this.productForm.reset();
+                        this.productForm.reset();
 
-                    this.submitedForm = false;
+                        this.submitedForm = false;
                     }
                     else
                     {
-                    this.submitedForm = true;
+                        this.submitedForm = true;
                     }
 
                 }
@@ -5531,7 +5531,7 @@ PAREI AQUI
 
                 public stock!: Stock;
                 public stockClasses!: any;
-                public stockStyles!: any;
+                public stockStyles!: any;                                   // Linha inserida
                 public saved: boolean = false;
                 public productsStock: Array<Stock> = [];
                 
@@ -5550,7 +5550,7 @@ PAREI AQUI
                         'small-change': !largeChange
                     };
 
-                    this.stockStyles = {
+                    this.stockStyles = {                                    // Objeto inserido
                         'color': this.stock.isPositiveChange() ? 'green' : 'red',
                         'font-size': largeChange ? '1.2em' : '0.8em'
                     };
@@ -5634,10 +5634,10 @@ PAREI AQUI
 
         . Abra outro terminal e execute o comando abaixo na raiz do projeto:
 
-            json-server db.json
+            npx json-server db.json
 
 
-        . Faça as alterações abaixo no arquivo "stpck-item.component.ts":
+        . Faça as alterações abaixo no arquivo "stock-item.component.ts":
 
             import { HttpClient } from '@angular/common/http';              
 
@@ -5712,6 +5712,12 @@ PAREI AQUI
         . Levante a aplicação, digite código válidos de produtos e verifique se deu tudo certo
 
             ng s -o
+
+PAREI AQUI
+
+Utilize o link abaixo como exemplo para criar o CRUD
+
+https://www.tektutorialshub.com/angular/angular-http-get-example-using-httpclient/
 
 
 
