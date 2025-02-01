@@ -5720,6 +5720,8 @@ https://www.tektutorialshub.com/angular/angular-http-get-example-using-httpclien
 
 
 
+
+
 https://www.tektutorialshub.com/angular/angular-forms-fundamentals/
 https://www.fabricadecodigo.com/criar-formulario-reactive-forms/
 https://medium.com/@zeeshankhan8838/reactive-forms-in-angular-848d709cfba4
@@ -5744,33 +5746,8 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+10. Routing
+-----------
 
     . A tag "<router-outlet>" age como um marcador para onde a rota carregada deve ser exibida na interface. Basicamente, 
         é uma área reservada no DOM que indica ao Angular Router onde ele deve renderizar os componentes com base nas rotas 
@@ -5779,11 +5756,197 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
         . Com base na URL e na configuração da URL vs componente associado, o angular irá renderizar o conteúdo no lugar 
             da tag <router-outlet>. Por exemplo:
 
-                                        Apontar para                            Associado ao html
-            http:///localhome:4200/     ------------->  WeatherHomeComponent    ------------------>     weather-home.component.html
+                                            Apontar para                        Associado ao html
+            http:///localhome:4200/about     ------------->  AboutComponent    ------------------>     about.component.html
                     |                                                                                               ^
                     V                                                                                               |
                 Quando essa URL é chamada o <router-outlet> renderizará a página -----------------------------------+
+
+        . A tag <router-outlet> deve ser inserida no componente "app.component.html" para executar a associação da URL com 
+            o componente angular que será configurada num dos arquivos logo abaixo :
+
+            // app.component.html
+            <router-outlet></router-outlet>
+
+    . No Angular, o roteamento é uma parte fundamental que permite a navegação entre diferentes componentes. As rotas 
+        podem ser configuradas em três locais principais: no arquivo `app.module.ts`, no `app-routing.module.ts`, e em 
+        um módulo específico. A seguir, apresento como realizar essas configurações.
+
+        . Configuração no `app.module.ts`
+
+            . No arquivo `app.module.ts`, você pode configurar as rotas diretamente, embora isso não seja a prática 
+                recomendada para aplicações maiores. Aqui está um exemplo básico:
+
+                import { NgModule } from '@angular/core';
+                import { BrowserModule } from '@angular/platform-browser';
+                import { RouterModule, Routes } from '@angular/router';
+                import { AppComponent } from './app.component';
+                import { HomeComponent } from './home/home.component';      // Importação dos componentes
+                import { AboutComponent } from './about/about.component';   // Importação dos componentes
+
+                // Configuração das rotas
+                const appRoutes: Routes = [
+                    { path: '', component: HomeComponent },
+                    { path: 'about', component: AboutComponent }
+                ];
+
+                @NgModule({
+                    declarations: [
+                        AppComponent,
+                        HomeComponent,
+                        AboutComponent
+                    ],
+                    imports: [
+                        BrowserModule,
+                        RouterModule.forRoot(appRoutes) // Configurando as rotas aqui
+                    ],
+                    providers: [],
+                    bootstrap: [AppComponent]
+                })
+                export class AppModule { }
+
+        . Configuração no `app-routing.module.ts`
+
+            . A maneira mais comum e organizada de configurar rotas é através do módulo de roteamento, geralmente chamado 
+                de `app-routing.module.ts`. 
+
+                import { NgModule } from '@angular/core';
+                import { RouterModule, Routes } from '@angular/router';
+                import { HomeComponent } from './home/home.component';
+                import { AboutComponent } from './about/about.component';
+
+                // Configuração das rotas
+                const routes: Routes = [
+                    { path: '', component: HomeComponent },
+                    { path: 'about', component: AboutComponent }
+                ];
+
+                @NgModule({
+                    imports: [RouterModule.forRoot(routes)],    // Utilização das rotas configuradas
+                    exports: [RouterModule]
+                })
+
+                export class AppRoutingModule { }
+
+        . Configuração em um Módulo Específico
+
+            . O comando CLI para criar um arquivo de módulo das rotas são:
+
+                ng generate module nome-do-modulo --routing
+                
+                ou
+
+                ng g m nome-do-modulo --routing
+
+            . Para módulos específicos (feature modules), você pode criar um arquivo de roteamento separado, pode ser no diretório raiz. 
+                Por exemplo,  se você tiver um módulo chamado `AdminModule`, a configuração das rotas poderia ser feita assim:
+
+                import { NgModule } from '@angular/core';
+                import { RouterModule, Routes } from '@angular/router';
+                import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+                import { AdminSettingsComponent } from './admin-settings/admin-settings.component';
+
+                // Configuração das roas
+                const adminRoutes: Routes = [
+                    { path: 'dashboard', component: AdminDashboardComponent },
+                    { path: 'settings', component: AdminSettingsComponent }
+                ];
+
+                @NgModule({
+                    imports: [RouterModule.forChild(adminRoutes)],      // Utilização das rotas
+                    exports: [RouterModule]
+                })
+
+                export class AdminRoutingModule { } ------------------------------------------------------------+
+                                                                                                                |
+            . Neste cenário precisamos adicionar o arquivo de módulo das rotas no componente "app.module.ts"    |
+                                                                                                                |
+                import { NgModule } from '@angular/core';                                                       |
+                import { BrowserModule } from '@angular/platform-browser';                                      |
+                import { AppComponent } from './app.component';                                                 |
+                import { AppRoutingModule } from './app-routing.module';                                        |
+                                                                                                                |
+                @NgModule({                                                                                     |
+                  declarations: [AppComponent],                                                                 |
+                  imports: [BrowserModule, AdminRoutingModule], <-----------------------------------------------+
+                  providers: [],
+                  bootstrap: [AppComponent]
+                })
+                export class AppModule { }
+
+    . Demo
+
+        . Vamos utilizar a maneira mais padrão de configuração de rotas, que será no arquivo "app-routing.module.ts".
+
+        . Faça as alterações no arquivo "app-routing.module.ts" conforme abaixo:
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+
+            // Faça os imports abaixo
+            import { StockItemComponent } from './stock/stock-item/stock-item.component';
+            import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+            import { CreateStockItemComponent } from './stock/create-stock-item/create-stock-item.component';
+            import { CreateProductItemComponent } from './stock/create-product-item/create-product-item.component';
+
+            // Objeto inserido
+            const routes: Routes = [
+                { path: 'stock-item', component: StockItemComponent },
+                { path: 'create-stock', component: CreateStockComponent },
+                { path: 'create-stock-item', component: CreateStockItemComponent },
+                { path: 'create-product-item', component: CreateProductItemComponent },
+                { path: '', redirectTo: '/stock-item', pathMatch: 'full' },
+                { path: '**', redirectTo: '/stock-item', pathMatch: 'full' }
+            ];
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+            export class AppRoutingModule { }
+
+        . Altere a linha do arquivo "app.component.html" conforme abaixo:
+
+            <router-outlet></router-outlet>
+
+        . Levante o projeto 
+
+            ng s -o
+
+        . Execute as URLs abaixo:
+
+            http://localhost:4200/stock-item
+            http://localhost:4200/create-stock
+            http://localhost:4200/create-stock-item
+            http://localhost:4200/create-product-item
+
+        . Insira as linhas abaixo no arquivo "app.component.html"
+
+            <!-- Div inserida -->
+            <div>
+                <span><a href="/stock-item">Stock Item</a></span>&nbsp;&nbsp;
+                <span><a href="/create-stock">Create Stock</a></span>&nbsp;&nbsp;
+                <span><a href="/create-product-item">Create Product Item</a></span>
+            </div>
+
+            <router-outlet></router-outlet>
+
+        . Verifique o menu acima se está funcionando na página
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     . Bibliotecas utilizadas
 
