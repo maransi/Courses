@@ -5711,7 +5711,152 @@ https://consolelog.com.br/introducao-ao-angular-17/
         . Levante a aplicação, digite código válidos de produtos e verifique se deu tudo certo
 
             ng s -o
-PAREI AQUI
+
+
+    . Configuração e redirecionamento das chamadas "http":
+
+        . Quando você executa o comando ng serve, o Angular cria um servidor de desenvolvimento que serve os arquivos 
+            do seu aplicativo. No entanto, se o seu aplicativo precisa fazer requisições para um servidor de back-end, 
+            você pode configurar o servidor de desenvolvimento para encaminhar essas requisições, ao invés de fazer as 
+            chamadas diretamente ao servidor, por exemplo:
+
+            . Ao executar o comando, no prompt na pasta raiz:
+
+                npx json-server db.json
+
+            . A saida será:
+
+                JSON Server started on PORT :3000
+                Press CTRL-C to stop
+                Watching db.json...
+
+                (˶ᵔ ᵕ ᵔ˶)
+
+                Index:
+                http://localhost:3000/
+
+                Static files:
+                Serving ./public directory if it exists
+
+                Endpoints:
+                http://localhost:3000/stocks
+
+        . A rota principal para realizar nossas chamadas da API será "http://localhost:3000". Podemos abreviar essa rota 
+            fazendo configurações num arquivo proxy separadamente:
+
+            . Basta ter um arquivo com o nome "proxy.conf.json" na pasta raiz do projeto com o conteúdo abaixo:
+
+                       +---> path 
+                {      |
+                    "/api": {
+                        "target": "http://localhost:8080",  // todas as requisições para /api serão encaminhadas para http://localhost:8080
+                        "secure": false,
+                        "changeOrigin": true,
+                        "pathRewrite": {
+                            "^/api": ""
+                        }
+                    }
+                }
+
+            .  Esse arquivo de configuração é um arquivo JSON que contém as seguintes propriedades:
+
+                . path: o caminho da requisição que deve ser encaminhada
+                
+                . target: o URL do servidor de back-end que deve receber a requisição
+                
+                . secure: um booleano que indica se a conexão com o servidor de back-end deve ser segura (HTTPS)
+                
+                . changeOrigin: um booleano que indica se o servidor de desenvolvimento deve alterar a origem da requisição
+
+        . Tendo o arquivo "proxy.conf.json" configurado corretamente, basta levantar o projeto com o comando abaixo:
+
+            ng serve --proxy-config  proxy.conf.json  
+
+        . A partir do Angular 15 também introduziu um novo recurso chamado "proxy" no arquivo angular.json. Esse recurso permite que você 
+            configure o proxy de forma mais fácil e flexível:
+
+            {
+                ...
+                "projects": {
+                    "my-app": {
+                        ...
+                        "architect": {
+                            "serve": {
+                                "options": {                            // Nó inserido
+                                    "proxyConfig": "proxy.conf.json"
+                                },
+                                ...
+                            }
+                        }
+                    }
+                }
+            }
+
+        . Dessa forma podemos levantar o projeto da forma convencional, que as configurações serão utilizadas:
+
+            ng s -o
+
+    . Demo
+
+        . Certifique-se que o servidor json está ativo e está rodando na URL "http://localhost:3000/"
+
+            npx json-server db.json
+
+        . Crie o arquivo "proxy.conf.json" na pasta raiz do projeto com o conteúdo abaixo:
+
+            {
+                "/api/stock": {
+                    "target": "http://localhost:3000",
+                    "secure": false,
+                    "changeOrigin": true,
+                    "pathRewrite": {
+                        "^/api/stock": ""
+                    }
+                }
+            }
+
+        . Altere o arquivo "angular.json" conforme abaixo:
+
+            {
+                ...
+                "projects": {
+                    "my-app": {
+                        ...
+                        "architect": {
+                            "serve": {
+                                "options": {                            // Nó inserido
+                                    "proxyConfig": "proxy.conf.json"
+                                },
+                                ...
+                            }
+                        }
+                    }
+                }
+            }
+
+        . Altere a chamada da URL no arquivo "stock-item.component.ts" como abaixo:
+
+            ...
+            onQueryProduct() {
+//                this.http.get('/http://localhost:3000/stocks/' + this.stock.code)         // Linha eliminada
+                this.http.get('/api/stock/stocks/' + this.stock.code)                           // Linha alterada
+                .subscribe(resposta => {
+                    console.log(resposta);
+                    this.response = resposta;
+                    this.stock.code = this.response.code;
+                    this.stock.name = this.response.name;
+                    this.stock.price = this.response.price;
+                    this.stock.previousPrice = this.response.previousPrice;
+                    this.stock.exchange = this.response.exchange;
+                });
+            }
+            ...           
+
+        . Levante o projeto e veja se a página "stock-item.component" está executando a chamada do item corretamente.
+
+            ng s -o
+
+
 
 Utilize o link abaixo como exemplo para criar o CRUD
 
