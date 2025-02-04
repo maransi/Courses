@@ -127,8 +127,8 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
     . Instalação do JSon Server
 
-        # Instalação do JSon Server
-        npm install json-server
+        # Instalação do JSon Server global use -g, sem esse parâmetro o start do json-server será pelo comando "npx"
+        npm install json-server -g
 
         # Crie o arquivo json abaixo com o nome de db.json
         {
@@ -147,7 +147,12 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
 
         # Execute o comando abaixo
+        json-server db.json
+
+        ou
+
         npx json-server db.json
+        
 
         # Testando as rotas
         curl http://localhost:3000/posts/1
@@ -5856,7 +5861,7 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
             ng s -o
 
-
+Página 302
 
 Utilize o link abaixo como exemplo para criar o CRUD
 
@@ -6078,6 +6083,66 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
         . Verifique o menu acima se está funcionando na página
 
+    . Rotas Curingas e Padrões (Wildcards and Default)
+
+
+        . Wildcards são usados em rotas do Angular para lidar com situações em que a rota não é exatamente igual à rota 
+            definida no componente. Eles são representados por um asterisco (*) e podem ser usados para capturar 
+            qualquer parte da URL que não seja igual à rota definida.
+
+            const routes: Routes = [
+              { path: 'usuario/:id', component: UsuarioComponent },
+              { path: 'usuario/*', component: UsuarioComponent }
+            ];
+
+            .  A rota /usuario/* é uma rota wildcard que captura qualquer parte da URL que venha após /usuario/. Se
+                o usuário acessar a URL /usuario/123/abc, a rota wildcard será ativada e o componente 
+                UsuarioComponent será renderizado.
+
+        . Defaults são usados em rotas do Angular para definir uma rota padrão que deve ser usada quando nenhuma outra rota 
+            é encontrada. Eles são representados por um duplo asterisco (**) e podem ser usados para direcionar qualquer 
+            URL que não seja igual à rota definida para um componente específico.
+
+            const routes: Routes = [
+              { path: '**', component: Erro404Component },
+              { path: '', component: HomeComponent }
+            ];
+
+    . Demo
+
+        . Insira as linhas abaixo no arquivo "app-routing.modules.ts":
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+            import { StockItemComponent } from './stock/stock-item/stock-item.component';
+            import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+            import { CreateStockItemComponent } from './stock/create-stock-item/create-stock-item.component';
+            import { CreateProductItemComponent } from './stock/create-product-item/create-product-item.component';
+
+            const routes: Routes = [
+                { path: 'stock-item', component: StockItemComponent },
+                { path: 'create-stock', component: CreateStockComponent },
+                { path: 'create-stock-item', component: CreateStockItemComponent },
+                { path: 'create-product-item', component: CreateProductItemComponent },
+                { path: '', redirectTo: '/stock-item', pathMatch: 'full' },                 // Linha inserida
+                { path: '**', redirectTo: '/create-product-item', pathMatch: 'full' }       // Linha inserida
+            ];
+
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+            export class AppRoutingModule { }
+
+        . Levante o projeto:
+
+            ng s -o
+
+        . Execute as rotas abaixo no navegador e veja o resultado:
+
+            http://localhost:4200/
+            http://localhost:4200/pagina
 
 
 
@@ -6086,10 +6151,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
 
 
-
-
-
-
+            
 
 
 
