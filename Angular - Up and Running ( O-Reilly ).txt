@@ -5633,6 +5633,62 @@ https://consolelog.com.br/introducao-ao-angular-17/
                         "price": 300,
                         "previousPrice": 290,
                         "exchange": "NYSE"
+                    },
+                    {
+                        "id": "60",
+                        "code": "60",
+                        "name": "Intel Corp.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "70",
+                        "code": "70",
+                        "name": "NVidia Corp.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "80",
+                        "code": "80",
+                        "name": "Qualcomm Inc.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "90",
+                        "code": "90",
+                        "name": "Sony Corp.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "91",
+                        "code": "91",
+                        "name": "Samsung Corp.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "92",
+                        "code": "92",
+                        "name": "Nokia Corp.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NASDAQ"
+                    },
+                    {
+                        "id": "93",
+                        "code": "93",
+                        "name": "LG Corp.",
+                        "price": 400,
+                        "previousPrice": 390,
+                        "exchange": "NASDAQ"
                     }
                 ]
             }
@@ -5861,6 +5917,8 @@ https://consolelog.com.br/introducao-ao-angular-17/
 
             ng s -o
 
+
+
 Página 302
 
 Utilize o link abaixo como exemplo para criar o CRUD
@@ -5898,6 +5956,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
 10. Routing
 -----------
+
 
     . A tag "<router-outlet>" age como um marcador para onde a rota carregada deve ser exibida na interface. Basicamente, 
         é uma área reservada no DOM que indica ao Angular Router onde ele deve renderizar os componentes com base nas rotas 
@@ -6037,16 +6096,11 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             import { StockItemComponent } from './stock/stock-item/stock-item.component';
             import { CreateStockComponent } from './stock/create-stock/create-stock.component';
             import { CreateStockItemComponent } from './stock/create-stock-item/create-stock-item.component';
-            import { CreateProductItemComponent } from './stock/create-product-item/create-product-item.component';
 
             // Objeto inserido
             const routes: Routes = [
                 { path: 'stock-item', component: StockItemComponent },
                 { path: 'create-stock', component: CreateStockComponent },
-                { path: 'create-stock-item', component: CreateStockItemComponent },
-                { path: 'create-product-item', component: CreateProductItemComponent },
-                { path: '', redirectTo: '/stock-item', pathMatch: 'full' },
-                { path: '**', redirectTo: '/stock-item', pathMatch: 'full' }
             ];
 
             @NgModule({
@@ -6067,8 +6121,6 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
             http://localhost:4200/stock-item
             http://localhost:4200/create-stock
-            http://localhost:4200/create-stock-item
-            http://localhost:4200/create-product-item
 
         . Insira as linhas abaixo no arquivo "app.component.html"
 
@@ -6083,8 +6135,8 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
         . Verifique o menu acima se está funcionando na página
 
-    . Rotas Curingas e Padrões (Wildcards and Default)
 
+    . Rotas Curingas e Padrões (Wildcards and Default)
 
         . Wildcards são usados em rotas do Angular para lidar com situações em que a rota não é exatamente igual à rota 
             definida no componente. Eles são representados por um asterisco (*) e podem ser usados para capturar 
@@ -6117,15 +6169,12 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             import { StockItemComponent } from './stock/stock-item/stock-item.component';
             import { CreateStockComponent } from './stock/create-stock/create-stock.component';
             import { CreateStockItemComponent } from './stock/create-stock-item/create-stock-item.component';
-            import { CreateProductItemComponent } from './stock/create-product-item/create-product-item.component';
 
             const routes: Routes = [
                 { path: 'stock-item', component: StockItemComponent },
                 { path: 'create-stock', component: CreateStockComponent },
-                { path: 'create-stock-item', component: CreateStockItemComponent },
-                { path: 'create-product-item', component: CreateProductItemComponent },
                 { path: '', redirectTo: '/stock-item', pathMatch: 'full' },                 // Linha inserida
-                { path: '**', redirectTo: '/create-product-item', pathMatch: 'full' }       // Linha inserida
+                { path: '**', redirectTo: '/stock-item', pathMatch: 'full' }       // Linha inserida
             ];
 
 
@@ -6144,11 +6193,265 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             http://localhost:4200/
             http://localhost:4200/pagina
 
+        . Crie as linhas abaixo no arquivo "app-routing.modules.ts":
 
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+
+            import { StockItemComponent } from './stock/stock-item/stock-item.component';
+            import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+
+            // Objeto inserido
+            export enum ROUTER_TOKENS {
+                STOCK_ITEM = 'stock-item',
+                CREATE_STOCK = 'create-stock'
+            }
+
+            const routes: Routes = [
+                { path: ROUTER_TOKENS.STOCK_ITEM, component: StockItemComponent },      // Linha alterada
+                { path: ROUTER_TOKENS.CREATE_STOCK, component: CreateStockComponent },              // Linha alterada
+                { path: '', redirectTo: ROUTER_TOKENS.STOCK_ITEM, pathMatch: 'full' },             // Linha alterada    
+                { path: '**', redirectTo: ROUTER_TOKENS.STOCK_ITEM, pathMatch: 'full' }            // Linha alterada
+            ];
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+            export class AppRoutingModule { }
+
+        . Verifique se os links do menu estão funcionando
+
+        . Insira as linhas abaixo no arquivo "stock-card.component.css":
+
+            .card:hover {
+                cursor: pointer;
+                border-color: black;
+            }
+
+        . Insira a linha abaixo no arquivo "stock-item.component.ts":
+
+            ...
+
+            onInitStock() {
+                this.stock = new Stock('', '', '', 0, 0, '');
+
+                // Insira as linhas abaixo
+                this.http.get('/api/stock/stocks/')
+                    .subscribe(resposta => {
+                        console.log(resposta);
+                        this.response = resposta;
+                        
+                        this.productsStock = this.response.map( (stock: any) => {
+                            return new Stock( stock.name, stock.code, stock.price, stock.previousPrice, stock.exchange);
+                        });
+                    });    
+            }
+
+            ...
+
+        . Levante a aplicação e veja se está aparencendo todos os cards definido pelo arquivo "db.json":
+
+            ng s -o
+
+    . Navegação entre links:
+
+        . A navegação entre links dentro das páginas utiliza o routerLink, que permite criar links de navegação para 
+            atualizar o conteúdo da página sem recarregá-la.
+
+        . Navegação estática
+
+            . A navegação estática é feita através do uso do atributo routerLink em um elemento HTML, por exemplo:
+
+                <a routerLink="/admin">Ir para admin</a>
+
+        . Navegação por atributo
+
+            . A navegação por atributo é feita através do uso da diretiva [routerLink] em um elemento HTML, por exemplo:
+
+                <a [routerLink]="['/admin', id]">Ir para admin</a>
+                                ----------------
+                                        |
+                                        V 
+            O valor de id é uma variável TypeScript que é vinculada ao atributo [routerLink]. 
+            Quando o usuário clica no link, o Angular atualiza o conteúdo da página com o 
+            componente associado à rota /admin e passa o valor de id como argumento "/admin/10"
+
+
+        . Vantagens de cada uma
+
+            . A navegação estática é mais simples e fácil de usar, enquanto a navegação por atributo é mais flexível e 
+                permite criar links de navegação mais complexos.
+
+            . A vantagem da navegação estática é que é mais fácil de entender e usar, especialmente para links simples.
+
+            . A vantagem da navegação por atributo é que permite criar links de navegação mais complexos, como links com 
+                parâmetros ou links que dependem de condições.
+
+        . Quando usar cada uma
+
+            . Use a navegação estática quando você precisa criar um link de navegação simples e estático.
+
+            . Use a navegação por atributo quando você precisa criar um link de navegação mais complexo, como um link 
+                com parâmetros ou um link que depende de condições.
+
+
+    . Demo
+
+        . Faça as alterações abaixo no arquivo app.component.html:
+
+            <div>
+                <!-- Alteração do "href" pelo [routerLink] -->
+                <span><a [routerLink]="['/stock-item']">Stock Item</a></span>&nbsp;&nbsp;
+
+                <!-- Alteração do "href" pelo [routerLink] -->
+                <span><a [routerLink]="['/create-stock']">Create Stock</a></span>&nbsp;&nbsp;
+            </div>
+
+            <router-outlet></router-outlet>
+
+        . Altere as linhas abaixo no arquivo "stock-card.component.html":
+
+            <!-- tag "a" inserida -->
+            <a [routerLink]="['/create-stock']">
+                <div class="card">
+                    <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg" class="card-img-top"
+                        style="width: 100%; height: auto;">
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{stockItem.name}}</h5>
+                        <p class="card-text">
+                            R$ {{stockItem.price}} <br>
+                            {{ stockItem.exchange}}
+                        </p>
+                    </div>
+                </div>
+            </a>
+
+
+        . Levante o projeto e veja se a página "create-stock.component" está sendo chamada ao clicar num dos cards apresentados.
+
+            ng s -o
+
+        . Altere o componente "app.component.ts" conforme abaixo:
+
+            ...
+            import { ROUTER_TOKENS } from './app-routing.module';       // Linha inserida
+            ...
+
+            export class AppComponent implements OnInit, OnChanges, OnDestroy,
+                DoCheck, AfterContentChecked,
+                AfterContentInit,
+                AfterViewChecked,
+                AfterViewInit {
+
+                title = 'app works!';
+                public stock!: Stock;
+
+                // Linha inserida
+                readonly ROUTER_TOKENS = ROUTER_TOKENS;
+                ...
+            }
+
+        . Altere o componente "app.component.html" conforme abaixo:
+
+            <div>
+                <!-- Alteração do link pelo ROUTER_TOKENS -->
+                <span><a [routerLink]="['/', ROUTER_TOKENS.STOCK_ITEM]">Stock Item</a></span>&nbsp;&nbsp;
+                
+                <!-- Alteração do link pelo ROUTER_TOKENS -->
+                <span><a [routerLink]="['/', ROUTER_TOKENS.CREATE_STOCK]">Create Stock</a></span>&nbsp;&nbsp;
+            </div>
+
+            <router-outlet></router-outlet>        
+
+        . Insira as linhas abaixo no arquivo "stock-card.component.ts":
+
+            import { Component, Input } from '@angular/core';
+            import { ROUTER_TOKENS } from 'src/app/app-routing.module';     // Linha inserida
+            import { Stock } from 'src/app/model/stock';
+            @Component({
+                selector: 'app-stock-card',
+                templateUrl: './stock-card.component.html',
+                styleUrls: ['./stock-card.component.css']
+            })
+            export class StockCardComponent {
+
+                // Linha inserida
+                readonly ROUTER_TOKENS = ROUTER_TOKENS;
+
+                @Input()
+                stockItem!: Stock;
+            }
+
+        . Altere o link abaixo no componente "stock-card.component.html":
+
+            <!-- Altere o parâmetro abaixo no link para a constante ROUTER_TOKENS.CREATE_STOCK -->
+            <a [routerLink]="['/', ROUTER_TOKENS.CREATE_STOCK]">
+
+            <!-- Ao invés de utilizar o "routerLink" como atributo acima, podemos utilizar ele de forma estática como abaixo -->
+            <!-- <a routerLink="/{{ROUTER_TOKENS.CREATE_STOCK}}"> -->
+
+                <div class="card">
+                    <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg" class="card-img-top"
+                        style="width: 100%; height: auto;">
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{stockItem.name}}</h5>
+                        <p class="card-text">
+                            R$ {{stockItem.price}} <br>
+                            {{ stockItem.exchange}}
+                        </p>
+                    </div>
+                </div>
+            </a>
+
+    . Para dar destaque ao link atualmente em uso podemos fazer uso do atributo "routerLinkActive".
+
+        . O atributo routerLinkActive é uma diretiva do Angular que é usada para adicionar uma classe CSS a um elemento quando o link 
+            associado à rota é ativo.
+
+        . Quando você adiciona o atributo routerLinkActive a um elemento, o Angular verifica se o link associado à rota é ativo. Se for, 
+            adiciona a classe CSS especificada no atributo ao elemento. Por exemplo:    
+
+            <a routerLink="/admin" routerLinkActive="active-link">Ir para admin</a>
+                                                          |
+                                                          V
+                                        Especifica a classe CSS que será adicionada ao elemento quando 
+                                        o link é ativo.
+
+    . Demo
+
+        . Insira as linhas abaixo no arquivo "app.component.css":
+
+            .active-link {
+                font-size: 16px;
+                font-weight: 800;
+                text-shadow: 3px 3px 3px #000;
+            }
+
+            .active-link-li {
+                background-color: rgb( 222,222,222);
+            }
+
+        . Altere as linhas abaixo no arquivo "app.component.html":
+
+            <div>                                                    <!-- atributo routerLinkActive inserido -->
+                <span><a [routerLink]="['/', ROUTER_TOKENS.STOCK_ITEM]"  routerLinkActive="active-link">Stock Item</a></span>&nbsp;&nbsp;
+
+                                                                     <!-- atributo routerLinkActive inserido -->
+                <span><a [routerLink]="['/', ROUTER_TOKENS.CREATE_STOCK]" routerLinkActive="active-link">Create Stock</a></span>&nbsp;&nbsp;
+            </div>
+
+            <router-outlet></router-outlet>
+
+        . Verifique como ficou os links da página inicial após clicar num deles.
+
+        
 
 
 PAGINA 302
-
 
 
 
