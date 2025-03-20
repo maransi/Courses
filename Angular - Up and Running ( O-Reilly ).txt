@@ -6287,7 +6287,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             ...
 
             onInitStock() {
-                this.stock = new Stock('', '', '', 0, 0, '');
+                this.stock = new Stock('', '', 0, 0, '');
 
                 // Insira as linhas abaixo
                 this.http.get('/api/stock/stocks/')
@@ -6303,8 +6303,9 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
             ...
 
-        . Levante a aplicação e veja se está aparencendo todos os cards definido pelo arquivo "db.json":
+        . Levante a aplicação, acesse o link do stock-item e veja se está aparencendo todos os cards definido pelo arquivo "db.json":
 
+            npx json-server db.json
             ng s -o
 
     . Navegação entre links:
@@ -6458,6 +6459,10 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
                     </div>
                 </div>
             </a>
+
+        . Levante o projeto e veja se a página "create-stock.component" está sendo chamada ao clicar num dos cards apresentados.
+
+            ng s -o
 
     . Para dar destaque ao link atualmente em uso podemos fazer uso do atributo "routerLinkActive".
 
