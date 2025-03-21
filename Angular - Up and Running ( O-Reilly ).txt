@@ -6505,6 +6505,122 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
         . Verifique como ficou os links da página inicial após clicar num deles.
 
+
+    . Trabalhando com parâmetros nas rotas
+
+        . Trabalhar com parâmetros nas rotas no Angular é uma forma de passar dados 
+            adicionais para uma rota específica. Isso pode ser útil para criar rotas 
+            dinâmicas que dependem de dados específicos.
+
+        . Existem dois tipos de parâmetros que podem ser usados nas rotas do Angular:
+
+            . Parâmetros de rota: são parâmetros que são passados como parte da URL da rota.
+
+            . Parâmetros de consulta: são parâmetros que são passados como parte da string de 
+                consulta da URL.
+
+        . Parâmetros de rotas:
+
+            // app.routing.modules.ts
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+            import { HomeComponent } from './home/home.component';
+            import { DetalheComponent } from './detalhe/detalhe.component';
+            
+            const routes: Routes = [
+              { path: '', component: HomeComponent },
+              { path: 'detalhe/:id', component: DetalheComponent }  
+            ];        |-----------|
+                            |
+            @NgModule({     +---------------------------------------+                                               
+              imports: [RouterModule.forRoot(routes)],              |
+              exports: [RouterModule]                               |
+            })                                                      |
+            export class AppRoutingModule { }                       |
+                                                                    |
+                                                                    V
+                            
+                                        A rota /detalhe/:id tem um parâmetro de rota chamado id. 
+                                        O símbolo : é usado para indicar que o parâmetro é obrigatório.
+
+                                        Para acessar o valor do parâmetro de rota, você pode usar o 
+                                        serviço ActivatedRoute do Angular. 
+
+                                                                    |
+                                                                    |
+            import { Component, OnInit } from '@angular/core';      |
+            import { ActivatedRoute } from '@angular/router';       |
+                                                                    |
+            @Component({                                            |
+              selector: 'app-detalhe',                              |
+              template: '<p>Detalhe do item {{ id }}</p>'           |
+            })                                                      |
+            export class DetalheComponent implements OnInit {       |
+              id: string;                       +-------------------+
+                                                |
+                                                V
+              constructor(private route: ActivatedRoute) { }
+                                    |
+              ngOnInit(): void {    V
+                this.id =    this.route.snapshot.paramMap.get('id');
+              }                                 |--------|
+            }
+
+        . Parâmetros de consultas:
+
+            // app-routing.modules.ts
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+            import { HomeComponent } from './home/home.component';
+            import { DetalheComponent } from './detalhe/detalhe.component';
+            
+            const routes: Routes = [
+              { path: '', component: HomeComponent },
+              { path: 'detalhe', component: DetalheComponent }
+            ];             |
+                           +----------------------------------------+
+            @NgModule({                                             |
+              imports: [RouterModule.forRoot(routes)],              |
+              exports: [RouterModule]                               |
+            })                                                      |
+            export class AppRoutingModule { }                       |
+                                                                    |
+                                                                    V
+ 
+                                            a rota /detalhe não tem parâmetros de rota. Em vez disso, 
+                                            você pode passar parâmetros de consulta usando a string 
+                                            de consulta da URL.
+                                            
+                                            Para acessar o valor dos parâmetros de consulta, você pode 
+                                            usar o serviço ActivatedRoute do Angular
+
+                                                                    |
+                                                                    |
+            import { Component, OnInit } from '@angular/core';      |
+            import { ActivatedRoute } from '@angular/router';       |
+                                                                    |
+            @Component({                                            |
+              selector: 'app-detalhe',                              |
+              template: '<p>Detalhe do item {{ id }}</p>'           |
+            })                                                      |
+            export class DetalheComponent implements OnInit {       |
+              id: string;                       +-------------------+
+                                                |
+                                                V
+              constructor(private route: ActivatedRoute) { }
+                                    |
+              ngOnInit(): void {    V
+                this.id =   this.route.snapshot.queryParamMap.get('id');
+              }                                 |-----------|
+            }
+
+
+
+
+
+
+
+
         
 05. User Navigation between views   13:00
 
