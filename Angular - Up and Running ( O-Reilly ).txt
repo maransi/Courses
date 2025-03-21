@@ -6290,7 +6290,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
                 this.stock = new Stock('', '', 0, 0, '');
 
                 // Insira as linhas abaixo
-                this.http.get('/api/stock/stocks/')
+                this.http.get('http://localhost:3000/stocks')
                     .subscribe(resposta => {
                         console.log(resposta);
                         this.response = resposta;
@@ -6518,8 +6518,12 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
             . Parâmetros de consulta: são parâmetros que são passados como parte da string de 
                 consulta da URL.
-
+        
         . Parâmetros de rotas:
+
+            // Exemplo de URL com parâmetro de rota
+            http://example.com/detalhe/123
+
 
             // app.routing.modules.ts
             import { NgModule } from '@angular/core';
@@ -6566,7 +6570,20 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
               }                                 |--------|
             }
 
+
+            // Exemplo de uma tag do link no componente no html chamador
+            <a [routerLink]="['/detalhe', 123]">
+                {{ produto.nome }}
+            </a>
+
+
+
+
         . Parâmetros de consultas:
+
+            // Exemplo de URL com parâmetro de consulta
+            http://example.com/detalhe?id=123
+
 
             // app-routing.modules.ts
             import { NgModule } from '@angular/core';
@@ -6615,11 +6632,161 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             }
 
 
+            // Exemplo de uma tag do link no componente no html chamador
+            <a [routerLink]="['/detalhe']" [queryParams]="{ id: 123, nome: 'Produto X' }">
+                {{ produto.nome }}
+            </a>
+
+    . Demo
+
+        . Trabalhando com Parâmetros de consulta:
+
+            . Realize as alterações abaixo no arquivo "create-stock.component.ts"
+
+                import { HttpClient } from '@angular/common/http';                          // Linha inserida
+                import { Component, EventEmitter, OnInit, Output } from '@angular/core';    // Linha alterada
+                import { ActivatedRoute } from '@angular/router';
+                import { Stock } from 'src/app/model/stock';
+
+                @Component({
+                    selector: 'app-create-stock',
+                    templateUrl: './create-stock.component.html',
+                    styleUrls: ['./create-stock.component.css']
+                })
+                export class CreateStockComponent implements OnInit {                       // Linha alterada
+                    public stock!: Stock;
+                    public confirmed!: boolean;
+                    
+                    private code?: string | null;                                           // Linha inserida
+
+                    public response: any;                                                 // Linha inserifda
+
+                    @Output()
+                    public eventoEmitido = new EventEmitter<Stock>();
+
+                    constructor( private route: ActivatedRoute, private http: HttpCliente) {  // Linha alterada
+                        this.stock = new Stock('', '', 0, 0, 'NASDAQ');
+                    }
+
+                    // Método inserido
+                    ngOnInit(): void {    
+                        this.code =   this.route.snapshot.queryParamMap.get('code') || '';  
+
+                        this.stock.code = this.code;  
+
+                        this.onQueryProduct();                                      
+                    }                                 
+
+                    onQueryProduct() {                                                  // Método inserido
+                        this.http.get('http://localhost:3000/stocks/' + this.stock.code)
+                        .subscribe(resposta => {
+                            console.log(resposta);
+                            this.response = resposta;
+                            this.stock.code = this.response.code;
+                            this.stock.name = this.response.name;
+                            this.stock.price = this.response.price;
+                            this.stock.previousPrice = this.response.previousPrice;
+                            this.stock.exchange = this.response.exchange;
+                        });
+                    }
+
+                    ...                 
+                }
+
+            . Realize a alteração abaixo no arquivo "stock-cad.component.html":
+
+                <!-- Tag abaixo alterada -->
+                <a [routerLink]="['/', ROUTER_TOKENS.CREATE_STOCK]" [queryParams]="{code: stockItem.code}">
+                    <div class="card">
+                        <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg" class="card-img-top"
+                            style="width: 100%; height: auto;">
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{stockItem.name}}</h5>
+                            <p class="card-text">
+                                R$ {{stockItem.price}} <br>
+                                {{ stockItem.exchange}}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+
+            . Levante o projeto, verifique se os links dos boxes de produtos estão saindo com o link "http://localhost:4200/create-stock?code=.." e
+                se ao abrir a página do componente "create-stock.component" está sendo identificado o código do produto do link
+                acionado.
+
+                npx json-server db.json
+
+                ng s -o
+
+        . Trabalhando com Parâmetros de rotas
+
+            . Insira a linha abaixo no arquivo "app-routing.component.ts"
 
 
+                import { NgModule } from '@angular/core';
+                import { RouterModule, Routes } from '@angular/router';
+                import { StockItemComponent } from './stock/stock-item/stock-item.component';
+                import { CreateStockComponent } from './stock/create-stock/create-stock.component';
 
+                // Objeto inserido
+                export enum ROUTER_TOKENS {
+                    STOCK_ITEM = 'stock-item',
+                    CREATE_STOCK = 'create-stock'
+                }
 
+                // Objeto inserido
+                const routes: Routes = [
+                    { path: ROUTER_TOKENS.STOCK_ITEM, component: StockItemComponent },
+                    { path: ROUTER_TOKENS.CREATE_STOCK, component: CreateStockComponent},
+                    { path: 'create-stock/:code', component: CreateStockComponent },        // Linha inserida
+                    { path: '', redirectTo: '/stock-item', pathMatch: 'full' },       
+                    { path: '**', redirectTo: '/stock-item', pathMatch: 'full' }      
 
+                ];
+
+                @NgModule({
+                    imports: [RouterModule.forRoot(routes)],
+                    exports: [RouterModule]
+                })
+                export class AppRoutingModule { }
+
+            . Altere a linha abaixo no arquivo "create-stock.component.ts":
+
+                ngOnInit(): void {    
+                    this.code =   this.route.snapshot.paramMap.get('code') || '';     // Linha alterada trocado para "...paramMap"
+
+                    this.stock.code = this.code;
+                    
+                    this.onQueryProduct();
+                }    
+
+            . Altere a linha abaixo no arquivo "stock-card.component.html":
+
+                <-- Tag abaixo alterada -->
+                <a [routerLink]="['/', ROUTER_TOKENS.CREATE_STOCK, stockItem.code]"> 
+
+                    <div class="card">
+                        <img src="https://randomuser.me/api/portraits/women/{{stockItem.code}}.jpg" class="card-img-top"
+                            style="width: 100%; height: auto;">
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{stockItem.name}}</h5>
+                            <p class="card-text">
+                                R$ {{stockItem.price}} <br>
+                                {{ stockItem.exchange}}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+
+            . Levante o projeto, verifique se os links dos boxes de produtos estão saindo com o link "http://localhost:4200/create-stock?code=.." e
+                se ao abrir a página do componente "create-stock.component" está sendo identificado o código do produto do link
+                acionado.
+
+                npx json-server db.json
+
+                ng s -o
 
         
 05. User Navigation between views   13:00
