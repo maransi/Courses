@@ -1972,7 +1972,7 @@ https://www.youtube.com/watch?v=RKYCRsa5WRM&list=PL7yxJa4Na-ipxalMfzYWdj4HMzOvzO
                         </div>
 
                         <div class="row" style="padding: 10px;">
-                            <div class="col-2">
+                            <div class="col-1">
                                 <button [disabled]="!confirmed" class="btn btn-primary" type="submit">Create</button>
                             </div>
                         </div>
@@ -2861,7 +2861,7 @@ https://www.youtube.com/watch?v=RKYCRsa5WRM&list=PL7yxJa4Na-ipxalMfzYWdj4HMzOvzO
 
                         <!-- Tag alterada - alterado o método (click) -->
                         <div class="row" style="padding: 10px;">
-                            <div class="col-2">
+                            <div class="col-1">
                                 <button [disabled]="!confirmed" 
                                         (click)="emitirEvento(stock)"
                                         class="btn btn-primary" 
@@ -6788,10 +6788,128 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
                 ng s -o
 
-        
-05. User Navigation between views   13:00
+    . Navegando entre rotas
 
-PAGINA 302
+        . A classe "Router" contêm um método para navegação entre as rotas da aplicação "Router.navigate"
+
+            . Assinatura:
+                
+                navigate(commands: any[], extras?: NavigationExtras): Promise<boolean>
+
+            . Parâmetros
+
+                . commands: é um array de comandos de navegação. Cada comando pode ser uma string (nome da rota) ou 
+                    um objeto com propriedades específicas (ver abaixo).
+
+                . extras: é um objeto opcional que contém informações adicionais sobre a navegação, como parâmetros de 
+                    consulta ou uma URL completa.
+
+            . Sintaxe
+
+                this.router.navigate(commands, extras);
+
+        . Exemplos:
+
+            . Navegação simples para uma rota absoluta:
+
+                import { Router } from '@angular/router';
+
+                constructor(private router: Router) {}
+
+                navegarParaHome() {
+                    this.router.navigate(['/home']);
+                }
+
+
+            . Navegação com parâmetros de rota
+
+                // Definição da rota
+                { path: 'produto/:id', component: ProdutoComponent }
+
+                // Navegação
+                this.router.navigate(['/produto', 123]); // Navega para '/produto/123'
+
+                // Rota criada
+                /produto/123
+
+            . Passando parâmetros de consulta (Query Params)
+
+                this.router.navigate(['/produtos'], { queryParams: { categoria: 'eletronicos', ordenacao: 'preco' } });
+
+                // Rota criada
+                /produtos?categoria=eletronicos&ordenacao=preco
+
+            . Usando Fragmentos (Anchors)
+
+                // Para navegar para uma seção específica de uma página
+                this.router.navigate(['/sobre'], { fragment: 'contato' });
+
+                // Rota criada
+                /sobre#contato
+
+            . Navegação relativa
+
+                // Se quiser navegar com base na rota atual
+                import { ActivatedRoute } from '@angular/router';
+
+                constructor(private router: Router, private route: ActivatedRoute) {}
+
+                irParaDetalhes() {
+                    this.router.navigate(['detalhes'], { relativeTo: this.route });
+                }
+
+                // Isso funciona quando a rota atual é, por exemplo, /produtos, e queremos ir para /produtos/detalhes
+
+    . Demo
+
+        . Altere as linha do componente "create-stock.component.ts":
+
+            import { HttpClient } from '@angular/common/http';
+            import { Component, EventEmitter, OnInit, Output } from '@angular/core';    
+            import { ActivatedRoute, Router } from '@angular/router';                   // Linha alterada
+            import { Stock } from 'src/app/model/stock';
+            import { ROUTER_TOKENS } from 'src/app/app-routing.module';
+
+            ...
+
+            // Assinatura do método alterado -----------------------+
+            //                                                      | Inserido
+            //                                                      V
+            constructor( private route: ActivatedRoute, private router: Router, private http: HttpClient) {                           // Linha alterada
+                this.stock = new Stock('', '', 0, 0, 'NASDAQ');
+            }
+
+            ...
+
+            // Método inserido
+            voltar( event: any ){
+                this.router.navigate([ROUTER_TOKENS.STOCK_ITEM]);
+            }
+
+
+        . Inclua a linha abaixo no componente "create-stock.component.html":
+
+            ...
+            <div class="row" style="padding: 10px;">
+                <div class="col-1">
+                    <button [disabled]="!confirmed" 
+                            (click)="emitirEvento(stock)"
+                            class="btn btn-primary" 
+                            type="submit">
+                        Create
+                    </button>
+                </div>
+                <!--  -->
+                <div class="col-1">
+                    <button class="btn btn-primary" 
+                            (click)="Voltar($event)">
+                        Voltar
+                    </button>
+                </div>
+            </div>
+            ...
+        
+PAGINA 314
 
 
 
