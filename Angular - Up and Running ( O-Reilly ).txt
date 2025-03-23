@@ -6187,7 +6187,6 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
         . Verifique o menu acima se está funcionando na página
 
-
     . Rotas Curingas e Padrões (Wildcards and Default)
 
         . Wildcards são usados em rotas do Angular para lidar com situações em que a rota não é exatamente igual à rota 
@@ -6349,7 +6348,6 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             . Use a navegação por atributo quando você precisa criar um link de navegação mais complexo, como um link 
                 com parâmetros ou um link que depende de condições.
 
-
     . Demo
 
         . Faça as alterações abaixo no arquivo app.component.html:
@@ -6504,7 +6502,6 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             <router-outlet></router-outlet>
 
         . Verifique como ficou os links da página inicial após clicar num deles.
-
 
     . Trabalhando com parâmetros nas rotas
 
@@ -6908,7 +6905,151 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
                 </div>
             </div>
             ...
-        
+
+    . Guarda de rotas
+
+        . São funções que permitem ou impedem a navegação entre rotas com base em condições específicas. Elas 
+            são executadas antes de a rota ser ativada e podem ser usadas para realizar tarefas como:
+
+            . Autenticação: verificar se o usuário está logado antes de permitir a navegação para uma rota protegida.
+
+            . Autorização: verificar se o usuário tem permissão para acessar uma rota específica.
+
+            . Validação: verificar se os dados necessários para a rota estão disponíveis ou são válidos.
+
+            . Redirecionamento: redirecionar o usuário para uma rota diferente com base em condições específicas.
+
+        . Existem cinco tipos de guardas de rotas no Angular:
+
+            . CanActivate: Verifica se a rota pode ser ativada. Se retornar false, a navegação é cancelada.
+
+            . CanActivateChild: Verifica se as rotas filhas podem ser ativadas. Se retornar false, a navegação é cancelada.
+
+            . CanDeactivate: Verifica se a rota atual pode ser desativada. Se retornar false, a navegação é cancelada.
+
+            . CanLoad: Verifica se o módulo pode ser carregado. Se retornar false, o módulo não é carregado.
+
+            . Resolve: Resolve os dados necessários para a rota antes de ativar a rota.
+
+        . Exemplo para criação e configuração de guarda de rota:
+
+            . Criação do componente "ProtectedComponent":
+
+                ng generate component protected
+
+            . Criação do serviço de autenticação "auth.service.ts" :
+
+                ng generate service auth
+
+            . Exemplo de um componente de serviço de autenticação "auth.service.ts", criado pelo comando acima:
+
+                import { Injectable } from '@angular/core';
+                
+                @Injectable({
+                  providedIn: 'root'
+                })
+                export class AuthService {
+                  isLoggedIn = false;
+                
+                  login() {
+                    this.isLoggedIn = true;
+                  }
+                
+                  logout() {
+                    this.isLoggedIn = false;
+                  }
+                }
+
+            . Criação da guarda da rota "auth.guard.ts"
+
+                ng generate guard auth
+
+            . Exemplo do componente de guarda de rota criado no passo anterior "auth.guard.ts":
+
+                import { Injectable } from '@angular/core';
+                import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+                import { AuthService } from './auth.service';
+                
+                @Injectable({
+                  providedIn: 'root'
+                })
+                export class AuthGuard implements CanActivate {
+                  constructor(private authService: AuthService) { }
+                
+                  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+                    if (this.authService.isLoggedIn) {
+                      return true;
+                    } else {
+                      return false;
+                    }
+                  }
+                }
+
+            . Configuração da proteção da rota no arquivo "app-routing.module.ts":
+
+                import { NgModule } from '@angular/core';
+                import { RouterModule, Routes } from '@angular/router';
+                import { ProtectedComponent } from './protected/protected.component';
+                import { AuthGuard } from './auth.guard';
+                
+                const routes: Routes = [
+                  {
+                    path: 'protected',
+                    component: ProtectedComponent,
+                    canActivate: [AuthGuard]
+                  }
+                ];
+                
+                @NgModule({
+                  imports: [RouterModule.forRoot(routes)],
+                  exports: [RouterModule]
+                })
+                export class AppRoutingModule { }
+
+            . Teste da rota
+
+                ng s -o
+
+                # Acione o rota abaixo e veja se está disponível
+                https://localhost.com:[porta]/protected
+
+
+            . Controle de autenticação no componente "app.component.ts":
+
+                import { Component } from '@angular/core';
+                import { AuthService } from './auth.service';
+                
+                @Component({
+                  selector: 'app-root',
+                  template: `
+                    <button (click)="login()">Login</button>
+                    <button (click)="logout()">Logout</button>
+                    <router-outlet></router-outlet>
+                  `
+                })
+                export class AppComponent {
+                  constructor(private authService: AuthService) { }
+                
+                  login() {
+                    this.authService.login();
+                  }
+                
+                  logout() {
+                    this.authService.logout();
+                  }
+                }
+
+            . Execute o login e teste a rota abaixo:
+
+                https://localhost.com:[porta]/protected
+
+    . Demo                
+
+
+
+
+
+
 PAGINA 314
 
 
