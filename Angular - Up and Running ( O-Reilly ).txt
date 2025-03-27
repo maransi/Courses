@@ -6962,7 +6962,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
             . Criação da guarda da rota "auth.guard.ts"
 
-                ng generate guard auth
+                ng generate guard guards/auth
 
             . Exemplo do componente de guarda de rota criado no passo anterior "auth.guard.ts":
 
@@ -7045,10 +7045,388 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
     . Demo                
 
+        . Execute os comandos abaixo na raiz do projeto:
+
+            ng generate class model/user --skip-tests
+
+            ng g s services/user --skip-tests 
+
+            ng generate component pages/login --skip-tests
+
+        . Insira as linhas abaixo no arquivo "db.json":
+
+            {
+                "stocks": [
+                    ...
+                ],
+                // Linhas inseridas abaixo
+                "users": [
+                    {
+                    "id": "admin",
+                    "username": "admin",
+                    "password": "admin",
+                    "role": "admin"
+                    },
+                    {
+                    "id": "user",
+                    "username": "user",
+                    "password": "user",
+                    "role": "user"
+                    },
+                    {
+                    "id": "guest",
+                    "username": "guest",
+                    "password": "guest",
+                    "role": "guest"
+                    }
+                ]
+            }        
+
+        . Acesse o componente "user.ts" e atualize pelo código abaixo:
+
+            export class User {
+                private authenticated: boolean = false;
+
+                constructor(public username: string,
+                            public password: string) { }
+
+                isAuthenticated(): boolean {
+                    return this.authenticated;
+                }
+            }
+
+        . Acesse o componente "user.service.ts" e atualize com o código abaixo:
+
+            import { Injectable } from '@angular/core';
+            import { User } from '../model/user';
+            import { HttpClient } from '@angular/common/http';
+
+            @Injectable({
+                providedIn: 'root'
+            })
+
+            export class UserService {
+                private apiUrl = 'http://localhost:3000/users';
+
+                public user: User = new User('', '');
+
+                constructor( private http: HttpClient) { }
+
+                getUsuario(userName: string) {
+                    return this.http.get<User>(`${this.apiUrl}/${userName}`);
+                }
+            }
+
+        . Acesse o componente "login.component.css" e atualize pelo código abaixo:
+
+            label {
+                font-weight: bold;
+            }
+
+            .error {
+                color: red;
+            }
+
+        . Acesse o componente "login.component.html" e atualize pelo código abaixo:
+
+            <div class="d-flex justify-content-center align-items-center vh-100">
+                <div class="card" style="width: 28rem;">
+                    <div class="card-header">
+                        <b>Autenticação</b>
+                    </div>
+                    <div class="card-body">
+                        <form width="100%" (ngSubmit)="onSubmit()"> 
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="Login" class="col-form-label font-weight-bold">Login</label>
+                                        <input type="text"
+                                            name="login"
+                                            id="login"
+                                            width="60%"
+                                            maxLength="50"
+                                            class="form-control form-control-sm"
+                                            placeholder="email@email.com"
+                                            [(ngModel)]="userLogin.username" >
+                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 mt-3">
+                                        <label for="Senha" class="col-form-label font-weight-bold">Senha</label>
+                                        <input type="password"
+                                            name="senha"
+                                            id="senha"
+                                            width="60%"
+                                            maxLength="30"
+                                            [(ngModel)]="userLogin.password"
+                                            class="form-control form-control-sm"
+                                            placeholder="xYmiT1!#q.">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2 mt-3">
+                                        <button type="submit" class="btn btn-primary">Enviar</button>
+                                    </div>
+                                    <div class="col-2 mt-3 ml-3">
+                                        <a href="#" class="btn btn-primary">Registrar</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <p *ngIf="loginResult" class="error">{{ loginResult }}</p>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        . Acesse o componente "login.component.ts" e atualize com as linhas abaixo:
+
+            import { HttpErrorResponse } from '@angular/common/http';
+            import { Component, OnInit } from '@angular/core';
+            import { Router } from '@angular/router';
+            import { catchError, throwError } from 'rxjs';
+            import { User } from 'src/app/model/user';
+            import { UserService } from 'src/app/services/user.service';
+
+            @Component({
+                selector: 'app-login',
+                templateUrl: './login.component.html',
+                styleUrls: ['./login.component.css']
+            })
+
+            export class LoginComponent implements OnInit {
+                public userLogin!: User; //  = new User('', '');
+                public loginResult: string = '';
+
+                constructor(public userService: UserService, private router: Router)  {
+                    
+                } 
+
+                    ngOnInit(): void {
+                    this.userLogin = new User('', '');
+                    }
+
+                onSubmit() {
+                    this.login(this.userLogin.username);
+                }
+
+                login(userName: string): boolean {
+
+                    this.userService.getUsuario(userName)
+                    .subscribe(
+                    response => {
+                        console.log('Resposta 200:', response);
+
+                        this.userLogin.authenticated = this.userLogin.password === response.password;
+
+                        if ( ! this.userLogin.authenticated ) {
+                        
+                        this.userLogin.password = '';
+                        
+                        this.loginResult = 'Login ou senha inválidos';
+                        
+                        this.router.navigate(['/login']);
+                        
+                        return false;
+                        }
+
+                        localStorage.setItem('token', 'meu-token-falso');
+
+                        this.userService.user = this.userLogin;
+                        
+                        this.router.navigate(['/stock-item']);
+
+                        return true;        
+                    },
+                    error => {
+                        console.error('Erro na requisição:', error);
+
+                        if (error.status == 401 || error.status == 404) {
+                            this.loginResult = 'Login ou senha inválidos';
+                        } else {
+                            this.loginResult = error.statusText;
+                        }
+
+                        this.userLogin.authenticated = false;
+
+                        this.router.navigate(['/login']);
+
+                    }
+                    );
+
+                    return this.userLogin.authenticated;
+                }
+
+            }
+
+        . Execute o projeto e verifique se o login está funcionando corretamente
+
+            npx json-server db.json
+
+            ng s -o
+
+        . Execute o comando abaixo na raiz do projeto
+
+            ng generate guard guards/auth --skip-tests
+           
+        . Acesse o componente "auth.guard.ts" e atualize pelo código abaixo:
+
+            import { Injectable } from '@angular/core';
+            import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree } from '@angular/router';
+            import { Observable } from 'rxjs';
+            import { UserService } from '../services/user.service';
+
+            @Injectable({
+                providedIn: 'root'
+            })
+            export class AuthGuard implements CanActivate {
+
+                private constructor( private userService: UserService) { }
+                canActivate(
+                    route: ActivatedRouteSnapshot,
+                    state: RouterStateSnapshot):  boolean  {
+
+                    if (! this.userService.user.isAuthenticated()) {
+                        this.router.navigate(['/login']);
+                    }
+
+                    return this.userService.user.isAuthenticated();
+                }
+            
+            }
+
+
+        . Acesse o componente "app-routing.modules.ts" e faça as alterações abaixo:
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+            import { StockItemComponent } from './stock/stock-item/stock-item.component';
+            import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+            import { LoginComponent } from './pages/login/login.component';
+            import { AuthGuard } from './guards/auth.guard';                                                  // Linha inserida
+
+            export enum ROUTER_TOKENS {
+                STOCK_ITEM = 'stock-item',
+                CREATE_STOCK = 'create-stock'
+            }
+
+            const routes: Routes = [
+                { path: ROUTER_TOKENS.STOCK_ITEM, component: StockItemComponent, canActivate: [AuthGuard] },    // linha alterada
+                { path: ROUTER_TOKENS.CREATE_STOCK, component: CreateStockComponent, canActivate: [AuthGuard]}, // Linha alterada
+                { path: 'create-stock/:code', component: CreateStockComponent, canActivate: [AuthGuard]},       // Linha alterada
+                { path: 'login', component: LoginComponent },                                 
+                { path: '', redirectTo: '/login', pathMatch: 'full' },       
+                { path: '**', redirectTo: '/login', pathMatch: 'full' }       
+            ];
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+
+            export class AppRoutingModule { }
+
+        . Acesse o componente "app.component.ts" e insira o código abaixo:
+
+            import { Injectable, OnInit } from '@angular/core';
+            import { User } from '../model/user';
+            import { HttpClient } from '@angular/common/http';
+
+            @Injectable({
+                providedIn: 'root'
+            })
+            export class UserService{
+                private apiUrl = 'http://localhost:3000/users';
+
+                public user: User = new User('', '');
+
+
+                // Assinatura do construtor alterado
+                constructor( private http: HttpClient, private router: Router) { }
+
+
+                getUsuario(userName: string) {
+                    return this.http.get<User>(`${this.apiUrl}/${userName}`);
+                }
+
+                // Método inserido
+                logout(){
+                    this.user.authenticated = false;
+                    localStorage.removeItem('token');
+                    this.router.navigate(['/login']);
+
+                }
+            }
 
 
 
+        . Acesse o componente "app.component.ts" e realize as alterações abaixo:
 
+            import { ROUTER_TOKENS } from './app-routing.module';       
+
+            import {
+                Component, SimpleChanges, OnInit, OnChanges, OnDestroy,
+                DoCheck, AfterViewChecked, AfterViewInit,
+                AfterContentChecked,
+                AfterContentInit
+            } from '@angular/core';
+            import { Stock } from './model/stock';
+            import { UserService } from './services/user.service';      // Linha inserida
+
+
+            @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.css']
+            })
+
+            export class AppComponent implements OnInit{
+
+                ...
+
+                // Assinatura do construtor alterado
+                constructor(public userService: UserService) {                        // Linha alterada
+                    this.stock = new Stock('Test Stock Company', 'TSC', 85, 80, '');
+                    this.onToggleFavorite();
+                }
+
+                ... 
+
+                // Método inserido
+                logout() {
+                    this.userService.logout();
+                }
+
+            }
+
+        . Acesse o componente "app.component.html" e realize as alterações abaixo:
+
+            <!-- Tag div alterada, inclusão do "*ngIf" -->
+            <div *ngIf="userService.user.authenticated">
+                <span><a [routerLink]="['/', ROUTER_TOKENS.STOCK_ITEM]">Stock Item</a></span>&nbsp;&nbsp;
+                
+                <span><a [routerLink]="['/', ROUTER_TOKENS.CREATE_STOCK]">Create Stock</a></span>&nbsp;&nbsp;
+
+                <!-- Tag abaixo inserida -->
+                <span><a routerLink="#" (click)="logout()">Logout</a></span>&nbsp;&nbsp;
+            </div>
+
+            <router-outlet></router-outlet>
+
+        . Execute o projeto e verifique se as rotas "stock-item" e "create-stock" estão funcionando sem o login
+
+            npx json-server db.json
+
+            ng s -o
+
+
+2022-ASP.NET Core 6 and Angular ASP.NET 6 - Página 536
+
+# Child routes
+Web Development with Angular and Bootstrap - 3rd ed. - 2019 - Packt - Págnina 148
 
 PAGINA 314
 
