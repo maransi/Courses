@@ -6180,7 +6180,6 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             <div>
                 <span><a href="/stock-item">Stock Item</a></span>&nbsp;&nbsp;
                 <span><a href="/create-stock">Create Stock</a></span>&nbsp;&nbsp;
-                <span><a href="/create-product-item">Create Product Item</a></span>
             </div>
 
             <router-outlet></router-outlet>
@@ -6642,7 +6641,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
                 import { HttpClient } from '@angular/common/http';                          // Linha inserida
                 import { Component, EventEmitter, OnInit, Output } from '@angular/core';    // Linha alterada
-                import { ActivatedRoute } from '@angular/router';
+                import { ActivatedRoute } from '@angular/router';                           // Linha inserida
                 import { Stock } from 'src/app/model/stock';
 
                 @Component({
@@ -6865,24 +6864,34 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             import { Component, EventEmitter, OnInit, Output } from '@angular/core';    
             import { ActivatedRoute, Router } from '@angular/router';                   // Linha alterada
             import { Stock } from 'src/app/model/stock';
-            import { ROUTER_TOKENS } from 'src/app/app-routing.module';
+            import { ROUTER_TOKENS } from 'src/app/app-routing.module';                 // Linha inserida
 
             ...
+            export class CreateStockComponent implements OnInit {
+                public stock!: Stock;
+                public confirmed!: boolean;
+                private code?: string | null;                                          
 
-            // Assinatura do método alterado -----------------------+
-            //                                                      | Inserido
-            //                                                      V
-            constructor( private route: ActivatedRoute, private router: Router, private http: HttpClient) {                           // Linha alterada
-                this.stock = new Stock('', '', 0, 0, 'NASDAQ');
+                public response: any;                                                 
+
+                readonly ROUTER_TOKENS = ROUTER_TOKENS;                                 // Linha inserida
+
+                ...
+                // Assinatura do método alterado -----------------------+
+                //                                                      | Inserido
+                //                                                      V
+                constructor( private route: ActivatedRoute, private router: Router, private http: HttpClient) {                           // Linha alterada
+                    this.stock = new Stock('', '', 0, 0, 'NASDAQ');
+                }
+
+                ...
+
+                // Método inserido
+                voltar( event: any ){
+                    this.router.navigate([ROUTER_TOKENS.STOCK_ITEM]);
+                }
+                ...
             }
-
-            ...
-
-            // Método inserido
-            voltar( event: any ){
-                this.router.navigate([ROUTER_TOKENS.STOCK_ITEM]);
-            }
-
 
         . Inclua a linha abaixo no componente "create-stock.component.html":
 
@@ -6896,15 +6905,23 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
                         Create
                     </button>
                 </div>
-                <!--  -->
+
+                <!-- Tag Inserida -->
                 <div class="col-1">
                     <button class="btn btn-primary" 
-                            (click)="Voltar($event)">
+                            (click)="voltar($event)">
                         Voltar
                     </button>
                 </div>
             </div>
             ...
+
+        . Levante a aplicação e verifique se o botão de "Voltar" da tela "create-stock.component.html" está funcionando:
+
+            npx json-server db.json
+
+            ng s -o
+
 
     . Guarda de rotas
 
@@ -7062,22 +7079,22 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
                 // Linhas inseridas abaixo
                 "users": [
                     {
-                    "id": "admin",
-                    "username": "admin",
-                    "password": "admin",
-                    "role": "admin"
+                        "id": "admin",
+                        "username": "admin",
+                        "password": "admin",
+                        "role": "admin"
                     },
                     {
-                    "id": "user",
-                    "username": "user",
-                    "password": "user",
-                    "role": "user"
+                        "id": "user",
+                        "username": "user",
+                        "password": "user",
+                        "role": "user"
                     },
                     {
-                    "id": "guest",
-                    "username": "guest",
-                    "password": "guest",
-                    "role": "guest"
+                        "id": "guest",
+                        "username": "guest",
+                        "password": "guest",
+                        "role": "guest"
                     }
                 ]
             }        
@@ -7085,7 +7102,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
         . Acesse o componente "user.ts" e atualize pelo código abaixo:
 
             export class User {
-                private authenticated: boolean = false;
+                public authenticated: boolean = false;
 
                 constructor(public username: string,
                             public password: string) { }
@@ -7150,6 +7167,36 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             },
             ...
 
+        . Insira as linhas abaixo no componente "app-routing.component.ts":
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+            import { StockItemComponent } from './stock/stock-item/stock-item.component';
+            import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+            import { LoginComponent } from './pages/login/login.component';           // Linha inserida  
+
+            export enum ROUTER_TOKENS {
+                STOCK_ITEM = 'stock-item',
+                CREATE_STOCK = 'create-stock'
+            }
+
+            // Objeto inserido
+            const routes: Routes = [
+                { path: ROUTER_TOKENS.STOCK_ITEM, component: StockItemComponent },    
+                { path: ROUTER_TOKENS.CREATE_STOCK, component: CreateStockComponent }, 
+                { path: 'create-stock/:code', component: CreateStockComponent },       
+                { path: 'login', component: LoginComponent },                       // Linha inserida                         
+                { path: '', redirectTo: '/login', pathMatch: 'full' },              // Linha inserida
+                { path: '**', redirectTo: '/login', pathMatch: 'full' }             // Linha inserida
+
+            ];
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+
+            export class AppRoutingModule { }
 
         . Acesse o componente "login.component.html" e atualize pelo código abaixo:
 
@@ -7330,7 +7377,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
         . Acesse o componente "auth.guard.ts" e atualize pelo código abaixo:
 
             import { Injectable } from '@angular/core';
-            import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree } from '@angular/router';
+            import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
             import { Observable } from 'rxjs';
             import { UserService } from '../services/user.service';
 
@@ -7339,7 +7386,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             })
             export class AuthGuard implements CanActivate {
 
-                private constructor( private userService: UserService) { }
+                private constructor( private userService: UserService, private router: Router) { }
                 canActivate(
                     route: ActivatedRouteSnapshot,
                     state: RouterStateSnapshot):  boolean  {
@@ -7384,11 +7431,12 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
             export class AppRoutingModule { }
 
-        . Acesse o componente "app.component.ts" e insira o código abaixo:
+        . Acesse o componente "user.service.ts" e insira o código abaixo:
 
             import { Injectable, OnInit } from '@angular/core';
             import { User } from '../model/user';
             import { HttpClient } from '@angular/common/http';
+            import { Router } from '@angular/router';                   // Linha inserida
 
             @Injectable({
                 providedIn: 'root'
@@ -7429,6 +7477,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
                 AfterContentInit
             } from '@angular/core';
             import { Stock } from './model/stock';
+            import { ROUTER_TOKENS } from './app-routing.module';       
             import { UserService } from './services/user.service';      // Linha inserida
 
 
