@@ -2006,6 +2006,12 @@ https://www.youtube.com/watch?v=RKYCRsa5WRM&list=PL7yxJa4Na-ipxalMfzYWdj4HMzOvzO
                     <li *ngFor="let item of itens">{{ item.nome }}</li>
                 </ul>
 
+                <div [ngSwitch]="role">
+                    <p *ngSwitchCase="'admin'">Bem-vindo, administrador!</p>
+                    <p *ngSwitchCase="'user'">Bem-vindo, usuário!</p>
+                    <p *ngSwitchDefault>Bem-vindo, visitante!</p>
+                </div>
+
             Atributo - Podem ser anexadas a elementos DOM (e componentes, pois são elementos DOM) para modificar a aparência 
                         ou o comportamento de um elemento e não altera a estrutura do DOM.
 
@@ -7533,6 +7539,127 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 Web Development with Angular and Bootstrap - 3rd ed. - 2019 - Packt - Págnina 148
 
 PAGINA 314
+
+
+
+11. Novidades a partir da Versão 17+
+------------------------------------
+
+    . Para atualizar para a versão mais recente do Angular, execute o comando abaixo:
+
+        #     +--------------------------------> para atualizar a versão mais recente do angular
+        #     |
+        npm update -g @angular/cli
+
+        ng version
+
+    . Sintaxe para criação de um projeto:
+
+        ng new --minimal --defaults --skip-git --strict angular17
+
+        . Os parâmetros utilizados no comando acima tem o seguinte objetivo:
+
+            --minimal   cria o projeto sem um framework de testes
+            --defaults  desabilita as perguntas que aparecem no prompt, por exemplo, 
+                        qual opção para estilos você quer utilizar? CSS, SCSS, etc
+            --skip-git  não cria um repositório git
+            --strict    habilita o modo strict que torna as regras de codificação mais 
+                        rigorosas e ajuda a detectar erros comuns de forma mais 
+                        proativa durante o desenvolvimento.
+                        Se quiser saber mais: https://angular.io/guide/strict-mode    
+
+        
+    . Novas Sintaxe de Controle de Fluxo nos Templates
+
+        . A sintaxe baseada no símbolo @ substitui as tradicionais diretivas *ngIf, *ngFor e *ngSwitch, 
+            proporcionando uma abordagem mais declarativa e intuitiva.​
+
+            . @if: Utilizado para declarações condicionais, simplificando a estrutura de if/else.
+
+                @if (usuarioLogado()) {
+                    <p>Bem-vindo, {{ usuario.nome }}!</p>
+                } @else {
+                    <p>Por favor, faça login para continuar.</p>
+                }
+
+            . @for: Facilita a iteração sobre coleções, melhorando a legibilidade e o desempenho.
+
+                @for (produto of produtos(); track produto.id) {
+                    <div class="card">
+                    <h2 class="card-title">{{ produto.nome }}</h2>
+                    <!-- Outros detalhes do produto -->
+                    </div>
+                } @empty {
+                    <p>Nenhum produto encontrado!</p>
+                }
+                
+            . @switch: Substitui o *ngSwitch, oferecendo uma sintaxe mais limpa para múltiplas condições.​
+
+                @switch (nivelUsuario) {
+                    @case ('admin') { 
+                        <p>Acesso total ao sistema.</p> 
+                    }
+                    @case ('moderador') { 
+                        <p>Pode moderar comentários.</p> 
+                    }
+                    @default { 
+                        <p>Usuário comum.</p> 
+                    }
+                }
+
+    . Carregamento Preguiçoso de Componentes com @defer
+
+        . O Angular 17 introduziu o bloco @defer, permitindo o carregamento, adiando o carregamento 
+            de um componente ou conteúdo até que uma condição seja atendida. Otimizando o desempenho 
+            ao carregar conteúdo apenas quando necessário:
+
+            @defer {
+                <app-componente-pesado></app-componente-pesado>
+            }
+
+            . Carregamento condicional com when:
+
+                @defer (when="carregarComponente") {
+                    <app-componente-pesado></app-componente-pesado>
+                }
+
+            . Carregamento com atraso (after)
+
+                @defer (after="2000ms") {               // O componente será carregado após um atraso de 2 segundos.
+                    <app-componente-pesado></app-componente-pesado>
+                }
+
+            . Carregamento ao entrar na viewport (on idle)
+
+                @defer (on="viewport") {                // O componente será carregado automaticamente quando entrar na viewport
+                    <app-componente-pesado></app-componente-pesado>
+                }
+
+        . @placeholder para exibir conteúdo temporário. Antes do início do carregamento.
+
+            @defer {
+                <app-componente-pesado></app-componente-pesado>
+            } @placeholder {
+                <p>Carregando conteúdo...</p>
+            }
+
+        . Combinando @loading (Exibido enquanto o conteúdo está sendo carregado) e 
+            @error ( Exibido se ocorrer um erro durante o carregamento )
+
+            @defer {
+                <app-componente-pesado></app-componente-pesado>
+            } @placeholder {
+                <p>Preparando para carregar...</p>
+            } @loading {
+                <p>Carregando...</p>
+            } @error {
+                <p>Falha ao carregar o conteúdo.</p>
+            }
+
+
+
+
+
 
 
 
