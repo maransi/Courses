@@ -1554,6 +1554,24 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 
 		sudo ln -s /opt/Rider/bin/rider.sh /usr/bin/rider
 
+	. Crie o arquivo de atalho do menu "rider.desktop" na pasta "/usr/share/applications" com o conteúdo abaixo:
+
+		[Desktop Entry]
+		Type=Application
+		Name=Rider
+		Comment=Rider
+		Icon=/opt/Rider/bin/rider.png
+		Exec=/opt/Rider/bin/rider.sh
+		Terminal=false
+		Categories=Development;IDE
+		StartupWMClass=Rider
+		StartupNotify=false
+
+	. Altere o atributo do arquivo como abaixo
+
+		sudo chmod +x /usr/share/applications/Rider.desktop	
+
+
 	. Execute o comando abaixo no prompt do Terminal
 
 		rider
