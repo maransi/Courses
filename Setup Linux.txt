@@ -1049,7 +1049,34 @@ sudo apt install net-tools
 
 27. Configurações Adicionais para convidado do Virtualbox:
 
-	. Instale o Virtualbox
+	. Instalação do Virtualbox no Debian, em outras distros, verifique se na "Store" tem o Virtualbox para instalar
+
+		# Reinicie o computador após a atualização abaixo
+		sudo apt update && sudo apt upgrade
+
+		# Instalação das depedência
+		sudo apt install binutils build-essential dkms linux-headers-$(uname -r) make
+
+		sudo apt install -f
+
+		# adicione o repositório oficial do VirtualBox
+		echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian bookworm contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+
+		# importe a chave de assinatura GPG
+		cd /tmp && curl https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --dearmor --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg && cd $HOME
+
+		sudo apt update
+
+		# instalar a versão desejada do Oracle VirtualBox 
+
+		### Para instalar o VirtualBox 7.1:
+		sudo apt install virtualbox-7.1
+
+		### Para instalar o VirtualBox 7.0:
+		sudo apt install virtualbox-7.0
+
+		### Para instalar o VirtualBox 6.1:
+		sudo apt install virtualbox-6.1
 
 	. Crie uma VM
 		
