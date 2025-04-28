@@ -620,3 +620,170 @@ https://metring.com.br/para-que-serve-o-git-fetch-vs-pull
         # essa tag, onde haverá a possibilidade de realizar um download daquela tag/versão
         # dos arquivos.
  
+ 6. Trabalhando com "Branchs":
+
+    . Realizando o Primeiro Commit para podermos criar uma branch:
+
+        git add .
+        git commit -am "Primeiro Commit"
+
+
+    .  Criar uma nova branch: Use o comando git branch seguido do nome da branch que você 
+        deseja criar. Por exemplo:
+
+        git branch minha-nova-branch
+
+    . Alternar para a nova branch: Use o comando git checkout seguido do nome da branch que 
+        você deseja usar. Por exemplo:
+
+        git checkout minha-nova-branch
+
+    . Verificar a branch atual: Use o comando git branch para verificar qual é a branch atual. 
+        A branch atual será destacada com um asterisco (*).
+
+        git branch
+
+    . A forma mais correta para se fazer um "merge" é sempre começar atualizando a branch de trabalho com a "master".
+        Após isso, mudar para a branch "master" e atualizá-la com a branch de trabalho.
+
+        . Atualizando a branch de trabalho com a "master"
+
+            . Verificar se há conflitos na branch com as informações da master - Antes de fazer o merge, é uma boa 
+                prática verificar se há conflitos entre as duas branches. Você pode usar o comando 
+                "git merge --no-commit" para verificar se há conflitos:
+
+                git merge --no-commit master
+
+            . Se não houver conflitos, você pode fazer o merge usando o comando git merge:
+
+                git merge master
+
+            . Se houver conflitos, o Git irá mostrar os arquivos que têm conflitos e você precisará resolvê-los manualmente.
+
+                git merge master
+                
+                Auto-merging arquivo.txt
+                CONFLICT (content): Merge conflict in arquivo.txt
+                Automatic merge failed; fix conflicts and then commit the result.
+
+            .  Commitar o merge - Depois de fazer o merge, você precisa commitar as alterações:
+
+                git commit -am "Merge da branch nova-funcionalidade com a master"
+
+            . Podemos usar o comando git status para verificar o status do repositório e identificar quais arquivos têm 
+                conflitos:
+
+                git status
+
+                On branch master
+                You have unmerged paths.
+                (fix conflicts and run "git commit")
+                
+                Unmerged paths:
+                (use "git add <file>..." to mark resolution)
+                
+                        arquivo.txt
+
+            . Consultando o log de commit
+
+                git log 
+
+        . Fazendo o Merge da "master" com as mudanças da branch nova
+
+            . Mudar para a branch "master"
+
+                git checkout master
+
+            . Verificar se há conflitos na branch com as informações da branch nova - Antes de fazer o merge, é uma boa 
+                prática verificar se há conflitos entre as duas branches. Você pode usar o comando 
+                "git merge --no-commit" para verificar se há conflitos:
+
+                git merge --no-commit  minha-nova-branch
+
+            . Se não houver conflitos, você pode fazer o merge usando o comando git merge:
+
+                git merge minha-nova-branch
+
+            . Se houver conflitos, o Git irá mostrar os arquivos que têm conflitos e você precisará resolvê-los manualmente.
+
+                git merge master
+
+                Auto-merging arquivo.txt
+                CONFLICT (content): Merge conflict in arquivo.txt
+                Automatic merge failed; fix conflicts and then commit the result.
+
+
+            .  Commitar o merge - Depois de fazer o merge, você precisa commitar as alterações:
+
+                git commit -am "Merge da branch nova-funcionalidade com a master"
+
+    . Consultando o log de commit
+
+        git log [-p]
+                 |
+                 +-->  a opção -p para mostrar as alterações feitas em cada arquivo
+
+
+        commit 1ae9d1dea0c6b802199a3deb66620e4f84ea8a5f (HEAD -> master, AddingRequiredNugetPackage)
+        Author: maransi <maransi>
+        Date:   Mon Apr 28 18:25:38 2025 -0300
+
+            DotnetApplication - AddingRequiredNugetPackage
+
+                            +---------------------------------------------------------------------------+
+                            |                                                                           |
+        commit 554df97a790b036c78f59d329fa304227b337252 (ConnectionStringAndApplicationUser)            |
+        Author: maransi <maransi>                                                                       |
+        Date:   Mon Apr 28 17:54:56 2025 -0300                                                          |
+                                                                                                        |
+            DotnetApplication - Creating the PeopleController                                           |
+                                                                                                        |
+    . Mostrando as alterações em uma branch                                                             |
+                                                                                                        |
+                    +-----------------------------------------------------------------------------------+
+                    |
+                    V
+        git show <commit hash> 
+
+        git diff <commit_hash>..<commit_hash> -R    // Mostra as alterações feitas entre dois commits. 
+                                                    // Você pode usar a opção -R para mostrar as alterações 
+                                                    // feitas em cada arquivo
+
+    . O comando "git log --stat" mostra um histórico de commits, incluindo as estatísticas de alterações feitas em cada arquivo:
+
+        git log --stat
+
+        commit 1ae9d1dea0c6b802199a3deb66620e4f84ea8a5f (HEAD -> master, AddingRequiredNugetPackage)
+        Author: maransi <maransi>
+        Date:   Mon Apr 28 18:25:38 2025 -0300
+
+            DotnetApplication - AddingRequiredNugetPackage
+
+        src/DotnetApiCompleteAuth/DotnetApiCompleteAuth.csproj | 12 ++++++++++++
+        src/DotnetApiCompleteAuth/Program.cs                   |  2 +-
+        2 files changed, 13 insertions(+), 1 deletion(-)
+
+        commit 554df97a790b036c78f59d329fa304227b337252 (ConnectionStringAndApplicationUser)
+        Author: maransi <maransi>
+        Date:   Mon Apr 28 17:54:56 2025 -0300
+
+            DotnetApplication - Creating the PeopleController
+
+        .gitignore                                                | 484 +++++++++++++++++++++++++++++++++++++++++
+        DotnetApiCompleteAuth.sln                                 |  27 ++++++++
+        src/DotnetApiCompleteAuth/Controllers/PeopleController.cs |  24 +++++++
+        src/DotnetApiCompleteAuth/DotnetApiCompleteAuth.csproj    |  16 +++++
+        src/DotnetApiCompleteAuth/DotnetApiCompleteAuth.http      |   6 ++
+        src/DotnetApiCompleteAuth/Program.cs                      |  53 ++++++++++++++++
+        src/DotnetApiCompleteAuth/Properties/launchSettings.json  |  41 ++++++++++++
+        src/DotnetApiCompleteAuth/appsettings.Development.json    |   8 +++
+        src/DotnetApiCompleteAuth/appsettings.json                |   9 +++
+        9 files changed, 668 insertions(+)
+
+    . gitk -  é uma ferramenta gráfica para visualizar o histórico de commits do Git. Ela é incluída no pacote Git, então você não precisa instalar nada adicional.
+        No entanto, se você estiver usando um sistema operacional que não inclui gitk por padrão, você pode precisar instalar o pacote Git ou atualizar o seu sistema 
+        operacional para obter a ferramenta.
+
+        sudo apt-get install gitk
+
+        gitk -a
