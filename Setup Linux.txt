@@ -474,9 +474,13 @@ Bookmark						Va na barra vertical esquerda, click com o mouse direito e escolha
 
 . Atalhos
 
+
 	Alt + 1, 2, 3, 4, ...	Posiona na aba no.
 	Ctrl + b				Ativar o menu lateral esquerdo 
-	Ctrl + Alt + P			Para ativar a linha de comandos 
+	Ctrl + Alt + P ou F1	Para ativar a linha de comandos.
+							Digite "JSON" para localizar o arquivo de configurações 
+							JSON "Preferences: Open User Settings (JSON)"
+
 	Ctrl + P 				Localiza um determinado arquivo
 	Ctrl + W				Fecha a aba corrente
 	Ctrl + Shift + W		Fecha todas as abas abertas
@@ -511,116 +515,139 @@ Bookmark						Va na barra vertical esquerda, click com o mouse direito e escolha
 
 . Instale as seguinte Extensões:
 
-	SQL Formatter			- Shortcut Shift+Alt+F, ou Ctrl+K+F
-		ou SQL Beautify		- Shif + Alt + F
-	open-in-browser			- Shortcut Ctrl+Alt+O, Alt + B
-	Delphi Extension Pack	- Key Map Delphi, Number Bookmark
-	Bootstrap v4 Snippets
-	VS Code Printing Free
-	Material Icon Theme
-	Numbered Bookmarks		- Shortcut Ctrl+Shit+1,2,3... , Ctrl+1,2,3...
-	Power Mode				- Foguinho
-	HTML CSS Support		- Ctrl + Space mostra as opções
-	Intellisense for CSS Class
-	JS-CSS-HTML Formatter	- Ctrl + Shift + I
-	Live Server				- File -> Open Folder, Alt + L + O / Click no simbolo na barra do rodapé
-							- Extensao que exibe online as alteraçoes feitas a página 
-								no navegador.
-							- Acesse o setting e inclua  "liveServer.settings.CustomBrowser": "chrome"
-							- Para colocar o VSCode do lado do navegador clique Super + Left no VSCode
-								e Super + Left no navegador
-	Rainbow Brackets		- Ajuda identificar a abertura e fechamentos dos parenteses
-	
-	Language Support for 
-	Java(TM) by Red Hat		- Acesse o setting e inclua "java.home": "/opt/jdk18/",
+	. Essenciais
 
-	Java Debugger			- Crie um novo "launch.json" informando nele:
-								"jdkPath": "/opt/java-11/bin" e
-								"classpath": [
-													".",
-													"${fileDirname}",
-													"/home/marco/Downloads/mysql-connector-java-5.1.49-bin.jar"
-												]
-	Java Language Support
-	JQuery Code Snippets	- Basta digitar algo que comece com "jq"
-	Code Runner				- Ctrl + Shift + N, ou clique direito 
-	Regex Workbench			- Clique na estrela entre / / na barra de baixo
-	MDX Preview				- Consulta em tela de arquivo com extensão .MD
+		SQL Formatter			- Shortcut Shift+Alt+F, ou Ctrl+K+F
+			ou SQL Beautify		- Shif + Alt + F
+		Numbered Bookmarks		- Shortcut Ctrl+Shit+1,2,3... , Ctrl+1,2,3...
+		Material Icon Theme
+		Live Server				- File -> Open Folder, Alt + L + O / Click no simbolo na barra do rodapé
+								- Extensao que exibe online as alteraçoes feitas a página 
+									no navegador.
+								- Acesse o setting e inclua  "liveServer.settings.CustomBrowser": "chrome"
+								- Para colocar o VSCode do lado do navegador clique Super + Left no VSCode
+									e Super + Left no navegador
+		Rainbow Brackets		- Ajuda identificar a abertura e fechamentos dos parenteses
+		SQLTools
+		Error Lens
+		Color Highlight
 
+	. .NET 
 
-	Extensões para se trabalhar com o Angular:
-	------------------------------------------
-	Chrome 					(Verificar se nas versões recentes do VSCode ele já vem instalado automaticamente, tente fazer os procedimentos abaixo
-                    			sem instalar o plugin para ver se dá certo )
+		C# 
+		C# Extensions (JosKreativ)
+		C# XML Documentation Comments
+		C# Snippets
 
-            // https://www.youtube.com/watch?v=Lczqac3paNM    
+		ou
 
-            				. Pré requisito que o navegador Chrome esteja instalado no sistema operacional.
+		C# Dev Kit
 
-            				. Acesse o projeto, vá para a área de Debug, acione a criação do "launch.json" e informe o ambiente "Chrome".
+	. Angular
 
-            				. Acesse o arquivo launch.json e altere o conteúdo pelo abaixo:
+		. Angular Extension Pack
 
-                {
-                    // Use o IntelliSense para saber mais sobre os atributos possíveis.
-                    // Focalizar para exibir as descrições dos atributos existentes.
-                    // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
-                    "version": "0.2.0",
-                    "configurations": [
-                        {
-                            "name": "Debug Angular",
-                            "url": "http://localhost:4200",
-                            "webRoot": "${workspaceFolder}"
-                        }
+	. Opcionais
 
-                    ]
-                }
+		open-in-browser			- Shortcut Ctrl+Alt+O, Alt + B
+		Delphi Extension Pack	- Key Map Delphi, Number Bookmark
+		Bootstrap v4 Snippets
+		VS Code Printing Free
+		Power Mode				- Foguinho
+		HTML CSS Support		- Ctrl + Space mostra as opções
+		Intellisense for CSS Class
+		JS-CSS-HTML Formatter	- Ctrl + Shift + I
+		
+		Language Support for 
+		Java(TM) by Red Hat		- Acesse o setting e inclua "java.home": "/opt/jdk18/",
 
-            . Acesse o terminal para levantar o projeto 
-            
-                $ ng serve
-            
-            . No VSCode acesse a página principal.
-            
-            . Na área de debug de o "play" no debug.
-
-            . No navegador vá até a página onde você que depurar e faça as ações para isso.
-
-	Angular 2, 4 and upcoming latest TypeScript HTML Snippets
-
-		. Dentro de algum template digite ngFor e tecle tab.
-
-	tslint - Plugin para apontar ausências no padrão de programação, deixando em vermelhos os pontos que não estão
-				em conformidade. 
-
-		. Quando for trabalhar numa pasta de projeto, digite Ctrl + Shift + P e digitar "tslint", 
-			surge vários comandos especificos do plugin, escolha "Enable Workspace Library Execution"
-
-		. Acrescente o trecho abaixo no arquivo launch.json para habilitar o plugin:
-
-			// Dentro do array "configurations"
-			"editor.codeActionsOnSave": {
-				"source.fixAll.tslint": true
-			}
-
-	. editorconfig for VS Code - Plugin destinado a manter o padrão de codificação
-
-		. As configurações dos padrões estão no arquivo .editorconfig
+		Java Debugger			- Crie um novo "launch.json" informando nele:
+									"jdkPath": "/opt/java-11/bin" e
+									"classpath": [
+														".",
+														"${fileDirname}",
+														"/home/marco/Downloads/mysql-connector-java-5.1.49-bin.jar"
+													]
+		Java Language Support
+		JQuery Code Snippets	- Basta digitar algo que comece com "jq"
+		Code Runner				- Ctrl + Shift + N, ou clique direito 
+		Regex Workbench			- Clique na estrela entre / / na barra de baixo
+		MDX Preview				- Consulta em tela de arquivo com extensão .MD
 
 
-	Testar
+		Extensões para se trabalhar com o Angular:
+		------------------------------------------
+		Chrome 					(Verificar se nas versões recentes do VSCode ele já vem instalado automaticamente, tente fazer os procedimentos abaixo
+									sem instalar o plugin para ver se dá certo )
 
-	Gitlens
-	Settings Sync - Sincronização do VS Code na instalação ( Plugin, shortkeys, etc )
-	VSCode Icons
-	Brackets Pair Colorizer
-	CSS Peek
-	VS Color Picker
-	CSSTree Validator
+				// https://www.youtube.com/watch?v=Lczqac3paNM    
 
-	.NET Core Snippet Pack
-	C# Snippets
-	.Net CRUD Generator
+								. Pré requisito que o navegador Chrome esteja instalado no sistema operacional.
+
+								. Acesse o projeto, vá para a área de Debug, acione a criação do "launch.json" e informe o ambiente "Chrome".
+
+								. Acesse o arquivo launch.json e altere o conteúdo pelo abaixo:
+
+					{
+						// Use o IntelliSense para saber mais sobre os atributos possíveis.
+						// Focalizar para exibir as descrições dos atributos existentes.
+						// Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+						"version": "0.2.0",
+						"configurations": [
+							{
+								"name": "Debug Angular",
+								"url": "http://localhost:4200",
+								"webRoot": "${workspaceFolder}"
+							}
+
+						]
+					}
+
+				. Acesse o terminal para levantar o projeto 
+				
+					$ ng serve
+				
+				. No VSCode acesse a página principal.
+				
+				. Na área de debug de o "play" no debug.
+
+				. No navegador vá até a página onde você que depurar e faça as ações para isso.
+
+		Angular 2, 4 and upcoming latest TypeScript HTML Snippets
+
+			. Dentro de algum template digite ngFor e tecle tab.
+
+		tslint - Plugin para apontar ausências no padrão de programação, deixando em vermelhos os pontos que não estão
+					em conformidade. 
+
+			. Quando for trabalhar numa pasta de projeto, digite Ctrl + Shift + P e digitar "tslint", 
+				surge vários comandos especificos do plugin, escolha "Enable Workspace Library Execution"
+
+			. Acrescente o trecho abaixo no arquivo launch.json para habilitar o plugin:
+
+				// Dentro do array "configurations"
+				"editor.codeActionsOnSave": {
+					"source.fixAll.tslint": true
+				}
+
+		. editorconfig for VS Code - Plugin destinado a manter o padrão de codificação
+
+			. As configurações dos padrões estão no arquivo .editorconfig
+
+
+	. Testar
+
+		Gitlens
+		Settings Sync - Sincronização do VS Code na instalação ( Plugin, shortkeys, etc )
+		VSCode Icons
+		Brackets Pair Colorizer
+		CSS Peek
+		VS Color Picker
+		CSSTree Validator
+
+		.NET Core Snippet Pack
+		C# Snippets
+		.Net CRUD Generator
 
 . Configurações:
 
@@ -642,19 +669,30 @@ Bookmark						Va na barra vertical esquerda, click com o mouse direito e escolha
 		. Digite "Emmet: Remove Tag" e altere o "Keybinding" para "Alt+Shift+-", o "-" deve ser do bloco numerico
 			. De agora em diante, se precisar apagar uma tag HTML que cerca um conjunto de outras tags, basta posicioinar
 				o cursor sobre a "TAg" que deseja apagar e pressionar "Ctrl+Shift+-"
-	. Digite "Ctrl+Shift+P" e digite "Settings: Open User Settings (JSON)"
+	. Digite "Ctrl+Shift+P" ou F1 e digite "Settings: Open User Settings (JSON)"
 		. Digite a configuração abaixo:
 
 			...,
+			{
 			"editor.fontFamily": "Hack Nerd Font",
-			"terminal.integrated.fontFamily": "Hack Nerd Font",
-			"remote.autoForwardPortsSource": "hybrid",
-			"workbench.tree.indent": 40,
-			"workbench.tree.renderIndentGuides": "always",
-			"workbench.colorCustomizations": {
-				"tree.indentGuidesStroke": "#c8e0be"
-			}
-	. Acesse Configurações -> Profile -> Import Profile 
+				"security.workspace.trust.untrustedFiles": "open",
+				"editor.minimap.enabled": false,
+				"terminal.integrated.fontFamily": "Hack Nerd Font",
+				"terminal.integrated.fontSize": 12,
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"remote.autoForwardPortsSource": "hybrid",
+				"workbench.tree.indent": 40,
+				"workbench.tree.renderIndentGuides": "always",
+				"workbench.colorCustomizations": {
+					"tree.indentGuidesStroke": "#c8e0be"
+				},
+				"editor.acceptSuggestionOnEnter": "off",
+				"editor.suggest.insertMode": "replace",
+				"editor.quickSuggestionsDelay": 1000
+
+			}	
+		
+		. Acesse Configurações -> Profile -> Import Profile 
 		. Informe o link "https://vscode.dev/profile/github/12bd0215e34ffe344361b7dcf767842b" para resgatar as configurações para desenvolvimento em .NET
 
 https://www.youtube.com/watch?v=Ni_9mo932nA       8:00
