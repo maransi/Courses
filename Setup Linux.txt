@@ -1529,28 +1529,33 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 
 	wget https://dot.net/v1/dotnet-install.sh
 	chmod +x dotnet-install.sh
-    
-	./dotnet-install.sh -c 3.1
-	./dotnet-install.sh -c 5.0
-	./dotnet-install.sh -c 6.0
-	./dotnet-install.sh -c 8.0
+
+	export DOTNET_INSTALL_DIR=$HOME/.dotnet 
 	
-    # Se o bash shell for o padrão do linux execute as duas linha abaixo
-    echo 'export PATH="/home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"' >> ~/.bashrc
-    echo 'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1' >> ~/.bashrc
+	./dotnet-install.sh --install-dir $HOME/.dotnet -c 3.1
+	./dotnet-install.sh --install-dir $HOME/.dotnet -c 5.0
+	./dotnet-install.sh --install-dir $HOME/.dotnet -c 6.0
+	./dotnet-install.sh --install-dir $HOME/.dotnet -c 7.0
+
+	dotnet --version
+
+	# Caso o comando "dotnet" não se comportar como um executável, crie o link abaixo:
+	sudo ln -s /home/$USER/.dotnet/dotnet /usr/bin/dotnet
+
+	# insira as linhas abaixo no arquivo ".bashrc"
+	echo 'export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"' >> ~/.bashrc
+	echo 'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1' >> ~/.bashrc
+	echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.bashrc
 
 	source ~/.bashrc
 
-    # Se o zsh shell for o padrão do linux execute as duas linha abaixo
-    echo 'export PATH="/home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"' >> ~/.zshrc
-    echo 'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1' >> ~/.zshrc
+	# insira as linhas abaixo no arquivo ".zshrc"
+	echo 'export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"' >> ~/.zshrc
+	echo 'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1' >> ~/.zshrc
+	echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.zshrc
 
 	source ~/.zshrc
 
-    # Caso for o Fish Shell, insira na primeira linha do arquivo "~/.config/fish/config.fish" a linha abaixo
-    set -x PATH $PATH /home/$USER/.dotnet /home/$USER/.dotnet/tools
-
-	dotnet --info
 	dotnet --version
 	dotnet --list-runtimes
 	dotnet --list-sdks
