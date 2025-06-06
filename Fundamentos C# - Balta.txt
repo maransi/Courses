@@ -251,20 +251,35 @@ Criando uma Solution
 
         dotnet new
 
-    . Dentro da pasta CSharpBasico digite o comando abaixo:
+    . Demo
 
-        dotnet new sln --name CSharpBasico
+        . Dentro da pasta CSharpBasico digite o comando abaixo:
+
+            dotnet new sln --name CSharpBasico
+
+        . Dentro da "Solution" criaremos um projeto, do tipo console:
+
+            dotnet new console -n HelloWorld -o helloWorld
+            
+            -n : name da aplicação (Nome do projeto HelloWorld.csproj )
+            -o : output (nome da pasta que será criado para criar as classes)
+
+        . Agora precisamos associar o projeto a solution
+
+            dotnet sln add helloWorld/
+
+        . Digite o comando abaixo para verificar os projetos que compoem a solution:
+
+            dotnet sln list
+
+        . Dentro da pasta da solution digite o comando abaixo:
+
+            dotnet build
+            dotnet run --project ./helloWorld
 
     . Para acessar a solução com o VisualStudio Code digite o comando abaixo:
 
         code .
-
-    . Dentro da "Solution" criaremos um projeto, do tipo console:
-
-        dotnet new console -n HelloWorld -o helloWorld
-        
-        -n : name da aplicação (Nome do projeto HelloWorld.csproj )
-        -o : output (nome da pasta que será criado para criar as classes)
 
     . Para baixar todos os pacotes do projeto usamos o comando abaixo:
 
@@ -281,13 +296,6 @@ Criando uma Solution
         + HelloWorld.csproj
         + Program.cs
 
-    . Agora precisamos associar o projeto a solution
-
-        dotnet sln add helloWorld/
-
-    . Digite o comando abaixo para verificar os projetos que compoem a solution:
-
-        dotnet sln list
 
     . Para limpar os arquivos de cache execute o comando abaixo:
 
@@ -487,29 +495,32 @@ Escopo de Programa
             Console.WriteLine(args);
         }
     }
-    
-    . Crie a classe "HelloWorld.cs" com o código abaixo na pasta raiz do projeto "helloWorld"
 
-        namespace helloWorld;
 
-        public class HelloWorld
-        {
-            public static void Hello(string args)
+    . Demo
+
+        . Crie a classe "HelloWorld.cs" com o código abaixo na pasta raiz do projeto "helloWorld"
+
+            namespace helloWorld;
+
+            public class HelloWorld
             {
-                Console.WriteLine(args);
+                public static void Hello(string args)
+                {
+                    Console.WriteLine(args);
+                }
             }
-        }
 
-    . Altere o Program.cs como abaixo:
+        . Altere o Program.cs da solution pelo conteúdo abaixo:
 
-        using helloWorld;       // Linha inserida
+            using helloWorld;       // Linha inserida
 
-        HelloWorld.Hello("Hello, World!" );      // Linha inserida
+            HelloWorld.Hello("Hello, World!" );      // Linha inserida
 
-    . Execute o projeto:
+        . Execute o projeto:
 
-        # Da pasta da solution
-        dotnet run --project ./helloWorld
+            # Da pasta da solution
+            dotnet run --project ./helloWorld
 
     . Sugestão:
         
@@ -523,7 +534,6 @@ Escopo de Programa
             . Coloque a classe na pasta [Nome do projeto].Tutorial.Calculo. Se ambos forem iguais dará erro durante a compilação, 
                 pois não encontrará as referências das classes nas packages/namespace.
 
-PAREI AQUI
     . Variáveis, Constante
 
         . Uma variável pode ser iniciada pelo tipo (int, long, float, ...), ou pela palavra reservada "var":
@@ -541,6 +551,90 @@ PAREI AQUI
             const int IDADE_MINIMA = 10;
             const var IDADE_MINIMA = 10;
             const var IDADE_MINIMA;     // Inválido
+
+Sequências de Escape/"Escape Sequences"
+---------------------------------------
+
+    . São combinações de caracteres usadas dentro de strings para representar caracteres especiais que não podem ser 
+        inseridos diretamente no texto, como quebras de linha, tabulações, aspas, entre outros.
+
+    . Elas começam com uma barra invertida (\). Alguns exemplos comuns:
+
+        \n — Nova linha (line feed)
+        \r — Retorno de carro (carriage return)
+        \t — Tabulação
+        \\ — Barra invertida literal
+        \" — Aspas duplas dentro de uma string
+        \' — Aspas simples
+        \0 — Caractere nulo
+
+    . Exemplos:
+
+        Console.WriteLine("Primeira linha\nSegunda linha\tcom tabulação");
+        Console.WriteLine("Aspas duplas: \"texto entre aspas\"");
+
+
+    . Demo
+
+        . Altere o conteúdo do método "Hello" conforme abaixo:
+
+            namespace helloWorld;
+
+            public class HelloWorld
+            {
+                public static void Hello(string args)
+                {
+                    // Console.WriteLine(args);     // Linha eliminada
+
+
+                    // Linhas inseridas
+
+                    // \n — Nova linha
+                    Console.WriteLine("Primeira linha\nSegunda linha");
+
+                        // Primeira linha
+                        // Segunda linha
+
+                    // \t — Tabulação
+                    Console.WriteLine("Coluna 1\tColuna 2");
+
+                        // Coluna 1        Coluna 2
+
+                    // \\ — Barra invertida literal
+                    Console.WriteLine("Caminho: C:\\Users\\Marco");
+
+                        // Caminho: C:\Users\Marco
+
+                    // \" — Aspas duplas dentro de uma string
+                    Console.WriteLine("Ele disse: \"Olá, mundo!\"");
+
+                        // Ele disse: "Olá, mundo!"
+
+
+                    // \' — Aspas simples
+                    Console.WriteLine("Aspas simples: \'a\'");
+
+                        // Aspas simples: 'a'
+
+                    // \r — Retorno de carro
+                    Console.WriteLine("Texto antes do retorno\rNovo texto");
+
+                        // Novo textos do retorno
+
+                    // \0 — Caractere nulo
+                    string textoComNulo = "ABC\0DEF";
+                    Console.WriteLine("Texto com caractere nulo: " + textoComNulo);
+
+                        // Texto com caractere nulo: ABCDEF
+
+
+                    // Fim da inserção
+                }
+            }
+
+        . Execute o projeto e veja o resultado.
+
+            dotnet run --project ./helloWorld   
 
 
 Tipagem de Dados
@@ -579,6 +673,20 @@ Tipagem de Dados
             float salario = 2.500f;     // Float é necessário colocar a letra "f" quando for declarar "hardcode"
 
             decimal salario = 2.500m    // Idem para decimal, porém a letra é o "m"
+
+
+        . Evite float e double para valores monetários, mesmo que "funcionem", pois podem causar erros de arredondamento imperceptíveis, 
+            mas perigosos em cálculos acumulados, como juros compostos, faturas ou salários
+
+            . O tipo decimal tem alta precisão e baixa perda de dados em operações com casas decimais, o que é ideal para cálculos financeiros.
+
+                decimal preco = 1299.99m;
+                decimal imposto = 0.15m;
+                decimal total = preco * (1 + imposto);
+
+                Console.WriteLine($"Total com imposto: {total:C}");
+
+PAREI AQUI - Página 104
 
         . var
 
