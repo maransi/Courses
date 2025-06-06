@@ -478,67 +478,50 @@ Escopo de Programa
 
     using System;               // Importações
 
-    namespace HelloWorld        // Equivalente aos pacotes/divisões lógica
-    {
-        class Program           // Definição da classe
-        {
-            static void Main(string[] args)     // Método
-            {
-                string texto = "Hello World";
+    namespace HelloWorld;        // Equivalente aos pacotes/divisões lógica
 
-                Console.WriteLine(texto);
-            }
+    class Program           // Definição da classe
+    {
+        public static void Main(string args)     // Método
+        {
+            Console.WriteLine(args);
         }
     }
     
+    . Crie a classe "HelloWorld.cs" com o código abaixo na pasta raiz do projeto "helloWorld"
 
-    . Namespace, Using
+        namespace helloWorld;
 
-        . Crie dentro do projeto a classe abaixo Oi.cs:
-
-            using System;
-
-            namespace Teste
+        public class HelloWorld
+        {
+            public static void Hello(string args)
             {
-                class Oi
-                {
-                    public void BoaNoite( string nome)
-                    {
-                        Console.WriteLine("Boa Noite " + nome);
-                    }
+                Console.WriteLine(args);
+            }
+        }
 
-                }
+    . Altere o Program.cs como abaixo:
+
+        using helloWorld;       // Linha inserida
+
+        HelloWorld.Hello("Hello, World!" );      // Linha inserida
+
+    . Execute o projeto:
+
+        # Da pasta da solution
+        dotnet run --project ./helloWorld
+
+    . Sugestão:
+        
+        . Crie o nome das namespace levemente parecido com a pasta do projeto, por exemplo:
+
+            namespace Tutorial.Calculo
+            {
+                ...
             }
 
-        . Altere o Program.cs como abaixo:
-
-            using System;
-            using Teste;            // Importe da package "Teste" para acessar a classe Oi
-
-            namespace HelloWorld
-            {
-                class Program
-                {
-                    static void Main(string[] args)
-                    {
-                        Oi oi = new Oi();
-
-                        oi.BoaNoite("Marco");
-                    }
-                }
-            }
-
-        . Sugestão:
-            
-            . Crie o nome das namespace levemente parecido com a pasta do projeto, por exemplo:
-
-                namespace Tutorial.Calculo
-                {
-                    ...
-                }
-
-                . Coloque a classe na pasta [Nome do projeto].Tutorial.Calculo. Se ambos forem iguais dará erro durante a compilação, 
-                    pois não encontrará as referências das classes nas packages/namespace.
+            . Coloque a classe na pasta [Nome do projeto].Tutorial.Calculo. Se ambos forem iguais dará erro durante a compilação, 
+                pois não encontrará as referências das classes nas packages/namespace.
 
 PAREI AQUI
     . Variáveis, Constante
