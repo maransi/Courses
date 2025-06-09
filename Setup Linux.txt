@@ -27,6 +27,24 @@
 		Tipo de Formatação : Ext4
 		Ponto de Montagem : "/home"
 
+1. Configuração da localidade 
+
+	locale -a
+
+	sudo locale-gen pt_BR.UTF-8
+
+	sudo update-locale LANG=pt_BR.UTF-8
+
+	echo 'export LANG=pt_BR.UTF-8' >> ~/.bashrc
+	echo 'export LANGUAGE=pt_BR:pt' >> ~/.bashrc
+	echo 'export LC_ALL=pt_BR.UTF-8' >> ~/.bashrc
+
+	source ~/.bashrc
+
+
+	# Se quiser fazer de forma interativa
+	# sudo dpkg-reconfigure locales
+
 1. Instalação do VIM
 --------------------
 
