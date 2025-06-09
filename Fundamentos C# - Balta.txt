@@ -1,4 +1,7 @@
+Pagina 149
+
 Fundamentos C# - Balta
+----------------------
 
 Instalação AspNetCore 3.1
 -------------------------
@@ -16,7 +19,7 @@ https://www.javatpoint.com/c-sharp-tutorial
 
     . Acesse o link "Package manager instructions" 
 
-    . Instalçao para as versões do Ubuntu 20.04
+    . Instalaçao para as versões do Ubuntu 20.04
 
         . Localize a versão do Ubuntu que está sendo utilizado, copie e execute os comandos no 
             terminal:
@@ -60,21 +63,39 @@ https://www.javatpoint.com/c-sharp-tutorial
     
     . Instalação para as versões acima do Ubuntu 22.04
 
-        https://www.how2shout.com/linux/how-to-install-net-core-dotnet-on-ubuntu-22-04-lts/
-
-        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-        sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-
         wget https://dot.net/v1/dotnet-install.sh
         chmod +x dotnet-install.sh
-        ./dotnet-install.sh -c 5.0
-        ./dotnet-install.sh -c 6.00
+
+        export DOTNET_INSTALL_DIR=$HOME/.dotnet 
+        
+        ./dotnet-install.sh --install-dir $HOME/.dotnet -c 3.1
+        ./dotnet-install.sh --install-dir $HOME/.dotnet -c 5.0
+        ./dotnet-install.sh --install-dir $HOME/.dotnet -c 6.0
+        ./dotnet-install.sh --install-dir $HOME/.dotnet -c 7.0
+
         dotnet --version
-        echo 'export PATH="/home/$USER/.dotnet:/home/$USER/.dotnet/tools:$PATH"' >> ~/.bashrc
+
+        # Caso o comando "dotnet" não se comportar como um executável, crie o link abaixo:
+        sudo ln -s /home/$USER/.dotnet/dotnet /usr/bin/dotnet
+
+        # insira as linhas abaixo no arquivo ".bashrc"
+        echo 'export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"' >> ~/.bashrc
+        echo 'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1' >> ~/.bashrc
+        echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.bashrc
+
         source ~/.bashrc
+
+        # insira as linhas abaixo no arquivo ".zshrc"
+        echo 'export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"' >> ~/.zshrc
+        echo 'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1' >> ~/.zshrc
+        echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.zshrc
+
+        source ~/.zshrc
+
         dotnet --version
         dotnet --list-runtimes
         dotnet --list-sdks
+
 
 Instalação das extensões do VSCode
 ----------------------------------
@@ -1107,7 +1128,7 @@ TryParse
 
     Conversão para int usando Int.TryParse() 	            resultado
     ----------------------------------------                ---------
-    string valor1 = "100"
+    string valor1 = "1000"
     int resultado;                                          O valor é convertido sem erros.
     bool sucesso = int.TryParse(valor1, out resultado); 	resultado = 1000  e sucesso = true
 
@@ -1500,7 +1521,7 @@ String
 
             System.Console.WriteLine( id );     // 2c04a03a-f15d-44b0-a85e-f90fce3e2141
 
-    . Interpolação:
+    . Interpolação "$"
 
             var price = 10.2;
 
@@ -1513,18 +1534,42 @@ String
 
             var price = 10.2;
 
-            string texto = $"O preço do produto é {price:F2}";
+            string texto1 = $"O preço do produto é {price:F2}";
 
-            System.Console.WriteLine( texto );  // O preço do produto é 10,20
+            System.Console.WriteLine( texto1 );  // O preço do produto é 10,20
 
-            ou
+            /*
+                Resumo dos formatos:
 
-            // string verbatim 
-            string mensagem = @"Olá,
-                                meu nome é João
-                                e tenho 30 anos.";
+                {0:C}: moeda
+                {0:F2}: duas casas decimais
+                {0:D4}: inteiro com zeros à esquerda
+                {0:P2}: porcentagem com duas casas
+                {0:N0}: separador de milhar sem casas decimais
+            */
 
-            Console.WriteLine(mensagem)
+    . Verbatim "@"
+
+        // string verbatim 
+        string mensagem = @"Olá,
+                            meu nome é João
+                            e tenho 30 anos.";
+
+        Console.WriteLine(mensagem)
+
+
+    . Interpolação e Verbatim juntos "@$" ou "$@"
+
+        string userName = "John";
+
+        int inboxCount = 25;
+
+        int maxCount = 100;
+
+        var message = $@"{userName} has {inboxCount} messages.
+                            Message capacity remaining is {maxCount - inboxCount}.";
+
+        Console.WriteLine(message);
 
 
     . Comparação de strings
