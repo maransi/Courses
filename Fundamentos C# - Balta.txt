@@ -1,4 +1,4 @@
-Pagina 233
+Pagina 250
 
 Fundamentos C# - Balta
 ----------------------
@@ -1039,8 +1039,27 @@ Tipagem de Dados
 
         . Podemos atribuir null a um objeto, desde que o mesmo seja marcado como nullable, usando interrogação na frente do tipo.
         . Se uma chamada a um valor nulo for feita um erro sera apresentado.
+        . O ? após o tipo indica que a variável pode receber null.
+        . O ! é usado para informar ao compilador que você garante que o valor não será nulo naquele ponto.
 
-            int? idade = null;
+            string? nome = null;    // 'nome' pode ser nulo
+
+            ou
+
+            public class Pessoa
+            {
+                public string Nome { get; set; } = null!; // Diz ao compilador que será atribuído depois
+            }
+
+            ou
+
+            string? texto = ObterTexto();
+            Console.WriteLine(texto!.Length); // Garante ao compilador que texto não é nulo aqui
+
+            void ImprimirNome(Pessoa pessoa)
+            {
+                Console.WriteLine(pessoa.Nome!); // Garante ao compilador que Nome não é nulo
+            }
 
         . Trabalhando com strings nulas:
 
@@ -1576,7 +1595,6 @@ C# Class
 
             private string  _myField = string.Empty;  
 
-
     . Propriedades podem ser declaradas de duas formas:
 
         . Simplificada - Quando não existe necessidade de nenhuma lógica/regra ( vide item 8 )
@@ -1650,32 +1668,19 @@ C# Class
 
     . Podemos instânciar das seguintes formas:
 
-        Calculadora calc = new Calculadora(10, 10);
+        . Exemplos
 
-        int m = calc.somar();
+            Calculadora calc = new Calculadora(10, 10);
 
-        ou
+            int m = calc.somar();
 
-        Calculadora calc = new Calculadora(){a = 10, b = 10};
+            ou
 
-        int m = calc.soma();
+            Calculadora calc = new();
 
-        ou
+            calc.somar(10,20);
 
-        Calculadora calc = new();
-
-        calc.somar(10,20);
-
-
-    . Podemos deixar os parâmetros dos métodos opcionais. Basta na assinatura do método dar um valor para o parâmetro:
-
-        public int soma( int a, int b, bool formata = false );
-
-        . Dessa forma se houver o uso deste método somente com dois parâmetros não dará erro.
-
-    . Exemplos
-
-        Exemplo 1 - Usando o tipo do objeto a classe
+            ou
 
             // IMPORTANTE: Para se criar os objetos como abaixo, a classe é obrigada ter um construtor sem parâmetros. 
             //              Pois na parte "new BankAccount(){...}" o construtor que está
@@ -1717,13 +1722,77 @@ C# Class
             BankAccount account = new BankAccount() { AccountName = "John Doe", AccountNumber = 123456 };
             account.ShowAccountDetails();
 
-        Exemplo 2 - Usando o tipo do objeto de forma anônima. Nesse caso não se trata de classe e não fazemos mensão nenhuma a qq classe, usando o tipo "var"
+            ou
 
-            var student = new { Id = 1, Name = "MARCO ANTONIO", LastName = "SILVA", address = new { Id = 1, StreetName = "RUA CARIOBA 360", City = "SÃO PAULO", State = "SP", ZipCode = "02423-100" }  };
+            . Usando o tipo do objeto de forma anônima. Nesse caso não se trata de classe e não 
+                fazemos mensão nenhuma a qq classe, usando o tipo "var"
 
-            System.Console.WriteLine( student.Id );
-            System.Console.WriteLine( student.Name );
-            System.Console.WriteLine( student.Address.ToString());
+                var student = new { Id = 1, Name = "MARCO ANTONIO", LastName = "SILVA", address = new { Id = 1, StreetName = "RUA CARIOBA 360", City = "SÃO PAULO", State = "SP", ZipCode = "02423-100" }  };
+
+                System.Console.WriteLine( student.Id );
+                System.Console.WriteLine( student.Name );
+                System.Console.WriteLine( student.Address.ToString());
+
+
+
+
+    . Podemos deixar os parâmetros dos métodos opcionais. Basta na assinatura do método dar um valor para o parâmetro:
+
+        . Sintaxe:
+
+            public int soma( int a, int b, bool formata = false );
+
+        . Dessa forma se houver o uso deste método somente com dois parâmetros não dará erro.
+
+        . Exemplo
+
+            public void ExibirMensagem(string mensagem, int vezes = 1)
+            {
+                for (int i = 0; i < vezes; i++)
+                {
+                    Console.WriteLine(mensagem);
+                }
+            }
+
+            // Uso:
+            ExibirMensagem("Olá!");         // Exibe uma vez
+            ExibirMensagem("Oi!", 3);       // Exibe três vezes
+
+    . Chamada de método com argumentos nomeados 
+
+        // Chamada usando argumentos nomeados:
+        ExibirMensagem(vezes: 3, mensagem: "Olá, mundo!");
+
+    . Quantidade indefinida de parâmetros:
+
+        . É possível criar métodos que aceitam um número indefinido de parâmetros usando a palavra-chave "params". O 
+            parâmetro marcado com params deve ser o último da lista e permite passar zero ou mais argumentos do tipo 
+            especificado (ou um array desse tipo).
+
+            public int Somar(params int[] numeros)
+            {
+                int total = 0;
+                foreach (int n in numeros)
+                    total += n;
+                return total;
+            }
+
+            // Uso:
+            int resultado1 = Somar(1, 2, 3);        // resultado1 = 6
+            int resultado2 = Somar(10, 20);         // resultado2 = 30
+            int resultado3 = Somar();               // resultado3 = 0
+
+        . Conseguimos passar parâmetros de tipos diferentes para métodos com número indefinido de parâmetros se o 
+            tipo do parâmetro for object (ou outro tipo base comum).
+
+            public void ExibirValores(params object[] valores)
+            {
+                foreach (var valor in valores)
+                    Console.WriteLine(valor);
+            }
+
+            // Uso:
+            ExibirValores(1, "texto", 3.14, true);
 
 
 String
