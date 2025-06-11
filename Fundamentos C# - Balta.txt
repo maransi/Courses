@@ -1,4 +1,4 @@
-Pagina 189
+Pagina 233
 
 Fundamentos C# - Balta
 ----------------------
@@ -1430,14 +1430,27 @@ While
             i++;
 
             if (i > 10)
-                break;
+                break;              // Podemos utilizar break para sair do "while"
+        }
+
+    Exemplo 3
+
+        int i = 1;
+
+        while (i < 20) {
+            i++;
+
+            if ((i % 2) != 0)
+                continue;           // Podemos utilizar continue para pular para a linha logo abaixo do "while..."
+
+            Console.WriteLine("i = " + i);
         }
 
 
 C# Class
 --------
 
-// Insirar detalhes sobre "partial class"
+    // Insirar detalhes sobre "partial class"
 
     . No vSCode algumas atalhos (Snippet) estão disponíveis para facilitar na implementação do código:
 
@@ -1445,14 +1458,13 @@ C# Class
 
             public int MyProperty { get; set; }
 
-
         propfull + [Ctrl + Space]
 
-            private int myVar;
+            private int _myVar;
             public int MyProperty
             {
-                get { return myVar; }
-                set { myVar = value; }
+                get { return _myVar; }
+                set { _myVar = value; }
             }
 
         ctor  + [Ctrl + Space]  - Implementa o construtor
@@ -1515,7 +1527,8 @@ C# Class
             // 3. Modificador de acesso
             public class MyClass    // 4. Nome da classe
             {
-                public string  myField = string.Empty;  // 5. Propriedade de classe
+                public string  _myField = string.Empty;  // 5. Campo da classe
+                private string _firstname = "";
 
                 public MyClass()                        // 6. Construtor
                 {
@@ -1529,15 +1542,40 @@ C# Class
 
                 public int MyAutoImplementedProperty { get; set; }      // 8. Auto-implemented property
 
-                private int myPropertyVar;                              // 9. Propriedade
+                private int _myPropertyVar;                             // 9. Campo
                 
-                public int MyProperty                                   // 9. Propriedade
+                public int MyProperty                                   // 10. Propriedade
                 {
-                    get { return myPropertyVar; }
-                    set { myPropertyVar = value; }
+                    get { return _myPropertyVar; }
+                    set { _myPropertyVar = value; }
                 } 
             }
         }
+
+    . Padrões
+            
+        . Nomes campo das classes utilizam "_" como padrão para definir o nome
+
+            Exemplo:
+
+                namespace demo.myclass;
+
+                public class MyClass    
+                {
+                    private string  _myField = string.Empty;  
+                                    ^
+                                    +-------------------+
+                    public MyClass( string myField )    |                    
+                    {   +-------------------------------+
+                        |
+                        _myField = myField;
+                    }
+                }
+
+        . Campos são criados como "private"
+
+            private string  _myField = string.Empty;  
+
 
     . Propriedades podem ser declaradas de duas formas:
 
@@ -1561,18 +1599,73 @@ C# Class
                 }
             }
 
+            // ou utilizando Lambda
 
-    . Podemos iniciar uma classe de duas formas:
+            public class MyClass
+            {
+                private string _firstname = "";
+
+                public string FirstName {
+                    get => _firstname;              // é equivalente a get { return _firstname; }
+                    set => _firstname = value;      // é equivalente a set { _firstname = value; }
+                }
+            }
+
+    . Modificador de acesso "static"
+
+        . Podemos acessar membros estáticos diretamente pela classe, sem precisar criar um objeto.
+
+        . Eles compartilham o mesmo valor para todas as instâncias da classe (no caso de campos/propriedades).
+
+        . São úteis para funcionalidades que não dependem de dados específicos de um objeto.    
+
+        . Exemplo
+
+            public class Calculadora
+            {
+                private int a;
+                private int b;
+
+                public Calculadora( int a, int b)
+                {
+                    a = a;
+                    b = b;
+                }
+                public static int Contador { get; set; } // Propriedade estática
+
+                public static int Somar()
+                {
+                    this.Somar(a,b);
+                }
+
+                public static int Somar(int a, int b)    // Método estático
+                {
+                    return a + b;
+                }
+            }
+
+            // Uso:
+            int resultado = Calculadora.Somar(2, 3);
+            Calculadora.Contador = 10;
+
+    . Podemos instânciar das seguintes formas:
 
         Calculadora calc = new Calculadora(10, 10);
+
+        int m = calc.somar();
+
+        ou
+
+        Calculadora calc = new Calculadora(){a = 10, b = 10};
 
         int m = calc.soma();
 
         ou
 
-        Calculadora calc = new Calculadora{a = 10, b = 10};
+        Calculadora calc = new();
 
-        int m = calc.soma();
+        calc.somar(10,20);
+
 
     . Podemos deixar os parâmetros dos métodos opcionais. Basta na assinatura do método dar um valor para o parâmetro:
 
@@ -1584,14 +1677,45 @@ C# Class
 
         Exemplo 1 - Usando o tipo do objeto a classe
 
-            // IMPORTANTE: Para se criar os objetos como abaixo, as classes é obrigatório ter um construtor sem parâmetros. Pois na parte "new Student(){...}" o construtor que está
+            // IMPORTANTE: Para se criar os objetos como abaixo, a classe é obrigada ter um construtor sem parâmetros. 
+            //              Pois na parte "new BankAccount(){...}" o construtor que está
             //              sendo chamado é o construtor sem parâmetros. Podemos criar construtores com parâmetros, mas é obrigatório sem parâmetros.
-            
-            Student student = new Student(){ Id = 1, Name = "MARCO ANTONIO", LastName = "SILVA", Address = new Address(){ Id = 1, StreetName = "RUA CARIOBA 360", City = "SÃO PAULO", State = "SP", ZipCode = "02423-100" }  };
+            // IMPORTANTE: Para realizar a criação do objeto como abaixo também é necessário existir os respectivos métodos Getter e Setter para
+            //              cada item informado dentro das "{}"
 
-            System.Console.WriteLine( student.Id );
-            System.Console.WriteLine( student.Name );
-            System.Console.WriteLine( student.Address.ToString());
+            using System;
+
+            namespace bankAccount;
+
+            public class BankAccount
+            {
+                // métodos Getter e Setter para cada item informado dentro dos parenteses "new BankAccount() { AccountName = "John Doe", AccountNumber = 123456 };"
+                public string? AccountName { get; set; }
+
+                public int AccountNumber { get; set; }
+
+                public BankAccount()    // 1. Obrigatório se formos criar o objeto "new BankAccount(){...}"
+                {
+
+                }
+
+                public BankAccount(string accountName, int accountNumber)
+                {
+                    AccountName = accountName;
+                    AccountNumber = accountNumber;
+                }
+                public void ShowAccountDetails()
+                {
+                    Console.WriteLine($"Account Name: {AccountName}");
+                    Console.WriteLine($"Account Number: {AccountNumber}");
+                }
+
+            }
+
+
+            // Uso
+            BankAccount account = new BankAccount() { AccountName = "John Doe", AccountNumber = 123456 };
+            account.ShowAccountDetails();
 
         Exemplo 2 - Usando o tipo do objeto de forma anônima. Nesse caso não se trata de classe e não fazemos mensão nenhuma a qq classe, usando o tipo "var"
 
@@ -2030,7 +2154,7 @@ Exception
             static void Salvar( string texto ){
 
                 if ( string.IsNullOrEmpty( texto ) ){
-//                    throw new Exception( "Texto não pode ser nulo" );
+    //                    throw new Exception( "Texto não pode ser nulo" );
                     throw new ArgumentNullException("Texto não pode ser nulo.");        
                 }
             }
