@@ -1,4 +1,4 @@
-Pagina 149
+Pagina 189
 
 Fundamentos C# - Balta
 ----------------------
@@ -6,9 +6,9 @@ Fundamentos C# - Balta
 Instalação AspNetCore 3.1
 -------------------------
 
-https://balta.io/blog/dotnet-instalacao-configuracao-e-primeiros-passos#criando-seu-primeiro-app
-https://www.tutorialsteacher.com/csharp
-https://www.javatpoint.com/c-sharp-tutorial
+    https://balta.io/blog/dotnet-instalacao-configuracao-e-primeiros-passos#criando-seu-primeiro-app
+    https://www.tutorialsteacher.com/csharp
+    https://www.javatpoint.com/c-sharp-tutorial
 
 
     . Acesse o link abaixo para baixar o .NET Core 3.1
@@ -96,7 +96,6 @@ https://www.javatpoint.com/c-sharp-tutorial
         dotnet --list-runtimes
         dotnet --list-sdks
 
-
 Instalação das extensões do VSCode
 ----------------------------------
 
@@ -175,7 +174,7 @@ Configurar Visual Studio Code para .NETCore
 
     . Ctrl + C no terminal acaba com a execução do projeto:
 
-https://www.infoq.com/br/articles/netcore-cli/    
+    https://www.infoq.com/br/articles/netcore-cli/    
 
 
     . Comandos dotnet cli:
@@ -478,9 +477,6 @@ Debugando dentro do VSCode
         
     . No VSCode acesse a opção Terminal / Run Task... e escolha a opção "build"
 
-
-
-
 .NET Standard
 -------------
 
@@ -509,7 +505,7 @@ Escopo de Programa
 
     namespace HelloWorld;        // Equivalente aos pacotes/divisões lógica
 
-    class Program           // Definição da classe
+    [public/internal] class Program           // Definição da classe
     {
         public static void Main(string args)     // Método
         {
@@ -543,8 +539,75 @@ Escopo de Programa
             # Da pasta da solution
             dotnet run --project ./helloWorld
 
+    . "internal class"
+    
+        . A classe só pode ser acessada dentro do mesmo assembly (projeto/compilação).
+
+        . É o modificador de acesso padrão se nenhum for especificado em arquivos de nível de 
+            namespace (ou seja, fora de classes aninhadas).
+
+        . Exemplo:
+
+            // Arquivo: MinhaClasse.cs
+            internal class MinhaClasse
+            {
+                public void Metodo() => Console.WriteLine("Método chamado");
+            }
+
+            // Dentro do mesmo projeto
+            var obj = new MinhaClasse(); // OK
+
+            // Em outro projeto que referencia este (ex: biblioteca DLL)
+            var obj = new MinhaClasse(); // ERRO: 'MinhaClasse' é inacessível devido ao seu nível de proteção
+
+    . class (sem modificador explícito)
+
+        . Por padrão, classes de nível superior (não aninhadas) sem modificador são internal.
+
+        . Então, "class MinhaClasse" é o mesmo que "internal class MinhaClasse", se estiver fora de outra classe
+
+        . Exemplo:
+
+            // Isso é equivalente a "internal class MinhaClasse"
+            class MinhaClasse
+            {
+                public void Metodo() => Console.WriteLine("Sem modificador: ainda é internal");
+            }
+
+    . Resumo
+
+         Declaração         Visibilidade padrão     Acessível em outros projetos?
+         ----------         -------------------     ----------------------------
+         `internal class`   Interna                     ❌ Não                       
+         `class`            Interna                     ❌ Não                       
+         `public class`     Pública                     ✅ Sim                       
+
+
     . Sugestão:
-        
+
+        . Quando usar internal explicitamente?
+
+            . Quando você quer deixar claro que a classe é apenas para uso interno, mesmo que isso já seja o comportamento padrão.
+
+            . Para maior clareza e manutenção do código, especialmente em bibliotecas.
+
+            . Exemplo:
+
+                // Projeto A - Biblioteca
+                public class ClassePublica
+                {
+                    public void Metodo() => Console.WriteLine("Sou pública!");
+                }
+
+                internal class ClasseInterna
+                {
+                    public void Metodo() => Console.WriteLine("Sou interna!");
+                }
+
+                // Projeto B - App consumidor
+                var obj1 = new ClassePublica(); // OK
+                var obj2 = new ClasseInterna(); // ERRO: ClasseInterna é inacessível
+
         . Crie o nome das namespace levemente parecido com a pasta do projeto, por exemplo:
 
             namespace Tutorial.Calculo
@@ -706,8 +769,6 @@ Tipagem de Dados
                 decimal total = preco * (1 + imposto);
 
                 Console.WriteLine($"Total com imposto: {total:C}");
-
-PAREI AQUI - Página 104
 
         . var
 
@@ -990,7 +1051,6 @@ PAREI AQUI - Página 104
                 }
             }
 
-        
 
 System
 ------
@@ -1216,10 +1276,20 @@ Operadores Condicionais - IF
 
     Exemplo 2:
 
+        int x = 8;
+
+        if ( x > 9 ) {
+            Console.WriteLine("x is greater than 9!");
+        } else {
+            Console.WriteLine("x is less than 9!");
+        }
+
+    Exemplo 3:
+
         if (condicao)
             Console.log("Fim");
 
-    Exemplo 2:
+    Exemplo 4:
 
         if(condition1)
         {
@@ -1304,7 +1374,7 @@ For
                 i++;
             }
             else
-                break;
+                break;                      // Interrompe o loop imediatamente
         }
 
     Exemplo 4
@@ -1313,6 +1383,26 @@ For
         {
             Console.WriteLine("Value of i: {0}", i);
         }
+
+    Exemplo 5
+
+        for (int i = 0; i < 5; i++)
+        {
+            if (i == 2)
+                continue;                   // Pula o restante do bloco e passa para a próxima volta
+
+            Console.WriteLine($"i: {i}");
+        }
+
+        // Saída
+        i: 0
+        i: 1
+        i: 3
+        i: 4
+
+    . Existe outros tipos de loop que veremos mais a frente, como:
+
+        foreach - Veremos em "Arrays - Acessando os elementos através de um foreach"
 
 
 While
