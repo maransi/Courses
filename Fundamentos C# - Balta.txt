@@ -1,4 +1,4 @@
-Pagina 250
+Pagina 268
 
 Fundamentos C# - Balta
 ----------------------
@@ -961,51 +961,88 @@ Tipagem de Dados
 
         Delegate
 
-            Tipo definido pelo usuário. É um “ponteiro de função orientado a objeto. Podemos atribuir uma lista de métodos a um delegate e 
-            chamá-los ao invocar o delegate. O delegate corresponde mais ou menos a um “procedure of object” do Delphi, mas pode também apontar 
-            para métodos static (métodos class no Delphi) e para uma lista de métodos.Veja um exemplo:
+            . O delegate é um tipo que representa uma referência para métodos com uma determinada assinatura. Ele funciona como um 
+                "ponteiro de função seguro", permitindo armazenar e chamar métodos dinamicamente, inclusive métodos estáticos ou de 
+                instância.
 
+            . Exemplo:
 
-                // Declara um delegate. É um método que não aceita argumentos e retorna inteiros
-                delegate int MyDelegate();
+                namespace bankAccount;
 
-                // Declara uma classe. Note que os métodos tem a mesma “assinatura” do delegate acima:
-                // retornam um inteiro e não aceitam argumentos
-                public class MyClass
+                public class BankAccount
                 {
-                    public int InstanceMethod ()
+                    // 1. declaração do delegate especificando o tipo de retorno e os parâmetros
+                    public delegate string StringConverter(string input);
+
+                    public BankAccount()
                     {
-                        Console.WriteLine("A message from the instance method.");
-            
-                        return 0;
+
                     }
 
-                    static public int StaticMethod ()
+                    // 2.1. Declara os métodos com a mesma assinatura do delegate
+                    public string LowerCaseAccountName(string input)
                     {
-                        Console.WriteLine("A message from the static method.");
-                        return 0;
+                        if (string.IsNullOrEmpty(input))
+                        {
+                            return string.Empty;
+                        }
+
+                        return input.ToLower();
                     }
+
+                    // 2.2. Declara os métodos com a mesma assinatura do delegate
+                    public string UpperCaseAccountName(string input)
+                    {
+                        if (string.IsNullOrEmpty(input))
+                        {
+                            return string.Empty;
+                        }
+
+                        return input.ToUpper();
+                    }
+
+                    // 2.3. Declara os métodos com a mesma assinatura do delegate, detalhe método "static"
+                    public static string TitleCaseAccountName( string input)
+                    {
+                        if (string.IsNullOrEmpty(input))
+                        {
+                            return string.Empty;
+                        }
+
+                        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input.ToLower());
+                    }
+
+                    public void DoExampleDelegate(string input)
+                    {
+                        //  3.1. Associa os métodos compatíveis ao delegate.
+                        StringConverter converter1 = new(LowerCaseAccountName);
+                        StringConverter converter2 = new(UpperCaseAccountName);
+                                                //    |
+                                                //    +----> o "new" é opcional, poderiamos declarar referenciando diretamente ao método
+                                                //                  StringConverter converter1 = LowerCaseAccountName;
+
+                        //  3.2. Associa os métodos compatíveis ao delegate. Sem o "new()"
+                        StringConverter converter3 = TitleCaseAccountName;
+
+
+                        // 4. Faz a chamada do delegate, que executa o método da classe associada.
+                        var lower = converter1(input);
+                        var upper = converter2(input);
+                        var title = converter3(input);
+
+                        Console.WriteLine($"Lowercase: {lower}");
+                        Console.WriteLine($"Uppercase: {upper}");
+                        Console.WriteLine($"Title: {title}");
+                    }
+
                 }
 
-                public class MainClass
-                {
-                    static public void Main ()
-                    {
-                        MyClass p = new MyClass();
-                        
-                        // Mapeia o delegate ao método da classe criada acima
-                        MyDelegate d = new MyDelegate(p.InstanceMethod);
-                        
-                        // Chama o método via delegate
-                        d();
-                        
-                        // Mapeia outro método (agora é static)
-                        d = new MyDelegate(MyClass.StaticMethod);
-                
-                        // Chama o método via delegate
-                        d();
-                    }
-                }
+
+                // Chamada
+                BankAccount account = new();
+
+                account.DoExampleDelegate("wiLLiam chArLie aNTONY");
+
 
         Tipo string
 
@@ -1030,7 +1067,7 @@ Tipagem de Dados
                 // Exibe "John - Mary"
                 System.Console.WriteLine(Name + " - " + NewName);
 
-    Nullabel Types
+    Nullable Types
 
         . Significa vazio, nada
         . Diferente de zero ou uma string vazia
@@ -1280,8 +1317,6 @@ Operadores Lógicos
         bool entre = ( x > 25 ) && ( x < 40 );      // False
         bool ou = ( x < 25 ) || ( x < 40 );         // True
         bool negacao = !( x < 25 );                 // False
-
-
 
 Operadores Condicionais - IF
 ---------------------------    
@@ -1536,7 +1571,6 @@ C# Class
         using	    using statement
         while	    while loop
 
-
     . Template de Exemplo
 
         using System;                       // 1. Importação das bibliotecas. Equivalente aos imports do java
@@ -1733,9 +1767,6 @@ C# Class
                 System.Console.WriteLine( student.Name );
                 System.Console.WriteLine( student.Address.ToString());
 
-
-
-
     . Podemos deixar os parâmetros dos métodos opcionais. Basta na assinatura do método dar um valor para o parâmetro:
 
         . Sintaxe:
@@ -1762,6 +1793,67 @@ C# Class
 
         // Chamada usando argumentos nomeados:
         ExibirMensagem(vezes: 3, mensagem: "Olá, mundo!");
+
+    . Usando in, out e ref nos parâmetros dos métodos:
+
+        . "ref"     - O parâmetro é passado por referência e pode ser lido e modificado dentro do método
+
+            . Pré-requisito:    A variável deve ser inicializada antes da chamada.
+
+            . Uso comum:        Quando você quer que o método modifique o valor original da variável.
+
+            . Exemplo
+
+                void Dobrar(ref int valor) {
+                    valor *= 2;
+                }
+
+                int numero = 5;
+                Dobrar(ref numero);  // numero agora é 10
+
+        . "in"      - é usado para indicar que o parâmetro passado NÃO PODE SER modificado pelo método.
+
+            . Pré-requisito: A variável deve estar inicializada.
+
+            . Uso comum: Para evitar cópias caras de estruturas grandes (como structs), mas garantindo imutabilidade.
+
+            Exemplo
+
+                void Mostrar(in int valor) {
+                    Console.WriteLine(valor);
+                    // valor = 10; // Erro: não pode ser modificado
+                }
+
+                int numero = 42;
+                Mostrar(in numero);
+
+        . "out"     - O parâmetro é passado por referência, mas serve apenas para saída de dados.
+
+            . Pré-requisito:    A variável não precisa estar inicializada antes da chamada, mas o método deve atribuir um valor a ela.
+
+            . Uso comum:        Para retornar múltiplos valores de um método.
+
+            . Exemplo
+
+                void CriarUsuario(out string nome, out int idade) {
+                    nome = "Maria";
+                    idade = 30;
+                }
+
+                string nomeUsuario;
+                int idadeUsuario;
+                CriarUsuario(out nomeUsuario, out idadeUsuario);
+
+            . Resumo
+
+                Palavra-chave   Precisa inicializar antes?  Pode ser lido no método?	Pode ser modificado no método?	Obrigatório atribuir valor no método?
+                -------------   --------------------------  ------------------------    ------------------------------  -------------------------------------
+
+                ref	            Sim	                        Sim	                        Sim	                            Não
+                out	            Não	                        Não*	                    Sim	                            Sim
+                in	            Sim	                        Sim	                        Não	                            Não
+
+                *Com out, o valor só pode ser lido após ser atribuído dentro do método.
 
     . Quantidade indefinida de parâmetros:
 
