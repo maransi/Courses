@@ -1170,6 +1170,16 @@ sudo apt install net-tools
 		# Permissão de acesso ao usuário na pasta compartilhada
 		sudo adduser $USER vboxsf
 
+		# Ou acesse o arquivo /etc/group e altere conforme abaixo:
+		cd /etc
+		sudo vi group
+
+		--->Linha original: vboxsf:x:1001
+
+		--->Linha modificada: vboxsf:x:1001:{user}
+
+
+
 27. Instalação do CPU-G
 
 	sudo add-apt-repository ppa:atareao/atareao
