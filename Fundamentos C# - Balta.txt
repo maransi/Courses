@@ -1,4 +1,4 @@
-Pagina 268
+Pagina 293
 
 Fundamentos C# - Balta
 ----------------------
@@ -144,7 +144,6 @@ Instalação das extensões do VSCode
         F10:                                        durante a depuração, avança uma linha;
         F11:                                        durante a depuração, avança uma linha entrando nos detalhes da mesma;
 
-
 Configurar Visual Studio Code para .NETCore
 -------------------------------------------
 
@@ -157,7 +156,6 @@ Configurar Visual Studio Code para .NETCore
     . Digite "Format on save" e habilite a configuração
 
     . Digite "Final" e habilite a configuração "Files: Insert final newline" e habilite a configuração
-
 
 .NET Core Command-Line Interface (CLI)    
 --------------------------------------
@@ -253,14 +251,12 @@ Instalar pacotes através do Nuget.org
         dotnet clean
         dotnet restore
 
-
 Documentação do C# e o que eu posso fazer com C#
 ------------------------------------------------
 
     . A documentação da Microsoft encontra-se no link abaixo:
 
         https://docs.microsoft.com/pt-br/dotnet/csharp
-
 
 Criando uma Solution
 --------------------
@@ -334,7 +330,6 @@ Criando uma Solution
 
         dotnet run
 
-
 Variáveis de Ambiente
 ---------------------
 
@@ -343,7 +338,6 @@ Variáveis de Ambiente
         dotnet run --enviroment=$SEU_AMBIENTE
         dotnet run --enviroment=development
         dotnet run --enviroment=production
-
 
 Dica para alterar a versão do dotnet de um projeto "console"
 ------------------------------------------------------------
@@ -367,7 +361,6 @@ Dica para alterar a versão do dotnet de um projeto "console"
                 <TargetFramework>netcoreapp3.1</TargetFramework>
             </PropertyGroup>
         </Project>
-
 
 Dica de como alterar a versão do AspNetCore em um novo Projeto
 --------------------------------------------------------------
@@ -420,7 +413,6 @@ Dica de como alterar a versão do AspNetCore em um novo Projeto
         </Project>
 
     . Veja que o <TargetFramework> está configurado automaticamente para o SDK 3.1
-
 
 Debugando dentro do VSCode
 --------------------------
@@ -496,7 +488,6 @@ Debugando dentro do VSCode
         +-----------------------------+-----------------------------+-----------------------------+
         |       Compilers             |     Languages               |        Runtime Components   |
         +-----------------------------+-----------------------------+-----------------------------+
-
 
 Escopo de Programa
 ------------------
@@ -581,7 +572,6 @@ Escopo de Programa
          `internal class`   Interna                     ❌ Não                       
          `class`            Interna                     ❌ Não                       
          `public class`     Pública                     ✅ Sim                       
-
 
     . Sugestão:
 
@@ -719,7 +709,6 @@ Sequências de Escape/"Escape Sequences"
         . Execute o projeto e veja o resultado.
 
             dotnet run --project ./helloWorld   
-
 
 Tipagem de Dados
 ----------------
@@ -1043,6 +1032,80 @@ Tipagem de Dados
 
                 account.DoExampleDelegate("wiLLiam chArLie aNTONY");
 
+            . Podemos passar um delegate como parâmetro para um método em C#. Basta declarar o parâmetro do tipo do delegate desejado
+
+            . Exemplo
+
+                // 1. declaração do delegate especificando o tipo de retorno e os parâmetros
+                public delegate string StringConverter(string input);
+
+                // 2.1. Declara os métodos com a mesma assinatura do delegate
+                public string LowerCaseAccountName(string input)
+                {
+                    if (string.IsNullOrEmpty(input))
+                    {
+                        return string.Empty;
+                    }
+
+                    return input.ToLower();
+                }
+
+                ...
+
+                // 3. Declaração do método com o delegate na sua assinatura
+                public void DoDelegate( StringConverter converter, string input)
+                {
+                    if (converter == null)
+                    {
+                        throw new ArgumentNullException(nameof(converter), "Converter cannot be null");
+                    }
+
+                    string result = converter(input);
+                    Console.WriteLine($"Converted Result: {result}");
+                }
+
+
+                // 4. Chamada do método
+                DoDelegate(LowerCaseAccountName, input);
+
+            . Podemos trabalhar com delegate usando métodos anônimos em C# de duas formas: utilizando a palavra-chave 
+                delegate ou expressões lambda.
+
+                . Exemplo Métodos Anônimos
+
+                    // 1.1 Declaração do objeto função delegate
+                    StringConverter LowerCaseConverter = delegate (string input)
+                    {
+                        if (string.IsNullOrEmpty(input))
+                        {
+                            return string.Empty;
+                        }
+                        return input.ToLower();
+                    };
+
+                    // 1.2 Declaração do objeto função delegate
+                    StringConverter UpperCaseConverter = delegate (string input)
+                    {
+                        if (string.IsNullOrEmpty(input))
+                        {
+                            return string.Empty;
+                        }
+                        return input.ToUpper();
+                    };
+
+                    // 2. Chamada do objeto delegate
+                    Console.WriteLine(LowerCaseConverter(input));
+                    Console.WriteLine(UpperCaseConverter(input));
+
+                . Exemplo Expressões Lambda
+
+                    // 1. Declaração dos objetos função delegate
+                    StringConverter LowerCaseConverter = (string input) => input.ToLower();
+                    StringConverter UpperCaseConverter = (string input) => input.ToUpper();
+
+                    // 2. Chamada dos objetos delegate
+                    Console.WriteLine(LowerCaseConverter(input));
+                    Console.WriteLine(UpperCaseConverter(input));
 
         Tipo string
 
@@ -1067,7 +1130,7 @@ Tipagem de Dados
                 // Exibe "John - Mary"
                 System.Console.WriteLine(Name + " - " + NewName);
 
-    Nullable Types
+    . Nullable Types
 
         . Significa vazio, nada
         . Diferente de zero ou uma string vazia
@@ -1098,6 +1161,35 @@ Tipagem de Dados
                 Console.WriteLine(pessoa.Nome!); // Garante ao compilador que Nome não é nulo
             }
 
+        . Quando adicionamos <nullable>enable</nullable> no seu .csproj, o compilador passa a emitir avisos quando você pode estar usando 
+            referências nulas de forma insegura, ajudando a evitar erros de NullReferenceException.
+
+            . Habilitar tipos de referência anuláveis:
+
+                <PropertyGroup>
+                    <Nullable>enable</Nullable>
+                </PropertyGroup> 
+
+            . Desabilitar tipos de referência anuláveis:
+
+                <PropertyGroup>
+                    <Nullable>disable</Nullable>
+                </PropertyGroup>
+
+            . Valores possíveis:
+
+                enable: Ativa os avisos e recursos de tipos de referência anuláveis.
+                disable: Desativa os avisos e recursos.
+                warnings: Apenas mostra avisos, sem ativar o recurso.
+                annotations: Apenas ativa as anotações, sem avisos.
+
+            . Resumo
+                
+                . Com <Nullable>enable</Nullable>, você pode usar string? para indicar que uma string pode ser nula, e o compilador 
+                    vai avisar se você esquecer de tratar possíveis valores nulos.
+
+                . Ajuda a tornar o código mais seguro e menos propenso a erros de referência nula.
+
         . Trabalhando com strings nulas:
 
             static void Salvar( string texto ){
@@ -1106,7 +1198,6 @@ Tipagem de Dados
                     throw new Exception( "Texto não pode ser nulo" );
                 }
             }
-
 
 System
 ------
@@ -1149,7 +1240,6 @@ Conversão Implícita
         int	        long , float, double, ou decimal
         uint	    long , ulong, float, double, ou decimal
         long	    float , double, ou decimal
-
 
 Conversão Explícita
 -------------------
@@ -1207,7 +1297,6 @@ Conversão Explícita
             }
         }
 
-
 Parse
 -----
 
@@ -1234,7 +1323,6 @@ Parse
 
         string valor1 = "999999999999999999999999999999";
         int valor2 = int.Parse(valor1); 	                Lança a exceção OverflowException
-
 
 TryParse
 --------
@@ -1282,7 +1370,6 @@ Convert
 
         Você deve utilizar Convert.ToInt32 nos mesmos casos citados acima para int.Parse porem quando o argumento não for do tipo string.
 
-
 Operadores de comparação
 ------------------------
 
@@ -1301,7 +1388,6 @@ Operadores de comparação
         x != 0;     // True
         x > 0;      // True
         x < 0;      // False
-
 
 Operadores Lógicos
 ------------------
@@ -1376,7 +1462,6 @@ Operadores Condicionais - IF
         é o mesmo que fazer:
 
         int y = (x == null) ? -1 : x;
-
 
 Switch
 ------
@@ -1458,7 +1543,6 @@ For
 
         foreach - Veremos em "Arrays - Acessando os elementos através de um foreach"
 
-
 While
 -----
 
@@ -1499,7 +1583,6 @@ While
 
             Console.WriteLine("i = " + i);
         }
-
 
 C# Class
 --------
@@ -1629,9 +1712,111 @@ C# Class
 
             private string  _myField = string.Empty;  
 
+    . Lambda
+
+        . Funções lambda em C# são funções anônimas, ou seja, funções sem nome, que podem ser usadas para criar 
+            pequenos trechos de código de forma concisa. Elas são muito utilizadas com delegates, eventos, LINQ e 
+            métodos que recebem funções como parâmetro.
+
+        . Sintaxe
+
+            (parâmetros) => expressão_ou_bloco
+
+        . Se esquecer de usar {} após o =>, só é permitido uma única expressão (sem ponto e vírgula). Para múltiplas 
+            instruções, sempre use o bloco { ... }.
+
+        . Exemplo Simples - Utiliza "=>" para indicar o código que será executado
+
+            Func<int, int, int> soma = (a, b) => a + b;
+            int resultado = soma(2, 3); // resultado = 5
+
+        . Exemplo em bloco - Utiliza "=" caracterizar o nome da função e "{}" para cercar o corpo da função
+
+            Action<string> imprimir = (texto) => 
+            {
+                Console.WriteLine(texto.ToUpper());
+            };
+            imprimir("lambda em C#");
+
+        . Parâmetros das funções lambda
+
+            . Observe a passagem de parâmetros para a função lambda
+
+                Func<int, int, int> soma = (a,  b) => a + b
+                                            -----
+                                              |
+                                              V
+                                            Params
+
+                Action<string> imprimir = (texto) => {...}
+                                         -------
+                                            |
+                                            V
+                                          Param 
+
+        . Funções lambda podem ser declaradas de diferentes maneiras, dependendo do contexto e do tipo de 
+            delegate utilizado. Os tipos mais comuns são:
+
+            . Funções explicitas:
+
+                double USDToEuro(double dollars) => exchangeRate * dollars;
+
+            . Propriedades de classes:
+
+                public string FirstName {
+                    get => _firstname;              // é equivalente a get { return _firstname; }
+                    set => _firstname = value;      // é equivalente a set { _firstname = value; }
+                }
+
+            . Usando delegates genéricos (Func, Action, Predicate)
+
+                . Func: Representa um método que retorna um valor
+
+                             Tipos dos parâmetros
+                            +-------------------+
+                            |                   |
+                            |                   V
+                        ---------               ----
+                    Func<int, int, int> soma = (a, b) => a + b;
+                                   ---                   -----
+                                    |                       ^
+                                    |                       |
+                                    +-----------------------+
+                                        Tipo do retorno
+
+                    int resultado = soma(2, 3); // resultado = 5
+
+                . Action: Representa um método que não retorna valor (void)
+
+                    Action<string> imprimir = texto => Console.WriteLine(texto);
+                    imprimir("Olá, mundo!");
+
+                . Predicate: Representa um método que retorna bool e recebe um parâmetro.
+
+                    Predicate<int> ehPar = n => n % 2 == 0;
+                    bool resultado = ehPar(4); // true
+
+            . Usando delegates personalizados - Podemos criar seu próprio tipo delegate e atribuir uma função lambda a ele:
+
+                public delegate double Operacao(double x, double y);
+
+                Operacao multiplicar = (a, b) => a * b;
+                double resultado = multiplicar(2, 3); // resultado = 6
+
+            . Como parâmetro de métodos - Podemos passar uma função lambda diretamente como argumento para métodos que 
+                                            aceitam delegates:
+
+                List<int> numeros = new List<int> { 1, 2, 3, 4, 5 };
+                var pares = numeros.FindAll(n => n % 2 == 0); // Lambda como Predicate<int>
+                                            |
+                                            V
+                    Representa cada elemento da lista numeros que o método FindAll percorrerá
+
     . Propriedades podem ser declaradas de duas formas:
 
-        . Simplificada - Quando não existe necessidade de nenhuma lógica/regra ( vide item 8 )
+        . Simplificada - Quando não existe necessidade de nenhuma lógica/regra ( vide item 8. Auto-implemented property )
+
+            public int MyAutoImplementedProperty { get; set; }
 
         . Completa - Quando a necessidade de alguma lógica extra, por exemplo:
 
@@ -2480,214 +2665,214 @@ Classes Genérica
 Coleções
 --------
 
-        . ArrayList
+    . ArrayList
 
-            . ArrayList não aceita Generic e tem menos recursos que o List
+        . ArrayList não aceita Generic e tem menos recursos que o List
 
-            . Criando um arraylist
+        . Criando um arraylist
 
-                using System.Collections;
+            using System.Collections;
 
-                ArrayList arlist = new ArrayList(); 
-                // or 
-                var arlist = new ArrayList();         
+            ArrayList arlist = new ArrayList(); 
+            // or 
+            var arlist = new ArrayList();         
 
-            . Adicionando elementos
+        . Adicionando elementos
 
-                // adding elements using ArrayList.Add() method
-                var arlist1 = new ArrayList();
-                arlist1.Add(1);
-                arlist1.Add("Bill");
-                arlist1.Add(" ");
-                arlist1.Add(true);
-                arlist1.Add(4.5);
-                arlist1.Add(null);
+            // adding elements using ArrayList.Add() method
+            var arlist1 = new ArrayList();
+            arlist1.Add(1);
+            arlist1.Add("Bill");
+            arlist1.Add(" ");
+            arlist1.Add(true);
+            arlist1.Add(4.5);
+            arlist1.Add(null);
 
-                // adding elements using object initializer syntax
-                var arlist2 = new ArrayList()
-                                {
-                                    2, "Steve", " ", true, 4.5, null
-                                };
-            
-            . Acessando um elemento de um ArrayList
-
-
-
-                var arlist = new ArrayList()
-                                {
-                                    1,
-                                    "Bill",
-                                    300,
-                                    4.5f
-                                };
-
-                //Access individual item using indexer
-                int firstElement = (int) arlist[0]; //returns 1
-                string secondElement = (string) arlist[1]; //returns "Bill"
-                //int secondElement = (int) arlist[1]; //Error: cannot cover string to int
-
-                //using var keyword without explicit casting
-                var firstElement = arlist[0]; //returns 1
-                var secondElement = arlist[1]; //returns "Bill"
-                //var fifthElement = arlist[5]; //Error: Index out of range
-
-                //update elements
-                arlist[0] = "Steve"; 
-                arlist[1] = 100;
-                //arlist[5] = 500; //Error: Index out of range
-
-            . Iterando um ArrayList
-
-                ArrayList arlist = new ArrayList()
-                                        {
-                                            1,
-                                            "Bill",
-                                            300,
-                                            4.5F
-                                        };
-
-                foreach (var item in arlist)
-                    Console.Write(item + ", "); //output: 1, Bill, 300, 4.5, 
-                            
-                for(int i = 0 ; i < arlist.Count; i++)
-                    Console.Write(arlist[i] + ", "); //output: 1, Bill, 300, 4.5, 
+            // adding elements using object initializer syntax
+            var arlist2 = new ArrayList()
+                            {
+                                2, "Steve", " ", true, 4.5, null
+                            };
+        
+        . Acessando um elemento de um ArrayList
 
 
-                pessoas.ForEach( item => { 
-                    System.Console.WriteLine( item );
-                } );
 
-            . Checando a existência de um item
+            var arlist = new ArrayList()
+                            {
+                                1,
+                                "Bill",
+                                300,
+                                4.5f
+                            };
 
-                ArrayList arList = new ArrayList()
-                                {
-                                    1,
-                                    "Bill",
-                                    300,
-                                    4.5f,
-                                    300
-                                };
+            //Access individual item using indexer
+            int firstElement = (int) arlist[0]; //returns 1
+            string secondElement = (string) arlist[1]; //returns "Bill"
+            //int secondElement = (int) arlist[1]; //Error: cannot cover string to int
 
-                Console.WriteLine(arList.Contains(300)); // true
-                Console.WriteLine(arList.Contains("Bill")); // true
-                Console.WriteLine(arList.Contains(10)); // false
-                Console.WriteLine(arList.Contains("Steve")); // false
+            //using var keyword without explicit casting
+            var firstElement = arlist[0]; //returns 1
+            var secondElement = arlist[1]; //returns "Bill"
+            //var fifthElement = arlist[5]; //Error: Index out of range
 
-            . Métodos e propriedades
+            //update elements
+            arlist[0] = "Steve"; 
+            arlist[1] = 100;
+            //arlist[5] = 500; //Error: Index out of range
 
-                ArrayList  Properties
+        . Iterando um ArrayList
 
-                Properties 	        Description
-                ----------          -----------
-                Capacity 	        Gets or sets the number of elements that the ArrayList can contain.
-                Count 	            Gets the number of elements actually contained in the ArrayList.
-                IsFixedSize 	    Gets a value indicating whether the ArrayList has a fixed size.
-                IsReadOnly 	        Gets a value indicating whether the ArrayList is read-only.
-                Item 	            Gets or sets the element at the specified index.
-
-                ArrayList Methods
-
-                Methods 	            Description
-                -------                 -----------
-                Add()/AddRange() 	    Add() method adds single elements at the end of ArrayList.
-                AddRange()              method adds all the elements from the specified collection into ArrayList.
-                Insert()/InsertRange() 	Insert() method insert a single elements at the specified index in ArrayList.
-                InsertRange()           method insert all the elements of the specified collection starting from specified index in ArrayList.
-                Remove()/RemoveRange() 	Remove() method removes the specified element from the ArrayList.
-                RemoveRange()           method removes a range of elements from the ArrayList.
-                RemoveAt() 	            Removes the element at the specified index from the ArrayList.
-                Sort() 	                Sorts entire elements of the ArrayList.
-                Reverse() 	            Reverses the order of the elements in the entire ArrayList.
-                Contains 	            Checks whether specified element exists in the ArrayList or not. Returns true if exists otherwise false.
-                Clear 	                Removes all the elements in ArrayList.
-                CopyTo 	                Copies all the elements or range of elements to compitible Array.
-                GetRange 	            Returns specified number of elements from specified index from ArrayList.
-                IndexOf 	            Search specified element and returns zero based index if found. Returns -1 if element not found.
-                ToArray 	            Returns compitible array from an ArrayList. 
-
-        . List
-
-            . Aceita o uso de Generic
-
-            . Criando uma lista
-
-                List<int> primeNumbers = new List<int>();
-                primeNumbers.Add(1); // adding elements using add() method
-                primeNumbers.Add(3);
-                primeNumbers.Add(5);
-                primeNumbers.Add(7);
-
-                var cities = new List<string>();
-                cities.Add("New York");
-                cities.Add("London");
-                cities.Add("Mumbai");
-                cities.Add("Chicago");
-                cities.Add(null);// nulls are allowed for reference type list
-
-                //adding elements using collection-initializer syntax
-                var bigCities = new List<string>()
+            ArrayList arlist = new ArrayList()
                                     {
-                                        "New York",
-                                        "London",
-                                        "Mumbai",
-                                        "Chicago"                    
+                                        1,
+                                        "Bill",
+                                        300,
+                                        4.5F
                                     };
 
-            . Adicionando objetos num List
+            foreach (var item in arlist)
+                Console.Write(item + ", "); //output: 1, Bill, 300, 4.5, 
+                        
+            for(int i = 0 ; i < arlist.Count; i++)
+                Console.Write(arlist[i] + ", "); //output: 1, Bill, 300, 4.5, 
 
-                var students = new List<Student>() { 
-                    new Student(){ Id = 1, Name="Bill"},
-                    new Student(){ Id = 2, Name="Steve"},
-                    new Student(){ Id = 3, Name="Ram"},
-                    new Student(){ Id = 4, Name="Abdul"}
-                };
 
-            . Acessando lista
+            pessoas.ForEach( item => { 
+                System.Console.WriteLine( item );
+            } );
 
-                List<int> numbers = new List<int>() { 1, 2, 5, 7, 8, 10 };
-                Console.WriteLine(numbers[0]); // prints 1
-                Console.WriteLine(numbers[1]); // prints 2
-                Console.WriteLine(numbers[2]); // prints 5
-                Console.WriteLine(numbers[3]); // prints 7
+        . Checando a existência de um item
 
-                // using foreach LINQ method
-                numbers.ForEach(num => Console.WriteLine(num + ", "));//prints 1, 2, 5, 7, 8, 10,
+            ArrayList arList = new ArrayList()
+                            {
+                                1,
+                                "Bill",
+                                300,
+                                4.5f,
+                                300
+                            };
 
-                // using for loop
-                for(int i = 0; i < numbers.Count; i++)
-                    Console.WriteLine(numbers[i]);
+            Console.WriteLine(arList.Contains(300)); // true
+            Console.WriteLine(arList.Contains("Bill")); // true
+            Console.WriteLine(arList.Contains(10)); // false
+            Console.WriteLine(arList.Contains("Steve")); // false
 
-            . Verificando a existência de um item
+        . Métodos e propriedades
 
-                var numbers = new List<int>(){ 10, 20, 30, 40 };
-                numbers.Contains(10); // returns true
-                numbers.Contains(11); // returns false
-                numbers.Contains(20); // returns true
+            ArrayList  Properties
 
-            . List<T> Class Properties and Methods
+            Properties 	        Description
+            ----------          -----------
+            Capacity 	        Gets or sets the number of elements that the ArrayList can contain.
+            Count 	            Gets the number of elements actually contained in the ArrayList.
+            IsFixedSize 	    Gets a value indicating whether the ArrayList has a fixed size.
+            IsReadOnly 	        Gets a value indicating whether the ArrayList is read-only.
+            Item 	            Gets or sets the element at the specified index.
 
-                Property 	    Usage
-                --------        -----
-                Items 	        Gets or sets the element at the specified index
-                Count 	        Returns the total number of elements exists in the List<T>
+            ArrayList Methods
 
-                Method 	        Usage
-                ------          -----
-                Add 	        Adds an element at the end of a List<T>.
-                AddRange 	    Adds elements of the specified collection at the end of a List<T>.
-                BinarySearch 	Search the element and returns an index of the element.
-                Clear 	        Removes all the elements from a List<T>.
-                Contains 	    Checks whether the specified element exists or not in a List<T>.
-                Find 	        Finds the first element based on the specified predicate function.
-                Foreach 	    Iterates through a List<T>.
-                Insert 	        Inserts an element at the specified index in a List<T>.
-                InsertRange 	Inserts elements of another collection at the specified index.
-                Remove 	        Removes the first occurrence of the specified element.
-                RemoveAt 	    Removes the element at the specified index.
-                RemoveRange 	Removes all the elements that match the supplied predicate function.
-                Sort 	        Sorts all the elements.
-                TrimExcess 	    Sets the capacity to the actual number of elements.
-                TrueForAll 	    Determines whether every element in the List<T> matches the conditions defined by the specified predicate. 
+            Methods 	            Description
+            -------                 -----------
+            Add()/AddRange() 	    Add() method adds single elements at the end of ArrayList.
+            AddRange()              method adds all the elements from the specified collection into ArrayList.
+            Insert()/InsertRange() 	Insert() method insert a single elements at the specified index in ArrayList.
+            InsertRange()           method insert all the elements of the specified collection starting from specified index in ArrayList.
+            Remove()/RemoveRange() 	Remove() method removes the specified element from the ArrayList.
+            RemoveRange()           method removes a range of elements from the ArrayList.
+            RemoveAt() 	            Removes the element at the specified index from the ArrayList.
+            Sort() 	                Sorts entire elements of the ArrayList.
+            Reverse() 	            Reverses the order of the elements in the entire ArrayList.
+            Contains 	            Checks whether specified element exists in the ArrayList or not. Returns true if exists otherwise false.
+            Clear 	                Removes all the elements in ArrayList.
+            CopyTo 	                Copies all the elements or range of elements to compitible Array.
+            GetRange 	            Returns specified number of elements from specified index from ArrayList.
+            IndexOf 	            Search specified element and returns zero based index if found. Returns -1 if element not found.
+            ToArray 	            Returns compitible array from an ArrayList. 
+
+    . List
+
+        . Aceita o uso de Generic
+
+        . Criando uma lista
+
+            List<int> primeNumbers = new List<int>();
+            primeNumbers.Add(1); // adding elements using add() method
+            primeNumbers.Add(3);
+            primeNumbers.Add(5);
+            primeNumbers.Add(7);
+
+            var cities = new List<string>();
+            cities.Add("New York");
+            cities.Add("London");
+            cities.Add("Mumbai");
+            cities.Add("Chicago");
+            cities.Add(null);// nulls are allowed for reference type list
+
+            //adding elements using collection-initializer syntax
+            var bigCities = new List<string>()
+                                {
+                                    "New York",
+                                    "London",
+                                    "Mumbai",
+                                    "Chicago"                    
+                                };
+
+        . Adicionando objetos num List
+
+            var students = new List<Student>() { 
+                new Student(){ Id = 1, Name="Bill"},
+                new Student(){ Id = 2, Name="Steve"},
+                new Student(){ Id = 3, Name="Ram"},
+                new Student(){ Id = 4, Name="Abdul"}
+            };
+
+        . Acessando lista
+
+            List<int> numbers = new List<int>() { 1, 2, 5, 7, 8, 10 };
+            Console.WriteLine(numbers[0]); // prints 1
+            Console.WriteLine(numbers[1]); // prints 2
+            Console.WriteLine(numbers[2]); // prints 5
+            Console.WriteLine(numbers[3]); // prints 7
+
+            // using foreach LINQ method
+            numbers.ForEach(num => Console.WriteLine(num + ", "));//prints 1, 2, 5, 7, 8, 10,
+
+            // using for loop
+            for(int i = 0; i < numbers.Count; i++)
+                Console.WriteLine(numbers[i]);
+
+        . Verificando a existência de um item
+
+            var numbers = new List<int>(){ 10, 20, 30, 40 };
+            numbers.Contains(10); // returns true
+            numbers.Contains(11); // returns false
+            numbers.Contains(20); // returns true
+
+        . List<T> Class Properties and Methods
+
+            Property 	    Usage
+            --------        -----
+            Items 	        Gets or sets the element at the specified index
+            Count 	        Returns the total number of elements exists in the List<T>
+
+            Method 	        Usage
+            ------          -----
+            Add 	        Adds an element at the end of a List<T>.
+            AddRange 	    Adds elements of the specified collection at the end of a List<T>.
+            BinarySearch 	Search the element and returns an index of the element.
+            Clear 	        Removes all the elements from a List<T>.
+            Contains 	    Checks whether the specified element exists or not in a List<T>.
+            Find 	        Finds the first element based on the specified predicate function.
+            Foreach 	    Iterates through a List<T>.
+            Insert 	        Inserts an element at the specified index in a List<T>.
+            InsertRange 	Inserts elements of another collection at the specified index.
+            Remove 	        Removes the first occurrence of the specified element.
+            RemoveAt 	    Removes the element at the specified index.
+            RemoveRange 	Removes all the elements that match the supplied predicate function.
+            Sort 	        Sorts all the elements.
+            TrimExcess 	    Sets the capacity to the actual number of elements.
+            TrueForAll 	    Determines whether every element in the List<T> matches the conditions defined by the specified predicate. 
 
 
 EBM - Expression Bodied Member
