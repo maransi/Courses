@@ -1,4 +1,4 @@
-Pagina 293
+Pagina 304
 
 Fundamentos C# - Balta
 ----------------------
@@ -2070,6 +2070,185 @@ C# Class
 
             // Uso:
             ExibirValores(1, "texto", 3.14, true);
+
+    . Inheritance/Herença
+
+        . Na programação orientada a objetos, herança é um conceito que permite que uma classe (chamada de classe 
+            derivada ou filha) herde atributos e métodos de outra classe (chamada de classe base ou pai).
+
+        . Com herança, a classe derivada pode:
+
+            . Utilizar membros (métodos, propriedades, campos) da classe base.
+            
+            . Adicionar novos membros.
+            
+            . Sobrescrever métodos da classe base para alterar ou especializar comportamentos.
+
+        . Exemplo
+
+            // Classe Base - Classe pai
+            using System;
+            using System.Globalization;
+
+            namespace bankAccount;
+
+            public class BankAccount
+            {
+                private string _customerName;
+                private int _accountNumber;
+                private double _accountBalance;
+
+                public BankAccount(string customerName, int accountNumber,
+                double accountBalance)
+                {
+                    _customerName = customerName;
+                    _accountNumber = accountNumber;
+                    _accountBalance = accountBalance;
+                }
+
+                public double AccountBalance
+                {
+                    get => _accountBalance;
+                    set => _accountBalance = value;
+                }
+
+                public string CustomerName
+                {
+                    get => _customerName;
+                    set => _customerName = value;
+                }
+
+                public int AccountNumber
+                {
+                    get => _accountNumber;
+                    set => _accountNumber = value;
+                }
+
+                public void DisplayName()
+                {
+                    Console.WriteLine($"Customer name is {CustomerName}");
+                }
+            }
+
+
+
+            // Classe Derivada - Classe filha
+            namespace bankAccount;
+                                            //  +------------> A classe ClasseDerivada herda de ClasseBase.
+                                            //  |
+            internal class SavingsAccount : BankAccount
+            {
+                private double _interestRate;
+                public double InterestRate
+                {
+                    get => _interestRate;
+                    set => _interestRate = value;
+                }
+                public SavingsAccount(string accountName, int accountNumber, double accountBalance, double interestRate)
+                    : base(accountName, accountNumber, accountBalance)  
+                    //  |
+                    //  +------> O construtor da ClasseDerivada recebe os parâmetro nome e usa : base(accountName, accountNumber, accountBalance) para 
+                    //              passar esse parâmetro para o construtor da classe base.    
+                {
+                    _interestRate = interestRate;
+                }
+
+                public double MonthlyInterest => _interestRate * AccountBalance / 12;
+
+
+            }
+
+            SavingsAccount savingsAccount = new SavingsAccount("Jane Smith", 654321, 1000.0,  0.05 );
+
+            savingsAccount.DisplayName();
+
+            Console.WriteLine($"Account Name is {savingsAccount.CustomerName}");
+
+        . Pontos de atenção - Use ": base(...)" quando:
+
+            . A classe base não tem um construtor sem parâmetros.
+
+            . Você precisa passar argumentos específicos para o construtor da classe base.
+
+            . Quer tornar explícito qual construtor está sendo chamado na herança.
+
+        . Para que possamos criar os objetos fornecendo o nome de cada parâmetro precisamos adicionar os construtores sem parâmetros, 
+            tanto na classe base, quanto na classe derivada.
+
+            //                                          +------------>  Para realizar a declaração do obj dessa forma precisamos
+            //                                          |               ter o construtor sem parâmetros, tanto na SuperClass, quanto 
+            // Chamada da classe            |--------------------|      na SubClass
+            SavingsAccount savingsAccount = new SavingsAccount(){
+                CustomerName = "Joseph Murdock",
+                AccountNumber = 579796,
+                AccountBalance = 100.0,
+                InterestRate = 0.03
+            };
+
+
+            . Exemplo:
+
+                // Adicione o construtor abaixo na classe base
+                ...
+                public class BankAccount
+                {
+                    private string _customerName;
+                    private int _accountNumber;
+                    private double _accountBalance;
+
+                    // Construtor inserido
+                    public BankAccount()
+                    {
+                        _customerName = "";
+                        _accountNumber = 0;
+                        _accountBalance = 0.0;
+                    }
+
+                    ...
+                }
+
+
+                // Adicone o construtor abaixo na classe derivada
+                namespace bankAccount;
+
+                internal class SavingsAccount : BankAccount
+                {
+                    ...
+
+                    public SavingsAccount(string accountName, int accountNumber, double accountBalance, double interestRate)
+                        : base(accountName, accountNumber, accountBalance)
+                    {
+                        _interestRate = interestRate;
+                    }
+                  
+                    // Construtor inserido
+                    public SavingsAccount() : base()
+                    {
+
+                    }
+                  
+                    public double MonthlyInterest => _interestRate * AccountBalance / 12;
+                }
+
+
+
+
+                // Altere a chamada, substituindo a criação do objeto por parâmetros, pelo abaixo:
+
+                // Criação inserida
+                SavingsAccount savingsAccount = new SavingsAccount(){
+                    CustomerName = "Joseph Murdock",
+                    AccountNumber = 579796,
+                    AccountBalance = 100.0,
+                    InterestRate = 0.03
+                };
+
+                // Criação eliminada
+                // SavingsAccount savingsAccount = new SavingsAccount("Jane Smith", 654321, 1000.0,  0.05 );
+
+                savingsAccount.DisplayName();
+
+                Console.WriteLine($"Account Name is {savingsAccount.CustomerName}");
 
 
 String
