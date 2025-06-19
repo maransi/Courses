@@ -1,4 +1,4 @@
-Pagina 304
+Pagina 310
 
 Fundamentos C# - Balta
 ----------------------
@@ -2158,6 +2158,9 @@ C# Class
 
             }
 
+
+
+            // Chamada da classe
             SavingsAccount savingsAccount = new SavingsAccount("Jane Smith", 654321, 1000.0,  0.05 );
 
             savingsAccount.DisplayName();
@@ -2249,6 +2252,70 @@ C# Class
                 savingsAccount.DisplayName();
 
                 Console.WriteLine($"Account Name is {savingsAccount.CustomerName}");
+
+        . Sobrescrição de métodos
+
+            . Regras
+
+                . Marque o método na classe base com o modificador virtual para permitir sobrescrita.
+
+                . Use o modificador override na classe derivada para indicar que está sobrescrevendo o método.
+
+                . O método sobrescrito deve ter a mesma assinatura (tipo de retorno, nome e parâmetros) do método na classe base.
+
+                . O nível de acesso do método sobrescrito deve ser igual ou mais permissivo que o da classe base.
+
+                . Métodos estáticos não podem ser sobrescritos.
+
+                . Não é possível sobrescrever métodos marcados como static, private ou sealed.
+
+                . Se quiser impedir que uma classe derivada sobrescreva novamente o método, use sealed override.
+
+                . Para chamar a implementação da classe base dentro do método sobrescrito, utilize base.NomeDoMetodo().
+
+                . Métodos abstratos (abstract) obrigam a sobrescrita em classes derivadas não abstratas.
+
+            . Exemplo:
+
+
+                // Classe base
+                public class BankAccount
+                {
+                    ...
+
+                    // 1. Inclusão do modificador "virtual" no método da classe base
+                    public virtual void DisplayName()
+                    {
+                        Console.WriteLine($"Base -> Customer name is {CustomerName}");
+                    }
+                }
+
+
+                // Classe derivada
+                public class SavingsAccount : BankAccount
+                {
+
+                    ...
+
+                    // 2. Inserção do modificador "override" no métod da classe derivada
+                    public override void DisplayName()
+                    {
+                        Console.WriteLine($"Derivada -> Customer name is {CustomerName}");
+
+                        // Chamando o método da classe base
+                        base.DisplayName();
+                    }
+                }
+
+
+                // Chamada da classe
+                SavingsAccount savingsAccount = new SavingsAccount("Jane Smith", 654321, 1000.0,  0.05 );
+
+                BankAccount bankAccount = new BankAccount(){ AccountName: "John Dexter", AccountNumber: 171066, AccountBalance: 10, InterestRate: 3.5 };
+
+                bankAccount.DisplayName();
+                savingsAccount.DisplayName();
+
 
 
 String
