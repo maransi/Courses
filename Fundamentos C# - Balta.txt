@@ -1,4 +1,4 @@
-Pagina 310
+Pagina 323
 
 Fundamentos C# - Balta
 ----------------------
@@ -2315,6 +2315,125 @@ C# Class
 
                 bankAccount.DisplayName();
                 savingsAccount.DisplayName();
+
+    . Classes Abstratas
+
+        . São classes que não podem ser instanciadas diretamente e servem como base para outras classes. Elas podem conter 
+            métodos abstratos (sem implementação) e métodos concretos (com implementação). Classes derivadas devem implementar 
+            os métodos abstratos.
+
+            . Classes abstratas servem como modelo para outras classes.
+
+            . Não podem ser instanciadas diretamente.
+
+            . Podem ter métodos abstratos e concretos.
+
+            . Classes derivadas devem implementar os métodos abstratos.
+
+        . Exemplo:
+
+            // Classe abstrata
+            public abstract class BankAccount
+            {
+                public string CustomerName { get; set; }
+                public int AccountNumber { get; set; }
+                public double AccountBalance { get; set; }
+
+                // Método abstrato: deve ser implementado pelas classes derivadas
+                public abstract void DisplayName();
+
+                // Método concreto: pode ser usado ou sobrescrito pelas derivadas
+                public void ShowBalance()
+                {
+                    Console.WriteLine($"Saldo: {AccountBalance:C}");
+                }
+            }
+
+            // Classe derivada
+            public class SavingsAccount : BankAccount
+            {
+                public double InterestRate { get; set; }
+
+                // Implementação obrigatória do método abstrato
+                public override void DisplayName()
+                {
+                    Console.WriteLine($"Conta Poupança de {CustomerName}");
+                }
+            }
+
+            // Uso
+            SavingsAccount conta = new SavingsAccount
+            {
+                CustomerName = "Maria",
+                AccountNumber = 123,
+                AccountBalance = 1000.0,
+                InterestRate = 0.05
+            };
+
+            conta.DisplayName();   // Saída: Conta Poupança de Maria
+            conta.ShowBalance();   // Saída: Saldo: R$ 1.000,00
+
+        . Métodos virtuais em classes abstratadas
+
+            .  Métodos virtuais em classes abstratas funcionam como em classes comuns: eles têm uma implementação padrão, 
+                mas podem ser sobrescritos (override) em classes derivadas para alterar ou especializar o comportamento. 
+                Diferente de métodos abstratos (que não têm corpo), métodos virtuais podem ser usados diretamente ou 
+                sobrescritos.
+
+                . Métodos virtuais em classes abstratas têm implementação padrão e podem ser sobrescritos.
+
+                . Métodos abstratos obrigam a sobrescrita e não têm implementação na classe base.
+
+                . Você pode misturar membros abstratos e virtuais em uma mesma classe abstrata.
+
+
+            . Exemplo:
+
+                // Classe abstrata com método virtual
+                public abstract class BankAccount
+                {
+                    public string CustomerName { get; set; }
+                    public int AccountNumber { get; set; }
+                    public double AccountBalance { get; set; }
+
+                    // Método abstrato: deve ser implementado pelas derivadas
+                    public abstract void DisplayName();
+
+                    // Método virtual: pode ser sobrescrito, mas já tem implementação padrão
+                    public virtual void ShowAccountType()
+                    {
+                        Console.WriteLine("Tipo de conta: Conta Bancária");
+                    }
+                }
+
+                // Classe derivada sobrescrevendo o método virtual
+                public class SavingsAccount : BankAccount
+                {
+                    public double InterestRate { get; set; }
+
+                    public override void DisplayName()
+                    {
+                        Console.WriteLine($"Conta Poupança de {CustomerName}");
+                    }
+
+                    // Sobrescrevendo o método virtual
+                    public override void ShowAccountType()
+                    {
+                        Console.WriteLine("Tipo de conta: Conta Poupança");
+                    }
+                }
+
+                // Uso
+                SavingsAccount conta = new SavingsAccount
+                {
+                    CustomerName = "Maria",
+                    AccountNumber = 123,
+                    AccountBalance = 1000.0,
+                    InterestRate = 0.05
+                };
+
+                conta.DisplayName();      // Saída: Conta Poupança de Maria
+                conta.ShowAccountType();  // Saída: Tipo de conta: Conta Poupança
 
 
 
