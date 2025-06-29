@@ -37,7 +37,21 @@
 
 5. Procurar arquivos que tenham o seguinte texto:
 
-    grep -rnw ~/git -e 'blablabla'
+    grep -rnwi ~/git -e 'blablabla'
+
+        -r : busca recursiva em subdiretórios
+        -n : mostra o número da linha
+        -w : busca a palavra exata
+        -e : especifica o texto a ser procurado
+        -i : ignora diferença entre maiúsculas e minúsculas (case insensitive)
+
+    ou
+
+    grep -ril ~/git 'blablabla'
+
+        -r : busca recursiva em subdiretórios (procura em todas as pastas e subpastas)
+        -i : ignora diferença entre maiúsculas e minúsculas (case insensitive)
+        -l : mostra apenas o nome dos arquivos que contêm o texto procurado, sem exibir as linhas encontradas
 
 
 5. Como mudar as permissões de vários arquivos
