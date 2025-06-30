@@ -1,4 +1,4 @@
-Pagina 419
+Pagina 438
 
 Fundamentos C# - Balta
 ----------------------
@@ -3314,6 +3314,29 @@ Processamento Assincrono
         . await     - Significa que irá aguardar a execução do método especificado como "await" para sair do método pai/chamador
 
             await Task.Delay(TimeSpan.FromSeconds(6)); // Espera 2 segundos sem bloquear a thread principal
+
+    . Task.WaitAll  - É utilizado para aguardar a conclusão de várias tarefas (Tasks) assíncronas antes de continuar a execução do 
+                        código. Ele bloqueia a thread atual até que todas as Tasks passadas como parâmetro tenham terminado.
+                      
+
+        . Exemplo:
+
+            static void Main(string[] args)
+            {
+                // Executa o método ExecutarAsync
+                var retorno1 = ExecutarAsync("Processamento 1");
+                var retorno2 = ExecutarAsync("Processamento 2");
+                var retorno3 = ExecutarAsync("Processamento 3");
+
+                Console.WriteLine("Já passou os 2 segundos...");
+                Console.WriteLine("Fim");
+
+                Task.WaitAll( retorno1, retorno2, retorno3 );       // Podemos eliminar quaisquer outras forma de parar o processamento e utilizar 
+                                                                    // "Task.WaitAll" para aguardar a conclusão de todos os processamentos.
+            }
+
+
+
 
 
     . Threads são unidades de execução independentes dentro de um processo. Em C#, você pode criar threads manualmente usando 
