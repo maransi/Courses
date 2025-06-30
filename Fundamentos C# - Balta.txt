@@ -3242,6 +3242,113 @@ Coleções
             TrueForAll 	    Determines whether every element in the List<T> matches the conditions defined by the specified predicate. 
 
 
+Processamento Assincrono
+------------------------
+
+    . Processamento assíncrono em C# permite executar tarefas de forma não bloqueante, ou seja, o programa pode continuar 
+        executando outras operações enquanto aguarda a conclusão de uma tarefa demorada (como acesso a arquivos, banco de 
+        dados ou chamadas de rede). Isso é feito principalmente com as palavras-chave async e await, usando métodos que 
+        retornam Task ou Task<T>.
+
+    . Exemplos:
+
+        // Processamento Assíncrono "Program.cs"
+        class Program
+        {
+            static void Main(string[] args)
+            {
+                // Executa o método ExecutarAsync
+                var retorno1 = ExecutarAsync("Processamento 1");
+                var retorno2 = ExecutarAsync("Processamento 2");
+                var retorno3 = ExecutarAsync("Processamento 3");
+
+                Console.WriteLine("Já passou os 2 segundos...");
+                Console.WriteLine("Fim");
+
+                Console.ReadLine();                 // IMPORTANTE: É necessário a parada do processamento, para que o fluxo retorne a linha abaixo do
+                                                    //              "await Task.Delay(TimeSpan.FromSeconds(2));" 
+
+                Console.WriteLine(retorno1.Result); // IMPORTANTE: Como dito anterior é necessário ter uma parada no fluxo para que seja retornado
+                Console.WriteLine(retorno2.Result); //              na linha do "await", neste caso poderiamos comentar o "Console.ReadLine()" porque
+                Console.WriteLine(retorno3.Result); //              o "retorno1[2,3].Result" terá que aguardar a conclusão do método "ExecutarAsync" 
+                                                    //              para ter o seu resultado.
+            }
+
+            static async Task<string> ExecutarAsync(string msg)
+            {
+                Console.WriteLine($"Iníciando espera {msg}");
+
+                await Task.Delay(TimeSpan.FromSeconds(2)); // Espera 2 segundos sem bloquear a thread principal
+
+                Console.WriteLine($"Fim da espera {msg}");
+
+                return $"Tarefa concluída do {msg}!";
+            }
+
+        }
+
+
+        . Task      - Representa uma tarefa assíncrona, ou seja, uma operação que pode ser executada de forma independente e não bloqueia 
+                        o fluxo principal do programa. Ela faz parte do namespace System.Threading.Tasks e é usada para facilitar o processamento 
+                        assíncrono e paralelo
+
+            . Uma Task pode executar métodos que demoram (como acesso a arquivos, banco de dados, etc.) sem travar a aplicação.
+
+            . Pode retornar um resultado (Task<T>) ou apenas indicar a conclusão (Task).
+
+            . No caso dos métodos assíncronos o retorno será uma tarefa "Task" (tarefas a serem executadas em paralelo)
+
+
+
+            static async Task<string> ExecutarAsync()
+
+        . async     - Significa que o método será executado assincronamente.
+
+            static async void ExecutarAsync()
+                    |                 -----
+                    |                   |
+                    +--> Configuração   +----> Por convenção, qdo utilizamos "async" no método, o nome 
+                        do método como           dele também é batizado como "Async"
+                        "async"
+
+        . await     - Significa que irá aguardar a execução do método especificado como "await" para sair do método pai/chamador
+
+            await Task.Delay(TimeSpan.FromSeconds(6)); // Espera 2 segundos sem bloquear a thread principal
+
+
+    . Threads são unidades de execução independentes dentro de um processo. Em C#, você pode criar threads manualmente usando 
+        a classe Thread, mas normalmente o processamento assíncrono moderno utiliza o ThreadPool ou o Task Parallel Library (TPL), 
+        que gerenciam threads de forma eficiente.
+
+    . Relação entre Processamento Assíncrono e Threads são:
+
+        . O processamento assíncrono pode usar threads para executar tarefas em paralelo, mas nem toda operação assíncrona cria uma 
+            nova thread (por exemplo, operações de I/O podem ser aguardadas sem ocupar uma thread).
+
+        . O uso de async/await facilita o código assíncrono sem precisar gerenciar threads manualmente.
+
+        . Para tarefas que realmente exigem paralelismo (várias tarefas ao mesmo tempo), threads são usadas por trás dos panos.
+
+        // Thread
+        using System;
+        using System.Threading;
+
+        public class Exemplo
+        {
+            public void ExecutarComThread()
+            {
+                Thread thread = new Thread(() =>
+                {
+                    Console.WriteLine("Executando em outra thread");
+                });
+                thread.Start();
+            }
+        }        
+
+
+
+
+
 EBM - Expression Bodied Member
 ------------------------------
 
