@@ -1,4 +1,4 @@
-Pagina 438
+Pagina 477
 
 Fundamentos C# - Balta
 ----------------------
@@ -2753,6 +2753,7 @@ Arrays
         Array.Reverse(nums);                            // sorts array in descending order
         Array.ForEach(nums, n => Console.WriteLine(n)); // iterates array
         Array.BinarySearch(nums, 5);                    // binary search 
+        Array.Clear(nums, 0, 3 );                       // Limpando arrays
 
     . Passando array como argumento
 
@@ -2800,6 +2801,8 @@ Arrays
 
 
         }
+
+
 
 Exception
 ---------
@@ -3311,12 +3314,30 @@ Processamento Assincrono
                         do método como           dele também é batizado como "Async"
                         "async"
 
-        . await     - Significa que irá aguardar a execução do método especificado como "await" para sair do método pai/chamador
+        . await     - Pausa a execução até que a operação assíncrona termine, mas não bloqueia a thread/fluxo principal retornando para o chamador. 
+                        Assim, outros processos podem continuar rodando enquanto a Task está em execução.
 
-            await Task.Delay(TimeSpan.FromSeconds(6)); // Espera 2 segundos sem bloquear a thread principal
+                    Quando a Task termina, o método continua a execução a partir da linha seguinte ao await. Isso facilita o uso de operações 
+                    demoradas (como acesso a banco, arquivos, APIs) sem travar a aplicação.
 
-    . Task.WaitAll  - É utilizado para aguardar a conclusão de várias tarefas (Tasks) assíncronas antes de continuar a execução do 
-                        código. Ele bloqueia a thread atual até que todas as Tasks passadas como parâmetro tenham terminado.
+                    . Exemplo prático:
+        
+                        Console.WriteLine("Início");
+
+                        await Task.Delay(2000); // Pausa aqui por 2 segundos, sem bloquear a thread, retornando para o chamador
+
+                        Console.WriteLine("Fim"); // Só executa após o await terminar, saindo do chamador retornando para cá
+
+        
+         Significa que irá aguardar a execução do método especificado como "await" para sair do método pai/chamador. ATENÇÃO: Se 
+                        for colocado "await" o processamento deixa de ser assíncrono
+
+            await Task.Delay(TimeSpan.FromSeconds(2)); // Espera 2 segundos sem bloquear a thread principal
+
+    . Task.WaitAll  - É um método síncrono, utilizado para aguardar a conclusão de várias tarefas (Tasks) assíncronas antes de continuar 
+                        a execução do código. Ele bloqueia a thread atual até que todas as Tasks passadas como parâmetro tenham terminado.
+
+                    Não pode ser usado com await.
                       
 
         . Exemplo:
@@ -3335,6 +3356,30 @@ Processamento Assincrono
                                                                     // "Task.WaitAll" para aguardar a conclusão de todos os processamentos.
             }
 
+    . Task.WhenAll  - Quase igual ao "Task.WaitAll", só que assíncrono.
+
+        . Recebe um array ou lista de Tasks.
+
+        . Retorna uma Task que pode ser aguardada com await.
+
+        . Se todas as Tasks terminarem com sucesso, a Task retornada também termina com sucesso.
+
+        . Se alguma Task lançar exceção, a Task retornada lança uma AggregateException com todas as exceções.
+
+        . Exemplo:
+                              +---------> observe que fomos obrigado utilizar "async" "Task" porque a chamada do "Task.WhenAll" é feita com "await"
+                              |
+                         |----------|
+            public static async Task Main(string[] args)
+            {
+                var t1 = ExecutarAsync("Processo 1");
+                var t2 = ExecutarAsync("Processo 2");
+                var t3 = ExecutarAsync("Processo 3");
+
+                await Task.WhenAll(t1, t2, t3);
+
+                Console.WriteLine("Todos os processamentos concluídos!");
+            }
 
 
 
