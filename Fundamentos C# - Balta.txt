@@ -1,4 +1,4 @@
-Pagina 498
+Pagina 498 - Revisar Exception pagina 391
 
 Fundamentos C# - Balta
 ----------------------
@@ -3379,6 +3379,54 @@ Processamento Assincrono
 
                 Console.WriteLine("Todos os processamentos concluídos!");
             }
+
+    . No cenário em que você precisa executar vários comandos (INSERT, UPDATE, DELETE) no banco de dados usando ADO.NET, o recomendado é:
+
+        . Executar cada comando de forma assíncrona usando await.
+
+        . Evitar executar comandos concorrentes na mesma conexão (cada conexão só pode processar um comando por vez).
+
+        . Se os comandos precisam ser executados em sequência (um depende do outro), use await em cada chamada, um após o outro.
+
+        . Se os comandos são independentes e podem ser executados em paralelo, use conexões diferentes para cada comando e aguarde todos com Task.WhenAll.
+
+        . Exemplo:
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        using (var insertCmd = new SqlCommand("INSERT INTO Tabela ...", connection, transaction))
+                        {
+                            await insertCmd.ExecuteNonQueryAsync();
+                        }
+
+                        using (var updateCmd = new SqlCommand("UPDATE Tabela ...", connection, transaction))
+                        {
+                            await updateCmd.ExecuteNonQueryAsync();
+                        }
+
+                        using (var deleteCmd = new SqlCommand("DELETE FROM Tabela ...", connection, transaction))
+                        {
+                            await deleteCmd.ExecuteNonQueryAsync();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+
+
+
 
 
 
