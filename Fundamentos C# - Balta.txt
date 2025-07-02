@@ -1,4 +1,4 @@
-Pagina 498 - Revisar Exception pagina 391
+Pagina 543
 
 Fundamentos C# - Balta
 ----------------------
@@ -2869,59 +2869,95 @@ Exception
             static void Salvar( string texto ){
 
                 if ( string.IsNullOrEmpty( texto ) ){
-    //                    throw new Exception( "Texto não pode ser nulo" );
+                    // throw new Exception( "Texto não pode ser nulo" );
                     throw new ArgumentNullException("Texto não pode ser nulo.");        
                 }
             }
 
     . Custom Exception
 
-        class Student
-        {
-            public int StudentID { get; set; }
-            public string StudentName { get; set; }
-        }
+        . Excessões customizadas são derivados da classe Exception e devem
+            incluir três construtores e parâmetros, se necessário.
 
-        [Serializable]
-        class InvalidStudentNameException : Exception
-        {
-            public InvalidStudentNameException() {  }
+            // Classe model
+            namespace helloWorld;
 
-            public InvalidStudentNameException(string name)
-                : base(String.Format("Invalid Student Name: {0}", name))
+            class Student
             {
-
+                public int StudentID { get; set; }
+                public string StudentName { get; set; }
             }
-        }
 
-        static void Main(string[] args)
-        {
-            Student newStudent = null;
-            
-            try
-            {               
-                newStudent = new Student();
-                newStudent.StudentName = "James007";
-                
-                ValidateStudent(newStudent);
-            }
-            catch(InvalidStudentNameException ex)
+
+
+            // Excessão customizada
+            namespace helloWorld;
+
+            [Serializable]
+            class InvalidStudentNameException : Exception   // Derivada de Exception
             {
-                Console.WriteLine(ex.Message );
+                public InvalidStudentNameException() { }   // 1. Construtor sem parâmetro
+
+                public InvalidStudentNameException(string name) // 2. Construtor com parâmetro, indicando a msg
+                    : base(String.Format("Invalid Student Name: {0}", name))
+                {
+
+                }
+
+                public InvalidStudentNameException(string name, Exception inner) // 3. Construtor com parâmetro, indicando a msg e uma exception personalizada
+                    : base(String.Format("Invalid Student Name: {0}", name), inner)
+                {
+
+                }
             }
-            
 
-            Console.ReadKey();
-        }
 
-        private static void ValidateStudent(Student std)
-        {
-            Regex regex = new Regex("^[a-zA-Z]+$");
+            // Chamador
+            using System.Text.RegularExpressions;
+            using helloWorld;
 
-            if (!regex.IsMatch(std.StudentName))
-                throw new InvalidStudentNameException(std.StudentName);
-                
-        }
+            class Program
+            {
+                public static void Main(string[] args)
+                {
+                    Student? newStudent = null;
+
+                    try
+                    {
+                        newStudent = new Student();
+                        newStudent.StudentName = "James";
+
+                        ValidateStudent(newStudent);
+                    }
+                    catch (InvalidStudentNameException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+
+
+                    // Console.ReadKey();
+                }
+
+                private static void ValidateStudent(Student std)
+                {
+                    Regex regex = new Regex("^[a-zA-Z]+$");
+
+                    if (!regex.IsMatch(std.StudentName))
+                        throw new InvalidStudentNameException(std.StudentName);
+
+                    try
+                    {
+                        // Algum código que pode lançar uma exceção
+                        throw new FormatException("Operação inválida!");
+                    }
+                    catch (Exception ex)
+                    {
+                        // Lança uma exceção personalizada, incluindo a original como inner exception
+                        throw new InvalidStudentNameException("Erro de operação inválida!!!", ex);
+                    }
+                }
+            }
+
 
 Classes Genérica
 ----------------
@@ -3243,6 +3279,111 @@ Coleções
             TrueForAll 	    Determines whether every element in the List<T> matches the conditions defined by the specified predicate. 
 
     . Dictionary
+
+        . Dictionary em C# permite que os dados sejam armazenados e gerenciados como pares chave-valor. Os dicionários cumprem um
+            propósito semelhante ao de arrays e listas, exceto que cada item armazenado no dicionário tem associada uma chave única 
+            (para ser mais preciso, a chave é única para o objeto específico do dicionário) que pode ser usada para referenciar e 
+            acessar o valor correspondente.
+        
+        . A declaração de um Dictionary em C# é feita usando a classe genérica Dictionary<TKey, TValue>, onde TKey é o tipo da chave e TValue 
+            é o tipo do valor. 
+
+            . Sintaxe:
+
+                Dictionary<int, string> alunos = new Dictionary<int, string>();
+
+                Dictionary alunos = new Dictionary();
+                
+                var alunos = new Dictionary();
+
+                var alunos = new Dictionary() {   { key1, value1 },
+                                                { key2, value2 },
+                                                { key3, value3 }, 
+                                                ...
+                                            }
+
+        . Dictionary<T> Properties and Methods
+
+            Propriedades
+            ------------
+
+                Count: retorna o número de pares chave-valor no dicionário.
+                Keys: retorna uma coleção com todas as chaves.
+                Values: retorna uma coleção com todos os valores.
+                Item[TKey]: permite acessar ou definir o valor associado a uma chave específica (indexador).
+
+            Métodos
+            -------
+
+                Add(TKey key, TValue value): adiciona um novo par chave-valor.
+                Remove(TKey key): remove o elemento com a chave especificada.
+                Clear(): remove todos os elementos do dicionário.
+                ContainsKey(TKey key): verifica se uma chave existe no dicionário.
+                ContainsValue(TValue value): verifica se um valor existe no dicionário.
+                TryGetValue(TKey key, out TValue value): tenta obter o valor associado à chave, sem lançar exceção se não existir.
+                GetEnumerator(): retorna um enumerador para iterar pelos pares chave-valor.
+
+        . Iteração
+
+            . Usando foreach nos pares chave-valor
+
+                Dictionary<int, string> alunos = new Dictionary<int, string>();
+                // ... adicionar elementos ...
+
+                foreach (var item in alunos)
+                {
+                    Console.WriteLine($"Chave: {item.Key}, Valor: {item.Value}");
+                }
+
+            . Iterando apenas pelas chaves
+
+                foreach (var valor in alunos.Values)
+                {
+                    Console.WriteLine($"Valor: {valor}");
+                }
+
+            .  Iterando apenas pelos valores
+
+                foreach (var valor in alunos.Values)
+                {
+                    Console.WriteLine($"Valor: {valor}");
+                }
+
+        . Acessando itens na coleção pela chave
+
+            using System;
+            using System.Collections.Generic;
+
+            class Program
+            {
+                static void Main()
+                {
+                    // Declarando o Dictionary com chave string e valor int
+                    Dictionary<string, int> estoque = new Dictionary<string, int>();
+
+                    // Adicionando elementos
+                    estoque.Add("Arroz", 50);
+                    estoque.Add("Feijão", 30);
+                    estoque.Add("Macarrão", 20);
+
+                    // Acessando um valor pela chave
+                    Console.WriteLine($"Quantidade de Arroz: {estoque["Arroz"]}");  // Saída: Quantidade de Arroz: 50
+
+                    // Iterando sobre o Dictionary
+                    foreach (var item in estoque)
+                    {
+                        Console.WriteLine($"Produto: {item.Key}, Quantidade: {item.Value}");
+                    }
+
+                                /* Saída
+
+                                    Produto: Arroz, Quantidade: 50
+                                    Produto: Feijão, Quantidade: 30
+                                    Produto: Macarrão, Quantidade: 20
+                                */
+                }
+            }
+
 
 Processamento Assincrono
 ------------------------
