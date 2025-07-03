@@ -1,4 +1,4 @@
-Pagina 543
+Pagina 569
 
 Fundamentos C# - Balta
 ----------------------
@@ -2506,6 +2506,18 @@ String
 
     . Comparação de strings
 
+        . "compareTo" Compara duas strings e retorna um inteiro:
+
+            . 0 se forem iguais,
+            . < 0 se a string for menor,
+            . > 0 se for maior (ordem alfabética).
+        
+                string texto = "Testando";
+                texto.CompareTo("Testando"); // 0
+                texto.CompareTo("testando"); // 1 (case sensitive)
+
+        . Use "Contains" quando quiser saber se uma substring está presente dentro da string.
+
         string texto = "Testando";
 
         System.Console.WriteLine( texto.CompareTo("Testando") );        // Exibirá "0"
@@ -2528,6 +2540,8 @@ String
         System.Console.WriteLine( texto.EndsWith("test") );        // Exibirá false
 
     . Equals
+
+        . Use "Equals" quando quiser garantir que as strings são idênticas.
 
         string texto = "Testando";
 
