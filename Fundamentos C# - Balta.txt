@@ -1692,6 +1692,35 @@ C# Class
                     set => _firstname = value;      // é equivalente a set { _firstname = value; }
                 }
 
+            . No construtor da classe - Se o construtor possuir mais de uma linha de código ou expressão não podemos usar o "=>"
+
+                class Calculadora
+                {
+                    public int Numero1 = 100;
+                    public int Numero2 = 33;
+
+                    public Calculadora() => Numero1 = Numero1 + Numero2;
+                }
+
+            . Em métodos de classes
+
+                class Calculadora
+                {
+                    // Exibe um texto no console
+                    public void Exibir() => WriteLine("Olá, Macoratti");
+
+                    // Invoca outro método
+                    public void Invocar() => Exibir();
+
+                    // Possui dois parâmetros e retorna a soma mais 100
+                    // Não precisa usar Return com EBM
+                    public int Somar(int a, int b) => a + b + 100;
+                    
+                    // Método tem dois parâmetros e retorna um valor de acordo
+                    // com a condição do operador ternário
+                    public int Comparar(int a, int b) => a == b ? 100 : 200;
+                }
+
             . Usando delegates genéricos (Func, Action, Predicate)
 
                 . Func: Representa um método que retorna um valor
@@ -2489,7 +2518,6 @@ String
 
         Console.WriteLine(mensagem)
 
-
     . Interpolação e Verbatim juntos "@$" ou "$@"
 
         string userName = "John";
@@ -2502,7 +2530,6 @@ String
                             Message capacity remaining is {maxCount - inboxCount}.";
 
         Console.WriteLine(message);
-
 
     . Comparação de strings
 
@@ -2518,15 +2545,21 @@ String
 
         . Use "Contains" quando quiser saber se uma substring está presente dentro da string.
 
-        string texto = "Testando";
+        . Use "Equals" quando quiser garantir que as strings são idênticas.
 
-        System.Console.WriteLine( texto.CompareTo("Testando") );        // Exibirá "0"
-        System.Console.WriteLine( texto.CompareTo("testando") );        // Exibirá "1"
-        
-                
-        System.Console.WriteLine( texto.Contains("Test" ) );        // Exibirá True
-        System.Console.WriteLine( texto.Contains("test" ) );        // Exibirá False
-        System.Console.WriteLine( texto.Contains("testando", StringComparison.OrdinalIgnoreCase ) );        // Exibirá True
+            string texto = "Testando";
+
+            System.Console.WriteLine( texto.CompareTo("Testando") );        // Exibirá "0"
+            System.Console.WriteLine( texto.CompareTo("testando") );        // Exibirá "1"
+            
+                    
+            System.Console.WriteLine( texto.Contains("Test" ) );        // Exibirá True
+            System.Console.WriteLine( texto.Contains("test" ) );        // Exibirá False
+            System.Console.WriteLine( texto.Contains("testando", StringComparison.OrdinalIgnoreCase ) );        // Exibirá True
+
+            System.Console.WriteLine( texto.Equals("Testando") );        // Exibirá true
+            System.Console.WriteLine( texto.Equals("testando") );        // Exibirá false
+            System.Console.WriteLine( texto.Equals("testando", StringComparison.OrdinalIgnoreCase) );        // Exibirá true
 
         . CompareTo retorna um inteiro 0 - ok e 1 - Não Ok
 
@@ -2539,18 +2572,6 @@ String
         System.Console.WriteLine( texto.StartsWith("Test") );        // Exibirá true
         System.Console.WriteLine( texto.EndsWith("test") );        // Exibirá false
 
-    . Equals
-
-        . Use "Equals" quando quiser garantir que as strings são idênticas.
-
-        string texto = "Testando";
-
-        System.Console.WriteLine( texto.Equals("Testando") );        // Exibirá true
-        System.Console.WriteLine( texto.Equals("testando") );        // Exibirá false
-        System.Console.WriteLine( texto.Equals("testando", StringComparison.OrdinalIgnoreCase) );        // Exibirá true
-
-        . Equals é utilizado em outros tipo de objetos.
-
     . IndexOf   - Retorna a posição da string dentro de outra string    texto.IndexOf("esta") // exibirá 1
 
     . ToUpper e ToLower para deixar em caixa alta e baixa
@@ -2560,6 +2581,55 @@ String
     . Split para quebrar em um array
 
     . Substring( inicio, tamanho )
+
+    . Format( string, arg1, arg2 ) - substitui marcadores {0}, {1}, etc., pelos valores fornecidos.
+
+        . Exemplos:
+
+            double preco = 10.2;
+            string texto = string.Format("O preço do produto é {0}", preco);
+            Console.WriteLine(texto); // Saída: O preço do produto é 10,2
+
+            double preco = 10.2;
+            string texto = string.Format("O preço do produto é {0:C}", preco);
+            Console.WriteLine(texto); // Saída: O preço do produto é R$ 10,20 (dependendo da cultura)
+
+        . Os principais tipos de formatação suportados pelo string.Format em C# são:
+
+            {0:C} — Moeda (Currency):
+            Exibe o valor como moeda, de acordo com a cultura local.
+            Exemplo: R$ 10,20
+
+            {0:F2} — Número com casas decimais fixas (Fixed-point):
+            Exibe o número com 2 casas decimais.
+            Exemplo: 10,20
+
+            {0:D4} — Inteiro com zeros à esquerda (Decimal):
+            Exibe o número inteiro com pelo menos 4 dígitos, preenchendo com zeros à esquerda.
+            Exemplo: 0025
+
+            {0:P2} — Porcentagem (Percent):
+            Exibe o valor como porcentagem com 2 casas decimais.
+            Exemplo: 25,00%
+
+            {0:N0} — Separador de milhar (Number):
+            Exibe o número com separador de milhar e sem casas decimais.
+            Exemplo: 10.000
+
+            {0:E} — Notação científica (Exponential):
+            Exibe o número em notação científica.
+            Exemplo: 1.23E+004
+
+            {0:X} — Hexadecimal:
+            Exibe o número em formato hexadecimal.
+            Exemplo: FF
+
+            {0:G} — Geral (General):
+            Usa o formato mais compacto entre fixo e científico.
+
+            {0:yyyy-MM-dd HH:mm:ss} — Datas personalizadas:
+            Permite formatar datas conforme padrões definidos.
+            Exemplo: 2025-07-04 18:45:00
 
 DateTime
 --------
@@ -2610,6 +2680,18 @@ DateTime
         System.Console.WriteLine( dataAtual.AddMonths(7) );
         System.Console.WriteLine( dataAtual.AddYears(7) );
 
+
+        Method              Description
+        ------              -----------
+        Add                 Adds/Subtracts the value of the specified TimeSpan object instance.
+        AddDays             Adds/Subtracts the specified number of days.
+        AddHours            Adds/Subtracts the specified number of hours.
+        AddMilliseconds     Adds/Subtracts the specified number of Milliseconds.
+        AddMinutes          Adds/Subtracts the specified number of minutes.
+        AddMonths           Adds/Subtracts the specified number of months.
+        AddSeconds          Adds/Subtracts the specified number of seconds.
+        AddYears            Adds/Subtracts the specified number of years.
+
     . Operadores 
 
         DateTime dt1 = new DateTime(2015, 12, 20);  
@@ -2655,7 +2737,7 @@ DateTime
 
             DateTime dataAtual = DateTime.Now;
 
-            System.Console.WriteLine( String.Format("{0:dd/MM/yyyy}", dataAtual ) );
+            System.Console.WriteLine( String.Format("{0:dd/MM/yyy HH:mm:ss}", dataAtual ) );
 
     . Datas Nulas
 
@@ -2972,113 +3054,142 @@ Exception
                 }
             }
 
-
 Classes Genérica
 ----------------
 
-    class DataStore<T>
-    {
-        public T Data { get; set; }
-    }
+    Na abordagem de classes genéricas em C#, os principais pontos que devem ser abordados são:
+
+        . Definição de classe genérica
+
+            Sintaxe: class NomeClasse<T> { ... }
+            O que é o parâmetro de tipo (T).
+
+                class DataStore<T>
+                {
+                    public T Data { get; set; }
+                }
 
 
-    class KeyValuePair<TKey, TValue>
-    {
-        public TKey Key { get; set; }
-        public TValue Value { get; set; }
-    }
+                class KeyValuePair<TKey, TValue>
+                {
+                    public TKey Key { get; set; }
+                    public TValue Value { get; set; }
+                }
 
+        . Instanciação de classes genéricas
 
-    . Instanciando uma classe genérica
+            Como criar objetos de uma classe genérica com tipos diferentes.
 
-        DataStore<string> store = new DataStore<string>();
+                DataStore<string> store = new DataStore<string>();
 
-    . Utilização de classes genérica
+        . Campos e propriedades genéricas
 
-        DataStore<string> strStore = new DataStore<string>();
-        strStore.Data = "Hello World!";
-        //strStore.Data = 123; // compile-time error
+            Como declarar campos e propriedades usando o tipo genérico.
 
-        DataStore<int> intStore = new DataStore<int>();
-        intStore.Data = 100;
-        //intStore.Data = "Hello World!"; // compile-time error
+                class DataStore<T>
+                {
+                    public T data;
+                }
 
-        KeyValuePair<int, string> kvp1 = new KeyValuePair<int, string>();
-        kvp1.Key = 100;
-        kvp1.Value = "Hundred";
+                ou
 
-        KeyValuePair<string, string> kvp2 = new KeyValuePair<string, string>();
-        kvp2.Key = "IT";
-        kvp2.Value = "Information Technology";
+                class DataStore<T>
+                {
+                    public T[] data = new T[10];
+                }
 
-    . Campos/Propriedades de classes genéricas
+        . Métodos genéricos em classes genéricas
 
-        class DataStore<T>
-        {
-            public T data;
-        }
+            Métodos que usam o tipo genérico da classe.
+            Sobrecarga de métodos genéricos.
+            Métodos genéricos independentes do tipo da classe.
 
-        ou
-
-        class DataStore<T>
-        {
-            public T[] data = new T[10];
-        }
-
-    . Métodos genéricos
-
-        class DataStore<T>
-        {
-            private T[] _data = new T[10];
-            
-            public void AddOrUpdate(int index, T item)
+            class DataStore<T>
             {
-                if(index >= 0 && index < 10)
-                    _data[index] = item;
+                private T[] _data = new T[10];
+                
+                public void AddOrUpdate(int index, T item)
+                {
+                    if(index >= 0 && index < 10)
+                        _data[index] = item;
+                }
+
+                public T GetData(int index)
+                {
+                    if(index >= 0 && index < 10)
+                        return _data[index];
+                    else 
+                        return default(T);
+                }
             }
 
-            public T GetData(int index)
-            {
-                if(index >= 0 && index < 10)
-                    return _data[index];
-                else 
-                    return default(T);
-            }
-        }
+        
+            DataStore<string> cities = new DataStore<string>();
+            cities.AddOrUpdate(0, "Mumbai");
+            cities.AddOrUpdate(1, "Chicago");
+            cities.AddOrUpdate(2, "London");
 
-    
-        DataStore<string> cities = new DataStore<string>();
-        cities.AddOrUpdate(0, "Mumbai");
-        cities.AddOrUpdate(1, "Chicago");
-        cities.AddOrUpdate(2, "London");
+            DataStore<int> empIds = new DataStore<int>();
+            empIds.AddOrUpdate(0, 50);
+            empIds.AddOrUpdate(1, 65);
+            empIds.AddOrUpdate(2, 89);
 
-        DataStore<int> empIds = new DataStore<int>();
-        empIds.AddOrUpdate(0, 50);
-        empIds.AddOrUpdate(1, 65);
-        empIds.AddOrUpdate(2, 89);
+        . Métodos genéricos em classes não genéricas
 
-    . Métodos genéricos sobrecarregados
+            Como declarar métodos genéricos em classes comuns.
 
-        public void AddOrUpdate(int index, T data) { }
-        public void AddOrUpdate(T data1, T data2) { }
-        public void AddOrUpdate<U>(T data1, U data2) { }
-        public void AddOrUpdate(T data) { }
+                class Printer
+                {
+                    public void Print<T>(T data)
+                    {
+                        Console.WriteLine(data);
+                    }
+                }
 
-    . Métodos genéricos em classes não genéricas
+                Printer printer = new Printer();
+                printer.Print<int>(100);
+                printer.Print(200); // type infer from the specified value
+                printer.Print<string>("Hello");
+                printer.Print("World!"); // type infer from the specified value
 
-        class Printer
-        {
-            public void Print<T>(T data)
-            {
-                Console.WriteLine(data);
-            }
-        }
+        . Utilização de classes genérica
 
-        Printer printer = new Printer();
-        printer.Print<int>(100);
-        printer.Print(200); // type infer from the specified value
-        printer.Print<string>("Hello");
-        printer.Print("World!"); // type infer from the specified value
+            DataStore<string> strStore = new DataStore<string>();
+            strStore.Data = "Hello World!";
+            //strStore.Data = 123; // compile-time error
+
+            DataStore<int> intStore = new DataStore<int>();
+            intStore.Data = 100;
+            //intStore.Data = "Hello World!"; // compile-time error
+
+            KeyValuePair<int, string> kvp1 = new KeyValuePair<int, string>();
+            kvp1.Key = 100;
+            kvp1.Value = "Hundred";
+
+            KeyValuePair<string, string> kvp2 = new KeyValuePair<string, string>();
+            kvp2.Key = "IT";
+            kvp2.Value = "Information Technology";
+
+        . Vantagens do uso de generics
+
+            Reutilização de código.
+            Segurança de tipo em tempo de compilação.
+            Evita casts desnecessários.
+
+        . Limitações e restrições de tipos genéricos
+
+            Restrições com where (ex: where T : class, where T : new(), etc).
+
+        . Métodos genéricos sobrecarregados
+
+            public void AddOrUpdate(int index, T data) { }
+            public void AddOrUpdate(T data1, T data2) { }
+            public void AddOrUpdate<U>(T data1, U data2) { }
+            public void AddOrUpdate(T data) { }
+
+        . Exemplos práticos
+
+            Uso com listas, dicionários, pares chave-valor, etc.
 
 Coleções
 --------
@@ -3398,7 +3509,6 @@ Coleções
                 }
             }
 
-
 Processamento Assincrono
 ------------------------
 
@@ -3618,17 +3728,6 @@ Processamento Assincrono
 
 
 
-
-EBM - Expression Bodied Member
-------------------------------
-
-https://www.macoratti.net/18/01/c_expbodmem1.htm
-
-
-Generics
---------
-
-http://dotnetpattern.com/csharp-generics
 
 
 Injection Dependency
