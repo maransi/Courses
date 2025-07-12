@@ -151,7 +151,7 @@ Configurar Visual Studio Code para .NETCore
 
     . Digite C#
 
-    . Acesse "OmniSharp / CSharp Format Enabled" e habilite a configuração
+    . Acesse "OmniSharp / CSharp: Format: Enabled" e habilite a configuração
 
     . Digite "Format on save" e habilite a configuração
 
@@ -160,20 +160,17 @@ Configurar Visual Studio Code para .NETCore
 .NET Core Command-Line Interface (CLI)    
 --------------------------------------
 
-    . Digite no terminal "dotnet --info" para apresentar informações variadas da instação do dotnet
+    . No terminal digite o comando abaixo para verificar as versões dos SDKs disponível
 
-    . Digite no terminal "dotnet new" irá apresentar as várias possibilidades de criar diversos projetos, exemplo:
+        dotnet --list-sdks
 
-        dotnet new mvc
+    . No terminal digite o comando abaixo para verificar as versões das runtimes disponíveis:
 
-        dotnet run
+        dotnet --list-runtimes
 
-        #Acesse o navegador e digite a URL: https://localhost:5001/ para ver o resultado do projeto criado.
+    . No terminal digite o comando abaixo para verificar mais detalhes sobre as informações da runtime e SDK em uso:
 
-    . Ctrl + C no terminal acaba com a execução do projeto:
-
-    https://www.infoq.com/br/articles/netcore-cli/    
-
+        dotnet --info
 
     . Comandos dotnet cli:
 
@@ -184,6 +181,299 @@ Configurar Visual Studio Code para .NETCore
         dotnet new mvc              => Novo projeto ASP.NET Core
         dotnet new webapi           => Novo projeto ASP.NET Core
         dotnet new mstest           => Novo projeto Microsoft Test
+
+Documentação do C# e o que eu posso fazer com C#
+------------------------------------------------
+
+    . A documentação da Microsoft encontra-se no link abaixo:
+
+        https://docs.microsoft.com/pt-br/dotnet/csharp
+
+Criando uma Solution
+--------------------
+
+    . Criando o projeto já com a versão desejada:
+
+        dotnet new console -n InvestmentControl -o ./src/investimentControl --framework [netcoreapp3.1 / net5.0 / net6.0 / net7.0 / net8.0 / net9.0 ]
+        dotnet new console -n InvestmentControl -o ./src/investimentControl -f [netcoreapp3.1 / net5.0 / net6.0 / net7.0 / net8.0 / net9.0 ]
+
+    . Podemos verificar as opções do compilador dotnet com o comando abaixo:
+
+        dotnet new
+
+    . Variáveis de Ambiente
+
+        . Para trabalhar com variáveis de ambiente podemos passar como parâmetro no comando "dotnet run":
+
+            dotnet run --enviroment=$SEU_AMBIENTE
+            dotnet run --enviroment=development
+            dotnet run --enviroment=production
+
+    . Demo
+
+        . Dentro da pasta CSharpBasico digite o comando abaixo:
+
+            dotnet new sln --name CSharpBasico
+
+        . Crie a pasta "src"
+
+            mkdir src
+
+        . Dentro da "Solution" criaremos um projeto, do tipo console:
+
+            dotnet new console -n InvestmentControl -o ./src/investimentControl
+            
+            -n : name da aplicação (Nome do projeto InvestmentControl.csproj )
+            -o : output (nome da pasta que será criado para criar as classes)
+
+        . Agora precisamos associar o projeto a solution
+
+            dotnet sln add ./src/investimentControl/
+
+        . Digite o comando abaixo para verificar os projetos que compoem a solution:
+
+            dotnet sln list
+
+        . Dentro da pasta da solution digite o comando abaixo:
+
+            dotnet build
+            dotnet run --project ./src/investimentControl/
+
+    . Para acessar a solução com o VisualStudio Code digite o comando abaixo:
+
+        code .
+
+    . A estrutura de pastas ficará:
+
+        CSharpBasico
+            |
+            +----- src
+            |       |
+            |       +-----  investimentControl
+            |                    |
+            |                    +-----  bin
+            |                    |
+            |                    +-----  obj
+            |                    |
+            |                    + investimentControl
+            |                    |
+            |                    + Program.cs
+            |
+            + CSharpBasico.sln
+
+    . Para limpar os arquivos de cache execute o comando abaixo:
+
+        dotnet clean
+
+    . Para compilar o projeto execute os comandos abaixo:
+
+        dotnet clean
+        dotnet build
+
+    . O arquivo Program.cs em um projeto .NET é o ponto de entrada principal da aplicação. 
+        Ele pode conter o método Main, do .NET 6 em diante houve uma mudança importante: a partir do .NET 6, 
+        o C# passou a suportar o chamado "top-level statements" (instruções de nível superior). Isso significa 
+        que não é mais obrigado a declarar explicitamente a classe Program e o método Main. Você pode escrever 
+        o código diretamente no arquivo Program.cs, e o compilador cria o método Main automaticamente nos bastidores. 
+        O arquivo Program.cs pode ficar assim:
+
+        Console.WriteLine("Hello, World!");
+
+    . Porém, se quiser, ainda pode usar a estrutura tradicional com a classe Program e o método Main:
+
+        public class Program
+        {
+            public static void Main(string[] args)
+            {
+                Console.WriteLine("Hello, World!");
+            }
+        }
+
+    . No caso de aplicações console (como seu projeto InvestmentControl), o Main é responsável por iniciar a execução 
+        do código, podendo criar objetos, chamar métodos e controlar o fluxo do programa.
+
+    . Demo
+
+        . Acesse o arquivo "src/investimentControl/Program.cs" e altere o código conforme abaixo:
+
+            // Linha alterada
+            Console.WriteLine("InvestmentControl System");
+
+        . Execute o comando abaixo na pasta raiz da solution:
+
+            dotnet run --project ./src/investimentControl
+
+        . Acesse a pasta raiz do projeto console e execute o comando abaixo
+
+            cd CSharpBasico/src/investimentControl
+
+            dotnet run
+
+Dica para alterar a versão do dotnet de um projeto "console"
+------------------------------------------------------------
+
+
+
+    . Para baixar todos os pacotes do projeto usamos o comando abaixo:
+
+        dotnet restore
+
+        . Basicamente o "restore" é feito somente a primeira vez que abrimos o projeto para baixar os pacotes de dependência.
+
+    . Para limpar ps arquivos de build antigos, execute o comando abaixo:
+
+        dotnet clean
+
+    . Para compilar o projeto e gerar os arquivos necessários para execução.
+
+        dotnet build
+
+    . Acesse o arquivo .csproj e altere o valor da tag <TargetFramework> para.
+
+        net6
+        net7
+
+        Exemplo:
+
+        <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+                <OutputType>Exe</OutputType>
+                <TargetFramework>net6</TargetFramework>     <!-- Parametro alterado -->
+            </PropertyGroup>
+        </Project>
+
+    . O comando para verificar a versão do dotnet utilizada no projeto é:
+
+        dotnet list ./src/investimentControl/ package     
+
+    . Demo
+
+        . Execute o comando abaixo na raiz da solution:
+
+            dotnet list ./src/investimentControl/ package       # Saida:  [net8.0]: No packages were found for this framework. 
+
+        . Altere a versão do dotnet do projeto console. Altere a linha abaixo no arquivo ./src/invetimentControl/InvestimentControl.csproj"
+
+            <Project Sdk="Microsoft.NET.Sdk">
+
+                <PropertyGroup>
+                    <OutputType>Exe</OutputType>
+                    <TargetFramework>net6.0</TargetFramework>       <!-- Linha alterada -->
+                    <ImplicitUsings>enable</ImplicitUsings>
+                    <Nullable>enable</Nullable>
+                </PropertyGroup>
+
+            </Project>
+
+        . Execute o comando abaixo na raiz da solution:
+
+            dotnet clean
+            dotnet retore
+            dotnet build
+      
+            dotnet list ./src/investimentControl/ package       # Saida:  [net6.0]: No packages were found for this framework. 
+
+        . Acesse o arquivo "src/investimentControl/InvestmentControl.csproj" e retorne o projeto para a versão que foi criado "net8.0"
+
+        . Execute o comando abaixo na raiz da solution:
+
+            dotnet clean
+            dotnet retore
+            dotnet build
+      
+            dotnet list ./src/investimentControl/ package       # Saida:  [net8.0]: No packages were found for this framework. 
+
+Debugando dentro do VSCode
+--------------------------
+
+    . Acesse o projeto, vá para a área de Debug, acione link "create a launch.json file"
+
+    ou
+
+    . Dentro da pasta "src/investimentControl" acesse o VSCode
+
+        cd src/investimentControl
+
+        code .
+
+    . Ao entrar pela primeira vez ele irá fazer uma pergunta para colocar o build e o debug no projeto:
+
+        "Required assets to build and debug are missing from '...'. Add then?", responda "Yes"
+
+
+    . Ao responder "Yes", o VSCode ira criar uma pasta do projeto .vscode. Dentro desta pasta teremos dois arquivos
+        ( launch.json e tasks.json). Esses arquivos criados automaticamente tem as configurações para depuração.
+
+    . Podemos acessar a execução do projeto do icone com triângulo na barra vertical do VSCode, que surgira a "Side Bar".
+        Neste ponto surgirá os botões de execução do projeto. 
+
+    . Caso o projeto for um projeto Web:
+
+        . Execute o projeto e no navegador execute a URL abaixo:
+
+            http://localhost:5000/WeatherForecast
+
+        . Caso exiba a mensagem: "unable to generate assets to build and debug. omnisharp server is not running" siga os passos abaixo:
+
+            . Acesse a opção "Arquivos/Preferência/Configurações"
+
+            . Digite "OmniSharp" e faça a localização:
+
+            . Encontre a opção "OmniSharp Auto Start" e desabilite.
+
+            . Acesse as extensões, na barra lateral do VSCode, clique na extensão C# e faça um Downgrade da versão para 1.23.17
+
+            . Apague do seu projeto a pasta ".vscode"
+
+            . Digite Ctrl + Shift + P
+
+            . Digite ".Net: Generate Assests for Build and Debug" para criar o "launch.json" e o "task.json"
+
+            . Saia e entre no VSCode. Verifique na entrada se a instalação do OmniSharp ocorreu com sucesso.
+
+            . Retorne a opção "OmniSharp Auto Start" e habilite.
+
+    . Pare a aplicação, e elimine os arquivos abaixo do projeto:
+
+        /WeatherForecast.cs
+        Controllers/WeatherForecastController.cs
+        
+    . No VSCode acesse a opção Terminal / Run Task... e escolha a opção "build"
+
+    . Demo
+
+        . Acesse o projeto, vá para a área de Debug, acione link "create a launch.json file"
+
+            . Escolha a opção ".NET5...."
+
+            . Faça a gravação do arquivo "launch.json"
+
+        . Acesse o arquivo "Program.cs" e adicione um "breakpoint na linha com o "Console.WriteLine"
+
+        . Pressione F5, ou o botão de play na área de debug
+
+        . Quando a execução para no "breakpoint", pressione o botão F10 para ir para a próxima linha
+
+    . Os botões para realizar a execução do debug são:
+
+        F5              Inicia o debug
+        Ctrl + F5       Inicia o debug, mas não para nos breakpoints
+        F10             Movimenta para a próxima linha
+        F11             Acessa o código do método da linha em execução, caso essa chamar outra rotina.
+
+    . Na área de debug do VS Code, os principais quadros e suas funções são:
+
+        . Variables:    Exibe todas as variáveis locais, parâmetros e seus valores atuais durante a execução do código. 
+                        Permite inspecionar o estado do programa em cada ponto do debug.
+
+        . Watch:        Permite adicionar variáveis ou expressões específicas para monitorar seus valores ao longo da 
+                        execução, independentemente do escopo atual.
+
+        . Call Stack:   Mostra a pilha de chamadas de métodos/funções, permitindo ver a sequência de execuções que levou ao 
+                        ponto atual. Útil para entender o fluxo do programa e navegar entre métodos.
+
+        . Breakpoints:  Lista todos os breakpoints definidos no código, permitindo ativar, desativar ou removê-los facilmente.
+
 
 Instalar pacotes através do Nuget.org
 -------------------------------------
@@ -200,274 +490,86 @@ Instalar pacotes através do Nuget.org
 
     . Em se tratando de projeto, como se fosse as dependências de bibliotecas.
 
-    . Acesse o site nuget.org, digite "Microsoft Entity Framework Core" e faça a pesquisa.
-
-    . Acesse o item Microsoft.EntityFrameworkCore.
-
-    . Acesse uma das versões, atualmente 5.0.5.
-    
-    . Acesse a aba .NetCli.
-
-    . Copie o comando sugerido por esse caminho:
-
-        dotnet add package Microsoft.EntityFrameworkCore --version 5.0.5
-
-    . Acesse o terminal, vá na pasta do projeto e execute o comando acima. Cuidado é necessário acessar a pasta do projeto
-        e não da solução, exemplo: ~/workspace-two/CSharpBasico/helloWorld.
-
-
-    . Após a execução, no terminal, execute um dos comandos abaixo:
-
-        dotnet restore
-
-        ou
-
-        dotnet build
-
-    . Acesse o Visual Studio Code "code ." para entrar no projeto e acesse o arquivo com extensão "*.csproj". Podemos verificar 
-        que agora temos o pacote dentro da aplicação:
-
-        <ItemGroup>
-            <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
-        </ItemGroup>
-
-    . Retorne ao Home do site nuget.org e digite "Pomelo Entity Framework core" e acesse o link do MySQL.
-
-    . Acesse a aba "PackageReference" e copie o comando sugerido:
-
-    . Acesse novamente o arquivo com a extensão *.csproj e insira a dependência copiada dentro do nó "ItemGroup":
-
-        <ItemGroup>
-            <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
-            <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />    
-        </ItemGroup>
-
-    . Salve o conteúdo do arquivo, o VsCode irá pedir para dar o "Restore", confirme o restore.
-
-    . Se quiser podemos dar o "dotnet restore", ou o "dotnet build", no terminal.
-
-    . Caso haja a necessidade de retirar alguma dependência do nó "ItemGroup", acesse o terminal, e execute os comandos abaixo:
-
-        dotnet clean
-        dotnet restore
-
-Documentação do C# e o que eu posso fazer com C#
-------------------------------------------------
-
-    . A documentação da Microsoft encontra-se no link abaixo:
-
-        https://docs.microsoft.com/pt-br/dotnet/csharp
-
-Criando uma Solution
---------------------
-
-    . Crie uma pasta com o nome CSharpBasico
-
-    . Digite o comando abaixo para verificar as opções do compilador dotnet:
-
-        dotnet new
-
     . Demo
 
-        . Dentro da pasta CSharpBasico digite o comando abaixo:
+        . Acesse o site nuget.org, digite "Newtonsoft.Json" e faça a pesquisa.
 
-            dotnet new sln --name CSharpBasico
+        . Acesse o item Newtonsoft.Json
 
-        . Dentro da "Solution" criaremos um projeto, do tipo console:
+        . Acesse uma das versões, atualmente 13.0.3
+        
+        . Acesse a aba .NetCli.
 
-            dotnet new console -n HelloWorld -o helloWorld
-            
-            -n : name da aplicação (Nome do projeto HelloWorld.csproj )
-            -o : output (nome da pasta que será criado para criar as classes)
+        . Copie o comando sugerido por esse caminho
 
-        . Agora precisamos associar o projeto a solution
+        . Acesse a pasta do projeto console e execute o comando copiado
 
-            dotnet sln add helloWorld/
+            dotnet add package Newtonsoft.Json --version 13.0.3
 
-        . Digite o comando abaixo para verificar os projetos que compoem a solution:
+        . Após a execução, no terminal, execute um dos comandos abaixo:
 
-            dotnet sln list
+            dotnet restore
 
-        . Dentro da pasta da solution digite o comando abaixo:
+            ou
 
             dotnet build
-            dotnet run --project ./helloWorld
 
-    . Para acessar a solução com o VisualStudio Code digite o comando abaixo:
+        . Insira as linhas abaixo na classe "Program.cs"
 
-        code .
+            // linha inserida
+            using Newtonsoft.Json;
 
-    . Para baixar todos os pacotes do projeto usamos o comando abaixo:
+            // See https://aka.ms/new-console-template for more information
+            Console.WriteLine("Investment Control System");
 
-        dotnet restore
+            // Trecho de código inserido
+            Product product = new Product();
+            product.Name = "Apple";
+            product.Expiry = new DateTime(2008, 12, 28);
+            product.Sizes = new string[] { "Small" };
 
-        . Basicamente o "restore" é feito somente a primeira vez que abrimos o projeto para baixar os pacotes de dependência.
+            string json = JsonConvert.SerializeObject(product);
 
-    . A estrutura de pastas ficará:
+            Console.WriteLine(json);
 
-        HelloWorld
-        |
-        +------ obj
-        |
-        + HelloWorld.csproj
-        + Program.cs
+            class Product
+            {
+                public string? Name { get; set; }
+                public DateTime Expiry { get; set; }
+                public string[]? Sizes { get; set; }
+            }
+            // Fim da inserção
 
+        . Execute o comando na pasta do projeto console:
 
-    . Para limpar os arquivos de cache execute o comando abaixo:
+            dotnet run
 
-        dotnet clean
+        . Acesse o arquivo com extensão "*.csproj" e verifique que agora temos o pacote dentro da aplicação:
 
-    . Para compilar o projeto execute os comandos abaixo:
+            <ItemGroup>
+                <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+            </ItemGroup>
 
-        dotnet clean
-        dotnet build
+        . Retorne ao Home do site nuget.org e digite "Pomelo Entity Framework core" e acesse o link do MySQL.
 
+        . Acesse a aba "PackageReference" e copie o comando sugerido:
 
-    . O arquivo Program.cs possui um método main. Para executarmos a classe Program.cs digite os
-        comandos abaixo:
+        . Acesse novamente o arquivo com a extensão *.csproj e insira a dependência copiada dentro do nó "ItemGroup":
 
-        cd CSharpBasico/helloWorld
+            <ItemGroup>
+                <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+                <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />    
+            </ItemGroup>
 
-        dotnet run
+        . Salve o conteúdo do arquivo, o VsCode irá pedir para dar o "Restore", confirme o restore.
 
-Variáveis de Ambiente
----------------------
+        . Se quiser podemos dar o "dotnet restore", ou o "dotnet build", no terminal.
 
-    . Para trabalhar com variáveis de ambiente podemos passar como parâmetro no comando "dotnet run":
+        . Caso haja a necessidade de retirar alguma dependência do nó "ItemGroup", acesse o terminal, e execute os comandos abaixo:
 
-        dotnet run --enviroment=$SEU_AMBIENTE
-        dotnet run --enviroment=development
-        dotnet run --enviroment=production
+            dotnet clean
+            dotnet restore
 
-Dica para alterar a versão do dotnet de um projeto "console"
-------------------------------------------------------------
-
-    . Criando o projeto já com a versão desejada:
-
-        dotnet new console -n HelloWorld -o helloWorld --framework [net5.0 / netcoreapp3.1]
-
-        dotnet new console -n HelloWorld -o helloWorld -f [net5.0 / netcoreapp3.1]
-
-    . Acesse o arquivo .csproj e altere o valor da tag <TargetFramework> para.
-
-        netcoreapp3.1
-        net5.0
-
-        Exemplo:
-
-        <Project Sdk="Microsoft.NET.Sdk">
-            <PropertyGroup>
-                <OutputType>Exe</OutputType>
-                <TargetFramework>netcoreapp3.1</TargetFramework>
-            </PropertyGroup>
-        </Project>
-
-Dica de como alterar a versão do AspNetCore em um novo Projeto
---------------------------------------------------------------
-
-    . As configurações abaixo só funcionarão se houver mais de um SDK instalado no sistema operacional.
-
-    . Acesse nosso diretório de projetos e crie as pastas abaixo:
-
-        mkdir curso_api_netcore
-        mkdir curso_api_netcore/src
-        cd curso_api_netcore
-
-    . No terminal digite o comando abaixo para verificar a versão dos SDKs disponível
-
-        dotnet --list-sdks
-
-    . Acesse o code e dentro da pasta curso_api_netcore/src crie o arquivo global.json
-
-    . Coloque o conteúdo abaixo no arquivo global.json:
-
-        {
-            "sdk" : {
-                "version" : "3.1.408"
-            }     
-
-        }
-
-    . Acesse o terminal novamente, acesse a pasta curso_api_netcore/src e verifique a versão do SDK:
-
-        dotnet --version
-
-    . Acesse qualquer outra pasta e verifique novamente a versão
-
-        dotnet --version
-
-    . Se tudo der certo, teremos um SDK na pasta src diferente das outras pastas
-
-    . Acesse a pasta src e digite o comando abaixo:
-
-        dotnet new -n teste -o teste
-
-    . Acesse a pasta do projeto teste dentro do VSCode e verifique o conteúdo do arquivo teste.csproj
-
-        <Project Sdk="Microsoft.NET.Sdk.Web">
-
-        <PropertyGroup>
-            <TargetFramework>netcoreapp3.1</TargetFramework>
-        </PropertyGroup>
-
-        </Project>
-
-    . Veja que o <TargetFramework> está configurado automaticamente para o SDK 3.1
-
-Debugando dentro do VSCode
---------------------------
-
-    . Digite Ctrl + Shift + P
-
-    . Digite ".Net: Generate Assests for Build and Debug" para criar o "launch.json" e o "task.json"
-
-    ou 
-
-    . Acesse o projeto, vá para a área de Debug, acione a criação do "launch.json".
-
-    ou
-
-    . Dentro da pasta src acesse o VSCode, ao entrar pela primeira vez ele irá fazer uma pergunta para colocar o build e o debug no projeto,
-        "Install C# Extensions", responda "Yes".
-
-        code .
-
-        . Ao responder "Yes", o VSCode ira criar uma pasta do projeto .vscode. Dentro desta pasta teremos dois arquivos
-            ( launch.json e tasks.json). Esses arquivos criados automaticamente tem as configurações para depuração.
-
-        . Podemos acessar a execução do projeto do icone com triângulo na barra vertical do VSCode, que surgira a "Side Bar".
-            Neste ponto surgirá os botões de execução do projeto. 
-
-        . Execute o projeto e no navegador execute a URL abaixo:
-
-            http://localhost:5000/WeatherForecast
-
-    . Caso exiba a mensagem: "unable to generate assets to build and debug. omnisharp server is not running" siga os passos abaixo:
-
-        . Acesse a opção "Arquivos/Preferência/Configurações"
-
-        . Digite "OmniSharp" e faça a localização:
-
-        . Encontre a opção "OmniSharp Auto Start" e desabilite.
-
-        . Acesse as extensões, na barra lateral do VSCode, clique na extensão C# e faça um Downgrade da versão para 1.23.17
-
-        . Apague do seu projeto a pasta ".vscode"
-
-        . Digite Ctrl + Shift + P
-
-        . Digite ".Net: Generate Assests for Build and Debug" para criar o "launch.json" e o "task.json"
-
-        . Saia e entre no VSCode. Verifique na entrada se a instalação do OmniSharp ocorreu com sucesso.
-
-        . Retorne a opção "OmniSharp Auto Start" e habilite.
-    
-    . Pare a aplicação, e elimine os arquivos abaixo do projeto:
-
-        /WeatherForecast.cs
-        Controllers/WeatherForecastController.cs
-        
-    . No VSCode acesse a opção Terminal / Run Task... e escolha a opção "build"
 
 .NET Standard
 -------------
