@@ -550,18 +550,61 @@ Instalar pacotes através do Nuget.org
                 <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
             </ItemGroup>
 
-        . Retorne ao Home do site nuget.org e digite "Pomelo Entity Framework core" e acesse o link do MySQL.
+        . Retorne ao Home do site nuget.org, digite "Spectre.Console" e copie o comando sugerido por esse caminho:
 
-        . Acesse a aba "PackageReference" e copie o comando sugerido:
+        . Acesse a pasta do projeto console e execute o comando copiado
 
-        . Acesse novamente o arquivo com a extensão *.csproj e insira a dependência copiada dentro do nó "ItemGroup":
+            dotnet add package Spectre.Console --version 0.50.0
+            dotnet add package Serilog.Sinks.Console
+            dotnet add package Serilog.Sinks.File
+
+            dotnet restore
+
+            dotnet build
+
+        . Altere o código da classe "Program.cs" deixando como abaixo:
+
+            // Linha inserida
+            using Spectre.Console;
+
+            // See https://aka.ms/new-console-template for more information
+            Console.WriteLine("Investment Control System");
+
+            //////////////////////////////
+            // Trecho de código inserdo //
+            //////////////////////////////
+
+            // Ask the user to confirm
+            var confirmation = AnsiConsole.Prompt(
+                new TextPrompt<bool>("Run prompt example?")
+                    .AddChoice(true)
+                    .AddChoice(false)
+                    .DefaultValue(true)
+                    .WithConverter(choice => choice ? "y" : "n"));
+
+            var password = AnsiConsole.Prompt(
+                new TextPrompt<string>("Enter password:")
+                    .Secret());
+
+            // Echo the confirmation back to the terminal
+            Console.WriteLine(confirmation ? "Confirmed" : "Declined");
+
+            // Echo the password back to the terminal
+            Console.WriteLine($"Your password is {password}");
+
+            /////////////////////
+            // Fim da inserção //
+            ////////////////////
+
+        . Acesse novamente o arquivo com a extensão *.csproj e verifique a dependência copiada dentro do nó "ItemGroup":
 
             <ItemGroup>
-                <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
-                <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />    
+                <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+                <PackageReference Include="Spectre.Console" Version="0.50.0" />
+                <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+                <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+                <PackageReference Include="Spectre.Console" Version="0.50.0" />
             </ItemGroup>
-
-        . Salve o conteúdo do arquivo, o VsCode irá pedir para dar o "Restore", confirme o restore.
 
         . Se quiser podemos dar o "dotnet restore", ou o "dotnet build", no terminal.
 
@@ -573,6 +616,8 @@ Instalar pacotes através do Nuget.org
 
 .NET Standard
 -------------
+
+// PAREI AQUI
 
         +-----------------------------+-----------------------------+-----------------------------+
         |    .NET FRAMEWORK           |          .NET Core          |        XAMARIN              |
