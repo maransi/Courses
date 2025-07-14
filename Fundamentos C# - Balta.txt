@@ -1,6 +1,32 @@
 Pagina 569
 Estudar o tópico https://docs.fluentvalidation.net/en/latest/index.html
 
+1. Herança, polimorfismo e interfaces
+2. Exceções e tratamento de erros (try, catch, finally, throw, custom exceptions)
+3. Coleções genéricas (List, Dictionary, Queue, Stack, HashSet, etc.)
+4. LINQ (Language Integrated Query)
+5. Eventos e delegates avançados
+6. Expressões lambda avançadas
+7. Métodos de extensão
+8. Propriedades avançadas (get/set customizados, expression-bodied members)
+9. Partial classes e partial methods
+10. Records (C# 9+)
+11. Tuplas e deconstruction
+12. Pattern matching (switch avançado, is, when, etc.)
+13. Async/await e programação assíncrona
+14. Manipulação de arquivos e streams
+15. Reflection e atributos (attributes)
+16. Nullable Reference Types (C# 8+)
+17. Span<T> e Memory<T> (para alta performance)
+18. Dynamic e ExpandoObject
+19. Unsafe code e ponteiros (para cenários avançados)
+20. Testes unitários e boas práticas de testes em C#
+21. Internacionalização e localização
+22. Serialização (JSON, XML, Binary)
+23. Dependency Injection (conceito e uso em projetos .NET)
+24. Memory management e garbage collection
+25. Interoperação com código nativo (P/Invoke)
+
 Fundamentos C# - Balta
 ----------------------
 
@@ -505,6 +531,7 @@ Instalar pacotes através do Nuget.org
 
         . Acesse a pasta do projeto console e execute o comando copiado
 
+            # dotnet add package Newtonsoft.Json
             dotnet add package Newtonsoft.Json --version 13.0.3
 
         . Após a execução, no terminal, execute um dos comandos abaixo:
@@ -555,6 +582,7 @@ Instalar pacotes através do Nuget.org
 
         . Acesse a pasta do projeto console e execute o comando copiado
 
+            # Para criar interfaces de linha de comando ricas e interativas:
             dotnet add package Spectre.Console --version 0.50.0
 
             dotnet restore
@@ -609,11 +637,38 @@ Instalar pacotes através do Nuget.org
             dotnet clean
             dotnet restore
 
+    . Outras bibliotecas que interagem com projetos console que podem ser testadas:
+
+        Serilog             Para logging estruturado:
+
+            dotnet add package Serilog
+
+        Dapper              Para acesso a banco de dados de forma simples e performática:
+
+            dotnet add package Dapper
+
+        CsvHelper           Para leitura e escrita de arquivos CSV:
+
+            dotnet add package CsvHelper
+
+        Polly               Para políticas de resiliência e tratamento de falhas (retry, circuit breaker, etc.):
+
+            dotnet add package Polly
+
+        Spectre.Console     Para criar interfaces de linha de comando ricas e interativas:
+
+            dotnet add package Spectre.Console
+
+        FluentValidation    Para validação de objetos:
+
+            dotnet add package FluentValidation
+
+        AutoMapper          Para mapeamento automático de objetos:
+
+            dotnet add package AutoMapper
 
 .NET Standard
 -------------
-
-// PAREI AQUI
 
         +-----------------------------+-----------------------------+-----------------------------+
         |    .NET FRAMEWORK           |          .NET Core          |        XAMARIN              |
@@ -632,142 +687,6 @@ Instalar pacotes através do Nuget.org
         |       Compilers             |     Languages               |        Runtime Components   |
         +-----------------------------+-----------------------------+-----------------------------+
 
-Escopo de Programa
-------------------
-
-    using System;               // Importações
-
-    namespace HelloWorld;        // Equivalente aos pacotes/divisões lógica
-
-    [public/private/protected/internal/file] class Program           // Definição da classe
-    {
-        public static void Main(string args)     // Método
-        {
-            Console.WriteLine(args);
-        }
-    }
-
-
-    . Demo
-
-        . Crie a classe "HelloWorld.cs" com o código abaixo na pasta raiz do projeto "helloWorld"
-
-            namespace helloWorld;
-
-            public class HelloWorld
-            {
-                public static void Hello(string args)
-                {
-                    Console.WriteLine(args);
-                }
-            }
-
-        . Altere o Program.cs da solution pelo conteúdo abaixo:
-
-            using helloWorld;       // Linha inserida
-
-            HelloWorld.Hello("Hello, World!" );      // Linha inserida
-
-        . Execute o projeto:
-
-            # Da pasta da solution
-            dotnet run --project ./helloWorld
-
-    . "internal class"
-    
-        . A classe só pode ser acessada dentro do mesmo assembly (projeto/compilação).
-
-        . É o modificador de acesso padrão se nenhum for especificado em arquivos de nível de 
-            namespace (ou seja, fora de classes aninhadas).
-
-        . Exemplo:
-
-            // Arquivo: MinhaClasse.cs
-            internal class MinhaClasse
-            {
-                public void Metodo() => Console.WriteLine("Método chamado");
-            }
-
-            // Dentro do mesmo projeto
-            var obj = new MinhaClasse(); // OK
-
-            // Em outro projeto que referencia este (ex: biblioteca DLL)
-            var obj = new MinhaClasse(); // ERRO: 'MinhaClasse' é inacessível devido ao seu nível de proteção
-
-    . class (sem modificador explícito)
-
-        . Por padrão, classes de nível superior (não aninhadas) sem modificador são internal.
-
-        . Então, "class MinhaClasse" é o mesmo que "internal class MinhaClasse", se estiver fora de outra classe
-
-        . Exemplo:
-
-            // Isso é equivalente a "internal class MinhaClasse"
-            class MinhaClasse
-            {
-                public void Metodo() => Console.WriteLine("Sem modificador: ainda é internal");
-            }
-
-    . Resumo
-
-         Declaração         Visibilidade padrão     Acessível em outros projetos?
-         ----------         -------------------     ----------------------------
-         `internal class`   Interna                     ❌ Não                       
-         `class`            Interna                     ❌ Não                       
-         `public class`     Pública                     ✅ Sim                       
-
-    . Sugestão:
-
-        . Quando usar internal explicitamente?
-
-            . Quando você quer deixar claro que a classe é apenas para uso interno, mesmo que isso já seja o comportamento padrão.
-
-            . Para maior clareza e manutenção do código, especialmente em bibliotecas.
-
-            . Exemplo:
-
-                // Projeto A - Biblioteca
-                public class ClassePublica
-                {
-                    public void Metodo() => Console.WriteLine("Sou pública!");
-                }
-
-                internal class ClasseInterna
-                {
-                    public void Metodo() => Console.WriteLine("Sou interna!");
-                }
-
-                // Projeto B - App consumidor
-                var obj1 = new ClassePublica(); // OK
-                var obj2 = new ClasseInterna(); // ERRO: ClasseInterna é inacessível
-
-        . Crie o nome das namespace levemente parecido com a pasta do projeto, por exemplo:
-
-            namespace Tutorial.Calculo
-            {
-                ...
-            }
-
-            . Coloque a classe na pasta [Nome do projeto].Tutorial.Calculo. Se ambos forem iguais dará erro durante a compilação, 
-                pois não encontrará as referências das classes nas packages/namespace.
-
-    . Variáveis, Constante
-
-        . Uma variável pode ser iniciada pelo tipo (int, long, float, ...), ou pela palavra reservada "var":
-
-            int idade = 10;
-            var idade = 10;
-
-            . "var" obriga que um valor seja informado, pois é através dele que o compilador determina o tipo da variável.
-
-                int idade;      // Válido
-                var idade;      // Inválido
-
-        . Declaração de constantes
-
-            const int IDADE_MINIMA = 10;
-            const var IDADE_MINIMA = 10;
-            const var IDADE_MINIMA;     // Inválido
 
 Sequências de Escape/"Escape Sequences"
 ---------------------------------------
@@ -856,7 +775,7 @@ Sequências de Escape/"Escape Sequences"
 Tipagem de Dados
 ----------------
 
-    Tipos por valor ou primitivos:
+    . Tipos por valor ou primitivos:
 
         . São alocados diretamente na pilha.
         . Não precisam ser inicializados com o operador new.
@@ -890,7 +809,6 @@ Tipagem de Dados
 
             decimal salario = 2.500m    // Idem para decimal, porém a letra é o "m"
 
-
         . Evite float e double para valores monetários, mesmo que "funcionem", pois podem causar erros de arredondamento imperceptíveis, 
             mas perigosos em cálculos acumulados, como juros compostos, faturas ou salários
 
@@ -915,6 +833,22 @@ Tipagem de Dados
                 ou
 
                 var clientes = new IEnumerable<Cliente>();
+
+            . Uma variável pode ser iniciada pelo tipo (int, long, float, ...), ou pela palavra reservada "var":
+
+                int idade = 10;
+                var idade = 10;
+
+                . "var" obriga que um valor seja informado, pois é através dele que o compilador determina o tipo da variável.
+
+                    int idade;      // Válido
+                    var idade;      // Inválido
+
+        . Constantes
+
+            const int IDADE_MINIMA = 10;
+            const var IDADE_MINIMA = 10;
+            const var IDADE_MINIMA;     // Inválido
 
         . Object é usado da mesma forma do var
 
@@ -996,7 +930,9 @@ Tipagem de Dados
                 As structs fornecem uma alternativa mais “leve e barata” às classes, onde o custo do uso das classes 
                 (alocação dinâmica de memória, métodos virtuais e uso de ponteiros) seria muito caro. Por exemplo, um ponto (coordenada X, Y).
 
-    Tipos por Referência, ou complexos:
+// colocar "record"
+
+    . Tipos por Referência, ou complexos:
 
         . São alocados em um heap e sujeitos à “coleta de lixo” (“garbage collection”) quando não forem mais usados.
         . Devem ser inicializados com o operador new.
@@ -1006,16 +942,14 @@ Tipagem de Dados
             pequeno frente a sua flexibilidade.
         . Podem conter o valor null, embora se usarmos uma variável com o valor null a exception NullReferenceException será gerada.
 
-
-        Arrays
+        . Arrays
 
             Um array é sempre criado dinamicamente em tempo de execução. Podemos ter arrays de várias dimensões e arrays de arrays. 
             Veja um exemplo de criação e inicialização de um array de inteiros de uma dimensão:
 
                 int[] myIntArray = new int[5] { 1, 2, 3, 4, 5 };
 
-
-        Tipo string
+        . Tipo string
 
             As strings são tecnicamente um tipo por referência, mas possuem algumas características especiais:
 
@@ -1494,6 +1428,125 @@ While
 
 C# Class
 --------
+
+    . Escopo de Programa
+
+        using System;               // Importações
+
+        namespace HelloWorld;        // Equivalente aos pacotes/divisões lógica
+
+        [public/private/protected/internal/file] class Program           // Definição da classe
+        {
+            public static void Main(string args)     // Método
+            {
+                Console.WriteLine(args);
+            }
+        }
+
+
+    . Demo
+
+        . Crie a classe "HelloWorld.cs" com o código abaixo na pasta raiz do projeto "helloWorld"
+
+            namespace helloWorld;
+
+            public class HelloWorld
+            {
+                public static void Hello(string args)
+                {
+                    Console.WriteLine(args);
+                }
+            }
+
+        . Altere o Program.cs da solution pelo conteúdo abaixo:
+
+            using helloWorld;       // Linha inserida
+
+            HelloWorld.Hello("Hello, World!" );      // Linha inserida
+
+        . Execute o projeto:
+
+            # Da pasta da solution
+            dotnet run --project ./helloWorld
+
+    . "internal class"
+    
+        . A classe só pode ser acessada dentro do mesmo assembly (projeto/compilação).
+
+        . É o modificador de acesso padrão se nenhum for especificado em arquivos de nível de 
+            namespace (ou seja, fora de classes aninhadas).
+
+        . Exemplo:
+
+            // Arquivo: MinhaClasse.cs
+            internal class MinhaClasse
+            {
+                public void Metodo() => Console.WriteLine("Método chamado");
+            }
+
+            // Dentro do mesmo projeto
+            var obj = new MinhaClasse(); // OK
+
+            // Em outro projeto que referencia este (ex: biblioteca DLL)
+            var obj = new MinhaClasse(); // ERRO: 'MinhaClasse' é inacessível devido ao seu nível de proteção
+
+    . class (sem modificador explícito)
+
+        . Por padrão, classes de nível superior (não aninhadas) sem modificador são internal.
+
+        . Então, "class MinhaClasse" é o mesmo que "internal class MinhaClasse", se estiver fora de outra classe
+
+        . Exemplo:
+
+            // Isso é equivalente a "internal class MinhaClasse"
+            class MinhaClasse
+            {
+                public void Metodo() => Console.WriteLine("Sem modificador: ainda é internal");
+            }
+
+    . Resumo
+
+        Declaração         Visibilidade padrão     Acessível em outros projetos?
+        ----------         -------------------     ----------------------------
+        `internal class`   Interna                     ❌ Não                       
+        `class`            Interna                     ❌ Não                       
+        `public class`     Pública                     ✅ Sim                       
+
+    . Sugestão:
+
+        . Quando usar internal explicitamente?
+
+            . Quando você quer deixar claro que a classe é apenas para uso interno, mesmo que isso já seja o comportamento padrão.
+
+            . Para maior clareza e manutenção do código, especialmente em bibliotecas.
+
+            . Exemplo:
+
+                // Projeto A - Biblioteca
+                public class ClassePublica
+                {
+                    public void Metodo() => Console.WriteLine("Sou pública!");
+                }
+
+                internal class ClasseInterna
+                {
+                    public void Metodo() => Console.WriteLine("Sou interna!");
+                }
+
+                // Projeto B - App consumidor
+                var obj1 = new ClassePublica(); // OK
+                var obj2 = new ClasseInterna(); // ERRO: ClasseInterna é inacessível
+
+        . Crie o nome das namespace levemente parecido com a pasta do projeto, por exemplo:
+
+            namespace Tutorial.Calculo
+            {
+                ...
+            }
+
+            . Coloque a classe na pasta [Nome do projeto].Tutorial.Calculo. Se ambos forem iguais dará erro durante a compilação, 
+                pois não encontrará as referências das classes nas packages/namespace.
+
 
     // Insirar detalhes sobre "partial class"
 
