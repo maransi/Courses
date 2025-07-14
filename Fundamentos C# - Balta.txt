@@ -714,65 +714,54 @@ Sequências de Escape/"Escape Sequences"
 
     . Demo
 
-        . Altere o conteúdo do método "Hello" conforme abaixo:
+        . Altere o conteúdo da classe "Program.cs" conforme abaixo:
 
-            namespace helloWorld;
+            // Linhas inseridas
 
-            public class HelloWorld
-            {
-                public static void Hello(string args)
-                {
-                    // Console.WriteLine(args);     // Linha eliminada
+            // \n — Nova linha
+            Console.WriteLine("Primeira linha\nSegunda linha");
 
+            // Primeira linha
+            // Segunda linha
 
-                    // Linhas inseridas
+            // \t — Tabulação
+            Console.WriteLine("Coluna 1\tColuna 2");
 
-                    // \n — Nova linha
-                    Console.WriteLine("Primeira linha\nSegunda linha");
+            // Coluna 1        Coluna 2
 
-                        // Primeira linha
-                        // Segunda linha
+            // \\ — Barra invertida literal
+            Console.WriteLine("Caminho: C:\\Users\\Marco");
 
-                    // \t — Tabulação
-                    Console.WriteLine("Coluna 1\tColuna 2");
+            // Caminho: C:\Users\Marco
 
-                        // Coluna 1        Coluna 2
+            // \" — Aspas duplas dentro de uma string
+            Console.WriteLine("Ele disse: \"Olá, mundo!\"");
 
-                    // \\ — Barra invertida literal
-                    Console.WriteLine("Caminho: C:\\Users\\Marco");
-
-                        // Caminho: C:\Users\Marco
-
-                    // \" — Aspas duplas dentro de uma string
-                    Console.WriteLine("Ele disse: \"Olá, mundo!\"");
-
-                        // Ele disse: "Olá, mundo!"
+            // Ele disse: "Olá, mundo!"
 
 
-                    // \' — Aspas simples
-                    Console.WriteLine("Aspas simples: \'a\'");
+            // \' — Aspas simples
+            Console.WriteLine("Aspas simples: \'a\'");
 
-                        // Aspas simples: 'a'
+            // Aspas simples: 'a'
 
-                    // \r — Retorno de carro
-                    Console.WriteLine("Texto antes do retorno\rNovo texto");
+            // \r — Retorno de carro
+            Console.WriteLine("Texto antes do retorno\r\nNovo texto");
 
-                        // Novo textos do retorno
+            // Texto antes do retorno
+            // Novo texto
 
-                    // \0 — Caractere nulo
-                    string textoComNulo = "ABC\0DEF";
-                    Console.WriteLine("Texto com caractere nulo: " + textoComNulo);
+            // \0 — Caractere nulo
+            string textoComNulo = "ABC\0DEF";
+            Console.WriteLine("Texto com caractere nulo: " + textoComNulo);
 
-                        // Texto com caractere nulo: ABCDEF
+            // Texto com caractere nulo: ABC?DEF
 
-
-                    // Fim da inserção
-                }
-            }
+            // Fim da inserção
 
         . Execute o projeto e veja o resultado.
 
-            dotnet run --project ./helloWorld   
+            dotnet run --project ./src/investimentControl
 
 Tipagem de Dados
 ----------------
@@ -825,8 +814,10 @@ Tipagem de Dados
         . var
 
             . Substitui o nome de um tipo
+
             . Será do tipo do primeiro valor atribuido
-            . Rcomendado o uso ( DEixe pra usar va quando j´dominar os tipos)
+
+            . Recomendado o uso ( Deixe pra usar var quando já dominar os tipos)
 
             . A grande vantagem em usar o var é na economia de código, por exemplo:
 
@@ -864,75 +855,385 @@ Tipagem de Dados
 
         . Tipos definidos pelo usuário:
 
-            enum
+            . enum
 
-                Permite declarar uma seqüência de identificadores associados, mas incompatíveis com inteiros e com outras enumerações. 
-                Praticamente idêntico às enumerações do Delphi. Exemplo:
+                . Permite declarar uma seqüência de identificadores associados, mas incompatíveis com inteiros e com outras enumerações. 
+                    Praticamente idêntico às enumerações do Delphi. Exemplo:
 
-                enum Days { Sun, // 0
-                            Mon, // 1
-                            Tue, 
-                            Wed, 
-                            Thu, 
-                            Fri, 
-                            Sat}; // 6
+                    enum Days { Sun, // 0
+                                Mon, // 1
+                                Tue, 
+                                Wed, 
+                                Thu, 
+                                Fri, 
+                                Sat}; // 6
 
-
-                enum Categories
-                {
-                    Electronics = 1,  
-                    Food = 5, 
-                    Automotive = 6, 
-                    Arts = 10, 
-                    BeautyCare = 11, 
-                    Fashion = 15,
-                    WomanFashion = 15
-                }
-
-                enum WeekDays
-                {
-                    Monday, 
-                    Tuesday,
-                    Wednesday,
-                    Thursday, 
-                    Friday, 
-                    Saturday,
-                    Sunday 
-                }
-
-                Console.WriteLine(WeekDays.Friday); //output: Friday 
-                int day = (int) WeekDays.Friday; // enum to int conversion
-                Console.WriteLine(day); //output: 4 
-                        
-                var wd = (WeekDays) 5; // int to enum conversion
-                Console.WriteLine(wd);//output: Saturday 
-
-            struct
-
-                Permite declarar tipos que contém vários valores, identificados por um nome. Semelhante ao record do Delphi. Exemplo:
-
-                    public struct Point { 
-                        public int x, y; 
-                        
-                        public Point(int p1, int p2) { 
-                            x = p1; 
-                            y = p2;    
-                        } 
+                    enum Categories
+                    {
+                        Electronics = 1,  
+                        Food = 5, 
+                        Automotive = 6, 
+                        Arts = 10, 
+                        BeautyCare = 11, 
+                        Fashion = 15,
+                        WomanFashion = 15
                     }
 
-                As structs possuem algumas características em comum com as classes:
+                . Em C#, o lugar mais comum e recomendado para declarar um enum é fora dos métodos, mas dentro de uma classe, struct ou namespace. 
+                    Não é permitido declarar um enum diretamente dentro de um método.
 
-                    . Podem ter métodos.
-                    . Podem ter construtores. Entretanto, existem diferenças em relação às classes:
-                    . Elas são tipos por valor enquanto as classes são tipos por referência.
-                    . Não podemos declarar um construtor que não aceite argumentos.
-                    . Podemos atribuir à variável this, correspondente ao self no Delphi;
-                    . Não suportam herança; elas são implicitamente sealed.
+                    // Enum fora da classe (nível de namespace):
+                    enum WeekDays
+                    {
+                        Sunday,
+                        Monday,
+                        Tuesday,
+                        Wednesday,
+                        Thursday,
+                        Friday,
+                        Saturday
+                    }
 
-                As structs fornecem uma alternativa mais “leve e barata” às classes, onde o custo do uso das classes 
-                (alocação dinâmica de memória, métodos virtuais e uso de ponteiros) seria muito caro. Por exemplo, um ponto (coordenada X, Y).
+                    class Program
+                    {
+                        static void Main(string[] args)
+                        {
+                            ...
+                        }
+                    }
 
-// colocar "record"
+
+                    // Enum dentro da classe, mas fora dos métodos:
+                    class Program
+                    {
+                        enum WeekDays
+                        {
+                            Sunday,
+                            Monday,
+                            Tuesday,
+                            Wednesday,
+                            Thursday,
+                            Friday,
+                            Saturday
+                        }
+
+                        static void Main(string[] args)
+                        {
+                            ...
+                        }
+                    }
+
+            . Demo
+
+                . Substitua o conteúdo da classe "Program.cs" pelo conteúdo abaixo:
+
+
+                    class Program
+                    {
+                        enum WeekDays
+                        {
+                            Sunday,
+                            Monday,
+                            Tuesday,
+                            Wednesday,
+                            Thursday,
+                            Friday,
+                            Saturday
+                        }
+
+
+                        static void Main(string[] args)
+                        {
+                            var day = (int)WeekDays.Sunday;
+
+                            var sd = (WeekDays)0;
+
+                            Console.WriteLine($"{WeekDays.Sunday}, referente ao dia {day} da semana. {sd} é o primeiro dia da semana.");
+                            // Saída: Sunday, referente ao dia 0 da semana. Sunday é o primeiro dia da semana.
+                        }
+                    }
+
+            . Record -  É um tipo de referência introduzido no C# 9.0, projetado para representar objetos imutáveis e com foco em 
+                        igualdade de valor (value-based equality), ou seja, dois records com os mesmos valores em suas propriedades são 
+                        considerados iguais, diferente das classes tradicionais que comparam por referência.
+
+                . Características principais dos records:
+
+                    . São imutáveis por padrão (mas podem ser mutáveis).
+
+                    . Comparação de igualdade baseada nos valores das propriedades.
+
+                    . Suporte a "with-expressions" para criar cópias com alterações.
+
+                    . Sintaxe concisa para declaração.
+
+                . Exemplos:
+
+                    1. Record simples (imutável por padrão):
+
+                        public record Pessoa(string Nome, int Idade);
+                    
+                        var pessoa1 = new Pessoa("Maria", 30);
+                        var pessoa2 = new Pessoa("Maria", 30);
+                        
+                        Console.WriteLine(pessoa1 == pessoa2); // True (igualdade por valor)
+
+                    2. Usando with-expressions:
+
+                        var pessoa3 = pessoa1 with { Idade = 31 };
+
+                        Console.WriteLine(pessoa3); // Pessoa { Nome = Maria, Idade = 31 }
+
+                    3. Record com propriedades nomeadas:
+
+                        public record Produto       // +------> podemos utilizar "set" no lugar do "init" para deixar mutável
+                        {                           // |        o record, porém não é recomendado
+                            public string Nome { get; init; }           //      |
+                            public decimal Preco { get; init; }         //      +--->   Neste caso poderiamos alterar a propriedade 
+                        }                                               //              do objeto record: 
+                                                                        //
+                                                                        //                  var produto = new Produto{ Nome = "Mouse", Preco = 50m };
+                                                                        //                  produto.preco = 10m;
+                        
+                        // Propriedades nomeadas ----+
+                        //                           |
+                        //                           V
+                        var produto = new Produto { Nome = "Notebook", Preco = 3500m };
+
+                    4. Record mutável (não recomendado, mas possível):
+
+                        public record Carro
+                        {
+                            public string Modelo { get; set; }
+                            public int Ano { get; set; }
+                        }
+
+                . Record é uma excelente opção para substituir classes DTOs (Data Transfer Objects) em APIs no C#.
+                        Pessoa { Nome = Maria, Idade = 31 }
+                        Produto: Notebook, Preço: 3500
+                        Cachorro: Rex, Raça: Labrador
+
+
+                    . São ideais para esse cenário porque:
+
+                        . São imutáveis por padrão, o que aumenta a segurança e previsibilidade dos dados.
+
+                        . Possuem igualdade baseada em valor, facilitando comparações e testes.
+
+                        . Têm sintaxe concisa, reduzindo o código boilerplate.
+
+                        . Suportam with-expressions, permitindo criar cópias modificadas facilmente.
+
+                    . Exemplo:
+                        
+                        // Record
+                        public record ProdutoRequest(string Nome, decimal Preco);
+
+                        // Controller API
+                        [HttpPost]
+                        public IActionResult CriarProduto([FromBody] ProdutoRequest request)
+                        {
+                            // request.Nome e request.Preco disponíveis aqui
+                            ...
+                        }
+
+            . Demo
+
+                . Altere o conteúdo da classe "Program.cs" com o conteúdo abaixo:
+
+                    public record Pessoa( string Nome, int Idade);
+
+                    class Program
+                    {
+                        static void Main(string[] args)
+                        {
+                            var pessoa1 = new Pessoa("Maria", 30);
+                            var pessoa2 = new Pessoa("Maria", 30);
+
+                            Console.WriteLine(pessoa1);
+                            Console.WriteLine(pessoa2);
+
+                            Console.WriteLine(pessoa1 == pessoa2);
+                        }
+
+                    }
+
+                . Execute o projeto e veja o resultado:
+
+                    dotnet run --project ./src/investimentControl
+
+                    # Saída:    
+                    
+                    Pessoa { Nome = Maria, Idade = 30 }
+                    Pessoa { Nome = Maria, Idade = 30 }
+                    True
+
+                . Insira a linha abaixo na classe "Program.cs":
+
+                    public record Pessoa( string Nome, int Idade);
+
+                    class Program
+                    {
+                        static void Main(string[] args)
+                        {
+                            var pessoa1 = new Pessoa("Maria", 30);
+                            var pessoa2 = new Pessoa("Maria", 30);
+
+                            Console.WriteLine(pessoa1);
+                            Console.WriteLine(pessoa2);
+
+                            Console.WriteLine(pessoa1 == pessoa2);
+
+                            // Linha inserida
+                            var pessoa3 = pessoa1 with { Idade = 31 };
+
+                            // Linha inserida
+                            Console.WriteLine(pessoa3);
+                        }
+
+                    }
+
+                . Execute o projeto e veja o resultado:
+
+                    dotnet run --project ./src/investimentControl
+
+                    # Saída:    
+                    
+                    Pessoa { Nome = Maria, Idade = 30 }
+                    Pessoa { Nome = Maria, Idade = 30 }
+                    True
+                    Pessoa { Nome = Maria, Idade = 31 }
+
+                . Insira a linha abaixo na classe "Program.cs":
+
+                    public record Pessoa( string Nome, int Idade);
+
+                    // Record inserido
+                    public record Produto
+                    {
+                        public string Nome { get; init; }
+                        public decimal Preco { get; init; }
+                    }
+                    class Program
+                    {
+                        static void Main(string[] args)
+                        {
+                            var pessoa1 = new Pessoa("Maria", 30);
+                            var pessoa2 = new Pessoa("Maria", 30);
+
+                            Console.WriteLine(pessoa1);
+                            Console.WriteLine(pessoa2);
+
+                            Console.WriteLine(pessoa1 == pessoa2);
+
+                            var pessoa3 = pessoa1 with { Idade = 31 };
+                            Console.WriteLine(pessoa3);
+
+
+                            // Linha inserida
+                            var produto = new Produto{ Nome = "Notebook", Preco = 3500m };
+                            
+                            // Linha inserida
+                            Console.WriteLine($"Produto: {produto.Nome}, Preço: {produto.Preco}");
+
+                        }
+
+                    }
+
+                . Execute o projeto e veja o resultado:
+
+                    dotnet run --project ./src/investimentControl
+                
+                    # Saída:    
+                    
+                    Pessoa { Nome = Maria, Idade = 30 }
+                    Pessoa { Nome = Maria, Idade = 30 }
+                    True
+                    Pessoa { Nome = Maria, Idade = 31 }
+                    Produto: Notebook, Preço: 3500
+
+                . Insira a linha abaixo na classe "Program.cs":
+
+                    public record Pessoa( string Nome, int Idade);
+
+                    public record Produto
+                    {
+                        public string Nome { get; init; }
+                        public decimal Preco { get; init; }
+                    }
+
+                    // Record inserido
+                    public record Animal(string Nome);
+
+                    // Record inserido
+                    public record Cachorro( string Nome, string Raca ) : Animal(Nome);
+
+                    class Program
+                    {
+                        static void Main(string[] args)
+                        {
+                            var pessoa1 = new Pessoa("Maria", 30);
+                            var pessoa2 = new Pessoa("Maria", 30);
+
+                            Console.WriteLine(pessoa1);
+                            Console.WriteLine(pessoa2);
+
+                            Console.WriteLine(pessoa1 == pessoa2);
+
+                            var pessoa3 = pessoa1 with { Idade = 31 };
+                            Console.WriteLine(pessoa3);
+
+                            var produto = new Produto { Nome = "Notebook", Preco = 3500m };
+
+                            Console.WriteLine($"Produto: {produto.Nome}, Preço: {produto.Preco}");
+
+                            // Linha inserida
+                            var cachorro = new Cachorro("Rex", "Labrador");
+                            
+                            // Linha inserida
+                            Console.WriteLine($"Cachorro: {cachorro.Nome}, Raça: {cachorro.Raca}");
+
+
+                        }
+
+                    }
+
+                . Execute o projeto e veja o resultado:
+
+                    dotnet run --project ./src/investimentControl
+                
+                    # Saída:    
+                    
+                    Pessoa { Nome = Maria, Idade = 30 }
+                    Pessoa { Nome = Maria, Idade = 30 }
+                    True
+
+// PAREI AQUI
+
+            . struct
+
+                    Permite declarar tipos que contém vários valores, identificados por um nome. Semelhante ao record do Delphi. Exemplo:
+
+                        public struct Point { 
+                            public int x, y; 
+                            
+                            public Point(int p1, int p2) { 
+                                x = p1; 
+                                y = p2;    
+                            } 
+                        }
+
+                    As structs possuem algumas características em comum com as classes:
+
+                        . Podem ter métodos.
+                        . Podem ter construtores. Entretanto, existem diferenças em relação às classes:
+                        . Elas são tipos por valor enquanto as classes são tipos por referência.
+                        . Não podemos declarar um construtor que não aceite argumentos.
+                        . Podemos atribuir à variável this, correspondente ao self no Delphi;
+                        . Não suportam herança; elas são implicitamente sealed.
+
+                    As structs fornecem uma alternativa mais “leve e barata” às classes, onde o custo do uso das classes 
+                    (alocação dinâmica de memória, métodos virtuais e uso de ponteiros) seria muito caro. Por exemplo, um ponto (coordenada X, Y).
 
     . Tipos por Referência, ou complexos:
 
