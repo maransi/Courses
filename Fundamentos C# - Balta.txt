@@ -1208,11 +1208,22 @@ Tipagem de Dados
                     Pessoa { Nome = Maria, Idade = 30 }
                     True
 
-// PAREI AQUI
+            . struct 
+            
+                . (estrutura) é um tipo de valor que permite agrupar vários dados sob um mesmo nome, semelhante a uma classe, 
+                        mas com algumas diferenças importantes:
 
-            . struct
+                    . São tipos por valor (alocados na stack, não no heap).
 
-                    Permite declarar tipos que contém vários valores, identificados por um nome. Semelhante ao record do Delphi. Exemplo:
+                    . Não suportam herança (são implicitamente sealed).
+
+                    . Podem ter métodos, propriedades, construtores (desde que aceitem parâmetros), e implementar interfaces.
+
+                    . Não podem ter um construtor sem parâmetros definido pelo usuário (o compilador gera um padrão).
+
+                    . São ideais para representar pequenos conjuntos de dados que não precisam de identidade única.
+
+                . Exemplo:
 
                         public struct Point { 
                             public int x, y; 
@@ -1223,17 +1234,50 @@ Tipagem de Dados
                             } 
                         }
 
-                    As structs possuem algumas características em comum com as classes:
+// PAREI AQUI
 
-                        . Podem ter métodos.
-                        . Podem ter construtores. Entretanto, existem diferenças em relação às classes:
-                        . Elas são tipos por valor enquanto as classes são tipos por referência.
-                        . Não podemos declarar um construtor que não aceite argumentos.
-                        . Podemos atribuir à variável this, correspondente ao self no Delphi;
-                        . Não suportam herança; elas são implicitamente sealed.
+            . Demo
 
-                    As structs fornecem uma alternativa mais “leve e barata” às classes, onde o custo do uso das classes 
-                    (alocação dinâmica de memória, métodos virtuais e uso de ponteiros) seria muito caro. Por exemplo, um ponto (coordenada X, Y).
+                using System;
+
+                public struct Investor
+                {
+                    // Propriedades
+                    public string Name { get; set; }
+                    public string Email { get; set; }
+                    public decimal TotalInvested { get; set; }
+                    public DateTime RegistrationDate { get; set; }
+
+                    // Construtor com parâmetros
+                    public Investor(string name, string email, decimal totalInvested, DateTime registrationDate)
+                    {
+                        Name = name;
+                        Email = email;
+                        TotalInvested = totalInvested;
+                        RegistrationDate = registrationDate;
+                    }
+
+                    // Método para exibir informações do investidor
+                    public void ShowInfo()
+                    {
+                        Console.WriteLine($"Nome: {Name}");
+                        Console.WriteLine($"Email: {Email}");
+                        Console.WriteLine($"Total Investido: {TotalInvested:C}");
+                        Console.WriteLine($"Data de Cadastro: {RegistrationDate:dd/MM/yyyy}");
+                    }
+                }
+
+                // Exemplo de uso
+                class Program
+                {
+                    static void Main()
+                    {
+                        Investor investor = new Investor("Ana Souza", "ana@email.com", 15000m, DateTime.Now);
+                        investor.ShowInfo();
+                    }
+                }
+
+
 
     . Tipos por Referência, ou complexos:
 
