@@ -1096,15 +1096,69 @@ Tipagem de Dados
                     Investidor { Nome = Jose Silva, Email = jose.silva@email.com.br, TotalInvestido = 1000, DataInclusao = 07/15/2025 00:00:00 }
                     True
                     Investidor { Nome = Maria, Email = jose.silva@email.com.br, TotalInvestido = 1000, DataInclusao = 07/15/2025 00:00:00 }
-// PAREI AQUI
+
                 . Insira a linha abaixo na classe "Program.cs":
 
                     public record Investidor(string Nome, string Email, decimal TotalInvestido, DateTime DataInclusao);
 
-// TODO: TROCAR A CLASSE CONTAAPLICACAO PELA CONTA E DEIXAR PARA CRIAR A CONTAAPLICACAO NO ITEM SEGUINTE
+                    // Record inserido
+                    public record Conta
+                    {
+                        public string agencia { get; init; }
+                        public string nrConta ( get; init; )
+                    }
 
-                    // Redord inserido
-                    public record ContaAplicacao
+                    class Program
+                    {
+
+                        static void Main(string[] args)
+                        {
+                            var investidor1 = new Investidor("Jose Silva", "jose.silva@email.com.br", 1000m, DateTime.Today);
+                            var investidor2 = new Investidor("Jose Silva", "jose.silva@email.com.br", 1000m, DateTime.Today);
+
+                            Console.WriteLine(investidor1);
+                            Console.WriteLine(investidor2);
+
+                            Console.WriteLine(investidor1 == investidor2);
+
+                            var investidor3 = investidor1 with { Nome = "Maria" };
+
+                            Console.WriteLine(investidor3);
+
+                            // Linha inserida
+                            var conta = new Conta(){ agencia : "001", nrConta : "12345"};
+                            
+                            // Linha inserida
+                            Console.WriteLine($"Conta -> {conta}");
+                        }
+
+                    }
+
+                . Execute o projeto e veja o resultado:
+
+                    dotnet run --project ./src/investimentControl
+                
+                    # Saída:    
+                    Investidor { Nome = Jose Silva, Email = jose.silva@email.com.br, TotalInvestido = 1000, DataInclusao = 07/15/2025 00:00:00 }
+                    Investidor { Nome = Jose Silva, Email = jose.silva@email.com.br, TotalInvestido = 1000, DataInclusao = 07/15/2025 00:00:00 }
+                    True
+                    Investidor { Nome = Maria, Email = jose.silva@email.com.br, TotalInvestido = 1000, DataInclusao = 07/15/2025 00:00:00 }
+                    Conta { agencia = 001, nrConta = 12345 }
+
+                . Insira a linha abaixo na classe "Program.cs":
+
+                    using System.ComponentModel;
+
+                    public record Investidor(string Nome, string Email, decimal TotalInvestido, DateTime DataInclusao);
+
+                    public record Conta
+                    {
+                        public string? agencia { get; init; }
+                        public string? nrConta { get; init; }
+                    }
+
+                    // Record inserido
+                    public record ContaAplicacao : Conta
                     {
                         public Investidor? Investidor { get; init; }
                         public DateTime DataAbertura { get; init; }
@@ -1127,11 +1181,22 @@ Tipagem de Dados
 
                             Console.WriteLine(investidor3);
 
+                            var conta = new Conta() { agencia = "001", nrConta = "12345" };
+
+                            Console.WriteLine($"{conta}");
+
                             // Linha inserida
-                            var contaAplicacao = new ContaAplicacao { Investidor = investidor3, DataAbertura = DateTime.Today };
-                            
+                            var contaAplicacao = new ContaAplicacao()
+                            {
+                                agencia = "001",
+                                nrConta = "12345",
+                                Investidor = investidor3,
+                                DataAbertura = DateTime.Today
+                            };
+
                             // Linha inserida
-                            Console.WriteLine($"Conta Aplicação -> Investidor: {contaAplicacao.Investidor?.Nome}, Data Abertura: {contaAplicacao.DataAbertura:dd/MM/yyyy}");
+                            Console.WriteLine($"{contaAplicacao}");
+
                         }
 
                     }
@@ -1145,63 +1210,8 @@ Tipagem de Dados
                     Investidor { Nome = Jose Silva, Email = jose.silva@email.com.br, TotalInvestido = 1000, DataInclusao = 07/15/2025 00:00:00 }
                     True
                     Investidor { Nome = Maria, Email = jose.silva@email.com.br, TotalInvestido = 1000, DataInclusao = 07/15/2025 00:00:00 }
-                    Conta Aplicação -> Investidor: Maria, Data Abertura: 15/07/2025
-// PAREI AQUI
-                . Insira a linha abaixo na classe "Program.cs":
-
-                    public record Pessoa( string Nome, int Idade);
-
-                    public record Produto
-                    {
-                        public string Nome { get; init; }
-                        public decimal Preco { get; init; }
-                    }
-
-                    // Record inserido
-                    public record Animal(string Nome);
-
-                    // Record inserido
-                    public record Cachorro( string Nome, string Raca ) : Animal(Nome);
-
-                    class Program
-                    {
-                        static void Main(string[] args)
-                        {
-                            var pessoa1 = new Pessoa("Maria", 30);
-                            var pessoa2 = new Pessoa("Maria", 30);
-
-                            Console.WriteLine(pessoa1);
-                            Console.WriteLine(pessoa2);
-
-                            Console.WriteLine(pessoa1 == pessoa2);
-
-                            var pessoa3 = pessoa1 with { Idade = 31 };
-                            Console.WriteLine(pessoa3);
-
-                            var produto = new Produto { Nome = "Notebook", Preco = 3500m };
-
-                            Console.WriteLine($"Produto: {produto.Nome}, Preço: {produto.Preco}");
-
-                            // Linha inserida
-                            var cachorro = new Cachorro("Rex", "Labrador");
-                            
-                            // Linha inserida
-                            Console.WriteLine($"Cachorro: {cachorro.Nome}, Raça: {cachorro.Raca}");
-
-
-                        }
-
-                    }
-
-                . Execute o projeto e veja o resultado:
-
-                    dotnet run --project ./src/investimentControl
-                
-                    # Saída:    
-                    
-                    Pessoa { Nome = Maria, Idade = 30 }
-                    Pessoa { Nome = Maria, Idade = 30 }
-                    True
+                    Conta { agencia = 001, nrConta = 12345 }
+                    ContaAplicacao { agencia = 001, nrConta = 12345, Investidor = Investidor { Nome = Maria, Email = jose.silva@email.com.br, TotalInvestido = 1000, DataInclusao = 07/15/2025 00:00:00 }, DataAbertura = 07/15/2025 00:00:00 }
 
             . struct 
             
