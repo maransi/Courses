@@ -1224,7 +1224,7 @@ Tipagem de Dados
 
                     . Podem ter métodos, propriedades, construtores (desde que aceitem parâmetros), e implementar interfaces.
 
-                    . Não podem ter um construtor sem parâmetros definido pelo usuário (o compilador gera um padrão).
+                    . Podem ter um construtor sem parâmetros definido pelo usuário (caso não tenha, o compilador gera um padrão).
 
                     . São ideais para representar pequenos conjuntos de dados que não precisam de identidade única.
 
@@ -1233,72 +1233,112 @@ Tipagem de Dados
                         public struct Point { 
                             public int x, y; 
                             
+                            // Construtor com parâmetros
                             public Point(int p1, int p2) { 
                                 x = p1; 
                                 y = p2;    
                             } 
                         }
 
+                        // Método
+                        public void Print()
+                        {
+                            Console.WriteLine($"({X}, {Y})");
+                        }
+
+                        class Program
+                        {
+                            static void Main()
+                            {
+                                // Instanciando struct
+                                Point p1 = new Point(10, 20);
+                                p1.Print(); // Saída: (10, 20)
+
+                                // Structs podem ser criadas sem usar new (mas os campos precisam ser inicializados antes do uso)
+                                Point p2;
+                                p2.X = 5;
+                                p2.Y = 15;
+                                p2.Print(); // Saída: (5, 15)
+                            }
+                        }
 
             . Demo
 
-                using System;
+                . Atualize o código da classe "Program.cs" com o conteúdo abaixo:
 
-                public struct Investor
-                {
-                    // Propriedades
-                    public string Name { get; set; }
-                    public string Email { get; set; }
-                    public decimal TotalInvested { get; set; }
-                    public DateTime RegistrationDate { get; set; }
+                    using System;
 
-                    // Construtor com parâmetros
-                    public Investor(string name, string email, decimal totalInvested, DateTime registrationDate)
+                    public struct Investor
                     {
-                        Name = name;
-                        Email = email;
-                        TotalInvested = totalInvested;
-                        RegistrationDate = registrationDate;
+                        // Propriedades
+                        public string Name { get; set; }
+                        public string Email { get; set; }
+                        public decimal TotalInvested { get; set; }
+                        public DateTime RegistrationDate { get; set; }
+
+                        // Construtor com parâmetros
+                        public Investor(string name, string email, decimal totalInvested, DateTime registrationDate)
+                        {
+                            Name = name;
+                            Email = email;
+                            TotalInvested = totalInvested;
+                            RegistrationDate = registrationDate;
+                        }
+
+                        // Método para exibir informações do investidor
+                        public void ShowInfo()
+                        {
+                            Console.WriteLine($"Nome: {Name}");
+                            Console.WriteLine($"Email: {Email}");
+                            Console.WriteLine($"Total Investido: {TotalInvested:C}");
+                            Console.WriteLine($"Data de Cadastro: {RegistrationDate:dd/MM/yyyy}");
+                        }
                     }
 
-                    // Método para exibir informações do investidor
-                    public void ShowInfo()
+                    // Exemplo de uso
+                    class Program
                     {
-                        Console.WriteLine($"Nome: {Name}");
-                        Console.WriteLine($"Email: {Email}");
-                        Console.WriteLine($"Total Investido: {TotalInvested:C}");
-                        Console.WriteLine($"Data de Cadastro: {RegistrationDate:dd/MM/yyyy}");
+                        static void Main()
+                        {
+                            Investor investor = new Investor("Ana Souza", "ana@email.com", 15000m, DateTime.Now);
+                            investor.ShowInfo();
+                        }
                     }
-                }
 
-                // Exemplo de uso
-                class Program
-                {
-                    static void Main()
-                    {
-                        Investor investor = new Investor("Ana Souza", "ana@email.com", 15000m, DateTime.Now);
-                        investor.ShowInfo();
-                    }
-                }
+                . Execute o projeto e veja o resultado:
 
+                    dotnet run --project ./src/investimentControl
 
+                    # Saída:    
+                    Nome: Ana Souza
+                    Email: ana@email.com
+                    Total Investido: ¤15,000.00
+                    Data de Cadastro: 15/07/2025
 
     . Tipos por Referência, ou complexos:
 
         . São alocados em um heap e sujeitos à “coleta de lixo” (“garbage collection”) quando não forem mais usados.
+
         . Devem ser inicializados com o operador new.
+
         . A variável armazena uma “referência”, uma espécie de ponteiro; o conteúdo em si fica no heap.
+
         . A atribuição de uma variável a outra copia a referência; podemos ter muitas variáveis referindo-se ao mesmo valor.
+
         . Normalmente usados com tipos de grande tamanho (mais que 16 bytes), onde o custo da alocação dinâmica é relativamente 
+
             pequeno frente a sua flexibilidade.
+
         . Podem conter o valor null, embora se usarmos uma variável com o valor null a exception NullReferenceException será gerada.
 
         . Arrays
 
-            Um array é sempre criado dinamicamente em tempo de execução. Podemos ter arrays de várias dimensões e arrays de arrays. 
-            Veja um exemplo de criação e inicialização de um array de inteiros de uma dimensão:
+            . Um array é sempre criado dinamicamente em tempo de execução. Podemos ter arrays de várias dimensões e arrays de arrays. 
+                Veja um exemplo de criação e inicialização de um array de inteiros de uma dimensão:
 
                 int[] myIntArray = new int[5] { 1, 2, 3, 4, 5 };
+
+            . Existe um tópico mais a frente que detalha melhor o uso de Arrays
 
         . Tipo string
 
@@ -1390,6 +1430,16 @@ Tipagem de Dados
                 if ( string.IsNullOrEmpty( texto ) ){
                     throw new Exception( "Texto não pode ser nulo" );
                 }
+
+                if (string.IsNullOrWhiteSpace(texto))
+                {
+                    throw new Exception( "String é nula, vazia ou só espaços" );
+                }
+
+                if (texto == null)
+                {
+                    throw new Exception("String é nula");
+                }
             }
 
 System
@@ -1410,6 +1460,7 @@ Valores Padrões
 Conversão Implícita
 -------------------
 
+// PAREI AQUI
     . Conversões implícitas ocorre quando somente fazemos a passagem de dados e com tipos compatíveis:
 
         float valor = 25.8f;
@@ -3301,6 +3352,8 @@ DateTime
 
 Moeda
 -----
+
+    // Faça as adaptações conforme o link https://chatgpt.com/share/68770275-5cec-800f-b5ae-19145c1cc9b2
 
     decimal valor = 10536.25m;
 
