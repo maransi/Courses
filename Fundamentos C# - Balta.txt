@@ -689,7 +689,6 @@ Instalar pacotes através do Nuget.org
         |       Compilers             |     Languages               |        Runtime Components   |
         +-----------------------------+-----------------------------+-----------------------------+
 
-
 Sequências de Escape/"Escape Sequences"
 ---------------------------------------
 
@@ -794,6 +793,10 @@ Tipagem de Dados
 
         . float, double e decimal são tipos para uso com casas decimais. O decimal mais usado para valores monetários com calculos financeiro.
 
+            int qtdEstoque = 10;
+
+            long qtdEstoque = 10L;      // para declarar números long é necessário colocar a letra "L"
+
             double salario = 2.500; 
 
             float salario = 2.500f;     // Float é necessário colocar a letra "f" quando for declarar "hardcode"
@@ -810,6 +813,12 @@ Tipagem de Dados
                 decimal total = preco * (1 + imposto);
 
                 Console.WriteLine($"Total com imposto: {total:C}");
+
+        . Números explícitos informados na inicialização de variáveis, sem casas decimais, são considerados do tipo int por padrão.
+            Números com casas decimais são considerados do tipo double por padrão.
+
+            int x = 10;        // 10 é int
+            double y = 2.5;    // 2.5 é double
 
         . var
 
@@ -1460,7 +1469,6 @@ Valores Padrões
 Conversão Implícita
 -------------------
 
-// PAREI AQUI
     . Conversões implícitas ocorre quando somente fazemos a passagem de dados e com tipos compatíveis:
 
         float valor = 25.8f;
@@ -1470,7 +1478,7 @@ Conversão Implícita
 
         outro = valor;      // Erro de conversão, float não pode ser convertido para int;
 
-    . Retorno no passo "Tipagem de Dados" e observe o valor máximo de cada tipo. O tamanho de cada tipo também limitará 
+    . Retorne no passo "Tipagem de Dados" e observe o valor máximo de cada tipo. O tamanho de cada tipo também limitará 
         a conversão implícita.
 
     . Conversões implícita válidas:
@@ -1544,9 +1552,9 @@ Conversão Explícita
 Parse
 -----
 
-    int.Parse() - lança uma exceção se a conversão falhar;
+    . int.Parse() - lança uma exceção se a conversão falhar;
 
-    As exceções possíveis usando ambos os métodos são:
+    . As exceções possíveis usando ambos os métodos são:
 
         Exceção 	            Condição
         -------                 --------
@@ -1567,6 +1575,105 @@ Parse
 
         string valor1 = "999999999999999999999999999999";
         int valor2 = int.Parse(valor1); 	                Lança a exceção OverflowException
+
+    . Demo
+
+        . Adapte a classe "Program.cs" com as linhas abaixo:
+
+            // Exemplo de conversão usando Parse, TryParse e Convert para tipos nativos em C#
+            using System;
+
+            class Program
+            {
+                static void Main()
+                {
+                    // int
+                    string intStr = "123";
+                    int intVal = int.Parse(intStr);
+
+                    // long
+                    string longStr = "123456789";
+                    long longVal = long.Parse(longStr);
+
+                    // short
+                    string shortStr = "32000";
+                    short shortVal = short.Parse(shortStr);
+
+                    // byte
+                    string byteStr = "255";
+                    byte byteVal = byte.Parse(byteStr);
+
+                    // sbyte
+                    string sbyteStr = "127";
+                    sbyte sbyteVal = sbyte.Parse(sbyteStr);
+
+                    // uint
+                    string uintStr = "4294967295";
+                    uint uintVal = uint.Parse(uintStr);
+
+                    // ulong
+                    string ulongStr = "18446744073709551615";
+                    ulong ulongVal = ulong.Parse(ulongStr);
+
+                    // ushort
+                    string ushortStr = "65535";
+                    ushort ushortVal = ushort.Parse(ushortStr);
+
+                    // float
+                    string floatStr = "3.14";
+                    float floatVal = float.Parse(floatStr);
+
+                    // double
+                    string doubleStr = "3.14159265359";
+                    double doubleVal = double.Parse(doubleStr);
+
+                    // decimal
+                    string decimalStr = "12345.6789";
+                    decimal decimalVal = decimal.Parse(decimalStr);
+
+                    // bool
+                    string boolStr = "true";
+                    bool boolVal = bool.Parse(boolStr);
+
+                    // char
+                    string charStr = "A";
+                    char charVal = char.Parse(charStr);
+
+                    // Exibindo resultados
+                    Console.WriteLine($"int: {intVal}");
+                    Console.WriteLine($"long: {longVal}");
+                    Console.WriteLine($"short: {shortVal}");
+                    Console.WriteLine($"byte: {byteVal}");
+                    Console.WriteLine($"sbyte: {sbyteVal}");
+                    Console.WriteLine($"uint: {uintVal}");
+                    Console.WriteLine($"ulong: {ulongVal}");
+                    Console.WriteLine($"ushort: {ushortVal}");
+                    Console.WriteLine($"float: {floatVal}");
+                    Console.WriteLine($"double: {doubleVal}");
+                    Console.WriteLine($"decimal: {decimalVal}");
+                    Console.WriteLine($"bool: {boolVal}");
+                    Console.WriteLine($"char: {charVal}");
+                }
+            }
+
+        . Execute o projeto e veja o resultado:
+
+            dotnet run --project ./src/investimentControl
+
+            # Saída:    
+            int: 123
+            long: 123456789
+            short: 32000
+            byte: 255
+            sbyte: 127
+            uint: 4294967295
+            ulong: 18446744073709551615
+            ushort: 65535
+            float: 314
+            double: 314159265359
+            decimal: 123456789
+            bool: True
+            char: A
 
 TryParse
 --------
@@ -1592,6 +1699,108 @@ TryParse
     int resultado;                                          Conversão falhou
     bool sucesso = int.Parse(valor1, out resultado); 	    resultado = 0  e sucesso = false
 
+
+    . Demo
+
+        . Adapte a classe "Program.cs" com as linhas abaixo:
+
+            // Exemplo de conversão usando Parse, TryParse e Convert para tipos nativos em C#
+            using System;
+
+            class Program
+            {
+                static void Main()
+                {
+                    // int
+                    string intStr = "123";
+                    int.TryParse(intStr, out int intTryVal);
+
+                    // long
+                    string longStr = "123456789";
+                    long.TryParse(longStr, out long longTryVal);
+
+                    // short
+                    string shortStr = "32000";
+                    short.TryParse(shortStr, out short shortTryVal);
+
+                    // byte
+                    string byteStr = "255";
+                    byte.TryParse(byteStr, out byte byteTryVal);
+
+                    // sbyte
+                    string sbyteStr = "127";
+                    sbyte.TryParse(sbyteStr, out sbyte sbyteTryVal);
+
+                    // uint
+                    string uintStr = "4294967295";
+                    uint.TryParse(uintStr, out uint uintTryVal);
+
+                    // ulong
+                    string ulongStr = "18446744073709551615";
+                    ulong.TryParse(ulongStr, out ulong ulongTryVal);
+
+                    // ushort
+                    string ushortStr = "65535";
+                    ushort.TryParse(ushortStr, out ushort ushortTryVal);
+
+                    // float
+                    string floatStr = "3.14";
+                    float.TryParse(floatStr, out float floatTryVal);
+
+                    // double
+                    string doubleStr = "3.14159265359";
+                    double.TryParse(doubleStr, out double doubleTryVal);
+
+                    // decimal
+                    string decimalStr = "12345.6789";
+                    decimal decimalVal = decimal.Parse(decimalStr);
+                    decimal.TryParse(decimalStr, out decimal decimalTryVal);
+
+                    // bool
+                    string boolStr = "true";
+                    bool.TryParse(boolStr, out bool boolTryVal);
+
+                    // char
+                    string charStr = "A";
+                    char.TryParse(charStr, out char charTryVal);
+
+                    // Exibindo resultados
+                    Console.WriteLine($"int:  {intTryVal}");
+                    Console.WriteLine($"long:  {longTryVal}");
+                    Console.WriteLine($"short:  {shortTryVal}");
+                    Console.WriteLine($"byte:  {byteTryVal}");
+                    Console.WriteLine($"sbyte:  {sbyteTryVal}");
+                    Console.WriteLine($"uint:  {uintTryVal}");
+                    Console.WriteLine($"ulong:  {ulongTryVal}");
+                    Console.WriteLine($"ushort:  {ushortTryVal}");
+                    Console.WriteLine($"float:  {floatTryVal}");
+                    Console.WriteLine($"double:  {doubleTryVal}");
+                    Console.WriteLine($"decimal:  {decimalTryVal}");
+                    Console.WriteLine($"bool:  {boolTryVal}");
+                    Console.WriteLine($"char:  {charTryVal}");
+                }
+            }
+
+        . Execute o projeto e veja o resultado:
+
+            dotnet run --project ./src/investimentControl
+
+            # Saída:    
+            int:  123
+            long:  123456789
+            short:  32000
+            byte:  255
+            sbyte:  127
+            uint:  4294967295
+            ulong:  18446744073709551615
+            ushort:  65535
+            float:  314
+            double:  314159265359
+            decimal:  123456789
+            bool:  True
+            char:  A
+
+
 Convert
 -------
 
@@ -1614,9 +1823,110 @@ Convert
 
         Você deve utilizar Convert.ToInt32 nos mesmos casos citados acima para int.Parse porem quando o argumento não for do tipo string.
 
+    . Demo
+
+        . Adapte a classe "Program.cs" com as linhas abaixo:
+
+            // Exemplo de conversão usando Parse, TryParse e Convert para tipos nativos em C#
+            using System;
+
+            class Program
+            {
+                static void Main()
+                {
+                    // int
+                    string intStr = "123";
+                    int intConv = Convert.ToInt32(intStr);
+
+                    // long
+                    string longStr = "123456789";
+                    long longConv = Convert.ToInt64(longStr);
+
+                    // short
+                    string shortStr = "32000";
+                    short shortConv = Convert.ToInt16(shortStr);
+
+                    // byte
+                    string byteStr = "255";
+                    byte byteConv = Convert.ToByte(byteStr);
+
+                    // sbyte
+                    string sbyteStr = "127";
+                    sbyte sbyteConv = Convert.ToSByte(sbyteStr);
+
+                    // uint
+                    string uintStr = "4294967295";
+                    uint uintConv = Convert.ToUInt32(uintStr);
+
+                    // ulong
+                    string ulongStr = "18446744073709551615";
+                    ulong ulongConv = Convert.ToUInt64(ulongStr);
+
+                    // ushort
+                    string ushortStr = "65535";
+                    ushort ushortConv = Convert.ToUInt16(ushortStr);
+
+                    // float
+                    string floatStr = "3.14";
+                    float floatConv = Convert.ToSingle(floatStr);
+
+                    // double
+                    string doubleStr = "3.14159265359";
+                    double doubleConv = Convert.ToDouble(doubleStr);
+
+                    // decimal
+                    string decimalStr = "12345.6789";
+                    decimal decimalConv = Convert.ToDecimal(decimalStr);
+
+                    // bool
+                    string boolStr = "true";
+                    bool boolConv = Convert.ToBoolean(boolStr);
+
+                    // char
+                    string charStr = "A";
+                    char charConv = Convert.ToChar(charStr);
+
+                    // Exibindo resultados
+                    Console.WriteLine($"int:  {intConv}");
+                    Console.WriteLine($"long:  {longConv}");
+                    Console.WriteLine($"short:  {shortConv}");
+                    Console.WriteLine($"byte:  {byteConv}");
+                    Console.WriteLine($"sbyte:  {sbyteConv}");
+                    Console.WriteLine($"uint:  {uintConv}");
+                    Console.WriteLine($"ulong:  {ulongConv}");
+                    Console.WriteLine($"ushort:  {ushortConv}");
+                    Console.WriteLine($"float:  {floatConv}");
+                    Console.WriteLine($"double:  {doubleConv}");
+                    Console.WriteLine($"decimal:  {decimalConv}");
+                    Console.WriteLine($"bool:  {boolConv}");
+                    Console.WriteLine($"char:  {charConv}");
+                }
+            }
+
+        . Execute o projeto e veja o resultado:
+
+            dotnet run --project ./src/investimentControl
+
+            # Saída:    
+            int:  123
+            long:  123456789
+            short:  32000
+            byte:  255
+            sbyte:  127
+            uint:  4294967295
+            ulong:  18446744073709551615
+            ushort:  65535
+            float:  314
+            double:  314159265359
+            decimal:  123456789
+            bool:  True
+            char:  A
+
+
+
 Operadores de comparação
 ------------------------
-
+// PAREI AQUI
     ==      igual
     !=      diferente
     >       Maior que
