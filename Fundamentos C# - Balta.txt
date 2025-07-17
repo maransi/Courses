@@ -1800,7 +1800,6 @@ TryParse
             bool:  True
             char:  A
 
-
 Convert
 -------
 
@@ -1922,11 +1921,9 @@ Convert
             bool:  True
             char:  A
 
-
-
 Operadores de comparação
 ------------------------
-// PAREI AQUI
+   
     ==      igual
     !=      diferente
     >       Maior que
@@ -2017,6 +2014,161 @@ Operadores Condicionais - IF
 
         int y = (x == null) ? -1 : x;
 
+    . Demo
+
+        . Adapte a classe "Program.cs" com as linhas abaixo:
+
+            // Exemplo de uso de operadores de comparação em C#
+            using System;
+
+            class Program
+            {
+                static void Main()
+                {
+                    int a = 10;
+                    int b = 20;
+
+                    Console.WriteLine($"a == b: {a == b}");   // False
+                    Console.WriteLine($"a != b: {a != b}");   // True
+                    Console.WriteLine($"a > b: {a > b}");     // False
+                    Console.WriteLine($"a < b: {a < b}");     // True
+                    Console.WriteLine($"a >= b: {a >= b}");   // False
+                    Console.WriteLine($"a <= b: {a <= b}");   // True
+
+                    // Exemplo prático
+                    if (a < b)
+                    {
+                        Console.WriteLine("a é menor que b");
+                    }
+                    else
+                    {
+                        Console.WriteLine("a não é menor que b");
+                    }
+                }
+            }
+
+        . Execute o projeto e veja o resultado:
+
+            dotnet run --project ./src/investimentControl
+
+            # Saída:    
+            a  == b: False
+            a != b: True
+            a > b: False
+            a < b: True
+            a >= b: False
+            a <= b: True
+
+        . Insira as linhas abaixo na classe "Program.cs":
+
+            using System;
+
+            class Program
+            {
+                static void Main()
+                {
+                    var a = 10;
+                    var b = 20;
+
+                    System.Console.WriteLine($"a == b: {a == b}");
+                    System.Console.WriteLine($"a != b: {a != b}");
+                    System.Console.WriteLine($"a > b: {a > b}");
+                    System.Console.WriteLine($"a < b: {a < b}");
+                    System.Console.WriteLine($"a >= b: {a >= b}");
+                    System.Console.WriteLine($"a <= b: {a <= b}");
+
+                    // IF inserido
+                    if (a < b)
+                    {
+                        System.Console.WriteLine("a é menor que b");
+                    }
+                    else if (a > b)
+                    {
+                        System.Console.WriteLine("a é maior que b");
+                    }
+                    else
+                    {
+                        System.Console.WriteLine("a é igual a b");
+                    }
+                }
+            }
+
+        . Execute o projeto e veja o resultado:
+
+            dotnet run --project ./src/investimentControl
+
+            # Saída:    
+            a == b: False
+            a != b: True
+            a > b: False
+            a < b: True
+            a >= b: False
+            a <= b: True
+            a é menor que b
+
+        . Insira as linhas abaixo na classe "Program.cs":
+
+            // Exemplo de conversão usando Parse, TryParse e Convert para tipos nativos em C#
+            using System;
+
+            class Program
+            {
+                static void Main()
+                {
+                    var a = 10;
+                    var b = 20;
+
+                    System.Console.WriteLine($"a == b: {a == b}");
+                    System.Console.WriteLine($"a != b: {a != b}");
+                    System.Console.WriteLine($"a > b: {a > b}");
+                    System.Console.WriteLine($"a < b: {a < b}");
+                    System.Console.WriteLine($"a >= b: {a >= b}");
+                    System.Console.WriteLine($"a <= b: {a <= b}");
+
+                    // linhas inseridas
+                    // Operadores lógicos
+                    bool resultadoAnd = (a > 5) && (b > 15);      // True && True => True
+                    bool resultadoOr = (a > 15) || (b > 15);      // False || True => True
+                    bool resultadoNot = !(a == b);                // !False => True
+
+                    Console.WriteLine($"(a > 5) && (b > 15): {resultadoAnd}");
+                    Console.WriteLine($"(a > 15) || (b > 15): {resultadoOr}");
+                    Console.WriteLine($"!(a == b): {resultadoNot}");
+                    // Fim das linhas inseridas
+
+
+                    // If alterado
+                    // Exemplo prático
+                    if ((a < b) && (a > 0))
+                    {
+                        Console.WriteLine("a é menor que b E maior que zero");
+                    }
+                    else
+                    {
+                        Console.WriteLine("a não atende à condição composta");
+                    }
+                    // Fim do exemplo prático
+
+
+                }
+            }
+
+        . Execute o projeto e veja o resultado:
+
+            dotnet run --project ./src/investimentControl
+
+            # Saída:    
+            a == b: False
+            a != b: True
+            a > b: False
+            a < b: True
+            a >= b: False
+            a <= b: True
+            (a > 5) && (b > 15): True
+            (a > 15) || (b > 15): True
+            !(a == b): True
+            a é menor que b E maior que zero
+
 Switch
 ------
 
@@ -2042,7 +2194,7 @@ Switch
 
 For
 ---
-
+// PAREI AQUI
     Exemplo 1
 
         for(int i = 0; i < 10; i++)
