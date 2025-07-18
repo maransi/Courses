@@ -2194,7 +2194,6 @@ Switch
 
 For
 ---
-// PAREI AQUI
     Exemplo 1
 
         for(int i = 0; i < 10; i++)
@@ -2245,6 +2244,120 @@ For
         i: 3
         i: 4
 
+    . Demo
+
+        . Adapte o conteúdo da classe "Program.cs" com as linhas abaixo:
+
+            class Program
+            {
+                static void Main( string[] args)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        System.Console.WriteLine($"i -> {i}");
+                    }
+
+                }
+            }
+
+        . Execute o projeto
+
+            dotnet run --project ./src/investimentControl
+
+            Saida:
+            i -> 0
+            i -> 1
+            i -> 2
+            i -> 3
+            i -> 4
+            i -> 5
+            i -> 6
+            i -> 7
+            i -> 8
+            i -> 9
+
+        . Insira as linhas abaixo na classe "Program.cs"
+
+            class Program
+            {
+                static void Main( string[] args)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        // IF inserido
+                        if (i == 5)
+                        {
+                            continue;
+                        }
+                        else if (i == 8)
+                        {
+                            break;
+                        }
+
+                        System.Console.WriteLine($"i -> {i}");
+                    }
+
+                }
+            }
+
+        . Execute o projeto
+
+            dotnet run --project ./src/investimentControl
+
+            Saida:
+            i -> 0
+            i -> 1
+            i -> 2
+            i -> 3
+            i -> 4
+            i -> 6
+            i -> 7
+
+        . Faça as alterações abaixo na classe "Program.cs"
+
+            class Program
+            {
+                static void Main( string[] args)
+                {
+                    // Linha inserida
+                    var i = 0;
+
+                    // Loop alterado
+                    for (; ; )
+                    {
+                        // IF alterado
+                        if (i < 10)
+                        {
+                            System.Console.WriteLine($"i -> {i}");
+                        }
+                        else
+                        {
+                            break;
+                        }
+
+                        // Linha inserida
+                        i++;
+                    }
+
+                }
+            }
+
+        . Execute o projeto
+
+            dotnet run --project ./src/investimentControl
+
+            Saida:
+            i -> 0
+            i -> 1
+            i -> 2
+            i -> 3
+            i -> 4
+            i -> 5
+            i -> 6
+            i -> 7
+            i -> 8
+            i -> 9
+
     . Existe outros tipos de loop que veremos mais a frente, como:
 
         foreach - Veremos em "Arrays - Acessando os elementos através de um foreach"
@@ -2290,6 +2403,49 @@ While
             Console.WriteLine("i = " + i);
         }
 
+    . Demo
+
+        . Adapte o conteúdo da classe "Program.cs" com as linhas abaixo:
+
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    var numeroAleatorio = new int[args.Length];
+
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        Console.WriteLine($"i -> {args[i]}");
+
+                        int.TryParse(args[i], out numeroAleatorio[i]);
+                    }
+
+                    var a = 0;
+
+                    while (a < numeroAleatorio.Length)
+                    {
+                        System.Console.WriteLine($"numeroAleatorio[{a}] -> {numeroAleatorio[a]}");
+
+                        a++;
+                    } 
+
+                }
+            }
+
+        . Execute o projeto:
+
+            dotnet run --project ./src/investimentControl -- 1 2 3 4
+
+            Saida:
+            i -> 1
+            i -> 2
+            i -> 3
+            i -> 4
+            numeroAleatorio[0] -> 1
+            numeroAleatorio[1] -> 2
+            numeroAleatorio[2] -> 3
+            numeroAleatorio[3] -> 4
+
 C# Class
 --------
 
@@ -2297,41 +2453,17 @@ C# Class
 
         using System;               // Importações
 
-        namespace HelloWorld;        // Equivalente aos pacotes/divisões lógica
+        namespace helloWorld;       // Equivalente aos pacotes/divisões lógica
 
-        [public/private/protected/internal/file] class Program           // Definição da classe
+        [public/private/protected/internal/file]  class HelloWorld      // Definição da classe
         {
-            public static void Main(string args)     // Método
+                            +-----> tipo do retorno do método (string, int, ...), caso não retorne nada fica valendo "void"
+                            |
+            public static void Hello(string args)           // Método
             {
                 Console.WriteLine(args);
             }
         }
-
-
-    . Demo
-
-        . Crie a classe "HelloWorld.cs" com o código abaixo na pasta raiz do projeto "helloWorld"
-
-            namespace helloWorld;
-
-            public class HelloWorld
-            {
-                public static void Hello(string args)
-                {
-                    Console.WriteLine(args);
-                }
-            }
-
-        . Altere o Program.cs da solution pelo conteúdo abaixo:
-
-            using helloWorld;       // Linha inserida
-
-            HelloWorld.Hello("Hello, World!" );      // Linha inserida
-
-        . Execute o projeto:
-
-            # Da pasta da solution
-            dotnet run --project ./helloWorld
 
     . "internal class"
     
@@ -2411,8 +2543,7 @@ C# Class
             . Coloque a classe na pasta [Nome do projeto].Tutorial.Calculo. Se ambos forem iguais dará erro durante a compilação, 
                 pois não encontrará as referências das classes nas packages/namespace.
 
-
-    // Insirar detalhes sobre "partial class"
+    // Insirar detalhes sobre "partial class" e "sealed class"
 
     . No vSCode algumas atalhos (Snippet) estão disponíveis para facilitar na implementação do código:
 
@@ -2513,16 +2644,97 @@ C# Class
             }
         }
 
+    . Demo
+
+        . Crie a pasta "investment/register" dentro projeto "InvestmentControl" e crie a classe "Investor" com o conteúdo abaixo:
+
+            namespace investiment.register;
+
+            internal class Investor
+            {
+                public string Name { get; set; }
+                public string Email { get; set; }
+                public string Document { get; set; }
+                public DateTime BirthDate { get; set; }
+                public decimal Income { get; set; }
+                public DateTime CreatedAt { get; set; }
+
+                public Investor()
+                {
+                    
+                }
+
+                public Investor(string name, string email, string document, DateTime birthDate, decimal income)
+                {
+                    Name = name;
+                    Email = email;
+                    Document = document;
+                    BirthDate = birthDate;
+                    Income = income;
+                    CreatedAt = DateTime.Now;
+                }
+
+                public void ShowInfo()
+                {
+                    System.Console.WriteLine($"Name: {Name}");
+                    System.Console.WriteLine($"Email: {Email}");
+                    System.Console.WriteLine($"Document: {Document}");
+                    System.Console.WriteLine($"BirthDate: {BirthDate.ToShortDateString()}");
+                    System.Console.WriteLine($"Income: {Income:C}");
+                    System.Console.WriteLine($"Created At: {CreatedAt.ToShortDateString()}");
+                }
+
+            }
+
+
+        . Altere o Program.cs do projeto console como abaixo
+
+            using investiment.register;
+
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    var investor = new Investor()
+                    {
+                        Name = "John Doe",
+                        Email = "john.doe@email.com",
+                        Document = "123456789",
+                        BirthDate = new DateTime(1990, 1, 1),
+                        Income = 50000.00m,
+                        CreatedAt = DateTime.Now,
+                    };
+
+                    investor.ShowInfo();
+
+                }
+            }
+
+        . Execute o projeto:
+
+            # Da pasta da solution
+            dotnet run --project ./src/investimentControl
+
+            Saida:
+            Name: John Doe
+            Email: john.doe@email.com
+            Document: 123456789
+            BirthDate: 01/01/1990
+            Income: R$ 50.000,00
+            Created At: 18/07/2025
+
     . Padronizações
             
-        . Nomes campo das classes utilizam "_" como padrão para definir o nome
+        . Nomes campo das classes utilizam "_" como padrão para definir o nome. Geralmente são usadas por 
+            convenção para indicar campos privados de uma classe.
 
             Exemplo:
 
                 namespace demo.myclass;
 
                 public class MyClass    
-                {
+                {                   +----> para indicar campos privados de uma classe
+                                    |
                     private string  _myField = string.Empty;  
                                     ^
                                     +-------------------+
@@ -2532,11 +2744,7 @@ C# Class
                         _myField = myField;
                     }
                 }
-
-        . Campos são criados como "private"
-
-            private string  _myField = string.Empty;  
-
+// PAREI AQUI
     . Delegate
 
         . O delegate é um tipo que representa uma referência para métodos com uma determinada assinatura. Ele funciona como um 
