@@ -2515,7 +2515,7 @@ C# Class
         `class`            Interna                     ❌ Não                       
         `public class`     Pública                     ✅ Sim                       
 
-    . Sugestão:
+    . Sugestões:
 
         . Quando usar internal explicitamente?
 
@@ -3163,10 +3163,6 @@ C# Class
 
             . Exemplo Expressões Lambda
 
-// PAREI AQUI
-// Explorar mais sobre delegate vs Lamda
-// https://www.tutorialsteacher.com/csharp/csharp-action-delegate
-
                 // 1. Declaração dos objetos função delegate
                 StringConverter LowerCaseConverter = (string input) => input.ToLower();
                 StringConverter UpperCaseConverter = (string input) => input.ToUpper();
@@ -3211,15 +3207,218 @@ C# Class
                     ...
                 }
 
-// Colocar no DEMO o uso de delegate com Lambda
+            . Execute o projeto:
 
-// Explicar o uso da Action como delegate
-// https://chatgpt.com/share/6883d040-f46c-800f-baf5-683e4c7965db
-// https://www.freecodecamp.org/news/action-and-func-delegates-in-c-sharp/
-// https://www.tutorialsteacher.com/csharp/csharp-action-delegate
+                # Da pasta da solution
+                dotnet run --project ./src/investimentControl
 
+                Saida:
+                Name: John Doe
+                Email: john.doe@email.com
+                Document: 123456789
+                BirthDate: 01/01/1990
+                Income: R$ 50.000,00
+                Created At: 25/07/2025
+                Current Account: R$ 9.000,00
+                Overdraft Limit: R$ 1.000,00
+                O valor R$ 5.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 2.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 2.000,00
+                O valor R$ 2.500,00 foi debitado com sucesso
+                Saldo Atual: -R$ 500,00
+                O valor R$ 2.500,00 foi estornado com sucesso
+                Saldo Atual: R$ 2.000,00
+
+            . Insira as linhas abaixo na classe "Program.cs":
+
+                using investiment.register;
+
+
+                class Program
+                {
+                    public delegate string DebitDelegate(decimal amount);
+
+                    static void Main(string[] args)
+                    {
+                        ...
+
+                        // Linha inserida
+                        DebitDelegate creditDelegate = (amount) =>
+                        {
+                            investor.CurrentAccount += amount;
+
+                            return $"O valor {amount:C} foi creditado com sucesso";
+                        };
+
+                        // Linha inserida
+                        resultadoOperacao = creditDelegate(3000m);
+
+                        // Linha inserida
+                        System.Console.WriteLine(resultadoOperacao);
+
+                        // Linha inserida
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                    }
+
+                    ...
+                }
+
+            . Execute o projeto:
+
+                # Da pasta da solution
+                dotnet run --project ./src/investimentControl
+
+                Saida:
+                Name: John Doe
+                Email: john.doe@email.com
+                Document: 123456789
+                BirthDate: 01/01/1990
+                Income: R$ 50.000,00
+                Created At: 25/07/2025
+                Current Account: R$ 9.000,00
+                Overdraft Limit: R$ 1.000,00
+                O valor R$ 5.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 2.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 2.000,00
+                O valor R$ 2.500,00 foi debitado com sucesso
+                Saldo Atual: -R$ 500,00
+                O valor R$ 2.500,00 foi estornado com sucesso
+                Saldo Atual: R$ 2.000,00
+                O valor R$ 3.000,00 foi creditado com sucesso
+                Saldo Atual: R$ 5.000,00
+
+    . Action
+
+        . Action é um delegate genérico embutido no .NET que representa métodos que não retornam 
+            valor (void) e que aceitam zero ou mais parâmetros.
+
+            . Exemplo Action → nenhum parâmetro, nenhum retorno
+
+                Action a = () => Console.WriteLine("Oi!");
+
+            . Exemplo Action<int> → um parâmetro do tipo int, sem retorno
+
+                            Tipo
+                        +----------------+
+                        |                |
+                        |                V
+                Action<int> printDobro = x => Console.WriteLine(x * 2);
+                                         |
+                                         |
+                                         +---> Parâmetro do tipo int
+
+            . Exemplo Action<string, decimal> → dois parâmetros (string e decimal), sem retorno
+
+                                 +-------------------+
+                         +------ | ------------+     |
+                         |       |             |     |
+                         |       |             V     V
+                Action<string, decimal> log = (msg, valor) => Console.WriteLine($"{msg}: {valor}");
+
+        . Action podem ser declaradas da forma como os delegates:
+        
+            . Exemplo Convencional
+
+                public delegate void Print(int val);
+
+                static void ConsolePrint(int i)
+                {
+                    Console.WriteLine(i);
+                }
+
+                static void Main(string[] args)
+                {           
+                    Print prnt = ConsolePrint;
+                    prnt(10);
+                }
+
+            . Exemplo Anônimo
+
+                static void Main(string[] args)
+                {
+                    Action<int> printActionDel = delegate(int i)
+                                                {
+                                                    Console.WriteLine(i);
+                                                };
+
+                    printActionDel(10);
+                }
+
+            . Exemplo Lambda
+
+                static void Main(string[] args)
+                {
+
+                    Action<int> printActionDel = i => Console.WriteLine(i);
+                    
+                    printActionDel(10);
+                }
+
+    . Demo
+
+        . Insira as linhas abaixo na classe "Program.cs":
+   
+            using investiment.register;
+
+
+            class Program
+            {
+                public delegate string DebitDelegate(decimal amount);
+
+                static void Main(string[] args)
+                {
+                    ...
+
+                    resultadoOperacao = creditDelegate(3000m);
+
+                    System.Console.WriteLine(resultadoOperacao);
+
+                    System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                    // Linha inserida
+                    Action showInfo = () => investor.ShowInfo();
+
+                    // Linha inserida
+                    showInfo();
+                }
+
+                ...
+            }
+
+        . Execute o projeto:
+
+            # Da pasta da solution
+            dotnet run --project ./src/investimentControl
+
+            Saida:
+            Saldo Atual: R$ 4.000,00
+            O valor R$ 2.000,00 foi debitado com sucesso
+            Saldo Atual: R$ 2.000,00
+            O valor R$ 2.500,00 foi debitado com sucesso
+            Saldo Atual: -R$ 500,00
+            O valor R$ 2.500,00 foi estornado com sucesso
+            Saldo Atual: R$ 2.000,00
+            O valor R$ 3.000,00 foi creditado com sucesso
+            Saldo Atual: R$ 5.000,00
+            Name: John Doe
+            Email: john.doe@email.com
+            Document: 123456789
+            BirthDate: 01/01/1990
+            Income: R$ 50.000,00
+            Created At: 25/07/2025
+            Current Account: R$ 5.000,00
+            Overdraft Limit: R$ 1.000,00
 
     . Lambda
+
+// PAREI AQUI
 
         . Funções lambda em C# são funções anônimas, ou seja, funções sem nome, que podem ser usadas para criar 
             pequenos trechos de código de forma concisa. Elas são muito utilizadas com delegates, eventos, LINQ e 
