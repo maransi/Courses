@@ -2831,9 +2831,205 @@ C# Class
 
         . Demo
 
-            // PAREI AQUI
+            . Altere a classe "Investor.cs" com o conteúdo abaixo:
+
+                namespace investiment.register;
+
+                internal class Investor
+                {
+                    public string? Name { get; set; }
+                    public string? Email { get; set; }
+                    public string? Document { get; set; }
+                    public DateTime BirthDate { get; set; }
+                    public decimal? Income { get; set; }
+                    public DateTime CreatedAt { get; set; }
+                    
+                    public decimal? CurrentAccount { get; set; }        // linha inserida - Saldo do Investidor
+                    public decimal? OverdraftLimit { get; set; }        // linha inserida - Limite da conta
+                    
+                    public Investor(string name, string email, string document, DateTime birthDate, decimal income, decimal currentAccount, decimal overdraftLimit)
+                    {
+                        Name = name;
+                        Email = email;
+                        Document = document;
+                        BirthDate = birthDate;
+                        Income = income;
+
+                        // Linha inserida
+                        CurrentAccount = currentAccount;
+                        // Linha inserida
+                        OverdraftLimit = overdraftLimit;
+                        
+                        CreatedAt = DateTime.Now;
+                    }
+
+                    public Investor()
+                    {
+                        
+                    }
+
+                    public void ShowInfo()
+                    {
+                        System.Console.WriteLine($"Name: {Name}");
+                        System.Console.WriteLine($"Email: {Email}");
+                        System.Console.WriteLine($"Document: {Document}");
+                        System.Console.WriteLine($"BirthDate: {BirthDate.ToShortDateString()}");
+                        System.Console.WriteLine($"Income: {Income:C}");
+                        System.Console.WriteLine($"Created At: {CreatedAt.ToShortDateString()}");
+                        
+                        // Linhas inserida
+                        Console.WriteLine($"Current Account: {CurrentAccount:C}");
+                        Console.WriteLine($"Overdraft Limit: {OverdraftLimit:C}");
+                    }
+
+                    // Método inserido
+                    public string Debit(decimal amount)
+                    {
+                        if (CurrentAccount - amount < OverdraftLimit * -1)
+                        {
+                            return $"O valor {amount:C} solicitado para debito superou o Limite do cliente. Operação não efetivada!";
+                        }
+
+                        CurrentAccount -= amount;
+
+                        return $"O valor {amount:C} foi debitado com sucesso";
+
+                    }
+                }
+
+            . Altere a classe "Program.cs" com o conteúdo abaixo:
+
+                using investiment.register;
+
+                class Program
+                {
+                    static void Main(string[] args)
+                    {
+                        var investor = new Investor()
+                        {
+                            Name = "John Doe",
+                            Email = "john.doe@email.com",
+                            Document = "123456789",
+                            BirthDate = new DateTime(1990, 1, 1),
+                            Income = 50000.00m,
+
+                            CurrentAccount = 9000.00m,      // Linha inserida
+                            OverdraftLimit = 10000.00m,     // Linha inserida
+
+                            CreatedAt = DateTime.Now
+                        };
+
+                        investor.ShowInfo();
+
+                        // Linha inserida                        
+                        var resultadoOperacao = investor.Debit(5000);
+
+                        // Linha inserida                        
+                        Console.WriteLine(resultadoOperacao);
+
+                        // Linha inserida                        
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                        // Linha inserida                        
+                        resultadoOperacao = investor.Debit(6000);
+
+                        // Linha inserida                        
+                        Console.WriteLine(resultadoOperacao);
+
+                        // Linha inserida                        
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+                    }
+                }
+
+            . Execute o projeto:
+
+                # Da pasta da solution
+                dotnet run --project ./src/investimentControl
+
+                Saida:
+                Name: John Doe
+                Email: john.doe@email.com
+                Document: 123456789
+                BirthDate: 01/01/1990
+                Income: R$ 50.000,00
+                Created At: 25/07/2025
+                Current Account: R$ 9.000,00
+                Overdraft Limit: R$ 1.000,00
+                O valor R$ 5.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
+                Saldo Atual: R$ 4.000,00
+
+            . Altere a classe "Program.cs" com as linhas abaixo:
+
+                using investiment.register;
+
+                class Program
+                {
+                    // Linha inserida
+                    public delegate string DebitDelegate(decimal amount);
 
 
+                    static void Main(string[] args)
+                    {
+                        var investor = new Investor()
+                        {
+                            Name = "John Doe",
+                            Email = "john.doe@email.com",
+                            Document = "123456789",
+                            BirthDate = new DateTime(1990, 1, 1),
+                            Income = 50000.00m,
+
+                            CurrentAccount = 9000.00m,
+                            OverdraftLimit = 1000.00m,
+
+                            CreatedAt = DateTime.Now
+                        };
+
+                        investor.ShowInfo();
+
+                        var resultadoOperacao = investor.Debit(5000);
+
+                        Console.WriteLine(resultadoOperacao);
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                        resultadoOperacao = investor.Debit(6000);
+
+                        Console.WriteLine(resultadoOperacao);
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                        // Linha inserida
+                        DebitDelegate debitDelegate = new(investor.Debit);
+
+                        // Linha inserida
+                        Console.WriteLine(debitDelegate(2000));
+
+                        // Linha inserida
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                    }
+                }
+
+            . Execute o projeto:
+
+                # Da pasta da solution
+                dotnet run --project ./src/investimentControl
+
+                Saida:
+                Name: John Doe
+                Email: john.doe@email.com
+                Document: 123456789
+                BirthDate: 01/01/1990
+                Income: R$ 50.000,00
+                Created At: 25/07/2025
+                Current Account: R$ 9.000,00
+                Overdraft Limit: R$ 1.000,00
+                O valor R$ 5.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 2.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 2.000,00
 
         . Podemos passar um delegate como parâmetro para um método em C#. Basta declarar o parâmetro do tipo do delegate desejado
 
@@ -2871,6 +3067,64 @@ C# Class
             // 4. Chamada do método
             DoDelegate(LowerCaseAccountName, input);
 
+        . Demo
+
+            . Insira as linhas abaixo na classe "Program.cs"
+
+                using investiment.register;
+
+
+                class Program
+                {
+                    public delegate string DebitDelegate(decimal amount);
+
+                    static void Main(string[] args)
+                    {
+                        ...
+
+                        Console.WriteLine(debitDelegate(2000));
+
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                        // Linha inserida
+                        DoDebitDelegate(debitDelegate, 2500m);
+
+                        // Linha inserida
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                    }
+
+                    // Método inserido
+                    static void DoDebitDelegate(DebitDelegate debitDelegate, decimal amount)
+                    {
+                        var result = debitDelegate(amount);
+                        Console.WriteLine(result);
+                    }
+                }
+
+            . Execute o projeto:
+
+                # Da pasta da solution
+                dotnet run --project ./src/investimentControl
+
+                Saida:
+                Name: John Doe
+                Email: john.doe@email.com
+                Document: 123456789
+                BirthDate: 01/01/1990
+                Income: R$ 50.000,00
+                Created At: 25/07/2025
+                Current Account: R$ 9.000,00
+                Overdraft Limit: R$ 1.000,00
+                O valor R$ 5.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
+                Saldo Atual: R$ 4.000,00
+                O valor R$ 2.000,00 foi debitado com sucesso
+                Saldo Atual: R$ 2.000,00
+                O valor R$ 2.500,00 foi debitado com sucesso
+                Saldo Atual: -R$ 500,00
+
         . Podemos trabalhar com delegate usando métodos anônimos em C# de duas formas: utilizando a palavra-chave 
             delegate ou expressões lambda.
 
@@ -2902,6 +3156,10 @@ C# Class
 
             . Exemplo Expressões Lambda
 
+// PAREI AQUI
+// Explorar mais sobre delegate vs Lamda
+// https://www.tutorialsteacher.com/csharp/csharp-action-delegate
+
                 // 1. Declaração dos objetos função delegate
                 StringConverter LowerCaseConverter = (string input) => input.ToLower();
                 StringConverter UpperCaseConverter = (string input) => input.ToUpper();
@@ -2909,6 +3167,50 @@ C# Class
                 // 2. Chamada dos objetos delegate
                 Console.WriteLine(LowerCaseConverter(input));
                 Console.WriteLine(UpperCaseConverter(input));
+
+        . Demo
+
+            . Insira as linhas abaixo na classe "Program.cs":
+
+                using investiment.register;
+
+
+                class Program
+                {
+                    public delegate string DebitDelegate(decimal amount);
+
+                    static void Main(string[] args)
+                    {
+                        ...
+
+                        DoDebitDelegate(debitDelegate, 2500m);
+
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+
+                        // Delegate inserido
+                        DebitDelegate cancelDelegate = delegate (decimal amount)
+                        {
+                            investor.CurrentAccount += amount;
+                            return $"O valor {amount:C} foi estornado com sucesso";
+                        };
+
+                        // Linha inserida
+                        System.Console.WriteLine(cancelDelegate(2500m));
+
+                        // Linha inserida
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+                    }
+
+                    ...
+                }
+
+// Colocar no DEMO o uso de delegate com Lambda
+
+// Explicar o uso da Action como delegate
+// https://chatgpt.com/share/6883d040-f46c-800f-baf5-683e4c7965db
+// https://www.freecodecamp.org/news/action-and-func-delegates-in-c-sharp/
+// https://www.tutorialsteacher.com/csharp/csharp-action-delegate
+
 
     . Lambda
 
