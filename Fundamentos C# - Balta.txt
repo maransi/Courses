@@ -29,12 +29,25 @@ Estudar o tópico https://docs.fluentvalidation.net/en/latest/index.html
 26. Generics
 27. Métodos de extensão (extension methods) C#
 28. Clean Code
+
     https://learn.microsoft.com/pt-br/dotnet/csharp/fundamentals/coding-style/coding-conventions
     https://www.youtube.com/watch?v=Qflaa9yH-qg&list=PL6jHXauyCdo-oVnD1fcRPjS7c_w-8CkZU
 
+29. SOLID
 
+    https://www.tutorialsteacher.com/csharp/solid-principles
 
+30. Diversos
 
+    https://www.youtube.com/@CentraldotNET/videos
+
+31. OOP
+
+    https://www.tutorialsteacher.com/csharp/oop
+
+32. Método extendido
+
+    https://www.tutorialsteacher.com/csharp/csharp-extension-method
 
 Fundamentos C# - Balta
 ----------------------
@@ -2515,7 +2528,7 @@ C# Class
         `class`            Interna                     ❌ Não                       
         `public class`     Pública                     ✅ Sim                       
 
-    . Sugestões:
+    . Sugestões para nomenclaturas:
 
         . Quando usar internal explicitamente?
 
@@ -2730,7 +2743,7 @@ C# Class
             Income: R$ 50.000,00
             Created At: 18/07/2025
 
-    . Padronizações
+    . Padrão de nomenclatura de propriedades
             
         . Nomes campo das classes utilizam "_" como padrão para definir o nome. Geralmente são usadas por 
             convenção para indicar campos privados de uma classe.
@@ -3294,7 +3307,7 @@ C# Class
                 O valor R$ 3.000,00 foi creditado com sucesso
                 Saldo Atual: R$ 5.000,00
 
-    . Action
+    . Action Delegate
 
         . Action é um delegate genérico embutido no .NET que representa métodos que não retornam 
             valor (void) e que aceitam zero ou mais parâmetros.
@@ -3305,7 +3318,7 @@ C# Class
 
             . Exemplo Action<int> → um parâmetro do tipo int, sem retorno
 
-                            Tipo
+                        Tipo do Parâmetro
                         +----------------+
                         |                |
                         |                V
@@ -3316,6 +3329,7 @@ C# Class
 
             . Exemplo Action<string, decimal> → dois parâmetros (string e decimal), sem retorno
 
+                         Tipo dos Parâmetros
                                  +-------------------+
                          +------ | ------------+     |
                          |       |             |     |
@@ -3416,9 +3430,78 @@ C# Class
             Current Account: R$ 5.000,00
             Overdraft Limit: R$ 1.000,00
 
+    . Func Delegate
+
+        . É um tipo genérico embutido que representa métodos que retornam um valor e podem 
+            receber de zero até 16 parâmetros. A última posição do tipo genérico sempre 
+            indica o tipo de retorno.
+
+                                         Tipos do Parâmetro (int, string, boolean, ...)
+                                         +-------------------+
+                                         |                   |   
+                                         |  +------------------------+
+                                         |  |                |       |
+                                         |  |                V       V
+            public delegate TResult Func<T, K, out TResult>( T arg1, K arg2 );
+                                |                     ^
+                                |                     |
+                                +---------------------+
+                                    Tipo do retorno
+
+        . Exemplo
+
+            Func<int, int, int> soma = (a, b) => a + b;
+            
+            int resultado = soma(2, 3); // resultado = 5
+
+        . Podemos criar Func Delegate de várias formas:
+
+            . Com um método nomeado
+
+                class Program
+                {
+                    static int Sum(int x, int y)
+                    {
+                        return x + y;
+                    }
+
+                    static void Main(string[] args)
+                    {
+                        Func<int,int, int> add = Sum;
+
+                        int result = add(10, 10);
+
+                        Console.WriteLine(result); 
+                    }
+                }
+
+            . Métodos Anônimos
+
+                Func<int> getRandomNumber = delegate()
+                            {
+                                Random rnd = new Random();
+                                return rnd.Next(1, 100);
+                            };            
+
+            . Com expressões Lambda
+
+                Func<int> getRandomNumber = () => new Random().Next(1, 100);
+
+                //Or 
+
+                Func<int, int, int>  Sum  = (x, y) => x + y;
+
+
+    . Event Delegate
+
+        https://www.youtube.com/watch?v=K4xj_gjVSGw&t=22s
+        https://www.youtube.com/watch?v=SuW2GwO17qA&pp=0gcJCccJAYcqIYzv
+        https://www.youtube.com/watch?v=OWQFXFsqbDY
+
+
     . Lambda
 
-// PAREI AQUI
+        // PAREI AQUI
 
         . Funções lambda em C# são funções anônimas, ou seja, funções sem nome, que podem ser usadas para criar 
             pequenos trechos de código de forma concisa. Elas são muito utilizadas com delegates, eventos, LINQ e 
@@ -3620,7 +3703,8 @@ C# Class
             int resultado = Calculadora.Somar(2, 3);
             Calculadora.Contador = 10;
 
-    . Podemos instânciar das seguintes formas:
+    . Instanciação de Classes
+        . Podemos instânciar das seguintes formas:
 
         . Exemplos
 
