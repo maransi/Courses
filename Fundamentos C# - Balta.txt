@@ -3494,6 +3494,93 @@ C# Class
 
     . Event Delegate
 
+        . Em C# é um mecanismo que permite que um objeto (a fonte do evento) notifique outros objetos (os assinantes) 
+            quando algo acontece. Ele combina delegates (ponteiros seguros para métodos) com o conceito de eventos, 
+            criando um padrão de comunicação desacoplado entre componentes.
+
+        . O que ele resolve?
+
+            . Desacoplamento: O objeto que dispara o evento não precisa saber quem está ouvindo; ele apenas dispara o evento.
+
+            . Notificação automática: Vários objetos podem se inscrever para serem notificados quando algo acontece.
+
+            . Padrão Observer: Implementa o padrão Observer, muito usado em interfaces gráficas, sistemas de mensagens, etc.
+
+        . Analogia teórica
+            
+            . Imagine um botão de campainha em uma casa:
+
+                . O botão é o objeto que dispara o evento (fonte).
+
+                . As pessoas dentro da casa são assinantes (ouvintes).
+
+                . Quando alguém aperta o botão (evento ocorre), todos que estão ouvindo (assinantes) são notificados (métodos chamados).
+
+        . Exemplo 
+
+            1. Definindo o delegate e o evento:
+
+                public class Campainha
+                {
+                    
+                    public delegate void TocarEventHandler(string mensagem);        // Delegate que define a assinatura dos métodos que podem ser assinantes do evento
+                                                /
+                                               / 
+                                              V  
+                    public event TocarEventHandler AoTocar;                         // Evento baseado no delegate
+                
+                    public void Tocar()
+                    {
+                        AoTocar?.Invoke("A campainha tocou!");          // Dispara o evento, notificando todos os assinantes
+
+                        // ou
+                        
+                        // AoTocar("A campainha tocou!");
+
+                        /*
+                            . AoTocar?.Invoke(...) é thread-safe para evitar exceções se o evento ficar sem assinantes entre a verificação e a chamada.
+                            . Chamar diretamente (AoTocar(...)) pode causar exceções em cenários multithread.
+                        */
+
+                    }
+                }            
+
+            2. Assinando o evento:
+
+                class Morador
+                {
+                    public void Atender(string mensagem)
+                    {
+                        Console.WriteLine($"Morador: {mensagem} Vou atender a porta!");
+                    }
+                }
+                
+                class Program
+                {
+                    static void Main()
+                    {
+                        var campainha = new Campainha();
+                        var morador = new Morador();
+                
+                        // Morador se inscreve para ser notificado quando a campainha tocar
+                        campainha.AoTocar += morador.Atender;
+                
+                        campainha.Tocar(); // Saída: Morador: A campainha tocou! Vou atender a porta!
+                    }
+                }
+
+        . Resumo:
+
+            . Event delegate permite que um objeto dispare notificações para múltiplos ouvintes de forma desacoplada.
+
+            . Resolve o problema de comunicação entre componentes sem dependência direta.
+
+            . Analogia: botão de campainha e moradores ouvindo.
+
+            . Prático para GUIs, sistemas de mensagens, logs, etc.
+
+
+
         https://www.youtube.com/watch?v=K4xj_gjVSGw&t=22s
         https://www.youtube.com/watch?v=SuW2GwO17qA&pp=0gcJCccJAYcqIYzv
         https://www.youtube.com/watch?v=OWQFXFsqbDY
