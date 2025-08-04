@@ -2670,7 +2670,7 @@ C# Class
 
             namespace investiment.register;
 
-            internal class Investor
+            public class Investor
             {
                 public string Name { get; set; }
                 public string Email { get; set; }
@@ -2855,7 +2855,7 @@ C# Class
 
                 namespace investiment.register;
 
-                internal class Investor
+                public class Investor
                 {
                     public string? Name { get; set; }
                     public string? Email { get; set; }
@@ -3092,7 +3092,6 @@ C# Class
             . Insira as linhas abaixo na classe "Program.cs"
 
                 using investiment.register;
-
 
                 class Program
                 {
@@ -3377,6 +3376,9 @@ C# Class
 
     . Demo
 
+        . Crie a classe 
+
+
         . Insira as linhas abaixo na classe "Program.cs":
    
             using investiment.register;
@@ -3587,29 +3589,31 @@ C# Class
 
     . Demo
 
-        . Crie a pasta "investiment/moviment" e dentro dela a classe "BankTransaction" com o conteúdo abaixo:
+        . Crie a pasta "investiment/moviment" e dentro dela a classe "Transaction" com o conteúdo abaixo:
 
             namespace investiment.moviment;
 
-            internal class BankTransaction
+            public class Transaction
             {
                 public string? Type { get; set; }
                 public decimal Amount { get; set; }
                 public DateTime Date { get; set; }
 
-                public BankTransaction(string type, decimal amount)
+                public Account Account { get; set; }
+
+                public Transaction(Account account, string type, DateTime dateTransaction,  decimal amount)
                 {
                     Type = type;
                     Amount = amount;
-                    Date = DateTime.Now;
+                    Date = dateTransaction;
+                    Account = account;
                 }
 
-                public BankTransaction()
+                public Transaction()
                 {
                     
                 }
-
-                public void ShowBankTransaction()
+                public void ShowTransaction()
                 {
                     System.Console.WriteLine($"Type: {Type}");
                     
@@ -3627,14 +3631,84 @@ C# Class
                 }
             }
 
-        . Altere a classe "Investor" conforme abaixo:
+        . Crie a classe "Account" com o conteúdo abaixo dentro da pasta "investiment/moviment" :
 
-            // Linha inserida
+            namespace investiment.moviment;
+
+            public class Account
+            {
+                public int AccountId { get; set; }
+                public string AccountName { get; set; }
+                public decimal Balance { get; set; }
+                public DateTime CreatedAt { get; set; }
+
+                public List<Transaction> Transactions { get; set; }
+
+                public Account(string accountName, decimal balance)
+                {
+                    AccountName = accountName;
+                    Balance = balance;
+                    CreatedAt = DateTime.Now;
+                    Transactions = new List<Transaction>();
+                }
+
+                public Account()
+                {
+                    CreatedAt = DateTime.Now;
+                    Transactions = new List<Transaction>();
+                }
+
+                public void Debit(DateTime dateTransaction, decimal amount)
+                {
+                    if (amount <= 0)
+                    {
+                        throw new ArgumentException("Amount must be greater than zero.");
+                    }
+
+                    if (Balance - amount < 0)
+                    {
+                        throw new InvalidOperationException("Insufficient funds.");
+                    }
+
+                    Balance -= amount;
+
+                    Transactions.Add(new Transaction(this, "Debit", dateTransaction, amount));
+                }
+
+                public void Credit(DateTime dateTransaction, decimal amount)
+                {
+                    if (amount <= 0)
+                    {
+                        throw new ArgumentException("Amount must be greater than zero.");
+                    }
+
+                    Balance += amount;
+
+                    Transactions.Add(new Transaction(this, "Credit", dateTransaction, amount));
+                }
+
+                public void ListTransactions()
+                {
+                    Transactions.ForEach(transaction =>
+                    {
+                        System.Console.WriteLine($"{transaction.Type} - {transaction.Amount:C} on {transaction.Date.ToShortDateString()}");
+                    });
+                }
+
+                public void ShowBalance()
+                {
+                    System.Console.WriteLine("-----------------------------------------------");
+                    System.Console.WriteLine($"Total Account: {AccountName} - Balance: {Balance:C}");
+                }
+            }
+
+        . Substitua a classe "Investor" pelo conteúdo abaixo:
+
             using investiment.moviment;
 
             namespace investiment.register;
 
-            internal class Investor
+            public class Investor
             {
 
                 public string? Name { get; set; }
@@ -3644,25 +3718,16 @@ C# Class
                 public decimal Income { get; set; }
                 public DateTime CreatedAt { get; set; }
 
-                public decimal? CurrentAccount { get; set; }
-                public decimal? OverdraftLimit { get; set; }
+                public Account Account { get; set; }
 
-                // Linha inserida
-                public List<BankTransaction> BankTransactions { get; set; }
-
-                public Investor(string name, string email, string document, DateTime birthDate, decimal income, decimal currentAccount, decimal overdraftLimit)
+                public Investor(string name, string email, string document, DateTime birthDate, decimal income, Account account)
                 {
                     Name = name;
                     Email = email;
                     Document = document;
                     BirthDate = birthDate;
                     Income = income;
-
-                    // Linha inserida
-                    BankTransactions = new List<BankTransaction>();
-
-                    CurrentAccount = currentAccount;
-                    OverdraftLimit = overdraftLimit;
+                    Account = account;
 
                     CreatedAt = DateTime.Now;
                 }
@@ -3670,98 +3735,19 @@ C# Class
                 public Investor()
                 {
                     // Linha inserida
-                    BankTransactions = new List<BankTransaction>();
-
-                    // Linha inserida
                     CreatedAt = DateTime.Now;
                 }
 
-                public void ShowInfo()
-                {
-                    System.Console.WriteLine($"Name: {Name}");
-                    System.Console.WriteLine($"Email: {Email}");
-                    System.Console.WriteLine($"Document: {Document}");
-                    System.Console.WriteLine($"BirthDate: {BirthDate.ToShortDateString()}");
-                    System.Console.WriteLine($"Income: {Income:C}");
-                    System.Console.WriteLine($"Created At: {CreatedAt.ToShortDateString()}");
-
-                    Console.WriteLine($"Current Account: {CurrentAccount:C}");
-                    Console.WriteLine($"Overdraft Limit: {OverdraftLimit:C}");
-                }
-
-                // Método alterado
-                public string Debit(decimal amount, DateTime transactionDate = default)
-                {
-                    // If alterado
-                    if (amount == 0)
-                    {
-                        return "O valor para debito deve ser diferente que zero.";
-                    }
-                    else if (CurrentAccount - amount < OverdraftLimit * -1)
-                    {
-                        return $"O valor {amount:C} solicitado para debito superou o Limite do cliente. Operação não efetivada!";
-                    }
-
-                    // Linha inserida
-                    BankTransactions.Add(new BankTransaction() { Type = "Debit", Amount = amount, Date = transactionDate == default ? DateTime.Today : transactionDate });
-
-                    CurrentAccount -= amount;
-
-                    return $"O valor {amount:C} foi debitado com sucesso";
-                }
-
-                // Método inserido
-                public string Credit(decimal amount, DateTime transactionDate = default)
-                {
-                    if (amount == 0)
-                    {
-                        return "O valor para crédito deve ser maior que zero.";
-                    }
-
-                    BankTransactions.Add(new BankTransaction() { Type = "Credit", Amount = amount, Date = transactionDate == default ? DateTime.Today : transactionDate });
-
-                    CurrentAccount += amount;
-
-                    return $"O valor {amount:C} foi creditado com sucesso";
-                }
-
-                // Metodo inserido
-                public void ShowTransactions()
-                {
-                    if (BankTransactions.Count == 0)
-                    {
-                        System.Console.WriteLine("Nenhuma transação registrada.");
-                        return;
-                    }
-
-                    BankTransactions.ForEach(transaction =>
-                                        {
-                                            transaction.ShowBankTransaction();
-                                            System.Console.WriteLine("-----------------------------");
-                                        });
-                }
-
-                // Método inserido
-                public void ShowAccountBalance()
-                {
-                    System.Console.WriteLine($"Saldo Atual: {CurrentAccount:C}");
-                    System.Console.WriteLine($"Limite de Cheque Especial: {OverdraftLimit:C}");
-                }
 
             }
 
-        . Altere a classe "Program.cs" conforme abaixo:
-
+        . Substitua o conteudo da classe "Program.cs" conforme abaixo:
 
             using investiment.register;
-
-            // Linha inserida
             using investiment.moviment;
 
             class Program
             {
-                public delegate string DebitDelegate(decimal amount);
-
                 // Metodo Main alterado totalmente
                 static void Main(string[] args)
                 {
@@ -3772,28 +3758,33 @@ C# Class
                         Document = "123456789",
                         BirthDate = new DateTime(1990, 1, 1),
                         Income = 5000,
-                        CurrentAccount = 0,
-                        OverdraftLimit = 1000
+                        Account = new Account()
+                        {
+                            AccountName = "Jonh's Account",
+                            Balance = 0
+                        }
                     };
 
-                    investor.Credit(1500, new DateTime(2025, 8,1));
-                    investor.Debit(200);
-                    investor.Debit(300);
-                    investor.Debit(300);
-                    investor.Credit(3000);
-                    investor.Debit(3700);
-                    investor.Debit(1100);
+                    investor.Account.Credit(new DateTime(2025, 8, 1), 200);
+                    investor.Account.Credit(new DateTime(2025, 8, 2), 1000);
+                    investor.Account.Debit(new DateTime(2025, 8, 3), 300);
 
-                    investor.ShowTransactions();
-                    investor.ShowAccountBalance();
+                    investor.Account.ListTransactions();
+                    investor.Account.ShowBalance();
                 }
-
-                ....
             }
 
         . Execute o projeto:
 
             dotnet run --project ./src/investimentControl
+
+            Saída:
+
+            Credit -        R$ 200,00       on 01/08/2025
+            Credit -        R$ 1.000,00     on 02/08/2025
+            Debit -         (R$ 300,00)     on 03/08/2025
+            -----------------------------------------------
+            Account: Jonh's Account - Total Balance: R$ 900,00
 
     // PAREI AQUI.
 
