@@ -3660,19 +3660,19 @@ C# Class
 
                 public void Debit(DateTime dateTransaction, decimal amount)
                 {
-                    if (amount <= 0)
+                    if (amount >= 0)
                     {
                         throw new ArgumentException("Amount must be greater than zero.");
                     }
 
-                    if (Balance - amount < 0)
+                    if (Balance - (amount * -1) < 0)
                     {
                         throw new InvalidOperationException("Insufficient funds.");
                     }
 
-                    Balance -= amount;
+                    Balance -= amount * -1;
 
-                    Transactions.Add(new Transaction(this, "Debit", dateTransaction, amount));
+                    Transactions.Add(new Transaction(this, "Debit", dateTransaction, amount * -1));
                 }
 
                 public void Credit(DateTime dateTransaction, decimal amount)
@@ -3767,7 +3767,7 @@ C# Class
 
                     investor.Account.Credit(new DateTime(2025, 8, 1), 200);
                     investor.Account.Credit(new DateTime(2025, 8, 2), 1000);
-                    investor.Account.Debit(new DateTime(2025, 8, 3), 300);
+                    investor.Account.Debit(new DateTime(2025, 8, 3), -300);
 
                     investor.Account.ListTransactions();
                     investor.Account.ShowBalance();
@@ -3785,6 +3785,179 @@ C# Class
             Debit -         (R$ 300,00)     on 03/08/2025
             -----------------------------------------------
             Account: Jonh's Account - Total Balance: R$ 900,00
+
+        . Altere a classe "Investor" com o conteúdo abaixo:
+
+            using investiment.moviment;
+
+
+            namespace investiment.register;
+
+            public class Investor
+            {
+                // Linha inserida
+                public delegate void TransactionAccountEventHandler(DateTime dateTransaction, decimal amount);
+
+                // Linha inserida
+                public event TransactionAccountEventHandler? TransactionAccount;
+
+                ...
+
+                // Método inserido
+                public void AddTransaction(DateTime dateTransaction, decimal amount)
+                {
+                    TransactionAccount = null;
+                    
+                    if (amount > 0)
+                    {
+                        TransactionAccount += Account.Credit;
+                    }
+                    else
+                    {
+                        TransactionAccount += Account.Debit;
+
+                    }
+
+                    TransactionAccount?.Invoke(dateTransaction, amount);
+                }
+
+            }
+
+        . Altere a classe "Program" com o conteúdo abaixo
+
+            using investiment.register;
+            using investiment.moviment;
+
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    Investor investor = new Investor()
+                    {
+                        Name = "Jonh Doe",
+                        Email = "john.doe@email.com",
+                        Document = "123456789",
+                        BirthDate = new DateTime(1990, 1, 1),
+                        Income = 5000,
+                        Account = new Account()
+                        {
+                            AccountName = "Jonh's Account",
+                            Balance = 0
+                        }
+                    };
+
+                    // Linhas eliminadas
+                    // investor.Account.Credit(new DateTime(2025, 8, 1), 200);
+                    // investor.Account.Credit(new DateTime(2025, 8, 2), 1000);
+                    // investor.Account.Debit(new DateTime(2025, 8, 3), -300);
+
+                    // Linhas inseridas
+                    investor.AddTransaction(new DateTime(2025, 8, 1), 200);
+                    investor.AddTransaction(new DateTime(2025, 8, 2), 1000);
+                    investor.AddTransaction(new DateTime(2025, 8, 3), -300);
+
+                    investor.Account.ListTransactions();
+                    investor.Account.ShowBalance();
+
+
+                }
+            }
+
+        . Execute o projeto:
+
+            dotnet run --project ./src/investimentControl
+
+            Saída:
+
+            Credit -        R$ 200,00       on 01/08/2025
+            Credit -        R$ 1.000,00     on 02/08/2025
+            Debit -         (R$ 300,00)     on 03/08/2025
+            -----------------------------------------------
+            Account: Jonh's Account - Total Balance: R$ 900,00
+
+        . Altere a classe "Investor" com o conteúdo abaixo:
+
+            using investiment.moviment;
+
+
+            namespace investiment.register;
+
+            public class Investor
+            {
+                public delegate void TransactionAccountEventHandler(DateTime dateTransaction, decimal amount);
+
+                // Linha inserida
+                public delegate void ListTransactionAccountEventHandler();
+
+                public event TransactionAccountEventHandler? TransactionAccount;
+
+                // Linha inserida
+                public event ListTransactionAccountEventHandler? ListTransactionAccount;
+
+                ...
+
+                // Método inserido
+                public void ListTransaction()
+                {
+                    ListTransactionAccount = Account.ListTransactions;
+                    ListTransactionAccount += Account.ShowBalance;
+
+                    ListTransactionAccount?.Invoke();
+
+                }
+            }
+
+        . Altere a classe "Program" com o conteúdo abaixo:
+
+            using investiment.register;
+            using investiment.moviment;
+
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    Investor investor = new Investor()
+                    {
+                        Name = "Jonh Doe",
+                        Email = "john.doe@email.com",
+                        Document = "123456789",
+                        BirthDate = new DateTime(1990, 1, 1),
+                        Income = 5000,
+                        Account = new Account()
+                        {
+                            AccountName = "Jonh's Account",
+                            Balance = 0
+                        }
+                    };
+
+                    investor.AddTransaction(new DateTime(2025, 8, 1), 200);
+                    investor.AddTransaction(new DateTime(2025, 8, 2), 1000);
+                    investor.AddTransaction(new DateTime(2025, 8, 3), -300);
+
+
+                    // Linhas eliminadas
+                    // investor.Account.ListTransactions();
+                    // investor.Account.ShowBalance();
+
+                    // Linha inserida
+                    investor.ListTransaction();
+
+                }
+            }
+
+        . Execute o projeto:
+
+            dotnet run --project ./src/investimentControl
+
+            Saída:
+
+            Credit -        R$ 200,00       on 01/08/2025
+            Credit -        R$ 1.000,00     on 02/08/2025
+            Debit -         (R$ 300,00)     on 03/08/2025
+            -----------------------------------------------
+            Account: Jonh's Account - Total Balance: R$ 900,00
+
+
 
     // PAREI AQUI.
 
