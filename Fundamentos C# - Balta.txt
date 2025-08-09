@@ -2664,6 +2664,174 @@ C# Class
             }
         }
 
+    . Propriedades podem ser declaradas de duas formas:
+
+        . Simplificada - Quando não existe necessidade de nenhuma lógica/regra ( vide item 8. Auto-implemented property )
+
+            public int MyAutoImplementedProperty { get; set; }
+
+        . Completa - Quando a necessidade de alguma lógica extra, por exemplo:
+
+            private int _myPropertyVar;
+
+            public int MyProperty
+            {
+                get {
+                    return _myPropertyVar / 2;
+                }
+
+                set {
+                    if (value > 100)
+                        _myPropertyVar = 100;
+                    else
+                        _myPropertyVar = value; ;
+                }
+            }
+
+            // ou utilizando Lambda
+
+            public class MyClass
+            {
+                private string _firstname = "";
+
+                public string FirstName {
+                    get => _firstname;              // é equivalente a get { return _firstname; }
+                    set => _firstname = value;      // é equivalente a set { _firstname = value; }
+                }
+            }
+
+    . Modificador de acesso "static"
+
+        . Podemos acessar membros estáticos diretamente pela classe, sem precisar criar um objeto.
+
+        . Eles compartilham o mesmo valor para todas as instâncias da classe (no caso de campos/propriedades).
+
+        . São úteis para funcionalidades que não dependem de dados específicos de um objeto.    
+
+        . Exemplo
+
+            public class Calculadora
+            {
+                private int a;
+                private int b;
+
+                public Calculadora( int a, int b)
+                {
+                    a = a;
+                    b = b;
+                }
+                public static int Contador { get; set; } // Propriedade estática
+
+                public static int Somar()
+                {
+                    this.Somar(a,b);
+                }
+
+                public static int Somar(int a, int b)    // Método estático
+                {
+                    return a + b;
+                }
+            }
+
+            // Uso:
+            int resultado = Calculadora.Somar(2, 3);
+            Calculadora.Contador = 10;
+
+    . Instanciação de Classes
+        . Podemos instânciar das seguintes formas:
+
+        . Exemplos
+
+            Calculadora calc = new Calculadora(10, 10);
+
+            int m = calc.somar();
+
+            ou
+
+            Calculadora calc = new();
+
+            calc.somar(10,20);
+
+            ou
+
+            // IMPORTANTE: Para se criar os objetos como abaixo, a classe é obrigada ter um construtor sem parâmetros. 
+            //              Pois na parte "new BankAccount(){...}" o construtor que está
+            //              sendo chamado é o construtor sem parâmetros. Podemos criar construtores com parâmetros, mas é obrigatório sem parâmetros.
+            // IMPORTANTE: Para realizar a criação do objeto como abaixo também é necessário existir os respectivos métodos Getter e Setter para
+            //              cada item informado dentro das "{}"
+
+            using System;
+
+            namespace bankAccount;
+
+            public class BankAccount
+            {
+                // métodos Getter e Setter para cada item informado dentro dos parenteses "new BankAccount() { AccountName = "John Doe", AccountNumber = 123456 };"
+                public string? AccountName { get; set; }
+
+                public int AccountNumber { get; set; }
+
+                public BankAccount()    // 1. Obrigatório se formos criar o objeto "new BankAccount(){...}"
+                {
+
+                }
+
+                public BankAccount(string accountName, int accountNumber)
+                {
+                    AccountName = accountName;
+                    AccountNumber = accountNumber;
+                }
+                public void ShowAccountDetails()
+                {
+                    Console.WriteLine($"Account Name: {AccountName}");
+                    Console.WriteLine($"Account Number: {AccountNumber}");
+                }
+
+            }
+
+
+            // Uso
+            BankAccount account = new BankAccount() { AccountName = "John Doe", AccountNumber = 123456 };
+            account.ShowAccountDetails();
+
+            ou
+
+            . Usando o tipo do objeto de forma anônima. Nesse caso não se trata de classe e não 
+                fazemos mensão nenhuma a qq classe, usando o tipo "var"
+
+                var student = new { Id = 1, Name = "MARCO ANTONIO", LastName = "SILVA", address = new { Id = 1, StreetName = "RUA CARIOBA 360", City = "SÃO PAULO", State = "SP", ZipCode = "02423-100" }  };
+
+                System.Console.WriteLine( student.Id );
+                System.Console.WriteLine( student.Name );
+                System.Console.WriteLine( student.Address.ToString());
+
+    . Podemos deixar os parâmetros dos métodos opcionais. Basta na assinatura do método dar um valor para o parâmetro:
+
+        . Sintaxe:
+
+            public int soma( int a, int b, bool formata = false );
+
+        . Dessa forma se houver o uso deste método somente com dois parâmetros não dará erro.
+
+        . Exemplo
+
+            public void ExibirMensagem(string mensagem, int vezes = 1)
+            {
+                for (int i = 0; i < vezes; i++)
+                {
+                    Console.WriteLine(mensagem);
+                }
+            }
+
+            // Uso:
+            ExibirMensagem("Olá!");         // Exibe uma vez
+            ExibirMensagem("Oi!", 3);       // Exibe três vezes
+
+    . Chamada de método com argumentos nomeados 
+
+        // Chamada usando argumentos nomeados:
+        ExibirMensagem(vezes: 3, mensagem: "Olá, mundo!");
+
     . Demo
 
         . Crie a pasta "investment/register" dentro projeto "InvestmentControl" e crie a classe "Investor" com o conteúdo abaixo:
@@ -4089,174 +4257,6 @@ C# Class
                                             |
                                             V
                     Representa cada elemento da lista numeros que o método FindAll percorrerá
-
-    . Propriedades podem ser declaradas de duas formas:
-
-        . Simplificada - Quando não existe necessidade de nenhuma lógica/regra ( vide item 8. Auto-implemented property )
-
-            public int MyAutoImplementedProperty { get; set; }
-
-        . Completa - Quando a necessidade de alguma lógica extra, por exemplo:
-
-            private int _myPropertyVar;
-
-            public int MyProperty
-            {
-                get {
-                    return _myPropertyVar / 2;
-                }
-
-                set {
-                    if (value > 100)
-                        _myPropertyVar = 100;
-                    else
-                        _myPropertyVar = value; ;
-                }
-            }
-
-            // ou utilizando Lambda
-
-            public class MyClass
-            {
-                private string _firstname = "";
-
-                public string FirstName {
-                    get => _firstname;              // é equivalente a get { return _firstname; }
-                    set => _firstname = value;      // é equivalente a set { _firstname = value; }
-                }
-            }
-
-    . Modificador de acesso "static"
-
-        . Podemos acessar membros estáticos diretamente pela classe, sem precisar criar um objeto.
-
-        . Eles compartilham o mesmo valor para todas as instâncias da classe (no caso de campos/propriedades).
-
-        . São úteis para funcionalidades que não dependem de dados específicos de um objeto.    
-
-        . Exemplo
-
-            public class Calculadora
-            {
-                private int a;
-                private int b;
-
-                public Calculadora( int a, int b)
-                {
-                    a = a;
-                    b = b;
-                }
-                public static int Contador { get; set; } // Propriedade estática
-
-                public static int Somar()
-                {
-                    this.Somar(a,b);
-                }
-
-                public static int Somar(int a, int b)    // Método estático
-                {
-                    return a + b;
-                }
-            }
-
-            // Uso:
-            int resultado = Calculadora.Somar(2, 3);
-            Calculadora.Contador = 10;
-
-    . Instanciação de Classes
-        . Podemos instânciar das seguintes formas:
-
-        . Exemplos
-
-            Calculadora calc = new Calculadora(10, 10);
-
-            int m = calc.somar();
-
-            ou
-
-            Calculadora calc = new();
-
-            calc.somar(10,20);
-
-            ou
-
-            // IMPORTANTE: Para se criar os objetos como abaixo, a classe é obrigada ter um construtor sem parâmetros. 
-            //              Pois na parte "new BankAccount(){...}" o construtor que está
-            //              sendo chamado é o construtor sem parâmetros. Podemos criar construtores com parâmetros, mas é obrigatório sem parâmetros.
-            // IMPORTANTE: Para realizar a criação do objeto como abaixo também é necessário existir os respectivos métodos Getter e Setter para
-            //              cada item informado dentro das "{}"
-
-            using System;
-
-            namespace bankAccount;
-
-            public class BankAccount
-            {
-                // métodos Getter e Setter para cada item informado dentro dos parenteses "new BankAccount() { AccountName = "John Doe", AccountNumber = 123456 };"
-                public string? AccountName { get; set; }
-
-                public int AccountNumber { get; set; }
-
-                public BankAccount()    // 1. Obrigatório se formos criar o objeto "new BankAccount(){...}"
-                {
-
-                }
-
-                public BankAccount(string accountName, int accountNumber)
-                {
-                    AccountName = accountName;
-                    AccountNumber = accountNumber;
-                }
-                public void ShowAccountDetails()
-                {
-                    Console.WriteLine($"Account Name: {AccountName}");
-                    Console.WriteLine($"Account Number: {AccountNumber}");
-                }
-
-            }
-
-
-            // Uso
-            BankAccount account = new BankAccount() { AccountName = "John Doe", AccountNumber = 123456 };
-            account.ShowAccountDetails();
-
-            ou
-
-            . Usando o tipo do objeto de forma anônima. Nesse caso não se trata de classe e não 
-                fazemos mensão nenhuma a qq classe, usando o tipo "var"
-
-                var student = new { Id = 1, Name = "MARCO ANTONIO", LastName = "SILVA", address = new { Id = 1, StreetName = "RUA CARIOBA 360", City = "SÃO PAULO", State = "SP", ZipCode = "02423-100" }  };
-
-                System.Console.WriteLine( student.Id );
-                System.Console.WriteLine( student.Name );
-                System.Console.WriteLine( student.Address.ToString());
-
-    . Podemos deixar os parâmetros dos métodos opcionais. Basta na assinatura do método dar um valor para o parâmetro:
-
-        . Sintaxe:
-
-            public int soma( int a, int b, bool formata = false );
-
-        . Dessa forma se houver o uso deste método somente com dois parâmetros não dará erro.
-
-        . Exemplo
-
-            public void ExibirMensagem(string mensagem, int vezes = 1)
-            {
-                for (int i = 0; i < vezes; i++)
-                {
-                    Console.WriteLine(mensagem);
-                }
-            }
-
-            // Uso:
-            ExibirMensagem("Olá!");         // Exibe uma vez
-            ExibirMensagem("Oi!", 3);       // Exibe três vezes
-
-    . Chamada de método com argumentos nomeados 
-
-        // Chamada usando argumentos nomeados:
-        ExibirMensagem(vezes: 3, mensagem: "Olá, mundo!");
 
     . Usando in, out e ref nos parâmetros dos métodos:
 
