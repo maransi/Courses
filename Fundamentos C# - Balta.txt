@@ -4125,8 +4125,6 @@ C# Class
             -----------------------------------------------
             Account: Jonh's Account - Total Balance: R$ 900,00
 
-
-
     . Lambda
 
         // PAREI AQUI
@@ -4257,6 +4255,83 @@ C# Class
                                             |
                                             V
                     Representa cada elemento da lista numeros que o método FindAll percorrerá
+
+    . Demo
+
+        . Insira as linhas abaixo na classe "Program.cs":
+
+            using investiment.register;
+            using investiment.moviment;
+
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    ...
+
+                    investor.ListTransaction();
+
+                    // Action inserida para listar transações
+                    Action<DateTime, DateTime, List<Transaction>> doListTrasanction = (initialDate, finalDate, transactions) =>
+                    {
+                        System.Console.WriteLine("\n------------------------------------------------");
+                        System.Console.WriteLine($"Period from {initialDate.ToShortDateString()} to {finalDate.ToShortDateString()}");
+
+                        decimal initialBalance = transactions
+                            .Where(transaction => transaction.Date < initialDate)
+                            .Sum(transaction => transaction.Type == "Credit" ? transaction.Amount : transaction.Amount * -1);
+
+                        System.Console.WriteLine($"\nInitial Balance: {initialBalance:C}\n");
+
+                        transactions
+                            .Where(transaction => transaction.Date >= initialDate && transaction.Date <= finalDate)
+                            .ToList()
+                            .ForEach(transaction =>
+                            {
+                                if (transaction.Type == "Debit")
+                                {
+                                    System.Console.WriteLine($"{transaction.Type} - \t({transaction.Amount:C}) \ton {transaction.Date.ToShortDateString()}");
+                                }
+                                else
+                                {
+                                    System.Console.WriteLine($"{transaction.Type} - \t{transaction.Amount:C} \ton {transaction.Date.ToShortDateString()}");
+                                }
+                            });
+
+                        decimal finalBalance = initialBalance +
+                            transactions
+                            .Where(transaction => transaction.Date >= initialDate && transaction.Date <= finalDate)
+                            .Sum(transaction => transaction.Type == "Credit"  ? transaction.Amount : transaction.Amount * -1);
+
+                        System.Console.WriteLine($"\nFinal Balance: {finalBalance:C}\n");
+
+                    };
+
+                    // Linha inserida para chamar a ação de listar transações
+                    doListTrasanction(new DateTime(2025, 8, 3), new DateTime(2025, 8, 3), investor.Account.Transactions);
+                }
+            }
+
+        . Execute o projeto:
+
+            dotnet run --project ./src/investimentControl
+
+            Saída:
+            Credit - 	R$ 200,00 	on 01/08/2025
+            Credit - 	R$ 1.000,00 	on 02/08/2025
+            Debit - 	(R$ 300,00) 	on 03/08/2025
+            -----------------------------------------------
+            Account: Jonh's Account - Total Balance: R$ 900,00
+
+            ------------------------------------------------
+            Period from 03/08/2025 to 03/08/2025
+
+            Initial Balance: R$ 1.200,00
+
+            Debit - 	(R$ 300,00) 	on 03/08/2025
+
+            Final Balance: R$ 900,00
+
 
     . Usando in, out e ref nos parâmetros dos métodos:
 
