@@ -2492,6 +2492,10 @@ C# Class
         . É o modificador de acesso padrão se nenhum for especificado em arquivos de nível de 
             namespace (ou seja, fora de classes aninhadas).
 
+        . Uma classe com o modificador de acesso "internal" não poderá ser definida em outra classe com modificador de acesso
+            mais restritivo. Isto refere-se aos casos de propriedades getter/setter, ou como parâmetro de construtores, de 
+            classes que contém referência a uma classe internal. Neste caso dará erro.
+
         . Exemplo:
 
             // Arquivo: MinhaClasse.cs
@@ -4331,7 +4335,7 @@ C# Class
             Debit - 	(R$ 300,00) 	on 03/08/2025
 
             Final Balance: R$ 900,00
-
+PAREI AQUI
 
     . Usando in, out e ref nos parâmetros dos métodos:
 
