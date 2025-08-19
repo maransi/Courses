@@ -2034,6 +2034,10 @@ Operadores Condicionais - IF
 
         int y = (x == null) ? -1 : x;
 
+        ou
+
+        int y ??= -1;   // Já verifica se "y" for nulo e atribui o valor "-1"
+
     . Demo
 
         . Adapte a classe "Program.cs" com as linhas abaixo:
@@ -2844,9 +2848,9 @@ C# Class
 
             public class Investor
             {
-                public string Name { get; set; }
-                public string Email { get; set; }
-                public string Document { get; set; }
+                public string? Name { get; set; }
+                public string? Email { get; set; }
+                public string? Document { get; set; }
                 public DateTime BirthDate { get; set; }
                 public decimal Income { get; set; }
                 public DateTime CreatedAt { get; set; }
@@ -3039,6 +3043,7 @@ C# Class
                     public decimal? CurrentAccount { get; set; }        // linha inserida - Saldo do Investidor
                     public decimal? OverdraftLimit { get; set; }        // linha inserida - Limite da conta
                     
+                    // Assinatura alterada, incluido currentAccount e overdraftLimit
                     public Investor(string name, string email, string document, DateTime birthDate, decimal income, decimal currentAccount, decimal overdraftLimit)
                     {
                         Name = name;
@@ -3144,13 +3149,13 @@ C# Class
                 Document: 123456789
                 BirthDate: 01/01/1990
                 Income: R$ 50.000,00
-                Created At: 25/07/2025
+                Created At: 19/08/2025
                 Current Account: R$ 9.000,00
-                Overdraft Limit: R$ 1.000,00
+                Overdraft Limit: R$ 10.000,00
                 O valor R$ 5.000,00 foi debitado com sucesso
                 Saldo Atual: R$ 4.000,00
-                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
-                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 foi debitado com sucesso
+                Saldo Atual: -R$ 2.000,00
 
             . Altere a classe "Program.cs" com as linhas abaixo:
 
@@ -3173,7 +3178,7 @@ C# Class
                             Income = 50000.00m,
 
                             CurrentAccount = 9000.00m,
-                            OverdraftLimit = 1000.00m,
+                            OverdraftLimit = 10000.00m,
 
                             CreatedAt = DateTime.Now
                         };
@@ -3213,15 +3218,15 @@ C# Class
                 Document: 123456789
                 BirthDate: 01/01/1990
                 Income: R$ 50.000,00
-                Created At: 25/07/2025
+                Created At: 19/08/2025
                 Current Account: R$ 9.000,00
-                Overdraft Limit: R$ 1.000,00
+                Overdraft Limit: R$ 10.000,00
                 O valor R$ 5.000,00 foi debitado com sucesso
                 Saldo Atual: R$ 4.000,00
-                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
-                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 foi debitado com sucesso
+                Saldo Atual: -R$ 2.000,00
                 O valor R$ 2.000,00 foi debitado com sucesso
-                Saldo Atual: R$ 2.000,00
+                Saldo Atual: -R$ 4.000,00
 
         . Podemos passar um delegate como parâmetro para um método em C#. Basta declarar o parâmetro do tipo do delegate desejado
 
@@ -3304,17 +3309,17 @@ C# Class
                 Document: 123456789
                 BirthDate: 01/01/1990
                 Income: R$ 50.000,00
-                Created At: 25/07/2025
+                Created At: 19/08/2025
                 Current Account: R$ 9.000,00
-                Overdraft Limit: R$ 1.000,00
+                Overdraft Limit: R$ 10.000,00
                 O valor R$ 5.000,00 foi debitado com sucesso
                 Saldo Atual: R$ 4.000,00
-                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
-                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 foi debitado com sucesso
+                Saldo Atual: -R$ 2.000,00
                 O valor R$ 2.000,00 foi debitado com sucesso
-                Saldo Atual: R$ 2.000,00
+                Saldo Atual: -R$ 4.000,00
                 O valor R$ 2.500,00 foi debitado com sucesso
-                Saldo Atual: -R$ 500,00
+                Saldo Atual: -R$ 6.500,00
 
         . Podemos trabalhar com delegate usando métodos anônimos em C# de duas formas: utilizando a palavra-chave 
             delegate ou expressões lambda.
@@ -3402,19 +3407,19 @@ C# Class
                 Document: 123456789
                 BirthDate: 01/01/1990
                 Income: R$ 50.000,00
-                Created At: 25/07/2025
+                Created At: 19/08/2025
                 Current Account: R$ 9.000,00
-                Overdraft Limit: R$ 1.000,00
+                Overdraft Limit: R$ 10.000,00
                 O valor R$ 5.000,00 foi debitado com sucesso
                 Saldo Atual: R$ 4.000,00
-                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
-                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 foi debitado com sucesso
+                Saldo Atual: -R$ 2.000,00
                 O valor R$ 2.000,00 foi debitado com sucesso
-                Saldo Atual: R$ 2.000,00
+                Saldo Atual: -R$ 4.000,00
                 O valor R$ 2.500,00 foi debitado com sucesso
-                Saldo Atual: -R$ 500,00
+                Saldo Atual: -R$ 6.500,00
                 O valor R$ 2.500,00 foi estornado com sucesso
-                Saldo Atual: R$ 2.000,00
+                Saldo Atual: -R$ 4.000,00
 
             . Insira as linhas abaixo na classe "Program.cs":
 
@@ -3428,6 +3433,10 @@ C# Class
                     static void Main(string[] args)
                     {
                         ...
+
+                        System.Console.WriteLine(cancelDelegate(2500m));
+
+                        System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
 
                         // Linha inserida
                         DebitDelegate creditDelegate = (amount) =>
@@ -3462,21 +3471,21 @@ C# Class
                 Document: 123456789
                 BirthDate: 01/01/1990
                 Income: R$ 50.000,00
-                Created At: 25/07/2025
+                Created At: 19/08/2025
                 Current Account: R$ 9.000,00
-                Overdraft Limit: R$ 1.000,00
+                Overdraft Limit: R$ 10.000,00
                 O valor R$ 5.000,00 foi debitado com sucesso
                 Saldo Atual: R$ 4.000,00
-                O valor R$ 6.000,00 solicitado para debito superou o Limite do cliente. Operação não efetivada!
-                Saldo Atual: R$ 4.000,00
+                O valor R$ 6.000,00 foi debitado com sucesso
+                Saldo Atual: -R$ 2.000,00
                 O valor R$ 2.000,00 foi debitado com sucesso
-                Saldo Atual: R$ 2.000,00
+                Saldo Atual: -R$ 4.000,00
                 O valor R$ 2.500,00 foi debitado com sucesso
-                Saldo Atual: -R$ 500,00
+                Saldo Atual: -R$ 6.500,00
                 O valor R$ 2.500,00 foi estornado com sucesso
-                Saldo Atual: R$ 2.000,00
+                Saldo Atual: -R$ 4.000,00
                 O valor R$ 3.000,00 foi creditado com sucesso
-                Saldo Atual: R$ 5.000,00
+                Saldo Atual: -R$ 1.000,00
 
     . Action Delegate
 
@@ -3548,9 +3557,6 @@ C# Class
 
     . Demo
 
-        . Crie a classe 
-
-
         . Insira as linhas abaixo na classe "Program.cs":
    
             using investiment.register;
@@ -3564,17 +3570,19 @@ C# Class
                 {
                     ...
 
-                    resultadoOperacao = creditDelegate(3000m);
-
-                    System.Console.WriteLine(resultadoOperacao);
-
-                    System.Console.WriteLine($"Saldo Atual: {investor.CurrentAccount:C}");
+                    // Linha comentada
+                    // investor.ShowInfo();
 
                     // Linha inserida
                     Action showInfo = () => investor.ShowInfo();
 
                     // Linha inserida
                     showInfo();
+
+                    var resultadoOperacao = investor.Debit(5000);
+
+                    Console.WriteLine(resultadoOperacao);
+
                 }
 
                 ...
@@ -3760,6 +3768,9 @@ C# Class
         https://www.youtube.com/watch?v=OWQFXFsqbDY
 
     . Demo
+
+// PAREI AQUI 2a. versao
+
 
         . Crie a pasta "investiment/moviment" e dentro dela a classe "Transaction" com o conteúdo abaixo:
 
@@ -5162,21 +5173,37 @@ Moeda
 
     // Faça as adaptações conforme o link https://chatgpt.com/share/68770275-5cec-800f-b5ae-19145c1cc9b2
 
-    decimal valor = 10536.25m;
+    . Desabilitando o modo de globalização invariante
 
-    Console.WriteLine(valor.ToString(CultureInfo.CreateSpecificCulture("pt-BR")));          // 10536,25
+        . No ambiente onde a aplicação está rodando (Linux, Docker, etc.), você precisa garantir que as bibliotecas 
+            de globalização estejam disponíveis e que o modo invariante esteja desativado.
 
-    Console.WriteLine(valor.ToString("G",   // Formatador númerico                                          
-                                        CultureInfo.CreateSpecificCulture("pt-BR")));       // 10536,25
+            <InvariantGlobalization>false</InvariantGlobalization>
 
-    Console.WriteLine(valor.ToString("C", // Formatador de Moeda/Currency
-                                        CultureInfo.CreateSpecificCulture("pt-BR")));       // R$ 10.536,25
+        . Na configuração de ambiente:
 
-    Console.WriteLine(valor.ToString("F",  // Fração, com uma casa decimal a mais
-                                        CultureInfo.CreateSpecificCulture("pt-BR")));       // 10536,250
+            . Defina a variável de ambiente antes de executar sua aplicação:
 
-    Console.WriteLine(valor.ToString("N", // Númerico
-                                        CultureInfo.CreateSpecificCulture("pt-BR")));       // 10.536,25
+                export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+
+        . Usando diretamente no comando de saida:
+
+            decimal valor = 10536.25m;
+
+            Console.WriteLine(valor.ToString(CultureInfo.CreateSpecificCulture("pt-BR")));          // 10536,25
+
+            Console.WriteLine(valor.ToString("G",   // Formatador númerico                                          
+                                                CultureInfo.CreateSpecificCulture("pt-BR")));       // 10536,25
+
+            Console.WriteLine(valor.ToString("C", // Formatador de Moeda/Currency
+                                                CultureInfo.CreateSpecificCulture("pt-BR")));       // R$ 10.536,25
+
+            Console.WriteLine(valor.ToString("F",  // Fração, com uma casa decimal a mais
+                                                CultureInfo.CreateSpecificCulture("pt-BR")));       // 10536,250
+
+            Console.WriteLine(valor.ToString("N", // Númerico
+                                                CultureInfo.CreateSpecificCulture("pt-BR")));       // 10.536,25
 
 Arrays
 ------
