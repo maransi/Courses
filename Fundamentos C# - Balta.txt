@@ -3991,6 +3991,8 @@ C# Class
                 {
                     TransactionAccount = null;
                     
+                    TransactionAccount += ammount > 0 ? Account.Credit: Account.Debit;
+/*                    
                     if (amount > 0)
                     {
                         TransactionAccount += Account.Credit;
@@ -4000,7 +4002,7 @@ C# Class
                         TransactionAccount += Account.Debit;
 
                     }
-
+*/
                     TransactionAccount?.Invoke(dateTransaction, amount);
                 }
 
