@@ -3769,9 +3769,6 @@ C# Class
 
     . Demo
 
-// PAREI AQUI 2a. versao
-
-
         . Crie a pasta "investiment/moviment" e dentro dela a classe "Transaction" com o conteúdo abaixo:
 
             namespace investiment.moviment;
@@ -3901,6 +3898,7 @@ C# Class
                 public decimal Income { get; set; }
                 public DateTime CreatedAt { get; set; }
 
+                // Linha inserida
                 public Account Account { get; set; }
 
                 public Investor(string name, string email, string document, DateTime birthDate, decimal income, Account account)
@@ -3948,9 +3946,9 @@ C# Class
                         }
                     };
 
-                    investor.Account.Credit(new DateTime(2025, 8, 1), 200);
-                    investor.Account.Credit(new DateTime(2025, 8, 2), 1000);
-                    investor.Account.Debit(new DateTime(2025, 8, 3), -300);
+                    investor.Account.Credit(new DateTime(2025, 8, 1), 200m);
+                    investor.Account.Credit(new DateTime(2025, 8, 2), 1000m);
+                    investor.Account.Debit(new DateTime(2025, 8, 3), -300m);
 
                     investor.Account.ListTransactions();
                     investor.Account.ShowBalance();
@@ -3991,19 +3989,15 @@ C# Class
                 {
                     TransactionAccount = null;
                     
-                    TransactionAccount += ammount > 0 ? Account.Credit: Account.Debit;
-/*                    
-                    if (amount > 0)
+                    if (Account != null)
                     {
-                        TransactionAccount += Account.Credit;
+                        TransactionAccount += amount > 0 ? Account.Credit : Account.Debit;
+                        TransactionAccount?.Invoke(dateTransaction, amount);
                     }
                     else
                     {
-                        TransactionAccount += Account.Debit;
-
+                        throw new InvalidOperationException("Account is null. Cannot perform transaction.");
                     }
-*/
-                    TransactionAccount?.Invoke(dateTransaction, amount);
                 }
 
             }
@@ -4084,10 +4078,17 @@ C# Class
                 // Método inserido
                 public void ListTransaction()
                 {
-                    ListTransactionAccount = Account.ListTransactions;
-                    ListTransactionAccount += Account.ShowBalance;
+                    if (Account != null)
+                    {
+                        ListTransactionAccount = Account.ListTransactions;
+                        ListTransactionAccount += Account.ShowBalance;
 
-                    ListTransactionAccount?.Invoke();
+                        ListTransactionAccount?.Invoke();
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Account is null. Cannot list transactions.");
+                    }
 
                 }
             }
@@ -4144,7 +4145,7 @@ C# Class
 
     . Lambda
 
-        // PAREI AQUI
+        // PAREI AQUI 2a. versao
 
         . Funções lambda em C# são funções anônimas, ou seja, funções sem nome, que podem ser usadas para criar 
             pequenos trechos de código de forma concisa. Elas são muito utilizadas com delegates, eventos, LINQ e 
