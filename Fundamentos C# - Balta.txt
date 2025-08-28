@@ -3797,15 +3797,7 @@ C# Class
                 {
                     System.Console.WriteLine($"Type: {Type}");
                     
-                    if (Type == "Debit")
-                    {
-                        System.Console.WriteLine($"Amount: ({Amount:C})");
-
-                    }
-                    else
-                    {
-                        System.Console.WriteLine($"Amount: {Amount:C}");
-                    }
+                    System.Console.WriteLine(Type == "Debit" ? $"Amount: ({Amount:C})" : $"Amount: {Amount:C}");
                     
                     System.Console.WriteLine($"Date: {Date.ToShortDateString()}");
                 }
@@ -4272,9 +4264,29 @@ C# Class
                                             V
                     Representa cada elemento da lista numeros que o método FindAll percorrerá
 
-        // PAREI AQUI 2a. versao
-
     . Demo
+
+        . Insira o método abaixo na classe "Account":
+
+            namespace investiment.moviment;
+
+            public class Account
+            {
+                ...
+
+                public void ShowBalance()
+                {
+                    System.Console.WriteLine("-----------------------------------------------");
+                    System.Console.WriteLine($"Total Account: {AccountName} - Balance: {Balance:C}");
+                }
+
+                // Método inserido
+                public decimal GetBalanceIn(DateTime dateTransaction) =>  
+                    Transactions
+                        .Where(t => t.Date < dateTransaction )
+                        .Sum(t => t.Amount);
+            }
+
 
         . Insira as linhas abaixo na classe "Program.cs":
 
@@ -4287,46 +4299,20 @@ C# Class
                 {
                     ...
 
-                    investor.ListTransaction();
+                    // Linha eliminada
+                    // investor.ListTransaction();
 
-                    // Action inserida para listar transações
-                    Action<DateTime, DateTime, List<Transaction>> doListTrasanction = (initialDate, finalDate, transactions) =>
-                    {
-                        System.Console.WriteLine("\n------------------------------------------------");
-                        System.Console.WriteLine($"Period from {initialDate.ToShortDateString()} to {finalDate.ToShortDateString()}");
+                    // Linhas inseridas
+                    DateTime initialDate = new DateTime(2025, 8, 2);
+                    DateTime finalDate = new DateTime(2025, 8, 3);
 
-                        decimal initialBalance = transactions
-                            .Where(transaction => transaction.Date < initialDate)
-                            .Sum(transaction => transaction.Type == "Credit" ? transaction.Amount : transaction.Amount * -1);
+                    decimal balanceIn = investor.Account.GetBalanceIn(initialDate);
 
-                        System.Console.WriteLine($"\nInitial Balance: {initialBalance:C}\n");
+                    System.Console.WriteLine("\n------------------------------------------------");
+                    System.Console.WriteLine($"Period from {initialDate.ToShortDateString()} to {finalDate.ToShortDateString()}");
+                    System.Console.WriteLine($"\nInitial Balance in {initialDate.ToShortDateString()}: \t\t{balanceIn:C}\n");
+                    // Fim linhas inseridas
 
-                        transactions
-                            .Where(transaction => transaction.Date >= initialDate && transaction.Date <= finalDate)
-                            .ToList()
-                            .ForEach(transaction =>
-                            {
-                                if (transaction.Type == "Debit")
-                                {
-                                    System.Console.WriteLine($"{transaction.Type} - \t({transaction.Amount:C}) \ton {transaction.Date.ToShortDateString()}");
-                                }
-                                else
-                                {
-                                    System.Console.WriteLine($"{transaction.Type} - \t{transaction.Amount:C} \ton {transaction.Date.ToShortDateString()}");
-                                }
-                            });
-
-                        decimal finalBalance = initialBalance +
-                            transactions
-                            .Where(transaction => transaction.Date >= initialDate && transaction.Date <= finalDate)
-                            .Sum(transaction => transaction.Type == "Credit"  ? transaction.Amount : transaction.Amount * -1);
-
-                        System.Console.WriteLine($"\nFinal Balance: {finalBalance:C}\n");
-
-                    };
-
-                    // Linha inserida para chamar a ação de listar transações
-                    doListTrasanction(new DateTime(2025, 8, 3), new DateTime(2025, 8, 3), investor.Account.Transactions);
                 }
             }
 
@@ -4335,20 +4321,193 @@ C# Class
             dotnet run --project ./src/investimentControl
 
             Saída:
-            Credit - 	R$ 200,00 	on 01/08/2025
-            Credit - 	R$ 1.000,00 	on 02/08/2025
-            Debit - 	(R$ 300,00) 	on 03/08/2025
             -----------------------------------------------
-            Account: Jonh's Account - Total Balance: R$ 900,00
+            Period from 02/08/2025 to 03/08/2025
+
+            Initial Balance in 02/08/2025: 		R$ 200,00
+            
+        . Insira o método abaixo na classe "Account":
+
+            namespace investiment.moviment;
+
+            public class Account
+            {
+                ...
+
+                public decimal GetBalanceIn(DateTime dateTransaction) =>
+                    Transactions
+                        .Where(t => t.Date < dateTransaction)
+                        .Sum(t => t.Amount * (t.Type == "Debit" ? -1 : 1)) ;
+
+
+                // Método inserido
+                public void ListTransactions(DateTime initialDate, DateTime finalDate) =>
+                    Transactions
+                        .Where(t => t.Date >= initialDate && t.Date <= finalDate)
+                        .OrderBy(t => t.Date)
+                        .ToList()
+                        .ForEach(transaction =>
+                        {
+                            System.Console.WriteLine(transaction.Type == "Credit"
+                                                        ? $"{transaction.Type} - {transaction.Amount:C} on {transaction.Date.ToShortDateString()}"
+                                                        : $"{transaction.Type} - ({transaction.Amount:C}) on {transaction.Date.ToShortDateString()}");
+                        });
+
+            }
+
+        . Atualize a classe "Program.cs" com as linhas abaixo:
+
+            using investiment.moviment;
+            using investiment.register;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    ...
+
+                    investor.AddTransaction(new DateTime(2025, 8, 1), 200m);
+                    investor.AddTransaction(new DateTime(2025, 8, 2), 1000m);
+                    investor.AddTransaction(new DateTime(2025, 8, 3), -300m);
+
+                    DateTime initialDate = new DateTime(2025, 8, 2);
+                    DateTime finalDate = new DateTime(2025, 8, 3);
+
+                    decimal balanceIn = investor.Account.GetBalanceIn(initialDate);
+
+                    System.Console.WriteLine("\n------------------------------------------------");
+                    System.Console.WriteLine($"Period from {initialDate.ToShortDateString()} to {finalDate.ToShortDateString()}");
+                    System.Console.WriteLine($"\nInitial Balance in {initialDate.ToShortDateString()}: \t\t{balanceIn:C}\n");
+
+                    // Linhas inseridas
+                    System.Console.WriteLine("------------------------------------------------");
+                    investor.Account.ListTransactions( initialDate, finalDate);
+                    System.Console.WriteLine("------------------------------------------------\n");
+                    // Fim da inserção
+
+                }
+            }
+
+        . Execute o projeto:
+
+            dotnet run --project ./src/investimentControl
+
+            Saída:
+            ------------------------------------------------
+            Period from 02/08/2025 to 03/08/2025
+
+            Initial Balance in 02/08/2025: 		R$ 200,00
 
             ------------------------------------------------
-            Period from 03/08/2025 to 03/08/2025
+            Credit - R$ 1.000,00 on 02/08/2025
+            Debit - (R$ 300,00) on 03/08/2025
+            ------------------------------------------------
 
-            Initial Balance: R$ 1.200,00
+        . Insira as linhas abaixo na classe "Program.cs":
 
-            Debit - 	(R$ 300,00) 	on 03/08/2025
+            using investiment.moviment;
+            using investiment.register;
 
-            Final Balance: R$ 900,00
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    ...
+
+                    investor.AddTransaction(new DateTime(2025, 8, 1), 200m);
+                    investor.AddTransaction(new DateTime(2025, 8, 2), 1000m);
+                    investor.AddTransaction(new DateTime(2025, 8, 3), -300m);
+
+                    DateTime initialDate = new DateTime(2025, 8, 2);
+                    DateTime finalDate = new DateTime(2025, 8, 3);
+
+                    decimal balanceIn = investor.Account.GetBalanceIn(initialDate);
+
+                    System.Console.WriteLine("\n------------------------------------------------");
+                    System.Console.WriteLine($"Period from {initialDate.ToShortDateString()} to {finalDate.ToShortDateString()}");
+                    System.Console.WriteLine($"\nInitial Balance in {initialDate.ToShortDateString()}: \t\t{balanceIn:C}\n");
+
+                    System.Console.WriteLine("------------------------------------------------");
+                    investor.Account.ListTransactions( initialDate, finalDate);
+                    System.Console.WriteLine("------------------------------------------------\n");
+
+                    // Linhas inseridas
+                    balanceIn = investor.Account.GetBalanceIn(finalDate.AddDays(1));
+
+                    System.Console.WriteLine($"\n\nFinal Balance in {finalDate.ToShortDateString()}: \t\t{balanceIn:C}\n");
+                    // Fim da inserção
+                }
+            }
+
+        . Execute o projeto:
+
+            dotnet run --project ./src/investimentControl
+
+            Saída:
+            -----------------------------------------------
+            Period from 02/08/2025 to 03/08/2025
+
+            Initial Balance in 02/08/2025: 		R$ 200,00
+
+            ------------------------------------------------
+            Credit - R$ 1.000,00 on 02/08/2025
+            Debit - (R$ 300,00) on 03/08/2025
+            ------------------------------------------------
+
+            Final Balance in 03/08/2025: 		R$ 900,00
+
+
+        . Insira as linhas abaixo na classe "Program.cs":
+
+            using investiment.moviment;
+            using investiment.register;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    ...
+
+                    // Insira a action abaixo. Coloque o código desenvolvido dentro da Action
+                    Action<DateTime, DateTime> doListTransactions = (initialDate, finalDate) =>
+                    {
+                        decimal balanceIn = investor.Account.GetBalanceIn(initialDate);
+
+
+                        System.Console.WriteLine("\n------------------------------------------------");
+                        System.Console.WriteLine($"Period from {initialDate.ToShortDateString()} to {finalDate.ToShortDateString()}");
+                        System.Console.WriteLine($"\nInitial Balance in {initialDate.ToShortDateString()}: \t\t{balanceIn:C}\n");
+
+                        System.Console.WriteLine("------------------------------------------------");
+                        investor.Account.ListTransactions(initialDate, finalDate);
+                        System.Console.WriteLine("------------------------------------------------\n");
+
+                        balanceIn = investor.Account.GetBalanceIn(finalDate.AddDays(1));
+
+                        System.Console.WriteLine($"\n\nFinal Balance in {finalDate.ToShortDateString()}: \t\t{balanceIn:C}\n");
+                    };
+
+                    // Insira a linha abaixo
+                    doListTransactions(initialDate, finalDate);
+                }
+            }
+
+        . Execute o projeto:
+
+            dotnet run --project ./src/investimentControl
+
+            Saída:
+            -----------------------------------------------
+            Period from 02/08/2025 to 03/08/2025
+
+            Initial Balance in 02/08/2025: 		R$ 200,00
+
+            ------------------------------------------------
+            Credit - R$ 1.000,00 on 02/08/2025
+            Debit - (R$ 300,00) on 03/08/2025
+            ------------------------------------------------
+
+            Final Balance in 03/08/2025: 		R$ 900,00
 PAREI AQUI
 
     . Usando in, out e ref nos parâmetros dos métodos:
