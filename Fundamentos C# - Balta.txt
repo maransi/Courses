@@ -64,52 +64,6 @@ Instalação AspNetCore 3.1
 
         https://dotnet.microsoft.com/download
 
-    . Acesse o download "All .NET Core downloads" e baixe a versão 3.1
-
-    . Acesse o link "Package manager instructions" 
-
-    . Instalaçao para as versões do Ubuntu 20.04
-
-        . Localize a versão do Ubuntu que está sendo utilizado, copie e execute os comandos no 
-            terminal:
-
-            wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-            sudo dpkg -i packages-microsoft-prod.deb
-
-            sudo dpkg --purge packages-microsoft-prod && sudo dpkg -i packages-microsoft-prod.deb
-            sudo apt-get update
-
-            sudo apt-get install -y gpg
-            wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
-            sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
-            wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list
-            sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
-            sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
-            sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
-
-            # Comando para o Ubuntu 22.04 em diante
-            # wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-            # sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-            
-            sudo apt-get update; \
-            sudo apt-get install -y apt-transport-https && \
-            sudo apt-get update && \
-            sudo apt-get install -y dotnet-sdk-5.0
-
-            sudo apt-get install -y apt-transport-https && \
-            sudo apt-get update && \
-            sudo apt-get install -y aspnetcore-runtime-5.0
-
-            sudo apt-get install -y dotnet-runtime-5.0
-
-        . Para testar a instalação execute os comandos abaixo:
-
-            dotnet --version
-            dotnet --help
-            dotnet --list
-            dotnet --list-runtimes
-            dotnet --list-sdks
-    
     . Instalação para as versões acima do Ubuntu 22.04
 
         wget https://dot.net/v1/dotnet-install.sh
@@ -144,6 +98,16 @@ Instalação AspNetCore 3.1
         dotnet --version
         dotnet --list-runtimes
         dotnet --list-sdks
+
+    . Para testar a instalação execute os comandos abaixo:
+
+        dotnet --version
+        dotnet --help
+        dotnet --list
+        dotnet --list-runtimes
+        dotnet --list-sdks
+
+
 
 Instalação das extensões do VSCode
 ----------------------------------
@@ -304,7 +268,7 @@ Criando uma Solution
             |                    |
             |                    +-----  obj
             |                    |
-            |                    + investimentControl
+            |                    + InvestimentControl.csproj
             |                    |
             |                    + Program.cs
             |
@@ -1131,8 +1095,8 @@ Tipagem de Dados
                     public record Investidor(string Nome, string Email, decimal TotalInvestido, DateTime DataInclusao);
 
                     // Record inserido
-                    public record Conta
-                    {
+                    public record Conta             // +--------> só permite atribuir um valor durante a inicialização do objeto, ou seja, dentro do construtor ou no momento da criação com object initializer.
+                    {                               // |
                         public string agencia { get; init; }
                         public string nrConta ( get; init; )
                     }
@@ -1259,37 +1223,42 @@ Tipagem de Dados
 
                 . Exemplo:
 
-                        public struct Point { 
-                            public int x, y; 
-                            
-                            // Construtor com parâmetros
-                            public Point(int p1, int p2) { 
-                                x = p1; 
-                                y = p2;    
-                            } 
-                        }
+                    public struct Point
+                    {
+                        public int x { get; set; }
+                        public int y { get; set; }
 
-                        // Método
+                        // Construtor com parâmetros
+                        public Point(int p1, int p2)
+                        {
+                            x = p1;
+                            y = p2;
+                        }
                         public void Print()
                         {
-                            Console.WriteLine($"({X}, {Y})");
-                        }
+                            Console.WriteLine($"({x}, {y})");
 
-                        class Program
+
+                        }
+                    }
+
+                    class Program
+                    {
+                        static void Main()
                         {
-                            static void Main()
-                            {
-                                // Instanciando struct
-                                Point p1 = new Point(10, 20);
-                                p1.Print(); // Saída: (10, 20)
+                            // Instanciando struct
+                            Point p1 = new Point(10, 20);
+                            p1.Print(); // Saída: (10, 20)
 
-                                // Structs podem ser criadas sem usar new (mas os campos precisam ser inicializados antes do uso)
-                                Point p2;
-                                p2.X = 5;
-                                p2.Y = 15;
-                                p2.Print(); // Saída: (5, 15)
-                            }
+
+                            // Structs podem ser criadas sem usar new (mas os campos precisam ser inicializados antes do uso)
+                            Point p2 = new Point(30,40);
+                            p2.x = 5;
+                            p2.y = 15;
+                            p2.Print(); // Saída: (5, 15)
+
                         }
+                    }
 
             . Demo
 
@@ -2481,38 +2450,47 @@ C# Class
 
         [public/private/protected/internal/file]  class HelloWorld      // Definição da classe
         {
-                            +-----> tipo do retorno do método (string, int, ...), caso não retorne nada fica valendo "void"
-                            |
-            public static void Hello(string args)           // Método
+                                                        +-----> tipo do retorno do método (string, int, ...), caso não retorne nada fica valendo "void"
+                                                        |
+            [public/private/protected/internal] static void Hello(string args)           // Método
             {
                 Console.WriteLine(args);
             }
         }
 
-    . "internal class"
-    
-        . A classe só pode ser acessada dentro do mesmo assembly (projeto/compilação).
+    . Modificadores de acesso
 
-        . É o modificador de acesso padrão se nenhum for especificado em arquivos de nível de 
-            namespace (ou seja, fora de classes aninhadas).
+        . "public class"
 
-        . Uma classe com o modificador de acesso "internal" não poderá ser definida em outra classe com modificador de acesso
-            mais restritivo. Isto refere-se aos casos de propriedades getter/setter, ou como parâmetro de construtores, de 
-            classes que contém referência a uma classe internal. Neste caso dará erro.
+            Acessível para todas as classes.
 
-        . Exemplo:
+        . "private 
 
-            // Arquivo: MinhaClasse.cs
-            internal class MinhaClasse
-            {
-                public void Metodo() => Console.WriteLine("Método chamado");
-            }
 
-            // Dentro do mesmo projeto
-            var obj = new MinhaClasse(); // OK
+        . "internal class"
+        
+            . A classe só pode ser acessada dentro do mesmo assembly (projeto/compilação).
 
-            // Em outro projeto que referencia este (ex: biblioteca DLL)
-            var obj = new MinhaClasse(); // ERRO: 'MinhaClasse' é inacessível devido ao seu nível de proteção
+            . É o modificador de acesso padrão se nenhum for especificado em arquivos de nível de 
+                namespace (ou seja, fora de classes aninhadas).
+
+            . Uma classe com o modificador de acesso "internal" não poderá ser definida em outra classe com modificador de acesso
+                mais restritivo. Isto refere-se aos casos de propriedades getter/setter, ou como parâmetro de construtores, de 
+                classes que contém referência a uma classe internal. Neste caso dará erro.
+
+            . Exemplo:
+
+                // Arquivo: MinhaClasse.cs
+                internal class MinhaClasse
+                {
+                    public void Metodo() => Console.WriteLine("Método chamado");
+                }
+
+                // Dentro do mesmo projeto
+                var obj = new MinhaClasse(); // OK
+
+                // Em outro projeto que referencia este (ex: biblioteca DLL)
+                var obj = new MinhaClasse(); // ERRO: 'MinhaClasse' é inacessível devido ao seu nível de proteção
 
     . class (sem modificador explícito)
 
@@ -5861,11 +5839,6 @@ Coleções
                         
             for(int i = 0 ; i < arlist.Count; i++)
                 Console.Write(arlist[i] + ", "); //output: 1, Bill, 300, 4.5, 
-
-
-            pessoas.ForEach( item => { 
-                System.Console.WriteLine( item );
-            } );
 
         . Checando a existência de um item
 
