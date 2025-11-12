@@ -1,0 +1,462 @@
+CSharp Orientado a Objetos
+--------------------------
+
+1. Fundamentos da Programação Orientada a Objetos:
+
+    . O que é Programação Orientada a Objetos (POO)?
+
+        . A Programação Orientada a Objetos (POO) é um paradigma de programação baseado na modelagem do mundo real por meio de objetos.
+
+        . Um objeto é uma entidade que possui características (atributos) e comportamentos (métodos).
+
+        . Esses objetos interagem entre si para resolver problemas dentro de um programa.
+
+            . Pense em um Carro:
+
+                . Atributos: cor, modelo, velocidade.
+
+                . Métodos: acelerar(), frear(), buzinar().
+
+        . Na POO, você cria classes (como moldes) e, a partir delas, objetos (como instâncias reais daquele molde).
+
+    . Diferença entre paradigma estruturado e orientado a objetos:
+
+        Conceito	                    Paradigma Estruturado	    Paradigma Orientado a Objetos
+        --------                        ---------------------       -----------------------------
+        Foco	                        Funções e procedimentos	    Objetos e suas interações
+        Organização do código	        Em blocos de funções	    Em classes e objetos
+        Reutilização	                Por meio de funções	        Por meio de herança e polimorfismo
+        Abordagem	                    Sequencial (top-down)	    Modelagem do mundo real (bottom-up)
+        Dados e comportamento	        Separados	                Encapsulados juntos
+        Exemplo em C# (estruturado)	    Funções estáticas que 
+                                        manipulam variáveis globais	
+        Exemplo em C# (OO)	            Classes que possuem dados 
+                                        e métodos internos	    
+
+        . O paradigma estruturado foca em “o que fazer e em qual ordem”, enquanto o orientado a objetos foca em 
+            “quem faz e como interage”.
+
+2. Classes e objetos
+
+    . Classe
+
+        . Descreve como será o objeto: quais atributos e métodos ele terá.    
+
+            using System;               // Importações
+
+            namespace carro;       // Equivalente aos pacotes/divisões lógica
+
+            [public/private/protected/internal/file]  class Carro      // Definição da classe
+            {
+                // Atributos
+                public string Modelo;
+                public string Cor;
+                public int Velocidade;
+                                                            +-----> tipo do retorno do método (string, int, ...), caso não retorne nada fica valendo "void"
+                                                            |
+                [public/private/protected/internal] static void Acelerar()           // Método
+                {
+                    Velocidade += 10;
+                }
+            }
+
+
+        . É o molde, a forma, o modelo ou a definição de um tipo de objeto.
+
+    . Objeto
+
+        . É uma entidade concreta criada a partir de uma classe.
+
+        . Um objeto é a representação real (na memória) da classe, uma instância da classe.
+
+            Carro meuCarro = new Carro();
+
+    . Atributos e Métodos
+
+
+        . Atributos - são as características ou propriedades do objeto (variáveis dentro da classe).                
+
+            public class Pessoa
+            {
+                public string Nome;
+                public int Idade;
+            }
+
+        . Métodos - São as ações que o objeto pode executar (funções dentro da classe).
+
+            public void Falar()
+            {
+                Console.WriteLine($"{Nome} está falando...");
+            }
+
+        . Construtores - é um método especial que é executado automaticamente quando um objeto é criado.
+
+            . Serve para inicializar os atributos de um objeto, garantindo que ele nasça com valores válidos.
+
+                public class Pessoa
+                {
+                    public string Nome;
+                    public int Idade;
+
+                    // Construtor
+                    public Pessoa(string nome, int idade)
+                    {
+                        Nome = nome;
+                        Idade = idade;
+                    }
+
+                    public void Apresentar()
+                    {
+                        Console.WriteLine($"Olá, meu nome é {Nome} e tenho {Idade} anos.");
+                    }
+                }
+
+                // Uso:
+                Pessoa p = new Pessoa("Marco", 30);
+                p.Apresentar();
+
+        . Resumo
+
+            . Construtores não têm tipo de retorno (nem void).
+
+            . Possuem o mesmo nome da classe.
+
+            . Podem existir vários construtores com diferentes parâmetros (sobrecarga).
+
+            Conceito	Definição	                                    Exemplo
+            --------    ---------                                       -------
+            Classe	    Modelo que define estrutura e comportamento	    public class Carro { ... }
+            Objeto	    Entidade concreta criada a partir da classe	    Carro meuCarro = new Carro();
+            Atributo	Propriedade do objeto	                        public string Cor;
+            Método	    Ação do objeto	                                public void Acelerar() { ... }
+            Construtor	Método que inicializa o objeto	                public Carro(string cor) { Cor = cor; }
+
+. Encapsulamento
+
+    . Modificadores de acesso - Controlam a visibilidade e acesso de tipos e membros em C#.
+                                Eles determinam onde (em quais partes do programa) um código pode ser utilizado.
+
+        . Impõem encapsulamento — um dos pilares da POO.
+
+        . Tipos de modificadores de acesso no C#
+
+            Modificador	            Nível de acesso	                                Onde pode ser usado
+            -----------             ---------------                                 -------------------
+            public	                Acesso total (qualquer lugar)	                Classe, método, propriedade, campo
+            private	                Acesso apenas dentro da própria classe	        Método, campo, propriedade, construtor
+            protected	            Acesso dentro da classe e das subclasses        Método, campo, propriedade
+                                    (herdeiras)	
+            internal	            Acesso dentro do mesmo assembly (projeto)	    Classe, método, propriedade, campo
+            protected internal	    Acesso dentro do mesmo assembly ou por herança	Método, campo, propriedade
+            private protected	    Acesso somente por herança e dentro do mesmo    Método, campo, propriedade
+                                    assembly	
+
+        . Modificadores de acesso em nível de classe:
+
+            . Classe pública (public)
+
+                . Pode ser acessada de qualquer lugar, inclusive de outros assemblies (projetos).
+
+                . Caso só exista um projeto, onde a classe será usada, ou se ela for utilizada somente no projeto ao qual pertença,
+                    não faz sentido utilizar o modificador "public".
+
+                    public class Pessoa
+                    {
+                        public string Nome { get; set; }
+                    }
+
+            . Classe interna (internal)
+
+                . Padrão se não especificar nenhum modificador.
+
+                . Pode ser usada apenas dentro do mesmo assembly/projeto.
+
+                . Muito usada para classes auxiliares ou de infraestrutura.
+
+                        +---------------------------------> Se tentar usar essa classe em outro projeto (assembly), o compilador não deixará.
+                        |
+                    internal class Repositorio
+                    {
+                        public void Salvar() { }
+                    }
+
+            . Classes aninhadas (nested classes)
+
+                    public class Externa
+                    {
+                        private class InternaPrivada { }
+                        protected class InternaProtegida { }
+                        internal class InternaInterna { }
+                    }       |
+                            +--------------------------->  Aqui podemos usar todos os modificadores (public, private, protected, internal, protected internal, private protected).
+
+        . Modificadores de acesso em membros (métodos, atributos, propriedades, construtores)                            
+
+            . public - Acesso total, sem restrições.
+
+                public class Cliente
+                {
+                    public string Nome { get; set; }
+
+                    public void Apresentar() => Console.WriteLine($"Olá, eu sou {Nome}");
+                }
+
+            . private - Acesso apenas dentro da própria classe. É o padrão se não for especificado.
+
+                public class ContaBancaria
+                {
+                    private decimal saldo = 0;
+
+                    public void Depositar(decimal valor)
+                    {
+                        saldo += valor;
+                    }
+
+                        +------------------------------> não pode ser chamado fora da classe.
+                        |           |
+                    private void AtualizarLog()
+                    {
+                        Console.WriteLine("Log interno atualizado");
+                    }
+                }
+
+            . protected - Acesso permitido na classe e nas classes derivadas (herdeiras).
+
+                public class Funcionario
+                {
+                    protected decimal SalarioBase = 1000;
+                }       |
+                        +------------------------------> Gerente pode acessar SalarioBase. Um código externo não pode.
+
+                public class Gerente : Funcionario
+                {
+                    public void MostrarSalario()
+                    {
+                        Console.WriteLine($"Salário: {SalarioBase}");
+                    }
+                }
+
+            . internal - Acesso permitido apenas dentro do mesmo assembly (projeto).
+
+                public class Relatorio
+                {
+                    internal void Gerar() => Console.WriteLine("Gerando relatório...");
+                }       |           |
+                        +-------------------------------->  Se tentar acessar Gerar() de outro projeto, dá erro.
+                                                            Dentro do mesmo projeto, tudo bem.
+
+            . protected internal
+
+                . Acesso permitido:
+
+                    Dentro do mesmo assembly (mesmo projeto)
+                    OU
+                    Por herança (em outro assembly).
+
+
+                public class Documento
+                {
+                    protected internal void Validar() => Console.WriteLine("Documento validado");
+                }       |       |               |
+                        +-------+---------------+-------->  Pode ser acessado por classes derivadas em outro projeto
+                                                            Pode ser acessado diretamente dentro do mesmo projeto
+                                                            Não pode ser acessado fora do assembly se não for herdado.
+
+    . Encapsulamento - é o princípio de ocultar os detalhes internos de uma classe e expor apenas o necessário para o mundo externo.
+
+        . Podemos proteger os dados internos de acesso direto e fornece métodos controlados (como get e set) para ler 
+            ou alterar esses dados de forma segura e validada.
+
+        . Métodos Getter/Setter
+
+            . Simplificada - Quando não existe necessidade de nenhuma lógica/regra ( vide item 8. Auto-implemented property )
+
+                public int MyAutoImplementedProperty { get; set; }
+
+            . Completa - Quando a necessidade de alguma lógica extra, por exemplo:
+
+                private int _myPropertyVar;
+
+                public int MyProperty
+                {
+                    get {
+                        return _myPropertyVar / 2;
+                    }
+
+                    set {
+                        if (value > 100)
+                            _myPropertyVar = 100;
+                        else
+                            _myPropertyVar = value; ;
+                    }
+                }
+
+                // ou utilizando Lambda
+
+                public class MyClass
+                {
+                    private string _firstname = "";
+
+                    public string FirstName {
+                        get => _firstname;              // é equivalente a get { return _firstname; }
+                        set => _firstname = value;      // é equivalente a set { _firstname = value; }
+                    }
+                }
+
+. Herança 
+
+    . É o mecanismo da POO que permite que uma classe reaproveite atributos e métodos de outra classe, evitando duplicação de código e promovendo reuso.
+        Em C#, uma classe pode herdar de apenas uma outra classe (herança simples), mas pode implementar várias interfaces.
+
+    . Classe Base e Classe Derivada
+
+        . Classe base (superclasse) - É a classe “pai”, que fornece características e comportamentos genéricos.
+
+        . Classe derivada (subclasse) - É a classe “filha”, que herda os membros da classe base e pode adicionar ou modificar comportamentos.        
+
+        . Exemplo:
+
+            // Classe base
+            public class Pessoa
+            {
+                public string Nome { get; set; }
+
+                public void Falar()
+                {
+                    Console.WriteLine($"{Nome} está falando.");
+                }
+            }
+
+            // Classe derivada
+            public class Aluno : Pessoa
+            {
+                public string Matricula { get; set; }
+
+                public void Estudar()
+                {
+                    Console.WriteLine($"{Nome} está estudando.");
+                }
+            }
+
+
+            // Uso
+            Aluno a = new Aluno();
+            a.Nome = "Marco";
+            a.Matricula = "A123";
+            a.Falar();     // Herdado da classe base
+            a.Estudar();   // Método da classe derivada
+
+    . Palavra-chave "base"
+
+        . A palavra-chave base é usada dentro da classe derivada para:
+
+            . Acessar membros da classe base, como métodos e propriedades.
+
+            . Chamar o construtor da classe base.
+
+        . Exemplo
+
+            public class Pessoa
+            {
+                public void Apresentar()                    <-------------------+
+                {                                                               |
+                    Console.WriteLine("Sou uma pessoa.");                       |
+                }                                                               |
+            }                                                                   |
+                                                                                |
+            public class Aluno : Pessoa                                         |
+            {                                                                   |
+                public void Apresentar()                                        |
+                {                                                               |
+                    base.Apresentar(); // Chama o método da classe base --------+
+                    Console.WriteLine("Sou um aluno.");
+                }
+            }
+
+    . Modificadores virtual, override e new - Esses três modificadores controlam como os métodos da classe 
+                                                base podem ser modificados pelas classes derivadas.
+
+        . virtual — Permite sobrescrita
+
+            . O método na classe base deve ser marcado como virtual para poder ser substituído nas classes filhas.
+
+                public class Pessoa
+                {
+                    public virtual void Apresentar()
+                    {
+                        Console.WriteLine("Sou uma pessoa.");
+                    }
+                }
+
+        . override — Substitui o método herdado
+
+            . Na classe derivada, usamos override para modificar o comportamento do método herdado.
+
+                public class Aluno : Pessoa
+                {
+                    public override void Apresentar()
+                    {
+                        Console.WriteLine("Sou um aluno.");
+                    }
+                }
+
+        . Utilização
+
+            Pessoa p = new Pessoa();
+            p.Apresentar(); // Sou uma pessoa.
+
+            Aluno a = new Aluno();
+            a.Apresentar(); // Sou um aluno.
+
+                +--------------------------------------> o método que será chamado depende do tipo da variável, não do tipo do objeto real.
+                |
+            Pessoa p = new Aluno();
+            p.Apresentar(); // Sou uma pessoa.
+
+    . Construtores herdados - Os construtores não são herdados automaticamente, mas você pode chamar o construtor da 
+                                classe base usando o base(...).    
+
+        public class Pessoa
+        {
+            public string Nome { get; set; }
+
+            public Pessoa(string nome)                          <-------------------+
+            {                                                                       |
+                Nome = nome;                                                        |
+                Console.WriteLine("Construtor Pessoa executado.");                  |
+            }                                                                       |
+        }                                                                           |
+                                                                                    |
+        public class Aluno : Pessoa                                                 |
+        {                                                                           |
+            public string Matricula { get; set; }                                   |
+                                                                                    |
+            // Construtor da classe derivada                                        |
+            public Aluno(string nome, string matricula) : base(nome)    ------------+   Executa o construtor da superclasse enviando o nome como parâmetro
+            {                                                                                                   |
+                Matricula = matricula;                                  <---------------------------------------+   
+                Console.WriteLine("Construtor Aluno executado.");                       Depois executa o método da subclasse
+            }
+        }
+
+        // Uso
+        Aluno a = new Aluno("Marco", "A123");
+
+        // Saída
+        Construtor Pessoa executado.
+        Construtor Aluno executado.
+
+    . Resumo
+
+        Conceito	    Descrição	                                    Exemplo
+        --------        ---------                                       -------
+        Classe base     Classe “pai” com comportamento genérico	        class Pessoa { ... }
+        Classe derivada	Classe “filha” que herda da base	            class Aluno : Pessoa { ... }
+        base	        Chama métodos ou construtores da classe base	base.Apresentar() / : base(nome)
+        virtual	        Permite sobrescrita na classe filha	            public virtual void Metodo()
+        override	    Substitui método da classe base	                public override void Metodo()
+        new	            Oculta método da classe base	                public new void Metodo()
+        Construtores    Chamados com base(...)	                        public Filho(...) : base(...) {}
+        herdados	    
+
+. Polimorfismo
