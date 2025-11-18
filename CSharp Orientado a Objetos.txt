@@ -461,3 +461,316 @@ CSharp Orientado a Objetos
 
 . Polimorfismo
 
+    . Significa que um mesmo método pode ter comportamentos diferentes dependendo do tipo real do objeto que o está executando. 
+
+    . O que importa é o tipo REAL do objeto em tempo de execução, não o tipo da variável.
+
+    . Isso acontece somente quando você usa virtual + override ou quando trabalha com classes/métodos abstratos.
+
+    . Sobrescrita de métodos (override) - É quando uma classe derivada modifica o comportamento de um método herdado da classe base.
+
+        . Para que isso seja possível, a classe base deve marcar o método como virtual ou abstract.
+
+        . Regras do override:
+
+            . A assinatura do método deve ser idêntica.
+
+            . O método da base deve ser virtual, abstract ou override.
+
+            . O método da derivada deve usar override.
+
+    . Exemplo
+
+        public class Pessoa             Na classe base declara o método como "virtual"
+        {            +--------------------------------------------------+
+                     |                                                  |
+            public virtual void Apresentar()                            |
+            {                                                           |
+                Console.WriteLine("Olá, sou uma pessoa.");              |
+            }                                                           |
+        }                                                               |
+                                                                        |
+        public class Aluno : Pessoa                                     |
+        {               +-----------------------------------------------+
+                        |   Na classe derivada subescreve o método com "override"
+                        V
+            public override void Apresentar()
+            {
+                Console.WriteLine("Olá, sou um aluno.");
+            }
+        }
+
+        // Uso
+        Pessoa p1 = new Aluno();
+        Pessoa p2 = new Pessoa();
+
+        p1.Apresentar(); // Chama o método da classe Aluno
+        p2.Apresentar(); // Aluno (mesmo sendo Pessoa no tipo da variável)
+
+    . Classes Abstratas e Métodos Abstratos - é uma classe que não pode ser instanciada e que serve como modelo para outras classes.
+
+        . Existe para forçar as subclasses a implementar determinados comportamentos.
+
+        . Características:
+
+            . Não pode criar objetos dela.
+
+            . Pode ter métodos normais e métodos abstratos.
+
+            . Pode conter campos, propriedades e construtores.
+
+            . Serve para definir contratos e comportamentos comuns.
+
+        . Métodos abstratos (abstract)
+
+            . Não têm implementação na classe base.
+
+            . Forçam as subclasses a implementar sua própria versão.
+
+            . São sempre combinados com override na classe derivada.
+
+            . Exemplo
+
+                public abstract class Forma
+                {
+                    public abstract double CalcularArea(); // sem corpo
+                }           |     
+                            +---------------------------------+   Na classe base declara como "abstract"
+                                                                |
+                public class Quadrado : Forma                   |
+                {                                               |
+                    public double Lado { get; set; }            |
+                            +---------------------------------+
+                            |   Na classe derivada subescreve o método com "override"
+                            V
+                    public override double CalcularArea()
+                    {
+                        return Lado * Lado;
+                    }
+                }
+
+                public class Circulo : Forma
+                {
+                    public double Raio { get; set; }
+
+                    public override double CalcularArea()
+                    {
+                        return Math.PI * Raio * Raio;
+                    }
+                }
+
+                // Uso
+                Forma f1 = new Quadrado { Lado = 4 };
+                Forma f2 = new Circulo { Raio = 3 };
+
+                Console.WriteLine(f1.CalcularArea()); // 16
+                Console.WriteLine(f2.CalcularArea()); // 28.27...
+
+    . Palavra-chave "sealed"
+
+        . sealed impede que uma classe seja herdada ou que um método seja sobrescrito novamente.
+
+        . Para bloquear a herança
+
+            public sealed class Cliente
+            {
+                
+            }
+
+            public class Vip : Cliente // ERRO
+            {
+
+            }
+
+        . Para bloquear sobrescrita de métodos
+
+            . Se quiser permitir que uma classe seja herdada, mas impedir que um método override 
+                continue sendo substituído, faça:
+
+                public class Pessoa
+                {
+                    public virtual void Falar()
+                    {
+                        Console.WriteLine("Pessoa falando");
+                    }
+                }
+
+                public class Aluno : Pessoa
+                {
+                    public sealed override void Falar()
+                    {
+                        Console.WriteLine("Aluno falando");
+                    }
+                }
+
+    . Resumo
+
+        Conceito	                        Explicação
+        ---------                           ----------
+        Sobrescrita (override)	            A subclasse redefine o comportamento de um método virtual herdado.
+        Polimorfismo em tempo de execução   O método executado depende do tipo real do objeto, não do tipo da variável.
+        Classe abstrata	                    Classe que não pode ser instanciada e serve como modelo para subclasses.
+        Método abstrato	                    Método sem implementação que deve ser obrigatoriamente sobrescrito.
+        sealed	                            Impede herança ou impede sobrescrita adicional de um método.    
+
+. Interface e abstração
+
+    . Resumo
+
+        Recurso	                        Classe Abstrata	            Interface
+        -------                         ---------------             ---------
+        Pode ter implementação?	        Sim	                        Não (exceto default methods em C# modernos)
+        Pode ter campos (variáveis)?	Sim	                        Não
+        Pode ter construtor?	        Sim	                        Não
+        Pode herdar de mais de uma?	    Não (C# não permite)	    Sim (multiplas interfaces)
+        Modela…	                        Conceito	                Comportamento
+        Útil para…	                    Herança, compartilhamento   Polimorfismo e contratos
+                                        de lógica	
+
+    . Exemplo Interface
+
+        public interface ICalculavel
+        {
+            decimal CalcularValor();
+        }
+
+        // Uso
+        public class Produto : ICalculavel
+        {
+            public decimal Preco { get; set; }
+            public int Quantidade { get; set; }
+
+            public decimal CalcularValor()
+            {
+                return Preco * Quantidade;
+            }
+        }
+
+        public class Servico : ICalculavel
+        {
+            public decimal Horas { get; set; }
+            public decimal ValorHora { get; set; }
+
+            public decimal CalcularValor()
+            {
+                return Horas * ValorHora;
+            }
+        }
+
+
+        // Polimorfismo via Interfaces
+        List<ICalculavel> itens = new List<ICalculavel>
+        {
+            new Produto { Preco = 10, Quantidade = 3 },
+            new Servico { Horas = 2, ValorHora = 50 }
+        };
+
+        foreach (var item in itens)
+        {
+            Console.WriteLine(item.CalcularValor());
+        }
+
+    . Injeção de Dependência
+
+        . (DI) é um padrão que permite que uma classe receba suas dependências de fora, em vez de criá-las internamente.
+
+        . Exemplo sem DI
+
+            public class PedidoService
+            {
+                private ProdutoRepository repo = new ProdutoRepository(); // acoplamento forte
+
+                public void Processar()
+                {
+                    repo.Salvar();
+                }
+            }
+
+        . Desvantagens sem DI
+
+            . Difícil testar
+
+            . Forte acoplamento
+
+            . Dificulta troca de implementação
+
+        . Exemplo com DI
+
+            public interface IProdutoRepository
+            {
+                void Salvar();
+            }
+
+            public class ProdutoRepository : IProdutoRepository
+            {
+                public void Salvar() { }
+            }
+
+
+
+
+            public class PedidoService
+            {                           
+                private readonly IProdutoRepository repo;
+                                                          +-------------- O construtor faz a injeção da dependência automaticamente recebendo
+                                                          |                 o objeto
+                                                          V
+                public PedidoService(IProdutoRepository repo)
+                {
+                    this.repo = repo;
+                }
+
+                public void Processar()
+                {
+                    repo.Salvar();
+                }
+            }
+
+            // Uso
+            IProdutoRepository repo = new ProdutoRepository();
+            PedidoService service = new PedidoService(repo);
+
+            service.Processar();
+
+        . Vantagens do uso DI
+
+            . Permite trocar implementações
+
+            . Facilita testes com mocks
+
+            . Diminui acoplamento
+
+            . Permite seguir SOLID (principalmente DIP — Princípio da Inversão de Dependência)
+
+        . Interface + Polimorfismo + DI
+
+            . O fluxo profissional é:
+
+                . Você define uma interface → contrato
+
+                . Cria classes que implementam o contrato → polimorfismo
+
+                . Injeta a interface em outras classes → baixo acoplamento
+
+                . O sistema escolhe qual implementação usar → flexibilidade total
+
+            . Exemplo
+
+                public interface ICalculavel
+                {
+                    decimal CalcularValor();
+                }
+
+                public class FaturamentoService
+                {
+                    public decimal CalcularTotal(ICalculavel item)
+                    {
+                        return item.CalcularValor();
+                    }
+                }
+
+                // Uso
+                var total1 = service.CalcularTotal(new Produto(...));
+                var total2 = service.CalcularTotal(new Servico(...));
+
+
