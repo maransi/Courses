@@ -29,7 +29,7 @@ Design Pattern com CSharp
         . Estruturais: Lidaram com a maneira de compor classes e objetos para formar estruturas maiores.
         
             . Proxy: Forneça um substituto ou marcador para outro objeto, a fim de controlar o acesso a ele.
-            . Decorator: Atribua responsabilidades adicionais a um objeto dinamicamente. Os decoradores 
+            . Decorator: Atribui responsabilidades adicionais a um objeto dinamicamente. Os decoradores 
                             fornecem uma alternativa flexível à criação de subclasses para estender a 
                             funcionalidade.
             . Adapter: Permite que objetos com interfaces incompatíveis trabalhem juntos.
@@ -58,18 +58,413 @@ Design Pattern com CSharp
             . Command: Encapsula uma solicitação como um objeto, permitindo assim parametrizar clientes com
                         solicitações diferentes, enfileirar ou registrar solicitações e oferecer suporte a 
                         operações reversíveis.
-            . Iterator:
-            . Memento:
-            . State:
-            . Mediator:
+            . Iterator: Fornece uma maneira de acessar os elementos de um objeto agregado sequencialmente sem
+                        expor sua representação subjacente.
+            . Memento: Sem violar o encapsulamento, capture e externalize o estado interno de um objeto para que
+                        o objeto possa ser restaurado a esse estado posteriormente.
+            . State: Permite que um objeto altere seu comportamento quando seu estado interno mudar. O objeto 
+                        parecerá mudar de classe.
+            . Mediator: Centralizar a comunicação entre objetos, fazendo com que eles não se comuniquem diretamente 
+                        entre si, mas sim através de um objeto mediador.
             . Chain of Responsibility: Permite que uma solicitação percorra uma cadeia de manipuladores, 
                                         onde cada manipulador decide se processa a solicitação ou a 
                                         encaminha para o próximo. 
-            . Interpreter:
+            . Interpreter: Dada uma linguagem, defina uma representação para sua gramática juntamente com um 
+                            interpretador que use a representação para interpretar frases na linguagem.
     
     . Design Patterns adicionais:
 
-        . Simple Factor:
-        . Null Object:
-        . MVC:
-        . 
+        . Simple Factor: Cria um objeto sem expor a lógica de criação para o cliente.
+        . Null Object: Fornece um objeto “nulo” com comportamento padrão, em vez de usar null. Em vez de retornar 
+                        null e obrigar o código cliente a verificar if(obj != null), Você retorna um objeto especial, 
+                        que implementa a mesma interface, seguindo um comportamento neutro, seguro e vazio.
+
+        . MVC: padrão arquitetural que separa uma aplicação em três componentes principais: model (dados e regras de negócio),
+                View (interface com o usuário), Controller (controle do fluxo e orquestração das ações). O objetivo do MVC 
+                é organizar o código, separar responsabilidades e tornar o sistema mais manutenível, testável e escalável.
+
+. Pattern Criacionais 
+
+    . Singleton
+
+        . Definição
+            
+            . Garante que uma classe tenha apenas uma única instância e fornece um ponto de acesso global para ela.
+
+        . Conceito
+
+            . Uma determinada classe deve ter apenas uma instância. Você pode usar essa instância sempre que precisar e, portanto, 
+                evitar a criação de objetos desnecessários.
+
+        . Ilustração
+
+                Client(Program.cs)
+
+
+                Singleton
+
+
+            . O construtor é private, assim não poderá ser instanciado (new)
+
+            . Antes de tentar criar um objeto, verificamos se existe uma cópia disponível. Se
+                não existir, criamos novo objeto; caso contrário, reutilizamos a existente.
+
+        . Exemplo
+
+            // Singleton
+            using System;
+            namespace Pattern.Singleton
+            {               
+                public sealed class Singleton       // sealed impedi que a classe Singleton seja herdada por outras classes
+                {
+                    private static readonly Singleton instance = new Singleton();
+                    private int numberOfInstances = 0;
+
+                    //Private constructor is used to prevent
+                    //creation of instances with 'new' keyword outside this class
+                    private Singleton()
+                    {
+                        Console.WriteLine("Instantiating inside the private constructor.");
+                        numberOfInstances++;
+                        Console.WriteLine("Number of instances ={0}", numberOfInstances);
+                    }
+
+
+                    // Detalhe importante, o bloco abaixo é uma propriedade e não um método. 
+                    // Se terminasse com "()" seria um método e poderiamos retornar o "instance" com 
+                    // "return instance"
+                    public static Singleton Instance
+                    {
+                        get
+                        {
+                            Console.WriteLine("We already have an instance now.Use it.");
+                            return instance;
+                        }
+                    }
+                }
+            }        
+
+
+            // Program
+
+            using Pattern.Singleton;
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Singleton Pattern Demo***\n");
+                    //Console.WriteLine(Singleton.MyInt);
+                    // Private Constructor.So,we cannot use 'new' keyword.
+                    Console.WriteLine("Trying to create instance s1.");
+                    Singleton s1 = Singleton.Instance;
+                    Console.WriteLine("Trying to create instance s2.");
+                    Singleton s2 = Singleton.Instance;
+                    if (s1 == s2)
+                    {
+                        Console.WriteLine("Only one instance exists.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Different instances exist.");
+                    }
+                    Console.Read();
+                }
+            }
+
+    . Prototype
+
+        . Definição
+
+            .  Especifica os tipos de objetos para criar utilizando uma intância prototipada, criando um novo objeto 
+                copiando neste prtotipo.
+
+        . Conceito
+
+            . Fornece um método para criar, ou clonar, uma instância de um objeto existente. 
+
+        . Ilustração
+
+
+                            BasicCar    <-------    Client( Program.cs )
+                            ^      ^
+                            |      |
+                            |      |
+                        Nano   Ford
+
+            . BasiCar é o prototipo. 
+            . Nano e Ford são as classes concretas prototipadas, que implementam o método "clone"
+            . Client inicialemente cria o objeto prototipada com os objetos Nano e Ford, posteriormente
+                alteramos o preço da classe prototipada.
+
+        . Exemplo
+
+            // BasicCar
+            using System;
+
+            namespace Pattern.Prototype
+            {
+                public abstract class BasicCar
+                {
+                    public string? ModelName { get; set; }
+                    public int Price { get; set; }
+                    public static int SetPrice()
+                    {
+                        int price = 0;
+                        Random r = new Random();
+                        int p = r.Next(200000, 500000);
+                        price = p;
+                        return price;
+                    }
+                    public abstract BasicCar Clone();
+                }
+            }
+
+
+        
+            //Nano.cs
+            using System;
+
+            namespace Pattern.Prototype
+            {
+                public class Nano : BasicCar
+                {
+                    public Nano(string m)
+                    {
+                        ModelName = m;
+                    }
+                    public override BasicCar Clone()
+                    {
+                        return (Nano)this.MemberwiseClone();    // MemberwiseClone() -> cria uma cópia shallow do objeto, 
+                    }                                           // copiando todos os valores dos campos (fields) para 
+                }                                               // um novo objeto da mesma classe.
+            }        
+
+
+
+            //Ford.cs
+            using System;
+
+            namespace Pattern.Prototype
+            {
+                public class Ford : BasicCar
+                {
+                    public Ford(string m)
+                    {
+                        ModelName = m;
+                    }
+                    public override BasicCar Clone()
+                    {
+                        return (Ford)this.MemberwiseClone();
+                    }
+                }
+            }
+
+
+
+            // Client( Program.cs )
+            using Pattern.Prototype;
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Prototype Pattern Demo***\n");
+
+                    //Base or Original Copy
+                    BasicCar nanoBase = new Nano("Green Nano") { Price = 100000 };
+                    BasicCar fordBase = new Ford("Ford Yellow") { Price = 500000 };
+                    
+                    BasicCar bcNano;
+                    
+                    //Nano
+                    bcNano = nanoBase.Clone();
+                    bcNano.Price = nanoBase.Price + BasicCar.SetPrice();
+                    Console.WriteLine("Car is: {0}, and it's price is Rs. {1}", bcNano.ModelName, bcNano.Price);
+                    
+                    //Ford
+                    bcNano = fordBase.Clone();
+                    bcNano.Price = fordBase.Price + BasicCar.SetPrice();
+                    Console.WriteLine("Car is: {0}, and it's price is Rs. {1}", bcNano.ModelName, bcNano.Price);
+
+                    Console.ReadLine();
+                }
+            }
+
+    . Builder
+
+        . Definição
+
+            . Separa a construção de um objeto complexo de sua representação, permitindo que o mesmo processo gere 
+                diferentes representações.
+
+        . Conceito 
+
+            . É util para criar objetos complexos, que tem multiplas partes. O processo de criação de um objeto terá
+                partes independentes. O processo de criação não se importa como as partes são montadas.
+                
+        . Ilustração
+
+                                Director    <>----------  Builder
+
+                                                            ^
+                                                            |
+                                                            |
+
+                                                        ConcreteBuilder ------> Product
+
+
+
+        . Exemplo
+
+            // Builders common interface
+            using System;
+            using System.Collections.Generic;
+
+            namespace Pattern.Builder
+            {
+                internal interface IBuilder
+                {
+                    void StartUpOperations();
+                    void BuildBody();
+                    void InsertWheels();
+                    void AddHeadlights();
+                    void EndOperations();
+                    Product GetVehicle();
+                }
+            }
+
+
+            // ConcreteBuilder: Car
+            using Pattern.Builder;
+
+            class Car : IBuilder
+            {
+                private string brandName;
+                private Product product;
+
+                public Car(string brand)
+                {
+                    product = new Product();
+                    this.brandName = brand;
+                }
+
+                public void StartUpOperations()
+                { //Starting with brandname
+                    product.Add(string.Format("Car Model name :{0}", this.
+                    brandName));
+                }
+
+                public void BuildBody()
+                {
+                    product.Add("This is a body of a Car");
+                }
+
+                public void InsertWheels()
+                {
+                    product.Add("4 wheels are added");
+                }
+
+                public void AddHeadlights()
+                {
+                    product.Add("2 Headlights are added");
+                }
+
+                public void EndOperations()
+                { //Nothing in this case
+                }
+
+                public Product GetVehicle()
+                {
+                    return product;
+                }
+            }
+
+
+            // ConcreteBuilder:Motorcycle
+            using Pattern.Builder;
+
+            class MotorCycle : IBuilder
+            {
+                private string brandName;
+                private Product product;
+                public MotorCycle(string brand)
+                {
+                    product = new Product();
+                    this.brandName = brand;
+                }
+                public void StartUpOperations()
+                { //Nothing in this case
+                }
+                public void BuildBody()
+                {
+                    product.Add("This is a body of a Motorcycle");
+                }
+                public void InsertWheels()
+                {
+                    product.Add("2 wheels are added");
+                }
+                public void AddHeadlights()
+                {
+                    product.Add("1 Headlights are added");
+                }
+                public void EndOperations()
+                {
+                    //Finishing up with brandname
+                    product.Add(string.Format("Motorcycle Model name :{0}",
+                    this.brandName));
+                }
+                public Product GetVehicle()
+                {
+                    return product;
+                }
+            }
+
+
+
+            // "Product"
+            namespace Pattern.Builder;
+
+            class Product
+            {
+                // We can use any data structure that you prefer e.g.List<string> etc.
+                private LinkedList<string> parts;
+                public Product()
+                {
+                    parts = new LinkedList<string>();
+                }
+                public void Add(string part)
+                {
+                    //Adding parts
+                    parts.AddLast(part);
+                }
+                public void Show()
+                {
+                    Console.WriteLine("\nProduct completed as below :");
+                    foreach (string part in parts)
+                        Console.WriteLine(part);
+                }
+            }
+
+
+
+            // "Director"
+            using Pattern.Builder;
+
+            class Director
+            {
+                IBuilder builder;
+                // A series of steps-in real life, steps are complex.
+                public void Construct(IBuilder builder)
+                {
+                    this.builder = builder;
+                    builder.StartUpOperations();
+                    builder.BuildBody();
+                    builder.InsertWheels();
+                    builder.AddHeadlights();
+                    builder.EndOperations();
+                }
+            }
+
+    . Factory Method
+    
