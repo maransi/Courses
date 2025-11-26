@@ -34,7 +34,7 @@ Visual Studio 2022 - Guia do Desenvolvedor
             . Opção para mudar o caminho padrão da instalação do Visual Studio
 
     . Depois que fizer a instalação do Visual Studio, caso queiramos instalar algum componente que 
-        ficou de fora da instalação inicial, basta:
+        ficou de fora da instalação inicial, ou reparar a instalação, basta:
         
         . Acessar o programa "Visual Studio Installer", na opção
             modificar e escolher as opção que ficaram de fora da instalação inicial.
@@ -55,6 +55,7 @@ Visual Studio 2022 - Guia do Desenvolvedor
 
                 . IMPORTANTE: os passos acima deste item é necessário para habilitar a criação de projeto "Webforms"
 
+            . Para reparar, acesse o botão "More" e escolha a opção "Repair"
 
     . Alterar idioma direto pelas Configurações do Visual Studio
 
@@ -69,3 +70,54 @@ Visual Studio 2022 - Guia do Desenvolvedor
         . Selecione English
 
         . Reinicie o Visual Studio
+
+2. Configurando o IDE
+
+    . Abra um projeto/solução.
+
+    . Color Scheme - Acesse "Tools / Theme"  OU "Tools / Options / Environment"
+
+    . Startup Open "Tela inicial do Visual Studio" - Tools / Options / Enviromment / General / On startup, open
+
+    . Customização da barra de ferramentas, menu, etc - Tools/Customize... OU  View/Toolbar
+
+    . Panel accommodation/Acomodação dos paineis laterais (Solution Explorer, etc) - Basta clicar e segurar no title do 
+        painel, arrastá-lo para dentro da dock que aparece no meio da tela, num dos locais desejados da dock.
+
+        . Depois de configurar o layout, podemos salvá-lo em "Windows/Save Windows Layout"; informe um nome para o Layout;
+            e depois pode resgatá-lo "Windows/Apply Windows Layout" escolhendo um dos Layouts salvo.
+
+3. Melhorias do Visual Studio
+
+    . Breakpoints - Clique com o direito sobre a barra lateral onde são incluido os Breakpoints, aparecerá vários tipos de 
+                    breakpoint, como por exemplo: conditional
+
+4. Criando projetos 
+
+    . Durante a criação do projeto/solução, informamos o tipo do projeto (ASP.NET Core MVC,...). Após isso, fornecemos o 
+        nome e o local do projeto/solução. Na sequência, fornecemos:
+
+        . Framework: This dropdown will show you the set of frameworks available to
+                        work with the selected technology. Although it is possible to select older
+                        frameworks, it is always advisable to create new projects with the latest version
+                        of the framework available.
+
+        . Configure for HTTPS: This checkbox allows you to configure the project to use a
+                                self-signed SSL certificate. If you are working on such a project for the first time,
+                                you will be asked to trust the certificate when you run the application so that
+                                everything works correctly. Although it is possible to work with the HTTP protocol,
+                                it is always recommended to use HTTPS in real life. 
+
+                . Equivalente aos comandos abaixo:
+
+                    # Execute na pasta da solution
+                    dotnet dev-certs https --clean
+                    dotnet dev-certs https --trust
+
+        . Enable Docker: This option allows you to enable Docker support in your project.
+                            This means that a Docker file will be generated, which you can then publish – for
+                            example, to Microsoft Azure.        
+
+
+
+
