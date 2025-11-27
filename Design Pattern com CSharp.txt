@@ -468,3 +468,213 @@ Design Pattern com CSharp
 
     . Factory Method
     
+        . Definição
+
+            . Define uma interface para a criação de objetos, mas deixa as subclasses decidir qual classe
+                será instanciada. O padrão Factory Method permite que uma classe diferencie a subclasse a 
+                ser instanciada.
+
+        . Ilustração
+
+                                +-----------------------+               +-----------------------+       +-----------------------+
+                                |     IAnimalFactory    |               |       Client          |       |       IAnimal         |
+                                |   <<Abstract Class>>  |               |      <<Class>>        |       |       <<Interface>>   |
+                                +-----------------------+               +-----------------------+       +-----------------------+
+                                |                       |               |                       |       |                       |
+                                +-----------------------+               +-----------------------+       +-----------------------+
+                                | + CreateAnimal        |               | # Main                |       | + Action              |
+                                +-----------------------+               +-----------------------+       | + Speak               |
+                                            ^                                                           +-----------------------+
+                                        /_\
+                                            |
+                            +---------------------------+
+                            |                           |
+            +-----------------------+       +-----------------------+   +-----------------------+   +-----------------------+
+            |     IAnimalFactory    |       |       TiegerFactory   |   |           Dog         |   |       Tiger           |
+            |   <<Abstract Class>>  |       |       <<Class>>       |   |         <<Class>>     |   |       <<Class>>       |
+            +-----------------------+       +-----------------------+   +-----------------------+   +-----------------------+
+            |                       |       |                       |   |                       |   |                       |
+            +-----------------------+       +-----------------------+   +-----------------------+   +-----------------------+ 
+            | + CreateAnimal        |       | + CreateAnimal        |   | + Action              |   | + Action              |
+            +-----------------------+       +-----------------------+   | + Speak               |   | + Speak               |
+                                                                        +-----------------------+   +-----------------------+
+
+        . Exemplo
+
+            . Primeira Versão
+
+                // Interface para as classes de criação
+                namespace Pattern.FactoryMethod;
+
+                public interface IAnimal
+                {
+                    void Speak();
+                    void Action();
+                }
+
+
+                // Interface para as classe de fabricação
+
+                namespace Pattern.FactoryMethod;
+
+                public abstract class IAnimalFactory
+                {
+                    //Remember the GoF definition which says "....Factory method lets a class
+                    //defer instantiation to subclasses." Following method will create a Tiger
+                    //or Dog But at this point it does not know whether it will get a Dog or a
+                    //Tiger. It will be decided by the subclasses i.e.DogFactory or TigerFactory.
+                    //So, the following method is acting like a factory (of creation).
+
+                    public abstract IAnimal CreateAnimal();
+                }            
+
+
+                // Classes de criação
+                namespace Pattern.FactoryMethod;
+
+                public class Dog : IAnimal
+                {
+                    public void Speak()
+                    {
+                        Console.WriteLine("Dog says: Bow-Wow.");
+                    }
+                    public void Action()
+                    {
+                        Console.WriteLine("Dogs prefer barking...\n");
+                    }
+                }
+
+
+                // Classe de criação
+                namespace Pattern.FactoryMethod;
+
+                public class Tiger: IAnimal
+                {
+                    public void Speak()
+                    {
+                        Console.WriteLine("Tiger say: Halum.");
+                    }
+
+                    public void Action()
+                    {
+                        Console.WriteLine("Tigers prefer hunting....\n");
+                    }
+                }
+
+
+
+                // Factory da classe Dog
+                namespace Pattern.FactoryMethod;
+
+                public class DogFactory: IAnimalFactory
+                {
+                    public override IAnimal CreateAnimal()
+                    {
+                        return new Dog();
+                    }
+                }
+
+
+                // Factory da classe Tiger
+                namespace Pattern.FactoryMethod;
+
+                public class TigerFactory: IAnimalFactory
+                {
+                    public override IAnimal CreateAnimal()
+                    {
+                        return new Tiger();
+                    }
+                }
+
+
+
+                // Classe "client" para efetuar as chamadas
+                using Pattern.FactoryMethod;
+
+
+                class Program
+                {
+                    static void Main()
+                    {
+                        Console.WriteLine("*** Factory Pattern Demo***\n");
+
+                        IAnimalFactory tigerFactory = new TigerFactory();
+                        IAnimalFactory dogFactory = new DogFactory();
+
+                        IAnimal tiger = tigerFactory.CreateAnimal();
+
+                        IAnimal dog = dogFactory.CreateAnimal();
+
+                        tiger.Speak();
+                        tiger.Action();
+
+                        dog.Speak();
+                        dog.Action();
+
+                        Console.ReadKey();
+                    }
+                }
+
+            . Melhorias
+
+                // Inserção do método MakeAnimal, assim todas as Factory implementarão automaticamente esse método.
+                // Quando for chamado o método MakeAnimal das classes [Dog/Tiger]Factory, a chamada será da classe
+                // abstrata pai "IAnimalFactory" e consequentemente retornará a classe de criação Dog/Tiger
+                namespace Pattern.FactoryMethod;
+
+                public abstract class IAnimalFactory
+                {
+                    public abstract IAnimal CreateAnimal();
+
+                    // Método inserido
+                    public IAnimal MakeAnimal()
+                    {
+                        IAnimal animal = CreateAnimal();
+
+                        animal.Speak();
+                        animal.Action();
+
+                        return animal;
+                    }
+                }
+
+
+
+
+                using Pattern.FactoryMethod;
+
+
+                class Program
+                {
+                    static void Main()
+                    {
+                        Console.WriteLine("*** Factory Pattern Demo***\n");
+
+                        IAnimalFactory tigerFactory = new TigerFactory();
+                        IAnimalFactory dogFactory = new DogFactory();
+
+                        /*  Trecho substituido
+                        IAnimal tiger = tigerFactory.CreateAnimal();
+                        IAnimal dog = dogFactory.CreateAnimal();
+                        */
+
+                        // Linha inserida
+                        IAnimal tiger = tigerFactory.MakeAnimal();
+
+                        // Linha inserida
+                        IAnimal dog = dogFactory.MakeAnimal();
+                        
+                        tiger.Speak();
+                        tiger.Action();
+
+                        dog.Speak();
+                        dog.Action();
+
+                        Console.ReadKey();
+                    }
+                }
+
+
+
+
+
