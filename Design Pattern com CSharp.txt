@@ -674,6 +674,70 @@ Design Pattern com CSharp
                     }
                 }
 
+    . Abstract Factory
+
+        . Definição
+
+            . É um padrão que fornece uma interface para criar grupos de objetos relacionados entre si, garantindo 
+                que o código cliente use apenas interfaces/abstrações, nunca classes concretas.
+
+            . Suponha que queiramos categorizar cachorros e tigres, e escolhemos obter um animal pet (cachorro ou tigre);
+                ou um animal selvagem (cachorro ou tigre) através de uma fabrica. Introduziremos duas fabricas concretas:
+                WildAnimalFactory (responsável pela criação de animias selvagens) e PetAnimalFactory (responsável pela 
+                criação dos animais pet).
+
+
+        .Exemplo
+
+
+            namespace Pattern.AbstractFactory;
+            public interface IDog
+            {
+                void Speak();
+                void Action();
+            }
+
+
+
+            namespace Pattern.AbstractFactory;
+
+            public interface ITiger
+            {
+                void Speak();
+                void Action();
+            }
+
+
+
+namespace Pattern.AbstractFactory;
+
+class PetDog : IDog
+{
+    public void Speak()
+    {
+        Console.WriteLine("Pet Dog says: Bow-Wow.");
+    }
+    public void Action()
+    {
+        Console.WriteLine("Pet Dogs prefer to stay at home.\n");
+    }
+}
+
+
+
+
+
+namespace Pattern.AbstractFactory;
+
+public interface IAnimalFactory
+{
+    IDog GetDog();
+    ITiger GetTiger();
+}
+
+
+
+
 
 
 
