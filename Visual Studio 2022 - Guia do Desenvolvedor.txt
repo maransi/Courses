@@ -173,3 +173,90 @@ Visual Studio 2022 - Guia do Desenvolvedor
         . Acesse "Debug | Windows | Call Stack" durante o debug.
 
 6. Adicionando "Code Snippets"
+
+    . "Code Snippets" são atalhos, que ao ser digitado retornam um conjunto de código de acordo com o template que estiver associado. Resumindo, são
+        "shortcut" predefinidos.
+
+        prop + [Ctrl + Space]
+
+            public int MyProperty { get; set; }
+
+        propfull + [Ctrl + Space]
+
+            private int _myVar;
+            public int MyProperty
+            {
+                get { return _myVar; }
+                set { _myVar = value; }
+            }
+
+        ctor  + [Ctrl + Space]  - Implementa o construtor
+
+            public Calculadora(Parameters)
+            {
+                
+            }
+
+        for  + [Ctrl + Space]  -  monta um laço for padrão;
+
+        foreach + [Ctrl + Space]  -  monta um laço foreach padrão;
+
+        if + [Ctrl + Space]  -  monta uma estrutura if padrão;
+
+        cw + [Ctrl + Space]  -  chama um Console.WriteLine();
+
+        do + [Ctrl + Space]  -  cria um bloco do/while(true);
+
+        while + [Ctrl + Space]  -  cria um bloco while padrão;
+
+        try/tryf    - Cria um bloco try/catch ou try/finally
+
+        Shortcut	Description
+        --------    -----------
+        class	    Creates a class
+        ctor	    constructor
+        cw	        Console.WriteLine
+        do	        do...while loop
+        enum	    Creates an enum
+        for	        for loop
+        foreach	    foreach statement
+        if	        if statement
+        interface	Creates an interface
+        prop	    An automatically implemented property
+        region	    #region
+        svm	void    Main()
+        using	    using statement
+        while	    while loop
+
+    . Criando um "Code Snippets"
+
+        . Crie a pasta "C:\Users\[user]\Documents\CodeSnippets" e dentro dela o arquivo "codesnippet.snippet" com o conteúdo abaixo:
+
+            
+            <?xml version="1.0" encoding="utf-8"?>
+            <CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+                <CodeSnippet Format="1.0.0">
+                    <Header>
+                        <Title>If Linux condition</Title>
+                        <Author>Myself</Author>
+                        <Description>Conditional to now if the operating system is Linux</Description>
+                        <Shortcut>ifln</Shortcut>
+                    </Header>
+                    <Snippet>
+                        <Code Language="CSharp">
+                            <![CDATA[if (OperatingSystem.IsLinux())
+                            {
+                                return new List<WeatherForecast>();
+                            }]]>
+                        </Code>
+                    </Snippet>
+                </CodeSnippet>
+            </CodeSnippets>
+
+        . IMPORTANTE: Cuidado ao salvar o arquivo acima para não ficar com a extensão ".xml", tem que ficar com extensão ".snippet"
+
+        . Navegue para "Tools | Code Snippets Manager", escolha a "Language" CSharp, clique em "Add..." e escolha a pasta criada no passo anterior
+
+        . Acesse uma classe e faça o teste com a "Shortcut" "ifln"
+
+
