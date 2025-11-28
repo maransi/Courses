@@ -113,7 +113,7 @@ Design Pattern com CSharp
 
             // Singleton
             using System;
-            namespace Pattern.Singleton
+            namespace  Pattern.Creational.Singleton
             {               
                 public sealed class Singleton       // sealed impedi que a classe Singleton seja herdada por outras classes
                 {
@@ -147,7 +147,7 @@ Design Pattern com CSharp
 
             // Program
 
-            using Pattern.Singleton;
+            using Pattern.Creational.Singleton;
 
             class Program
             {
@@ -202,7 +202,7 @@ Design Pattern com CSharp
             // BasicCar
             using System;
 
-            namespace Pattern.Prototype
+            namespace  Pattern.Creational.Prototype
             {
                 public abstract class BasicCar
                 {
@@ -225,7 +225,7 @@ Design Pattern com CSharp
             //Nano.cs
             using System;
 
-            namespace Pattern.Prototype
+            namespace  Pattern.Creational.Prototype
             {
                 public class Nano : BasicCar
                 {
@@ -245,7 +245,7 @@ Design Pattern com CSharp
             //Ford.cs
             using System;
 
-            namespace Pattern.Prototype
+            namespace  Pattern.Creational.Prototype
             {
                 public class Ford : BasicCar
                 {
@@ -263,7 +263,7 @@ Design Pattern com CSharp
 
 
             // Client( Program.cs )
-            using Pattern.Prototype;
+            using Pattern.Creational.Prototype;
 
             class Program
             {
@@ -321,7 +321,7 @@ Design Pattern com CSharp
             using System;
             using System.Collections.Generic;
 
-            namespace Pattern.Builder
+            namespace  Pattern.Creational.Builder
             {
                 internal interface IBuilder
                 {
@@ -336,7 +336,7 @@ Design Pattern com CSharp
 
 
             // ConcreteBuilder: Car
-            using Pattern.Builder;
+            using Pattern.Creational.Builder;
 
             class Car : IBuilder
             {
@@ -382,7 +382,7 @@ Design Pattern com CSharp
 
 
             // ConcreteBuilder:Motorcycle
-            using Pattern.Builder;
+            using Pattern.Creational.Builder;
 
             class MotorCycle : IBuilder
             {
@@ -423,7 +423,7 @@ Design Pattern com CSharp
 
 
             // "Product"
-            namespace Pattern.Builder;
+            namespace  Pattern.Creational.Builder;
 
             class Product
             {
@@ -449,7 +449,7 @@ Design Pattern com CSharp
 
 
             // "Director"
-            using Pattern.Builder;
+            using Pattern.Creational.Builder;
 
             class Director
             {
@@ -504,7 +504,7 @@ Design Pattern com CSharp
             . Primeira Versão
 
                 // Interface para as classes de criação
-                namespace Pattern.FactoryMethod;
+                namespace  Pattern.Creational.FactoryMethod;
 
                 public interface IAnimal
                 {
@@ -515,7 +515,7 @@ Design Pattern com CSharp
 
                 // Interface para as classe de fabricação
 
-                namespace Pattern.FactoryMethod;
+                namespace  Pattern.Creational.FactoryMethod;
 
                 public abstract class IAnimalFactory
                 {
@@ -530,7 +530,7 @@ Design Pattern com CSharp
 
 
                 // Classes de criação
-                namespace Pattern.FactoryMethod;
+                namespace  Pattern.Creational.FactoryMethod;
 
                 public class Dog : IAnimal
                 {
@@ -546,7 +546,7 @@ Design Pattern com CSharp
 
 
                 // Classe de criação
-                namespace Pattern.FactoryMethod;
+                namespace  Pattern.Creational.FactoryMethod;
 
                 public class Tiger: IAnimal
                 {
@@ -564,7 +564,7 @@ Design Pattern com CSharp
 
 
                 // Factory da classe Dog
-                namespace Pattern.FactoryMethod;
+                namespace  Pattern.Creational.FactoryMethod;
 
                 public class DogFactory: IAnimalFactory
                 {
@@ -576,7 +576,7 @@ Design Pattern com CSharp
 
 
                 // Factory da classe Tiger
-                namespace Pattern.FactoryMethod;
+                namespace  Pattern.Creational.FactoryMethod;
 
                 public class TigerFactory: IAnimalFactory
                 {
@@ -589,7 +589,7 @@ Design Pattern com CSharp
 
 
                 // Classe "client" para efetuar as chamadas
-                using Pattern.FactoryMethod;
+                using Pattern.Creational.FactoryMethod;
 
 
                 class Program
@@ -620,7 +620,7 @@ Design Pattern com CSharp
                 // Inserção do método MakeAnimal, assim todas as Factory implementarão automaticamente esse método.
                 // Quando for chamado o método MakeAnimal das classes [Dog/Tiger]Factory, a chamada será da classe
                 // abstrata pai "IAnimalFactory" e consequentemente retornará a classe de criação Dog/Tiger
-                namespace Pattern.FactoryMethod;
+                namespace  Pattern.Creational.FactoryMethod;
 
                 public abstract class IAnimalFactory
                 {
@@ -641,7 +641,7 @@ Design Pattern com CSharp
 
 
 
-                using Pattern.FactoryMethod;
+                using Pattern.Creational.FactoryMethod;
 
 
                 class Program
@@ -689,8 +689,9 @@ Design Pattern com CSharp
 
         .Exemplo
 
+            // Interface IDog
+            namespace  Pattern.Creational.AbstractFactory;
 
-            namespace Pattern.AbstractFactory;
             public interface IDog
             {
                 void Speak();
@@ -698,8 +699,8 @@ Design Pattern com CSharp
             }
 
 
-
-            namespace Pattern.AbstractFactory;
+            // Interface ITiger
+            namespace  Pattern.Creational.AbstractFactory;
 
             public interface ITiger
             {
@@ -708,34 +709,275 @@ Design Pattern com CSharp
             }
 
 
+            // Classe PetDog
+            namespace  Pattern.Creational.AbstractFactory;
 
-namespace Pattern.AbstractFactory;
-
-class PetDog : IDog
-{
-    public void Speak()
-    {
-        Console.WriteLine("Pet Dog says: Bow-Wow.");
-    }
-    public void Action()
-    {
-        Console.WriteLine("Pet Dogs prefer to stay at home.\n");
-    }
-}
-
-
+            class PetDog : IDog
+            {
+                public void Speak()
+                {
+                    Console.WriteLine("Pet Dog says: Bow-Wow.");
+                }
+                public void Action()
+                {
+                    Console.WriteLine("Pet Dogs prefer to stay at home.\n");
+                }
+            }
 
 
+            // Classe PetTiger
+            namespace  Pattern.Creational.AbstractFactory;
 
-namespace Pattern.AbstractFactory;
+            class PetTiger : ITiger
+            {
+                public void Speak()
+                {
+                    Console.WriteLine("Pet Tiger says: Halum.");
+                }
+                public void Action()
+                {
+                    Console.WriteLine("Pet Tigers play in an animal circus.\n");
+                }
+            }
 
-public interface IAnimalFactory
-{
-    IDog GetDog();
-    ITiger GetTiger();
-}
+
+            // Classe WildDog
+            namespace  Pattern.Creational.AbstractFactory;
+
+            class WildDog : IDog
+            {
+                public void Speak()
+                {
+                    Console.WriteLine("Wild Dog says: Bow-Wow.");
+                }
+                public void Action()
+                {
+                    Console.WriteLine(@"Wild Dogs prefer to roam freely in
+                    jungles.\n");
+                }
+            }
 
 
+            // Classe WildTiger
+            namespace  Pattern.Creational.AbstractFactory;
+
+            class WildTiger : ITiger
+            {
+                public void Speak()
+                {
+                    Console.WriteLine("Wild Tiger says: Halum.");
+                }
+                public void Action()
+                {
+                    Console.WriteLine("Wild Tigers prefer hunting in jungles.\n");
+                }
+            }
+
+
+            // Interface IAnimalFactory
+            namespace  Pattern.Creational.AbstractFactory;
+
+            public interface IAnimalFactory
+            {
+                IDog GetDog();
+                ITiger GetTiger();
+            }
+
+
+
+            // Classe Factory PetAnimalFactory
+            namespace  Pattern.Creational.AbstractFactory;
+
+            public class PetAnimalFactory : IAnimalFactory
+            {
+                public IDog GetDog()
+                {
+                    return new PetDog();
+                }
+                public ITiger GetTiger()
+                {
+                    return new PetTiger();
+                }
+            }
+
+
+            // Classe Factory WildAnimalFactory
+            namespace  Pattern.Creational.AbstractFactory;
+
+            public class WildAnimalFactory : IAnimalFactory
+            {
+                public IDog GetDog()
+                {
+                    return new WildDog();
+                }
+                public ITiger GetTiger()
+                {
+                    return new WildTiger();
+                }
+            }
+
+
+
+
+
+            // Classe Client "Program.cs"
+            using Pattern.Creational.AbstractFactory;
+
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Abstract Factory Pattern Demo***\n");
+                    //Making a wild dog through WildAnimalFactory
+                    IAnimalFactory wildAnimalFactory = new WildAnimalFactory();
+
+                    IDog wildDog = wildAnimalFactory.GetDog();
+
+                    wildDog.Speak();
+                    wildDog.Action();
+
+                    //Making a wild tiger through WildAnimalFactory
+                    ITiger wildTiger = wildAnimalFactory.GetTiger();
+
+                    wildTiger.Speak();
+                    wildTiger.Action();
+
+                    Console.WriteLine("******************");
+                    
+                    //Making a pet dog through PetAnimalFactory
+                    IAnimalFactory petAnimalFactory = new PetAnimalFactory();
+
+                    IDog petDog = petAnimalFactory.GetDog();
+
+                    petDog.Speak();
+                    petDog.Action();
+
+                    //Making a pet tiger through PetAnimalFactory
+                    ITiger petTiger = petAnimalFactory.GetTiger();
+
+                    petTiger.Speak();
+                    petTiger.Action();
+
+
+                    Console.ReadKey();
+                }
+            }
+
+
+. Pattern Estruturais
+
+    . Proxy
+
+        . Definição
+
+            . É um padrão estrutural que fornece um objeto substituto para controlar o acesso a outro objeto, podendo 
+                adicionar comportamentos extras antes ou depois da operação real.
+
+        . Conceito
+
+            . Um proxy é como um substituto para um objeto real. Quando o cliente usa o proxy, ele acha que está 
+                falando diretamente com o objeto verdadeiro — mas, na verdade, está falando com o substituto.
+
+            . Isso é útil porque nem sempre é possível acessar o objeto real diretamente.
+
+            . Pode ser por causa de:
+
+                . segurança,
+
+                . desempenho,
+
+                . o objeto real ser pesado para carregar,
+
+                . ou porque ele está em outro computador.
+
+            . Então o padrão Proxy ajuda criando uma classe intermediária, que age como se fosse o objeto 
+                verdadeiro e serve de ponte para ele.
+
+            . Resumindo: Proxy é um objeto que fica no lugar do real e controla o acesso a ele.
+
+        . Ilustração
+
+                            +-------------------+                       +-------------------+
+                            | Subject           |                       | Program           |
+                            | <<Absract Class>> |                       | <<Class>>         |
+                            +-------------------+                       +-------------------+
+                            |                   |                       |                   |
+                            +-------------------+                       +-------------------+
+                            | + DoSomeWork      |                       | + Main            |
+                            +-------------------+                       +-------------------+
+                                    ^
+                                / \
+                                    |
+                    +-------------------------------+
+                    |                               |
+            +-------------------+       +-------------------+
+            | Proxy             |       | ConcreteSubject   |
+            | <<Class>>         |       | <<Class>>         |
+            +-------------------+       +-------------------+
+            | # cs              |       |                   |
+            +-------------------+       +-------------------+
+            | + DoSomeWork      |       | + DoSomeWork      |
+            +-------------------+       +-------------------+
+
+    . Exemplo
+
+        // Abstract Classe Subject
+        namespace Pattern.Structural.Proxy;
+
+        public abstract class Subject
+        {
+            public abstract void DoSomeWork();
+        }
+
+
+        // Classe ConcreteSubject
+        namespace Pattern.Structural.Proxy;
+
+        public class ConcreteSubject : Subject
+        {
+            public override void DoSomeWork()
+            {
+                Console.WriteLine("ConcreteSubject.DoSomeWork()");
+            }
+        }
+
+
+        // Classe Proxy
+        namespace Pattern.Structural.Proxy;
+
+        public class Proxy : Subject
+        {
+            Subject subject;
+            public override void DoSomeWork()
+            {
+                Console.WriteLine("Proxy call happening now...");
+                //Lazy initialization:We'll not instantiate until the method is
+                //called
+                if (subject == null)
+                {
+                    subject = new ConcreteSubject();
+                }
+                subject.DoSomeWork();
+            }
+        }
+
+
+        // Classe "Client" "Program.cs"
+        using Pattern.Structural.Proxy;
+
+        class Program
+        {
+            static void Main()
+            {
+                Console.WriteLine("***Proxy Pattern Demo***\n");
+
+                Proxy px = new Proxy();
+                px.DoSomeWork();
+
+                Console.ReadKey();
+            }
+        }
 
 
 
