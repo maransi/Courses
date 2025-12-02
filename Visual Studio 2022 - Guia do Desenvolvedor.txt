@@ -257,4 +257,85 @@ Visual Studio 2022 - Guia do Desenvolvedor
 
 8. Web Tools and Hot Reload
 
+    . Scaffolding
 
+        . Para usar o "Scaffold" no Visual Studio Basta Acessar:
+
+            . Controller
+
+                . Clique na pasta root do projeto
+
+                . Escolha "Add / New Scaffolded Item... /"
+
+                . Escolha "API Controller with read/write actions" e acione o botão "Add"
+
+                . Na próxima tela escolha "API Controller with read/write actions" e forneça 
+                    o nome do controller, por exemplo: "GeneratedController.cs"
+
+                . Clique no botãoi "Add"
+
+            . Razor View
+
+                . Dentro da pasta "Views", crie a pasta "Generated"
+
+                . Clique direito na pasta "Views/Generated" do projeto
+                
+                . Escolha "Add / New Scaffolded Item... /"
+
+                . Escolha "Razor View", acione o botão "Add"
+
+                . Na próxima tela, informe:
+
+                    View Name: Index
+                    Template: Create
+
+                . Clique no botãoi "Add"
+
+            . JavaScript and CSS libraries
+
+                . Clique com o botão direito sobre a pasta "wwwroot" e escolha:
+
+                    "Add/Client-Side Library..."
+
+                . Na tela que abrir, escolha:
+
+                    Provider: cdnjs
+                    Library: Bootstrap
+                    Include all/Choose: [Escolha os arquivos desejaddos]
+
+
+                . Clique em "Install"
+
+                . Após o "Install", será criado um arquivo na raiz do projeto com nome "libman.json" com
+                    os arquivos js e css inseridos no projetos. Caso viermos alterá-lo, incluindo outras 
+                    referências nele, como por exemplo "jquery", automaticamente serão criados os arquivos
+                    dentro das respectivas pastas na pasta "wwwroot". 
+
+                . Altere o arquivo libman.json com o conteúdo abaixo:
+
+                    {
+                        "version": "1.0",
+                        "defaultProvider": "cdnjs",
+                        "libraries": [
+                            {
+                            "library": "jquery@3.6.0",
+                            "destination": "wwwroot/lib/jquery"
+                            },
+                            {
+                            "library": "bootstrap@5.1.3",
+                            "files": ["css/bootstrap.min.css", "js/bootstrap.bundle.min.js"],
+                            "destination": "wwwroot/lib/bootstrap"
+                            }
+                        ]
+                    }
+
+                . Verifique a pasta "wwwroot" se foram criadas as respectivas pastas.
+
+    . Hot Reload
+
+        . Para fazer o "Hot Reload" funcionar é necessário iniciar o projeto e verificar 
+            se no icone do "foguinho" na barra de ferramentas a opção "Hot Reload on File Save"
+            está ativado. Se quiser também podemos acessar essa opção em 
+            "Tools / Options / Debuging / .NET / C++ Hot Reload" e marcar o "Hot Reload on File Save"
+
+            

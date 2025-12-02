@@ -1790,12 +1790,17 @@ Criando a primeira página
 
         . Execute o comando abaixo na pasta raiz do projeto:
 
-            libman install bootstrap@5.1.3
+            libman install jquery -p cdnjs -d wwwroot/lib/jquery
 
             . Verifique se foi criado a pasta "wwwroot/lib/bootstrap" com os arquivo da bibliote "bootstrap"
 
-        . No comando de instalação acima não foi possível a execução, dando erro, embora toda a instalação tenha ocorrido com sucesso.
-            Vamos substituir o "libman" pelo "npm" para fazer o downloading das bibliotecas javascript.
+		. Esse comando lê o arquivo libman.json e baixa todas as bibliotecas e arquivos definidos nele.
+
+			libman restore
+
+        . Remover a biblioteca
+
+            libman uninstall jquery
 
     . Instalando o npm
 
