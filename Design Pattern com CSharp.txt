@@ -1171,14 +1171,114 @@ Design Pattern com CSharp
 
         . Definição
 
-
-
-
-
-        . Conceito
-
-
+            . Permite que interfaces incompatíveis trabalhem juntas, convertendo a interface de uma 
+                classe em outra interface esperada pelos clientes
 
 
         . Ilustração
 
+            +------------------------+
+            |      ITwoPinPlug       |  <<Target>>
+            |------------------------|
+            | + Connect2Pins()       |
+            +-----------+------------+
+                        ^
+                        |
+            +-----------+------------+
+            |     TwoPinOutlet       |  (Cliente usa isso)
+            |------------------------|
+            | + SupplyPower(ITwoPinPlug) |
+            +------------------------+
+
+            +------------------------+
+            |     ThreePinDevice     |  <<Adaptee>>
+            |------------------------|
+            | + Connect3Pins()       |
+            +------------------------+
+
+            +------------------------+
+            |     PlugAdapter        |  <<Adapter>>
+            |------------------------|
+            | - device: ThreePinDevice |
+            |------------------------|
+            | + PlugAdapter(device)  |
+            | + Connect2Pins()       |
+            |     (chama device.Connect3Pins()) |
+            +------------------------+
+
+            +------------------------+
+            |        Program         |
+            +------------------------+
+            | + Main()               |
+            +------------------------+
+
+        . Exemplo:
+
+            using System;
+
+            namespace AdapterExample2
+            {
+                // Target - Interface que o sistema espera
+                public interface ITwoPinPlug
+                {
+                    void Connect2Pins();
+                }
+
+                // Adaptee - Classe incompatível
+                public class ThreePinDevice
+                {
+                    public void Connect3Pins()
+                    {
+                        Console.WriteLine("Three-pin device connected using 3 pins.");
+                    }
+                }
+
+                // Adapter - converte a interface
+                public class PlugAdapter : ITwoPinPlug
+                {
+                    private readonly ThreePinDevice device;
+
+                    public PlugAdapter(ThreePinDevice device)
+                    {
+                        this.device = device;
+                    }
+
+                    public void Connect2Pins()
+                    {
+                        Console.WriteLine("Adapter converting 2-pin request to 3-pin...");
+                        device.Connect3Pins();
+                    }
+                }
+
+                // Cliente
+                public class TwoPinOutlet
+                {
+                    public void SupplyPower(ITwoPinPlug plug)
+                    {
+                        Console.WriteLine("Outlet supplying power...");
+                        plug.Connect2Pins();
+                    }
+                }
+
+                class Program
+                {
+                    static void Main()
+                    {
+                        var outlet = new TwoPinOutlet();
+
+                        // Aparelho incompatível
+                        var modernDevice = new ThreePinDevice();
+
+                        // Adaptando o aparelho para 2 pinos
+                        ITwoPinPlug adapter = new PlugAdapter(modernDevice);
+
+                        // Cliente funciona normalmente
+                        outlet.SupplyPower(adapter);
+
+                        Console.ReadKey();
+                    }
+                }
+            }
+
+    . Facade
+    
