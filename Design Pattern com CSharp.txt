@@ -907,7 +907,7 @@ Design Pattern com CSharp
                             | + DoSomeWork      |                       | + Main            |
                             +-------------------+                       +-------------------+
                                     ^
-                                / \
+                                   / \
                                     |
                     +-------------------------------+
                     |                               |
@@ -915,72 +915,270 @@ Design Pattern com CSharp
             | Proxy             |       | ConcreteSubject   |
             | <<Class>>         |       | <<Class>>         |
             +-------------------+       +-------------------+
-            | # cs              |       |                   |
+            | # subject         |       |                   |
             +-------------------+       +-------------------+
             | + DoSomeWork      |       | + DoSomeWork      |
             +-------------------+       +-------------------+
 
-    . Exemplo
+        . Exemplo
 
-        // Abstract Classe Subject
-        namespace Pattern.Structural.Proxy;
+            // Abstract Classe Subject
+            namespace Pattern.Structural.Proxy;
 
-        public abstract class Subject
-        {
-            public abstract void DoSomeWork();
-        }
-
-
-        // Classe ConcreteSubject
-        namespace Pattern.Structural.Proxy;
-
-        public class ConcreteSubject : Subject
-        {
-            public override void DoSomeWork()
+            public abstract class Subject
             {
-                Console.WriteLine("ConcreteSubject.DoSomeWork()");
+                public abstract void DoSomeWork();
             }
-        }
 
 
-        // Classe Proxy
-        namespace Pattern.Structural.Proxy;
+            // Classe ConcreteSubject
+            namespace Pattern.Structural.Proxy;
 
-        public class Proxy : Subject
-        {
-            Subject subject;
-            public override void DoSomeWork()
+            public class ConcreteSubject : Subject
             {
-                Console.WriteLine("Proxy call happening now...");
-                //Lazy initialization:We'll not instantiate until the method is
-                //called
-                if (subject == null)
+                public override void DoSomeWork()
                 {
-                    subject = new ConcreteSubject();
+                    Console.WriteLine("ConcreteSubject.DoSomeWork()");
                 }
-                subject.DoSomeWork();
             }
-        }
 
 
-        // Classe "Client" "Program.cs"
-        using Pattern.Structural.Proxy;
+            // Classe Proxy
+            namespace Pattern.Structural.Proxy;
 
-        class Program
-        {
-            static void Main()
+            public class Proxy : Subject
             {
-                Console.WriteLine("***Proxy Pattern Demo***\n");
-
-                Proxy px = new Proxy();
-                px.DoSomeWork();
-
-                Console.ReadKey();
+                Subject subject;
+                public override void DoSomeWork()
+                {
+                    Console.WriteLine("Proxy call happening now...");
+                    //Lazy initialization:We'll not instantiate until the method is
+                    //called
+                    if (subject == null)
+                    {
+                        subject = new ConcreteSubject();
+                    }
+                    subject.DoSomeWork();
+                }
             }
-        }
+
+
+            // Classe "Client" "Program.cs"
+            using Pattern.Structural.Proxy;
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Proxy Pattern Demo***\n");
+
+                    Proxy px = new Proxy();
+                    px.DoSomeWork();
+
+                    Console.ReadKey();
+                }
+            }
+
+    . Decorator
+
+        . Definição
+
+            . Permite adicionar responsabilidades (comportamentos) a um objeto dinamicamente, 
+                colocando-o dentro de outro objeto que envolva o original. Decorators 
+                oferecem uma alternativa flexível à herança para estender funcionalidades.
+    
+        . Conceito
+
+            . Este padrão promove o conceito de que sua classe deve ser fechada para modificação,
+                mas aberta para extensão. Em outras palavras, você pode adicionar uma funcionalidade 
+                sem atrapalhar as funcionalidades existentes. O conceito é útil quando você deseja 
+                adicionar alguma funcionalidade especial a um objeto específico em vez de toda 
+                a classe. Este padrão prefere a composição de objetos à herança. Depois de 
+                dominar essa técnica, você pode adicionar novas
+                responsabilidades a um objeto sem afetar as classes subjacentes.
+
+        . Ilustração
+
+
+
+                            +---------------------+
+                            |     Component       |
+                            | <<Abstract Class>>  |
+                            |---------------------|
+                            | + MakeHouse()       |
+                            +----------+----------+
+                                    ^
+                                    |
+                        +-----------+-----------+
+                        |                       |
+            +--------------------------+   +------------------------------------------------------------+
+            |     ConcreteComponent    |   |    AbstractDecorator                                       |
+            |                          |   |    <<Abstract Class>>                                      |
+            |--------------------------|   |------------------------------------------------------------|
+            | + MakeHouse()            |   | - _component: Component                                    |
+            +--------------------------+   |------------------------------------------------------------+
+                                           | + AbstractDecorator(Component component) <<constructor>>   |
+                                           | + SetTheComponent()                                        |
+                                           | + MakeHouse()                                              |
+                                           +-----------+------------------------------------------------+
+                                                                        ^
+                                                                        |
+                                                    +-------------------+------------------+
+                                                    |                                      |
+                                        +---------------------------+        +---------------------------+
+                                        |    ConcreteDecoratorA     |        |    ConcreteDecoratorB     |
+                                        |---------------------------|        |---------------------------|
+                                        | + MakeHouse()             |        | + MakeHouse()             |
+                                        | + AddFloor()              |        | + PaintTheHouse()         |
+                                        +---------------------------+        +---------------------------+
+
+        . Exemplo
+
+
+            namespace Pattern.Structural.Decorator;
+            public abstract class Component
+            {
+                public abstract void MakeHouse();
+            }
+
+
+
+
+            namespace Pattern.Structural.Decorator;
+
+            public abstract class AbstractDecorator: Component
+            {
+                
+                protected Component _component;
+
+                public void SetTheComponent(Component component)
+                {
+                    this._component = component;
+                }
+
+                public override void MakeHouse()
+                {
+                    if ( _component != null)
+                    {
+                        _component.MakeHouse();
+                    }
+                }
+
+                protected AbstractDecorator( Component component)
+                {
+                    this._component = component;
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Structural.Decorator;
+
+            public class ConcreteComponent : Component
+            {
+
+                public override void MakeHouse()
+                {
+                    Console.WriteLine("WriteLine(\"A casa original está completa. Ela está fechada para modificações!!!\"");
+                }
+            }
 
 
 
 
 
+            namespace Pattern.Structural.Decorator;
+
+            public class ConcreteDecoratorA: AbstractDecorator
+            {
+                public override void MakeHouse()
+                {
+                    base.MakeHouse();
+                    AddFloor();
+                    Console.WriteLine("A casa foi decorada com o estilo A.");
+                }
+                void AddFloor()
+                {
+                    Console.WriteLine("Adicionando mais um andar do ConcreteDecoratorA.");
+                }
+
+                public ConcreteDecoratorA(Component component): base(component)
+                {
+
+                }
+            }
+
+
+            using System.ComponentModel;
+
+            namespace Pattern.Structural.Decorator;
+
+            public class ConcreteDecoratorB: AbstractDecorator
+            {
+                public override void MakeHouse()
+                {
+                    Console.WriteLine("");
+
+                    base.MakeHouse();
+                    Console.WriteLine("Usando outro Decorator");
+
+                    AddGarage();
+
+                    Console.WriteLine("A casa foi decorada com o estilo B.");
+                }
+
+                void AddGarage()
+                {
+                    Console.WriteLine("Garagem foi adicionada pelo ConcreteDecorateB.");
+                }
+
+                public ConcreteDecoratorB( Component component) : base(component)
+                {
+                    
+                }
+            }
+
+
+
+            using Pattern.Structural.Decorator;
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Decorator Pattern Demo***\n");
+
+                    ConcreteComponent cc = new ConcreteComponent();
+
+                    ConcreteDecoratorA decoratorA = new ConcreteDecoratorA(cc);
+                    // decoratorA.SetTheComponent(cc);
+
+                    decoratorA.MakeHouse();
+
+                    ConcreteDecoratorB decoratorB = new ConcreteDecoratorB(decoratorA);
+                    // decoratorB.SetTheComponent(decoratorA);
+                    decoratorB.MakeHouse();
+
+
+                    Console.ReadKey();
+                }
+            }
+
+
+    . Adapter
+
+        . Definição
+
+
+
+
+
+        . Conceito
+
+
+
+
+        . Ilustração
 

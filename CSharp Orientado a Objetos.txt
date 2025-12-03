@@ -373,6 +373,30 @@ CSharp Orientado a Objetos
                 }
             }
 
+
+        . Podemos repassar os parâmetros do construtor da classe derivada para a base
+
+        . Exemplo
+
+            public class Pessoa
+            {
+                string _nome;
+
+                public Pessoa( string nome )    <-----------------------+   Chama o construtor da 
+                {                                                       |   classe base
+                    _nome = nome;                                       |
+                }                                                       |
+            }                                                           |
+                                                                        |
+            public class Aluno : Pessoa                                 |
+            {                                                           |
+                public Aluno( string nome ): base( nome )   ------------+
+                {
+
+                }
+            }
+
+
     . Modificadores virtual, override e new - Esses três modificadores controlam como os métodos da classe 
                                                 base podem ser modificados pelas classes derivadas.
 
