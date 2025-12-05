@@ -864,7 +864,6 @@ Design Pattern com CSharp
                 }
             }
 
-
 . Pattern Estruturais
 
     . Proxy
@@ -1280,3 +1279,396 @@ Design Pattern com CSharp
             }
 
     . Facade
+
+        . Definição
+
+            . Fornece uma interface unificada para um conjunto de interfaces em um subsistema. O 
+                pattern "Facade" define uma interface de nível superior que facilita o uso do 
+                subsistema.        
+
+        . Conceito
+
+            . Este padrão suporta baixo acoplamento. Com este padrão, você pode enfatizar a
+                abstração e ocultar os detalhes complexos expondo uma interface simples.
+
+        . Ilustração
+
+            . Neste exemplo, seus clientes podem construir ou destruir um tipo específico de robô
+                invocando métodos simples como "ConstructMilanoRobot" e "DestroyMilanoRobot".
+                Do ponto de vista do cliente, ele precisa interagir apenas com um "Facade"
+                (consulte o arquivo Program.cs). A classe RobotFacade assume total responsabilidade 
+                pela criação ou destruição de um tipo específico de robô. Esse "Facade" se comunica 
+                com cada um desses subsistemas (RobotHands, RobotBody, RobotColor) para atender 
+                à solicitação do cliente. Os clientes não precisam se preocupar com
+                o processo de criação ou destruição ou com a sequência de chamadas desses métodos.
+
+
+                +------------------------+
+                |        Program         |
+                +------------------------+
+                | + Main()               |
+                +------------------------+
+                            |
+                            | usa
+                            v
+                +------------------------+
+                |      RobotFacade       |
+                +------------------------+
+                | - rb : RobotBody       |
+                | - rh : RobotHands      |----------------------------------------------------------+
+                | - rc : RobotColor      |                                                          |
+                +------------------------+                                                          |
+                | + RobotFacade()        |                                                          |
+                | + ConstructMilano()    |----------------------+                                   |
+                | + ConstructRobonaut()  |                      |                                   |
+                | + DestroyMilano()      |                      |                                   |
+                | + DestroyRobonaut()    |                      |                                   |
+                +------------------------+                      |                                   |
+                    |                                           |                                   |
+                    |                                           |                                   |
+                    v                                           v                                   v
+                +------------------------+        +------------------------+            +------------------------+
+                |       RobotBody        |        |      RobotHands        |            |      RobotColor        |
+                +------------------------+        +------------------------+            |                        |
+                | + CreateHands()        |        | + ResetMilanoHands()   |            +------------------------+
+                | + CreateRemaining()    |        | + ResetRobonautHands() |            | + SetDefaultColor()    |
+                | + DestroyHands()       |        | + SetMilanoHands()     |            | + SetGreenColor()      |
+                | + DestroyRemaining()   |        | + SetRobonautHands()   |            +------------------------+ 
+                +------------------------+        +------------------------+
+                           
+
+            . Exemplo:
+
+                // RobotBody.cs
+
+                namespace Pattern.Structural.Facade;
+
+                public class RobotBody
+                {
+                    public void CreateHands()
+                    {
+                        Console.WriteLine("Hands manufactured");
+                    }
+                    public void CreateRemainingParts()
+                    {
+                        Console.WriteLine("Remaining parts (other than hands) are created");
+                    }
+                    public void DestroyHands()
+                    {
+                        Console.WriteLine("The robot's hands are destroyed");
+                    }
+                    public void DestroyRemainingParts()
+                    {
+                        Console.WriteLine("The robot's remaining parts are destroyed");
+                    }
+                }
+
+
+
+                //RobotColor.cs
+                namespace Pattern.Structural.Facade;
+
+                public class RobotColor
+                {
+                    public void SetDefaultColor()
+                    {
+                        Console.WriteLine("This is steel color robot.");
+                    }
+                    public void SetGreenColor()
+                    {
+                        Console.WriteLine("This is a green color robot.");
+                    }
+                }
+
+
+                // RobotHands.cs
+                namespace Pattern.Structural.Facade;
+
+                public class RobotHands
+                {
+                    public void SetMilanoHands()
+                    {
+                        Console.WriteLine("The robot will have EH1 Milano hands");
+                    }
+                    public void SetRobonautHands()
+                    {
+                        Console.WriteLine("The robot will have Robonaut hands");
+                    }
+                    public void ResetMilanoHands()
+                    {
+                        Console.WriteLine("EH1 Milano hands are about to be destroyed");
+                    }
+                    public void ResetRobonautHands()
+                    {
+                        Console.WriteLine("Robonaut hands are about to be destroyed");
+                    }
+                }
+
+
+
+
+                // RobotFacade.cs
+
+                namespace Pattern.Structural.Facade;
+
+                public class RobotFacade
+                {
+                    RobotColor rc;
+                    RobotHands rh;
+                    RobotBody rb;
+                    public RobotFacade()
+                    {
+                        rc = new RobotColor();
+                        rh = new RobotHands();
+                        rb = new RobotBody();
+                    }
+                    public void ConstructMilanoRobot()
+                    {
+                        Console.WriteLine("Creation of a Milano Robot Start");
+                        rc.SetDefaultColor();
+                        rh.SetMilanoHands();
+                        rb.CreateHands();
+                        rb.CreateRemainingParts();
+                        Console.WriteLine("Milano Robot Creation End");
+                        Console.WriteLine();
+                    }
+                    public void ConstructRobonautRobot()
+                    {
+                        Console.WriteLine("Initiating the creational process of a Robonaut Robot");
+                        rc.SetGreenColor();
+                        rh.SetRobonautHands(); 
+                        rb.CreateHands();
+                        rb.CreateRemainingParts();
+                        Console.WriteLine("A Robonaut Robot is created");
+                        Console.WriteLine();
+                    }
+                    public void DestroyMilanoRobot()
+                    {
+                        Console.WriteLine("Milano Robot's destruction process is started");
+                        rh.ResetMilanoHands();
+                        rb.DestroyHands();
+                        rb.DestroyRemainingParts();
+                        Console.WriteLine("Milano Robot's destruction process is over");
+                        Console.WriteLine();
+                    }
+                    public void DestroyRobonautRobot()
+                    {
+                        Console.WriteLine("Initiating a Robonaut Robot's destruction process.");
+                        rh.ResetRobonautHands();
+                        rb.DestroyHands();
+                        rb.DestroyRemainingParts();
+                        Console.WriteLine("A Robonaut Robot is destroyed");
+                        Console.WriteLine();
+                    }
+                }
+
+
+
+                // Program.cs
+                using Pattern.Structural.Facade;
+
+                Console.WriteLine("***Facade Pattern Demo***\n");
+                //Creating Robots
+                RobotFacade rf1 = new RobotFacade();
+                rf1.ConstructMilanoRobot();
+                RobotFacade rf2 = new RobotFacade();
+                rf2.ConstructRobonautRobot();
+                //Destroying robots
+                rf1.DestroyMilanoRobot();
+                rf2.DestroyRobonautRobot();
+                Console.ReadLine();
+
+    . Flyweight
+
+        . Definição
+
+            . Flyweight é um padrão estrutural que reduz o uso de memória compartilhando objetos de forma eficiente 
+                quando muitos objetos similares precisam ser criados. Ele permite que grandes quantidades de objetos
+                sejam representados por poucos objetos compartilhados.        
+
+        . Ilustração
+
+            +-------------------------------------------------------+
+            |        RobotFactory                                   |
+            +-------------------------------------------------------+
+            | - shapes : (collection)                               |  // ex.: Dictionary<string, IRobot>
+            +-------------------------------------------------------+
+            | + TotalObjectsCreated : int {get;}                    |
+            +-------------------------------------------------------+
+            | + GetRobotFromFactory( robotType : string ) : IRobot  |
+            +-------------------------------------------------------+
+
+
+            +----------------------------+
+            |          IRobot            | <<interface>>
+            +----------------------------+
+            | + Print(color : string)    |
+            +----------------------------+
+
+
+            +----------------------------+
+            |          LargeRobot        |
+            +----------------------------+
+            | + Print(color : string)    |  // implementação de IRobot
+            +----------------------------+
+                    ^
+                    |
+                    implements IRobot
+
+
+            +----------------------------+
+            |          SmallRobot        |
+            +----------------------------+
+            | + Print(color : string)    |  // implementação de IRobot
+            +----------------------------+
+                    ^
+                    |
+                    implements IRobot
+
+
+            +----------------------------+
+            |           Program          |
+            +----------------------------+
+            | + Main() : void            |
+            +----------------------------+
+
+
+        . Exemplo:
+
+
+            namespace Pattern.Structural.Flyweight;
+
+            /// <summary>
+            /// The 'Flyweight' interface
+            /// </summary>
+            public interface IRobot
+            {
+                void Print();
+            }
+
+
+
+            namespace Pattern.Structural.Flyweight;
+            /// <summary>
+            /// A 'ConcreteFlyweight' class
+            /// </summary>
+            class LargeRobot : IRobot
+            {
+                public void Print()
+                {
+                    Console.WriteLine("I am a large Robot");
+                }
+            }
+
+
+
+            namespace Pattern.Structural.Flyweight;
+
+            /// <summary>
+            /// A 'ConcreteFlyweight' class
+            /// </summary>
+            class SmallRobot : IRobot
+            {
+                public void Print()
+                {
+                    Console.WriteLine("This is a small Robot");
+                }
+            }
+
+
+
+            // RobotFactory.cs
+            namespace Pattern.Structural.Flyweight;
+
+            public class RobotFactory
+            {
+                Dictionary<string, IRobot> shapes = new Dictionary<string, IRobot>();
+
+                public int TotalObjectsCreated
+                {
+                    get {  return shapes.Count; }
+                }
+
+                public IRobot GetRobotFromFactory(string robotType)
+                {
+                    IRobot robotCategory = null;
+
+                    if (shapes.ContainsKey(robotType))
+                    {
+                        robotCategory = shapes[robotType];
+                    }
+                    else
+                    {
+                        switch (robotType)
+                        {
+                            case "Small":
+
+                                robotCategory = new SmallRobot();
+
+                                shapes.Add(robotType, robotCategory);
+
+                                break;
+                            case "Large":
+                                robotCategory = new LargeRobot();
+                                shapes.Add(robotType, robotCategory);
+                                break;
+                            default:
+                                throw new Exception("Robot Factory can created only small and large robots");
+                        }
+
+                    }
+
+                    return robotCategory;
+                }
+            }
+
+
+
+            using Pattern.Structural.Flyweight;
+
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Flyweight Pattern Demo***\n");
+
+                    RobotFactory myfactory = new RobotFactory();
+
+                    IRobot shape = myfactory.GetRobotFromFactory("Small");
+
+                    shape.Print();
+
+                    for (int i = 0; i < 2; i++)
+                    {
+                        shape = myfactory.GetRobotFromFactory("Small");
+                        shape.Print();
+                    }
+
+                    int NumOfDistinctRobots = myfactory.TotalObjectsCreated;
+
+                    Console.WriteLine("\n Now, total numbers of distinct robot objects is = {0}\n", NumOfDistinctRobots);
+
+                    /*Here we are trying to get the 5 more Large robots.
+                    Note that: now onwards we need not create additional small
+                    robots because we have already created one of this category */
+                    for (int i = 0; i < 5; i++)
+                    {
+                        shape = myfactory.GetRobotFromFactory("Large");
+                        shape.Print();
+                    }
+
+                    NumOfDistinctRobots = myfactory.TotalObjectsCreated;
+
+                    Console.WriteLine("\n Distinct Robot objects created till now = {0}", NumOfDistinctRobots);
+
+                    Console.ReadKey();
+                }
+            }
+
+    . Composite
+
+    
+
+
+                                    
