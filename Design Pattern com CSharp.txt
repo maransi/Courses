@@ -1668,7 +1668,183 @@ Design Pattern com CSharp
 
     . Composite
 
-    
+        . Definição
+
+            . Composite é um padrão estrutural que permite compor objetos em estruturas de árvore, 
+                para que objetos individuais (folhas) e composições de objetos (nós) sejam tratados 
+                de forma uniforme.    
+
+        . Ilustração
+
+                                                +------------------------+
+                                                |        Program         |
+                                                +------------------------+
+                                                | + Main() : void        |
+                                                +------------------------+
+
+                                                +------------------------+
+                                                |      IEmployee         | 
+                                                |    <<interface>>       |
+                                                +------------------------+
+                                                | + PrintStructures()    |
+                                                +------------------------+
+                                                            ^
+                                                            |
+                                                            |
+                                    +-------------------------------------------------------+
+                                    |                                                       |
+                                    |                                                       |
+                +---------------------------------------+                   +--------------------------------+
+                |          CompositeEmployee            |                   |           Employee             |
+                +---------------------------------------+                   +--------------------------------+
+                | - controls : List<IEmployee>          |                   | - dept : string                |
+                | - dept     : string                   |                   | - name : string                |
+                | - name     : string                   |                   +--------------------------------+
+                +---------------------------------------+                   | + Employee(name, dept)         |
+                | + CompositeEmployee(name, dept)       |                   | + PrintStructures() : void     |
+                | + Add(emp: IEmployee) : void          |                   +--------------------------------+
+                | + Remove(emp: IEmployee) : void       |
+                | + PrintStructures() : void            |
+                +---------------------------------------+
 
 
-                                    
+    . Exemplo
+
+
+
+        namespace Pattern.Structural.Composite;
+
+        public interface IEmployee
+        {
+            void PrintStructure();
+        }
+
+
+
+        namespace Pattern.Structural.Composite;
+
+        public class CompositeEmployee: IEmployee
+        {
+            public string? name { get; set; }
+            public string? dept { get; set; }
+
+            private List<IEmployee> controls = new();
+
+            public CompositeEmployee()
+            {
+                
+            }
+            public CompositeEmployee( string name, string dept)
+            {
+                this.name = name;
+                this.dept = dept;
+                //controls = new List<IEmployee>();
+            }
+
+            public void Add( IEmployee e)
+            {
+                controls.Add(e);
+            }
+
+            public void Remove( IEmployee e)
+            {
+                controls.Remove(e);
+            }
+
+            public void PrintStructure()
+            {
+                Console.WriteLine($"\t {this.name} works in {this.dept}");
+
+                foreach (IEmployee emp in controls)
+                {
+                    emp.PrintStructure();
+                }
+            }
+        }
+
+
+
+
+
+
+        namespace Pattern.Structural.Composite;
+
+        public class Employee : IEmployee
+        {
+            public string? name { get; set; }
+            public string? dept { get; set; }
+
+            public Employee()
+            {
+                
+            }
+            public Employee(string name, string dept)
+            {
+                this.name = name;
+                this.dept = dept;
+            }
+
+            public void PrintStructure()
+            {
+                Console.WriteLine($"\t {this.name} works in {this.dept}");
+            }
+        }
+
+
+
+
+
+        using Pattern.Structural.Composite;
+        using Pattern.Structural.Flyweight;
+
+
+        public class Program
+        {
+            static void Main(string[] args)
+            {
+
+                Console.WriteLine("**** Composite Pattern Demo ****");
+
+                CompositeEmployee principal = new CompositeEmployee() { name = "Dr.S.Som (Principal)", dept = "Planning-Supervising-Managing" };
+
+                CompositeEmployee hodMat = new CompositeEmployee() { name = "Ms. A. Mathur (HOD)", dept = "Mathematics Department" };
+
+                CompositeEmployee hodCompSc = new CompositeEmployee() { name = "Ms. B. Sharma (HOD-CSE)", dept = "Computer Science Department" };
+
+                Employee mathTeacher1 = new Employee(){ name = "Mr. C. Gupta (Teacher 1)", dept = "Mathematics" };
+                Employee mathTeacher2 = new Employee(){ name = "Ms. D. Iyer (Teacher 2)", dept = "Mathematics" };
+
+
+                Employee cseTeacher1 = new Employee(){ name = "Mr. E. Khan (Teacher 1)", dept = "Computer Science" };
+                Employee cseTeacher2 = new Employee(){ name = "Ms. F. Singh (Teacher 2)", dept = "Computer Science" };
+                Employee cseTeacher3 = new Employee(){ name = "Mr. G. Verma (Teacher 3)", dept = "Computer Science" };
+
+                hodMat.Add( mathTeacher1);
+                hodMat.Add( mathTeacher2);
+
+                hodCompSc.Add( cseTeacher1);
+                hodCompSc.Add( cseTeacher2);
+                hodCompSc.Add( cseTeacher3);
+
+                principal.Add( hodMat);
+                principal.Add( hodCompSc);
+
+                Console.WriteLine("\nTestando a estrutura principal do objeto");
+
+                principal.PrintStructure();
+
+                Console.WriteLine("\n Testing the structure of a HOD object:");
+                Console.WriteLine("Teachers working at Computer Science department: ");
+
+                hodCompSc.PrintStructure();
+
+                Console.WriteLine("\n Testing the structure of a leaf node:");
+                mathTeacher1.PrintStructure();
+                //Suppose, one computer teacher is leaving now from the organization.
+                hodCompSc.Remove(cseTeacher2);
+                Console.WriteLine("\n After CSE Teacher-2 resigned, the organization has following members: ");
+                principal.PrintStructure();
+
+                Console.ReadKey();
+            }
+        }
