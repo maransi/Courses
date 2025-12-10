@@ -71,7 +71,7 @@ CSharp Orientado a Objetos
 
             Carro meuCarro = new Carro();
 
-    . Atributos e Métodos
+    . Atributos, Métodos e Construtor
 
 
         . Atributos - são as características ou propriedades do objeto (variáveis dentro da classe).                
@@ -133,6 +133,54 @@ CSharp Orientado a Objetos
 
 . Encapsulamento
 
+    . Encapsulamento é o princípio da orientação a objetos que consiste em ocultar os detalhes internos de um objeto, expondo 
+        apenas o que é necessário por meio de interfaces controladas. Ele protege o estado interno (atributos) e controla 
+        como ele pode ser acessado ou modificado (métodos).
+
+
+        public class Employee
+        {
+                +------------->  Os dados são vinculados de forma privada dentro de uma classe, sem acesso direto de fora da classe
+                |
+            private string name;
+            private double salary;
+
+                            +---------> Todos os objetos que precisam ler ou modificar os dados de um objeto devem fazê-lo através
+                            |               os métodos públicos que uma classe fornece
+            public string Name
+            {
+                get { return name; }
+                set { name = value; }
+            }
+
+            public double Salary
+            {
+                get { return salary; }
+            }
+
+            public Employee(string name, double salary)
+            {
+                this.name = name;
+                this.salary = salary;
+            }
+
+            public void GiveRaise(double percent)
+            {
+                salary *= (1.0 + percent / 100.0);
+            }
+        }
+
+
+        // Client
+        Employee employee = new Employee("John Doe", 2500);
+
+        Console.WriteLine($"{employee.Name} earns {employee.Salary}");
+
+        employee.GiveRaise(5.5);
+
+        Console.WriteLine($"{employee.Name} earns {employee.Salary}");
+
+
     . Modificadores de acesso - Controlam a visibilidade e acesso de tipos e membros em C#.
                                 Eles determinam onde (em quais partes do programa) um código pode ser utilizado.
 
@@ -151,116 +199,116 @@ CSharp Orientado a Objetos
             private protected	    Acesso somente por herança e dentro do mesmo    Método, campo, propriedade
                                     assembly	
 
-        . Modificadores de acesso em nível de classe:
+    . Modificadores de acesso em nível de classe:
 
-            . Classe pública (public)
+        . Classe pública (public)
 
-                . Pode ser acessada de qualquer lugar, inclusive de outros assemblies (projetos).
+            . Pode ser acessada de qualquer lugar, inclusive de outros assemblies (projetos).
 
-                . Caso só exista um projeto, onde a classe será usada, ou se ela for utilizada somente no projeto ao qual pertença,
-                    não faz sentido utilizar o modificador "public".
+            . Caso só exista um projeto, onde a classe será usada, ou se ela for utilizada somente no projeto ao qual pertença,
+                não faz sentido utilizar o modificador "public".
 
-                    public class Pessoa
-                    {
-                        public string Nome { get; set; }
-                    }
-
-            . Classe interna (internal)
-
-                . Padrão se não especificar nenhum modificador.
-
-                . Pode ser usada apenas dentro do mesmo assembly/projeto.
-
-                . Muito usada para classes auxiliares ou de infraestrutura.
-
-                        +---------------------------------> Se tentar usar essa classe em outro projeto (assembly), o compilador não deixará.
-                        |
-                    internal class Repositorio
-                    {
-                        public void Salvar() { }
-                    }
-
-            . Classes aninhadas (nested classes)
-
-                    public class Externa
-                    {
-                        private class InternaPrivada { }
-                        protected class InternaProtegida { }
-                        internal class InternaInterna { }
-                    }       |
-                            +--------------------------->  Aqui podemos usar todos os modificadores (public, private, protected, internal, protected internal, private protected).
-
-        . Modificadores de acesso em membros (métodos, atributos, propriedades, construtores)                            
-
-            . public - Acesso total, sem restrições.
-
-                public class Cliente
+                public class Pessoa
                 {
                     public string Nome { get; set; }
-
-                    public void Apresentar() => Console.WriteLine($"Olá, eu sou {Nome}");
                 }
 
-            . private - Acesso apenas dentro da própria classe. É o padrão se não for especificado.
+        . Classe interna (internal)
 
-                public class ContaBancaria
+            . Padrão se não especificar nenhum modificador.
+
+            . Pode ser usada apenas dentro do mesmo assembly/projeto.
+
+            . Muito usada para classes auxiliares ou de infraestrutura.
+
+                    +---------------------------------> Se tentar usar essa classe em outro projeto (assembly), o compilador não deixará.
+                    |
+                internal class Repositorio
                 {
-                    private decimal saldo = 0;
-
-                    public void Depositar(decimal valor)
-                    {
-                        saldo += valor;
-                    }
-
-                        +------------------------------> não pode ser chamado fora da classe.
-                        |           |
-                    private void AtualizarLog()
-                    {
-                        Console.WriteLine("Log interno atualizado");
-                    }
+                    public void Salvar() { }
                 }
 
-            . protected - Acesso permitido na classe e nas classes derivadas (herdeiras).
+        . Classes aninhadas (nested classes)
 
-                public class Funcionario
+                public class Externa
                 {
-                    protected decimal SalarioBase = 1000;
+                    private class InternaPrivada { }
+                    protected class InternaProtegida { }
+                    internal class InternaInterna { }
                 }       |
-                        +------------------------------> Gerente pode acessar SalarioBase. Um código externo não pode.
+                        +--------------------------->  Aqui podemos usar todos os modificadores (public, private, protected, internal, protected internal, private protected).
 
-                public class Gerente : Funcionario
+    . Modificadores de acesso em membros (métodos, atributos, propriedades, construtores)                            
+
+        . public - Acesso total, sem restrições.
+
+            public class Cliente
+            {
+                public string Nome { get; set; }
+
+                public void Apresentar() => Console.WriteLine($"Olá, eu sou {Nome}");
+            }
+
+        . private - Acesso apenas dentro da própria classe. É o padrão se não for especificado.
+
+            public class ContaBancaria
+            {
+                private decimal saldo = 0;
+
+                public void Depositar(decimal valor)
                 {
-                    public void MostrarSalario()
-                    {
-                        Console.WriteLine($"Salário: {SalarioBase}");
-                    }
+                    saldo += valor;
                 }
 
-            . internal - Acesso permitido apenas dentro do mesmo assembly (projeto).
-
-                public class Relatorio
+                    +------------------------------> não pode ser chamado fora da classe.
+                    |           |
+                private void AtualizarLog()
                 {
-                    internal void Gerar() => Console.WriteLine("Gerando relatório...");
-                }       |           |
-                        +-------------------------------->  Se tentar acessar Gerar() de outro projeto, dá erro.
-                                                            Dentro do mesmo projeto, tudo bem.
+                    Console.WriteLine("Log interno atualizado");
+                }
+            }
 
-            . protected internal
+        . protected - Acesso permitido na classe e nas classes derivadas (herdeiras).
 
-                . Acesso permitido:
+            public class Funcionario
+            {
+                protected decimal SalarioBase = 1000;
+            }       |
+                    +------------------------------> Gerente pode acessar SalarioBase. Um código externo não pode.
 
-                    Dentro do mesmo assembly (mesmo projeto)
-                    OU
-                    Por herança (em outro assembly).
-
-
-                public class Documento
+            public class Gerente : Funcionario
+            {
+                public void MostrarSalario()
                 {
-                    protected internal void Validar() => Console.WriteLine("Documento validado");
-                }       |       |               |
-                        +-------+---------------+-------->  Pode ser acessado por classes derivadas em outro projeto
-                                                            Pode ser acessado diretamente dentro do mesmo projeto
-                                                            Não pode ser acessado fora do assembly se não for herdado.
+                    Console.WriteLine($"Salário: {SalarioBase}");
+                }
+            }
+
+        . internal - Acesso permitido apenas dentro do mesmo assembly (projeto).
+
+            public class Relatorio
+            {
+                internal void Gerar() => Console.WriteLine("Gerando relatório...");
+            }       |           |
+                    +-------------------------------->  Se tentar acessar Gerar() de outro projeto, dá erro.
+                                                        Dentro do mesmo projeto, tudo bem.
+
+        . protected internal
+
+            . Acesso permitido:
+
+                Dentro do mesmo assembly (mesmo projeto)
+                OU
+                Por herança (em outro assembly).
+
+
+            public class Documento
+            {
+                protected internal void Validar() => Console.WriteLine("Documento validado");
+            }       |       |               |
+                    +-------+---------------+-------->  Pode ser acessado por classes derivadas em outro projeto
+                                                        Pode ser acessado diretamente dentro do mesmo projeto
+                                                        Não pode ser acessado fora do assembly se não for herdado.
 
     . Encapsulamento - é o princípio de ocultar os detalhes internos de uma classe e expor apenas o necessário para o mundo externo.
 
