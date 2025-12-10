@@ -1849,3 +1849,147 @@ Design Pattern com CSharp
 
     . Bridge
 
+        . Definição
+
+            . É um padrão estrutural que separa uma abstração da sua implementação, permitindo que 
+                ambas evoluam de forma independente.
+
+        . Conceito
+
+            . O padrão Bridge (também chamado de Handle/Body) serve para separar uma abstração da sua 
+                implementação, criando uma ponte entre elas. Com essa ponte, a implementação e a 
+                abstração deixam de depender diretamente uma da outra.
+
+            . Isso permite que:
+
+                . Altere ou evolua a abstração sem mexer na implementação
+
+                . Altere ou evolua a implementação sem mexer na abstração
+
+            . Ou seja, você pode mudar cada lado de forma independente, sem causar impacto no outro.
+
+        . Ilustração
+
+                                    +------------------------+
+                                    |     ElectronicGoods    | 
+                                    |      <<abstract>>      |
+                                    +------------------------+
+                                    | - state : IState       |
+                                    +------------------------+
+                                    | + ElectronicGoods(s)   |
+                                    | + MoveState()          |
+                                    +------------------------+
+                                            ^
+                                            |
+                            +----------------+----------------+
+                            |                                 |
+                +----------------------------+        +----------------------------+
+                |       Television           |        |          VCD               |
+                +----------------------------+        +----------------------------+
+                | (inherits ElectronicGoods) |        | (inherits ElectronicGoods) |
+                +----------------------------+        +----------------------------+
+
+
+                                    +------------------------+
+                                    |         IState         | 
+                                    |      <<interface>>     |
+                                    +------------------------+
+                                    | + MoveState()          |
+                                    +------------------------+
+                                            ^
+                                +-----------+------------+
+                                |                        |
+                    +------------------------+   +------------------------+
+                    |        OffState        |   |        OnState         |
+                    +------------------------+   +------------------------+
+                    | + MoveState()          |   | + MoveState()          |
+                    +------------------------+   +------------------------+
+
+
+                                    +------------------------+
+                                    |        Program         |
+                                    +------------------------+
+                                    | + Main()               |
+                                    +------------------------+
+                                            |
+                                            | usa ElectronicGoods + IState
+                                            v
+                                    (cria Television/VCD com estados OnState/OffState)
+
+
+
+            . Exemplo
+
+                namespace Pattern.Structural.Bridge;
+
+                public interface IState
+                {
+                    void MoveState();
+                }
+
+
+
+                namespace Pattern.Structural.Bridge;
+
+                public class OffState: IState
+                {
+                    public void MoveState()
+                    {
+                        Console.WriteLine("Moving to Off State");
+                    }
+                }
+
+
+
+
+                namespace Pattern.Structural.Bridge;
+
+                public class OnState : IState
+                {
+                    public void MoveState()
+                    {
+                        Console.WriteLine("Moving to On State");
+                    }
+                }
+
+
+
+
+
+                namespace Pattern.Structural.Bridge
+                {
+                    public abstract class ElectronicGoods
+                    {
+                        public IState? State { get; set; }
+
+                        abstract public void MoveToCurrentState();
+                    }
+                }
+
+
+
+
+                namespace Pattern.Structural.Bridge;
+
+                public class Television : ElectronicGoods
+                {
+                    public override void MoveToCurrentState()
+                    {
+                        Console.WriteLine("\n Television is functioning at :");
+                        State?.MoveState();
+                    }
+                }
+
+
+
+                namespace Pattern.Structural.Bridge;
+
+                public class VCD: ElectronicGoods
+                {
+                    public override void MoveToCurrentState()
+                    {
+                        Console.WriteLine("VCD is functioning at: ");
+
+                        State?.MoveState();
+                    }
+                }
