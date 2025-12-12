@@ -485,7 +485,6 @@ Design Pattern com CSharp
                                 | + CreateAnimal        |               | # Main                |       | + Action              |
                                 +-----------------------+               +-----------------------+       | + Speak               |
                                             ^                                                           +-----------------------+
-                                        /_\
                                             |
                             +---------------------------+
                             |                           |
@@ -2037,3 +2036,197 @@ Design Pattern com CSharp
 
     . Visitor
     
+        . Defnição
+
+            . Permite definir novas operações sobre uma estrutura de objetos sem modificar as classes
+                desses objetos. Isso é feito separando o algoritmo (Visitor) da estrutura de dados 
+                (Element).
+
+        . Ilustração
+
+            +-----------------+        +-------------------+
+            |    IVisitor     |        |   IElement        |
+            +-----------------+        +-------------------+
+            | + Visit(Book)   |        | + Accept(visitor) |
+            | + Visit(Fruit)  |        +-------------------+
+            +-----------------+             ^     ^
+                ^                           |     +-----------------------+
+                |                           |                             |
+            +-----------------+        +-------------------+    +-----------------------+
+            | PriceVisitor    |        |   Fruit           |    |       Book            |
+            +-----------------+        +-------------------+    +-----------------------+
+            | + Visit(Fruit)  |        | + Accept(visitor) |    | + Accept( visitor)    |
+            | + Visit(Book)   |        +-------------------+    +-----------------------+
+            +-----------------+               
+                ^
+                |
+            +-----------------+
+            | ShippingVisitor |
+            | + Visit(Book)   |
+            | + Visit(Fruit)  |
+            +-----------------+
+
+        . Exemplo
+
+            // Visitor interface - declara Visit para cada ConcreteElement
+            namespace Pattern.Behavior.Visitor;
+
+            public interface IVisitor
+            {
+                void Visit(Book book);
+                void Visit(Fruit fruit);
+            }
+
+
+
+            // Element interface - aceita um Visitor
+            namespace Pattern.Behavior.Visitor;
+
+            public interface IElement
+            {
+                void Accept(IVisitor visitor);
+            }
+
+
+
+            // ConcreteElement 1
+            namespace Pattern.Behavior.Visitor;
+
+            public class Book : IElement
+            {
+                public double Price { get; set; }
+                public string? Isbn { get; set; }
+
+                public Book()
+                {
+                    
+                }
+                public Book(string isbn, double price)
+                {
+                    Isbn = isbn;
+                    Price = price;
+                }
+
+                public void Accept( IVisitor visitor ) => visitor.Visit(this); // double dispatch: chama Visit(Book)
+
+            }
+
+
+            // ConcreteElement 2
+
+            namespace Pattern.Behavior.Visitor;
+
+            public class Fruit : IElement
+            {
+                public string Name { get; set; }
+                public double PricePerKg { get; set; }
+                public double WeightKg { get; set; }
+
+
+                public Fruit()
+                {
+                    
+                }
+
+                public Fruit(string name, double pricePerKg, double weightKg)
+                {
+                    Name = name;
+                    PricePerKg = pricePerKg;
+                    WeightKg = weightKg;
+                }
+
+                public void Accept(IVisitor visitor) => visitor.Visit(this);        // double dispatch: chama Visit(Fruit)
+            }
+
+
+            // ConcreteVisitor 1: calcula preço total
+
+            namespace Pattern.Behavior.Visitor;
+
+            public class PriceVisitor : IVisitor
+            {
+                public double Total { get; private set; } = 0.0;
+
+                public void Visit(Book book)
+                {
+                    // Ex.: aplicar um desconto fixo para livros
+                    double bookPrice = book.Price * 0.9; // 10% discount
+                    Total += bookPrice;
+                    Console.WriteLine($"PriceVisitor: Book (ISBN={book.Isbn}) price after discount = {bookPrice:F2}");
+                }
+
+                public void Visit(Fruit fruit)
+                {
+                    double fruitPrice = fruit.PricePerKg * fruit.WeightKg;
+                    Total += fruitPrice;
+                    Console.WriteLine($"PriceVisitor: Fruit ({fruit.Name}) price = {fruitPrice:F2}");
+                }
+            }
+
+
+
+            // ConcreteVisitor 2: calcula custo de envio
+            namespace Pattern.Behavior.Visitor;
+
+            public class ShippingVisitor : IVisitor
+            {
+                public double Cost { get; private set; } = 0.0;
+
+                public void Visit(Book book)
+                {
+                    // Livros são leves, frete fixo baixo
+                    double shipping = 2.0;
+                    Cost += shipping;
+                    Console.WriteLine($"ShippingVisitor: Book (ISBN={book.Isbn}) shipping = {shipping:F2}");
+                }
+
+                public void Visit(Fruit fruit)
+                {
+                    // Frutas dependem do peso
+                    double shipping = 1.0 * fruit.WeightKg; // 1.0 por kg
+                    Cost += shipping;
+                    Console.WriteLine($"ShippingVisitor: Fruit ({fruit.Name}) shipping = {shipping:F2}");
+                }
+            }
+
+
+
+            using Pattern.Behavior.Visitor;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+
+                    // Cria elementos (itens do carrinho)
+                    var items = new List<IElement>
+                        {
+                            new Book(){ Isbn = "978-0131103627", Price = 50.0},
+                            new Book(){ Isbn = "978-0201633610", Price = 70.0},
+
+                            new Fruit() { Name = "Banana", PricePerKg = 3.0, WeightKg = 2.0},   // 2kg * 3.0/kg = 6.0
+                            new Fruit() { Name = "Apple", PricePerKg = 5.0, WeightKg = 1.5},    // 1.5kg * 5.0/kg = 7.5
+                        };
+
+                    // Cria visitantes
+                    var priceVisitor = new PriceVisitor();
+                    var shippingVisitor = new ShippingVisitor();
+
+                    // Aplica PriceVisitor a todos os elementos
+                    Console.WriteLine("== Calculating Prices ==");
+                    foreach (var item in items)
+                    {
+                        item.Accept(priceVisitor);
+                    }
+                    Console.WriteLine($"Total price = {priceVisitor.Total:F2}\n");
+
+                    // Aplica ShippingVisitor a todos os elementos
+                    Console.WriteLine("== Calculating Shipping ==");
+                    foreach (var item in items)
+                    {
+                        item.Accept(shippingVisitor);
+                    }
+                    Console.WriteLine($"Total shipping = {shippingVisitor.Cost:F2}");
+                }
+
+            }
