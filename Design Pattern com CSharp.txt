@@ -2230,3 +2230,236 @@ Design Pattern com CSharp
                 }
 
             }
+
+    . Observer
+
+        . Definição
+
+            . Defina uma dependência de um para muitos entre objetos, de forma que, 
+                quando um objeto mudar de estado, todos os seus dependentes sejam 
+                notificados e atualizados automaticamente.
+
+        . Conceito
+
+
+            . Nesse padrão, existem muitos observadores (objetos) que observam um determinado objeto principal.
+                Os observadores desejam ser notificados quando ocorre uma mudança dentro desse
+                objeto. Portanto, eles se registram nesse objeto. Quando perdem o interesse no
+                nele, simplesmente cancelam o registro. Às vezes, esse modelo é chamado de
+                modelo "Publisher-Subscriber". A ideia geral pode ser resumida da seguinte forma: usando esse
+                padrão, um objeto (sujeito) pode enviar notificações para vários observadores (um conjunto de objetos)
+                ao mesmo tempo.
+
+                . O modelo "Publisher–Subscriber" é um padrão de comunicação onde quem produz informações não conhece 
+                    quem as consome. Ele serve para desacoplar emissores e receptores de mensagens. Um ou mais publicadores 
+                    enviam mensagens para um canal, e vários assinantes recebem essas mensagens automaticamente.
+
+                . O publisher não envia mensagens diretamente para os subscribers — ele apenas publica eventos.
+
+        . Ilustração
+
+            . Para este exemplo, criei três observadores e um objeto principal. O objeto principal (subject) mantém
+                uma lista de todos os seus usuários registrados. Os observadores desejam receber uma notificação quando o
+                valor do sinalizador mudar no objeto principal. Na saída, você descobrirá que esses observadores estão
+                recebendo notificações quando os valores do sinalizador são alterados para 5, 50 e 100, respectivamente. Mas
+                um deles não recebe nenhuma notificação quando o valor do sinalizador muda para 50 porque
+                naquele momento ele não era um usuário registrado no sujeito. Mas, no final, ele começa
+                a receber notificações novamente porque se registra novamente.
+
+                                                    +-----------------------------+             
+                                                    |          ISubject           |             
+                                                    |       <<interface>>         |             
+                                                    +-----------------------------+             
+                                                    | + NotifyRegisteredUsers()   |             
+                                                    | + Register(obs: IObserver)  |             
+                                                    | + Unregister(obs: IObserver)|
+                                                    +-----------------------------+
+                                                                ^
+                                                                |
+                                                                |
+                                                +---------------------------------------+
+                                                |               Subject                 |
+                                                +---------------------------------------+
+                                                | - flag : bool                         |
+                                                | - observerList : List<IObserver>      |
+                                                +---------------------------------------+
+                                                | + Flag : bool { get; set; }           |
+                                                +---------------------------------------+
+                                                | + NotifyRegisteredUsers()             |
+                                                | + Register(obs: IObserver)            |
+                                                | + Unregister(obs: IObserver)          |
+                                                +---------------------------------------+
+
+
+                                                    +-----------------------------+
+                                                    |        IObserver            |
+                                                    |       <<interface>>         |
+                                                    +-----------------------------+
+                                                    | + Update()                  |
+                                                    +-----------------------------+
+                                                                    ^
+                                                                    |
+                                        +---------------------------------------------------+
+                                        |                                                   |
+                        +---------------------------------------+       +---------------------------------------+
+                        |            ObserverType1              |       |            ObserverType2              |
+                        +---------------------------------------+       +---------------------------------------+
+                        | - nameOfObserver : string             |       | - nameOfObserver : string             |
+                        +---------------------------------------+       +---------------------------------------+
+                        | + ObserverType1(name: string)         |       | + ObserverType2(name: string)         |
+                        | + Update()                            |       | + Update()                            |
+                        +---------------------------------------+       +---------------------------------------+
+
+
+                                                    +-----------------------------+
+                                                    |           Program           |
+                                                    +-----------------------------+
+                                                    | + Main() : void             |
+                                                    +-----------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Observer;
+
+            public interface IObserver
+            {
+                void Update(int i);
+            }
+
+
+
+
+            namespace Pattern.Behavior.Observer;
+
+            public class ObserverType1: IObserver
+            {
+                private string? nameOfObserver;
+
+                public ObserverType1( string name)
+                {
+                    this.nameOfObserver = name;
+                }
+
+                public void Update(int i)
+                {
+                    Console.WriteLine($"{nameOfObserver} has received an alert: Someone has updated myValue in Subject to: {i}");
+                }
+            }
+
+
+
+
+
+            namespace Pattern.Behavior.Observer;
+
+            public class ObserverType2: IObserver
+            {
+                private string? nameOfObserver;
+                public ObserverType2(string name)
+                {
+                    this.nameOfObserver = name;
+                }
+                public void Update(int i)
+                {
+                    Console.WriteLine($"{nameOfObserver} has received an alert: Someone has updated myValue in Subject to: {i}");
+                }
+            }
+
+
+
+
+
+            namespace Pattern.Behavior.Observer;
+
+            public interface ISubject
+            {
+                void Register(IObserver o);
+                void Unregister( IObserver o);
+                void NotifyRegisteredUsers(int i);
+            }
+
+
+
+
+
+            namespace Pattern.Behavior.Observer;
+
+            public class Subject: ISubject
+            {
+                List<IObserver> observerList = new List<IObserver>();
+
+                private int flag;
+
+                public int Flag
+                {
+                    get { return flag; }
+                    set { 
+                            flag = value; 
+                            NotifyRegisteredUsers(flag);
+                    }
+                }
+
+                public void Register( IObserver anObserver)
+                { 
+                    observerList.Add(anObserver);
+                }
+
+                public void Unregister( IObserver anObserver)
+                {
+                    observerList.Remove(anObserver);
+                }
+
+                public void NotifyRegisteredUsers(int i)
+                {
+                    foreach( IObserver o in observerList)
+                    {
+                        o.Update(i);
+                    }
+                }
+            }
+
+
+
+
+            using Pattern.Behavior.Observer;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("**** Observer Pattern Demo ****\n");
+
+                    //We have 3 observers-2 of them are ObserverType1, 1 of them is of ObserverType2
+                    IObserver myObserver1 = new ObserverType1("Roy");
+                    IObserver myObserver2 = new ObserverType1("Kevin");
+                    IObserver myObserver3 = new ObserverType2("Bose");
+
+                    Subject subject = new Subject();
+
+                    subject.Register(myObserver1);
+                    subject.Register(myObserver2);
+                    subject.Register(myObserver3);
+
+                    Console.WriteLine("Setting Flag = 5");
+
+                    subject.Flag = 5;
+
+                    //Unregistering an observer(Roy))
+                    subject.Unregister(myObserver1);
+
+                    //No notification this time Roy. Since it is unregistered.
+                    Console.WriteLine("\n Setting Flag = 50");
+
+                    subject.Flag = 50;
+                    //Roy is registering himself again
+                    subject.Register(myObserver1);
+                    Console.WriteLine("\n Setting Flag = 100 ");
+                    subject.Flag = 100;
+                    Console.ReadKey();
+
+                }
+
+            }
+
+
+
