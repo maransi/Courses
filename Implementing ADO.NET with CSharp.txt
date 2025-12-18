@@ -612,6 +612,11 @@ Demo
 
         SOURCE /tmp/spUpdateCliente.sql
 
+        # Comandos interessantes do MySQL
+        SHOW PROCEDURE STATUS WHERE Db = DATABASE() AND Name = 'spUpdateCliente'; -- Lista todas as procedures do database
+
+        SHOW CREATE PROCEDURE spUpdateCliente;  -- Lista o corpo da procedure
+
     . Crie o método abaixo no arquivo "ConnectionModel":
 
         ...
