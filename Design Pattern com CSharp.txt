@@ -2461,5 +2461,495 @@ Design Pattern com CSharp
 
             }
 
+    . Strategy
+
+        . Definição
+
+            . Define uma família de algoritmos, encapsula cada um deles e os torna intercambiáveis. "Strategy" permite 
+                que o algoritmo varie independentemente dos clientes que o utilizam.
+
+            . Strategy resolve o problema de variações de comportamento sem precisar usar muitos if/else ou switch.
+
+                . Ele faz isso separando:
+
+                    . O que varia (o algoritmo)
+
+                    . De quem usa o algoritmo (o cliente/contexto)
+
+
+        . Conceito
+
+            . Podemos selecionar o comportamento de um algoritmo dinamicamente em tempo de execução.
+
+            Conceitos-chave do Strategy
+
+                . Família de algoritmos: Várias formas diferentes de fazer a mesma coisa (ex: cálculo, validação, ordenação).
+
+                . Encapsulamento: Cada algoritmo fica em sua própria classe.
+
+                . Intercambiáveis: Você pode trocar o algoritmo em tempo de execução.
+
+                 .Independência do cliente: O cliente não precisa saber qual algoritmo está sendo usado.
+
+        . Ilustração
+
+            . Neste exemplo, no arquivo Program.cs, testei duas opções arbitrárias de usuários 
+                (embora você possa ter quantas quiser). Dependendo da entrada do usuário, seus objetos de 
+                contexto decidirão qual opção deve ser definida e exibida.
+
+                                            +------------------------+
+                                            |        Program         |
+                                            +------------------------+
+                                            | + Main() : void        |
+                                            +------------------------+
+
+
+                                        +-----------------------------------+
+                                        |           Context                 |
+                                        +-----------------------------------+
+                                        | - choice : IChoice                |
+                                        +-----------------------------------+
+                                        | + Choice(): IChoice { get; set; } |
+                                        | + ShowChoice() : void             |
+                                        +-----------------------------------+
+
+
+                                        +-----------------------------+
+                                        |           IChoice           | 
+                                        |       <<interface>>         |
+                                        +-----------------------------+
+                                        | + myChoice() : void         |
+                                        +-----------------------------+
+                                                        ^
+                                                        |
+                                    +---------------------------------------+
+                                    |                                       |
+                    +-----------------------------+         +-----------------------------+
+                    |        FirstChoice          |         |        SecondChoice         |
+                    +-----------------------------+         +-----------------------------+
+                    | + myChoice() : void         |         | + myChoice() : void         |
+                    +-----------------------------+         +-----------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Strategy;
+
+            public interface IChoice
+            {
+                void MyChoice();
+            }
+
+
+
+            using System;
+
+            namespace Pattern.Behavior.Strategy;
+
+            public class FirstChoice : IChoice
+            {
+
+                public void MyChoice()
+                {
+                    Console.WriteLine("Traveling to Japan");
+                }
+
+            }
+
+
+
+            namespace Pattern.Behavior.Strategy;
+
+            public class SecondChoice: IChoice
+            {
+                public void MyChoice()
+                {
+                    Console.WriteLine("Traveling to India");
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.Strategy;
+
+            public class Context
+            {
+                public IChoice Choice { get;  set; }
+
+                public Context()
+                {
+
+                }
+
+                public Context(IChoice choice)
+                {
+                    Choice = choice;
+                }
+
+                public void ShowChoice()
+                {
+                    Choice.MyChoice();
+                }
+            }
+
+
+
+
+            using Pattern.Behavior.Strategy;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Strategy Pattern Demo***\n");
+                    IChoice ic = null;
+                    Context cxt = new Context();
+                    //For simplicity, we are considering 2 user inputs only.
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Console.WriteLine("\nEnter ur choice(1 or 2)");
+                        string c = Console.ReadLine();
+                        if (c.Equals("1"))
+                        {
+                            ic = new FirstChoice();
+                        }
+                        else
+                        {
+                            ic = new SecondChoice();
+                        }
+                        cxt.Choice = ic;
+                        cxt.ShowChoice();
+                    }
+                    Console.ReadKey();
+                }
+
+            }
+
+    . Template Method
+
+        . Definição:
+
+            . Define o esqueleto de um algoritmo em uma operação, delegando algumas etapas para subclasses.
+            
+            . O padrão Template Method permite que subclasses redefinam certas etapas de um algoritmo
+                sem alterar a estrutura do algoritmo.        
+
+        . Contexto:
+
+            . Com o padrão Template Method, você define a estrutura mínima ou essencial de um algoritmo. Em seguida, 
+                você delega parte da responsabilidade às subclasses. A ideia principal é que você pode redefinir certas 
+                etapas de um algoritmo, mas essas alterações não afetarão a arquitetura principal.
+
+            . Esse padrão de projeto é útil se você precisar implementar um algoritmo de várias etapas e quiser 
+                permitir a personalização por meio de subclasses.        
+
+        . Ilustração:
+
+            . Suponha que cada estudante de engenharia precise ser aprovado em matemática e também demonstrar
+                habilidades interpessoais (como habilidades de comunicação, habilidades de gestão de pessoas e 
+                assim por diante) em seus semestres iniciais para obter seus diplomas. Posteriormente, você 
+                adicionará algumas disciplinas específicas aos seus cursos com base nas áreas escolhidas 
+                (ciência da computação ou eletrônica).        
+
+                    +-------------------------------+
+                    |            Program            |
+                    +-------------------------------+
+                    | + Main() : void               |
+                    +-------------------------------+
+
+
+            +--------------------------------------------+
+            |        BasicEngineering                    | 
+            |           <<abstract>>                     |
+            +--------------------------------------------+
+            | + Math() : void                            |
+            | + Papers() : void                          |
+            | + SoftSkills() : void                      |
+            | # SpecialPaper() : void                    |
+            +--------------------------------------------+
+                                ^
+                                |
+                    +---------------------------+
+                    |                           |
+            +---------------------+   +------------------------+
+            |     Electronics     |   |    ComputerScience     |
+            +---------------------+   +------------------------+
+            | + SpecialPaper()    |   | + SpecialPaper()       |
+            +---------------------+   +------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.TemplateMethod;
+
+            public abstract class BasicEngineering
+            {
+                public void Papers()
+                {
+                    Math();
+                    SoftSkills();
+                    SpecialPaper();
+                }
+
+                private void Math()
+                {
+                    Console.WriteLine("Mathematics");
+                }
+
+                private void SoftSkills()
+                {
+                    Console.WriteLine("Soft Skills");
+                }
+
+                public abstract void SpecialPaper();
+            }
+
+
+
+            namespace Pattern.Behavior.TemplateMethod;
+
+            public class ComputerScience: BasicEngineering
+            {
+                public override void SpecialPaper()
+                {
+                    Console.WriteLine("Oriented Object Programming");
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.TemplateMethod;
+
+            public class Electronics: BasicEngineering
+            {
+
+                public override void SpecialPaper()
+                {
+                    Console.WriteLine("Digital Logic and Circuit Theory");
+                }
+            }
+
+
+
+
+            using Pattern.Behavior.TemplateMethod;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Template Method Pattern Demo***\n");
+                    BasicEngineering bs = new ComputerScience();
+                    Console.WriteLine("Computer Sc Papers:");
+                    bs.Papers();
+                    Console.WriteLine();
+                    bs = new Electronics();
+                    Console.WriteLine("Electronics Papers:");
+                    bs.Papers();
+                    Console.ReadLine();
+                }
+
+            }
+
+    . Command
+
+        . Definição
+
+            . Encapsula uma solicitação como um objeto, permitindo assim parametrizar clientes com diferentes solicitações, 
+                enfileirar ou registrar solicitações e oferecer suporte a operações reversíveis.
+
+        . Conceito
+
+            . Com esse padrão, você encapsula um processo de invocação de método. Em geral, quatro termos
+            são importantes aqui: invoker, client, command e "receiver". Um objeto de comando pode
+            invocar um método do "receiver/receptor" de uma maneira específica para a classe desse receiver/receptor. O
+            receiver então inicia o processamento da tarefa. Um objeto de "command/comando" é passado separadamente para o
+            objeto "invoker/invocador" para invocar o comando. O objeto "client/cliente" contém o objeto "invoker/invocador" e
+            os objetos de "command/comando". O "client/cliente" apenas toma a decisão (quais comandos executar)
+            e então passa o comando para o objeto "invoker/invocador" (para a execução).
+
+
+        . Ilustração
+
+
+                            +-------------------------------+
+                            |            Client             |
+                            +-------------------------------+
+                            | + Main() : void               |
+                            +-------------------------------+
+
+
+                    +---------------------------------------------+
+                    |                Invoke                       |
+                    +---------------------------------------------+
+                    | - commandToBePerformed : ICommand           |
+                    +---------------------------------------------+
+                    | + SetCommand(cmd : ICommand) : void         |
+                    | + ExecuteCommand() : void                   |
+                    +---------------------------------------------+
+                                    |
+                                    | usa
+                                    v
+                    +---------------------------------------------+
+                    |               ICommand                      | <<interface>>
+                    +---------------------------------------------+
+                    | + Do() : void                               |
+                    +---------------------------------------------+
+                        ^                               ^
+                        |                               |
+                        |                               |
+            +-------------------------------+   +-------------------------------+
+            |         MyUndoCommand         |   |         MyRedoCommand         |
+            +-------------------------------+   +-------------------------------+
+            | - receiver : Receiver         |   | - receiver : Receiver         |
+            +-------------------------------+   +-------------------------------+
+            | + Do() : void                 |   | + Do() : void                 |
+            +-------------------------------+   +-------------------------------+
+                        \                               /
+                         \                             /
+                          v                           v
+                        +---------------------------------------------+
+                        |                  Receiver                   |
+                        +---------------------------------------------+
+                        | + OptionalTaskPriorToRedo() : void          |
+                        | + OptionalTaskPriorToUndo() : void          |
+                        | + PerformRedo() : void                      |
+                        | + PerformUndo() : void                      |
+                        +---------------------------------------------+
+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Command;
+
+            public interface ICommand
+            {
+                void Do();
+            }
+
+
+
+            namespace Pattern.Behavior.Command;
+
+            public class MyUndoCommand : ICommand
+            {
+                private Receiver receiver;
+
+                public MyUndoCommand( Receiver recv)
+                {
+                    receiver = recv;
+                }
+
+                public void Do()
+                {
+                    receiver.OptionalTaskPriorToUndo();
+
+                    receiver.PerformUndo();
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.Command;
+
+            public class MyRedoCommand: ICommand
+            {
+                private Receiver receiver;
+
+                public MyRedoCommand( Receiver recv)
+                {
+                    receiver = recv;
+                }
+
+                public void Do()
+                {
+                    receiver.OptionalTaskPriorToRedo();
+
+                    receiver.PerformRedo();
+                }
+            }
+
+
+
+
+
+
+            namespace Pattern.Behavior.Command;
+
+            public class Receiver
+            {
+                public void PerformUndo()
+                {
+                    Console.WriteLine("Executing-MyUndoCommand");
+                }
+                public void PerformRedo()
+                {
+                    Console.WriteLine("Executing-MyRedoCommand");
+                }
+                //Optional method-If you want to perform any prior tasks before
+                //Undo.
+                public void OptionalTaskPriorToUndo()
+                {
+                    Console.WriteLine("Executing-Optional Tasks prior to execute undo command");
+                }
+                //Optional method-If you want to perform any prior tasks before
+                //Redo.
+                public void OptionalTaskPriorToRedo()
+                {
+                    Console.WriteLine("Executing-Optional Tasks prior to execute redo command");
+                }
+
+            }
+
+
+
+
+
+
+            namespace Pattern.Behavior.Command;
+
+            //Invoker class
+            public class Invoke
+            {
+                ICommand commandToBePerformed;
+                public void SetCommand(ICommand command)
+                {
+                    this.commandToBePerformed = command;
+                }
+                public void ExecuteCommand()
+                {
+                    commandToBePerformed.Do();
+                }
+            }
+
+
+
+
+
+
+            using Pattern.Behavior.Command;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Command Pattern Demo***\n");
+                    /*Client holds both the Invoker and Command Objects*/
+                    Invoke invoker = new Invoke();
+                    Receiver intendedreceiver = new Receiver();
+                    MyUndoCommand undoCmd = new MyUndoCommand(intendedreceiver);
+                    invoker.SetCommand(undoCmd);
+                    invoker.ExecuteCommand();
+                    MyRedoCommand redoCmd = new MyRedoCommand(intendedreceiver);
+                    invoker.SetCommand(redoCmd);
+                    invoker.ExecuteCommand();
+                    Console.ReadKey();
+                }
+
+            }
+
 
 
