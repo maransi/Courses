@@ -2951,5 +2951,290 @@ Design Pattern com CSharp
 
             }
 
+    . Iterator
+
+        . Definição
+
+            Fornece uma maneira de acessar os elementos de um objeto agregado sequencialmente sem
+            expor sua representação subjacente.        
+
+        . Conceito
+
+            . Os iteradores são geralmente usados ​​para percorrer um contêiner (que é basicamente um objeto) para
+                acessar seus elementos, mas você não precisa lidar com os detalhes internos do elemento. Você
+                usará frequentemente os conceitos de iteradores quando quiser percorrer diferentes tipos de
+                objetos de coleção de uma maneira padronizada e uniforme.
+
+        . Ilustração
+
+            +-------------------------------+
+            |           ISubjects           | 
+            |           <<interface>>       |
+            +-------------------------------+
+            | + CreateIterator() : IIterator|
+            +-------------------------------+
 
 
+            +-------------------------------+
+            |           IIterator           | 
+            |           <<interface>>       |
+            +-------------------------------+
+            | + First() : void              |
+            | + Next() : void               |
+            | + IsDone() : bool             |
+            | + CurrentItem() : string      |
+            +-------------------------------+
+
+
+            +---------------------------------------+
+            |               Science                 |
+            +---------------------------------------+
+            | - subjects : List<string>             |
+            +---------------------------------------+
+            | + Science()                            |
+            | + CreateIterator() : IIterator         |
+            +---------------------------------------+
+                            ^
+                            | implements ISubjects
+                            |
+
+
+            +---------------------------------------+
+            |                Arts                   |
+            +---------------------------------------+
+            | - subjects : List<string>             |
+            +---------------------------------------+
+            | + Arts()                               |
+            | + CreateIterator() : IIterator         |
+            +---------------------------------------+
+                            ^
+                            | implements ISubjects
+                            |
+
+
+            +---------------------------------------+
+            |          ScienceIterator               |
+            +---------------------------------------+
+            | - position : int                      |
+            | - subjects : List<string>             |
+            +---------------------------------------+
+            | + ScienceIterator(subjects)           |
+            | + First() : void                      |
+            | + Next() : void                       |
+            | + IsDone() : bool                     |
+            | + CurrentItem() : string              |
+            +---------------------------------------+
+                            ^
+                            | implements IIterator
+                            |
+
+
+            +---------------------------------------+
+            |            ArtsIterator                |
+            +---------------------------------------+
+            | - position : int                      |
+            | - subjects : List<string>             |
+            +---------------------------------------+
+            | + ArtsIterator(subjects)              |
+            | + First() : void                      |
+            | + Next() : void                       |
+            | + IsDone() : bool                     |
+            | + CurrentItem() : string              |
+            +---------------------------------------+
+                            ^
+                            | implements IIterator
+                            |
+
+
+            +-------------------------------+
+            |            Program            |
+            +-------------------------------+
+            | + Main() : void               |
+            | + Print(subjects : ISubjects) |
+            +-------------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Iterator;
+
+            public interface ISubjects
+            {
+                IIterator CreateIterator();
+            }
+
+
+
+
+            namespace Pattern.Behavior.Iterator;
+
+            public interface IIterator
+            {
+                void First();
+
+                string Next();
+
+                bool IsDone();
+
+                string CurrentItem();
+
+            }
+
+
+
+
+
+            namespace Pattern.Behavior.Iterator;
+
+            public class Arts: ISubjects
+            {
+                private string[] _subjects = { "Bengali", "English" };
+                public IIterator CreateIterator()
+                {
+                    return new ArtsIterator(_subjects);
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.Iterator;
+
+            public class Science: ISubjects
+            {
+                private LinkedList<string> _subjects = new LinkedList<string>();
+
+                public Science()
+                {
+                    _subjects.AddFirst("Maths");
+                    _subjects.AddFirst("Comp. Sc.");
+                    _subjects.AddFirst("Physics");
+                }
+
+                public IIterator CreateIterator()
+                {
+                    return new ScienceIterator(_subjects);
+
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.Iterator
+            {
+                public class ArtsIterator: IIterator
+                {
+
+                    private string[] _subjects;
+                    private int _position;
+
+                    public ArtsIterator( string[] subjects)
+                    {
+                        _subjects = subjects;
+                        _position = 0;
+                    }
+
+                    public void First()
+                    {
+                        _position = 0;
+                    }
+                    public string Next()
+                    {
+                        return _subjects[_position++];
+                    }
+                    public bool IsDone()
+                    {
+                        if (_position < _subjects.Length)
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
+                    public string CurrentItem()
+                    {
+                        return _subjects[_position];
+                    }
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.Iterator;
+
+            public class ScienceIterator: IIterator
+            {
+                private LinkedList<string> _subjects;
+                private int _position;
+
+                public ScienceIterator( LinkedList<string> subjects)
+                {
+                    this._subjects = subjects;
+                    this._position = 0;
+                }
+
+                public string CurrentItem()
+                {
+                    return _subjects.ElementAt(this._position);
+                }
+
+                public void First()
+                {
+                    _position = 0;
+
+                }
+
+                public bool IsDone()
+                {
+                    if (_position < _subjects.Count)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+
+                public string Next()
+                {
+                    return _subjects.ElementAt( _position++ );
+                }
+            }
+
+
+
+            using Pattern.Behavior.Iterator;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Iterator Pattern Demo***");
+                    ISubjects ScienceSubjects = new Science();
+                    ISubjects ArtsSubjects = new Arts();
+                    IIterator IteratorForScience = ScienceSubjects.CreateIterator();
+                    IIterator IteratorForArts = ArtsSubjects.CreateIterator();
+                    Console.WriteLine("\nScience subjects :");
+                    Print(IteratorForScience);
+                    Console.WriteLine("\nArts subjects :");
+                    Print(IteratorForArts);
+
+                    Console.ReadLine();
+                }
+                public static void Print(IIterator iterator)
+                {
+                    while (!iterator.IsDone())
+                    {
+                        Console.WriteLine(iterator.Next());
+                    }
+                }
+            }
+
+    . Memento
+
+    
