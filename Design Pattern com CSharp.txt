@@ -3237,4 +3237,707 @@ Design Pattern com CSharp
 
     . Memento
 
+        . Definição
+
+            . Sem violar o encapsulamento, captura e externaliza o estado interno de um objeto para que
+                o objeto possa ser restaurado a esse estado posteriormente.
+
+        . Conceito
+
+            . A definição da palavra "memento" no dicionário remete a uma lembrança de eventos passados.
+                Ao usar esse padrão, você pode restaurar um objeto ao seu estado anterior. Esse padrão
+                fornece uma maneira orientada a objetos de salvar o estado de um objeto.
+
+        . Ilustração
+
+            . Neste exemplo, três objetos estão envolvidos: um memento, um originator e um caretaker/guarda.
+                (Essas são convenções de nomenclatura comuns, por isso as estou usando aqui.) O
+                objeto originator tem um estado interno, e um cliente pode definir um estado nele. O caretaker primeiro
+                solicita ao originator um objeto memento porque deseja manter (ou salvar) o estado atual
+                do objeto originator. O objeto caretaker também confirma a operação de salvamento
+                exibindo uma mensagem no console. Agora, suponha que o cliente queira reverter para o estado 
+                anterior. Como o estado do objeto originator já foi alterado, para reverter para o estado anterior,
+                você precisa da ajuda do objeto caretaker que salvou o estado anteriormente. Portanto,
+                o objeto caretaker agora retorna o objeto memento (com o estado anterior) para o
+                originator. Além disso, o próprio objeto memento é um objeto opaco (um objeto no qual o caretaker
+                não tem permissão para fazer alterações).            
+
+
+            +------------------------+
+            |        Program         |
+            +------------------------+
+            | + Main() : void        |
+            +------------------------+
+
+
+            +------------------------------------+
+            |            Originator              |
+            +------------------------------------+
+            | - state : string                   |
+            | - myMemento : Memento              |
+            +------------------------------------+
+            | + State : string { get; set; }     |
+            +------------------------------------+
+            | + GetTheMemento() : Memento        |
+            | + RevertToState(m : Memento) : void|
+            +------------------------------------+
+                            |
+                            | cria / usa
+                            v
+            +------------------------------------+
+            |              Memento               |
+            +------------------------------------+
+            | - state : string                   |
+            +------------------------------------+
+            | + State : string { get; set; }     |
+            +------------------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Memento;
+
+            public class Memento
+            {
+                private string? state;
+
+                //If we want the state to be same when a memento is created for the
+                //first time, we could prefer a constructor (as shown below)
+                //instead of using a setter method in this case.
+                public Memento(string state)
+                {
+                    this.state = state;
+                }
+
+                public Memento()
+                {
+                    
+                }
+                public string? State { get; set; }
+            }
+
+
+
+            namespace Pattern.Behavior.Memento;
+
+            public class Originator
+            {
+                private string? state;
+                Memento? memento;
+
+                public string State
+                {
+                    get { return state; }
+                    set 
+                    { 
+                        state = value;
+                        Console.WriteLine($"Current state: {state}");
+                    }
+                }
+
+                public Memento GetMemento()
+                {
+                    memento = new Memento();
+
+                    memento.State = state;
+
+                    return memento;
+                }
+
+                public void RevertToState( Memento previousMemento)
+                {
+                    Console.WriteLine("Restoring to previous state...");
+
+                    this.state = previousMemento.State;
+                    Console.WriteLine($"Current State: {state}");
+
+                }
+
+
+
+            }
+
+
+
+            // Caretaker
+            using Pattern.Behavior.Memento;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("****Memento Pattern Demo\n");
+
+                    Originator originator = new Originator();
+
+                    Memento memento;
+
+                    originator.State = "Initial State";
+
+                    memento = originator.GetMemento();
+
+                    originator.State = "Intermediary state";
+
+                    originator.RevertToState(memento);
+
+                    Console.ReadKey();
+
+                }
+            }
+
+    . State
+
+        , Definição
+
+            . Permite que um objeto altere seu comportamento quando seu estado interno mudar. 
+                O objeto parecerá mudar de classe.
+
+        . Ilustração
+
+            . Este exemplo modela as funcionalidades relacionadas a uma televisão e seu controle remoto.
+                Suponha que você tenha um controle remoto para operar uma TV. Você pode simplesmente
+                assumir que, a qualquer momento, sua TV pode estar em um destes três estados: Ligada,
+                Desligada ou Mudo. Inicialmente, a TV está no estado Desligado. Quando você pressiona o botão Ligar em um controle remoto,
+                a TV estará no estado Ligado e, em seguida, se você pressionar o botão Mudo, ela entrará no
+                estado Mudo. Você também pode assumir que, se pressionar o botão Desligar quando a TV já estiver
+                Desligada, se pressionar o botão Ligar quando a TV já estiver Ligada ou se
+                pressionar o botão Mudo quando a TV já estiver no modo Mudo, não haverá mudança de estado
+                para a TV. A TV pode entrar no estado Desligado a partir do estado Ligado ou do estado Mudo (se você pressionar
+                o botão Desligar). A Figura abaixo mostra o diagrama de estados que reflete todos esses cenários possíveis.
+
+
+                . Diagrama de estado
+
+                            ●
+                            |
+                            v
+                        +------+
+                        | Off  |
+                        +------+
+                            |  \
+                            |   \ PressOnButton
+                    PressOff|    \
+                    Button  |     v
+                            |   +------+
+                            |   |  On  |
+                            |   +------+
+                            |      |
+                            |      | PressMuteButton
+                            |      v
+                            |   +--------+
+                            |   |  Mute  |
+                            |   +--------+
+                            |      |
+                            |      | PressOffButton
+                            |      v
+                            +---->+------+
+                                Off
+
+                . Diagrama de classes
+
+                    +-------------------------------+
+                    |           Program             |
+                    +-------------------------------+
+                    | + Main() : void               |
+                    +-------------------------------+
+
+
+                    +----------------------------------------------+
+                    |        IPossibleStates                       | 
+                    |        <<interface>>                         |
+                    +----------------------------------------------+
+                    | + PressMuteButton() : void                   |
+                    | + PressOffButton()  : void                   |
+                    | + PressOnButton()   : void                   |
+                    +----------------------------------------------+
+                                    ^
+                                    |
+                    +--------------+---------------+---------------------------+
+                    |              |               |                           |
+                    +----------------------+  +----------------------+  +----------------------+
+                    |        Off           |  |         On           |  |        Mute          |
+                    +----------------------+  +----------------------+  +----------------------+
+                    | - tvContext : TV     |  | - tvContext : TV     |  | - tvContext : TV     |
+                    +----------------------+  +----------------------+  +----------------------+
+                    | + Off(tv : TV)       |  | + On(tv : TV)        |  | + Mute(tv : TV)      |
+                    | + PressMuteButton()  |  | + PressMuteButton()  |  | + PressMuteButton()  |
+                    | + PressOffButton()   |  | + PressOffButton()   |  | + PressOffButton()   |
+                    | + PressOnButton()    |  | + PressOnButton()    |  | + PressOnButton()    |
+                    +----------------------+  +----------------------+  +----------------------+
+
+
+                    +----------------------------------------------+
+                    |                 TV                           |
+                    +----------------------------------------------+
+                    | - currentState : IPossibleStates             |
+                    +----------------------------------------------+
+                    | + CurrentState : IPossibleStates { get; set;}|
+                    +----------------------------------------------+
+                    | + PressMuteButton() : void                   |
+                    | + PressOffButton()  : void                   |
+                    | + PressOnButton()   : void                   |
+                    | + TV()                                       |
+                    +----------------------------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.State;
+
+            public interface IPossibleState
+            {
+                void PressOnButton(TV context);
+                void PressOffButton(TV context);
+                void PressMuteButton(TV context);
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.State;
+
+            public class Off: IPossibleState
+            {
+                TV tvContext;
+                //Initially we'll start from Off state
+                public Off(TV context)
+                {
+                    Console.WriteLine(" TV is Off now.");
+                    this.tvContext = context;
+                }
+                //Users can press any of these buttons at this state-On, Off or Mute
+                //TV is Off now, user is pressing On button
+                public void PressOnButton(TV context)
+                {
+                    Console.WriteLine("You pressed On button. Going from Off to On state");
+                    tvContext.CurrentState = new On(context);
+                }
+                //TV is Off already, user is pressing Off button again
+                public void PressOffButton(TV context)
+                {
+                    Console.WriteLine("You pressed Off button. TV is already in Off state");
+                    tvContext.CurrentState = new Mute(context);
+                }
+                public void PressMuteButton(TV context)
+                {
+                    Console.WriteLine("You pressed Mute button. TV is already in Off state, so Mute operation will not work.");
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.State;
+            public class On : IPossibleState
+            {
+                TV tvContext;
+                public On(TV context)
+                {
+                    Console.WriteLine("TV is On now.");
+                    this.tvContext = context;
+                }
+                //Users can press any of these buttons at this state-On, Off or Mute
+                //TV is On already, user is pressing On button again
+                public void PressOnButton(TV context)
+                {
+                    Console.WriteLine("You pressed On button. TV is already in On state.");
+                }
+                //TV is On now, user is pressing Off button
+                public void PressOffButton(TV context)
+                {
+                    Console.WriteLine("You pressed Off button. Going from On to Off state.");
+                    tvContext.CurrentState = new Off(context);
+                }
+                //TV is On now, user is pressing Mute button
+                public void PressMuteButton(TV context)
+                {
+                    Console.WriteLine("You pressed Mute button. Going from On to Mute mode.");
+                    tvContext.CurrentState = new Mute(context);
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.State;
+
+            public class Mute: IPossibleState
+            {
+                TV tvContext;
+                public Mute(TV context)
+                {
+                    Console.WriteLine("TV is in Mute mode now.");
+                    this.tvContext = context;
+                }
+                //Users can press any of these buttons at this state-On, Off or Mute
+                //TV is in mute, user is pressing On button
+                public void PressOnButton(TV context)
+                {
+                    Console.WriteLine("You pressed On button. Going from Mute mode to On state.");
+                    tvContext.CurrentState = new On(context);
+                }
+                //TV is in mute, user is pressing Off button
+                public void PressOffButton(TV context)
+                {
+                    Console.WriteLine("You pressed Off button. Going to Mute mode to Off state.");
+                    tvContext.CurrentState = new Off(context);
+                }
+                //TV is in mute already, user is pressing mute button again
+                public void PressMuteButton(TV context)
+                {
+                    Console.WriteLine(" You pressed Mute button. TV is already in Mute mode.");
+                }
+
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.State;
+
+            public class TV
+            {
+                private IPossibleState currentState;
+                public IPossibleState CurrentState
+                {
+                    //get;set;//Not working as expected
+                    get
+                    {
+                        return currentState;
+                    }
+                    /*Usually this value will be set by the class that
+                    implements the interface "IPossibleStates"*/
+                    set
+                    {
+                        currentState = value;
+                    }
+                }
+                public TV()
+                {
+                    this.currentState = new Off(this);
+                }
+                public void PressOffButton()
+                {
+                    currentState.PressOffButton(this);//Delegating the state
+                }
+                public void PressOnButton()
+                {
+                    currentState.PressOnButton(this);//Delegating the state
+                }
+                public void PressMuteButton()
+                {
+                    currentState.PressMuteButton(this);//Delegating the state
+                }
+
+            }
+
+
+
+            using Pattern.Behavior.State;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***State Pattern Demo***\n");
+                    //Initially TV is Off
+                    TV tv = new TV();
+                    Console.WriteLine("User is pressing buttons in the following sequence: ");
+                    Console.WriteLine("Off->Mute->On->On->Mute->Mute->Off\n");
+                    //TV is already in Off state
+                    tv.PressOffButton();
+                    //TV is already in Off state, still pressing the Mute button
+                    tv.PressMuteButton();
+                    //Making the TV on
+                    tv.PressOnButton();
+                    //TV is already in On state, pressing On button again
+                    tv.PressOnButton();
+                    //Putting the TV in Mute mode
+                    tv.PressMuteButton();
+                    //TV is already in Mute, pressing Mute button again
+                    tv.PressMuteButton();
+                    //Making the TV off
+                    tv.PressOffButton();
+                    // Wait for user
+                    Console.Read();
+                }
+            }
+
+    . Mediator
+
+        . Definição
+
+            . Defina um objeto que encapsule como um conjunto de objetos interage. O Mediator promove o baixo acoplamento, 
+                impedindo que os objetos se refiram uns aos outros explicitamente, e permite que você varie a interação 
+                deles de forma independente.        
+
+        . Conceito
+
+            . Um mediador assume a responsabilidade de controlar e coordenar as interações de
+                um grupo específico de objetos que não podem se referir uns aos outros explicitamente. Em outras palavras,
+                um mediador é um intermediário por meio do qual esses objetos se comunicam. Esse tipo de
+                implementação ajuda a reduzir o número de interconexões entre diferentes
+                objetos. Como resultado, é possível reduzir o acoplamento no sistema.
+
+        . Ilustração
+
+            . Os participantes são descritos da seguinte forma:
+
+                • Mediator: Define a interface que fornece a
+                comunicação entre objetos Colleague.
+
+                • ConcreteMediator: Conhece e mantém a lista de objetos Colleague.
+                Ele implementa a interface Mediador e coordena a
+                comunicação entre os objetos Colleague.
+
+                • Colleague: Define a interface para comunicação com outros
+                Colleagues.
+
+                • ConcreteColleague: Um colega concreto deve implementar a interface Colleague.
+                Esses objetos se comunicam entre si através do mediador.
+
+            . Neste exemplo, substituí a palavra Colleagues por Friends (sim, você pode
+                presumir que se trata de um ambiente amigável). Vamos supor que você tenha um grupo de três
+                amigos: Amit, Sohel e Raghu. Raghu é o chefe e quer garantir que as coisas funcionem
+                sem problemas. Vamos supor ainda que os três amigos possam se comunicar entre si
+                através de um servidor de bate-papo.
+
+            . Ao final do programa, apresentei outro amigo, Jack. Mas ele não
+                se registrou no objeto mediator, então o mediator não está permitindo que ele publique
+                mensagens.
+
+
+            +-------------------------------+
+            |            Program            |
+            +-------------------------------+
+            | + Main() : void               |
+            +-------------------------------+
+
+
+            +----------------------------------------------+
+            |                Friend                        | 
+            |               <<abstract>>                   |
+            +----------------------------------------------+
+            | - name : string                              |
+            +----------------------------------------------+
+            | + Name : string { get; set; }                |
+            +----------------------------------------------+
+            | + Friend(name : string)                      |
+            | + Send(message : string) : void              |
+            +----------------------------------------------+
+                            ^
+                            |
+            +-------------+-------------+--------------+
+            |             |             |              |
+            +-----------+  +-----------+  +-----------+  +-----------+
+            |  Friend1  |  |  Friend2  |  |  Unknown  |  |   Boss    |
+            +-----------+  +-----------+  +-----------+  +-----------+
+            | + Friend1()| | + Friend2()| | + Unknown()| | + Boss() |
+            | + Send()  |  | + Send()  |  | + Send()  |  | + Send() |
+            +-----------+  +-----------+  +-----------+  +-----------+
+
+
+            +----------------------------------------------+
+            |              IMediator                       | 
+            |            <<interface>>                     |
+            +----------------------------------------------+
+            | + Register(friend : Friend) : void           |
+            | + Send(message : string, sender : Friend)    |
+            +----------------------------------------------+
+                                ^
+                                |
+                                |
+            +----------------------------------------------+
+            |           ConcreteMediator                   |
+            +----------------------------------------------+
+            | - participants : List<Friend>                |
+            +----------------------------------------------+
+            | + Register(friend : Friend) : void           |
+            | + Send(message : string, sender : Friend)    |
+            | + DisplayDetails() : void                    |
+            +----------------------------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Mediator;
+
+            public abstract class Friend
+            {
+                protected IMediator mediator;
+                private string? name;
+
+                public string Name
+                {
+                    get { return name; }
+                    set { name = value; }
+                }
+
+                protected Friend( IMediator mediator)
+                {
+                    this.mediator = mediator;
+                }
+
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            public class Friend1 : Friend
+            {
+                public Friend1( IMediator mediator, string name): base(mediator)
+                {
+                    this.Name = name;
+                }
+
+                public void Send(string msg)
+                {
+                    mediator.Send(this, msg);
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            class Friend2 : Friend
+            {
+                // Constructor
+                public Friend2(IMediator mediator, string name): base(mediator)
+                {
+                    this.Name = name;
+                }
+                public void Send(string msg)
+                {
+                    mediator.Send(this, msg);
+                }
+            }
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            class Boss : Friend
+            {
+                // Constructor
+                public Boss(IMediator mediator, string name)
+                : base(mediator)
+                {
+                    this.Name = name;
+                }
+                public void Send(string msg)
+                {
+                    mediator.Send(this, msg);
+                }
+            }
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            class Unknown : Friend
+            {
+                // Constructor
+                public Unknown(IMediator mediator, string name)
+                : base(mediator)
+                {
+                    this.Name = name;
+                }
+                public void Send(string msg)
+                {
+                    mediator.Send(this, msg);
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            public class ConcreteMediator : IMediator
+            {
+
+                List<Friend> participants = new List<Friend>();
+
+
+                public void Register(Friend friend)
+                {
+                    participants.Add(friend);
+                }
+
+                public void Send(Friend friend, string msg)
+                {
+                    if (participants.Contains(friend))
+                    {
+                        foreach (Friend participant in participants)
+                        {
+                            Console.WriteLine(String.Format("[{0}] posts: {1} Last message posted {2}", friend.Name, msg, DateTime.Now));
+
+                            System.Threading.Thread.Sleep(1000);
+
+
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"An outsider named{friend.Name} trying to send some messages");
+                    }
+
+
+                }
+
+                public void DisplayDetails()
+                {
+                    Console.WriteLine("At present, registered Participants are:\n");
+
+                    foreach (Friend participant in participants)
+                    {
+                        Console.WriteLine($"{participant.Name}");
+                    }
+                }
+            }
+
+
+
+
+            using Pattern.Behavior.Mediator;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                
+                    Console.WriteLine("***Mediator Pattern Demo***\n");
+                    ConcreteMediator mediator = new ConcreteMediator();
+                    Friend1 Amit = new Friend1(mediator, "Amit");
+                    Friend2 Sohel = new Friend2(mediator, "Sohel");
+                    Boss Raghu = new Boss(mediator, "Raghu");
+                    //Registering participants
+                    mediator.Register(Amit);
+                    mediator.Register(Sohel);
+                    mediator.Register(Raghu);
+                    //Displaying the participant's list
+                    mediator.DisplayDetails();
+                    Console.WriteLine("Communication starts among participants...");
+                    Amit.Send("Hi Sohel,can we discuss the mediator pattern?");
+
+                    Sohel.Send("Hi Amit,Yup, we can discuss now.");
+                    Raghu.Send("Please get back to work quickly.");
+                    //An outsider/unknown person tries to participate
+                    Unknown unknown = new Unknown(mediator, "Jack");
+                    unknown.Send("Hello Guys..");
+                    // Wait for user
+                    Console.Read();
+
+                }
+            }
+
+    . Chain of Responsibility
+
     
+
