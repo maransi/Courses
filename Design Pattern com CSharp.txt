@@ -3939,5 +3939,189 @@ Design Pattern com CSharp
 
     . Chain of Responsibility
 
+        . Definição
+
+            . Evita acoplar o remetente de uma solicitação ao seu destinatário, dando mais de um objeto a 
+                chance de lidar com a solicitação. Encadeia os objetos receptores e passa a solicitação ao 
+                longo da cadeia até que um objeto o processe.
+
+        . Conceito
+
+            . Nesse padrão, você forma uma cadeia de objetos onde cada objeto na cadeia pode lidar com um 
+                tipo específico de solicitação. Se um objeto não puder lidar totalmente com a solicitação, 
+                ele o passa para o próximo objeto na cadeia. Esse processo pode continuar até o final da 
+                cadeia. Esse tipo de mecanismo de tratamento de solicitações oferece a flexibilidade de 
+                adicionar um novo objeto de processamento (manipulador) ao final da cadeia.
+
+                Incoming Request
+                        |
+                        v
+                +-----------+    +-----------+           +-------------+    +-----------+
+                | Handler-1 | -> | Handler-2 | -> ... -> | Handler-N-1 | -> | Handler-N |
+                +-----------+    +-----------+           +-------------+    +-----------+
+                                                                                |
+                                                                                v
+                                                                            End of Chain
+            
+        . Ilustração
+
+            ┌───────────────────────────┐                 ┌───────────────────────────┐
+            │         IReceiver         │                 │        IssueRaiser        │
+            │        <<interface>>      │                 │           Class           │
+            ├───────────────────────────┤                 ├───────────────────────────┤
+            │ + HandleMessage(msg)      │                 │ - setFirstReceiver        │
+            └─────────────▲─────────────┘                 ├───────────────────────────┤
+                          │     ^                         │ + IssueRaiser()           │
+                          │     |                         │ + RaiseMessage(msg)       │
+                          │     |                         └───────────────────────────┘
+                          │     +---------------------------+
+                          |                                 |
+            ┌─────────────┴─────────────┐     ┌─────────────┴─────────────┐
+            │     EmailErrorHandler     │     │      FaxErrorHandler      │
+            │            Class          │     │            Class          │
+            ├───────────────────────────┤     ├───────────────────────────┤
+            │ - nextReceiver : IReceiver│     │ - nextReceiver : IReceiver│
+            ├───────────────────────────┤     ├───────────────────────────┤
+            │ + EmailErrorHandler()     │     │ + FaxErrorHandler()       │
+            │ + HandleMessage(msg)      │     │ + HandleMessage(msg)      │
+            └───────────────────────────┘     └───────────────────────────┘
+
+
+            ┌───────────────────────────┐     ┌─────────────────────────────┐
+            │      MessagePriority      │     │          Message            │
+            │            Enum           │     │            Class            │
+            ├───────────────────────────┤     ├─────────────────────────────┤
+            │ Normal                    │     │ - Priority : MessagePriority│
+            │ High                      │     │ - Text : string             │
+            └───────────────────────────┘     ├─────────────────────────────┤
+                                              │ + Message()                 │
+                                              └─────────────────────────────┘
+
+
+            ┌───────────────────────────┐
+            │          Program          │
+            │           Class           │
+            ├───────────────────────────┤
+            │ + Main()                  │
+            └───────────────────────────┘
+
+        . Exemplo
+
+            namespace Pattern.Behavior.ChainOfResponsibility;
+
+            public interface IReceiver
+            {
+                bool HandleMessage( Message message);
+
+            }
+
+
+            namespace Pattern.Behavior.ChainOfResponsibility;
+
+            public enum MessagePriority
+            {
+                Normal,
+                High
+            }
+            public class Message
+            {
+                public string Text;
+                public MessagePriority Priority;
+
+                public Message( string msg, MessagePriority p)
+                {
+                    Text = msg;
+                    Priority = p;
+                }
+
+
+            }
+
+
+            namespace Pattern.Behavior.ChainOfResponsibility;
+
+            public class EmailErrorHandler: IReceiver
+            {
+                private IReceiver nextReceiver;
+                public EmailErrorHandler(IReceiver nextReceiver)
+                {
+                    this.nextReceiver = nextReceiver;
+                }
+                public bool HandleMessage(Message message)
+                {
+                    if (message.Text.Contains("Email"))
+                    {
+                        Console.WriteLine($"EmailErrorHandler processed {message.Text} priority issue: {message.Priority}");
+
+                        return true;
+                    }
+                    else
+                    {
+                        if (nextReceiver != null)
+                            nextReceiver.HandleMessage(message);
+                    }
+                    return false;
+                }
+            }
+
+
+
+            namespace Pattern.Behavior.ChainOfResponsibility
+            {
+                public class FaxErrorHandler: IReceiver
+                {
+                    public IReceiver nextReceiver;
+                    public FaxErrorHandler( IReceiver nextReceiver)
+                    {
+                        this.nextReceiver = nextReceiver;
+                    }
+
+                    public bool HandleMessage( Message message )
+                    {
+                        if (message.Text.Contains("Fax"))
+                        {
+                            Console.WriteLine($"FaxErrorHandles processed {message.Text} priority issue: {message.Priority}");
+
+                            return true;
+                        } else
+                        {
+                            if (nextReceiver != null)
+                                nextReceiver.HandleMessage( message );
+                        }
+
+                        return false;
+
+                    }
+
+
+                }
+            }
+
+
+
+            namespace Pattern.Behavior.ChainOfResponsibility;
+
+            public class IssueRaiser
+            {
+                public IReceiver setFirstReceiver;
+
+                public IssueRaiser( IReceiver firstReceiver)
+                {
+                    this.setFirstReceiver = firstReceiver;
+                }
+
+                public void RaiseMessage(Message message)
+                {
+                    if (setFirstReceiver != null)
+                    {
+                        setFirstReceiver.HandleMessage(message);
+                    }
+                }
+
+            }
+
+    . Interpreter
+
     
+
 
