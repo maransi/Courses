@@ -4005,6 +4005,48 @@ Design Pattern com CSharp
             │ + Main()                  │
             └───────────────────────────┘
 
+
+
+            Program                         IssueRaiser     EmailErrorHandler     FaxErrorHandler           Message
+            |                                   |                 |                    |                        |
+            | emailHandler =                    |                 |                    |                        |
+            | new EmailErrorHandler()           |                 |                    |                        |
+            |<----------------------------------------------------|                    |                        |
+            |                                   |                 |                    |                        |
+            | faxHandler =                      |                 |                    |                        |
+            | new FaxErrorHandler(emailHandler) |                 |                    |                        |
+            |<-------------------------------------------------------------------------|                        |
+            |                                   |                 |                    |                        |
+            |  m1 = new Message("Fax is...") <------------------------------------------------------------------|
+            |  m2 = new Message("Email are...") <---------------------------------------------------------------|
+            |  m3 = new Message("In Email, ...") <--------------------------------------------------------------|
+            |  m4 = new Message("Fax is not...") <--------------------------------------------------------------|
+            |                                   |                 |                    |                        |
+            |                                   |                 |                    |                        |
+            | raiser =                          |                 |                    |                        |
+            | new IssueRaiser(faxHandler) <-----|                 |                    |                        |
+            |                                   |                 |                    |                        |
+            |                                   |                 |                    |                        |
+            |                                   |                 |                    |                        |
+            | RaiseMessage(m1)                  |                 |                    |                        |
+            |--------------/------------------->|                 |                    |                        |
+            |             /                     | HandleMessage() |                    |                        |
+            |            /                      |---------------->|                    |                        |
+            |    +----------------------------+ |  contains Email?|                    |                        |
+            |    | Repetir a mesma chamada    | |  [false]        |                    |                        |
+            |    | para os objetos m2,m3 e m4 | | nextReceiver    |                    |                        |
+            |    +----------------------------+ |------------------------------->      |                        |
+            |                                   |                 | HandleMessage()    |                        |
+            |                                   |                 |------------------> |                        |
+            |                                   |                 | contains Fax?      |                        |
+            |                                   |                 | [true]             |                        |
+            |                                   |                 | Console.WriteLine()|                        |
+            |                                   |                 | return true        |                        |
+            |                                   |<-------------------------------------|                        |
+            |<----------------------------------|                 |                    |                        |
+
+
+
         . Exemplo
 
             namespace Pattern.Behavior.ChainOfResponsibility;
