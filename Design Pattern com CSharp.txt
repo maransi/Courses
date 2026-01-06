@@ -4177,3 +4177,128 @@ Design Pattern com CSharp
                 Por exemplo, neste exemplo, você transformará um número inteiro de três dígitos que é inserido em sua
                 forma de palavra equivalente (em outras palavras, uma string).
 
+
+        . Ilustração
+
+            . Vamos interpretar expressões como:
+
+                true AND false
+                true OR false
+            
+            . Diagrama de Classes
+
+                +----------------------------+
+                |        IExpression         | <<interface>>
+                +----------------------------+
+                | + Interpret() : bool       |
+                +----------------------------+
+                            ▲
+                            |
+                    +---------+-----------------------+
+                    |                                 |
+                +------------------------+   +------------------------+
+                |   BooleanExpression    |   |   AndExpression        |
+                +------------------------+   +------------------------+
+                | - value : bool         |   | - left  : IExpression  |
+                +------------------------+   | - right : IExpression  |
+                | + Interpret()          |   +------------------------+
+                +------------------------+   | + Interpret()          |
+                                            +------------------------+
+                                                    ▲
+                                                    |
+                                            +------------------------+
+                                            |   OrExpression         |
+                                            +------------------------+
+                                            | - left  : IExpression  |
+                                            | - right : IExpression  |
+                                            +------------------------+
+                                            | + Interpret()          |
+                                            +------------------------+
+
+        . Exemplo
+
+            public interface IExpression
+            {
+                bool Interpret();
+            }
+
+
+            public class BooleanExpression : IExpression
+            {
+                private readonly bool _value;
+
+                public BooleanExpression(bool value)
+                {
+                    _value = value;
+                }
+
+                public bool Interpret()
+                {
+                    return _value;
+                }
+            }
+
+
+
+            public class AndExpression : IExpression
+            {
+                private readonly IExpression _left;
+                private readonly IExpression _right;
+
+                public AndExpression(IExpression left, IExpression right)
+                {
+                    _left = left;
+                    _right = right;
+                }
+
+                public bool Interpret()
+                {
+                    return _left.Interpret() && _right.Interpret();
+                }
+            }
+
+            public class OrExpression : IExpression
+            {
+                private readonly IExpression _left;
+                private readonly IExpression _right;
+
+                public OrExpression(IExpression left, IExpression right)
+                {
+                    _left = left;
+                    _right = right;
+                }
+
+                public bool Interpret()
+                {
+                    return _left.Interpret() || _right.Interpret();
+                }
+            }
+
+
+
+            class Program
+            {
+                static void Main()
+                {
+                    // true AND false
+                    IExpression expr1 =
+                        new AndExpression(
+                            new BooleanExpression(true),
+                            new BooleanExpression(false)
+                        );
+
+                    // true OR false
+                    IExpression expr2 =
+                        new OrExpression(
+                            new BooleanExpression(true),
+                            new BooleanExpression(false)
+                        );
+
+                    Console.WriteLine(expr1.Interpret()); // false
+                    Console.WriteLine(expr2.Interpret()); // true
+                }
+            }
+
+
+
+
