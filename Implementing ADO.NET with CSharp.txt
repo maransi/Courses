@@ -1,8 +1,7 @@
 Implementing ADO.NET with C#
 ----------------------------
 
-Classes do ADO.NET
-----------------------
+. Classes do ADO.NET
 
     . O que é ADO.NET?
 
@@ -80,9 +79,7 @@ Classes do ADO.NET
 
             . https://dev.mysql.com/doc/connector-net/en/connector-net-tutorials-intro.html
 
-
-ORMs and ADO.NET
-----------------
+. ORMs and ADO.NET
 
     . Exemplos de ORMs:
 
@@ -106,9 +103,7 @@ ORMs and ADO.NET
             bases de dados relacionais e arquivos XML, sendo o LINQ o encarregado de fazer a devida “tradução” para cada 
             uma das fontes a serem consultadas.
 
-
-The Connection Class
---------------------
+. The Connection Class
 
     . Passando string de conexão:
 
@@ -156,8 +151,7 @@ The Connection Class
 
          con.Dispose(); // Quase que obrigado fazer o dispose neste casso com o uso do "new"
 
-Demo
-----
+. Demo
 
     . Digite os comandos abaixo no prompt do sistema operacional:
 
@@ -195,10 +189,7 @@ Demo
                                 nome            VARCHAR(50),
                                 dataAniversario DATE);
 
-
-
-Openning a Connection
----------------------
+. Openning a Connection
 
     . Para abrirmos uma conexão precisamos de uma string de conexão:
   
@@ -212,8 +203,7 @@ Openning a Connection
 
         . Para encontrar as diversas formas de montar uma string de conexão acesse o site https://www.connectionstrings.com/
 
-Demo
-----
+. Demo
 
     . Crie a pasta "AdoNet" dentro do projeto "adoNetSystem" e crie a classe abaixo dentro 
 
@@ -464,8 +454,31 @@ Demo
 
         . Se retorna um único valor → ExecuteScalar
 
+. Parâmetros
+
+    . Os parâmetros também podem ser enviados da seguinte forma:
+
+        cmd.Parameters.Add( new MySqlParameter("@nome", "Jose Saramago"));
+        cmd.Parameters.Add( new MySqlParameter("@dataAniversario", "2010-10-17"));
+
+        ou
+
+        cmd.Parameters.Add( new MySqlParameter( parameterName : "@dataAniversario", value: "2010-10-17"));
+
+        ou
+
+        cmd.Parameters.Add("@nome", MySqlDbType.VarChar, 100)
+                      .Value = "Jose Camargo";        
+
+    . Boas práticas técnicas
+
+        . Sempre definir tipo (MySqlDbType)
+
+        . Definir tamanho quando aplicável (VARCHAR)
+
+        . Evitar AddWithValue (problemas de inferência)
+
 . Demo
-------
 
     . Implemente o método abaixo na classe "ConnectionModel".
 
@@ -548,8 +561,11 @@ Demo
                     {
                         cmd.CommandType = CommandType.Text;
 
-                        cmd.Parameters.AddWithValue("@nome", "Cecilia Meireles");
-                        cmd.Parameters.AddWithValue("@dataAniversario", "1966-10-17");
+                        cmd.Parameters.Add("@nome", MySqlDbType.VarChar, 100)       // O tamanho (100) pode ser opcional
+                                        .Value("Cecilia Meireles");
+
+                        cmd.Parameters.Add("@dataAniversario", MySqlDbType.DateTime)
+                                      .Value(, "1966-10-17");
 
                         rowsAffected = cmd.ExecuteNonQuery();
                     }
@@ -582,6 +598,41 @@ Demo
 
     . Execute o projeto
 
+
+    . Implemente o método abaixo na classe ConnectionModel.cs:
+
+        public void GetallCliente()
+        {
+            var cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+            try
+            {
+                using var cn = new MySqlConnection(cs);
+                using var cmd = new MySqlCommand("SELECT * FROM cliente", cn);
+
+                cn.Open();
+
+                using MySqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    System.Console.WriteLine($"({rdr.GetInt16(0)}) -> {rdr.GetString(1)} - Date of Birthday {rdr.GetDateTime(2)}\n");
+                }
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+        }
+
+    . Altere as linhas abaixo na classe "Program":
+
+        using AdoNet;
+
+        ConnectionModel cm = new ConnectionModel();
+
+        cm.GetallCliente(); // Linha inserida
 
     . Crie a procedure abaixo numa pasta do disco
 
@@ -630,7 +681,7 @@ Demo
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.Add("@prNome", MySqlDbType.VarChar, 100).Value = "MARCOS SILVA";
+                    cmd.Parameters.Add("@prNome", MySqlDbType.VarChar,100).Value = "MARCOS SILVA";
                     cmd.Parameters.Add("@prDataAniversario", MySqlDbType.Date).Value = "1985-05-20";
                     cmd.Parameters.Add("@prId", MySqlDbType.Int64).Value = 1;
 
@@ -663,83 +714,299 @@ Demo
 
     . Execute o projeto
 
-
-. Parâemtros
-
-    . Os parâmetros também podem ser enviados da seguinte forma:
-
-        cmd.Parameters.Add( new MySqlParameter("@nome", "Jose Saramago"));
-        cmd.Parameters.Add( new MySqlParameter("@dataAniversario", "2010-10-17"));
-
-        ou
-
-        cmd.Parameters.Add( new MySqlParameter( parameterName : "@dataAniversario", value: "2010-10-17"));
-
-    . Veja mais opções de declarar "Parameters" no link https://csharp.hotexamples.com/pt/examples/-/MySqlDbType/-/php-mysqldbtype-class-examples.html
-
-        . Altere o Program.cs para efetuar a chamada do método acima:
-
-            using AdoNetSystem;
-
-            using ( ConnectionModel connectionModel = new ConnectionModel()){
-                connectionModel.InsertCliente();
-            }
-
-        . Execute o projeto e veja o resultado.
-
-
-
-
 . Using OUTPUT Parameters
 
-    . Acesse o arquivo Program.cs e substitua o código abaixo:
+    . Um parâmetro de saída é um canal de retorno controlado entre o banco e a aplicação.
 
-        using System;
-        using MySql.Data.MySqlClient;
+    . Ele serve para:
 
-        string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
+        . Retornar status da operação
 
-        using var con = new MySqlConnection(cs);
+        . Retornar IDs gerados
 
-        con.Open();
+        . Retornar mensagens de negócio
 
-        var stm = "SELECT * FROM cliente";
-        var cmd = new MySqlCommand(stm, con);
+        . Retornar valores calculados internamente
 
-        using MySqlDataReader rdr = cmd.ExecuteReader();
+    . Diferente de um SELECT, o OUT não faz parte do result set — ele faz parte do contrato da procedure.
 
-        while (rdr.Read())
+    . Diferença entre SELECT, RETURN e OUT:
+
+        Técnica	    MySQL   Uso
+        -------     -----   ---
+        SELECT	    ✔	    Retornar dados (linhas/colunas)
+        RETURN	    ❌	   MySQL não suporta retorno escalar como SQL Server
+        OUT	        ✔	    Retornar controle e metadados
+
+    . No MySQL, parâmetros OUT são o “RETURN real”
+
+    . Passo a passo para utilizar parâmetros de saída:
+
+        . Você define o parâmetro como Direction = Output
+
+            MySqlParameter output = new MySqlParameter("@IdGerado", SqlDbType.Int)
+            {
+                Direction = ParameterDirection.Output
+            };
+
+            cmd.Parameters.Add(output);
+
+        . O provider envia o comando ao MySQL
+
+        . O MySQL executa a procedure
+
+        . O valor do OUT é armazenado no buffer do comando
+
+        . Após ExecuteNonQuery, o valor é populado em Parameter.Value
+
+    . Antes do ExecuteNonQuery, o valor sempre será null
+
+. Demo
+
+    . Crie o arquivo abaixo numa pasta qualquer, com o nome de "spInsertCliente.sql":
+
+        DELIMITER $$
+
+        DROP PROCEDURE IF EXISTS spUpdateCliente $$
+
+        CREATE PROCEDURE spinsertCliente( IN prNome VARCHAR(100), IN prDataAniversario DATE, OUT prId INT)
+        BEGIN
+            INSERT INTO cliente(Nome, DataAniversario) VALUES (prNome, prDataAniversario);
+
+            SET prId = LAST_INSERT_ID();
+        END $$
+
+        DELIMITER ;
+
+    . Execute o comando abaixo no prompt do sistema operacional:
+
+        docker cp "d:\temp\spInsertCliente.sql" adoNetSystemDb:/tmp/spInsertCliente.sql
+
+    . Acesse o banco de dados e compile a procedure
+
+        docker exec -it adoNetSystemDb mysql -u root -p
+
+        use adoNetSystem;
+
+        SOURCE /tmp/spInsertCliente.sql
+
+        # Comandos interessantes do MySQL para verificar se a procedure foi criada com sucesso
+        SHOW PROCEDURE STATUS WHERE Db = DATABASE() AND Name = 'spInsertCliente'; -- Lista todas as procedures do database
+
+        SHOW CREATE PROCEDURE spInsertCliente;  -- Lista o corpo da procedure
+
+    . Insira o método abaixo na classe "ConnectionModel.cs":
+
+        ...
+        public void InsertClienteStoredProcedure()
         {
-            Console.WriteLine("{0} {1} ", rdr.GetInt32(0), rdr.GetString(1));
+            using (MySqlConnection cn = new MySqlConnection(@"server=localhost;userid=root;password=root;database=adoNetSystem"))
+            {
+                cn.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("spInsertCliente", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@prNome", MySqlDbType.VarChar, 100).Value = "MARCOS SILVA";
+                    cmd.Parameters.Add("@prDataAniversario", MySqlDbType.Date).Value = "1985-05-20";
+                    MySqlParameter output = new MySqlParameter("@prId", SqlDbType.Int)
+                    {
+                        Direction = ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(output);
+
+                    cmd.ExecuteNonQuery();
+
+                    int id = (int)cmd.Parameters["@prId"].Value;
+                }
+            }
+        }
+        ...
+
+    . Insira a linha abaixo na classe "Program.cs":
+
+        ...
+        cm.InsertClienteStoredProcedure();  // Linha inserida
+        ...
+
+    . Execute o projeto e verifique o valor do "id".
+
+    . Crie o método "InsertClienteWithOutputParameter" na classe "ConnectionModel"
+
+        public void InsertClienteWithOutputParameter()
+        {
+            string cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+            try
+            {
+                var sql = @"INSERT INTO cliente( nome, dataAniversario ) VALUES( @nome, @dataAniversario ); 
+                                SELECT LAST_INSERT_ID();";
+
+                using var cn = new MySqlConnection(cs);
+                using var cmd = new MySqlCommand(sql, cn);  
+
+                cmd.Parameters.Add("@nome", MySqlDbType.VarChar).Value = "Libero Badaró";
+                cmd.Parameters.Add("@dataAniversario", MySqlDbType.Date).Value = "1960-10-17";
+
+                cn.Open();
+                cmd.ExecuteScalar();
+
+                long id = Convert.ToInt64(cmd.ExecuteScalar());
+
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+
         }
 
-        Console.WriteLine($"MySQL version : {con.ServerVersion}");
+    . Insira a linha abaixo na classe "Program.cs":
 
-    . Substitua o código do arquivo Programa.cs pelo código abaixo:
+        ...
+        cm.InsertClienteWithOutputParameter();  // Linha inserida
+        ...
 
-        using System;
-        using MySql.Data.MySqlClient;
+    . Execute o projeto e verifique o valor do "id"
 
-        string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
+. Modelo Desconectado ( DataTable, DataSet e SqlDataAdapter )
 
-        using var con = new MySqlConnection(cs);
+    . O objetivo do modelo desconectado é trabalhar com dados fora da conexão, mantendo-os em memória, permitindo:
 
-        con.Open();
+        leitura  \
+                  |
+        edição    |  
+                  |----> sincronizar depois com o banco.    
+        inclusão  |                 |
+                  |                 |
+        exclusão /                  |
+                                    |
+                                    V
+                        A conexão com o banco:
 
-        var cmd = con.CreateCommand();
-        var stm = @"SELECT * FROM cliente WHERE nome LIKE '%DA%'";
+                            . fica aberta o mínimo possível
 
-        cmd.CommandText = stm;
+                            . melhora performance
 
-        var rdr = cmd.ExecuteReader();
+                            . melhora escalabilidade
 
-        while (rdr.Read())
-        {
-            Console.WriteLine("{0} {1} ", rdr.GetInt32(0), rdr.GetString(1));
-        }
+    . Visão geral do módelo desconectado:
 
-        Console.WriteLine($"MySQL version : {con.ServerVersion}");
+                Banco de Dados
+                    ↑
+                SqlDataAdapter
+                    ↑
+                DataTable / DataSet  (memória)
+                    ↓
+                Alterações (Insert/Update/Delete)
+                    ↓
+                SqlDataAdapter.Update()
+                    ↓
+                Banco de Dados
+
+    . DataTable
+
+        . Representa uma tabela inteira em memória.
+
+            . Estrutura (colunas, tipos)
+
+            . Dados (linhas)
+
+            . Estado das linhas (Added, Modified, Deleted)
+
+        . Ele não sabe nada sobre o banco. Ele apenas armazena dados.
+
+        . Exemplos:
+
+            . Criando a tabela:
+
+                var table = new DataTable("cliente");
+
+                table.Columns.Add("id", typeof(int));
+                table.Columns.Add("nome", typeof(string));
+                table.Columns.Add("dataAniversario", typeof(DateTime));
+
+                table.Rows.Add(1, "Ana",  new DateTime(2001, 2, 10););
+                table.Rows.Add(2, "João", new DateTime(2008, 12, 28););
+
+            . Alterando dados
+
+                table.Rows[0]["Nome"] = "Ana Maria";        // O ADO.NET automaticamente marca a linha como: RowState = Modified
+
+            . Podemos inserir uma "Primary Key" no objeto DataTable:
+
+                table.PrimaryKey = new[] { table.Columns["id"] };
+
+
+        . Existem diversas maneiros para localizar/selecionar/filtrar ocorrências dentro de um objeto DataTable:
+
+            . DataTable.Select() - permite filtrar linhas em memória, usando uma expressão parecida com SQL (WHERE).Retorna um array de DataRow.
+
+                DataRow[] linhas = table.Select("Id = 10");
+                
+                DataRow[] resultado = table.Select("nome = 'Ana'");
+
+                DataRow[] linhas = table.Select("Id > 1");
+
+                DataRow[] resultado = table.Select("nome = 'Ana' AND id < 2 " );
+
+                DataRow[] resultado = table.Select("nome LIKE '%Silva%'");
+
+                DataRow[] resultado = table.Select("Status IN ('A', 'I')");
+
+                DataRow[] resultado = table.Select("dataAniversario >= #2025-01-01#");
 
 
 
- 
+                // Filtra e deixa o resultado ordenado
+                DataRow[] linhas = table.Select("Id > 0, nome ASC ");   
+
+            . DataView - é uma visão filtrada de um DataTable (sem duplicação de dados e ideal para filtros dinâmicos)
+
+                DataView view = new DataView(table);
+
+                view.RowFilter = "Saldo > 1000";
+
+                view.Sort = "Nome ASC";
+
+
+                // Percorrendo o resultado
+                foreach (DataRowView row in view)
+                {
+                    Console.WriteLine(row["Nome"]);
+                }
+
+            . Buscando a linha:
+
+                DataRow row = table.Rows.Find(10);
+
+            . LINQ
+
+                var resultado = table.AsEnumerable()
+                                        .Where( row => row.Field<int>("Id") > 0 )
+                                        .OrderByDescending( row => row.Field<string>("nome") )
+                                        .ToList();
+
+                resultado.ForEach( row => 
+                {
+                    Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+                } );
+
+
+
+                OU
+
+                var cliente = table.AsEnumerable()
+                   .FirstOrDefault(r => r.Field<int>("Id") == 10);
+
+        . Comparação
+
+            Método              Melhor cenário         
+            -------------       ---------------------- 
+            `Select()`          Filtro simples         
+            `DataView`          UI / filtros dinâmicos 
+            `Rows.Find()`       Busca por chave        
+            LINQ                Regras complexas       
+
