@@ -906,107 +906,330 @@ Implementing ADO.NET with C#
                     ↓
                 Banco de Dados
 
-    . DataTable
+. DataTable
 
-        . Representa uma tabela inteira em memória.
+    . Representa uma tabela inteira em memória.
 
-            . Estrutura (colunas, tipos)
+        . Estrutura (colunas, tipos)
 
-            . Dados (linhas)
+        . Dados (linhas)
 
-            . Estado das linhas (Added, Modified, Deleted)
+        . Estado das linhas (Added, Modified, Deleted)
 
-        . Ele não sabe nada sobre o banco. Ele apenas armazena dados.
+    . Ele não sabe nada sobre o banco. Ele apenas armazena dados.
 
-        . Exemplos:
+    . Exemplos:
 
-            . Criando a tabela:
+        . Criando a tabela:
 
-                var table = new DataTable("cliente");
+            var table = new DataTable("cliente");
 
-                table.Columns.Add("id", typeof(int));
-                table.Columns.Add("nome", typeof(string));
-                table.Columns.Add("dataAniversario", typeof(DateTime));
+            table.Columns.Add("id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
 
-                table.Rows.Add(1, "Ana",  new DateTime(2001, 2, 10););
-                table.Rows.Add(2, "João", new DateTime(2008, 12, 28););
+            table.Rows.Add(1, "Ana",  new DateTime(2001, 2, 10););
+            table.Rows.Add(2, "João", new DateTime(2008, 12, 28););
 
-            . Alterando dados
+        . Alterando dados
 
-                table.Rows[0]["Nome"] = "Ana Maria";        // O ADO.NET automaticamente marca a linha como: RowState = Modified
+            table.Rows[0]["Nome"] = "Ana Maria";        // O ADO.NET automaticamente marca a linha como: RowState = Modified
 
-            . Podemos inserir uma "Primary Key" no objeto DataTable:
+        . Podemos inserir uma "Primary Key" no objeto DataTable:
 
-                table.PrimaryKey = new[] { table.Columns["id"] };
+            table.PrimaryKey = new[] { table.Columns["id"] };
 
-
-        . Existem diversas maneiros para localizar/selecionar/filtrar ocorrências dentro de um objeto DataTable:
-
-            . DataTable.Select() - permite filtrar linhas em memória, usando uma expressão parecida com SQL (WHERE).Retorna um array de DataRow.
-
-                DataRow[] linhas = table.Select("Id = 10");
-                
-                DataRow[] resultado = table.Select("nome = 'Ana'");
-
-                DataRow[] linhas = table.Select("Id > 1");
-
-                DataRow[] resultado = table.Select("nome = 'Ana' AND id < 2 " );
-
-                DataRow[] resultado = table.Select("nome LIKE '%Silva%'");
-
-                DataRow[] resultado = table.Select("Status IN ('A', 'I')");
-
-                DataRow[] resultado = table.Select("dataAniversario >= #2025-01-01#");
+            // Buscando ocorrência pela PK
+            DataRow row = table.Rows.Find(10);
 
 
+    . Existem diversas maneiros para localizar/selecionar/filtrar ocorrências dentro de um objeto DataTable:
 
-                // Filtra e deixa o resultado ordenado
-                DataRow[] linhas = table.Select("Id > 0, nome ASC ");   
+        . DataTable.Select() - permite filtrar linhas em memória, usando uma expressão parecida com SQL (WHERE).Retorna um array de DataRow.
 
-            . DataView - é uma visão filtrada de um DataTable (sem duplicação de dados e ideal para filtros dinâmicos)
+            DataRow[] linhas = table.Select("Id = 10");
+            
+            DataRow[] resultado = table.Select("nome = 'Ana'");
 
-                DataView view = new DataView(table);
+            DataRow[] linhas = table.Select("Id > 1");
 
-                view.RowFilter = "Saldo > 1000";
+            DataRow[] resultado = table.Select("nome = 'Ana' AND id < 2 " );
 
-                view.Sort = "Nome ASC";
+            DataRow[] resultado = table.Select("nome LIKE '%Silva%'");
 
+            DataRow[] resultado = table.Select("Status IN ('A', 'I')");
 
-                // Percorrendo o resultado
-                foreach (DataRowView row in view)
-                {
-                    Console.WriteLine(row["Nome"]);
-                }
-
-            . Buscando a linha:
-
-                DataRow row = table.Rows.Find(10);
-
-            . LINQ
-
-                var resultado = table.AsEnumerable()
-                                        .Where( row => row.Field<int>("Id") > 0 )
-                                        .OrderByDescending( row => row.Field<string>("nome") )
-                                        .ToList();
-
-                resultado.ForEach( row => 
-                {
-                    Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
-                } );
+            DataRow[] resultado = table.Select("dataAniversario >= #2025-01-01#");
 
 
 
-                OU
+            // Filtra e deixa o resultado ordenado
+            DataRow[] linhas = table.Select("Id > 0, nome ASC ");   
 
-                var cliente = table.AsEnumerable()
-                   .FirstOrDefault(r => r.Field<int>("Id") == 10);
 
-        . Comparação
+        . Buscando a linha:
 
-            Método              Melhor cenário         
-            -------------       ---------------------- 
-            `Select()`          Filtro simples         
-            `DataView`          UI / filtros dinâmicos 
-            `Rows.Find()`       Busca por chave        
-            LINQ                Regras complexas       
+            DataRow row = table.Rows.Find(10);
+
+        . LINQ
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+
+            OU
+
+            var cliente = table.AsEnumerable()
+                .FirstOrDefault(r => r.Field<int>("Id") == 10);
+
+    . Comparação
+
+        Método              Melhor cenário         
+        -------------       ---------------------- 
+        `Select()`          Filtro simples         
+        `DataView`          UI / filtros dinâmicos 
+        `Rows.Find()`       Busca por chave        
+        LINQ                Regras complexas       
+
+. Demo
+
+    . Insira o método abaixo na classe ConnectionModel.cs
+
+        ...
+        public void WorkingWithDataTable()
+        {
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "João Silva", new DateTime(1980, 5, 12));
+            table.Rows.Add(2, "Maria Souza", new DateTime(1990, 8, 23));
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+        }
+        ...
+
+    . Altere o métod main da classe Program.cs como abaixo:
+
+        using AdoNet;
+
+        // Linha apagada
+        // ConnectionModel cm = new ConnectionModel();
+
+        Linhas apagadas
+        // string version = cm.GetClientesCountScala();
+        // var rowsAffected = cm.InsertCliente();
+
+        // Linha inserida
+        cm.WorkingWithDataTable();
+
+    . Execute o projeto e veja se está sendo listado o conteúdo da lista "resultado" do método "WorkingWithDataTable"
+
+    . Insira as linhas abaixo no método "WorkingWithDataTable":
+
+        ...
+        public void WorkingWithDataTable()
+        {
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "João Silva", new DateTime(1980, 5, 12));
+            table.Rows.Add(2, "Maria Souza", new DateTime(1990, 8, 23));
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+            // Linha inserida
+            DataRow[] linhas = table.Select("Id > 0", "nome DESC");
+
+
+            // foreach inserido
+            foreach( var row in linhas )
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            }
+        }
+        ...
+
+    . Execute o projeto e veja se está sendo listado o conteúdo da lista "linhas" do método "WorkingWithDataTable"
+
+    . Insira as linhas abaixo no método "WorkingWithDataTable":
+
+        ...
+        public void WorkingWithDataTable()
+        {
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "João Silva", new DateTime(1980, 5, 12));
+            table.Rows.Add(2, "Maria Souza", new DateTime(1990, 8, 23));
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+            DataRow[] linhas = table.Select("Id > 0", "nome DESC");
+
+            /*  foreach apagado
+            foreach( var row in linhas )
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            }
+            */
+
+            // foreach inserido
+            linhas.AsEnumerable().ToList().ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } 
+            );
+
+        }
+        ...
+
+    . Execute o projeto e veja se está sendo listado o conteúdo da lista "linhas" do método "WorkingWithDataTable"
+
+. DataView
+
+    . É uma visão filtrada de um DataTable.
+
+        . Não duplica dados
+
+        . Ideal para filtros dinâmicos
+
+        . Muito usado em UI / binding
+
+    . Criando uma View:
+
+        DataView view = new DataView(table);
+
+    . Aplicando Filtro
+
+        view.RowFilter = "Saldo > 1000";
+
+    . Ordenação
+
+        view.Sort = "Nome ASC";
+
+    . DataView - Percorrendo um DataView
+
+        DataView view = new DataView(table);
+
+        view.RowFilter = "Saldo > 1000";
+
+        view.Sort = "Nome ASC";
+
+
+        // Percorrendo o resultado
+        foreach (DataRowView row in view)
+        {
+            Console.WriteLine(row["Nome"]);
+        }
+
+. Demo
+
+    . Altere o método "WorkingWithDataTable" conforme abaixo:
+
+        public void WorkingWithDataTable()
+        {
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "João Silva", new DateTime(1980, 5, 12));
+            table.Rows.Add(2, "Maria Souza", new DateTime(1990, 8, 23));
+
+            // Linha inserida
+            DataView view = new DataView(table);
+
+            // Linha inserida
+            view.Sort = "nome DESC";
+
+            // Linha inserida
+            view.RowFilter = "Id > 0";
+
+            // foreach inserida
+            foreach( DataRowView row in view )
+            {
+                // DataRow row = rowView.Row;
+                // Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+                System.Console.WriteLine( $"Id: {row["Id"]}, Nome: {row["nome"]}, Data Aniversário: {row["dataAniversario"]}" );
+            }
+
+
+            /*  Linhas apagadas
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+            DataRow[] linhas = table.Select("Id > 0", "nome DESC");
+
+
+            linhas.AsEnumerable().ToList().ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } 
+            );
+
+            */        
+
+        }
+
+    . Execute o projeto e veja a iteração do DataView está funcionando.
+
+. SqlDataAdapter
+
+
+
 
