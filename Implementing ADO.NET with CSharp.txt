@@ -79,6 +79,16 @@ Implementing ADO.NET with C#
 
             . https://dev.mysql.com/doc/connector-net/en/connector-net-tutorials-intro.html
 
+    . Para se conectar e interagir com um banco de dados MySQL, você precisa usar as classes do namespace MySql.Data.MySqlClient 
+        (disponível após instalar o pacote NuGet MySQL Connector/NET ou MySqlConnector):
+
+        Em vez de SqlConnection, use MySqlConnection.
+        Em vez de SqlCommand, use MySqlCommand.
+        Em vez de SqlDataAdapter, use MySqlDataAdapter.
+        Em vez de SqlDataReader, use MySqlDataReader. 
+
+
+
 . ORMs and ADO.NET
 
     . Exemplos de ORMs:
@@ -102,6 +112,7 @@ Implementing ADO.NET with C#
         . Trazendo para um exemplo mais palpável: você consegue unicamente com código C# fazer consultas a conjuntos de objetos, 
             bases de dados relacionais e arquivos XML, sendo o LINQ o encarregado de fazer a devida “tradução” para cada 
             uma das fontes a serem consultadas.
+
 
 . The Connection Class
 
@@ -1230,6 +1241,212 @@ Implementing ADO.NET with C#
 
 . SqlDataAdapter
 
+    . Um DataAdapter é usado para recuperar dados de uma fonte de dados e para popular tabelas em um DataSet
+
+    . Ele não mantém conexão aberta e não armazena dados.
+
+        . Ele sabe:
+
+            . Buscar dados
+
+            . Enviar alterações
+
+            . Traduzir RowState para SQL
+
+    . Manipula dados em memória e sincroniza depois com o banco, sem manter conexão aberta.
+
+    . Construtores
+
+        . SqlDataAdapter() : Inicializa uma nova instância da classe SqlDataAdapter.
+
+        . SqlDataAdapter(SqlCommand selectCommand) : Inicializa uma nova instância da classe SqlDataAdapter com o SqlCommand 
+            especificado. O selectCommand pode ser uma instrução SELECT do Transact-SQL ou um procedimento armazenado.
+
+        . SqlDataAdapter(string selectCommandText, string selectConnectionString): Inicializa uma nova instância da classe 
+            SqlDataAdapter com o comando e uma string de conexão. O selectCommandText pode ser uma instrução SELECT do Transact-SQL 
+            ou um procedimento armazenado.
+
+        . SqlDataAdapter(string selectCommandText, SqlConnection selectConnection) : Inicializa uma nova instância da classe SqlDataAdapter 
+            com o comando e uma string de conexão. O selectCommandText pode ser uma instrução SELECT do Transact-SQL ou um procedimento 
+            armazenado. Se a sua string de conexão não usar Integrated Security = true, você pode usar System.Data.SqlClient.SqlCredential 
+            para passar o ID do usuário e a senha de forma mais segura do que especificando o ID do usuário e a senha como texto na 
+            string de conexão.
+
+    . Métodos
+
+        . CloneInternals(): É usado para criar uma cópia desta instância de DataAdapter.
+            
+        . Dispose(Boolean): É usado para liberar os recursos não gerenciados utilizados pelo DataAdapter.
+            
+        . Fill(DataSet): É usado para adicionar linhas ao DataSet para corresponder às da fonte de dados.
+            
+        . FillSchema(DataSet, SchemaType, String, IDataReader): Adiciona um DataTable ao DataSet especificado.
+            
+        . GetFillParameters(): É utilizada para obter os parâmetros definidos pelo usuário ao executar uma instrução SQL SELECT.
+            
+        . ResetFillLoadOption(): É usado para redefinir FillLoadOption para seu estado padrão.
+            
+        . ShouldSerializeAcceptChangesDuringFill() : Determina se o
+            
+        . ShouldSerializeFillLoadOption(): Determina se a propriedade FillLoadOption deve ser persistida ou não.
+            
+        . ShouldSerializeTableMappings(): Determina se um ou mais objetos DataTableMapping existem ou não.
+            
+        . Update(DataSet): É usado para chamar as respectivas instruções INSERT, UPDATE ou DELETE.
+
+    . Quando utilizar SqlDataAdapter
+
+
+        . Operações de dados desconectadas: Se o seu aplicativo precisa trabalhar com dados offline (ou seja, sem uma conexão contínua com 
+            o banco de dados), o SqlDataAdapter é uma boa opção. Ele permite preencher um DataSet ou DataTable com dados, manipulá-los 
+            localmente e, em seguida, aplicar as alterações de volta ao banco de dados.
+
+        . Atualizações em lote: O SqlDataAdapter suporta atualizações em lote, permitindo acumular alterações feitas em várias linhas na 
+            memória e, em seguida, confirmá-las no banco de dados em um único lote. Isso pode melhorar a eficiência e reduzir o número de
+            consultas ao banco de dados.
+
+        . Vinculação de dados: Se você estiver criando interfaces de usuário vinculadas a dados, o SqlDataAdapter simplifica o processo. Você 
+            pode vincular controles diretamente ao DataTable dentro de um DataSet, facilitando a exibição e a manipulação de dados.
+
+        . Cache e acesso offline: você pode usar o SqlDataAdapter para preencher um DataSet com dados, armazená-los na memória e permitir 
+            que os usuários trabalhem com os dados mesmo quando estiverem offline ou desconectados do banco de dados.
+
+        . Manipulação complexa de dados: Quando sua aplicação exige mais do que apenas a simples recuperação de dados e você precisa 
+            realizar inserções, atualizações e exclusões nos dados, o SqlDataAdapter oferece uma maneira eficiente de gerenciar essas alterações.
+
+        . Controle de Concorrência: O SqlDataAdapter pode lidar com problemas de concorrência usando concorrência otimista. Ele verifica 
+            se os dados que estão sendo atualizados no banco de dados correspondem aos dados no DataSet antes de aplicar as alterações, 
+            evitando sobrescritas não intencionais.
+
+        . Transformação de dados: Você pode usar o SqlDataAdapter juntamente com outros componentes do ADO.NET para realizar tarefas de 
+            transformação de dados, como alterar tipos de dados, mesclar dados de diferentes fontes e muito mais.
+
+        . Desempenho: Em cenários onde se deseja minimizar o número de viagens de ida e volta ao banco de dados ao trabalhar com dados, 
+            o SqlDataAdapter permite buscar um grande volume de dados de uma só vez e trabalhar com eles localmente antes de aplicar as 
+            alterações de volta ao banco de dados.
+
+    . Exemplo:
+
+        // SELECT
+        using var conn = new SqlConnection(cs);
+
+        var adapter = new SqlDataAdapter(
+            "SELECT Id, Nome, Email FROM Cliente",
+            conn
+        );
+
+        var table = new DataTable();
+        adapter.Fill(table);
 
 
 
+
+        // INSERT
+        adapter.InsertCommand = new SqlCommand(
+            "INSERT INTO Cliente (Nome, Email) VALUES (@Nome, @Email)",
+            conn
+        );
+
+        adapter.InsertCommand.Parameters.Add("@Nome", SqlDbType.VarChar, 100, "Nome");
+        adapter.InsertCommand.Parameters.Add("@Email", SqlDbType.VarChar, 150, "Email");
+
+
+
+        // UPDATE
+        adapter.UpdateCommand = new SqlCommand(
+            "UPDATE Cliente SET Nome=@Nome, Email=@Email WHERE Id=@Id",
+            conn
+        );
+
+        adapter.UpdateCommand.Parameters.Add("@Nome", SqlDbType.VarChar, 100, "Nome");
+        adapter.UpdateCommand.Parameters.Add("@Email", SqlDbType.VarChar, 150, "Email");
+        adapter.UpdateCommand.Parameters.Add("@Id", SqlDbType.Int, 0, "Id");
+
+
+
+        // DELETE
+        adapter.DeleteCommand = new SqlCommand(
+            "DELETE FROM Cliente WHERE Id=@Id",
+            conn
+        );
+
+        adapter.DeleteCommand.Parameters.Add("@Id", SqlDbType.Int, 0, "Id");
+
+
+
+        // UPDATE SqlDataAdapter
+        adapter.Update(table);
+
+
+
+
+
+
+        // COMPLETO
+        var table = new DataTable();
+
+        adapter.Fill(table);
+
+        // INSERT
+        var nova = table.NewRow();
+        nova["Nome"] = "Pedro";
+        nova["Email"] = "pedro@email.com";
+        table.Rows.Add(nova);
+
+        // UPDATE
+        table.Rows[0]["Nome"] = "Pedro Silva";
+
+        // DELETE
+        table.Rows[1].Delete();
+
+        // sincroniza
+        adapter.Update(table);
+
+. Demo
+
+    . Insira o método abaixo na classe ConnectionModel.cs
+
+        ...
+        public void WorkingWithMySqlDataAdapter()
+        {
+            var cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+            try
+            {
+                using var cn = new MySqlConnection(cs);
+    
+                cn.Open();
+
+                var sql = "SELECT * FROM cliente";
+
+                using var adapter = new MySqlDataAdapter(sql, cn);
+
+                var dataTable = new DataTable();
+
+                adapter.Fill(dataTable);
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    System.Console.WriteLine($"({row["id"]}) -> {row["nome"]} - Date of Birthday {row["dataAniversario"]}\n");
+                }
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+        }
+        ...
+
+    . Altere a chamada do método acima na classe "Program.cs"
+
+        using AdoNet;
+
+        ConnectionModel cm = new ConnectionModel();
+
+        // Linha alterada
+        cm.WorkingWithMySqlDataAdapter();
+
+    . Execute o projeto e veja se o recuros do MySQLDataAdapter está funcionanado
+
+    
