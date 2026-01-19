@@ -157,9 +157,9 @@ const carteiraAtual = {
 */
 const carteiraAtual = {
     oportunidade: 55450,             // 9.20
-    fundoImobiliario: 251735,        // 60
-    acoes: 77848,                       // 20
-    risco: 80569                        // 10.8
+    fundoImobiliario: 271819,        // 60
+    acoes: 91680,                       // 20
+    risco: 46569                        // 10.8
 
 }
 /*
@@ -173,10 +173,10 @@ const carteiraAtual = {
 */
 const carteira = {
     percentual: {
-        oportunidade: 10,
-        fundoImobiliario: 60,
-        acoes: 15,
-        risco: 15
+        oportunidade: 10,           // 0,00
+        fundoImobiliario: 70,       // 68.417,20
+        acoes: 10,                  // 0,00
+        risco: 10                   // 7.582,80
     },
     saldo: carteiraAtual
 }
