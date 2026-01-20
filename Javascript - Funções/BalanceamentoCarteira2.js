@@ -157,9 +157,9 @@ const carteiraAtual = {
 */
 const carteiraAtual = {
     oportunidade: 55450,             // 9.20
-    fundoImobiliario: 271819,        // 60
-    acoes: 91680,                       // 20
-    risco: 46569                        // 10.8
+    fundoImobiliario: 253657,        // 60
+    acoes: 77848,                       // 20
+    risco: 81563                        // 10.8
 
 }
 /*
@@ -174,9 +174,9 @@ const carteiraAtual = {
 const carteira = {
     percentual: {
         oportunidade: 10,           // 0,00
-        fundoImobiliario: 70,       // 68.417,20
+        fundoImobiliario: 65,       // 75.885,30
         acoes: 10,                  // 0,00
-        risco: 10                   // 7.582,80
+        risco: 15                   // 114,70
     },
     saldo: carteiraAtual
 }
@@ -186,7 +186,7 @@ let saldoCarteiraInicial = carteira.saldo.oportunidade +
     carteira.saldo.acoes +
     carteira.saldo.risco;
 
-let aporte = 76000;        // 110000
+let aporte = 76000;        // 310000 -> para balancear a carteira
 
 console.log("Aporte");
 console.log(aporte);
