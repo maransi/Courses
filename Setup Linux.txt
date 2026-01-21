@@ -928,7 +928,16 @@ sudo apt install remmina remmina-plugin-rdp remmina-plugin-secret
 22. Instalação do Nodejs
 
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | $SHELL
+
+	# Se o zsh shell for o padrão do linux execute as duas linha abaixo	
+	echo 'export PATH="$HOME/.nvm:$PATH"' >> ~/.zshrc    
+
+    # Se o bash shell for o padrão do linux execute as duas linha abaixo
+	echo 'export PATH="$HOME/.nvm:$PATH"' >> ~/.bashrc    
+
+
 	nvm --version
+
 
 	# Para instalar a versão lts mais recente
 	nvm install --lts
