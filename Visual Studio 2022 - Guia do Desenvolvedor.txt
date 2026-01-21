@@ -1,0 +1,372 @@
+Visual Studio 2022 - Guia do Desenvolvedor
+------------------------------------------
+
+1. Instalando Visual Studio
+
+    . Acesse o link abaixo e baixe a versão "Community"
+
+        https://visualstudio.microsoft.com/downloads/
+
+    . Durante a instalação escolha as opções abaixo no instalador:
+
+        . Workloads:
+
+            . ASP.NET e desenvolvimento web
+
+            . Desenvolvimento de .NET Multi-Plataforma App Ui
+
+            . Desenvolvimento Desktop com .NET
+
+            . Desenvolvimento com a plataforma universal do Windows
+
+            . Processamento e armazenamento de dados
+
+        . Individual Components
+
+            . Escolha as versões do dotnet que desejar e as versões do framework .Net
+
+        . Language Packs
+
+            . Escolha o Inglês
+
+        . Installation Localization 
+
+            . Opção para mudar o caminho padrão da instalação do Visual Studio
+
+    . Depois que fizer a instalação do Visual Studio, caso queiramos instalar algum componente que 
+        ficou de fora da instalação inicial, ou reparar a instalação, basta:
+        
+        . Acessar o programa "Visual Studio Installer", na opção
+            modificar e escolher as opção que ficaram de fora da instalação inicial.
+
+        . Ou, acesse o "Visual Studio", opção "Ferramentas/Obter Ferramentas ou Funcionalidades"
+
+            . Para trabalhar com ASP.NET WebForm é necessário instalar alguns componentes no IDE:
+
+                . Acesse o vídeo abaixo para mais detalhes:
+
+                    https://www.youtube.com/watch?v=ANfMct1qFcs 
+
+                . Acesse a opção de menu "Ferramentas/Obter Ferramentas ou Funcionalidades"
+
+                . Acesse o item "Componentes Individuais"
+
+                . No item ".NET" selecione todos os itens deste grupo
+
+                . IMPORTANTE: os passos acima deste item é necessário para habilitar a criação de projeto "Webforms"
+
+            . Para reparar, acesse o botão "More" e escolha a opção "Repair"
+
+    . Alterar idioma direto pelas Configurações do Visual Studio
+
+        . Abra o Visual Studio
+
+        . Vá em Tools (Ferramentas)
+
+        . Clique em Options (Opções)
+
+        . No menu lateral, encontre Environment → International Settings (Configurações Internacionais)
+
+        . Selecione English
+
+        . Reinicie o Visual Studio
+
+2. Configurando o IDE
+
+    . Abra um projeto/solução.
+
+    . Color Scheme - Acesse "Tools / Theme"  OU "Tools / Options / Environment"
+
+    . Startup Open "Tela inicial do Visual Studio" - Tools / Options / Enviromment / General / On startup, open
+
+    . Customização da barra de ferramentas, menu, etc - Tools/Customize... OU  View/Toolbar
+
+    . Panel accommodation/Acomodação dos paineis laterais (Solution Explorer, etc) - Basta clicar e segurar no title do 
+        painel, arrastá-lo para dentro da dock que aparece no meio da tela, num dos locais desejados da dock.
+
+        . Depois de configurar o layout, podemos salvá-lo em "Windows/Save Windows Layout"; informe um nome para o Layout;
+            e depois pode resgatá-lo "Windows/Apply Windows Layout" escolhendo um dos Layouts salvo.
+
+    . Teclas de atalho
+
+        Ctrl K + D              - Formata todo o código
+        Ctrl K + F              - Formata o código selecionado
+        Ctrl K + Ctrl + C       - Comenta linha
+        Ctrl K + Ctrl + U       - Descomenta
+        F9                      - Inclui um breakpoint
+        F10                     - Em modo Debug vai para a próxima linha
+        F11                     - Desvia o debug para o objeto chamadado
+        Shift+F11               - Em modo Debug, restorna para a classe chamadora
+        Ctrl+Shift+T            - Localiza a classe desejada
+        Ctrl + -                - Volta para o programa chamador quando acessamos a classe pelo Ctrl + Click
+        Ctrl + Shift + -        - Avança, o contrário do acima.
+        Ctrl + D                - Duplica a linha atual
+        
+    . Identação
+
+        . Desativação da Smart Identação
+
+            . Acesse "Tools/Options/Text Editor/C#/Tabs/Identing
+
+            . Altere para "Block"
+
+            . Isso fará com que ao dar enter o cursor fique posicionado na linha de baixo sem dar o Tab automaticamente.
+
+4. Criando projetos 
+
+    . Durante a criação do projeto/solução, informamos o tipo do projeto (ASP.NET Core MVC). Após isso, fornecemos o 
+        nome e o local do projeto/solução. Na sequência, fornecemos:
+
+        . Framework: This dropdown will show you the set of frameworks available to
+                        work with the selected technology. Although it is possible to select older
+                        frameworks, it is always advisable to create new projects with the latest version
+                        of the framework available.
+
+        . Configure for HTTPS: This checkbox allows you to configure the project to use a
+                                self-signed SSL certificate. If you are working on such a project for the first time,
+                                you will be asked to trust the certificate when you run the application so that
+                                everything works correctly. Although it is possible to work with the HTTP protocol,
+                                it is always recommended to use HTTPS in real life. 
+
+                . Equivalente aos comandos abaixo:
+
+                    # Execute na pasta da solution
+                    dotnet dev-certs https --clean
+                    dotnet dev-certs https --trust
+
+        . Enable Docker: This option allows you to enable Docker support in your project.
+                            This means that a Docker file will be generated, which you can then publish – for
+                            example, to Microsoft Azure.        
+
+    . Template "ASP.NET Core Web API"
+
+        . Nas informações adicionais temos:
+
+            . User controllers: If this option is selected, the use of controller files will be enabled
+                                from the configuration. If it is deselected, a feature called minimal APIs will be
+                                used, which will create the minimum code necessary to have a functional API.
+
+            . Enable OpenAPI support: Swagger is a set of open source tools based on the
+                                OpenAPI specification that will allow us to describe the APIs we create in a simple,
+                                easy, and well-structured way, providing API users with good documentation.
+
+5. Debugando e executando os projetos
+
+    . Teclas de debug
+
+        Step into: the F11 key
+        Step over: the F10 key
+        Step out: Shift + F11 keys
+        New Breakpoint: F9
+
+    . Para verificar todos os breakpoints no projeto acesse "Debug/Windows/Breakpoints"
+
+    . Breakpoints - Clique com o direito sobre a barra lateral onde são incluido os Breakpoints, aparecerá vários tipos de 
+                    breakpoint, como por exemplo: conditional
+
+        . Se quiser, sobre a linha do breakpoint acione a tela "Alf+F9" + C que já irá para as condições do breakpoint.
+
+    . Watch Window
+
+        . Quando estiver em processo de debug e quisermos ver o contéudo dos objetos e variáveis, basta acessar "Debug/Windows/Watch/Watch 1"
+
+    . Fila de execução dos métodos:
+
+        . Acesse "Debug | Windows | Call Stack" durante o debug.
+
+6. Adicionando "Code Snippets"
+
+    . "Code Snippets" são atalhos, que ao ser digitado retornam um conjunto de código de acordo com o template que estiver associado. Resumindo, são
+        "shortcut" predefinidos.
+
+        prop + [Ctrl + Space]
+
+            public int MyProperty { get; set; }
+
+        propfull + [Ctrl + Space]
+
+            private int _myVar;
+            public int MyProperty
+            {
+                get { return _myVar; }
+                set { _myVar = value; }
+            }
+
+        ctor  + [Ctrl + Space]  - Implementa o construtor
+
+            public Calculadora(Parameters)
+            {
+                
+            }
+
+        for  + [Ctrl + Space]  -  monta um laço for padrão;
+
+        foreach + [Ctrl + Space]  -  monta um laço foreach padrão;
+
+        if + [Ctrl + Space]  -  monta uma estrutura if padrão;
+
+        cw + [Ctrl + Space]  -  chama um Console.WriteLine();
+
+        do + [Ctrl + Space]  -  cria um bloco do/while(true);
+
+        while + [Ctrl + Space]  -  cria um bloco while padrão;
+
+        try/tryf    - Cria um bloco try/catch ou try/finally
+
+        Shortcut	Description
+        --------    -----------
+        class	    Creates a class
+        ctor	    constructor
+        cw	        Console.WriteLine
+        do	        do...while loop
+        enum	    Creates an enum
+        for	        for loop
+        foreach	    foreach statement
+        if	        if statement
+        interface	Creates an interface
+        prop	    An automatically implemented property
+        region	    #region
+        svm	void    Main()
+        using	    using statement
+        while	    while loop
+
+    . Criando um "Code Snippets"
+
+        . Crie a pasta "C:\Users\[user]\Documents\CodeSnippets" e dentro dela o arquivo "codesnippet.snippet" com o conteúdo abaixo:
+
+            
+            <?xml version="1.0" encoding="utf-8"?>
+            <CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+                <CodeSnippet Format="1.0.0">
+                    <Header>
+                        <Title>If Linux condition</Title>
+                        <Author>Myself</Author>
+                        <Description>Conditional to now if the operating system is Linux</Description>
+                        <Shortcut>ifln</Shortcut>
+                    </Header>
+                    <Snippet>
+                        <Code Language="CSharp">
+                            <![CDATA[if (OperatingSystem.IsLinux())
+                            {
+                                return new List<WeatherForecast>();
+                            }]]>
+                        </Code>
+                    </Snippet>
+                </CodeSnippet>
+            </CodeSnippets>
+
+        . IMPORTANTE: Cuidado ao salvar o arquivo acima para não ficar com a extensão ".xml", tem que ficar com extensão ".snippet"
+
+        . Navegue para "Tools | Code Snippets Manager", escolha a "Language" CSharp, clique em "Add..." e escolha a pasta criada no passo anterior
+
+        . Acesse uma classe e faça o teste com a "Shortcut" "ifln"
+
+8. Web Tools and Hot Reload
+
+    . Scaffolding
+
+        . Para usar o "Scaffold" no Visual Studio Basta Acessar:
+
+            . Controller
+
+                . Clique na pasta root do projeto
+
+                . Escolha "Add / New Scaffolded Item... /"
+
+                . Escolha "API Controller with read/write actions" e acione o botão "Add"
+
+                . Na próxima tela escolha "API Controller with read/write actions" e forneça 
+                    o nome do controller, por exemplo: "GeneratedController.cs"
+
+                . Clique no botãoi "Add"
+
+            . Razor View
+
+                . Dentro da pasta "Views", crie a pasta "Generated"
+
+                . Clique direito na pasta "Views/Generated" do projeto
+                
+                . Escolha "Add / New Scaffolded Item... /"
+
+                . Escolha "Razor View", acione o botão "Add"
+
+                . Na próxima tela, informe:
+
+                    View Name: Index
+                    Template: Create
+
+                . Clique no botãoi "Add"
+
+            . JavaScript and CSS libraries
+
+                . Clique com o botão direito sobre a pasta "wwwroot" e escolha:
+
+                    "Add/Client-Side Library..."
+
+                . Na tela que abrir, escolha:
+
+                    Provider: cdnjs
+                    Library: Bootstrap
+                    Include all/Choose: [Escolha os arquivos desejaddos]
+
+
+                . Clique em "Install"
+
+                . Após o "Install", será criado um arquivo na raiz do projeto com nome "libman.json" com
+                    os arquivos js e css inseridos no projetos. Caso viermos alterá-lo, incluindo outras 
+                    referências nele, como por exemplo "jquery", automaticamente serão criados os arquivos
+                    dentro das respectivas pastas na pasta "wwwroot". 
+
+                . Altere o arquivo libman.json com o conteúdo abaixo:
+
+                    {
+                        "version": "1.0",
+                        "defaultProvider": "cdnjs",
+                        "libraries": [
+                            {
+                            "library": "jquery@3.6.0",
+                            "destination": "wwwroot/lib/jquery"
+                            },
+                            {
+                            "library": "bootstrap@5.1.3",
+                            "files": ["css/bootstrap.min.css", "js/bootstrap.bundle.min.js"],
+                            "destination": "wwwroot/lib/bootstrap"
+                            }
+                        ]
+                    }
+
+                . Verifique a pasta "wwwroot" se foram criadas as respectivas pastas.
+
+    . Hot Reload
+
+        . Para fazer o "Hot Reload" funcionar é necessário iniciar o projeto e verificar 
+            se no icone do "foguinho" na barra de ferramentas a opção "Hot Reload on File Save"
+            está ativado. Se quiser também podemos acessar essa opção em 
+            "Tools / Options / Debuging / .NET / C++ Hot Reload" e marcar o "Hot Reload on File Save"
+
+9. Extensões
+
+    . Bookmarks by the Numbers - equivalente ao Bookmark do Delphi
+
+        . Acesse "Extensions/Manage Extensions"
+
+        . Na aba "Browse", localize a extensão "Bookmarks by the Numbers" e instale
+
+        . Após a instalação, acesse "Tools/Options", vá em "Enviroment/Keyboard"
+
+            . Em "Show Commands Containing", informe a palavra "skoutsoft" para encontrar as configurações
+                de GotoBookmark e ToggleBookmark.
+
+                . Em cada item de GotoBookmark?, altere os parâmetros:
+                
+                    . "Use new shortcut" para "Text Editor"
+                    . "Press shortcut key" para "Ctrl + ?", pressione "Ctrl" + o no. da tela (1,2,3,...)
+                    . Pressione o botão "Assign"
+
+                . Em cada item de ToggleBookmark?, altere os parâmetros:
+                
+                    . "Use new shortcut" para "Text Editor"
+                    . "Press shortcut key" para "Ctrl + ?", pressione "Ctrl + Alt" + o no. da tela (1,2,3,...)
+                    . Pressione o botão "Assign"
+
+    . VSBookmarks - Opção ao "BookMarks by the Numbers" (Testar)

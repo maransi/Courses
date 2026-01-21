@@ -1,0 +1,333 @@
+Engenharia de Prompt
+--------------------
+
+. Engenharia de Prompt (ou Prompt Engineering) é uma prática dentro do universo da inteligência artificial,  
+    especialmente em modelos de linguagem como o GPT — que consiste em criar, estruturar e ajustar instruções 
+    (prompts) para que a IA produza respostas mais úteis, coerentes e alinhadas com a necessidade do usuário.
+
+. Em outras palavras: é a “arte” de conversar com a IA de forma estratégica.
+
+. Principais pontos da Engenharia de Prompt:
+
+    . Formulação da Instrução
+
+        . Como você escreve a pergunta/comando impacta diretamente a qualidade da resposta. 
+        
+        . Exemplo:
+
+            . Prompt genérico: “Explique fotosíntese”
+
+            . Prompt engenheirado: “Explique o processo da fotossíntese em linguagem simples, como se estivesse ensinando a 
+                uma criança de 10 anos, usando exemplos do dia a dia.”
+
+    . Contextualização
+
+        . Fornecer contexto ajuda a IA a entender melhor o que é esperado.
+
+        . Exemplo: 
+            
+            “Sou professor de biologia do ensino médio e preciso de uma explicação curta e ilustrada da fotossíntese 
+             para colocar em um slide.”
+
+            ou
+
+            “Vou te dar contexto, leia com atenção.”
+            “Depois, me responda com sugestões realistas, específicas e sem frases prontas.”
+
+            “Vou te dar contexto, leia com atenção: tenho 32 anos, trabalho em vendas há 10, mas quero migrar para 
+             gestão de produtos em empresas de tecnologia. Já fiz alguns cursos, mas não sei por onde começar 
+
+    . Inversão de lógica da interação:
+
+        . Em vez de entregar uma resposta genérica com base em poucas informações, a IA passa a agir como um consultor 
+            criterioso: primeiro investiga, depois responde. E quanto mais perguntas ele faz, mais mais refinada e útil 
+            será a resposta final
+
+        . Essa abordagem é especialmente poderosa em tarefas estratégicas, como:
+
+            . Elaborar planos de negócio
+
+            . Criar campanhas de marketing
+
+            . Fazer escolhas de carreira
+
+            . Redesenhar produtos ou processos
+
+            . Resolver conflitos interpessoais
+
+        . Exemplo:
+
+            "Antes de sugerir um plano de estudos, me faça perguntas para entender meu nível atual, 
+                meus objetivos e meu tempo disponível.”
+
+            “Quero que você me ajude a reestruturar meu currículo. Mas antes, pergunte tudo o que precisa 
+                saber sobre minha carreira.”
+
+            “Estou criando um produto novo. Antes de dar ideias de nome, me pergunte sobre o público, 
+                o diferencial e o posicionamento da marca.”
+
+    . Definição de Papéis
+
+        . Orientar o modelo a assumir um papel específico melhora a aderência.
+
+        . Exemplo: “Você é um especialista em investimentos, explique o que é renda fixa para um iniciante em finanças.”
+
+    . Especificação de Formato
+
+        . Você pode pedir que a resposta venha em tópicos, tabela, código ou narrativa.
+
+        . Exemplo: 
+            
+            “Liste em uma tabela os prós e contras da energia solar comparada à eólica.”
+
+    . Iteração e Refinamento
+
+        . Muitas vezes é necessário ajustar o prompt diversas vezes até chegar na resposta ideal.
+
+
+. Por que é importante?
+
+    . Eficiência: melhora a precisão das respostas.
+
+    . Controle: ajuda a reduzir ambiguidades.
+
+    . Produtividade: permite extrair mais valor da IA em menos tempo.
+
+    . Segurança: prompts bem projetados podem reduzir respostas incorretas ou enviesadas.
+
+. Resumindo: 
+
+    . Engenharia de prompt é o processo de projetar instruções para guiar modelos de IA a entregar 
+        o melhor resultado possível, de acordo com o objetivo desejado.        
+
+
+. Engenharia de prompt aplicada à programação de software, comparando um prompt mal formulado (genérico, ambíguo) 
+    com um prompt bem formulado (claro, contextualizado e objetivo).
+
+    . Exemplo 1 – Explicação de Código
+
+        . Código demonstrativo:
+
+            for i in range(5):
+                print(i * 2)
+
+        . Prompt genérico (ruim):
+
+            "Explique esse código em Python."
+
+        . Problema: sem contexto, a IA pode dar uma explicação superficial ou longa demais.
+
+        . Prompt engenheirado (bom):
+
+            "Explique o seguinte código Python linha por linha, como se eu fosse um iniciante em programação. 
+            Depois, resuma em uma frase o que o programa faz."
+
+    . Exemplo 2 – Geração de Código
+
+        . Prompt genérico (ruim):
+
+            "Escreva um código em Java para calcular média."
+
+        . Problema: não define tipo de entrada/saída nem contexto.
+
+        . Prompt engenheirado (bom):
+
+            . Escreva um código em Java que:
+
+                . Leia uma lista de números inteiros informada pelo usuário (via Scanner).
+
+                . Calcule a média aritmética.
+
+                . Exiba o resultado com 2 casas decimais.
+
+                . Trate o caso de lista vazia exibindo a mensagem: “Nenhum número informado.”
+
+    Exemplo 3 – Ajuda com Erros
+
+        . Código demonstrativo
+
+            public class Pessoa {
+                public string Nome { get; set; }
+            }
+
+            class Program {
+                static void Main() {
+                    Pessoa p = null;
+                    Console.WriteLine(p.Nome);
+                }
+            }
+
+        . Prompt genérico (ruim):
+
+            "Meu código está dando erro, me ajude."
+
+        . Problema: vago demais, a IA não tem material para analisar.
+
+        . Prompt engenheirado (bom):
+
+            "Meu código C# abaixo está lançando a exceção NullReferenceException.
+            Explique a causa provável e sugira como corrigir:"
+
+    . Exemplo 4 – Refatoração
+
+        . Código demonstrativo:
+
+            def soma(a, b):
+                return a+b
+            def sub(a,b): return a-b
+
+        . Prompt genérico (ruim):
+
+            "Melhore esse código."
+
+        . Problema: não define critérios de melhoria (performance? legibilidade? boas práticas?).
+
+        . Prompt engenheirado (bom):
+
+            "Refatore o seguinte código Python para seguir boas práticas do PEP8, reduzir 
+            redundâncias e incluir docstrings explicativas:"
+
+    . Exemplo 5 – Documentação
+
+        . Código demonstrativo:
+
+            def fatorial(n: int) -> int:
+                if n == 0:
+                    return 1
+                return n * fatorial(n-1)
+
+        . Prompt genérico (ruim):
+
+            "Documente esse código."
+
+        . Problema: não especifica o formato da documentação.
+
+        . Prompt engenheirado (bom):
+
+            "Gere documentação em formato Markdown para a função abaixo, incluindo:
+
+                Descrição geral
+
+                Parâmetros com tipo
+
+                Valor de retorno
+
+                Exemplo de uso"
+
+. Guia Rápido de Prompts para Desenvolvedores
+
+    . Geração de Código
+
+        . Prompt:
+
+            . Escreva um código em [linguagem] que faça o seguinte:
+
+                [descreva os requisitos de entrada/saída]
+
+                [adicione regras de formatação/validação]
+
+                [detalhe casos especiais a tratar]
+                O código deve estar comentado e seguir boas práticas.
+
+        . Exemplo:
+
+            "Escreva um código em Python que leia uma lista de números inteiros, remova duplicados, 
+                ordene em ordem crescente e exiba o resultado."
+
+    . Explicação de Código
+
+        . Prompt:
+
+            Explique o seguinte código em [linguagem]:
+
+                "Linha por linha, de forma didática.
+
+                Depois faça um resumo em 2 frases sobre o que o programa faz.
+                código aqui"
+
+        . Exemplo:
+
+            "Explique esse código em JavaScript para alguém que está aprendendo:"
+
+            const arr = [1,2,3];
+            const doubled = arr.map(x => x * 2);
+            console.log(doubled);
+
+    . Debugging
+
+        . Prompt:
+
+            "Meu código abaixo em [linguagem] está apresentando o erro [nome do erro].
+            Explique a causa provável e sugira como corrigir:
+
+                código aqui
+
+        . Exemplo:
+
+            . Meu código em Python está retornando IndexError: list index out of range.
+
+                lista = [10, 20, 30]
+                print(lista[3])
+
+    . Documentação
+
+        . Prompt:
+
+            "Gere documentação em [formato desejado: Markdown, Javadoc, XMLDoc] para a função abaixo, incluindo:
+
+                Descrição
+
+                Parâmetros com tipo
+
+                Valor de retorno
+
+                Exemplo de uso"
+
+
+                código aqui
+
+        . Exemplo:
+
+            . Documente essa função em formato Markdown:                
+
+                def potencia(base: int, exp: int) -> int:
+                    return base ** exp
+
+    . Conversão de Linguagem
+
+        . Prompt:
+
+            "Converta o seguinte código de [linguagem A] para [linguagem B], preservando a lógica e boas 
+                práticas da linguagem de destino."
+
+                código aqui
+
+        . Exemplo:
+
+            . Converta esse código Python para Java:
+
+                for i in range(5):
+                    print(i)
+
+    . Testes Automatizados
+
+        . Prompt:
+
+            "Crie testes unitários em [framework de testes] para a seguinte função, cobrindo:
+
+                Casos normais
+
+                Casos limite
+
+                Entrada inválida"
+
+                
+                código aqui
+
+        . Exemplo:
+
+            . Crie testes unitários com JUnit para essa função Java:
+
+                int soma(int a, int b){
+                    return a+b;
+                }

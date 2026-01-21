@@ -1,10 +1,17 @@
 Implementing ADO.NET with C#
 ----------------------------
 
-The Classes of ADO.NET
-----------------------
+. Classes do ADO.NET
 
-    . Principais classes do ADO.NET:
+    . O que é ADO.NET?
+
+        . ADO (ActiveX Data Objects) é uma das tecnologias de acesso a dados da Microsoft, que podemos comunicar
+            com diferentes banco de dados. Faz parte do .NET Framework, serve para conectar aplicações .NET
+            (Console, WCF, WPF, Windows, MVC, Web Form, etc.). Os bancos de dados podem ser: SQL Server, Oracle, MySQL, XML, 
+            etc. ADO.NET consiste em um conjunto de classes predefinidas utilizadas para conectar, resgatar, inserir, 
+            atualizar e eliminar dados em operações CRUD nesses bancos.
+
+    . Principais componentes do ADO.NET:
 
         . Connection - Cria uma conexão com o banco de dados.
 
@@ -72,9 +79,17 @@ The Classes of ADO.NET
 
             . https://dev.mysql.com/doc/connector-net/en/connector-net-tutorials-intro.html
 
+    . Para se conectar e interagir com um banco de dados MySQL, você precisa usar as classes do namespace MySql.Data.MySqlClient 
+        (disponível após instalar o pacote NuGet MySQL Connector/NET ou MySqlConnector):
 
-ORMs and ADO.NET
-----------------
+        Em vez de SqlConnection, use MySqlConnection.
+        Em vez de SqlCommand, use MySqlCommand.
+        Em vez de SqlDataAdapter, use MySqlDataAdapter.
+        Em vez de SqlDataReader, use MySqlDataReader. 
+
+
+
+. ORMs and ADO.NET
 
     . Exemplos de ORMs:
 
@@ -99,8 +114,7 @@ ORMs and ADO.NET
             uma das fontes a serem consultadas.
 
 
-The Connection Class
---------------------
+. The Connection Class
 
     . Passando string de conexão:
 
@@ -120,9 +134,35 @@ The Connection Class
 
         cnn.Dispose();
 
+    . using (ou using var) garante que o objeto que implementa IDisposable tenha Dispose() chamado automaticamente ao 
+        sair do escopo — mesmo se ocorrer uma exceção. É equivalente a um try/finally que chama Dispose().
 
-Openning a Connection
----------------------
+        using (MySqlConnection con = new MySqlConnection(cs))
+        {
+            ...
+
+            // con.Dispose();       Neste caso não precisa, porque utiliza o bloco "using", desde que implemente a interface "IDispose" 
+
+        }   // Dispose chamado aqui
+
+
+        ou
+
+        using var conn = new  MySqlConnection(cs)
+
+        conn.Open();
+        // Dispose chamado ao final do método/escopo
+
+
+    . Criar com new sozinho não chama Dispose() automaticamente; você precisa chamar Close()/Dispose() manualmente 
+        (normalmente dentro de um try/finally). Sem isso, o fechamento/retorno da conexão ao pool fica dependente 
+        do GC (não-determinístico), podendo causar esgotamento do pool.
+
+         MySqlConnection con = new MySqlConnection(cs);
+
+         con.Dispose(); // Quase que obrigado fazer o dispose neste casso com o uso do "new"
+
+. Demo
 
     . Digite os comandos abaixo no prompt do sistema operacional:
 
@@ -136,11 +176,31 @@ Openning a Connection
         dotnet add package MySql.Data
         code .
 
-    . Acesse o MySQL e execute a DDL abaixo:
+    . Instalando o MySQL
 
-        CREATE TABLE cliente( codigo bigint NOT NULL AUTOINCREMENT PRIMARY KEY,
-                                nome VARCHAR(50),
+        # Criando container com nome o banco de dados MySQL
+        docker container run -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 --name adoNetSystemDb -d mysql:8.0.36 --default-authentication-plugin=mysql_native_password
+        
+        docker start adoNetSystemDb
+
+        docker ps -a
+        docker exec -it adoNetSystemDb mysql -u root -p	
+
+        docker stop adoNetSystemDb
+
+    . Criando o banco de dados
+
+        docker exec -it adoNetSystemDb mysql -u root -p	
+
+        CREATE DATABASE adoNetSystem;
+
+        USE adoNetSystem;
+
+        CREATE TABLE cliente(   codigo          bigint NOT NULL AUTOINCREMENT PRIMARY KEY,
+                                nome            VARCHAR(50),
                                 dataAniversario DATE);
+
+. Openning a Connection
 
     . Para abrirmos uma conexão precisamos de uma string de conexão:
   
@@ -154,24 +214,85 @@ Openning a Connection
 
         . Para encontrar as diversas formas de montar uma string de conexão acesse o site https://www.connectionstrings.com/
 
-    . Um exemplo que podemos utilizar, inclua a classe abaixo no projeto:
+. Demo
+
+    . Crie a pasta "AdoNet" dentro do projeto "adoNetSystem" e crie a classe abaixo dentro 
 
         using System;
         using System.Text;
         using MySql.Data.MySqlClient;
 
-        namespace AdoNetSystem
+        namespace AdoNet;
+
+        public class ConnectionModel : IDisposable
         {
-            public class ConnectionModel : IDisposable
+
+            public void OpenConnection()
             {
-                public static void Main(string[] args){
-                    ConnectionModel connectionModel = new ConnectionModel();
 
-                    connectionModel.OpenConnection();
+                string cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+                using (MySqlConnection con = new MySqlConnection(cs))
+                {
+                    con.Open();
+
+                    string connectionInformation = GetConnectionInformation(con);
+
+                    Console.WriteLine(connectionInformation);
+
+                    // fechará a conexão com o servidor conforme definido na string de conexão
+                    con.Close();
+
+                    // Limpará completamente, removendo todos os recursos não gerenciados, evitando que a conexão 
+                    // seja usada novamente. Uma vez que descartado é chamado, você não deve mais tentar usar o objeto. 
+                    // con.Dispose();       // Não está sendo usado porque a conexão foi chamada dentro de um bloco "using"
                 }
+            }
 
-                public void OpenConnection(){
+            public string GetConnectionInformation(MySqlConnection con)
+            {
+                StringBuilder sb = new StringBuilder(1024);
 
+                sb.AppendLine("Connection String: " + con.ConnectionString);
+                sb.AppendLine("State: " + con.State.ToString());
+                sb.AppendLine("Connection Timeout: " + con.ConnectionTimeout.ToString());
+                sb.AppendLine("Database: " + con.Database);
+                sb.AppendLine("Data Source: " + con.DataSource);
+                sb.AppendLine("Server Version: " + con.ServerVersion);
+                //            sb.AppendLine("Workstation ID: " + con.WorkstationId);
+
+                return sb.ToString();
+
+            }
+
+            void IDisposable.Dispose()
+            {
+                throw new NotImplementedException();
+            }
+
+        }
+
+        . No método "OpenConnection()" utilizamos o bloco "using". Um detalhe para se destacar que a classe "ConnectionModel" precisa
+            implementar a interface "IDisposable" se quisermos utiliza-la num bloco "using". Neste caso, implementaremos o método "IDisposable.Dispose()"
+            nesta classe para liberar recursos utilizados pela classe em questão. Para mais detalhes acesse: https://www.devmedia.com.br/entendendo-o-bloco-using-no-csharp/16967
+
+
+    . Acesse a classe Programa.cs e altere todo o código abaixo:
+
+        using AdoNet;
+
+        ConnectionModel cm = new ConnectionModel();
+
+        cm.OpenConnection();
+
+    . Catching Connection Exceptions
+
+        . Implemente o bloco Try, catch dentro do método "OpenConnection" como abaixo:
+
+            public void OpenConnection(){
+
+                // Bloco try/catch inserido
+                try{
                     string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
 
                     using ( MySqlConnection con = new MySqlConnection(cs)){
@@ -186,150 +307,276 @@ Openning a Connection
                         con.Dispose();
                     }
                 }
-
-                public string GetConnectionInformation(MySqlConnection con ){
-                    StringBuilder sb = new StringBuilder(1024);
-                    
-                    sb.AppendLine("Connection String: " + con.ConnectionString);
-                    sb.AppendLine("State: " + con.State.ToString());
-                    sb.AppendLine("Connection Timeout: " + con.ConnectionTimeout.ToString());
-                    sb.AppendLine("Database: " + con.Database);
-                    sb.AppendLine("Data Source: " + con.DataSource);
-                    sb.AppendLine("Server Version: " + con.ServerVersion);
-        //            sb.AppendLine("Workstation ID: " + con.WorkstationId);
-
-                    return sb.ToString();
-
-                }
-
-                void IDisposable.Dispose()
-                {
-                    throw new NotImplementedException();
-                }
-
-            }
-        }
-
-        . Connection.Close () simplesmente fechará a conexão com o servidor conforme definido na string de conexão. 
-            A conexão pode ser usada/reaberta após este ponto.
-
-        . Connection.Dispose() limpará completamente, removendo todos os recursos não gerenciados, evitando que a conexão 
-            seja usada novamente. Uma vez que descartado é chamado, você não deve mais tentar usar o objeto. 
-            Dentro de Dispose(), Close () `certamente todos serão chamados também.
-
-        . No método "OpenConnection()" utilizamos o bloco "using". Um detalhe para se destacar que a classe "ConnectionModel" precisa
-            implementar a interface "IDisposable" se quisermos utiliza-la num bloco "using". Neste caso, implementaremos o método "IDisposable.Dispose()"
-            nesta classe para liberar recursos utilizados pela classe em questão. Para mais detalhes acesse: https://www.devmedia.com.br/entendendo-o-bloco-using-no-csharp/16967
-
-    . O projeto poderá ser executado de duas formas. Ou pela classe principal do projeto "Program.cs", ou diretamente pela classe "Model" "ConnectionModel";
-
-        . Acesse a classe Programa.cs e implemente o código abaixo:
-
-            using AdoNetSystem;
-
-            using ( ConnectionModel connectionModel = new ConnectionModel()){
-                connectionModel.OpenConnection();
-            }
-
-        . Acesse a classe "ConnectionModel"; comente o código da classe "Program.cs" para que ele não seja executado no lugar da classe "Model";
-            e execute o projeto.
-
-
-. Catching Connection Exceptions
-
-    . Implemente o bloco Try, catch dentro do método "OpenConnection" como abaixo:
-
-        public void OpenConnection(){
-            try{
-                string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
-
-                using ( MySqlConnection con = new MySqlConnection(cs)){
-                    con.Open();
-
-                    string connectionInformation = GetConnectionInformation(con);
-
-                    Console.WriteLine( connectionInformation );
-
-                    con.Close();
-
-                    con.Dispose();
+                catch( Exception ex){
+                    throw new Exception( "Ocorreu o seguinte Erro: " + ex.ToString());
                 }
             }
-            catch( Exception ex){
-                throw new Exception( "Ocorreu o seguinte Erro: " + ex.ToString());
-            }
-        }
 
-        . Altere alguma informação da string de conexão para dar erro e cair na excessão.
+        . Altere alguma informação da string de conexão para dar erro e cair na excessão, ou retire o docker container do arq.
 
     . Execute o projeto.
 
-. Retrieving a Scalar Value using a Command Object
+. SQLCommand
 
-    . Para executar alguma sentença DML precisamos faze-lo pela classe "Command".
+    . SqlCommand é a classe do ADO.NET responsável por representar um comando SQL que será executado no banco de dados.
+
+    . Ela pode executar:
+
+        SELECT
+
+        INSERT
+
+        UPDATE
+
+        DELETE
+
+        Stored Procedures
+
+    . Exemplo
+
+        using System.Data.SqlClient;
+
+        var command = new SqlCommand(
+            "SELECT COUNT(*) FROM Usuarios",
+            connection
+        );
+
+    . Método "ExecuteScalar"
+
+        . É um método do SqlCommand usado quando, você espera apenas um único valor como retorno.
+
+        . Características importantes:
+
+            . Executa o comando SQL
+
+            . Retorna somente a primeira coluna da primeira linha
+
+            . Ignora o resto do resultado
+
+        . Exemplo:
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                var command = new SqlCommand(
+                    "SELECT COUNT(*) FROM Usuarios",
+                    connection
+                );
+
+                int totalUsuarios = (int)command.ExecuteScalar();
+            }
+
+    . Método "ExecuteNonQuery"
+
+        . Executa comandos SQL que:
+
+            . Não retornam ResultSets (SELECT)
+
+            . Alteram o estado do banco de dados
+
+            . É usado principalmente para:
+
+                INSERT
+
+                UPDATE
+
+                DELETE
+
+                CREATE / ALTER / DROP
+
+        . Exemplo:
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string sql = "INSERT INTO Cliente (Nome, Email) VALUES (@Nome, @Email)";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Nome", "Marco");
+                    cmd.Parameters.AddWithValue("@Email", "marco@email.com");
+
+                    conn.Open();
+
+                    int linhasAfetadas = cmd.ExecuteNonQuery();
+                }
+            }
+
+    . Método "ExecuteReader"
+
+        . Retorna um DataReader com os dados da consulta e executa apenas o comando SELECT.
+            Use quando for preencher um DropDownList, CheckBoxList, RadioButtonList. ExecuteReader é somente leitura e 
+            não pode ser usado para outros fins.
+
+        . O que acontece internamente:
+
+            . O SqlCommand envia o SQL ao banco
+
+            . O banco começa a enviar os dados
+
+            . O C# cria um SqlDataReader
+
+            . Os dados são lidos linha a linha (forward-only)
+
+        . É rápido e consome pouca memória. Não permite voltar para registros anteriores
+
+        . Exemplo:
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string sql = "SELECT Id, Nome, Email FROM Cliente";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    conn.Open();
+                                                
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())   // Read() - avança para a próxima linha e Retorna true enquanto houver dados
+                        {
+                            int id = reader.GetInt32(0);
+                            string nome = reader.GetString(1);
+                            string email = reader.GetString(2);
+                        }
+                    }
+                }
+            }
+
+        . Formas de acessar os dados:
+
+            reader.GetString(2);        reader.GetInt32(0);
+
+            reader["Nome"].ToString();      // Mais legível, porém um pouco mais lento.
+
+            
+            string? email = reader.IsDBNull(2) ? null : reader.GetString(2);        // Verificando NULL
+
+        . Claúsula WHERE
+
+            string sql = "SELECT Nome FROM Cliente WHERE Id = @Id";
+
+            cmd.Parameters.AddWithValue("@Id", 1);
+
+    . Quando usar:
+
+        . Se não retorna dados → ExecuteNonQuery
+
+        . Se retorna muitas linhas → ExecuteReader
+
+        . Se retorna um único valor → ExecuteScalar
+
+. Parâmetros
+
+    . Os parâmetros também podem ser enviados da seguinte forma:
+
+        cmd.Parameters.Add( new MySqlParameter("@nome", "Jose Saramago"));
+        cmd.Parameters.Add( new MySqlParameter("@dataAniversario", "2010-10-17"));
+
+        ou
+
+        cmd.Parameters.Add( new MySqlParameter( parameterName : "@dataAniversario", value: "2010-10-17"));
+
+        ou
+
+        cmd.Parameters.Add("@nome", MySqlDbType.VarChar, 100)
+                      .Value = "Jose Camargo";        
+
+    . Boas práticas técnicas
+
+        . Sempre definir tipo (MySqlDbType)
+
+        . Definir tamanho quando aplicável (VARCHAR)
+
+        . Evitar AddWithValue (problemas de inferência)
+
+. Demo
 
     . Implemente o método abaixo na classe "ConnectionModel".
 
-        public long GetClientesCountScala(){
-            long rowsAffected = 0;
-
-            try{
-
-                string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
-
-                string sql = "SELECT COUNT(*) FROM cliente";
-
-                using ( MySqlConnection con = new MySqlConnection(cs)){
-                    using( MySqlCommand cmd = new MySqlCommand(sql, con)){
-                        con.Open();
-
-                        rowsAffected = (long)cmd.ExecuteScalar();
-
-                        Console.WriteLine( "Linhas Afetadas: " + rowsAffected.ToString() );
-                    }
-                }
-            }catch( Exception ex){
-                throw new Exception( "Ocorreu o seguinte Erro: " + ex.ToString());
-            }
-
-            return rowsAffected;
-        }
-
-    . Implemente a linha abaixo no método "main", ou substitua ele na classe "Program.cs":
-
-            long rowsAffected = connectionModel.GetClientesCountScala();
-
-    . Execute o projeto debugando a partir da linha acima da classe "ConnectionModel" e veja o resultado.
-
-    . ExecuteScalar - Retorna apenas um valor após a execução de uma consulta. Use quando quiser um valor apenas 
-        (uma linha e uma coluna). por exemplo para pegar o total de registros de uma tabela. 
-        
-    . ExecuteReader - Retorna um DataReader com os dados da consulta e executa apenas o comando SELECT.
-        Use quando for preencher um DropDownList, CheckBoxList, RadioButtonList. ExecuteReader é somente leitura e 
-        não pode ser usado para outros fins.
-
-    https://cbsa.com.br/post/diferencas-entre-executereader-executenonquery-executescalar-quando-usar-e-qual-usar.aspx
-
-
-. Submit an INSERT Statement using ExecuteNonQuery
-
-    . Implemente o método abaixo na classe ConnectionModel.cs:
-
-        public long InsertCliente(){
-            long rowsAffected = 0;
-            string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
-            string sql = @"INSERT INTO cliente( nome, dataAniversario ) VALUES( @nome, @dataAniversario )";
+        ...
+        public string GetClientesCountScala()
+        {
+            string version = string.Empty;
 
             try
             {
-                using( MySqlConnection cn = new MySqlConnection(cs)){
-                    using( MySqlCommand cmd = new MySqlCommand(sql, cn)){
+
+                string cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+                string sql = "SELECT VERSION()";
+
+                using (MySqlConnection con = new MySqlConnection(cs))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand(sql, con))
+                    {
+                        con.Open();
+
+                        version = (string)cmd.ExecuteScalar();
+
+                        Console.WriteLine($"A versão do Servidor MySQL é: {version}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu o seguinte Erro: " + ex.ToString());
+            }
+
+            return version;
+        }
+        ...
+
+    . Implemente a linha abaixo na classe "Program.cs":
+
+        using AdoNet;
+
+        ConnectionModel cm = new ConnectionModel();
+
+        // Apague a linha abaixo
+        // cm.OpenConnection();
+
+        // Insira a linha abaixo
+        string version = cm.GetClientesCountScala();
+
+    . Execute o projeto debugando a partir da linha acima da classe "ConnectionModel" e veja o resultado.
+
+    . Implemente o método abaixo na classe ConnectionModel.cs:
+
+        // Linha inserida
+        using System.Data;
+        ...
+
+        // Método inserido
+        public long InsertCliente()
+        {
+            long rowsAffected = 0;
+            string cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+            try
+            {
+                using (MySqlConnection cn = new MySqlConnection(cs))
+                {
+                    cn.Open();
+
+                    var dml = "DROP TABLE IF EXISTS cliente; CREATE TABLE cliente ( id INT AUTO_INCREMENT PRIMARY KEY, nome VARCHAR(100) NOT NULL, dataAniversario DATE NOT NULL );";
+
+                    using (MySqlCommand cmd = new MySqlCommand(dml, cn))
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    string sql = @"INSERT INTO cliente( nome, dataAniversario ) VALUES( @nome, @dataAniversario )";
+
+                    using (MySqlCommand cmd = new MySqlCommand(sql, cn))
+                    {
                         cmd.CommandType = CommandType.Text;
 
-                        cn.Open();
+                        cmd.Parameters.Add("@nome", MySqlDbType.VarChar, 100)       // O tamanho (100) pode ser opcional
+                                        .Value("Cecilia Meireles");
 
-                        cmd.Parameters.AddWithValue("@nome","Cecilia Meireles");
-                        cmd.Parameters.AddWithValue("@dataAniversario","1966-10-17");
+                        cmd.Parameters.Add("@dataAniversario", MySqlDbType.DateTime)
+                                      .Value(, "1966-10-17");
 
                         rowsAffected = cmd.ExecuteNonQuery();
                     }
@@ -337,8 +584,8 @@ Openning a Connection
             }
             catch (Exception ex)
             {
-                
-                throw new Exception( "Ocorreu o seguinte erro: " + ex.ToString());
+
+                throw new Exception("Ocorreu o seguinte erro: " + ex.ToString());
             }
 
             return rowsAffected;
@@ -348,114 +595,858 @@ Openning a Connection
             (para os demais retornará -1), é utilizado geralmente para fazer Inserts, Updates e Deletes. Use para inserir, atualizar
             e apagar dados do banco de dados.
 
-        . Os parâmetros também podem ser enviados da seguinte forma:
+    . Implemente a linha abaixo na classe "Program.cs":
 
-            cmd.Parameters.Add( new MySqlParameter("@nome", "Jose Saramago"));
-            cmd.Parameters.Add( new MySqlParameter("@dataAniversario", "2010-10-17"));
+        using AdoNet;
 
-            ou
+        ConnectionModel cm = new ConnectionModel();
 
-            cmd.Parameters.Add( new MySqlParameter( parameterName : "@dataAniversario", value: "2010-10-17"));
+        // Apague a linha abaixo
+        // string version = cm.GetClientesCountScala();
 
-        . Veja mais opções de declarar "Parameters" no link https://csharp.hotexamples.com/pt/examples/-/MySqlDbType/-/php-mysqldbtype-class-examples.html
+        // Insira a linha abaixo
+        var rowsAffected = cm.InsertCliente();
 
-    . Altere o Program.cs para efetuar a chamada do método acima:
+    . Execute o projeto
 
-        using AdoNetSystem;
 
-        using ( ConnectionModel connectionModel = new ConnectionModel()){
-            connectionModel.InsertCliente();
+    . Implemente o método abaixo na classe ConnectionModel.cs:
+
+        public void GetallCliente()
+        {
+            var cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+            try
+            {
+                using var cn = new MySqlConnection(cs);
+                using var cmd = new MySqlCommand("SELECT * FROM cliente", cn);
+
+                cn.Open();
+
+                using MySqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    System.Console.WriteLine($"({rdr.GetInt16(0)}) -> {rdr.GetString(1)} - Date of Birthday {rdr.GetDateTime(2)}\n");
+                }
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
         }
 
-    . Execute o projeto e veja o resultado.
+    . Altere as linhas abaixo na classe "Program":
 
+        using AdoNet;
+
+        ConnectionModel cm = new ConnectionModel();
+
+        cm.GetallCliente(); // Linha inserida
+
+    . Crie a procedure abaixo numa pasta do disco
+
+        DELIMITER $$
+
+        DROP PROCEDURE IF EXISTS spUpdateCliente $$
+
+        CREATE PROCEDURE spUpdateCliente( IN prId INT, IN prNome VARCHAR(100), IN prDataAniversario DATE)
+        BEGIN
+            UPDATE cliente
+            SET Nome = prNome,
+                DataAniversario = prDataAniversario
+            WHERE Id = prId;
+
+        END $$
+
+        DELIMITER ;
+
+    . Execute o comando abaixo no prompt do sistema operacional:
+
+        docker cp "d:\temp\spUpdateCliente.sql" adoNetSystemDb:/tmp/spUpdateCliente.sql
+
+    . Acesse o banco de dados e compile a procedure
+
+        docker exec -it adoNetSystemDb mysql -u root -p
+
+        use adoNetSystem;
+
+        SOURCE /tmp/spUpdateCliente.sql
+
+        # Comandos interessantes do MySQL para verificar se a procedure foi criada com sucesso
+        SHOW PROCEDURE STATUS WHERE Db = DATABASE() AND Name = 'spUpdateCliente'; -- Lista todas as procedures do database
+
+        SHOW CREATE PROCEDURE spUpdateCliente;  -- Lista o corpo da procedure
+
+    . Crie o método abaixo no arquivo "ConnectionModel":
+
+        ...
+        public void UpdateClienteStoredProcedure()
+        {
+            using (MySqlConnection cn = new MySqlConnection(@"server=localhost;userid=root;password=root;database=adoNetSystem"))
+            {
+                cn.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("spUpdateCliente", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@prNome", MySqlDbType.VarChar,100).Value = "MARCOS SILVA";
+                    cmd.Parameters.Add("@prDataAniversario", MySqlDbType.Date).Value = "1985-05-20";
+                    cmd.Parameters.Add("@prId", MySqlDbType.Int64).Value = 1;
+
+                    /*
+                    MySqlParameter output = new MySqlParameter("@IdGerado", SqlDbType.Int)
+                    {
+                        Direction = ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(output);
+                    */
+
+                    cmd.ExecuteNonQuery();
+
+                    // int id = (int)cmd.Parameters["@IdGerado"].Value;
+                }
+            }
+        }
+
+    . Altere as linhas abaixo na classe "Program":
+
+        using AdoNet;
+
+        ConnectionModel cm = new ConnectionModel();
+
+        // string version = cm.GetClientesCountScala();
+        // var rowsAffected = cm.InsertCliente();
+
+        // Insira a linha abaixo
+        cm.UpdateClienteStoredProcedure();
+
+    . Execute o projeto
 
 . Using OUTPUT Parameters
 
+    . Um parâmetro de saída é um canal de retorno controlado entre o banco e a aplicação.
+
+    . Ele serve para:
+
+        . Retornar status da operação
+
+        . Retornar IDs gerados
+
+        . Retornar mensagens de negócio
+
+        . Retornar valores calculados internamente
+
+    . Diferente de um SELECT, o OUT não faz parte do result set — ele faz parte do contrato da procedure.
+
+    . Diferença entre SELECT, RETURN e OUT:
+
+        Técnica	    MySQL   Uso
+        -------     -----   ---
+        SELECT	    ✔	    Retornar dados (linhas/colunas)
+        RETURN	    ❌	   MySQL não suporta retorno escalar como SQL Server
+        OUT	        ✔	    Retornar controle e metadados
+
+    . No MySQL, parâmetros OUT são o “RETURN real”
+
+    . Passo a passo para utilizar parâmetros de saída:
+
+        . Você define o parâmetro como Direction = Output
+
+            MySqlParameter output = new MySqlParameter("@IdGerado", SqlDbType.Int)
+            {
+                Direction = ParameterDirection.Output
+            };
+
+            cmd.Parameters.Add(output);
+
+        . O provider envia o comando ao MySQL
+
+        . O MySQL executa a procedure
+
+        . O valor do OUT é armazenado no buffer do comando
+
+        . Após ExecuteNonQuery, o valor é populado em Parameter.Value
+
+    . Antes do ExecuteNonQuery, o valor sempre será null
+
+. Demo
+
+    . Crie o arquivo abaixo numa pasta qualquer, com o nome de "spInsertCliente.sql":
+
+        DELIMITER $$
+
+        DROP PROCEDURE IF EXISTS spUpdateCliente $$
+
+        CREATE PROCEDURE spinsertCliente( IN prNome VARCHAR(100), IN prDataAniversario DATE, OUT prId INT)
+        BEGIN
+            INSERT INTO cliente(Nome, DataAniversario) VALUES (prNome, prDataAniversario);
+
+            SET prId = LAST_INSERT_ID();
+        END $$
+
+        DELIMITER ;
+
+    . Execute o comando abaixo no prompt do sistema operacional:
+
+        docker cp "d:\temp\spInsertCliente.sql" adoNetSystemDb:/tmp/spInsertCliente.sql
+
+    . Acesse o banco de dados e compile a procedure
+
+        docker exec -it adoNetSystemDb mysql -u root -p
+
+        use adoNetSystem;
+
+        SOURCE /tmp/spInsertCliente.sql
+
+        # Comandos interessantes do MySQL para verificar se a procedure foi criada com sucesso
+        SHOW PROCEDURE STATUS WHERE Db = DATABASE() AND Name = 'spInsertCliente'; -- Lista todas as procedures do database
+
+        SHOW CREATE PROCEDURE spInsertCliente;  -- Lista o corpo da procedure
+
+    . Insira o método abaixo na classe "ConnectionModel.cs":
+
+        ...
+        public void InsertClienteStoredProcedure()
+        {
+            using (MySqlConnection cn = new MySqlConnection(@"server=localhost;userid=root;password=root;database=adoNetSystem"))
+            {
+                cn.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("spInsertCliente", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@prNome", MySqlDbType.VarChar, 100).Value = "MARCOS SILVA";
+                    cmd.Parameters.Add("@prDataAniversario", MySqlDbType.Date).Value = "1985-05-20";
+                    MySqlParameter output = new MySqlParameter("@prId", SqlDbType.Int)
+                    {
+                        Direction = ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(output);
+
+                    cmd.ExecuteNonQuery();
+
+                    int id = (int)cmd.Parameters["@prId"].Value;
+                }
+            }
+        }
+        ...
+
+    . Insira a linha abaixo na classe "Program.cs":
+
+        ...
+        cm.InsertClienteStoredProcedure();  // Linha inserida
+        ...
+
+    . Execute o projeto e verifique o valor do "id".
+
+    . Crie o método "InsertClienteWithOutputParameter" na classe "ConnectionModel"
+
+        public void InsertClienteWithOutputParameter()
+        {
+            string cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+            try
+            {
+                var sql = @"INSERT INTO cliente( nome, dataAniversario ) VALUES( @nome, @dataAniversario ); 
+                                SELECT LAST_INSERT_ID();";
+
+                using var cn = new MySqlConnection(cs);
+                using var cmd = new MySqlCommand(sql, cn);  
+
+                cmd.Parameters.Add("@nome", MySqlDbType.VarChar).Value = "Libero Badaró";
+                cmd.Parameters.Add("@dataAniversario", MySqlDbType.Date).Value = "1960-10-17";
+
+                cn.Open();
+                cmd.ExecuteScalar();
+
+                long id = Convert.ToInt64(cmd.ExecuteScalar());
+
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+
+        }
+
+    . Insira a linha abaixo na classe "Program.cs":
+
+        ...
+        cm.InsertClienteWithOutputParameter();  // Linha inserida
+        ...
+
+    . Execute o projeto e verifique o valor do "id"
+
+. Modelo Desconectado ( DataTable, DataSet e SqlDataAdapter )
+
+    . O objetivo do modelo desconectado é trabalhar com dados fora da conexão, mantendo-os em memória, permitindo:
+
+        leitura  \
+                  |
+        edição    |  
+                  |----> sincronizar depois com o banco.    
+        inclusão  |                 |
+                  |                 |
+        exclusão /                  |
+                                    |
+                                    V
+                        A conexão com o banco:
+
+                            . fica aberta o mínimo possível
+
+                            . melhora performance
+
+                            . melhora escalabilidade
+
+    . Visão geral do módelo desconectado:
+
+                Banco de Dados
+                    ↑
+                SqlDataAdapter
+                    ↑
+                DataTable / DataSet  (memória)
+                    ↓
+                Alterações (Insert/Update/Delete)
+                    ↓
+                SqlDataAdapter.Update()
+                    ↓
+                Banco de Dados
+
+. DataTable
+
+    . Representa uma tabela inteira em memória.
+
+        . Estrutura (colunas, tipos)
+
+        . Dados (linhas)
+
+        . Estado das linhas (Added, Modified, Deleted)
+
+    . Ele não sabe nada sobre o banco. Ele apenas armazena dados.
+
+    . Exemplos:
+
+        . Criando a tabela:
+
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "Ana",  new DateTime(2001, 2, 10););
+            table.Rows.Add(2, "João", new DateTime(2008, 12, 28););
+
+        . Alterando dados
+
+            table.Rows[0]["Nome"] = "Ana Maria";        // O ADO.NET automaticamente marca a linha como: RowState = Modified
+
+        . Podemos inserir uma "Primary Key" no objeto DataTable:
+
+            table.PrimaryKey = new[] { table.Columns["id"] };
+
+            // Buscando ocorrência pela PK
+            DataRow row = table.Rows.Find(10);
 
 
+    . Existem diversas maneiros para localizar/selecionar/filtrar ocorrências dentro de um objeto DataTable:
 
+        . DataTable.Select() - permite filtrar linhas em memória, usando uma expressão parecida com SQL (WHERE).Retorna um array de DataRow.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
+            DataRow[] linhas = table.Select("Id = 10");
             
+            DataRow[] resultado = table.Select("nome = 'Ana'");
+
+            DataRow[] linhas = table.Select("Id > 1");
+
+            DataRow[] resultado = table.Select("nome = 'Ana' AND id < 2 " );
+
+            DataRow[] resultado = table.Select("nome LIKE '%Silva%'");
+
+            DataRow[] resultado = table.Select("Status IN ('A', 'I')");
+
+            DataRow[] resultado = table.Select("dataAniversario >= #2025-01-01#");
 
 
 
+            // Filtra e deixa o resultado ordenado
+            DataRow[] linhas = table.Select("Id > 0, nome ASC ");   
+
+
+        . Buscando a linha:
+
+            DataRow row = table.Rows.Find(10);
+
+        . LINQ
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
 
 
 
+            OU
 
+            var cliente = table.AsEnumerable()
+                .FirstOrDefault(r => r.Field<int>("Id") == 10);
 
+    . Comparação
 
+        Método              Melhor cenário         
+        -------------       ---------------------- 
+        `Select()`          Filtro simples         
+        `DataView`          UI / filtros dinâmicos 
+        `Rows.Find()`       Busca por chave        
+        LINQ                Regras complexas       
 
+. Demo
 
+    . Insira o método abaixo na classe ConnectionModel.cs
 
-
-
-
-    . Acesse o arquivo Program.cs e substitua o código abaixo:
-
-        using System;
-        using MySql.Data.MySqlClient;
-
-        string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
-
-        using var con = new MySqlConnection(cs);
-
-        con.Open();
-
-        var stm = "SELECT * FROM cliente";
-        var cmd = new MySqlCommand(stm, con);
-
-        using MySqlDataReader rdr = cmd.ExecuteReader();
-
-        while (rdr.Read())
+        ...
+        public void WorkingWithDataTable()
         {
-            Console.WriteLine("{0} {1} ", rdr.GetInt32(0), rdr.GetString(1));
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "João Silva", new DateTime(1980, 5, 12));
+            table.Rows.Add(2, "Maria Souza", new DateTime(1990, 8, 23));
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+        }
+        ...
+
+    . Altere o métod main da classe Program.cs como abaixo:
+
+        using AdoNet;
+
+        // Linha apagada
+        // ConnectionModel cm = new ConnectionModel();
+
+        Linhas apagadas
+        // string version = cm.GetClientesCountScala();
+        // var rowsAffected = cm.InsertCliente();
+
+        // Linha inserida
+        cm.WorkingWithDataTable();
+
+    . Execute o projeto e veja se está sendo listado o conteúdo da lista "resultado" do método "WorkingWithDataTable"
+
+    . Insira as linhas abaixo no método "WorkingWithDataTable":
+
+        ...
+        public void WorkingWithDataTable()
+        {
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "João Silva", new DateTime(1980, 5, 12));
+            table.Rows.Add(2, "Maria Souza", new DateTime(1990, 8, 23));
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+            // Linha inserida
+            DataRow[] linhas = table.Select("Id > 0", "nome DESC");
+
+
+            // foreach inserido
+            foreach( var row in linhas )
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            }
+        }
+        ...
+
+    . Execute o projeto e veja se está sendo listado o conteúdo da lista "linhas" do método "WorkingWithDataTable"
+
+    . Insira as linhas abaixo no método "WorkingWithDataTable":
+
+        ...
+        public void WorkingWithDataTable()
+        {
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "João Silva", new DateTime(1980, 5, 12));
+            table.Rows.Add(2, "Maria Souza", new DateTime(1990, 8, 23));
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+            DataRow[] linhas = table.Select("Id > 0", "nome DESC");
+
+            /*  foreach apagado
+            foreach( var row in linhas )
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            }
+            */
+
+            // foreach inserido
+            linhas.AsEnumerable().ToList().ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } 
+            );
+
+        }
+        ...
+
+    . Execute o projeto e veja se está sendo listado o conteúdo da lista "linhas" do método "WorkingWithDataTable"
+
+. DataView
+
+    . É uma visão filtrada de um DataTable.
+
+        . Não duplica dados
+
+        . Ideal para filtros dinâmicos
+
+        . Muito usado em UI / binding
+
+    . Criando uma View:
+
+        DataView view = new DataView(table);
+
+    . Aplicando Filtro
+
+        view.RowFilter = "Saldo > 1000";
+
+    . Ordenação
+
+        view.Sort = "Nome ASC";
+
+    . DataView - Percorrendo um DataView
+
+        DataView view = new DataView(table);
+
+        view.RowFilter = "Saldo > 1000";
+
+        view.Sort = "Nome ASC";
+
+
+        // Percorrendo o resultado
+        foreach (DataRowView row in view)
+        {
+            Console.WriteLine(row["Nome"]);
         }
 
-        Console.WriteLine($"MySQL version : {con.ServerVersion}");
+. Demo
 
-    . Substitua o código do arquivo Programa.cs pelo código abaixo:
+    . Altere o método "WorkingWithDataTable" conforme abaixo:
 
-        using System;
-        using MySql.Data.MySqlClient;
-
-        string cs = @"server=localhost;userid=marco;password=brasil2;database=desenv";
-
-        using var con = new MySqlConnection(cs);
-
-        con.Open();
-
-        var cmd = con.CreateCommand();
-        var stm = @"SELECT * FROM cliente WHERE nome LIKE '%DA%'";
-
-        cmd.CommandText = stm;
-
-        var rdr = cmd.ExecuteReader();
-
-        while (rdr.Read())
+        public void WorkingWithDataTable()
         {
-            Console.WriteLine("{0} {1} ", rdr.GetInt32(0), rdr.GetString(1));
+            var table = new DataTable("cliente");
+
+            table.Columns.Add("Id", typeof(int));
+            table.Columns.Add("nome", typeof(string));
+            table.Columns.Add("dataAniversario", typeof(DateTime));
+
+            table.Rows.Add(1, "João Silva", new DateTime(1980, 5, 12));
+            table.Rows.Add(2, "Maria Souza", new DateTime(1990, 8, 23));
+
+            // Linha inserida
+            DataView view = new DataView(table);
+
+            // Linha inserida
+            view.Sort = "nome DESC";
+
+            // Linha inserida
+            view.RowFilter = "Id > 0";
+
+            // foreach inserida
+            foreach( DataRowView row in view )
+            {
+                // DataRow row = rowView.Row;
+                // Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+                System.Console.WriteLine( $"Id: {row["Id"]}, Nome: {row["nome"]}, Data Aniversário: {row["dataAniversario"]}" );
+            }
+
+
+            /*  Linhas apagadas
+
+            var resultado = table.AsEnumerable()
+                                    .Where( row => row.Field<int>("Id") > 0 )
+                                    .OrderByDescending( row => row.Field<string>("nome") )
+                                    .ToList();
+
+            resultado.ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } );
+
+
+            DataRow[] linhas = table.Select("Id > 0", "nome DESC");
+
+
+            linhas.AsEnumerable().ToList().ForEach( row => 
+            {
+                Console.WriteLine($"Id: {row.Field<int>("Id")}, Nome: {row.Field<string>("nome")}, Data Aniversário: {row.Field<DateTime>("dataAniversario")}");
+            } 
+            );
+
+            */        
+
         }
 
-        Console.WriteLine($"MySQL version : {con.ServerVersion}");
+    . Execute o projeto e veja a iteração do DataView está funcionando.
+
+. SqlDataAdapter
+
+    . Um DataAdapter é usado para recuperar dados de uma fonte de dados e para popular tabelas em um DataSet
+
+    . Ele não mantém conexão aberta e não armazena dados.
+
+        . Ele sabe:
+
+            . Buscar dados
+
+            . Enviar alterações
+
+            . Traduzir RowState para SQL
+
+    . Manipula dados em memória e sincroniza depois com o banco, sem manter conexão aberta.
+
+    . Construtores
+
+        . SqlDataAdapter() : Inicializa uma nova instância da classe SqlDataAdapter.
+
+        . SqlDataAdapter(SqlCommand selectCommand) : Inicializa uma nova instância da classe SqlDataAdapter com o SqlCommand 
+            especificado. O selectCommand pode ser uma instrução SELECT do Transact-SQL ou um procedimento armazenado.
+
+        . SqlDataAdapter(string selectCommandText, string selectConnectionString): Inicializa uma nova instância da classe 
+            SqlDataAdapter com o comando e uma string de conexão. O selectCommandText pode ser uma instrução SELECT do Transact-SQL 
+            ou um procedimento armazenado.
+
+        . SqlDataAdapter(string selectCommandText, SqlConnection selectConnection) : Inicializa uma nova instância da classe SqlDataAdapter 
+            com o comando e uma string de conexão. O selectCommandText pode ser uma instrução SELECT do Transact-SQL ou um procedimento 
+            armazenado. Se a sua string de conexão não usar Integrated Security = true, você pode usar System.Data.SqlClient.SqlCredential 
+            para passar o ID do usuário e a senha de forma mais segura do que especificando o ID do usuário e a senha como texto na 
+            string de conexão.
+
+    . Métodos
+
+        . CloneInternals(): É usado para criar uma cópia desta instância de DataAdapter.
+            
+        . Dispose(Boolean): É usado para liberar os recursos não gerenciados utilizados pelo DataAdapter.
+            
+        . Fill(DataSet): É usado para adicionar linhas ao DataSet para corresponder às da fonte de dados.
+            
+        . FillSchema(DataSet, SchemaType, String, IDataReader): Adiciona um DataTable ao DataSet especificado.
+            
+        . GetFillParameters(): É utilizada para obter os parâmetros definidos pelo usuário ao executar uma instrução SQL SELECT.
+            
+        . ResetFillLoadOption(): É usado para redefinir FillLoadOption para seu estado padrão.
+            
+        . ShouldSerializeAcceptChangesDuringFill() : Determina se o
+            
+        . ShouldSerializeFillLoadOption(): Determina se a propriedade FillLoadOption deve ser persistida ou não.
+            
+        . ShouldSerializeTableMappings(): Determina se um ou mais objetos DataTableMapping existem ou não.
+            
+        . Update(DataSet): É usado para chamar as respectivas instruções INSERT, UPDATE ou DELETE.
+
+    . Quando utilizar SqlDataAdapter
+
+
+        . Operações de dados desconectadas: Se o seu aplicativo precisa trabalhar com dados offline (ou seja, sem uma conexão contínua com 
+            o banco de dados), o SqlDataAdapter é uma boa opção. Ele permite preencher um DataSet ou DataTable com dados, manipulá-los 
+            localmente e, em seguida, aplicar as alterações de volta ao banco de dados.
+
+        . Atualizações em lote: O SqlDataAdapter suporta atualizações em lote, permitindo acumular alterações feitas em várias linhas na 
+            memória e, em seguida, confirmá-las no banco de dados em um único lote. Isso pode melhorar a eficiência e reduzir o número de
+            consultas ao banco de dados.
+
+        . Vinculação de dados: Se você estiver criando interfaces de usuário vinculadas a dados, o SqlDataAdapter simplifica o processo. Você 
+            pode vincular controles diretamente ao DataTable dentro de um DataSet, facilitando a exibição e a manipulação de dados.
+
+        . Cache e acesso offline: você pode usar o SqlDataAdapter para preencher um DataSet com dados, armazená-los na memória e permitir 
+            que os usuários trabalhem com os dados mesmo quando estiverem offline ou desconectados do banco de dados.
+
+        . Manipulação complexa de dados: Quando sua aplicação exige mais do que apenas a simples recuperação de dados e você precisa 
+            realizar inserções, atualizações e exclusões nos dados, o SqlDataAdapter oferece uma maneira eficiente de gerenciar essas alterações.
+
+        . Controle de Concorrência: O SqlDataAdapter pode lidar com problemas de concorrência usando concorrência otimista. Ele verifica 
+            se os dados que estão sendo atualizados no banco de dados correspondem aos dados no DataSet antes de aplicar as alterações, 
+            evitando sobrescritas não intencionais.
+
+        . Transformação de dados: Você pode usar o SqlDataAdapter juntamente com outros componentes do ADO.NET para realizar tarefas de 
+            transformação de dados, como alterar tipos de dados, mesclar dados de diferentes fontes e muito mais.
+
+        . Desempenho: Em cenários onde se deseja minimizar o número de viagens de ida e volta ao banco de dados ao trabalhar com dados, 
+            o SqlDataAdapter permite buscar um grande volume de dados de uma só vez e trabalhar com eles localmente antes de aplicar as 
+            alterações de volta ao banco de dados.
+
+    . Exemplo:
+
+        // SELECT
+        using var conn = new SqlConnection(cs);
+
+        var adapter = new SqlDataAdapter(
+            "SELECT Id, Nome, Email FROM Cliente",
+            conn
+        );
+
+        var table = new DataTable();
+        adapter.Fill(table);
 
 
 
- 
+
+        // INSERT
+        adapter.InsertCommand = new SqlCommand(
+            "INSERT INTO Cliente (Nome, Email) VALUES (@Nome, @Email)",
+            conn
+        );
+
+        adapter.InsertCommand.Parameters.Add("@Nome", SqlDbType.VarChar, 100, "Nome");
+        adapter.InsertCommand.Parameters.Add("@Email", SqlDbType.VarChar, 150, "Email");
+
+
+
+        // UPDATE
+        adapter.UpdateCommand = new SqlCommand(
+            "UPDATE Cliente SET Nome=@Nome, Email=@Email WHERE Id=@Id",
+            conn
+        );
+
+        adapter.UpdateCommand.Parameters.Add("@Nome", SqlDbType.VarChar, 100, "Nome");
+        adapter.UpdateCommand.Parameters.Add("@Email", SqlDbType.VarChar, 150, "Email");
+        adapter.UpdateCommand.Parameters.Add("@Id", SqlDbType.Int, 0, "Id");
+
+
+
+        // DELETE
+        adapter.DeleteCommand = new SqlCommand(
+            "DELETE FROM Cliente WHERE Id=@Id",
+            conn
+        );
+
+        adapter.DeleteCommand.Parameters.Add("@Id", SqlDbType.Int, 0, "Id");
+
+
+
+        // UPDATE SqlDataAdapter
+        adapter.Update(table);
+
+
+
+
+
+
+        // COMPLETO
+        var table = new DataTable();
+
+        adapter.Fill(table);
+
+        // INSERT
+        var nova = table.NewRow();
+        nova["Nome"] = "Pedro";
+        nova["Email"] = "pedro@email.com";
+        table.Rows.Add(nova);
+
+        // UPDATE
+        table.Rows[0]["Nome"] = "Pedro Silva";
+
+        // DELETE
+        table.Rows[1].Delete();
+
+        // sincroniza
+        adapter.Update(table);
+
+. Demo
+
+    . Insira o método abaixo na classe ConnectionModel.cs
+
+        ...
+        public void WorkingWithMySqlDataAdapter()
+        {
+            var cs = @"server=localhost;userid=root;password=root;database=adoNetSystem";
+
+            try
+            {
+                using var cn = new MySqlConnection(cs);
+    
+                cn.Open();
+
+                var sql = "SELECT * FROM cliente";
+
+                using var adapter = new MySqlDataAdapter(sql, cn);
+
+                var dataTable = new DataTable();
+
+                adapter.Fill(dataTable);
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    System.Console.WriteLine($"({row["id"]}) -> {row["nome"]} - Date of Birthday {row["dataAniversario"]}\n");
+                }
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+        }
+        ...
+
+    . Altere a chamada do método acima na classe "Program.cs"
+
+        using AdoNet;
+
+        ConnectionModel cm = new ConnectionModel();
+
+        // Linha alterada
+        cm.WorkingWithMySqlDataAdapter();
+
+    . Execute o projeto e veja se o recuros do MySQLDataAdapter está funcionanado
+
+    

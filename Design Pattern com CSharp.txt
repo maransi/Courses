@@ -1,0 +1,4304 @@
+Design Pattern com CSharp
+-------------------------
+
+. Gang of Four (GoF) 
+
+    . Conjunto de 23 soluções clássicas para problemas de projeto recorrentes no desenvolvimento de 
+        software orientado a objetos, documentadas no livro de 1994 "Design Patterns: Elements of 
+        Reusable Object-Oriented Software". O termo "Gang of Four" refere-se aos quatro autores 
+        do livro: Erich Gamma, Richard Helm, Ralph Johnson e John Vlissides. Esses padrões são 
+        categorizados em três tipos (Criacional, Estrutural e Comportamental) e promovem a 
+        criação de código mais flexível, reutilizável e sustentáve
+
+    . Os três tipos de padrões GoF
+
+        . Criacionais: Focam em como criar objetos de forma flexível e controlada.
+        
+            . Singleton: Garante que uma classe tenha apenas uma única instância e fornece um 
+                            ponto de acesso global para ela.
+            . Prototype: Especifica os tipos de objetos para criar utilizando uma intância prototipada, 
+                            criando um novo objeto copiando neste prtotipo.
+            . Builder: Separa a construção de um objeto complexo de sua representação, permitindo 
+                        que o mesmo processo gere diferentes representações.
+            . Factory Method: Cria uma instância de várias classes derivadas, mas permite que 
+                                subclasses decidam qual classe instanciar.
+            . Abstract Factory: Permite criar famílias de objetos relacionados sem especificar 
+                                suas classes concretas.
+            . Prototype: Cria novas instâncias através da cópia de objetos existentes.
+
+        . Estruturais: Lidaram com a maneira de compor classes e objetos para formar estruturas maiores.
+        
+            . Proxy: Forneça um substituto ou marcador para outro objeto, a fim de controlar o acesso a ele.
+            . Decorator: Atribui responsabilidades adicionais a um objeto dinamicamente. Os decoradores 
+                            fornecem uma alternativa flexível à criação de subclasses para estender a 
+                            funcionalidade.
+            . Adapter: Permite que objetos com interfaces incompatíveis trabalhem juntos.
+            . Facade: Fornece uma interface unificada para um conjunto de interfaces em um subsistema. Facade 
+                        define uma interface de nível superior que facilita o uso do subsistema.
+            . Flyweight: Uso de compartilhamento para dar suporte a um grande número de objetos de 
+                            granularidade fina de forma eficiente.
+            . Composite: Composição de objetos em estruturas de árvore para representar hierarquias parte-todo. 
+                            O recurso Composite permite que os clientes tratem objetos individuais e 
+                            composições de objetos de forma uniforme.
+            . Bridge: Desacopla uma abstração de sua implementação para que ambas possam variar independentemente.
+
+        . Comportamentais: Descrevem como objetos interagem e distribuem responsabilidades entre si 
+                            de forma flexível e eficiente.
+
+            . Visitor: Representa uma operação a ser realizada nos elementos de uma estrutura de objeto. 
+                        O Visitor permite definir uma nova operação sem alterar as classes dos elementos 
+                        sobre os quais ela opera.
+            . Observer: Define uma dependência de um para muitos entre objetos, de forma que, quando um objeto 
+                        mudar de estado, todos os seus dependentes sejam notificados e atualizados automaticamente.
+            . Strategy: Define uma família de algoritmos, encapsula cada um e os torna intercambiáveis, 
+                        permitindo que o algoritmo varie independentemente do cliente que o usa.
+            . Template: Defina o esqueleto de um algoritmo em uma operação, delegando algumas etapas para subclasses.
+                        O padrão Template Method permite que subclasses redefinam certas etapas de um algoritmo
+                        sem alterar a estrutura do algoritmo.
+            . Command: Encapsula uma solicitação como um objeto, permitindo assim parametrizar clientes com
+                        solicitações diferentes, enfileirar ou registrar solicitações e oferecer suporte a 
+                        operações reversíveis.
+            . Iterator: Fornece uma maneira de acessar os elementos de um objeto agregado sequencialmente sem
+                        expor sua representação subjacente.
+            . Memento: Sem violar o encapsulamento, capture e externalize o estado interno de um objeto para que
+                        o objeto possa ser restaurado a esse estado posteriormente.
+            . State: Permite que um objeto altere seu comportamento quando seu estado interno mudar. O objeto 
+                        parecerá mudar de classe.
+            . Mediator: Centralizar a comunicação entre objetos, fazendo com que eles não se comuniquem diretamente 
+                        entre si, mas sim através de um objeto mediador.
+            . Chain of Responsibility: Permite que uma solicitação percorra uma cadeia de manipuladores, 
+                                        onde cada manipulador decide se processa a solicitação ou a 
+                                        encaminha para o próximo. 
+            . Interpreter: Dada uma linguagem, defina uma representação para sua gramática juntamente com um 
+                            interpretador que use a representação para interpretar frases na linguagem.
+    
+    . Design Patterns adicionais:
+
+        . Simple Factor: Cria um objeto sem expor a lógica de criação para o cliente.
+        . Null Object: Fornece um objeto “nulo” com comportamento padrão, em vez de usar null. Em vez de retornar 
+                        null e obrigar o código cliente a verificar if(obj != null), Você retorna um objeto especial, 
+                        que implementa a mesma interface, seguindo um comportamento neutro, seguro e vazio.
+
+        . MVC: padrão arquitetural que separa uma aplicação em três componentes principais: model (dados e regras de negócio),
+                View (interface com o usuário), Controller (controle do fluxo e orquestração das ações). O objetivo do MVC 
+                é organizar o código, separar responsabilidades e tornar o sistema mais manutenível, testável e escalável.
+
+. Criacionais Pattern 
+
+    . Singleton
+
+        . Definição
+            
+            . Garante que uma classe tenha apenas uma única instância e fornece um ponto de acesso global para ela.
+
+        . Conceito
+
+            . Uma determinada classe deve ter apenas uma instância. Você pode usar essa instância sempre que precisar e, portanto, 
+                evitar a criação de objetos desnecessários.
+
+        . Ilustração
+
+                Client(Program.cs)
+
+
+                Singleton
+
+
+            . O construtor é private, assim não poderá ser instanciado (new)
+
+            . Antes de tentar criar um objeto, verificamos se existe uma cópia disponível. Se
+                não existir, criamos novo objeto; caso contrário, reutilizamos a existente.
+
+        . Exemplo
+
+            // Singleton
+            using System;
+            namespace  Pattern.Creational.Singleton
+            {               
+                public sealed class Singleton       // sealed impedi que a classe Singleton seja herdada por outras classes
+                {
+                    private static readonly Singleton instance = new Singleton();
+                    private int numberOfInstances = 0;
+
+                    //Private constructor is used to prevent
+                    //creation of instances with 'new' keyword outside this class
+                    private Singleton()
+                    {
+                        Console.WriteLine("Instantiating inside the private constructor.");
+                        numberOfInstances++;
+                        Console.WriteLine("Number of instances ={0}", numberOfInstances);
+                    }
+
+
+                    // Detalhe importante, o bloco abaixo é uma propriedade e não um método. 
+                    // Se terminasse com "()" seria um método e poderiamos retornar o "instance" com 
+                    // "return instance"
+                    public static Singleton Instance
+                    {
+                        get
+                        {
+                            Console.WriteLine("We already have an instance now.Use it.");
+                            return instance;
+                        }
+                    }
+                }
+            }        
+
+
+            // Program
+
+            using Pattern.Creational.Singleton;
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Singleton Pattern Demo***\n");
+                    //Console.WriteLine(Singleton.MyInt);
+                    // Private Constructor.So,we cannot use 'new' keyword.
+                    Console.WriteLine("Trying to create instance s1.");
+                    Singleton s1 = Singleton.Instance;
+                    Console.WriteLine("Trying to create instance s2.");
+                    Singleton s2 = Singleton.Instance;
+                    if (s1 == s2)
+                    {
+                        Console.WriteLine("Only one instance exists.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Different instances exist.");
+                    }
+                    Console.Read();
+                }
+            }
+
+    . Prototype
+
+        . Definição
+
+            .  Especifica os tipos de objetos para criar utilizando uma intância prototipada, criando um novo objeto 
+                copiando neste prtotipo.
+
+        . Conceito
+
+            . Fornece um método para criar, ou clonar, uma instância de um objeto existente. 
+
+        . Ilustração
+
+
+                            BasicCar    <-------    Client( Program.cs )
+                            ^      ^
+                            |      |
+                            |      |
+                        Nano   Ford
+
+            . BasiCar é o prototipo. 
+            . Nano e Ford são as classes concretas prototipadas, que implementam o método "clone"
+            . Client inicialemente cria o objeto prototipada com os objetos Nano e Ford, posteriormente
+                alteramos o preço da classe prototipada.
+
+        . Exemplo
+
+            // BasicCar
+            using System;
+
+            namespace  Pattern.Creational.Prototype
+            {
+                public abstract class BasicCar
+                {
+                    public string? ModelName { get; set; }
+                    public int Price { get; set; }
+                    public static int SetPrice()
+                    {
+                        int price = 0;
+                        Random r = new Random();
+                        int p = r.Next(200000, 500000);
+                        price = p;
+                        return price;
+                    }
+                    public abstract BasicCar Clone();
+                }
+            }
+
+
+        
+            //Nano.cs
+            using System;
+
+            namespace  Pattern.Creational.Prototype
+            {
+                public class Nano : BasicCar
+                {
+                    public Nano(string m)
+                    {
+                        ModelName = m;
+                    }
+                    public override BasicCar Clone()
+                    {
+                        return (Nano)this.MemberwiseClone();    // MemberwiseClone() -> cria uma cópia shallow do objeto, 
+                    }                                           // copiando todos os valores dos campos (fields) para 
+                }                                               // um novo objeto da mesma classe.
+            }        
+
+
+
+            //Ford.cs
+            using System;
+
+            namespace  Pattern.Creational.Prototype
+            {
+                public class Ford : BasicCar
+                {
+                    public Ford(string m)
+                    {
+                        ModelName = m;
+                    }
+                    public override BasicCar Clone()
+                    {
+                        return (Ford)this.MemberwiseClone();
+                    }
+                }
+            }
+
+
+
+            // Client( Program.cs )
+            using Pattern.Creational.Prototype;
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Prototype Pattern Demo***\n");
+
+                    //Base or Original Copy
+                    BasicCar nanoBase = new Nano("Green Nano") { Price = 100000 };
+                    BasicCar fordBase = new Ford("Ford Yellow") { Price = 500000 };
+                    
+                    BasicCar bcNano;
+                    
+                    //Nano
+                    bcNano = nanoBase.Clone();
+                    bcNano.Price = nanoBase.Price + BasicCar.SetPrice();
+                    Console.WriteLine("Car is: {0}, and it's price is Rs. {1}", bcNano.ModelName, bcNano.Price);
+                    
+                    //Ford
+                    bcNano = fordBase.Clone();
+                    bcNano.Price = fordBase.Price + BasicCar.SetPrice();
+                    Console.WriteLine("Car is: {0}, and it's price is Rs. {1}", bcNano.ModelName, bcNano.Price);
+
+                    Console.ReadLine();
+                }
+            }
+
+    . Builder
+
+        . Definição
+
+            . Separa a construção de um objeto complexo de sua representação, permitindo que o mesmo processo gere 
+                diferentes representações.
+
+        . Conceito 
+
+            . É util para criar objetos complexos, que tem multiplas partes. O processo de criação de um objeto terá
+                partes independentes. O processo de criação não se importa como as partes são montadas.
+                
+        . Ilustração
+
+                                Director    <>----------  Builder
+
+                                                            ^
+                                                            |
+                                                            |
+
+                                                        ConcreteBuilder ------> Product
+
+
+
+        . Exemplo
+
+            // Builders common interface
+            using System;
+            using System.Collections.Generic;
+
+            namespace  Pattern.Creational.Builder
+            {
+                internal interface IBuilder
+                {
+                    void StartUpOperations();
+                    void BuildBody();
+                    void InsertWheels();
+                    void AddHeadlights();
+                    void EndOperations();
+                    Product GetVehicle();
+                }
+            }
+
+
+            // ConcreteBuilder: Car
+            using Pattern.Creational.Builder;
+
+            class Car : IBuilder
+            {
+                private string brandName;
+                private Product product;
+
+                public Car(string brand)
+                {
+                    product = new Product();
+                    this.brandName = brand;
+                }
+
+                public void StartUpOperations()
+                { //Starting with brandname
+                    product.Add(string.Format("Car Model name :{0}", this.
+                    brandName));
+                }
+
+                public void BuildBody()
+                {
+                    product.Add("This is a body of a Car");
+                }
+
+                public void InsertWheels()
+                {
+                    product.Add("4 wheels are added");
+                }
+
+                public void AddHeadlights()
+                {
+                    product.Add("2 Headlights are added");
+                }
+
+                public void EndOperations()
+                { //Nothing in this case
+                }
+
+                public Product GetVehicle()
+                {
+                    return product;
+                }
+            }
+
+
+            // ConcreteBuilder:Motorcycle
+            using Pattern.Creational.Builder;
+
+            class MotorCycle : IBuilder
+            {
+                private string brandName;
+                private Product product;
+                public MotorCycle(string brand)
+                {
+                    product = new Product();
+                    this.brandName = brand;
+                }
+                public void StartUpOperations()
+                { //Nothing in this case
+                }
+                public void BuildBody()
+                {
+                    product.Add("This is a body of a Motorcycle");
+                }
+                public void InsertWheels()
+                {
+                    product.Add("2 wheels are added");
+                }
+                public void AddHeadlights()
+                {
+                    product.Add("1 Headlights are added");
+                }
+                public void EndOperations()
+                {
+                    //Finishing up with brandname
+                    product.Add(string.Format("Motorcycle Model name :{0}",
+                    this.brandName));
+                }
+                public Product GetVehicle()
+                {
+                    return product;
+                }
+            }
+
+
+
+            // "Product"
+            namespace  Pattern.Creational.Builder;
+
+            class Product
+            {
+                // We can use any data structure that you prefer e.g.List<string> etc.
+                private LinkedList<string> parts;
+                public Product()
+                {
+                    parts = new LinkedList<string>();
+                }
+                public void Add(string part)
+                {
+                    //Adding parts
+                    parts.AddLast(part);
+                }
+                public void Show()
+                {
+                    Console.WriteLine("\nProduct completed as below :");
+                    foreach (string part in parts)
+                        Console.WriteLine(part);
+                }
+            }
+
+
+
+            // "Director"
+            using Pattern.Creational.Builder;
+
+            class Director
+            {
+                IBuilder builder;
+                // A series of steps-in real life, steps are complex.
+                public void Construct(IBuilder builder)
+                {
+                    this.builder = builder;
+                    builder.StartUpOperations();
+                    builder.BuildBody();
+                    builder.InsertWheels();
+                    builder.AddHeadlights();
+                    builder.EndOperations();
+                }
+            }
+
+    . Factory Method
+    
+        . Definição
+
+            . Define uma interface para a criação de objetos, mas deixa as subclasses decidir qual classe
+                será instanciada. O padrão Factory Method permite que uma classe diferencie a subclasse a 
+                ser instanciada.
+
+        . Ilustração
+
+                                +-----------------------+               +-----------------------+       +-----------------------+
+                                |     IAnimalFactory    |               |       Client          |       |       IAnimal         |
+                                |   <<Abstract Class>>  |               |      <<Class>>        |       |       <<Interface>>   |
+                                +-----------------------+               +-----------------------+       +-----------------------+
+                                |                       |               |                       |       |                       |
+                                +-----------------------+               +-----------------------+       +-----------------------+
+                                | + CreateAnimal        |               | # Main                |       | + Action              |
+                                +-----------------------+               +-----------------------+       | + Speak               |
+                                            ^                                                           +-----------------------+
+                                            |
+                            +---------------------------+
+                            |                           |
+            +-----------------------+       +-----------------------+   +-----------------------+   +-----------------------+
+            |     IAnimalFactory    |       |       TiegerFactory   |   |           Dog         |   |       Tiger           |
+            |   <<Abstract Class>>  |       |       <<Class>>       |   |         <<Class>>     |   |       <<Class>>       |
+            +-----------------------+       +-----------------------+   +-----------------------+   +-----------------------+
+            |                       |       |                       |   |                       |   |                       |
+            +-----------------------+       +-----------------------+   +-----------------------+   +-----------------------+ 
+            | + CreateAnimal        |       | + CreateAnimal        |   | + Action              |   | + Action              |
+            +-----------------------+       +-----------------------+   | + Speak               |   | + Speak               |
+                                                                        +-----------------------+   +-----------------------+
+
+        . Exemplo
+
+            . Primeira Versão
+
+                // Interface para as classes de criação
+                namespace  Pattern.Creational.FactoryMethod;
+
+                public interface IAnimal
+                {
+                    void Speak();
+                    void Action();
+                }
+
+
+                // Interface para as classe de fabricação
+
+                namespace  Pattern.Creational.FactoryMethod;
+
+                public abstract class IAnimalFactory
+                {
+                    //Remember the GoF definition which says "....Factory method lets a class
+                    //defer instantiation to subclasses." Following method will create a Tiger
+                    //or Dog But at this point it does not know whether it will get a Dog or a
+                    //Tiger. It will be decided by the subclasses i.e.DogFactory or TigerFactory.
+                    //So, the following method is acting like a factory (of creation).
+
+                    public abstract IAnimal CreateAnimal();
+                }            
+
+
+                // Classes de criação
+                namespace  Pattern.Creational.FactoryMethod;
+
+                public class Dog : IAnimal
+                {
+                    public void Speak()
+                    {
+                        Console.WriteLine("Dog says: Bow-Wow.");
+                    }
+                    public void Action()
+                    {
+                        Console.WriteLine("Dogs prefer barking...\n");
+                    }
+                }
+
+
+                // Classe de criação
+                namespace  Pattern.Creational.FactoryMethod;
+
+                public class Tiger: IAnimal
+                {
+                    public void Speak()
+                    {
+                        Console.WriteLine("Tiger say: Halum.");
+                    }
+
+                    public void Action()
+                    {
+                        Console.WriteLine("Tigers prefer hunting....\n");
+                    }
+                }
+
+
+
+                // Factory da classe Dog
+                namespace  Pattern.Creational.FactoryMethod;
+
+                public class DogFactory: IAnimalFactory
+                {
+                    public override IAnimal CreateAnimal()
+                    {
+                        return new Dog();
+                    }
+                }
+
+
+                // Factory da classe Tiger
+                namespace  Pattern.Creational.FactoryMethod;
+
+                public class TigerFactory: IAnimalFactory
+                {
+                    public override IAnimal CreateAnimal()
+                    {
+                        return new Tiger();
+                    }
+                }
+
+
+
+                // Classe "client" para efetuar as chamadas
+                using Pattern.Creational.FactoryMethod;
+
+
+                class Program
+                {
+                    static void Main()
+                    {
+                        Console.WriteLine("*** Factory Pattern Demo***\n");
+
+                        IAnimalFactory tigerFactory = new TigerFactory();
+                        IAnimalFactory dogFactory = new DogFactory();
+
+                        IAnimal tiger = tigerFactory.CreateAnimal();
+
+                        IAnimal dog = dogFactory.CreateAnimal();
+
+                        tiger.Speak();
+                        tiger.Action();
+
+                        dog.Speak();
+                        dog.Action();
+
+                        Console.ReadKey();
+                    }
+                }
+
+            . Melhorias
+
+                // Inserção do método MakeAnimal, assim todas as Factory implementarão automaticamente esse método.
+                // Quando for chamado o método MakeAnimal das classes [Dog/Tiger]Factory, a chamada será da classe
+                // abstrata pai "IAnimalFactory" e consequentemente retornará a classe de criação Dog/Tiger
+                namespace  Pattern.Creational.FactoryMethod;
+
+                public abstract class IAnimalFactory
+                {
+                    public abstract IAnimal CreateAnimal();
+
+                    // Método inserido
+                    public IAnimal MakeAnimal()
+                    {
+                        IAnimal animal = CreateAnimal();
+
+                        animal.Speak();
+                        animal.Action();
+
+                        return animal;
+                    }
+                }
+
+
+
+
+                using Pattern.Creational.FactoryMethod;
+
+
+                class Program
+                {
+                    static void Main()
+                    {
+                        Console.WriteLine("*** Factory Pattern Demo***\n");
+
+                        IAnimalFactory tigerFactory = new TigerFactory();
+                        IAnimalFactory dogFactory = new DogFactory();
+
+                        /*  Trecho substituido
+                        IAnimal tiger = tigerFactory.CreateAnimal();
+                        IAnimal dog = dogFactory.CreateAnimal();
+                        */
+
+                        // Linha inserida
+                        IAnimal tiger = tigerFactory.MakeAnimal();
+
+                        // Linha inserida
+                        IAnimal dog = dogFactory.MakeAnimal();
+                        
+                        tiger.Speak();
+                        tiger.Action();
+
+                        dog.Speak();
+                        dog.Action();
+
+                        Console.ReadKey();
+                    }
+                }
+
+    . Abstract Factory
+
+        . Definição
+
+            . É um padrão que fornece uma interface para criar grupos de objetos relacionados entre si, garantindo 
+                que o código cliente use apenas interfaces/abstrações, nunca classes concretas.
+
+            . Suponha que queiramos categorizar cachorros e tigres, e escolhemos obter um animal pet (cachorro ou tigre);
+                ou um animal selvagem (cachorro ou tigre) através de uma fabrica. Introduziremos duas fabricas concretas:
+                WildAnimalFactory (responsável pela criação de animias selvagens) e PetAnimalFactory (responsável pela 
+                criação dos animais pet).
+
+
+        .Exemplo
+
+            // Interface IDog
+            namespace  Pattern.Creational.AbstractFactory;
+
+            public interface IDog
+            {
+                void Speak();
+                void Action();
+            }
+
+
+            // Interface ITiger
+            namespace  Pattern.Creational.AbstractFactory;
+
+            public interface ITiger
+            {
+                void Speak();
+                void Action();
+            }
+
+
+            // Classe PetDog
+            namespace  Pattern.Creational.AbstractFactory;
+
+            class PetDog : IDog
+            {
+                public void Speak()
+                {
+                    Console.WriteLine("Pet Dog says: Bow-Wow.");
+                }
+                public void Action()
+                {
+                    Console.WriteLine("Pet Dogs prefer to stay at home.\n");
+                }
+            }
+
+
+            // Classe PetTiger
+            namespace  Pattern.Creational.AbstractFactory;
+
+            class PetTiger : ITiger
+            {
+                public void Speak()
+                {
+                    Console.WriteLine("Pet Tiger says: Halum.");
+                }
+                public void Action()
+                {
+                    Console.WriteLine("Pet Tigers play in an animal circus.\n");
+                }
+            }
+
+
+            // Classe WildDog
+            namespace  Pattern.Creational.AbstractFactory;
+
+            class WildDog : IDog
+            {
+                public void Speak()
+                {
+                    Console.WriteLine("Wild Dog says: Bow-Wow.");
+                }
+                public void Action()
+                {
+                    Console.WriteLine(@"Wild Dogs prefer to roam freely in
+                    jungles.\n");
+                }
+            }
+
+
+            // Classe WildTiger
+            namespace  Pattern.Creational.AbstractFactory;
+
+            class WildTiger : ITiger
+            {
+                public void Speak()
+                {
+                    Console.WriteLine("Wild Tiger says: Halum.");
+                }
+                public void Action()
+                {
+                    Console.WriteLine("Wild Tigers prefer hunting in jungles.\n");
+                }
+            }
+
+
+            // Interface IAnimalFactory
+            namespace  Pattern.Creational.AbstractFactory;
+
+            public interface IAnimalFactory
+            {
+                IDog GetDog();
+                ITiger GetTiger();
+            }
+
+
+
+            // Classe Factory PetAnimalFactory
+            namespace  Pattern.Creational.AbstractFactory;
+
+            public class PetAnimalFactory : IAnimalFactory
+            {
+                public IDog GetDog()
+                {
+                    return new PetDog();
+                }
+                public ITiger GetTiger()
+                {
+                    return new PetTiger();
+                }
+            }
+
+
+            // Classe Factory WildAnimalFactory
+            namespace  Pattern.Creational.AbstractFactory;
+
+            public class WildAnimalFactory : IAnimalFactory
+            {
+                public IDog GetDog()
+                {
+                    return new WildDog();
+                }
+                public ITiger GetTiger()
+                {
+                    return new WildTiger();
+                }
+            }
+
+
+
+
+
+            // Classe Client "Program.cs"
+            using Pattern.Creational.AbstractFactory;
+
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Abstract Factory Pattern Demo***\n");
+                    //Making a wild dog through WildAnimalFactory
+                    IAnimalFactory wildAnimalFactory = new WildAnimalFactory();
+
+                    IDog wildDog = wildAnimalFactory.GetDog();
+
+                    wildDog.Speak();
+                    wildDog.Action();
+
+                    //Making a wild tiger through WildAnimalFactory
+                    ITiger wildTiger = wildAnimalFactory.GetTiger();
+
+                    wildTiger.Speak();
+                    wildTiger.Action();
+
+                    Console.WriteLine("******************");
+                    
+                    //Making a pet dog through PetAnimalFactory
+                    IAnimalFactory petAnimalFactory = new PetAnimalFactory();
+
+                    IDog petDog = petAnimalFactory.GetDog();
+
+                    petDog.Speak();
+                    petDog.Action();
+
+                    //Making a pet tiger through PetAnimalFactory
+                    ITiger petTiger = petAnimalFactory.GetTiger();
+
+                    petTiger.Speak();
+                    petTiger.Action();
+
+
+                    Console.ReadKey();
+                }
+            }
+
+. Estruturais Pattern
+
+    . Proxy
+
+        . Definição
+
+            . É um padrão estrutural que fornece um objeto substituto para controlar o acesso a outro objeto, podendo 
+                adicionar comportamentos extras antes ou depois da operação real.
+
+        . Conceito
+
+            . Um proxy é como um substituto para um objeto real. Quando o cliente usa o proxy, ele acha que está 
+                falando diretamente com o objeto verdadeiro — mas, na verdade, está falando com o substituto.
+
+            . Isso é útil porque nem sempre é possível acessar o objeto real diretamente.
+
+            . Pode ser por causa de:
+
+                . segurança,
+
+                . desempenho,
+
+                . o objeto real ser pesado para carregar,
+
+                . ou porque ele está em outro computador.
+
+            . Então o padrão Proxy ajuda criando uma classe intermediária, que age como se fosse o objeto 
+                verdadeiro e serve de ponte para ele.
+
+            . Resumindo: Proxy é um objeto que fica no lugar do real e controla o acesso a ele.
+
+        . Ilustração
+
+                            +-------------------+                       +-------------------+
+                            | Subject           |                       | Program           |
+                            | <<Absract Class>> |                       | <<Class>>         |
+                            +-------------------+                       +-------------------+
+                            |                   |                       |                   |
+                            +-------------------+                       +-------------------+
+                            | + DoSomeWork      |                       | + Main            |
+                            +-------------------+                       +-------------------+
+                                    ^
+                                   / \
+                                    |
+                    +-------------------------------+
+                    |                               |
+            +-------------------+       +-------------------+
+            | Proxy             |       | ConcreteSubject   |
+            | <<Class>>         |       | <<Class>>         |
+            +-------------------+       +-------------------+
+            | # subject         |       |                   |
+            +-------------------+       +-------------------+
+            | + DoSomeWork      |       | + DoSomeWork      |
+            +-------------------+       +-------------------+
+
+        . Exemplo
+
+            // Abstract Classe Subject
+            namespace Pattern.Structural.Proxy;
+
+            public abstract class Subject
+            {
+                public abstract void DoSomeWork();
+            }
+
+
+            // Classe ConcreteSubject
+            namespace Pattern.Structural.Proxy;
+
+            public class ConcreteSubject : Subject
+            {
+                public override void DoSomeWork()
+                {
+                    Console.WriteLine("ConcreteSubject.DoSomeWork()");
+                }
+            }
+
+
+            // Classe Proxy
+            namespace Pattern.Structural.Proxy;
+
+            public class Proxy : Subject
+            {
+                Subject subject;
+                public override void DoSomeWork()
+                {
+                    Console.WriteLine("Proxy call happening now...");
+                    //Lazy initialization:We'll not instantiate until the method is
+                    //called
+                    if (subject == null)
+                    {
+                        subject = new ConcreteSubject();
+                    }
+                    subject.DoSomeWork();
+                }
+            }
+
+
+            // Classe "Client" "Program.cs"
+            using Pattern.Structural.Proxy;
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Proxy Pattern Demo***\n");
+
+                    Proxy px = new Proxy();
+                    px.DoSomeWork();
+
+                    Console.ReadKey();
+                }
+            }
+
+    . Decorator
+
+        . Definição
+
+            . Permite adicionar responsabilidades (comportamentos) a um objeto dinamicamente, 
+                colocando-o dentro de outro objeto que envolva o original. Decorators 
+                oferecem uma alternativa flexível à herança para estender funcionalidades.
+    
+        . Conceito
+
+            . Este padrão promove o conceito de que sua classe deve ser fechada para modificação,
+                mas aberta para extensão. Em outras palavras, você pode adicionar uma funcionalidade 
+                sem atrapalhar as funcionalidades existentes. O conceito é útil quando você deseja 
+                adicionar alguma funcionalidade especial a um objeto específico em vez de toda 
+                a classe. Este padrão prefere a composição de objetos à herança. Depois de 
+                dominar essa técnica, você pode adicionar novas
+                responsabilidades a um objeto sem afetar as classes subjacentes.
+
+        . Ilustração
+
+
+
+                            +---------------------+
+                            |     Component       |
+                            | <<Abstract Class>>  |
+                            |---------------------|
+                            | + MakeHouse()       |
+                            +----------+----------+
+                                    ^
+                                    |
+                        +-----------+-----------+
+                        |                       |
+            +--------------------------+   +------------------------------------------------------------+
+            |     ConcreteComponent    |   |    AbstractDecorator                                       |
+            |                          |   |    <<Abstract Class>>                                      |
+            |--------------------------|   |------------------------------------------------------------|
+            | + MakeHouse()            |   | - _component: Component                                    |
+            +--------------------------+   |------------------------------------------------------------+
+                                           | + AbstractDecorator(Component component) <<constructor>>   |
+                                           | + SetTheComponent()                                        |
+                                           | + MakeHouse()                                              |
+                                           +-----------+------------------------------------------------+
+                                                                        ^
+                                                                        |
+                                                    +-------------------+------------------+
+                                                    |                                      |
+                                        +---------------------------+        +---------------------------+
+                                        |    ConcreteDecoratorA     |        |    ConcreteDecoratorB     |
+                                        |---------------------------|        |---------------------------|
+                                        | + MakeHouse()             |        | + MakeHouse()             |
+                                        | + AddFloor()              |        | + PaintTheHouse()         |
+                                        +---------------------------+        +---------------------------+
+
+        . Exemplo
+
+
+            namespace Pattern.Structural.Decorator;
+            public abstract class Component
+            {
+                public abstract void MakeHouse();
+            }
+
+
+
+
+            namespace Pattern.Structural.Decorator;
+
+            public abstract class AbstractDecorator: Component
+            {
+                
+                protected Component _component;
+
+                public void SetTheComponent(Component component)
+                {
+                    this._component = component;
+                }
+
+                public override void MakeHouse()
+                {
+                    if ( _component != null)
+                    {
+                        _component.MakeHouse();
+                    }
+                }
+
+                protected AbstractDecorator( Component component)
+                {
+                    this._component = component;
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Structural.Decorator;
+
+            public class ConcreteComponent : Component
+            {
+
+                public override void MakeHouse()
+                {
+                    Console.WriteLine("WriteLine(\"A casa original está completa. Ela está fechada para modificações!!!\"");
+                }
+            }
+
+
+
+
+
+            namespace Pattern.Structural.Decorator;
+
+            public class ConcreteDecoratorA: AbstractDecorator
+            {
+                public override void MakeHouse()
+                {
+                    base.MakeHouse();
+                    AddFloor();
+                    Console.WriteLine("A casa foi decorada com o estilo A.");
+                }
+                void AddFloor()
+                {
+                    Console.WriteLine("Adicionando mais um andar do ConcreteDecoratorA.");
+                }
+
+                public ConcreteDecoratorA(Component component): base(component)
+                {
+
+                }
+            }
+
+
+            using System.ComponentModel;
+
+            namespace Pattern.Structural.Decorator;
+
+            public class ConcreteDecoratorB: AbstractDecorator
+            {
+                public override void MakeHouse()
+                {
+                    Console.WriteLine("");
+
+                    base.MakeHouse();
+                    Console.WriteLine("Usando outro Decorator");
+
+                    AddGarage();
+
+                    Console.WriteLine("A casa foi decorada com o estilo B.");
+                }
+
+                void AddGarage()
+                {
+                    Console.WriteLine("Garagem foi adicionada pelo ConcreteDecorateB.");
+                }
+
+                public ConcreteDecoratorB( Component component) : base(component)
+                {
+                    
+                }
+            }
+
+
+
+            using Pattern.Structural.Decorator;
+
+            class Program
+            {
+                static void Main()
+                {
+                    Console.WriteLine("***Decorator Pattern Demo***\n");
+
+                    ConcreteComponent cc = new ConcreteComponent();
+
+                    ConcreteDecoratorA decoratorA = new ConcreteDecoratorA(cc);
+                    // decoratorA.SetTheComponent(cc);
+
+                    decoratorA.MakeHouse();
+
+                    ConcreteDecoratorB decoratorB = new ConcreteDecoratorB(decoratorA);
+                    // decoratorB.SetTheComponent(decoratorA);
+                    decoratorB.MakeHouse();
+
+
+                    Console.ReadKey();
+                }
+            }
+
+    . Adapter
+
+        . Definição
+
+            . Permite que interfaces incompatíveis trabalhem juntas, convertendo a interface de uma 
+                classe em outra interface esperada pelos clientes
+
+
+        . Ilustração
+
+            +------------------------+
+            |      ITwoPinPlug       |  <<Target>>
+            |------------------------|
+            | + Connect2Pins()       |
+            +-----------+------------+
+                        ^
+                        |
+            +-----------+------------+
+            |     TwoPinOutlet       |  (Cliente usa isso)
+            |------------------------|
+            | + SupplyPower(ITwoPinPlug) |
+            +------------------------+
+
+            +------------------------+
+            |     ThreePinDevice     |  <<Adaptee>>
+            |------------------------|
+            | + Connect3Pins()       |
+            +------------------------+
+
+            +------------------------+
+            |     PlugAdapter        |  <<Adapter>>
+            |------------------------|
+            | - device: ThreePinDevice |
+            |------------------------|
+            | + PlugAdapter(device)  |
+            | + Connect2Pins()       |
+            |     (chama device.Connect3Pins()) |
+            +------------------------+
+
+            +------------------------+
+            |        Program         |
+            +------------------------+
+            | + Main()               |
+            +------------------------+
+
+        . Exemplo:
+
+            using System;
+
+            namespace AdapterExample2
+            {
+                // Target - Interface que o sistema espera
+                public interface ITwoPinPlug
+                {
+                    void Connect2Pins();
+                }
+
+                // Adaptee - Classe incompatível
+                public class ThreePinDevice
+                {
+                    public void Connect3Pins()
+                    {
+                        Console.WriteLine("Three-pin device connected using 3 pins.");
+                    }
+                }
+
+                // Adapter - converte a interface
+                public class PlugAdapter : ITwoPinPlug
+                {
+                    private readonly ThreePinDevice device;
+
+                    public PlugAdapter(ThreePinDevice device)
+                    {
+                        this.device = device;
+                    }
+
+                    public void Connect2Pins()
+                    {
+                        Console.WriteLine("Adapter converting 2-pin request to 3-pin...");
+                        device.Connect3Pins();
+                    }
+                }
+
+                // Cliente
+                public class TwoPinOutlet
+                {
+                    public void SupplyPower(ITwoPinPlug plug)
+                    {
+                        Console.WriteLine("Outlet supplying power...");
+                        plug.Connect2Pins();
+                    }
+                }
+
+                class Program
+                {
+                    static void Main()
+                    {
+                        var outlet = new TwoPinOutlet();
+
+                        // Aparelho incompatível
+                        var modernDevice = new ThreePinDevice();
+
+                        // Adaptando o aparelho para 2 pinos
+                        ITwoPinPlug adapter = new PlugAdapter(modernDevice);
+
+                        // Cliente funciona normalmente
+                        outlet.SupplyPower(adapter);
+
+                        Console.ReadKey();
+                    }
+                }
+            }
+
+    . Facade
+
+        . Definição
+
+            . Fornece uma interface unificada para um conjunto de interfaces em um subsistema. O 
+                pattern "Facade" define uma interface de nível superior que facilita o uso do 
+                subsistema.        
+
+        . Conceito
+
+            . Este padrão suporta baixo acoplamento. Com este padrão, você pode enfatizar a
+                abstração e ocultar os detalhes complexos expondo uma interface simples.
+
+        . Ilustração
+
+            . Neste exemplo, seus clientes podem construir ou destruir um tipo específico de robô
+                invocando métodos simples como "ConstructMilanoRobot" e "DestroyMilanoRobot".
+                Do ponto de vista do cliente, ele precisa interagir apenas com um "Facade"
+                (consulte o arquivo Program.cs). A classe RobotFacade assume total responsabilidade 
+                pela criação ou destruição de um tipo específico de robô. Esse "Facade" se comunica 
+                com cada um desses subsistemas (RobotHands, RobotBody, RobotColor) para atender 
+                à solicitação do cliente. Os clientes não precisam se preocupar com
+                o processo de criação ou destruição ou com a sequência de chamadas desses métodos.
+
+
+                +------------------------+
+                |        Program         |
+                +------------------------+
+                | + Main()               |
+                +------------------------+
+                            |
+                            | usa
+                            v
+                +------------------------+
+                |      RobotFacade       |
+                +------------------------+
+                | - rb : RobotBody       |
+                | - rh : RobotHands      |----------------------------------------------------------+
+                | - rc : RobotColor      |                                                          |
+                +------------------------+                                                          |
+                | + RobotFacade()        |                                                          |
+                | + ConstructMilano()    |----------------------+                                   |
+                | + ConstructRobonaut()  |                      |                                   |
+                | + DestroyMilano()      |                      |                                   |
+                | + DestroyRobonaut()    |                      |                                   |
+                +------------------------+                      |                                   |
+                    |                                           |                                   |
+                    |                                           |                                   |
+                    v                                           v                                   v
+                +------------------------+        +------------------------+            +------------------------+
+                |       RobotBody        |        |      RobotHands        |            |      RobotColor        |
+                +------------------------+        +------------------------+            |                        |
+                | + CreateHands()        |        | + ResetMilanoHands()   |            +------------------------+
+                | + CreateRemaining()    |        | + ResetRobonautHands() |            | + SetDefaultColor()    |
+                | + DestroyHands()       |        | + SetMilanoHands()     |            | + SetGreenColor()      |
+                | + DestroyRemaining()   |        | + SetRobonautHands()   |            +------------------------+ 
+                +------------------------+        +------------------------+
+                           
+
+            . Exemplo:
+
+                // RobotBody.cs
+
+                namespace Pattern.Structural.Facade;
+
+                public class RobotBody
+                {
+                    public void CreateHands()
+                    {
+                        Console.WriteLine("Hands manufactured");
+                    }
+                    public void CreateRemainingParts()
+                    {
+                        Console.WriteLine("Remaining parts (other than hands) are created");
+                    }
+                    public void DestroyHands()
+                    {
+                        Console.WriteLine("The robot's hands are destroyed");
+                    }
+                    public void DestroyRemainingParts()
+                    {
+                        Console.WriteLine("The robot's remaining parts are destroyed");
+                    }
+                }
+
+
+
+                //RobotColor.cs
+                namespace Pattern.Structural.Facade;
+
+                public class RobotColor
+                {
+                    public void SetDefaultColor()
+                    {
+                        Console.WriteLine("This is steel color robot.");
+                    }
+                    public void SetGreenColor()
+                    {
+                        Console.WriteLine("This is a green color robot.");
+                    }
+                }
+
+
+                // RobotHands.cs
+                namespace Pattern.Structural.Facade;
+
+                public class RobotHands
+                {
+                    public void SetMilanoHands()
+                    {
+                        Console.WriteLine("The robot will have EH1 Milano hands");
+                    }
+                    public void SetRobonautHands()
+                    {
+                        Console.WriteLine("The robot will have Robonaut hands");
+                    }
+                    public void ResetMilanoHands()
+                    {
+                        Console.WriteLine("EH1 Milano hands are about to be destroyed");
+                    }
+                    public void ResetRobonautHands()
+                    {
+                        Console.WriteLine("Robonaut hands are about to be destroyed");
+                    }
+                }
+
+
+
+
+                // RobotFacade.cs
+
+                namespace Pattern.Structural.Facade;
+
+                public class RobotFacade
+                {
+                    RobotColor rc;
+                    RobotHands rh;
+                    RobotBody rb;
+                    public RobotFacade()
+                    {
+                        rc = new RobotColor();
+                        rh = new RobotHands();
+                        rb = new RobotBody();
+                    }
+                    public void ConstructMilanoRobot()
+                    {
+                        Console.WriteLine("Creation of a Milano Robot Start");
+                        rc.SetDefaultColor();
+                        rh.SetMilanoHands();
+                        rb.CreateHands();
+                        rb.CreateRemainingParts();
+                        Console.WriteLine("Milano Robot Creation End");
+                        Console.WriteLine();
+                    }
+                    public void ConstructRobonautRobot()
+                    {
+                        Console.WriteLine("Initiating the creational process of a Robonaut Robot");
+                        rc.SetGreenColor();
+                        rh.SetRobonautHands(); 
+                        rb.CreateHands();
+                        rb.CreateRemainingParts();
+                        Console.WriteLine("A Robonaut Robot is created");
+                        Console.WriteLine();
+                    }
+                    public void DestroyMilanoRobot()
+                    {
+                        Console.WriteLine("Milano Robot's destruction process is started");
+                        rh.ResetMilanoHands();
+                        rb.DestroyHands();
+                        rb.DestroyRemainingParts();
+                        Console.WriteLine("Milano Robot's destruction process is over");
+                        Console.WriteLine();
+                    }
+                    public void DestroyRobonautRobot()
+                    {
+                        Console.WriteLine("Initiating a Robonaut Robot's destruction process.");
+                        rh.ResetRobonautHands();
+                        rb.DestroyHands();
+                        rb.DestroyRemainingParts();
+                        Console.WriteLine("A Robonaut Robot is destroyed");
+                        Console.WriteLine();
+                    }
+                }
+
+
+
+                // Program.cs
+                using Pattern.Structural.Facade;
+
+                Console.WriteLine("***Facade Pattern Demo***\n");
+                //Creating Robots
+                RobotFacade rf1 = new RobotFacade();
+                rf1.ConstructMilanoRobot();
+                RobotFacade rf2 = new RobotFacade();
+                rf2.ConstructRobonautRobot();
+                //Destroying robots
+                rf1.DestroyMilanoRobot();
+                rf2.DestroyRobonautRobot();
+                Console.ReadLine();
+
+    . Flyweight
+
+        . Definição
+
+            . Flyweight é um padrão estrutural que reduz o uso de memória compartilhando objetos de forma eficiente 
+                quando muitos objetos similares precisam ser criados. Ele permite que grandes quantidades de objetos
+                sejam representados por poucos objetos compartilhados.        
+
+        . Ilustração
+
+            +-------------------------------------------------------+
+            |        RobotFactory                                   |
+            +-------------------------------------------------------+
+            | - shapes : (collection)                               |  // ex.: Dictionary<string, IRobot>
+            +-------------------------------------------------------+
+            | + TotalObjectsCreated : int {get;}                    |
+            +-------------------------------------------------------+
+            | + GetRobotFromFactory( robotType : string ) : IRobot  |
+            +-------------------------------------------------------+
+
+
+            +----------------------------+
+            |          IRobot            | <<interface>>
+            +----------------------------+
+            | + Print(color : string)    |
+            +----------------------------+
+
+
+            +----------------------------+
+            |          LargeRobot        |
+            +----------------------------+
+            | + Print(color : string)    |  // implementação de IRobot
+            +----------------------------+
+                    ^
+                    |
+                    implements IRobot
+
+
+            +----------------------------+
+            |          SmallRobot        |
+            +----------------------------+
+            | + Print(color : string)    |  // implementação de IRobot
+            +----------------------------+
+                    ^
+                    |
+                    implements IRobot
+
+
+            +----------------------------+
+            |           Program          |
+            +----------------------------+
+            | + Main() : void            |
+            +----------------------------+
+
+
+        . Exemplo:
+
+
+            namespace Pattern.Structural.Flyweight;
+
+            /// <summary>
+            /// The 'Flyweight' interface
+            /// </summary>
+            public interface IRobot
+            {
+                void Print();
+            }
+
+
+
+            namespace Pattern.Structural.Flyweight;
+            /// <summary>
+            /// A 'ConcreteFlyweight' class
+            /// </summary>
+            class LargeRobot : IRobot
+            {
+                public void Print()
+                {
+                    Console.WriteLine("I am a large Robot");
+                }
+            }
+
+
+
+            namespace Pattern.Structural.Flyweight;
+
+            /// <summary>
+            /// A 'ConcreteFlyweight' class
+            /// </summary>
+            class SmallRobot : IRobot
+            {
+                public void Print()
+                {
+                    Console.WriteLine("This is a small Robot");
+                }
+            }
+
+
+
+            // RobotFactory.cs
+            namespace Pattern.Structural.Flyweight;
+
+            public class RobotFactory
+            {
+                Dictionary<string, IRobot> shapes = new Dictionary<string, IRobot>();
+
+                public int TotalObjectsCreated
+                {
+                    get {  return shapes.Count; }
+                }
+
+                public IRobot GetRobotFromFactory(string robotType)
+                {
+                    IRobot robotCategory = null;
+
+                    if (shapes.ContainsKey(robotType))
+                    {
+                        robotCategory = shapes[robotType];
+                    }
+                    else
+                    {
+                        switch (robotType)
+                        {
+                            case "Small":
+
+                                robotCategory = new SmallRobot();
+
+                                shapes.Add(robotType, robotCategory);
+
+                                break;
+                            case "Large":
+                                robotCategory = new LargeRobot();
+                                shapes.Add(robotType, robotCategory);
+                                break;
+                            default:
+                                throw new Exception("Robot Factory can created only small and large robots");
+                        }
+
+                    }
+
+                    return robotCategory;
+                }
+            }
+
+
+
+            using Pattern.Structural.Flyweight;
+
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Flyweight Pattern Demo***\n");
+
+                    RobotFactory myfactory = new RobotFactory();
+
+                    IRobot shape = myfactory.GetRobotFromFactory("Small");
+
+                    shape.Print();
+
+                    for (int i = 0; i < 2; i++)
+                    {
+                        shape = myfactory.GetRobotFromFactory("Small");
+                        shape.Print();
+                    }
+
+                    int NumOfDistinctRobots = myfactory.TotalObjectsCreated;
+
+                    Console.WriteLine("\n Now, total numbers of distinct robot objects is = {0}\n", NumOfDistinctRobots);
+
+                    /*Here we are trying to get the 5 more Large robots.
+                    Note that: now onwards we need not create additional small
+                    robots because we have already created one of this category */
+                    for (int i = 0; i < 5; i++)
+                    {
+                        shape = myfactory.GetRobotFromFactory("Large");
+                        shape.Print();
+                    }
+
+                    NumOfDistinctRobots = myfactory.TotalObjectsCreated;
+
+                    Console.WriteLine("\n Distinct Robot objects created till now = {0}", NumOfDistinctRobots);
+
+                    Console.ReadKey();
+                }
+            }
+
+    . Composite
+
+        . Definição
+
+            . Composite é um padrão estrutural que permite compor objetos em estruturas de árvore, 
+                para que objetos individuais (folhas) e composições de objetos (nós) sejam tratados 
+                de forma uniforme.    
+
+        . Ilustração
+
+                                                +------------------------+
+                                                |        Program         |
+                                                +------------------------+
+                                                | + Main() : void        |
+                                                +------------------------+
+
+                                                +------------------------+
+                                                |      IEmployee         | 
+                                                |    <<interface>>       |
+                                                +------------------------+
+                                                | + PrintStructures()    |
+                                                +------------------------+
+                                                            ^
+                                                            |
+                                                            |
+                                    +-------------------------------------------------------+
+                                    |                                                       |
+                                    |                                                       |
+                +---------------------------------------+                   +--------------------------------+
+                |          CompositeEmployee            |                   |           Employee             |
+                +---------------------------------------+                   +--------------------------------+
+                | - controls : List<IEmployee>          |                   | - dept : string                |
+                | - dept     : string                   |                   | - name : string                |
+                | - name     : string                   |                   +--------------------------------+
+                +---------------------------------------+                   | + Employee(name, dept)         |
+                | + CompositeEmployee(name, dept)       |                   | + PrintStructures() : void     |
+                | + Add(emp: IEmployee) : void          |                   +--------------------------------+
+                | + Remove(emp: IEmployee) : void       |
+                | + PrintStructures() : void            |
+                +---------------------------------------+
+
+
+        . Exemplo
+
+            namespace Pattern.Structural.Composite;
+
+            public interface IEmployee
+            {
+                void PrintStructure();
+            }
+
+
+
+            namespace Pattern.Structural.Composite;
+
+            public class CompositeEmployee: IEmployee
+            {
+                public string? name { get; set; }
+                public string? dept { get; set; }
+
+                private List<IEmployee> controls = new();
+
+                public CompositeEmployee()
+                {
+                    
+                }
+                public CompositeEmployee( string name, string dept)
+                {
+                    this.name = name;
+                    this.dept = dept;
+                    //controls = new List<IEmployee>();
+                }
+
+                public void Add( IEmployee e)
+                {
+                    controls.Add(e);
+                }
+
+                public void Remove( IEmployee e)
+                {
+                    controls.Remove(e);
+                }
+
+                public void PrintStructure()
+                {
+                    Console.WriteLine($"\t {this.name} works in {this.dept}");
+
+                    foreach (IEmployee emp in controls)
+                    {
+                        emp.PrintStructure();
+                    }
+                }
+            }
+
+
+
+
+
+
+            namespace Pattern.Structural.Composite;
+
+            public class Employee : IEmployee
+            {
+                public string? name { get; set; }
+                public string? dept { get; set; }
+
+                public Employee()
+                {
+                    
+                }
+                public Employee(string name, string dept)
+                {
+                    this.name = name;
+                    this.dept = dept;
+                }
+
+                public void PrintStructure()
+                {
+                    Console.WriteLine($"\t {this.name} works in {this.dept}");
+                }
+            }
+
+
+
+
+
+            using Pattern.Structural.Composite;
+            using Pattern.Structural.Flyweight;
+
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+
+                    Console.WriteLine("**** Composite Pattern Demo ****");
+
+                    CompositeEmployee principal = new CompositeEmployee() { name = "Dr.S.Som (Principal)", dept = "Planning-Supervising-Managing" };
+
+                    CompositeEmployee hodMat = new CompositeEmployee() { name = "Ms. A. Mathur (HOD)", dept = "Mathematics Department" };
+
+                    CompositeEmployee hodCompSc = new CompositeEmployee() { name = "Ms. B. Sharma (HOD-CSE)", dept = "Computer Science Department" };
+
+                    Employee mathTeacher1 = new Employee(){ name = "Mr. C. Gupta (Teacher 1)", dept = "Mathematics" };
+                    Employee mathTeacher2 = new Employee(){ name = "Ms. D. Iyer (Teacher 2)", dept = "Mathematics" };
+
+
+                    Employee cseTeacher1 = new Employee(){ name = "Mr. E. Khan (Teacher 1)", dept = "Computer Science" };
+                    Employee cseTeacher2 = new Employee(){ name = "Ms. F. Singh (Teacher 2)", dept = "Computer Science" };
+                    Employee cseTeacher3 = new Employee(){ name = "Mr. G. Verma (Teacher 3)", dept = "Computer Science" };
+
+                    hodMat.Add( mathTeacher1);
+                    hodMat.Add( mathTeacher2);
+
+                    hodCompSc.Add( cseTeacher1);
+                    hodCompSc.Add( cseTeacher2);
+                    hodCompSc.Add( cseTeacher3);
+
+                    principal.Add( hodMat);
+                    principal.Add( hodCompSc);
+
+                    Console.WriteLine("\nTestando a estrutura principal do objeto");
+
+                    principal.PrintStructure();
+
+                    Console.WriteLine("\n Testing the structure of a HOD object:");
+                    Console.WriteLine("Teachers working at Computer Science department: ");
+
+                    hodCompSc.PrintStructure();
+
+                    Console.WriteLine("\n Testing the structure of a leaf node:");
+                    mathTeacher1.PrintStructure();
+                    //Suppose, one computer teacher is leaving now from the organization.
+                    hodCompSc.Remove(cseTeacher2);
+                    Console.WriteLine("\n After CSE Teacher-2 resigned, the organization has following members: ");
+                    principal.PrintStructure();
+
+                    Console.ReadKey();
+                }
+            }
+
+    . Bridge
+
+        . Definição
+
+            . É um padrão estrutural que separa uma abstração da sua implementação, permitindo que 
+                ambas evoluam de forma independente.
+
+        . Conceito
+
+            . O padrão Bridge (também chamado de Handle/Body) serve para separar uma abstração da sua 
+                implementação, criando uma ponte entre elas. Com essa ponte, a implementação e a 
+                abstração deixam de depender diretamente uma da outra.
+
+            . Isso permite que:
+
+                . Altere ou evolua a abstração sem mexer na implementação
+
+                . Altere ou evolua a implementação sem mexer na abstração
+
+            . Ou seja, você pode mudar cada lado de forma independente, sem causar impacto no outro.
+
+        . Ilustração
+
+                                    +------------------------+
+                                    |     ElectronicGoods    | 
+                                    |      <<abstract>>      |
+                                    +------------------------+
+                                    | - state : IState       |
+                                    +------------------------+
+                                    | + ElectronicGoods(s)   |
+                                    | + MoveState()          |
+                                    +------------------------+
+                                            ^
+                                            |
+                            +----------------+----------------+
+                            |                                 |
+                +----------------------------+        +----------------------------+
+                |       Television           |        |          VCD               |
+                +----------------------------+        +----------------------------+
+                | (inherits ElectronicGoods) |        | (inherits ElectronicGoods) |
+                +----------------------------+        +----------------------------+
+
+
+                                    +------------------------+
+                                    |         IState         | 
+                                    |      <<interface>>     |
+                                    +------------------------+
+                                    | + MoveState()          |
+                                    +------------------------+
+                                            ^
+                                +-----------+------------+
+                                |                        |
+                    +------------------------+   +------------------------+
+                    |        OffState        |   |        OnState         |
+                    +------------------------+   +------------------------+
+                    | + MoveState()          |   | + MoveState()          |
+                    +------------------------+   +------------------------+
+
+
+                                    +------------------------+
+                                    |        Program         |
+                                    +------------------------+
+                                    | + Main()               |
+                                    +------------------------+
+                                            |
+                                            | usa ElectronicGoods + IState
+                                            v
+                                    (cria Television/VCD com estados OnState/OffState)
+
+
+
+            . Exemplo
+
+                namespace Pattern.Structural.Bridge;
+
+                public interface IState
+                {
+                    void MoveState();
+                }
+
+
+
+                namespace Pattern.Structural.Bridge;
+
+                public class OffState: IState
+                {
+                    public void MoveState()
+                    {
+                        Console.WriteLine("Moving to Off State");
+                    }
+                }
+
+
+
+
+                namespace Pattern.Structural.Bridge;
+
+                public class OnState : IState
+                {
+                    public void MoveState()
+                    {
+                        Console.WriteLine("Moving to On State");
+                    }
+                }
+
+
+
+
+
+                namespace Pattern.Structural.Bridge
+                {
+                    public abstract class ElectronicGoods
+                    {
+                        public IState? State { get; set; }
+
+                        abstract public void MoveToCurrentState();
+                    }
+                }
+
+
+
+
+                namespace Pattern.Structural.Bridge;
+
+                public class Television : ElectronicGoods
+                {
+                    public override void MoveToCurrentState()
+                    {
+                        Console.WriteLine("\n Television is functioning at :");
+                        State?.MoveState();
+                    }
+                }
+
+
+
+                namespace Pattern.Structural.Bridge;
+
+                public class VCD: ElectronicGoods
+                {
+                    public override void MoveToCurrentState()
+                    {
+                        Console.WriteLine("VCD is functioning at: ");
+
+                        State?.MoveState();
+                    }
+                }
+
+
+
+
+                using Pattern.Structural.Bridge;
+
+                public class Program
+                {
+                    static void Main(string[] args)
+                    {
+
+                        Console.WriteLine("***Bridge Pattern Demo***");
+                        Console.WriteLine("\nDealing with a Television:");
+                        //ElectronicGoods eItem = new Television(presentState);
+                        ElectronicGoods eItem = new Television();
+                        IState presentState = new OnState();
+                        eItem.State = presentState;
+                        eItem.MoveToCurrentState();
+                        //Verifying Off state of the Television now
+                        presentState = new OffState();
+                        //eItem = new Television(presentState);
+                        eItem.State = presentState;
+                        eItem.MoveToCurrentState();
+                        Console.WriteLine("\n \n Dealing with a VCD:");
+                        presentState = new OnState();
+                        //eItem = new VCD(presentState);
+                        eItem = new VCD();
+                        eItem.State = presentState;
+                        eItem.MoveToCurrentState();
+                        presentState = new OffState();
+                        //eItem = new VCD(presentState);
+                        eItem.State = presentState;
+                        eItem.MoveToCurrentState();
+                        Console.ReadLine();
+
+
+
+                    }
+                }
+
+. Behavior Pattern
+
+    . Visitor
+    
+        . Defnição
+
+            . Permite definir novas operações sobre uma estrutura de objetos sem modificar as classes
+                desses objetos. Isso é feito separando o algoritmo (Visitor) da estrutura de dados 
+                (Element).
+
+        . Ilustração
+
+            +-----------------+        +-------------------+
+            |    IVisitor     |        |   IElement        |
+            +-----------------+        +-------------------+
+            | + Visit(Book)   |        | + Accept(visitor) |
+            | + Visit(Fruit)  |        +-------------------+
+            +-----------------+             ^     ^
+                ^                           |     +-----------------------+
+                |                           |                             |
+            +-----------------+        +-------------------+    +-----------------------+
+            | PriceVisitor    |        |   Fruit           |    |       Book            |
+            +-----------------+        +-------------------+    +-----------------------+
+            | + Visit(Fruit)  |        | + Accept(visitor) |    | + Accept( visitor)    |
+            | + Visit(Book)   |        +-------------------+    +-----------------------+
+            +-----------------+               
+                ^
+                |
+            +-----------------+
+            | ShippingVisitor |
+            | + Visit(Book)   |
+            | + Visit(Fruit)  |
+            +-----------------+
+
+        . Exemplo
+
+            // Visitor interface - declara Visit para cada ConcreteElement
+            namespace Pattern.Behavior.Visitor;
+
+            public interface IVisitor
+            {
+                void Visit(Book book);
+                void Visit(Fruit fruit);
+            }
+
+
+
+            // Element interface - aceita um Visitor
+            namespace Pattern.Behavior.Visitor;
+
+            public interface IElement
+            {
+                void Accept(IVisitor visitor);
+            }
+
+
+
+            // ConcreteElement 1
+            namespace Pattern.Behavior.Visitor;
+
+            public class Book : IElement
+            {
+                public double Price { get; set; }
+                public string? Isbn { get; set; }
+
+                public Book()
+                {
+                    
+                }
+                public Book(string isbn, double price)
+                {
+                    Isbn = isbn;
+                    Price = price;
+                }
+
+                public void Accept( IVisitor visitor ) => visitor.Visit(this); // double dispatch: chama Visit(Book)
+
+            }
+
+
+            // ConcreteElement 2
+
+            namespace Pattern.Behavior.Visitor;
+
+            public class Fruit : IElement
+            {
+                public string Name { get; set; }
+                public double PricePerKg { get; set; }
+                public double WeightKg { get; set; }
+
+
+                public Fruit()
+                {
+                    
+                }
+
+                public Fruit(string name, double pricePerKg, double weightKg)
+                {
+                    Name = name;
+                    PricePerKg = pricePerKg;
+                    WeightKg = weightKg;
+                }
+
+                public void Accept(IVisitor visitor) => visitor.Visit(this);        // double dispatch: chama Visit(Fruit)
+            }
+
+
+            // ConcreteVisitor 1: calcula preço total
+
+            namespace Pattern.Behavior.Visitor;
+
+            public class PriceVisitor : IVisitor
+            {
+                public double Total { get; private set; } = 0.0;
+
+                public void Visit(Book book)
+                {
+                    // Ex.: aplicar um desconto fixo para livros
+                    double bookPrice = book.Price * 0.9; // 10% discount
+                    Total += bookPrice;
+                    Console.WriteLine($"PriceVisitor: Book (ISBN={book.Isbn}) price after discount = {bookPrice:F2}");
+                }
+
+                public void Visit(Fruit fruit)
+                {
+                    double fruitPrice = fruit.PricePerKg * fruit.WeightKg;
+                    Total += fruitPrice;
+                    Console.WriteLine($"PriceVisitor: Fruit ({fruit.Name}) price = {fruitPrice:F2}");
+                }
+            }
+
+
+
+            // ConcreteVisitor 2: calcula custo de envio
+            namespace Pattern.Behavior.Visitor;
+
+            public class ShippingVisitor : IVisitor
+            {
+                public double Cost { get; private set; } = 0.0;
+
+                public void Visit(Book book)
+                {
+                    // Livros são leves, frete fixo baixo
+                    double shipping = 2.0;
+                    Cost += shipping;
+                    Console.WriteLine($"ShippingVisitor: Book (ISBN={book.Isbn}) shipping = {shipping:F2}");
+                }
+
+                public void Visit(Fruit fruit)
+                {
+                    // Frutas dependem do peso
+                    double shipping = 1.0 * fruit.WeightKg; // 1.0 por kg
+                    Cost += shipping;
+                    Console.WriteLine($"ShippingVisitor: Fruit ({fruit.Name}) shipping = {shipping:F2}");
+                }
+            }
+
+
+
+            using Pattern.Behavior.Visitor;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+
+                    // Cria elementos (itens do carrinho)
+                    var items = new List<IElement>
+                        {
+                            new Book(){ Isbn = "978-0131103627", Price = 50.0},
+                            new Book(){ Isbn = "978-0201633610", Price = 70.0},
+
+                            new Fruit() { Name = "Banana", PricePerKg = 3.0, WeightKg = 2.0},   // 2kg * 3.0/kg = 6.0
+                            new Fruit() { Name = "Apple", PricePerKg = 5.0, WeightKg = 1.5},    // 1.5kg * 5.0/kg = 7.5
+                        };
+
+                    // Cria visitantes
+                    var priceVisitor = new PriceVisitor();
+                    var shippingVisitor = new ShippingVisitor();
+
+                    // Aplica PriceVisitor a todos os elementos
+                    Console.WriteLine("== Calculating Prices ==");
+                    foreach (var item in items)
+                    {
+                        item.Accept(priceVisitor);
+                    }
+                    Console.WriteLine($"Total price = {priceVisitor.Total:F2}\n");
+
+                    // Aplica ShippingVisitor a todos os elementos
+                    Console.WriteLine("== Calculating Shipping ==");
+                    foreach (var item in items)
+                    {
+                        item.Accept(shippingVisitor);
+                    }
+                    Console.WriteLine($"Total shipping = {shippingVisitor.Cost:F2}");
+                }
+
+            }
+
+    . Observer
+
+        . Definição
+
+            . Defina uma dependência de um para muitos entre objetos, de forma que, 
+                quando um objeto mudar de estado, todos os seus dependentes sejam 
+                notificados e atualizados automaticamente.
+
+        . Conceito
+
+
+            . Nesse padrão, existem muitos observadores (objetos) que observam um determinado objeto principal.
+                Os observadores desejam ser notificados quando ocorre uma mudança dentro desse
+                objeto. Portanto, eles se registram nesse objeto. Quando perdem o interesse no
+                nele, simplesmente cancelam o registro. Às vezes, esse modelo é chamado de
+                modelo "Publisher-Subscriber". A ideia geral pode ser resumida da seguinte forma: usando esse
+                padrão, um objeto (sujeito) pode enviar notificações para vários observadores (um conjunto de objetos)
+                ao mesmo tempo.
+
+                . O modelo "Publisher–Subscriber" é um padrão de comunicação onde quem produz informações não conhece 
+                    quem as consome. Ele serve para desacoplar emissores e receptores de mensagens. Um ou mais publicadores 
+                    enviam mensagens para um canal, e vários assinantes recebem essas mensagens automaticamente.
+
+                . O publisher não envia mensagens diretamente para os subscribers — ele apenas publica eventos.
+
+        . Ilustração
+
+            . Para este exemplo, criei três observadores e um objeto principal. O objeto principal (subject) mantém
+                uma lista de todos os seus usuários registrados. Os observadores desejam receber uma notificação quando o
+                valor do sinalizador mudar no objeto principal. Na saída, você descobrirá que esses observadores estão
+                recebendo notificações quando os valores do sinalizador são alterados para 5, 50 e 100, respectivamente. Mas
+                um deles não recebe nenhuma notificação quando o valor do sinalizador muda para 50 porque
+                naquele momento ele não era um usuário registrado no sujeito. Mas, no final, ele começa
+                a receber notificações novamente porque se registra novamente.
+
+                                                    +-----------------------------+             
+                                                    |          ISubject           |             
+                                                    |       <<interface>>         |             
+                                                    +-----------------------------+             
+                                                    | + NotifyRegisteredUsers()   |             
+                                                    | + Register(obs: IObserver)  |             
+                                                    | + Unregister(obs: IObserver)|
+                                                    +-----------------------------+
+                                                                ^
+                                                                |
+                                                                |
+                                                +---------------------------------------+
+                                                |               Subject                 |
+                                                +---------------------------------------+
+                                                | - flag : bool                         |
+                                                | - observerList : List<IObserver>      |
+                                                +---------------------------------------+
+                                                | + Flag : bool { get; set; }           |
+                                                +---------------------------------------+
+                                                | + NotifyRegisteredUsers()             |
+                                                | + Register(obs: IObserver)            |
+                                                | + Unregister(obs: IObserver)          |
+                                                +---------------------------------------+
+
+
+                                                    +-----------------------------+
+                                                    |        IObserver            |
+                                                    |       <<interface>>         |
+                                                    +-----------------------------+
+                                                    | + Update()                  |
+                                                    +-----------------------------+
+                                                                    ^
+                                                                    |
+                                        +---------------------------------------------------+
+                                        |                                                   |
+                        +---------------------------------------+       +---------------------------------------+
+                        |            ObserverType1              |       |            ObserverType2              |
+                        +---------------------------------------+       +---------------------------------------+
+                        | - nameOfObserver : string             |       | - nameOfObserver : string             |
+                        +---------------------------------------+       +---------------------------------------+
+                        | + ObserverType1(name: string)         |       | + ObserverType2(name: string)         |
+                        | + Update()                            |       | + Update()                            |
+                        +---------------------------------------+       +---------------------------------------+
+
+
+                                                    +-----------------------------+
+                                                    |           Program           |
+                                                    +-----------------------------+
+                                                    | + Main() : void             |
+                                                    +-----------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Observer;
+
+            public interface IObserver
+            {
+                void Update(int i);
+            }
+
+
+
+
+            namespace Pattern.Behavior.Observer;
+
+            public class ObserverType1: IObserver
+            {
+                private string? nameOfObserver;
+
+                public ObserverType1( string name)
+                {
+                    this.nameOfObserver = name;
+                }
+
+                public void Update(int i)
+                {
+                    Console.WriteLine($"{nameOfObserver} has received an alert: Someone has updated myValue in Subject to: {i}");
+                }
+            }
+
+
+
+
+
+            namespace Pattern.Behavior.Observer;
+
+            public class ObserverType2: IObserver
+            {
+                private string? nameOfObserver;
+                public ObserverType2(string name)
+                {
+                    this.nameOfObserver = name;
+                }
+                public void Update(int i)
+                {
+                    Console.WriteLine($"{nameOfObserver} has received an alert: Someone has updated myValue in Subject to: {i}");
+                }
+            }
+
+
+
+
+
+            namespace Pattern.Behavior.Observer;
+
+            public interface ISubject
+            {
+                void Register(IObserver o);
+                void Unregister( IObserver o);
+                void NotifyRegisteredUsers(int i);
+            }
+
+
+
+
+
+            namespace Pattern.Behavior.Observer;
+
+            public class Subject: ISubject
+            {
+                List<IObserver> observerList = new List<IObserver>();
+
+                private int flag;
+
+                public int Flag
+                {
+                    get { return flag; }
+                    set { 
+                            flag = value; 
+                            NotifyRegisteredUsers(flag);
+                    }
+                }
+
+                public void Register( IObserver anObserver)
+                { 
+                    observerList.Add(anObserver);
+                }
+
+                public void Unregister( IObserver anObserver)
+                {
+                    observerList.Remove(anObserver);
+                }
+
+                public void NotifyRegisteredUsers(int i)
+                {
+                    foreach( IObserver o in observerList)
+                    {
+                        o.Update(i);
+                    }
+                }
+            }
+
+
+
+
+            using Pattern.Behavior.Observer;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("**** Observer Pattern Demo ****\n");
+
+                    //We have 3 observers-2 of them are ObserverType1, 1 of them is of ObserverType2
+                    IObserver myObserver1 = new ObserverType1("Roy");
+                    IObserver myObserver2 = new ObserverType1("Kevin");
+                    IObserver myObserver3 = new ObserverType2("Bose");
+
+                    Subject subject = new Subject();
+
+                    subject.Register(myObserver1);
+                    subject.Register(myObserver2);
+                    subject.Register(myObserver3);
+
+                    Console.WriteLine("Setting Flag = 5");
+
+                    subject.Flag = 5;
+
+                    //Unregistering an observer(Roy))
+                    subject.Unregister(myObserver1);
+
+                    //No notification this time Roy. Since it is unregistered.
+                    Console.WriteLine("\n Setting Flag = 50");
+
+                    subject.Flag = 50;
+                    //Roy is registering himself again
+                    subject.Register(myObserver1);
+                    Console.WriteLine("\n Setting Flag = 100 ");
+                    subject.Flag = 100;
+                    Console.ReadKey();
+
+                }
+
+            }
+
+    . Strategy
+
+        . Definição
+
+            . Define uma família de algoritmos, encapsula cada um deles e os torna intercambiáveis. "Strategy" permite 
+                que o algoritmo varie independentemente dos clientes que o utilizam.
+
+            . Strategy resolve o problema de variações de comportamento sem precisar usar muitos if/else ou switch.
+
+                . Ele faz isso separando:
+
+                    . O que varia (o algoritmo)
+
+                    . De quem usa o algoritmo (o cliente/contexto)
+
+
+        . Conceito
+
+            . Podemos selecionar o comportamento de um algoritmo dinamicamente em tempo de execução.
+
+            Conceitos-chave do Strategy
+
+                . Família de algoritmos: Várias formas diferentes de fazer a mesma coisa (ex: cálculo, validação, ordenação).
+
+                . Encapsulamento: Cada algoritmo fica em sua própria classe.
+
+                . Intercambiáveis: Você pode trocar o algoritmo em tempo de execução.
+
+                 .Independência do cliente: O cliente não precisa saber qual algoritmo está sendo usado.
+
+        . Ilustração
+
+            . Neste exemplo, no arquivo Program.cs, testei duas opções arbitrárias de usuários 
+                (embora você possa ter quantas quiser). Dependendo da entrada do usuário, seus objetos de 
+                contexto decidirão qual opção deve ser definida e exibida.
+
+                                            +------------------------+
+                                            |        Program         |
+                                            +------------------------+
+                                            | + Main() : void        |
+                                            +------------------------+
+
+
+                                        +-----------------------------------+
+                                        |           Context                 |
+                                        +-----------------------------------+
+                                        | - choice : IChoice                |
+                                        +-----------------------------------+
+                                        | + Choice(): IChoice { get; set; } |
+                                        | + ShowChoice() : void             |
+                                        +-----------------------------------+
+
+
+                                        +-----------------------------+
+                                        |           IChoice           | 
+                                        |       <<interface>>         |
+                                        +-----------------------------+
+                                        | + myChoice() : void         |
+                                        +-----------------------------+
+                                                        ^
+                                                        |
+                                    +---------------------------------------+
+                                    |                                       |
+                    +-----------------------------+         +-----------------------------+
+                    |        FirstChoice          |         |        SecondChoice         |
+                    +-----------------------------+         +-----------------------------+
+                    | + myChoice() : void         |         | + myChoice() : void         |
+                    +-----------------------------+         +-----------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Strategy;
+
+            public interface IChoice
+            {
+                void MyChoice();
+            }
+
+
+
+            using System;
+
+            namespace Pattern.Behavior.Strategy;
+
+            public class FirstChoice : IChoice
+            {
+
+                public void MyChoice()
+                {
+                    Console.WriteLine("Traveling to Japan");
+                }
+
+            }
+
+
+
+            namespace Pattern.Behavior.Strategy;
+
+            public class SecondChoice: IChoice
+            {
+                public void MyChoice()
+                {
+                    Console.WriteLine("Traveling to India");
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.Strategy;
+
+            public class Context
+            {
+                public IChoice Choice { get;  set; }
+
+                public Context()
+                {
+
+                }
+
+                public Context(IChoice choice)
+                {
+                    Choice = choice;
+                }
+
+                public void ShowChoice()
+                {
+                    Choice.MyChoice();
+                }
+            }
+
+
+
+
+            using Pattern.Behavior.Strategy;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Strategy Pattern Demo***\n");
+                    IChoice ic = null;
+                    Context cxt = new Context();
+                    //For simplicity, we are considering 2 user inputs only.
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Console.WriteLine("\nEnter ur choice(1 or 2)");
+                        string c = Console.ReadLine();
+                        if (c.Equals("1"))
+                        {
+                            ic = new FirstChoice();
+                        }
+                        else
+                        {
+                            ic = new SecondChoice();
+                        }
+                        cxt.Choice = ic;
+                        cxt.ShowChoice();
+                    }
+                    Console.ReadKey();
+                }
+
+            }
+
+    . Template Method
+
+        . Definição:
+
+            . Define o esqueleto de um algoritmo em uma operação, delegando algumas etapas para subclasses.
+            
+            . O padrão Template Method permite que subclasses redefinam certas etapas de um algoritmo
+                sem alterar a estrutura do algoritmo.        
+
+        . Contexto:
+
+            . Com o padrão Template Method, você define a estrutura mínima ou essencial de um algoritmo. Em seguida, 
+                você delega parte da responsabilidade às subclasses. A ideia principal é que você pode redefinir certas 
+                etapas de um algoritmo, mas essas alterações não afetarão a arquitetura principal.
+
+            . Esse padrão de projeto é útil se você precisar implementar um algoritmo de várias etapas e quiser 
+                permitir a personalização por meio de subclasses.        
+
+        . Ilustração:
+
+            . Suponha que cada estudante de engenharia precise ser aprovado em matemática e também demonstrar
+                habilidades interpessoais (como habilidades de comunicação, habilidades de gestão de pessoas e 
+                assim por diante) em seus semestres iniciais para obter seus diplomas. Posteriormente, você 
+                adicionará algumas disciplinas específicas aos seus cursos com base nas áreas escolhidas 
+                (ciência da computação ou eletrônica).        
+
+                    +-------------------------------+
+                    |            Program            |
+                    +-------------------------------+
+                    | + Main() : void               |
+                    +-------------------------------+
+
+
+            +--------------------------------------------+
+            |        BasicEngineering                    | 
+            |           <<abstract>>                     |
+            +--------------------------------------------+
+            | + Math() : void                            |
+            | + Papers() : void                          |
+            | + SoftSkills() : void                      |
+            | # SpecialPaper() : void                    |
+            +--------------------------------------------+
+                                ^
+                                |
+                    +---------------------------+
+                    |                           |
+            +---------------------+   +------------------------+
+            |     Electronics     |   |    ComputerScience     |
+            +---------------------+   +------------------------+
+            | + SpecialPaper()    |   | + SpecialPaper()       |
+            +---------------------+   +------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.TemplateMethod;
+
+            public abstract class BasicEngineering
+            {
+                public void Papers()
+                {
+                    Math();
+                    SoftSkills();
+                    SpecialPaper();
+                }
+
+                private void Math()
+                {
+                    Console.WriteLine("Mathematics");
+                }
+
+                private void SoftSkills()
+                {
+                    Console.WriteLine("Soft Skills");
+                }
+
+                public abstract void SpecialPaper();
+            }
+
+
+
+            namespace Pattern.Behavior.TemplateMethod;
+
+            public class ComputerScience: BasicEngineering
+            {
+                public override void SpecialPaper()
+                {
+                    Console.WriteLine("Oriented Object Programming");
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.TemplateMethod;
+
+            public class Electronics: BasicEngineering
+            {
+
+                public override void SpecialPaper()
+                {
+                    Console.WriteLine("Digital Logic and Circuit Theory");
+                }
+            }
+
+
+
+
+            using Pattern.Behavior.TemplateMethod;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Template Method Pattern Demo***\n");
+                    BasicEngineering bs = new ComputerScience();
+                    Console.WriteLine("Computer Sc Papers:");
+                    bs.Papers();
+                    Console.WriteLine();
+                    bs = new Electronics();
+                    Console.WriteLine("Electronics Papers:");
+                    bs.Papers();
+                    Console.ReadLine();
+                }
+
+            }
+
+    . Command
+
+        . Definição
+
+            . Encapsula uma solicitação como um objeto, permitindo assim parametrizar clientes com diferentes solicitações, 
+                enfileirar ou registrar solicitações e oferecer suporte a operações reversíveis.
+
+        . Conceito
+
+            . Com esse padrão, você encapsula um processo de invocação de método. Em geral, quatro termos
+            são importantes aqui: invoker, client, command e "receiver". Um objeto de comando pode
+            invocar um método do "receiver/receptor" de uma maneira específica para a classe desse receiver/receptor. O
+            receiver então inicia o processamento da tarefa. Um objeto de "command/comando" é passado separadamente para o
+            objeto "invoker/invocador" para invocar o comando. O objeto "client/cliente" contém o objeto "invoker/invocador" e
+            os objetos de "command/comando". O "client/cliente" apenas toma a decisão (quais comandos executar)
+            e então passa o comando para o objeto "invoker/invocador" (para a execução).
+
+
+        . Ilustração
+
+
+                            +-------------------------------+
+                            |            Client             |
+                            +-------------------------------+
+                            | + Main() : void               |
+                            +-------------------------------+
+
+
+                    +---------------------------------------------+
+                    |                Invoke                       |
+                    +---------------------------------------------+
+                    | - commandToBePerformed : ICommand           |
+                    +---------------------------------------------+
+                    | + SetCommand(cmd : ICommand) : void         |
+                    | + ExecuteCommand() : void                   |
+                    +---------------------------------------------+
+                                    |
+                                    | usa
+                                    v
+                    +---------------------------------------------+
+                    |               ICommand                      | <<interface>>
+                    +---------------------------------------------+
+                    | + Do() : void                               |
+                    +---------------------------------------------+
+                        ^                               ^
+                        |                               |
+                        |                               |
+            +-------------------------------+   +-------------------------------+
+            |         MyUndoCommand         |   |         MyRedoCommand         |
+            +-------------------------------+   +-------------------------------+
+            | - receiver : Receiver         |   | - receiver : Receiver         |
+            +-------------------------------+   +-------------------------------+
+            | + Do() : void                 |   | + Do() : void                 |
+            +-------------------------------+   +-------------------------------+
+                        \                               /
+                         \                             /
+                          v                           v
+                        +---------------------------------------------+
+                        |                  Receiver                   |
+                        +---------------------------------------------+
+                        | + OptionalTaskPriorToRedo() : void          |
+                        | + OptionalTaskPriorToUndo() : void          |
+                        | + PerformRedo() : void                      |
+                        | + PerformUndo() : void                      |
+                        +---------------------------------------------+
+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Command;
+
+            public interface ICommand
+            {
+                void Do();
+            }
+
+
+
+            namespace Pattern.Behavior.Command;
+
+            public class MyUndoCommand : ICommand
+            {
+                private Receiver receiver;
+
+                public MyUndoCommand( Receiver recv)
+                {
+                    receiver = recv;
+                }
+
+                public void Do()
+                {
+                    receiver.OptionalTaskPriorToUndo();
+
+                    receiver.PerformUndo();
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.Command;
+
+            public class MyRedoCommand: ICommand
+            {
+                private Receiver receiver;
+
+                public MyRedoCommand( Receiver recv)
+                {
+                    receiver = recv;
+                }
+
+                public void Do()
+                {
+                    receiver.OptionalTaskPriorToRedo();
+
+                    receiver.PerformRedo();
+                }
+            }
+
+
+
+
+
+
+            namespace Pattern.Behavior.Command;
+
+            public class Receiver
+            {
+                public void PerformUndo()
+                {
+                    Console.WriteLine("Executing-MyUndoCommand");
+                }
+                public void PerformRedo()
+                {
+                    Console.WriteLine("Executing-MyRedoCommand");
+                }
+                //Optional method-If you want to perform any prior tasks before
+                //Undo.
+                public void OptionalTaskPriorToUndo()
+                {
+                    Console.WriteLine("Executing-Optional Tasks prior to execute undo command");
+                }
+                //Optional method-If you want to perform any prior tasks before
+                //Redo.
+                public void OptionalTaskPriorToRedo()
+                {
+                    Console.WriteLine("Executing-Optional Tasks prior to execute redo command");
+                }
+
+            }
+
+
+
+
+
+
+            namespace Pattern.Behavior.Command;
+
+            //Invoker class
+            public class Invoke
+            {
+                ICommand commandToBePerformed;
+                public void SetCommand(ICommand command)
+                {
+                    this.commandToBePerformed = command;
+                }
+                public void ExecuteCommand()
+                {
+                    commandToBePerformed.Do();
+                }
+            }
+
+
+
+
+
+
+            using Pattern.Behavior.Command;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Command Pattern Demo***\n");
+                    /*Client holds both the Invoker and Command Objects*/
+                    Invoke invoker = new Invoke();
+                    Receiver intendedreceiver = new Receiver();
+                    MyUndoCommand undoCmd = new MyUndoCommand(intendedreceiver);
+                    invoker.SetCommand(undoCmd);
+                    invoker.ExecuteCommand();
+                    MyRedoCommand redoCmd = new MyRedoCommand(intendedreceiver);
+                    invoker.SetCommand(redoCmd);
+                    invoker.ExecuteCommand();
+                    Console.ReadKey();
+                }
+
+            }
+
+    . Iterator
+
+        . Definição
+
+            Fornece uma maneira de acessar os elementos de um objeto agregado sequencialmente sem
+            expor sua representação subjacente.        
+
+        . Conceito
+
+            . Os iteradores são geralmente usados ​​para percorrer um contêiner (que é basicamente um objeto) para
+                acessar seus elementos, mas você não precisa lidar com os detalhes internos do elemento. Você
+                usará frequentemente os conceitos de iteradores quando quiser percorrer diferentes tipos de
+                objetos de coleção de uma maneira padronizada e uniforme.
+
+        . Ilustração
+
+            +-------------------------------+
+            |           ISubjects           | 
+            |           <<interface>>       |
+            +-------------------------------+
+            | + CreateIterator() : IIterator|
+            +-------------------------------+
+
+
+            +-------------------------------+
+            |           IIterator           | 
+            |           <<interface>>       |
+            +-------------------------------+
+            | + First() : void              |
+            | + Next() : void               |
+            | + IsDone() : bool             |
+            | + CurrentItem() : string      |
+            +-------------------------------+
+
+
+            +---------------------------------------+
+            |               Science                 |
+            +---------------------------------------+
+            | - subjects : List<string>             |
+            +---------------------------------------+
+            | + Science()                            |
+            | + CreateIterator() : IIterator         |
+            +---------------------------------------+
+                            ^
+                            | implements ISubjects
+                            |
+
+
+            +---------------------------------------+
+            |                Arts                   |
+            +---------------------------------------+
+            | - subjects : List<string>             |
+            +---------------------------------------+
+            | + Arts()                               |
+            | + CreateIterator() : IIterator         |
+            +---------------------------------------+
+                            ^
+                            | implements ISubjects
+                            |
+
+
+            +---------------------------------------+
+            |          ScienceIterator               |
+            +---------------------------------------+
+            | - position : int                      |
+            | - subjects : List<string>             |
+            +---------------------------------------+
+            | + ScienceIterator(subjects)           |
+            | + First() : void                      |
+            | + Next() : void                       |
+            | + IsDone() : bool                     |
+            | + CurrentItem() : string              |
+            +---------------------------------------+
+                            ^
+                            | implements IIterator
+                            |
+
+
+            +---------------------------------------+
+            |            ArtsIterator                |
+            +---------------------------------------+
+            | - position : int                      |
+            | - subjects : List<string>             |
+            +---------------------------------------+
+            | + ArtsIterator(subjects)              |
+            | + First() : void                      |
+            | + Next() : void                       |
+            | + IsDone() : bool                     |
+            | + CurrentItem() : string              |
+            +---------------------------------------+
+                            ^
+                            | implements IIterator
+                            |
+
+
+            +-------------------------------+
+            |            Program            |
+            +-------------------------------+
+            | + Main() : void               |
+            | + Print(subjects : ISubjects) |
+            +-------------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Iterator;
+
+            public interface ISubjects
+            {
+                IIterator CreateIterator();
+            }
+
+
+
+
+            namespace Pattern.Behavior.Iterator;
+
+            public interface IIterator
+            {
+                void First();
+
+                string Next();
+
+                bool IsDone();
+
+                string CurrentItem();
+
+            }
+
+
+
+
+
+            namespace Pattern.Behavior.Iterator;
+
+            public class Arts: ISubjects
+            {
+                private string[] _subjects = { "Bengali", "English" };
+                public IIterator CreateIterator()
+                {
+                    return new ArtsIterator(_subjects);
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.Iterator;
+
+            public class Science: ISubjects
+            {
+                private LinkedList<string> _subjects = new LinkedList<string>();
+
+                public Science()
+                {
+                    _subjects.AddFirst("Maths");
+                    _subjects.AddFirst("Comp. Sc.");
+                    _subjects.AddFirst("Physics");
+                }
+
+                public IIterator CreateIterator()
+                {
+                    return new ScienceIterator(_subjects);
+
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.Iterator
+            {
+                public class ArtsIterator: IIterator
+                {
+
+                    private string[] _subjects;
+                    private int _position;
+
+                    public ArtsIterator( string[] subjects)
+                    {
+                        _subjects = subjects;
+                        _position = 0;
+                    }
+
+                    public void First()
+                    {
+                        _position = 0;
+                    }
+                    public string Next()
+                    {
+                        return _subjects[_position++];
+                    }
+                    public bool IsDone()
+                    {
+                        if (_position < _subjects.Length)
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
+                    public string CurrentItem()
+                    {
+                        return _subjects[_position];
+                    }
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.Iterator;
+
+            public class ScienceIterator: IIterator
+            {
+                private LinkedList<string> _subjects;
+                private int _position;
+
+                public ScienceIterator( LinkedList<string> subjects)
+                {
+                    this._subjects = subjects;
+                    this._position = 0;
+                }
+
+                public string CurrentItem()
+                {
+                    return _subjects.ElementAt(this._position);
+                }
+
+                public void First()
+                {
+                    _position = 0;
+
+                }
+
+                public bool IsDone()
+                {
+                    if (_position < _subjects.Count)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+
+                public string Next()
+                {
+                    return _subjects.ElementAt( _position++ );
+                }
+            }
+
+
+
+            using Pattern.Behavior.Iterator;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***Iterator Pattern Demo***");
+                    ISubjects ScienceSubjects = new Science();
+                    ISubjects ArtsSubjects = new Arts();
+                    IIterator IteratorForScience = ScienceSubjects.CreateIterator();
+                    IIterator IteratorForArts = ArtsSubjects.CreateIterator();
+                    Console.WriteLine("\nScience subjects :");
+                    Print(IteratorForScience);
+                    Console.WriteLine("\nArts subjects :");
+                    Print(IteratorForArts);
+
+                    Console.ReadLine();
+                }
+                public static void Print(IIterator iterator)
+                {
+                    while (!iterator.IsDone())
+                    {
+                        Console.WriteLine(iterator.Next());
+                    }
+                }
+            }
+
+    . Memento
+
+        . Definição
+
+            . Sem violar o encapsulamento, captura e externaliza o estado interno de um objeto para que
+                o objeto possa ser restaurado a esse estado posteriormente.
+
+        . Conceito
+
+            . A definição da palavra "memento" no dicionário remete a uma lembrança de eventos passados.
+                Ao usar esse padrão, você pode restaurar um objeto ao seu estado anterior. Esse padrão
+                fornece uma maneira orientada a objetos de salvar o estado de um objeto.
+
+        . Ilustração
+
+            . Neste exemplo, três objetos estão envolvidos: um memento, um originator e um caretaker/guarda.
+                (Essas são convenções de nomenclatura comuns, por isso as estou usando aqui.) O
+                objeto originator tem um estado interno, e um cliente pode definir um estado nele. O caretaker primeiro
+                solicita ao originator um objeto memento porque deseja manter (ou salvar) o estado atual
+                do objeto originator. O objeto caretaker também confirma a operação de salvamento
+                exibindo uma mensagem no console. Agora, suponha que o cliente queira reverter para o estado 
+                anterior. Como o estado do objeto originator já foi alterado, para reverter para o estado anterior,
+                você precisa da ajuda do objeto caretaker que salvou o estado anteriormente. Portanto,
+                o objeto caretaker agora retorna o objeto memento (com o estado anterior) para o
+                originator. Além disso, o próprio objeto memento é um objeto opaco (um objeto no qual o caretaker
+                não tem permissão para fazer alterações).            
+
+
+            +------------------------+
+            |        Program         |
+            +------------------------+
+            | + Main() : void        |
+            +------------------------+
+
+
+            +------------------------------------+
+            |            Originator              |
+            +------------------------------------+
+            | - state : string                   |
+            | - myMemento : Memento              |
+            +------------------------------------+
+            | + State : string { get; set; }     |
+            +------------------------------------+
+            | + GetTheMemento() : Memento        |
+            | + RevertToState(m : Memento) : void|
+            +------------------------------------+
+                            |
+                            | cria / usa
+                            v
+            +------------------------------------+
+            |              Memento               |
+            +------------------------------------+
+            | - state : string                   |
+            +------------------------------------+
+            | + State : string { get; set; }     |
+            +------------------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Memento;
+
+            public class Memento
+            {
+                private string? state;
+
+                //If we want the state to be same when a memento is created for the
+                //first time, we could prefer a constructor (as shown below)
+                //instead of using a setter method in this case.
+                public Memento(string state)
+                {
+                    this.state = state;
+                }
+
+                public Memento()
+                {
+                    
+                }
+                public string? State { get; set; }
+            }
+
+
+
+            namespace Pattern.Behavior.Memento;
+
+            public class Originator
+            {
+                private string? state;
+                Memento? memento;
+
+                public string State
+                {
+                    get { return state; }
+                    set 
+                    { 
+                        state = value;
+                        Console.WriteLine($"Current state: {state}");
+                    }
+                }
+
+                public Memento GetMemento()
+                {
+                    memento = new Memento();
+
+                    memento.State = state;
+
+                    return memento;
+                }
+
+                public void RevertToState( Memento previousMemento)
+                {
+                    Console.WriteLine("Restoring to previous state...");
+
+                    this.state = previousMemento.State;
+                    Console.WriteLine($"Current State: {state}");
+
+                }
+
+
+
+            }
+
+
+
+            // Caretaker
+            using Pattern.Behavior.Memento;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("****Memento Pattern Demo\n");
+
+                    Originator originator = new Originator();
+
+                    Memento memento;
+
+                    originator.State = "Initial State";
+
+                    memento = originator.GetMemento();
+
+                    originator.State = "Intermediary state";
+
+                    originator.RevertToState(memento);
+
+                    Console.ReadKey();
+
+                }
+            }
+
+    . State
+
+        , Definição
+
+            . Permite que um objeto altere seu comportamento quando seu estado interno mudar. 
+                O objeto parecerá mudar de classe.
+
+        . Ilustração
+
+            . Este exemplo modela as funcionalidades relacionadas a uma televisão e seu controle remoto.
+                Suponha que você tenha um controle remoto para operar uma TV. Você pode simplesmente
+                assumir que, a qualquer momento, sua TV pode estar em um destes três estados: Ligada,
+                Desligada ou Mudo. Inicialmente, a TV está no estado Desligado. Quando você pressiona o botão Ligar em um controle remoto,
+                a TV estará no estado Ligado e, em seguida, se você pressionar o botão Mudo, ela entrará no
+                estado Mudo. Você também pode assumir que, se pressionar o botão Desligar quando a TV já estiver
+                Desligada, se pressionar o botão Ligar quando a TV já estiver Ligada ou se
+                pressionar o botão Mudo quando a TV já estiver no modo Mudo, não haverá mudança de estado
+                para a TV. A TV pode entrar no estado Desligado a partir do estado Ligado ou do estado Mudo (se você pressionar
+                o botão Desligar). A Figura abaixo mostra o diagrama de estados que reflete todos esses cenários possíveis.
+
+
+                . Diagrama de estado
+
+                            ●
+                            |
+                            v
+                        +------+
+                        | Off  |
+                        +------+
+                            |  \
+                            |   \ PressOnButton
+                    PressOff|    \
+                    Button  |     v
+                            |   +------+
+                            |   |  On  |
+                            |   +------+
+                            |      |
+                            |      | PressMuteButton
+                            |      v
+                            |   +--------+
+                            |   |  Mute  |
+                            |   +--------+
+                            |      |
+                            |      | PressOffButton
+                            |      v
+                            +---->+------+
+                                Off
+
+                . Diagrama de classes
+
+                    +-------------------------------+
+                    |           Program             |
+                    +-------------------------------+
+                    | + Main() : void               |
+                    +-------------------------------+
+
+
+                    +----------------------------------------------+
+                    |        IPossibleStates                       | 
+                    |        <<interface>>                         |
+                    +----------------------------------------------+
+                    | + PressMuteButton() : void                   |
+                    | + PressOffButton()  : void                   |
+                    | + PressOnButton()   : void                   |
+                    +----------------------------------------------+
+                                    ^
+                                    |
+                    +--------------+---------------+---------------------------+
+                    |              |               |                           |
+                    +----------------------+  +----------------------+  +----------------------+
+                    |        Off           |  |         On           |  |        Mute          |
+                    +----------------------+  +----------------------+  +----------------------+
+                    | - tvContext : TV     |  | - tvContext : TV     |  | - tvContext : TV     |
+                    +----------------------+  +----------------------+  +----------------------+
+                    | + Off(tv : TV)       |  | + On(tv : TV)        |  | + Mute(tv : TV)      |
+                    | + PressMuteButton()  |  | + PressMuteButton()  |  | + PressMuteButton()  |
+                    | + PressOffButton()   |  | + PressOffButton()   |  | + PressOffButton()   |
+                    | + PressOnButton()    |  | + PressOnButton()    |  | + PressOnButton()    |
+                    +----------------------+  +----------------------+  +----------------------+
+
+
+                    +----------------------------------------------+
+                    |                 TV                           |
+                    +----------------------------------------------+
+                    | - currentState : IPossibleStates             |
+                    +----------------------------------------------+
+                    | + CurrentState : IPossibleStates { get; set;}|
+                    +----------------------------------------------+
+                    | + PressMuteButton() : void                   |
+                    | + PressOffButton()  : void                   |
+                    | + PressOnButton()   : void                   |
+                    | + TV()                                       |
+                    +----------------------------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.State;
+
+            public interface IPossibleState
+            {
+                void PressOnButton(TV context);
+                void PressOffButton(TV context);
+                void PressMuteButton(TV context);
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.State;
+
+            public class Off: IPossibleState
+            {
+                TV tvContext;
+                //Initially we'll start from Off state
+                public Off(TV context)
+                {
+                    Console.WriteLine(" TV is Off now.");
+                    this.tvContext = context;
+                }
+                //Users can press any of these buttons at this state-On, Off or Mute
+                //TV is Off now, user is pressing On button
+                public void PressOnButton(TV context)
+                {
+                    Console.WriteLine("You pressed On button. Going from Off to On state");
+                    tvContext.CurrentState = new On(context);
+                }
+                //TV is Off already, user is pressing Off button again
+                public void PressOffButton(TV context)
+                {
+                    Console.WriteLine("You pressed Off button. TV is already in Off state");
+                    tvContext.CurrentState = new Mute(context);
+                }
+                public void PressMuteButton(TV context)
+                {
+                    Console.WriteLine("You pressed Mute button. TV is already in Off state, so Mute operation will not work.");
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.State;
+            public class On : IPossibleState
+            {
+                TV tvContext;
+                public On(TV context)
+                {
+                    Console.WriteLine("TV is On now.");
+                    this.tvContext = context;
+                }
+                //Users can press any of these buttons at this state-On, Off or Mute
+                //TV is On already, user is pressing On button again
+                public void PressOnButton(TV context)
+                {
+                    Console.WriteLine("You pressed On button. TV is already in On state.");
+                }
+                //TV is On now, user is pressing Off button
+                public void PressOffButton(TV context)
+                {
+                    Console.WriteLine("You pressed Off button. Going from On to Off state.");
+                    tvContext.CurrentState = new Off(context);
+                }
+                //TV is On now, user is pressing Mute button
+                public void PressMuteButton(TV context)
+                {
+                    Console.WriteLine("You pressed Mute button. Going from On to Mute mode.");
+                    tvContext.CurrentState = new Mute(context);
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.State;
+
+            public class Mute: IPossibleState
+            {
+                TV tvContext;
+                public Mute(TV context)
+                {
+                    Console.WriteLine("TV is in Mute mode now.");
+                    this.tvContext = context;
+                }
+                //Users can press any of these buttons at this state-On, Off or Mute
+                //TV is in mute, user is pressing On button
+                public void PressOnButton(TV context)
+                {
+                    Console.WriteLine("You pressed On button. Going from Mute mode to On state.");
+                    tvContext.CurrentState = new On(context);
+                }
+                //TV is in mute, user is pressing Off button
+                public void PressOffButton(TV context)
+                {
+                    Console.WriteLine("You pressed Off button. Going to Mute mode to Off state.");
+                    tvContext.CurrentState = new Off(context);
+                }
+                //TV is in mute already, user is pressing mute button again
+                public void PressMuteButton(TV context)
+                {
+                    Console.WriteLine(" You pressed Mute button. TV is already in Mute mode.");
+                }
+
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.State;
+
+            public class TV
+            {
+                private IPossibleState currentState;
+                public IPossibleState CurrentState
+                {
+                    //get;set;//Not working as expected
+                    get
+                    {
+                        return currentState;
+                    }
+                    /*Usually this value will be set by the class that
+                    implements the interface "IPossibleStates"*/
+                    set
+                    {
+                        currentState = value;
+                    }
+                }
+                public TV()
+                {
+                    this.currentState = new Off(this);
+                }
+                public void PressOffButton()
+                {
+                    currentState.PressOffButton(this);//Delegating the state
+                }
+                public void PressOnButton()
+                {
+                    currentState.PressOnButton(this);//Delegating the state
+                }
+                public void PressMuteButton()
+                {
+                    currentState.PressMuteButton(this);//Delegating the state
+                }
+
+            }
+
+
+
+            using Pattern.Behavior.State;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                    Console.WriteLine("***State Pattern Demo***\n");
+                    //Initially TV is Off
+                    TV tv = new TV();
+                    Console.WriteLine("User is pressing buttons in the following sequence: ");
+                    Console.WriteLine("Off->Mute->On->On->Mute->Mute->Off\n");
+                    //TV is already in Off state
+                    tv.PressOffButton();
+                    //TV is already in Off state, still pressing the Mute button
+                    tv.PressMuteButton();
+                    //Making the TV on
+                    tv.PressOnButton();
+                    //TV is already in On state, pressing On button again
+                    tv.PressOnButton();
+                    //Putting the TV in Mute mode
+                    tv.PressMuteButton();
+                    //TV is already in Mute, pressing Mute button again
+                    tv.PressMuteButton();
+                    //Making the TV off
+                    tv.PressOffButton();
+                    // Wait for user
+                    Console.Read();
+                }
+            }
+
+    . Mediator
+
+        . Definição
+
+            . Defina um objeto que encapsule como um conjunto de objetos interage. O Mediator promove o baixo acoplamento, 
+                impedindo que os objetos se refiram uns aos outros explicitamente, e permite que você varie a interação 
+                deles de forma independente.        
+
+        . Conceito
+
+            . Um mediador assume a responsabilidade de controlar e coordenar as interações de
+                um grupo específico de objetos que não podem se referir uns aos outros explicitamente. Em outras palavras,
+                um mediador é um intermediário por meio do qual esses objetos se comunicam. Esse tipo de
+                implementação ajuda a reduzir o número de interconexões entre diferentes
+                objetos. Como resultado, é possível reduzir o acoplamento no sistema.
+
+        . Ilustração
+
+            . Os participantes são descritos da seguinte forma:
+
+                • Mediator: Define a interface que fornece a
+                comunicação entre objetos Colleague.
+
+                • ConcreteMediator: Conhece e mantém a lista de objetos Colleague.
+                Ele implementa a interface Mediador e coordena a
+                comunicação entre os objetos Colleague.
+
+                • Colleague: Define a interface para comunicação com outros
+                Colleagues.
+
+                • ConcreteColleague: Um colega concreto deve implementar a interface Colleague.
+                Esses objetos se comunicam entre si através do mediador.
+
+            . Neste exemplo, substituí a palavra Colleagues por Friends (sim, você pode
+                presumir que se trata de um ambiente amigável). Vamos supor que você tenha um grupo de três
+                amigos: Amit, Sohel e Raghu. Raghu é o chefe e quer garantir que as coisas funcionem
+                sem problemas. Vamos supor ainda que os três amigos possam se comunicar entre si
+                através de um servidor de bate-papo.
+
+            . Ao final do programa, apresentei outro amigo, Jack. Mas ele não
+                se registrou no objeto mediator, então o mediator não está permitindo que ele publique
+                mensagens.
+
+
+            +-------------------------------+
+            |            Program            |
+            +-------------------------------+
+            | + Main() : void               |
+            +-------------------------------+
+
+
+            +----------------------------------------------+
+            |                Friend                        | 
+            |               <<abstract>>                   |
+            +----------------------------------------------+
+            | - name : string                              |
+            +----------------------------------------------+
+            | + Name : string { get; set; }                |
+            +----------------------------------------------+
+            | + Friend(name : string)                      |
+            | + Send(message : string) : void              |
+            +----------------------------------------------+
+                            ^
+                            |
+            +-------------+-------------+--------------+
+            |             |             |              |
+            +-----------+  +-----------+  +-----------+  +-----------+
+            |  Friend1  |  |  Friend2  |  |  Unknown  |  |   Boss    |
+            +-----------+  +-----------+  +-----------+  +-----------+
+            | + Friend1()| | + Friend2()| | + Unknown()| | + Boss() |
+            | + Send()  |  | + Send()  |  | + Send()  |  | + Send() |
+            +-----------+  +-----------+  +-----------+  +-----------+
+
+
+            +----------------------------------------------+
+            |              IMediator                       | 
+            |            <<interface>>                     |
+            +----------------------------------------------+
+            | + Register(friend : Friend) : void           |
+            | + Send(message : string, sender : Friend)    |
+            +----------------------------------------------+
+                                ^
+                                |
+                                |
+            +----------------------------------------------+
+            |           ConcreteMediator                   |
+            +----------------------------------------------+
+            | - participants : List<Friend>                |
+            +----------------------------------------------+
+            | + Register(friend : Friend) : void           |
+            | + Send(message : string, sender : Friend)    |
+            | + DisplayDetails() : void                    |
+            +----------------------------------------------+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.Mediator;
+
+            public abstract class Friend
+            {
+                protected IMediator mediator;
+                private string? name;
+
+                public string Name
+                {
+                    get { return name; }
+                    set { name = value; }
+                }
+
+                protected Friend( IMediator mediator)
+                {
+                    this.mediator = mediator;
+                }
+
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            public class Friend1 : Friend
+            {
+                public Friend1( IMediator mediator, string name): base(mediator)
+                {
+                    this.Name = name;
+                }
+
+                public void Send(string msg)
+                {
+                    mediator.Send(this, msg);
+                }
+
+            }
+
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            class Friend2 : Friend
+            {
+                // Constructor
+                public Friend2(IMediator mediator, string name): base(mediator)
+                {
+                    this.Name = name;
+                }
+                public void Send(string msg)
+                {
+                    mediator.Send(this, msg);
+                }
+            }
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            class Boss : Friend
+            {
+                // Constructor
+                public Boss(IMediator mediator, string name)
+                : base(mediator)
+                {
+                    this.Name = name;
+                }
+                public void Send(string msg)
+                {
+                    mediator.Send(this, msg);
+                }
+            }
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            class Unknown : Friend
+            {
+                // Constructor
+                public Unknown(IMediator mediator, string name)
+                : base(mediator)
+                {
+                    this.Name = name;
+                }
+                public void Send(string msg)
+                {
+                    mediator.Send(this, msg);
+                }
+            }
+
+
+
+
+            namespace Pattern.Behavior.Mediator;
+
+            public class ConcreteMediator : IMediator
+            {
+
+                List<Friend> participants = new List<Friend>();
+
+
+                public void Register(Friend friend)
+                {
+                    participants.Add(friend);
+                }
+
+                public void Send(Friend friend, string msg)
+                {
+                    if (participants.Contains(friend))
+                    {
+                        foreach (Friend participant in participants)
+                        {
+                            Console.WriteLine(String.Format("[{0}] posts: {1} Last message posted {2}", friend.Name, msg, DateTime.Now));
+
+                            System.Threading.Thread.Sleep(1000);
+
+
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"An outsider named{friend.Name} trying to send some messages");
+                    }
+
+
+                }
+
+                public void DisplayDetails()
+                {
+                    Console.WriteLine("At present, registered Participants are:\n");
+
+                    foreach (Friend participant in participants)
+                    {
+                        Console.WriteLine($"{participant.Name}");
+                    }
+                }
+            }
+
+
+
+
+            using Pattern.Behavior.Mediator;
+
+            public class Program
+            {
+                static void Main(string[] args)
+                {
+                
+                    Console.WriteLine("***Mediator Pattern Demo***\n");
+                    ConcreteMediator mediator = new ConcreteMediator();
+                    Friend1 Amit = new Friend1(mediator, "Amit");
+                    Friend2 Sohel = new Friend2(mediator, "Sohel");
+                    Boss Raghu = new Boss(mediator, "Raghu");
+                    //Registering participants
+                    mediator.Register(Amit);
+                    mediator.Register(Sohel);
+                    mediator.Register(Raghu);
+                    //Displaying the participant's list
+                    mediator.DisplayDetails();
+                    Console.WriteLine("Communication starts among participants...");
+                    Amit.Send("Hi Sohel,can we discuss the mediator pattern?");
+
+                    Sohel.Send("Hi Amit,Yup, we can discuss now.");
+                    Raghu.Send("Please get back to work quickly.");
+                    //An outsider/unknown person tries to participate
+                    Unknown unknown = new Unknown(mediator, "Jack");
+                    unknown.Send("Hello Guys..");
+                    // Wait for user
+                    Console.Read();
+
+                }
+            }
+
+    . Chain of Responsibility
+
+        . Definição
+
+            . Evita acoplar o remetente de uma solicitação ao seu destinatário, dando mais de um objeto a 
+                chance de lidar com a solicitação. Encadeia os objetos receptores e passa a solicitação ao 
+                longo da cadeia até que um objeto o processe.
+
+        . Conceito
+
+            . Nesse padrão, você forma uma cadeia de objetos onde cada objeto na cadeia pode lidar com um 
+                tipo específico de solicitação. Se um objeto não puder lidar totalmente com a solicitação, 
+                ele o passa para o próximo objeto na cadeia. Esse processo pode continuar até o final da 
+                cadeia. Esse tipo de mecanismo de tratamento de solicitações oferece a flexibilidade de 
+                adicionar um novo objeto de processamento (manipulador) ao final da cadeia.
+
+                Incoming Request
+                        |
+                        v
+                +-----------+    +-----------+           +-------------+    +-----------+
+                | Handler-1 | -> | Handler-2 | -> ... -> | Handler-N-1 | -> | Handler-N |
+                +-----------+    +-----------+           +-------------+    +-----------+
+                                                                                |
+                                                                                v
+                                                                            End of Chain
+            
+        . Ilustração
+
+            ┌───────────────────────────┐                 ┌───────────────────────────┐
+            │         IReceiver         │                 │        IssueRaiser        │
+            │        <<interface>>      │                 │           Class           │
+            ├───────────────────────────┤                 ├───────────────────────────┤
+            │ + HandleMessage(msg)      │                 │ - setFirstReceiver        │
+            └─────────────▲─────────────┘                 ├───────────────────────────┤
+                          │     ^                         │ + IssueRaiser()           │
+                          │     |                         │ + RaiseMessage(msg)       │
+                          │     |                         └───────────────────────────┘
+                          │     +---------------------------+
+                          |                                 |
+            ┌─────────────┴─────────────┐     ┌─────────────┴─────────────┐
+            │     EmailErrorHandler     │     │      FaxErrorHandler      │
+            │            Class          │     │            Class          │
+            ├───────────────────────────┤     ├───────────────────────────┤
+            │ - nextReceiver : IReceiver│     │ - nextReceiver : IReceiver│
+            ├───────────────────────────┤     ├───────────────────────────┤
+            │ + EmailErrorHandler()     │     │ + FaxErrorHandler()       │
+            │ + HandleMessage(msg)      │     │ + HandleMessage(msg)      │
+            └───────────────────────────┘     └───────────────────────────┘
+
+
+            ┌───────────────────────────┐     ┌─────────────────────────────┐
+            │      MessagePriority      │     │          Message            │
+            │            Enum           │     │            Class            │
+            ├───────────────────────────┤     ├─────────────────────────────┤
+            │ Normal                    │     │ - Priority : MessagePriority│
+            │ High                      │     │ - Text : string             │
+            └───────────────────────────┘     ├─────────────────────────────┤
+                                              │ + Message()                 │
+                                              └─────────────────────────────┘
+
+
+            ┌───────────────────────────┐
+            │          Program          │
+            │           Class           │
+            ├───────────────────────────┤
+            │ + Main()                  │
+            └───────────────────────────┘
+
+
+
+            Program                         IssueRaiser     EmailErrorHandler     FaxErrorHandler           Message
+            |                                   |                 |                    |                        |
+            | emailHandler =                    |                 |                    |                        |
+            | new EmailErrorHandler()           |                 |                    |                        |
+            |<----------------------------------------------------|                    |                        |
+            |                                   |                 |                    |                        |
+            | faxHandler =                      |                 |                    |                        |
+            | new FaxErrorHandler(emailHandler) |                 |                    |                        |
+            |<-------------------------------------------------------------------------|                        |
+            |                                   |                 |                    |                        |
+            |  m1 = new Message("Fax is...") <------------------------------------------------------------------|
+            |  m2 = new Message("Email are...") <---------------------------------------------------------------|
+            |  m3 = new Message("In Email, ...") <--------------------------------------------------------------|
+            |  m4 = new Message("Fax is not...") <--------------------------------------------------------------|
+            |                                   |                 |                    |                        |
+            |                                   |                 |                    |                        |
+            | raiser =                          |                 |                    |                        |
+            | new IssueRaiser(faxHandler) <-----|                 |                    |                        |
+            |                                   |                 |                    |                        |
+            |                                   |                 |                    |                        |
+            |                                   |                 |                    |                        |
+            | RaiseMessage(m1)                  |                 |                    |                        |
+            |--------------/------------------->|                 |                    |                        |
+            |             /                     | HandleMessage() |                    |                        |
+            |            /                      |---------------->|                    |                        |
+            |    +----------------------------+ |  contains Email?|                    |                        |
+            |    | Repetir a mesma chamada    | |  [false]        |                    |                        |
+            |    | para os objetos m2,m3 e m4 | | nextReceiver    |                    |                        |
+            |    +----------------------------+ |------------------------------->      |                        |
+            |                                   |                 | HandleMessage()    |                        |
+            |                                   |                 |------------------> |                        |
+            |                                   |                 | contains Fax?      |                        |
+            |                                   |                 | [true]             |                        |
+            |                                   |                 | Console.WriteLine()|                        |
+            |                                   |                 | return true        |                        |
+            |                                   |<-------------------------------------|                        |
+            |<----------------------------------|                 |                    |                        |
+
+
+
+        . Exemplo
+
+            namespace Pattern.Behavior.ChainOfResponsibility;
+
+            public interface IReceiver
+            {
+                bool HandleMessage( Message message);
+
+            }
+
+
+            namespace Pattern.Behavior.ChainOfResponsibility;
+
+            public enum MessagePriority
+            {
+                Normal,
+                High
+            }
+            public class Message
+            {
+                public string Text;
+                public MessagePriority Priority;
+
+                public Message( string msg, MessagePriority p)
+                {
+                    Text = msg;
+                    Priority = p;
+                }
+
+
+            }
+
+
+            namespace Pattern.Behavior.ChainOfResponsibility;
+
+            public class EmailErrorHandler: IReceiver
+            {
+                private IReceiver nextReceiver;
+                public EmailErrorHandler(IReceiver nextReceiver)
+                {
+                    this.nextReceiver = nextReceiver;
+                }
+                public bool HandleMessage(Message message)
+                {
+                    if (message.Text.Contains("Email"))
+                    {
+                        Console.WriteLine($"EmailErrorHandler processed {message.Text} priority issue: {message.Priority}");
+
+                        return true;
+                    }
+                    else
+                    {
+                        if (nextReceiver != null)
+                            nextReceiver.HandleMessage(message);
+                    }
+                    return false;
+                }
+            }
+
+
+
+            namespace Pattern.Behavior.ChainOfResponsibility
+            {
+                public class FaxErrorHandler: IReceiver
+                {
+                    public IReceiver nextReceiver;
+                    public FaxErrorHandler( IReceiver nextReceiver)
+                    {
+                        this.nextReceiver = nextReceiver;
+                    }
+
+                    public bool HandleMessage( Message message )
+                    {
+                        if (message.Text.Contains("Fax"))
+                        {
+                            Console.WriteLine($"FaxErrorHandles processed {message.Text} priority issue: {message.Priority}");
+
+                            return true;
+                        } else
+                        {
+                            if (nextReceiver != null)
+                                nextReceiver.HandleMessage( message );
+                        }
+
+                        return false;
+
+                    }
+
+
+                }
+            }
+
+
+
+            namespace Pattern.Behavior.ChainOfResponsibility;
+
+            public class IssueRaiser
+            {
+                public IReceiver setFirstReceiver;
+
+                public IssueRaiser( IReceiver firstReceiver)
+                {
+                    this.setFirstReceiver = firstReceiver;
+                }
+
+                public void RaiseMessage(Message message)
+                {
+                    if (setFirstReceiver != null)
+                    {
+                        setFirstReceiver.HandleMessage(message);
+                    }
+                }
+
+            }
+
+    . Interpreter
+
+        . Definição
+
+            . Dada uma linguagem, define uma representação para sua gramática juntamente com um interpretador que
+                usa a representação para interpretar frases na linguagem.
+
+        . Conceito
+
+            . Este padrão lida com a avaliação de sentenças em um idioma. Você precisa definir uma
+                gramática para representar o idioma e, em seguida, o interpretador lidará com essa gramática.
+
+                Por exemplo, neste exemplo, você transformará um número inteiro de três dígitos que é inserido em sua
+                forma de palavra equivalente (em outras palavras, uma string).
+
+
+        . Ilustração
+
+            . Vamos interpretar expressões como:
+
+                true AND false
+                true OR false
+            
+            . Diagrama de Classes
+
+                +----------------------------+
+                |        IExpression         | <<interface>>
+                +----------------------------+
+                | + Interpret() : bool       |
+                +----------------------------+
+                            ▲
+                            |
+                    +---------+-----------------------+
+                    |                                 |
+                +------------------------+   +------------------------+
+                |   BooleanExpression    |   |   AndExpression        |
+                +------------------------+   +------------------------+
+                | - value : bool         |   | - left  : IExpression  |
+                +------------------------+   | - right : IExpression  |
+                | + Interpret()          |   +------------------------+
+                +------------------------+   | + Interpret()          |
+                                            +------------------------+
+                                                    ▲
+                                                    |
+                                            +------------------------+
+                                            |   OrExpression         |
+                                            +------------------------+
+                                            | - left  : IExpression  |
+                                            | - right : IExpression  |
+                                            +------------------------+
+                                            | + Interpret()          |
+                                            +------------------------+
+
+        . Exemplo
+
+            public interface IExpression
+            {
+                bool Interpret();
+            }
+
+
+            public class BooleanExpression : IExpression
+            {
+                private readonly bool _value;
+
+                public BooleanExpression(bool value)
+                {
+                    _value = value;
+                }
+
+                public bool Interpret()
+                {
+                    return _value;
+                }
+            }
+
+
+
+            public class AndExpression : IExpression
+            {
+                private readonly IExpression _left;
+                private readonly IExpression _right;
+
+                public AndExpression(IExpression left, IExpression right)
+                {
+                    _left = left;
+                    _right = right;
+                }
+
+                public bool Interpret()
+                {
+                    return _left.Interpret() && _right.Interpret();
+                }
+            }
+
+            public class OrExpression : IExpression
+            {
+                private readonly IExpression _left;
+                private readonly IExpression _right;
+
+                public OrExpression(IExpression left, IExpression right)
+                {
+                    _left = left;
+                    _right = right;
+                }
+
+                public bool Interpret()
+                {
+                    return _left.Interpret() || _right.Interpret();
+                }
+            }
+
+
+
+            class Program
+            {
+                static void Main()
+                {
+                    // true AND false
+                    IExpression expr1 =
+                        new AndExpression(
+                            new BooleanExpression(true),
+                            new BooleanExpression(false)
+                        );
+
+                    // true OR false
+                    IExpression expr2 =
+                        new OrExpression(
+                            new BooleanExpression(true),
+                            new BooleanExpression(false)
+                        );
+
+                    Console.WriteLine(expr1.Interpret()); // false
+                    Console.WriteLine(expr2.Interpret()); // true
+                }
+            }
+
+
+
+

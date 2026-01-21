@@ -147,6 +147,7 @@ https://www.youtube.com/watch?v=RKYCRsa5WRM&list=PL7yxJa4Na-ipxalMfzYWdj4HMzOvzO
 
         . Configurações:
 
+            . Acesse Configurações/Settings -> localize "editor sticky scroll: enabled" e desmarque a opção.
             . Digite Ctrl K+S, localize o item "Delete Line" e configure Ctrl + D
             . Acesse View / Minimap para retirar o scroll de código da direita
             . Acessar configurações, ir em "Settings", Text editors, Sugestions:
@@ -2005,6 +2006,12 @@ https://www.youtube.com/watch?v=RKYCRsa5WRM&list=PL7yxJa4Na-ipxalMfzYWdj4HMzOvzO
                 <ul>
                     <li *ngFor="let item of itens">{{ item.nome }}</li>
                 </ul>
+
+                <div [ngSwitch]="role">
+                    <p *ngSwitchCase="'admin'">Bem-vindo, administrador!</p>
+                    <p *ngSwitchCase="'user'">Bem-vindo, usuário!</p>
+                    <p *ngSwitchDefault>Bem-vindo, visitante!</p>
+                </div>
 
             Atributo - Podem ser anexadas a elementos DOM (e componentes, pois são elementos DOM) para modificar a aparência 
                         ou o comportamento de um elemento e não altera a estrutura do DOM.
@@ -6180,13 +6187,11 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             <div>
                 <span><a href="/stock-item">Stock Item</a></span>&nbsp;&nbsp;
                 <span><a href="/create-stock">Create Stock</a></span>&nbsp;&nbsp;
-                <span><a href="/create-product-item">Create Product Item</a></span>
             </div>
 
             <router-outlet></router-outlet>
 
         . Verifique o menu acima se está funcionando na página
-
 
     . Rotas Curingas e Padrões (Wildcards and Default)
 
@@ -6349,7 +6354,6 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             . Use a navegação por atributo quando você precisa criar um link de navegação mais complexo, como um link 
                 com parâmetros ou um link que depende de condições.
 
-
     . Demo
 
         . Faça as alterações abaixo no arquivo app.component.html:
@@ -6505,7 +6509,6 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
         . Verifique como ficou os links da página inicial após clicar num deles.
 
-
     . Trabalhando com parâmetros nas rotas
 
         . Trabalhar com parâmetros nas rotas no Angular é uma forma de passar dados 
@@ -6645,7 +6648,7 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
 
                 import { HttpClient } from '@angular/common/http';                          // Linha inserida
                 import { Component, EventEmitter, OnInit, Output } from '@angular/core';    // Linha alterada
-                import { ActivatedRoute } from '@angular/router';
+                import { ActivatedRoute } from '@angular/router';                           // Linha inserida
                 import { Stock } from 'src/app/model/stock';
 
                 @Component({
@@ -6868,24 +6871,34 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
             import { Component, EventEmitter, OnInit, Output } from '@angular/core';    
             import { ActivatedRoute, Router } from '@angular/router';                   // Linha alterada
             import { Stock } from 'src/app/model/stock';
-            import { ROUTER_TOKENS } from 'src/app/app-routing.module';
+            import { ROUTER_TOKENS } from 'src/app/app-routing.module';                 // Linha inserida
 
             ...
+            export class CreateStockComponent implements OnInit {
+                public stock!: Stock;
+                public confirmed!: boolean;
+                private code?: string | null;                                          
 
-            // Assinatura do método alterado -----------------------+
-            //                                                      | Inserido
-            //                                                      V
-            constructor( private route: ActivatedRoute, private router: Router, private http: HttpClient) {                           // Linha alterada
-                this.stock = new Stock('', '', 0, 0, 'NASDAQ');
+                public response: any;                                                 
+
+                readonly ROUTER_TOKENS = ROUTER_TOKENS;                                 // Linha inserida
+
+                ...
+                // Assinatura do método alterado -----------------------+
+                //                                                      | Inserido
+                //                                                      V
+                constructor( private route: ActivatedRoute, private router: Router, private http: HttpClient) {                           // Linha alterada
+                    this.stock = new Stock('', '', 0, 0, 'NASDAQ');
+                }
+
+                ...
+
+                // Método inserido
+                voltar( event: any ){
+                    this.router.navigate([ROUTER_TOKENS.STOCK_ITEM]);
+                }
+                ...
             }
-
-            ...
-
-            // Método inserido
-            voltar( event: any ){
-                this.router.navigate([ROUTER_TOKENS.STOCK_ITEM]);
-            }
-
 
         . Inclua a linha abaixo no componente "create-stock.component.html":
 
@@ -6899,17 +6912,907 @@ https://www.toptal.com/angular-js/angular-4-forms-validation
                         Create
                     </button>
                 </div>
-                <!--  -->
+
+                <!-- Tag Inserida -->
                 <div class="col-1">
                     <button class="btn btn-primary" 
-                            (click)="Voltar($event)">
+                            (click)="voltar($event)">
                         Voltar
                     </button>
                 </div>
             </div>
             ...
-        
+
+        . Levante a aplicação e verifique se o botão de "Voltar" da tela "create-stock.component.html" está funcionando:
+
+            npx json-server db.json
+
+            ng s -o
+
+
+    . Guarda de rotas
+
+        . São funções que permitem ou impedem a navegação entre rotas com base em condições específicas. Elas 
+            são executadas antes de a rota ser ativada e podem ser usadas para realizar tarefas como:
+
+            . Autenticação: verificar se o usuário está logado antes de permitir a navegação para uma rota protegida.
+
+            . Autorização: verificar se o usuário tem permissão para acessar uma rota específica.
+
+            . Validação: verificar se os dados necessários para a rota estão disponíveis ou são válidos.
+
+            . Redirecionamento: redirecionar o usuário para uma rota diferente com base em condições específicas.
+
+        . Existem cinco tipos de guardas de rotas no Angular:
+
+            . CanActivate: Verifica se a rota pode ser ativada. Se retornar false, a navegação é cancelada.
+
+            . CanActivateChild: Verifica se as rotas filhas podem ser ativadas. Se retornar false, a navegação é cancelada.
+
+            . CanDeactivate: Verifica se a rota atual pode ser desativada. Se retornar false, a navegação é cancelada.
+
+            . CanLoad: Verifica se o módulo pode ser carregado. Se retornar false, o módulo não é carregado.
+
+            . Resolve: Resolve os dados necessários para a rota antes de ativar a rota.
+
+        . Exemplo para criação e configuração de guarda de rota:
+
+            . Criação do componente "ProtectedComponent":
+
+                ng generate component protected
+
+            . Criação do serviço de autenticação "auth.service.ts" :
+
+                ng generate service auth
+
+            . Exemplo de um componente de serviço de autenticação "auth.service.ts", criado pelo comando acima:
+
+                import { Injectable } from '@angular/core';
+                
+                @Injectable({
+                  providedIn: 'root'
+                })
+                export class AuthService {
+                  isLoggedIn = false;
+                
+                  login() {
+                    this.isLoggedIn = true;
+                  }
+                
+                  logout() {
+                    this.isLoggedIn = false;
+                  }
+                }
+
+            . Criação da guarda da rota "auth.guard.ts"
+
+                ng generate guard guards/auth
+
+            . Exemplo do componente de guarda de rota criado no passo anterior "auth.guard.ts":
+
+                import { Injectable } from '@angular/core';
+                import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+                import { AuthService } from './auth.service';
+                
+                @Injectable({
+                  providedIn: 'root'
+                })
+                export class AuthGuard implements CanActivate {
+                  constructor(private authService: AuthService) { }
+                
+                  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+                    if (this.authService.isLoggedIn) {
+                      return true;
+                    } else {
+                      return false;
+                    }
+                  }
+                }
+
+            . Configuração da proteção da rota no arquivo "app-routing.module.ts":
+
+                import { NgModule } from '@angular/core';
+                import { RouterModule, Routes } from '@angular/router';
+                import { ProtectedComponent } from './protected/protected.component';
+                import { AuthGuard } from './auth.guard';
+                
+                const routes: Routes = [
+                  {
+                    path: 'protected',
+                    component: ProtectedComponent,
+                    canActivate: [AuthGuard]
+                  }
+                ];
+                
+                @NgModule({
+                  imports: [RouterModule.forRoot(routes)],
+                  exports: [RouterModule]
+                })
+                export class AppRoutingModule { }
+
+            . Teste da rota
+
+                ng s -o
+
+                # Acione o rota abaixo e veja se está disponível
+                https://localhost.com:[porta]/protected
+
+
+            . Controle de autenticação no componente "app.component.ts":
+
+                import { Component } from '@angular/core';
+                import { AuthService } from './auth.service';
+                
+                @Component({
+                  selector: 'app-root',
+                  template: `
+                    <button (click)="login()">Login</button>
+                    <button (click)="logout()">Logout</button>
+                    <router-outlet></router-outlet>
+                  `
+                })
+                export class AppComponent {
+                  constructor(private authService: AuthService) { }
+                
+                  login() {
+                    this.authService.login();
+                  }
+                
+                  logout() {
+                    this.authService.logout();
+                  }
+                }
+
+            . Execute o login e teste a rota abaixo:
+
+                https://localhost.com:[porta]/protected
+
+    . Demo                
+
+        . Execute os comandos abaixo na raiz do projeto:
+
+            ng generate class model/user --skip-tests
+
+            ng g s services/user --skip-tests 
+
+            ng generate component pages/login --skip-tests
+
+        . Insira as linhas abaixo no arquivo "db.json":
+
+            {
+                "stocks": [
+                    ...
+                ],
+                // Linhas inseridas abaixo
+                "users": [
+                    {
+                        "id": "admin",
+                        "username": "admin",
+                        "password": "admin",
+                        "role": "admin"
+                    },
+                    {
+                        "id": "user",
+                        "username": "user",
+                        "password": "user",
+                        "role": "user"
+                    },
+                    {
+                        "id": "guest",
+                        "username": "guest",
+                        "password": "guest",
+                        "role": "guest"
+                    }
+                ]
+            }        
+
+        . Acesse o componente "user.ts" e atualize pelo código abaixo:
+
+            export class User {
+                public authenticated: boolean = false;
+
+                constructor(public username: string,
+                            public password: string) { }
+
+                isAuthenticated(): boolean {
+                    return this.authenticated;
+                }
+            }
+
+        . Acesse o componente "user.service.ts" e atualize com o código abaixo:
+
+            import { Injectable } from '@angular/core';
+            import { User } from '../model/user';
+            import { HttpClient } from '@angular/common/http';
+
+            @Injectable({
+                providedIn: 'root'
+            })
+
+            export class UserService {
+                private apiUrl = 'http://localhost:3000/users';
+
+                public user: User = new User('', '');
+
+                constructor( private http: HttpClient) { }
+
+                getUsuario(userName: string) {
+                    return this.http.get<User>(`${this.apiUrl}/${userName}`);
+                }
+            }
+
+        . Acesse o componente "login.component.css" e atualize pelo código abaixo:
+
+            label {
+                font-weight: bold;
+            }
+
+            .error {
+                color: red;
+            }
+
+            .error-message {
+                color: red;
+                font-size: 12px;
+                margin-top: 5px;
+            }
+
+            input.invalid {
+                border: 1px solid #f00;
+            }
+
+
+        . Altere a propriedade "noPropertyAccessFromIndexSignature" para "false" no arquivo "tsconfig.json":
+
+            {
+                ...,
+                "compilerOptions": {
+                    "noPropertyAccessFromIndexSignature": false,
+                    ...
+                }
+                ...
+            },
+            ...
+
+        . Insira as linhas abaixo no componente "app-routing.component.ts":
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+            import { StockItemComponent } from './stock/stock-item/stock-item.component';
+            import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+            import { LoginComponent } from './pages/login/login.component';           // Linha inserida  
+
+            export enum ROUTER_TOKENS {
+                STOCK_ITEM = 'stock-item',
+                CREATE_STOCK = 'create-stock'
+            }
+
+            // Objeto inserido
+            const routes: Routes = [
+                { path: ROUTER_TOKENS.STOCK_ITEM, component: StockItemComponent },    
+                { path: ROUTER_TOKENS.CREATE_STOCK, component: CreateStockComponent }, 
+                { path: 'create-stock/:code', component: CreateStockComponent },       
+                { path: 'login', component: LoginComponent },                       // Linha inserida                         
+                { path: '', redirectTo: '/login', pathMatch: 'full' },              // Linha inserida
+                { path: '**', redirectTo: '/login', pathMatch: 'full' }             // Linha inserida
+
+            ];
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+
+            export class AppRoutingModule { }
+
+        . Acesse o componente "login.component.html" e atualize pelo código abaixo:
+
+            <div class="d-flex justify-content-center align-items-center vh-100">
+                <div class="card" style="width: 28rem;">
+                    <div class="card-header">
+                        <b>Autenticação</b>
+                    </div>
+                    <div class="card-body">
+                        <form width="100%" (ngSubmit)="onSubmit()" #form="ngForm">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="Login" class="col-form-label font-weight-bold">Login</label>
+                                        <input type="text"
+                                            name="username"
+                                            id="username"
+                                            width="60%"
+                                            maxLength="30"
+                                            required
+                                            autocomplete="off"
+                                            class="form-control form-control-sm"
+                                            [ngClass]="{'invalid': username.invalid && (username.dirty || username.touched), 'form-control.form-control-sm': username.valid}"
+                                            placeholder="email@email.com"
+                                            #username="ngModel"
+                                            [(ngModel)]="userLogin.username" >
+            <!--
+                                        <div *ngIf="username.invalid && (username.dirty || username.touched)"
+                                            [ngClass]="{'error-message': username.invalid && (username.dirty || username.touched) }">
+                                            <div *ngIf="username.errors?.required">
+                                                * Login é obrigat&oacute;rio
+                                            </div>
+
+                                            <div *ngIf="username.errors?.minlength">
+                                                * Tamanho máximo de 30 caracteres
+                                            </div>
+                                        </div>
+            -->                            
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 mt-3">
+                                            <label for="Senha" class="col-form-label font-weight-bold">Senha</label>
+                                            <input type="password"
+                                                name="senha"
+                                                id="senha"
+                                                width="60%"
+                                                maxLength="30"
+                                                required
+                                                #senha="ngModel"
+                                                [(ngModel)]="userLogin.password"
+                                                class="form-control form-control-sm"
+                                                [ngClass]="{'invalid': senha.invalid && (senha.dirty || senha.touched), 'form-control.form-control-sm': senha.valid}"
+                                                placeholder="xYmiT1!#q.">
+            <!--
+                                            <div *ngIf="senha.invalid && (senha.dirty || senha.touched)"
+                                                [ngClass]="{'error-message': senha.invalid && (senha.dirty || username.touched) }">
+                                                <div *ngIf="senha.errors?.required">
+                                                    * Login é obrigat&oacute;rio
+                                                </div>
+
+                                                <div *ngIf="senha.errors?.minlength">
+                                                    * Tamanho máximo de 30 caracteres
+                                                </div>
+                                            </div>
+            -->
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-2 mt-3">
+                                            <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Enviar</button>
+                                        </div>
+                                        <div class="col-2 mt-3 ml-3">
+                                            <a href="#" class="btn btn-primary">Registrar</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <p *ngIf="loginResult" class="error">{{ loginResult }}</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        . Acesse o componente "login.component.ts" e atualize com as linhas abaixo:
+
+            import { HttpErrorResponse } from '@angular/common/http';
+            import { Component, OnInit } from '@angular/core';
+            import { Router } from '@angular/router';
+            import { catchError, throwError } from 'rxjs';
+            import { User } from 'src/app/model/user';
+            import { UserService } from 'src/app/services/user.service';
+
+            @Component({
+                selector: 'app-login',
+                templateUrl: './login.component.html',
+                styleUrls: ['./login.component.css']
+            })
+
+            export class LoginComponent implements OnInit {
+                public userLogin!: User; //  = new User('', '');
+                public loginResult: string = '';
+
+                constructor(public userService: UserService, private router: Router)  {
+                    
+                } 
+
+                    ngOnInit(): void {
+                    this.userLogin = new User('', '');
+                    }
+
+                onSubmit() {
+                    this.login(this.userLogin.username);
+                }
+
+                login(userName: string): boolean {
+
+                    this.userService.getUsuario(userName)
+                    .subscribe(
+                    response => {
+                        console.log('Resposta 200:', response);
+
+                        this.userLogin.authenticated = this.userLogin.password === response.password;
+
+                        if ( ! this.userLogin.authenticated ) {
+                        
+                        this.userLogin.password = '';
+                        
+                        this.loginResult = 'Login ou senha inválidos';
+                        
+                        this.router.navigate(['/login']);
+                        
+                        return false;
+                        }
+
+                        localStorage.setItem('token', 'meu-token-falso');
+
+                        this.userService.user = this.userLogin;
+                        
+                        this.router.navigate(['/stock-item']);
+
+                        return true;        
+                    },
+                    error => {
+                        console.error('Erro na requisição:', error);
+
+                        if (error.status == 401 || error.status == 404) {
+                            this.loginResult = 'Login ou senha inválidos';
+                        } else {
+                            this.loginResult = error.statusText;
+                        }
+
+                        this.userLogin.authenticated = false;
+
+                        this.router.navigate(['/login']);
+
+                    }
+                    );
+
+                    return this.userLogin.authenticated;
+                }
+
+            }
+
+        . Execute o projeto e verifique se o login está funcionando corretamente
+
+            npx json-server db.json
+
+            ng s -o
+
+        . Execute o comando abaixo na raiz do projeto
+
+            ng generate guard guards/auth --skip-tests
+           
+        . Acesse o componente "auth.guard.ts" e atualize pelo código abaixo:
+
+            import { Injectable } from '@angular/core';
+            import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+            import { Observable } from 'rxjs';
+            import { UserService } from '../services/user.service';
+
+            @Injectable({
+                providedIn: 'root'
+            })
+            export class AuthGuard implements CanActivate {
+
+                private constructor( private userService: UserService, private router: Router) { }
+                canActivate(
+                    route: ActivatedRouteSnapshot,
+                    state: RouterStateSnapshot):  boolean  {
+
+                    if (! this.userService.user.isAuthenticated()) {
+                        this.router.navigate(['/login']);
+                    }
+
+                    return this.userService.user.isAuthenticated();
+                }
+            
+            }
+
+
+        . Acesse o componente "app-routing.modules.ts" e faça as alterações abaixo:
+
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+            import { StockItemComponent } from './stock/stock-item/stock-item.component';
+            import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+            import { LoginComponent } from './pages/login/login.component';
+            import { AuthGuard } from './guards/auth.guard';                                                  // Linha inserida
+
+            export enum ROUTER_TOKENS {
+                STOCK_ITEM = 'stock-item',
+                CREATE_STOCK = 'create-stock'
+            }
+
+            const routes: Routes = [
+                { path: ROUTER_TOKENS.STOCK_ITEM, component: StockItemComponent, canActivate: [AuthGuard] },    // linha alterada
+                { path: ROUTER_TOKENS.CREATE_STOCK, component: CreateStockComponent, canActivate: [AuthGuard]}, // Linha alterada
+                { path: 'create-stock/:code', component: CreateStockComponent, canActivate: [AuthGuard]},       // Linha alterada
+                { path: 'login', component: LoginComponent },                                 
+                { path: '', redirectTo: '/login', pathMatch: 'full' },       
+                { path: '**', redirectTo: '/login', pathMatch: 'full' }       
+            ];
+
+            @NgModule({
+                imports: [RouterModule.forRoot(routes)],
+                exports: [RouterModule]
+            })
+
+            export class AppRoutingModule { }
+
+        . Acesse o componente "user.service.ts" e insira o código abaixo:
+
+            import { Injectable, OnInit } from '@angular/core';
+            import { User } from '../model/user';
+            import { HttpClient } from '@angular/common/http';
+            import { Router } from '@angular/router';                   // Linha inserida
+
+            @Injectable({
+                providedIn: 'root'
+            })
+            export class UserService{
+                private apiUrl = 'http://localhost:3000/users';
+
+                public user: User = new User('', '');
+
+
+                // Assinatura do construtor alterado
+                constructor( private http: HttpClient, private router: Router) { }
+
+
+                getUsuario(userName: string) {
+                    return this.http.get<User>(`${this.apiUrl}/${userName}`);
+                }
+
+                // Método inserido
+                logout(){
+                    this.user.authenticated = false;
+                    localStorage.removeItem('token');
+                    this.router.navigate(['/login']);
+
+                }
+            }
+
+
+
+        . Acesse o componente "app.component.ts" e realize as alterações abaixo:
+
+            import { ROUTER_TOKENS } from './app-routing.module';       
+
+            import {
+                Component, SimpleChanges, OnInit, OnChanges, OnDestroy,
+                DoCheck, AfterViewChecked, AfterViewInit,
+                AfterContentChecked,
+                AfterContentInit
+            } from '@angular/core';
+            import { Stock } from './model/stock';
+            import { ROUTER_TOKENS } from './app-routing.module';       
+            import { UserService } from './services/user.service';      // Linha inserida
+
+
+            @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.css']
+            })
+
+            export class AppComponent implements OnInit{
+
+                ...
+
+                // Assinatura do construtor alterado
+                constructor(public userService: UserService) {                        // Linha alterada
+                    this.stock = new Stock('Test Stock Company', 'TSC', 85, 80, '');
+                    this.onToggleFavorite();
+                }
+
+                ... 
+
+                // Método inserido
+                logout() {
+                    this.userService.logout();
+                }
+
+            }
+
+        . Acesse o componente "app.component.html" e realize as alterações abaixo:
+
+            <!-- Tag div alterada, inclusão do "*ngIf" -->
+            <div *ngIf="userService.user.authenticated">
+                <span><a [routerLink]="['/', ROUTER_TOKENS.STOCK_ITEM]">Stock Item</a></span>&nbsp;&nbsp;
+                
+                <span><a [routerLink]="['/', ROUTER_TOKENS.CREATE_STOCK]">Create Stock</a></span>&nbsp;&nbsp;
+
+                <!-- Tag abaixo inserida -->
+                <span><a routerLink="#" (click)="logout()">Logout</a></span>&nbsp;&nbsp;
+            </div>
+
+            <router-outlet></router-outlet>
+
+        . Execute o projeto e verifique se as rotas "stock-item" e "create-stock" estão funcionando sem o login
+
+            npx json-server db.json
+
+            ng s -o
+
+
+2022-ASP.NET Core 6 and Angular ASP.NET 6 - Página 536
+
+# Child routes
+Web Development with Angular and Bootstrap - 3rd ed. - 2019 - Packt - Págnina 148
+
 PAGINA 314
+
+
+
+11. Novidades a partir da Versão 17+
+------------------------------------
+
+    . Para atualizar para a versão mais recente do Angular, execute o comando abaixo:
+
+        #     +--------------------------------> para atualizar a versão mais recente do angular
+        #     |
+        npm update -g @angular/cli
+
+        ng version
+
+    . Sintaxe para criação de um projeto:
+
+        ng new --minimal --defaults --skip-git --strict angular17
+
+        . Os parâmetros utilizados no comando acima tem o seguinte objetivo:
+
+            --minimal   cria o projeto sem um framework de testes
+            --defaults  desabilita as perguntas que aparecem no prompt, por exemplo, 
+                        qual opção para estilos você quer utilizar? CSS, SCSS, etc
+            --skip-git  não cria um repositório git
+            --strict    habilita o modo strict que torna as regras de codificação mais 
+                        rigorosas e ajuda a detectar erros comuns de forma mais 
+                        proativa durante o desenvolvimento.
+                        Se quiser saber mais: https://angular.io/guide/strict-mode    
+
+        
+    . Novas Sintaxe de Controle de Fluxo nos Templates
+
+        . A sintaxe baseada no símbolo @ substitui as tradicionais diretivas *ngIf, *ngFor e *ngSwitch, 
+            proporcionando uma abordagem mais declarativa e intuitiva.​
+
+            . @if: Utilizado para declarações condicionais, simplificando a estrutura de if/else.
+
+                @if (usuarioLogado()) {
+                    <p>Bem-vindo, {{ usuario.nome }}!</p>
+                } @else {
+                    <p>Por favor, faça login para continuar.</p>
+                }
+
+            . @for: Facilita a iteração sobre coleções, melhorando a legibilidade e o desempenho.
+
+                @for (produto of produtos(); track produto.id) {
+                    <div class="card">
+                    <h2 class="card-title">{{ produto.nome }}</h2>
+                    <!-- Outros detalhes do produto -->
+                    </div>
+                } @empty {
+                    <p>Nenhum produto encontrado!</p>
+                }
+                
+            . @switch: Substitui o *ngSwitch, oferecendo uma sintaxe mais limpa para múltiplas condições.​
+
+                @switch (nivelUsuario) {
+                    @case ('admin') { 
+                        <p>Acesso total ao sistema.</p> 
+                    }
+                    @case ('moderador') { 
+                        <p>Pode moderar comentários.</p> 
+                    }
+                    @default { 
+                        <p>Usuário comum.</p> 
+                    }
+                }
+
+    . Carregamento Preguiçoso de Componentes com @defer
+
+        . O Angular 17 introduziu o bloco @defer, permitindo o carregamento, adiando o carregamento 
+            de um componente ou conteúdo até que uma condição seja atendida. Otimizando o desempenho 
+            ao carregar conteúdo apenas quando necessário:
+
+            @defer {
+                <app-componente-pesado></app-componente-pesado>
+            }
+
+            . Carregamento condicional com when:
+
+                @defer (when="carregarComponente") {
+                    <app-componente-pesado></app-componente-pesado>
+                }
+
+            . Carregamento com atraso (after)
+
+                @defer (after="2000ms") {               // O componente será carregado após um atraso de 2 segundos.
+                    <app-componente-pesado></app-componente-pesado>
+                }
+
+            . Carregamento ao entrar na viewport (on idle)
+
+                @defer (on="viewport") {                // O componente será carregado automaticamente quando entrar na viewport
+                    <app-componente-pesado></app-componente-pesado>
+                }
+
+        . @placeholder para exibir conteúdo temporário. Antes do início do carregamento.
+
+            @defer {
+                <app-componente-pesado></app-componente-pesado>
+            } @placeholder {
+                <p>Carregando conteúdo...</p>
+            }
+
+        . Combinando @loading (Exibido enquanto o conteúdo está sendo carregado) e 
+            @error ( Exibido se ocorrer um erro durante o carregamento )
+
+            @defer {
+                <app-componente-pesado></app-componente-pesado>
+            } @placeholder {
+                <p>Preparando para carregar...</p>
+            } @loading {
+                <p>Carregando...</p>
+            } @error {
+                <p>Falha ao carregar o conteúdo.</p>
+            }
+
+    . Injeção de depedência "inject()":
+
+        . Partir do Angular 18, houve uma introdução significativa na forma de realizar a injeção 
+            de dependências: a função inject(). Essa função permite injetar serviços diretamente 
+            dentro de métodos ou funções, sem a necessidade de defini-los no construtor da classe. 
+            Isso é particularmente útil em cenários onde a injeção via construtor não é viável ou 
+            desejável. ​
+
+            . Antes (Injeção via Construtor):
+
+                import { HttpClient } from '@angular/common/http';
+
+                export class MeuComponente {
+                    constructor(private http: HttpClient) {}
+                }
+
+            . Depois (Usando inject()):
+
+                import { inject } from '@angular/core';
+                import { HttpClient } from '@angular/common/http';
+
+                export class MeuComponente {
+                    private http = inject(HttpClient);
+
+                    contructor(){
+                        
+                    }
+                }
+
+    . Módulos:
+
+        . A partir do Angular 17, os Standalone Components se tornaram a abordagem padrão para a construção 
+            de aplicações, eliminando a necessidade de NgModules em muitos casos. Isso simplifica a estrutura 
+            do projeto e reduz a complexidade na configuração inicial.
+
+            1. Standalone Components como padrão
+
+                . Antes do Angular 17, era necessário definir os componentes dentro de um NgModule para que 
+                    pudessem ser utilizados na aplicação. Agora, um Standalone Component pode ser criado 
+                    sem precisar de um módulo:
+
+                . Antes "app.module.ts" (Com Módulo - Angular 16 e anteriores):
+
+                    import { NgModule } from '@angular/core';
+                    import { CommonModule } from '@angular/common';
+                    import { MeuComponente } from './meu-componente.component';
+
+                    @NgModule({
+                        declarations: [MeuComponente],
+                        imports: [CommonModule],
+                        exports: [MeuComponente]
+                    })
+                    export class MeuModulo { }
+
+                . Agora (Standalone Component - Angular 17+). Isso reduz a necessidade de criar arquivos 
+                    de módulo (*.module.ts), tornando o código mais direto e modular.
+
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-meu-componente',
+                        standalone: true,  // Standalone ativado!
+                        template: `<h1>Meu Componente</h1>`,
+                    })
+                    export class MeuComponente { }
+
+            2. Configuração Simplificada com bootstrapApplication
+
+                . Agora, ao invés de precisar definir um AppModule, a aplicação pode ser iniciada 
+                    diretamente com um componente standalone:
+
+                . Antes (Usando AppModule):
+
+                    import { NgModule } from '@angular/core';
+                    import { BrowserModule } from '@angular/platform-browser';
+                    import { AppComponent } from './app.component';
+
+                    @NgModule({
+                        declarations: [AppComponent],
+                        imports: [BrowserModule],
+                        bootstrap: [AppComponent]
+                    })
+                    export class AppModule { }
+
+                . Agora (Usando bootstrapApplication - Angular 17+):
+
+                    import { bootstrapApplication } from '@angular/platform-browser';
+                    import { AppComponent } from './app.component';
+
+                    bootstrapApplication(AppComponent);
+
+            3. Importação Direta de Serviços e Módulos
+
+                . Se precisar importar algo como HttpClientModule, basta adicioná-lo diretamente dentro 
+                    do providers do bootstrapApplication:
+
+                    import { bootstrapApplication } from '@angular/platform-browser';
+                    import { AppComponent } from './app.component';
+                    import { provideHttpClient } from '@angular/common/http';
+
+                    bootstrapApplication(AppComponent, {
+                        providers: [provideHttpClient()]            // Isso reduz ainda mais a complexidade da configuração inicial.
+                    });
+
+            4. Como Funciona o Routing em Standalone Components?
+
+                . Agora, a configuração de rotas também foi simplificada. Basta definir o roteamento 
+                    diretamente no provideRouter:
+
+                    import { bootstrapApplication } from '@angular/platform-browser';
+                    import { provideRouter, Routes } from '@angular/router';
+                    import { AppComponent } from './app.component';
+                    import { MeuComponente } from './meu-componente.component';
+
+                    const routes: Routes = [
+                        { path: '', component: MeuComponente }
+                    ];
+
+                    bootstrapApplication(AppComponent, {
+                        providers: [provideRouter(routes)]
+                    });
+
+        . Conclusão:
+
+            . NgModules não são mais obrigatórios, tornando o código mais modular e fácil de entender.
+
+            . Standalone Components são a nova abordagem padrão, simplificando a criação e o reuso de 
+                componentes.
+
+            . bootstrapApplication substitui o AppModule, reduzindo a quantidade de arquivos necessários.
+
+            . O roteamento e a injeção de dependências foram simplificados, eliminando a necessidade de 
+                importar módulos inteiros.
+
+
+
+
+
+
+
+
+# ANGULAR 17 NOVIDADES COM EXEMPLOS PRATICOS
+https://www.youtube.com/watch?v=MntMrlywYb8&list=PL7yxJa4Na-ipxalMfzYWdj4HMzOvzOhL6&index=122
+
+
+# PIPE
+
+
+# SIGNAL
+
+
+
+
+
+
+
 
 
 

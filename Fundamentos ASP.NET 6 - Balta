@@ -336,21 +336,25 @@ Aula 4. HTTP Status Code
         . Respostas de erro do Servidor:
 
             **500 Internal Server Error             - O servidor encontrou uma situação com a qual não sabe lidar.
-            501 Not Implemented                     - O método da requisição não é suportado pelo servidor e não pode ser manipulado. Os únicos métodos exigidos que servidores 
-                                                      suportem (e portanto não devem retornar este código) são GET e HEAD.
-            502 Bad Gateway                         - Esta resposta de erro significa que o servidor, ao trabalhar como um gateway a fim de obter uma resposta necessária 
-                                                      para manipular a requisição, obteve uma resposta inválida.
-            *503 Service Unavailable                - O servidor não está pronto para manipular a requisição. Causas comuns são um servidor em manutenção ou sobrecarregado. 
-                                                      Note que junto a esta resposta, uma página amigável explicando o problema deveria ser enviada. Estas respostas devem 
-                                                      ser usadas para condições temporárias e o cabeçalho HTTP Retry-After: deverá, se possível, conter o tempo estimado  
-                                                      para recuperação do serviço. O webmaster deve também tomar cuidado com os cabeçalhos relacionados com o cache que são   
-                                                      enviados com esta resposta, já que estas respostas de condições temporárias normalmente não deveriam ser postas em cache.
+            501 Not Implemented                     - O método da requisição não é suportado pelo servidor e não pode ser manipulado. Os únicos métodos 
+                                                      exigidos que servidores suportem (e portanto não devem retornar este código) são GET e HEAD.
+            502 Bad Gateway                         - Esta resposta de erro significa que o servidor, ao trabalhar como um gateway a fim de obter uma 
+                                                      resposta necessária para manipular a requisição, obteve uma resposta inválida.
+            *503 Service Unavailable                - O servidor não está pronto para manipular a requisição. Causas comuns são um servidor em 
+                                                      manutenção ou sobrecarregado. 
+                                                      Note que junto a esta resposta, uma página amigável explicando o problema deveria ser enviada. Estas 
+                                                      respostas devem ser usadas para condições temporárias e o cabeçalho HTTP Retry-After: deverá, se possível, 
+                                                      conter o tempo estimado  
+                                                      para recuperação do serviço. O webmaster deve também tomar cuidado com os cabeçalhos relacionados com o 
+                                                      cache que são enviados com esta resposta, já que estas respostas de condições temporárias normalmente 
+                                                      não deveriam ser postas em cache.
             504 Gateway Timeout                     - Esta resposta de erro é dada quando o servidor está atuando como um gateway e não obtém uma resposta a tempo.
             505 HTTP Version Not Supported          - A versão HTTP usada na requisição não é suportada pelo servidor.
-            506 Variant Also Negotiates             - O servidor tem um erro de configuração interno: a negociação transparente de conteúdo para a requisição resulta em   
-                                                      uma referência circular.
-            507 Insufficient Storage                - O servidor tem um erro interno de configuração: o recurso variante escolhido está configurado para entrar em negociação   
-                                                      transparente de conteúdo com ele mesmo, e portanto não é uma ponta válida no processo de negociação.
+            506 Variant Also Negotiates             - O servidor tem um erro de configuração interno: a negociação transparente de conteúdo para a requisição 
+                                                      resulta em uma referência circular.
+            507 Insufficient Storage                - O servidor tem um erro interno de configuração: o recurso variante escolhido está configurado para entrar 
+                                                      em negociação transparente de conteúdo com ele mesmo, e portanto não é uma ponta válida no processo de 
+                                                      negociação.
             508 Loop Detected (WebDAV (en-US))      - O servidor detectou um looping infinito ao processar a requisição.
             510 Not Extended                        - Exigem-se extensões posteriores à requisição para o servidor atendê-la.
             511 Network Authentication Required     - O código de status 511 indica que o cliente precisa se autenticar para ganhar acesso à rede.

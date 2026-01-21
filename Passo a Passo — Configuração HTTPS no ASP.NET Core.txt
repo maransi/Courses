@@ -1,0 +1,142 @@
+Passo a Passo — Configuração HTTPS no ASP.NET Core
+
+1. Gerar e Instalar Certificado de Desenvolvimento (Se necessário)
+
+    . O ASP.NET Core usa um certificado de desenvolvimento local gerado automaticamente.
+
+    . Execute no terminal:
+
+        # Isso cria e adiciona o certificado HTTPS local ao armazenamento confiável do sistema (Windows, macOS ou Linux).
+        dotnet dev-certs https --trust
+
+2. Configurar o arquivo launchSettings.json
+
+    {
+        "profiles": {
+            "YourProjectName": {
+            "commandName": "Project",
+            "dotnetRunMessages": true,
+            "launchBrowser": true,
+            "applicationUrl": "https://localhost:5001;http://localhost:5000",
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+            }
+        }
+    }
+
+    . Isso faz o app rodar tanto em HTTP (5000) quanto HTTPS (5001).
+
+3. Configurar o Redirecionamento HTTPS no Program.cs
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Configurar HTTPS Redirection Middleware
+    //
+    // O código abaixo força qualquer acesso via HTTP (porta 5000) a ser redirecionado para HTTPS (porta 5001).
+    builder.Services.AddHttpsRedirection(options =>
+    {
+        options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
+        options.HttpsPort = 5001;
+    });
+
+    var app = builder.Build();
+
+    app.UseHttpsRedirection(); // 🚨 Esta linha deve estar antes de middlewares como UseRouting, UseAuthorization
+
+    app.UseStaticFiles();
+
+    app.UseRouting();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+
+4. Configurar portas e certificados no appsettings.json (Opcional, mas recomendado)
+
+    {
+        "Kestrel": {
+            "Endpoints": {
+            "Http": {
+                "Url": "http://localhost:5000"
+            },
+            "Https": {
+                "Url": "https://localhost:5001"
+            }
+            }
+        }
+    }
+
+    . Essa configuração permite que você defina explicitamente como o servidor 
+        Kestrel vai escutar nas portas HTTP e HTTPS.
+
+5. Configuração no Program.cs para ambientes fora do Visual Studio (como produção)
+
+    . Se não estiver usando o launchSettings.json (ex.: deploy em servidor ou container), defina 
+        manualmente as portas:
+
+        builder.WebHost.ConfigureKestrel(serverOptions =>
+        {
+            serverOptions.ListenAnyIP(5000); // HTTP
+            serverOptions.ListenAnyIP(5001, listenOptions =>
+            {
+                listenOptions.UseHttps();
+            });
+        });
+
+6. Middleware na ordem correta
+
+    app.UseHttpsRedirection(); // Sempre no topo dos middlewares de pipeline
+    app.UseStaticFiles();
+    app.UseRouting();
+    app.UseAuthentication(); // Se usar autenticação
+    app.UseAuthorization();
+    app.MapControllers();
+
+7. Produção — Certificados válidos (Não usar o de desenvolvimento)
+
+    . Para produção, use certificados válidos de uma Autoridade Certificadora (CA), como:
+
+        . Let's Encrypt (gratuito)
+
+        . Cloudflare
+
+        . GoDaddy, DigiCert, etc.
+
+    Configure no Kestrel:
+
+        serverOptions.Listen(IPAddress.Any, 443, listenOptions =>
+        {
+            listenOptions.UseHttps("caminho/do/certificado.pfx", "senha-do-certificado");
+        });
+
+8. (Opcional) Usando Proxy reverso (NGINX, IIS, etc.)
+
+    . Se você usa um proxy reverso que faz o SSL, configure:
+
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = 
+                ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        });
+
+        app.UseForwardedHeaders();
+
+    . Isso garante que sua aplicação reconheça corretamente se a conexão é HTTPS quando o 
+        SSL está sendo gerenciado pelo proxy.
+
+9. Checklist Final — HTTPS funcionando perfeitamente
+
++---------------------------------------------+--------------+
+| Item                                        | ✅ Verificado|
+| ------------------------------------------- | ------------ |
+| Certificado de desenvolvimento instalado    | ✔️           |
+| `launchSettings.json` configurado           | ✔️           |
+| Middleware `UseHttpsRedirection` ativo      | ✔️           |
+| Portas HTTPS/HTTP configuradas corretamente | ✔️           |
+| Ordem correta dos middlewares               | ✔️           |
+| Produção usa certificado válido             | ✔️           |
+| Proxy reverso configurado (se usado)        | ✔️           |
++---------------------------------------------+--------------+

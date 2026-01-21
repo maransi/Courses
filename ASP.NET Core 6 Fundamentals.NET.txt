@@ -343,6 +343,14 @@ https://www.c-sharpcorner.com/article/folder-structure-of-asp-net-core-mvc-6-0-p
                                         ambiente, etc.
                                         Contém configurações necessárias para executar a aplicação
 
+                                        Se quiser utilizar um dos "profiles" existente dentro do "launcSetting.json" 
+                                        para executar o projeto, utilize abaixo:
+
+                                            # Executa o projeto com o perfil chamado https, usando HTTPS e variáveis definidas nele
+                                            dotnet run --launch-profile https	
+
+                                            # Executa o projeto usando o perfil http (geralmente sem SSL)
+                                            dotnet run --launch-profile http	
 
 
 https://raphaelcardoso.com.br/criando-aplicacao-web-com-aspnet-core-mvc-parte-1/
@@ -1790,12 +1798,17 @@ Criando a primeira página
 
         . Execute o comando abaixo na pasta raiz do projeto:
 
-            libman install bootstrap@5.1.3
+            libman install jquery -p cdnjs -d wwwroot/lib/jquery
 
             . Verifique se foi criado a pasta "wwwroot/lib/bootstrap" com os arquivo da bibliote "bootstrap"
 
-        . No comando de instalação acima não foi possível a execução, dando erro, embora toda a instalação tenha ocorrido com sucesso.
-            Vamos substituir o "libman" pelo "npm" para fazer o downloading das bibliotecas javascript.
+		. Esse comando lê o arquivo libman.json e baixa todas as bibliotecas e arquivos definidos nele.
+
+			libman restore
+
+        . Remover a biblioteca
+
+            libman uninstall jquery
 
     . Instalando o npm
 
