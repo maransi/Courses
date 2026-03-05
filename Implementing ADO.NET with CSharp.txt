@@ -1672,6 +1672,9 @@ Implementing ADO.NET with C#
 
 
     // Classe de implementação ClienteRepository
+    using System.Data;
+    using AdoNetSystem.models;
+    using AdoNetSystem.models.cliente;
     using MySql.Data.MySqlClient;
 
     public class ClienteRepository : Repository<Cliente>
@@ -1685,12 +1688,12 @@ Implementing ADO.NET with C#
         {
             using var conn = CriarConexao();
 
-            var cmd = new SqlCommand(
+            var cmd = new MySqlCommand(
                 "SELECT Id, Nome, Email FROM Cliente WHERE Id = @Id",
                 conn
             );
 
-            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+            cmd.Parameters.Add("@Id", MySqlDbType.Int64).Value = id;
 
             conn.Open();
 
@@ -1703,7 +1706,8 @@ Implementing ADO.NET with C#
             {
                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                 Nome = reader.GetString(reader.GetOrdinal("Nome")),
-                Email = reader.GetString(reader.GetOrdinal("Email"))
+                DataAniversario = reader.GetDateTime(reader.GetOrdinal("DataAniversario"))
+
             };
         }
 
@@ -1713,8 +1717,8 @@ Implementing ADO.NET with C#
 
             using var conn = CriarConexao();
 
-            var cmd = new SqlCommand(
-                "SELECT Id, Nome, Email FROM Cliente",
+            var cmd = new MySqlCommand(
+                "SELECT Id, Nome, dataAniversario FROM Cliente",
                 conn
             );
 
@@ -1728,7 +1732,7 @@ Implementing ADO.NET with C#
                 {
                     Id = reader.GetInt32(0),
                     Nome = reader.GetString(1),
-                    Email = reader.GetString(2)
+                    DataAniversario = reader.GetDateTime(2)
                 });
             }
 
@@ -1739,14 +1743,14 @@ Implementing ADO.NET with C#
         {
             using var conn = CriarConexao();
 
-            var cmd = new SqlCommand(
-                @"INSERT INTO Cliente (Nome, Email)
-                VALUES (@Nome, @Email)",
+            var cmd = new MySqlCommand(
+                @"INSERT INTO Cliente (nome, dataAniversario)
+                    VALUES (@Nome, @DataAniversario)",
                 conn
             );
 
-            cmd.Parameters.Add("@Nome", SqlDbType.VarChar).Value = cliente.Nome;
-            cmd.Parameters.Add("@Email", SqlDbType.VarChar).Value = cliente.Email;
+            cmd.Parameters.Add("@Nome", MySqlDbType.VarChar).Value = cliente.Nome;
+            cmd.Parameters.Add("@DataAniversario", MySqlDbType.DateTime).Value = cliente.DataAniversario;
 
             conn.Open();
             cmd.ExecuteNonQuery();
@@ -1756,10 +1760,10 @@ Implementing ADO.NET with C#
         {
             using var conn = CriarConexao();
 
-            var cmd = new SqlCommand(
+            var cmd = new MySqlCommand(
                 @"UPDATE Cliente
-                SET Nome = @Nome, Email = @Email
-                WHERE Id = @Id",
+                    SET nome = @Nome, dataAniversario = @DataAniversario
+                    WHERE Id = @Id",
                 conn
             );
 
@@ -1786,7 +1790,6 @@ Implementing ADO.NET with C#
             cmd.ExecuteNonQuery();
         }
     }
-
 
 
     // Classe de aplicação
