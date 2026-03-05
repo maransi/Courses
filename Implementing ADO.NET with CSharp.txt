@@ -87,8 +87,6 @@ Implementing ADO.NET with C#
         Em vez de SqlDataAdapter, use MySqlDataAdapter.
         Em vez de SqlDataReader, use MySqlDataReader. 
 
-
-
 . ORMs and ADO.NET
 
     . Exemplos de ORMs:
@@ -112,7 +110,6 @@ Implementing ADO.NET with C#
         . Trazendo para um exemplo mais palpável: você consegue unicamente com código C# fazer consultas a conjuntos de objetos, 
             bases de dados relacionais e arquivos XML, sendo o LINQ o encarregado de fazer a devida “tradução” para cada 
             uma das fontes a serem consultadas.
-
 
 . The Connection Class
 
@@ -1449,4 +1446,361 @@ Implementing ADO.NET with C#
 
     . Execute o projeto e veja se o recuros do MySQLDataAdapter está funcionanado
 
-    
+. Padrão Repository
+
+    . O Repository Pattern é um dos padrões mais utilizados em aplicações .NET que trabalham com 
+        dados (ADO.NET, Dapper, EF, etc.). Ele ajuda a separar a lógica de acesso a dados da lógica 
+        de negócio, criando uma camada intermediária que encapsula o acesso ao banco.
+
+    . Conceito
+
+        . O Repository Pattern abstrai o acesso a dados e faz com que a aplicação trate o 
+            repositório como se fosse uma coleção de objetos em memória.
+
+        . Em vez de escrever SQL espalhado pelo sistema, você acessa métodos como:    
+
+            clienteRepository.ObterPorId(10);
+            clienteRepository.Adicionar(cliente);
+            clienteRepository.Remover(10);
+
+        . O Repository esconde os detalhes de persistência e fornece uma interface simples para 
+            trabalhar com entidades.
+
+    . Principais benefícios:
+
+        . Separação de responsabilidades
+
+        . Código mais testável
+
+        . Centralização do acesso a dados
+
+        . Independência do mecanismo de persistência
+
+        . Facilita troca de tecnologia (ADO.NET → Dapper → EF)    
+
+
+    . Arquitetura Conceitual
+
+        Aplicação / Service
+            ↓
+        Repository
+            ↓
+        ADO.NET
+            ↓
+        Banco de Dados            
+
+    . As entidades não conhecem SQL, e o resto da aplicação não conhece ADO.NET.
+
+    . Componentes principais do Repository:
+
+        +-------------------------------------------------------+
+        | Componente        | Função                            |
+        | ----------------- | --------------------------------- |
+        | Entity            | Representa os dados (Cliente)     |
+        | IRepository<T>    | Interface genérica do repositório |
+        | Repository<T>     | Implementação base                |
+        | ClienteRepository | Repositório específico            |
+        +-------------------------------------------------------+
+
+    . Estrutura de classes
+
+        Entities
+        └ Cliente
+
+        Repositories
+        ├ IRepository<T>
+        ├ Repository<T>
+        └ ClienteRepository
+
+        Infrastructure
+        └ DbConnectionFactory
+
+
+    . Diagrama de Classes
+
+            +----------------------+
+            |       Cliente        |
+            +----------------------+
+            | +Id : int            |
+            | +Nome : string       |
+            | +Email : string      |
+            +----------------------+
+                    ▲
+                    |
+                    |
+        +----------------------------------+
+        |        IRepository<T>            |
+        +----------------------------------+
+        | +ObterPorId(id:int) : T          |
+        | +ObterTodos() : IEnumerable<T>   |
+        | +Adicionar(entidade:T) : void    |
+        | +Atualizar(entidade:T) : void    |
+        | +Remover(id:int) : void          |
+        +----------------------------------+
+                    ▲
+                    |
+                    |
+        +----------------------------------+
+        |        Repository<T>             |
+        |        (abstract)                |
+        +----------------------------------+
+        | -connectionString : string       |
+        +----------------------------------+
+        | +Repository(connectionString)    |
+        | #CriarConexao() : SqlConnection  |
+        | +ObterPorId(id:int) : T          |
+        | +ObterTodos() : IEnumerable<T>   |
+        | +Adicionar(entidade:T) : void    |
+        | +Atualizar(entidade:T) : void    |
+        | +Remover(id:int) : void          |
+        +----------------------------------+
+                    ▲
+                    |
+                    |
+        +----------------------------------+
+        |        ClienteRepository         |
+        +----------------------------------+
+        | +ClienteRepository(cs:string)    |
+        | +ObterPorId(id:int) : Cliente    |
+        | +ObterTodos() : IEnumerable      |
+        | +Adicionar(cliente:Cliente)      |
+        | +Atualizar(cliente:Cliente)      |
+        | +Remover(id:int)                 |
+        +----------------------------------+
+
+    . Diagrama de Sequências
+
+        Application        ClienteRepository      Repository<T>      SqlConnection      SqlCommand      Database      SqlDataReader      Cliente
+            |                     |                    |                   |                |               |               |               |
+            |---ObterPorId(id)--->|                    |                   |                |               |               |               |
+            |                     |                    |                   |                |               |               |               |
+            |                     |---CriarConexao()-->|                   |                |               |               |               |
+            |                     |<--SqlConnection----|                   |                |               |               |               |
+            |                     |                    |                   |                |               |               |               |
+            |                     |------------------Open()--------------->|                |               |               |               |
+            |                     |                    |                   |                |               |               |               |
+            |                     |-----------new SqlCommand-------------->|                |               |               |               |
+            |                     |                    |                   |                |               |               |               |
+            |                     |-------------ExecuteReader()----------->|--------------->|               |               |               |
+            |                     |                    |                   |                |---SELECT----->|               |               |
+            |                     |                    |                   |                |<--ResultSet---|               |               |
+            |                     |<-------------------SqlDataReader----------------------------------------|               |               |
+            |                     |                    |                   |                |               |               |               |
+            |                     |-----------Mapear dados----------------------------------------------------------------->|               |
+            |                     |<----------------------------------------------------------------------------------------|               |
+            |<-----Cliente--------|                    |                   |                |               |               |               |
+            |                     |                    |                   |                |               |               |               |
+
+    . Recursos Avançados:
+
+        Repository + Unit of Work
+
+        Repository + DataMapper
+
+        Repository com Expression / LINQ
+
+        Repository genérico com Reflection
+
+        Repository usando MySQL (MySqlConnector)
+
+
+. Demo
+
+
+    // Cliente
+    namespace AdoNetSystem.models.cliente;
+
+    public class Cliente
+    {
+        public int id { get; set; }
+
+        public string nome { get; set; }
+
+        public DateTime dataAniversario{ get; set; }
+    }
+
+
+
+    // Interface IRepository
+    namespace AdoNetSystem.models;
+
+    public interface IRepository<T>
+    {
+        T ObterPorId(int id);
+
+        IEnumerable<T> ObterTodos();
+
+        void Adicionar(T entidade);
+
+        void Atualizar(T entidade);
+
+        void Remover(int id);
+    }
+
+
+    // Classe Abstrata Repository
+    using MySql.Data.MySqlClient;
+
+    namespace AdoNetSystem.models;
+
+    public abstract class Repository<T> : IRepository<T>
+    {
+        private readonly string _connectionString;
+
+        protected Repository(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+        protected MySqlConnection CriarConexao()
+        {
+            return new MySqlConnection(_connectionString);
+        }
+
+        public abstract T ObterPorId(int id);
+
+        public abstract IEnumerable<T> ObterTodos();
+
+        public abstract void Adicionar(T entidade);
+
+        public abstract void Atualizar(T entidade);
+
+        public abstract void Remover(int id);
+    }
+
+
+
+
+    // Classe de implementação ClienteRepository
+    using MySql.Data.MySqlClient;
+
+    public class ClienteRepository : Repository<Cliente>
+    {
+        public ClienteRepository(string connectionString)
+            : base(connectionString)
+        {
+        }
+
+        public override Cliente ObterPorId(int id)
+        {
+            using var conn = CriarConexao();
+
+            var cmd = new SqlCommand(
+                "SELECT Id, Nome, Email FROM Cliente WHERE Id = @Id",
+                conn
+            );
+
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+            conn.Open();
+
+            using var reader = cmd.ExecuteReader();
+
+            if (!reader.Read())
+                return null;
+
+            return new Cliente
+            {
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                Nome = reader.GetString(reader.GetOrdinal("Nome")),
+                Email = reader.GetString(reader.GetOrdinal("Email"))
+            };
+        }
+
+        public override IEnumerable<Cliente> ObterTodos()
+        {
+            var lista = new List<Cliente>();
+
+            using var conn = CriarConexao();
+
+            var cmd = new SqlCommand(
+                "SELECT Id, Nome, Email FROM Cliente",
+                conn
+            );
+
+            conn.Open();
+
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                lista.Add(new Cliente
+                {
+                    Id = reader.GetInt32(0),
+                    Nome = reader.GetString(1),
+                    Email = reader.GetString(2)
+                });
+            }
+
+            return lista;
+        }
+
+        public override void Adicionar(Cliente cliente)
+        {
+            using var conn = CriarConexao();
+
+            var cmd = new SqlCommand(
+                @"INSERT INTO Cliente (Nome, Email)
+                VALUES (@Nome, @Email)",
+                conn
+            );
+
+            cmd.Parameters.Add("@Nome", SqlDbType.VarChar).Value = cliente.Nome;
+            cmd.Parameters.Add("@Email", SqlDbType.VarChar).Value = cliente.Email;
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        public override void Atualizar(Cliente cliente)
+        {
+            using var conn = CriarConexao();
+
+            var cmd = new SqlCommand(
+                @"UPDATE Cliente
+                SET Nome = @Nome, Email = @Email
+                WHERE Id = @Id",
+                conn
+            );
+
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = cliente.Id;
+            cmd.Parameters.Add("@Nome", SqlDbType.VarChar).Value = cliente.Nome;
+            cmd.Parameters.Add("@Email", SqlDbType.VarChar).Value = cliente.Email;
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        public override void Remover(int id)
+        {
+            using var conn = CriarConexao();
+
+            var cmd = new SqlCommand(
+                "DELETE FROM Cliente WHERE Id = @Id",
+                conn
+            );
+
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+            conn.Open();
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+
+
+    // Classe de aplicação
+    var repo = new ClienteRepository(connectionString);
+
+    var cliente = repo.ObterPorId(10);
+
+    repo.Adicionar(new Cliente
+    {
+        Nome = "Carlos",
+        Email = "carlos@email.com"
+    });
+
+    var clientes = repo.ObterTodos();
+
+
+
