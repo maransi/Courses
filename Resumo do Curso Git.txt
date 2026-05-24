@@ -797,3 +797,49 @@ https://metring.com.br/para-que-serve-o-git-fetch-vs-pull
         git reset --hard origin/master
 
         
+8. Caso ocorra erro na hora de fazer o PUSH como abaixo:
+
+    git push                    
+
+    To https://github.com/maransi/Tutoriais.git
+    ! [rejected]        master -> master (fetch first)
+    error: failed to push some refs to 'https://github.com/maransi/Tutoriais.git'
+    hint: Updates were rejected because the remote contains work that you do not
+    hint: have locally. This is usually caused by another repository pushing to
+    hint: the same ref. If you want to integrate the remote changes, use
+    hint: 'git pull' before pushing again.
+    hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+
+    . Execute:
+
+        git pull --rebase
+
+    . Depois:
+
+        git push
+
+    . Se aparecer conflito:
+
+        CONFLICT (content): Merge conflict in arquivo.txt
+
+    . Faça:
+
+        git status
+
+    . Edite os arquivos conflitantes e depois:
+
+        git add .
+        git rebase --continue
+
+    . Ao terminar:
+
+        git push
+
+
+    . Se quiser sobrescrever o remoto (cuidado)
+
+        . Se tiver certeza absoluta que quer ignorar o que está no GitHub:
+
+            # Isso apaga o commit remoto que você ainda não possui.
+            git push --force
