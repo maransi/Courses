@@ -47,11 +47,25 @@
 
     ou
 
-    grep -ril ~/git 'blablabla'
+    grep -rni ~/git 'blablabla'
 
         -r : busca recursiva em subdiretórios (procura em todas as pastas e subpastas)
         -i : ignora diferença entre maiúsculas e minúsculas (case insensitive)
         -l : mostra apenas o nome dos arquivos que contêm o texto procurado, sem exibir as linhas encontradas
+
+    ou
+
+    # O find funciona como o ls, mas foi feito para buscas avançadas. Este comando localiza os arquivos e passa para o grep ler o conteúdo deles:
+    find . -type f \( -name "*.txt" -o -name "*.log" \) -exec grep -rni "sua_palavra" {} +
+
+    find . type f -name "*.txt" -exec grep -rni 'launch-profile' {} +
+
+        find . -type f: Procura apenas arquivos no diretório atual (ignora pastas na listagem final) 
+        -name "*.txt" -o -name "*.log": Filtra as extensões (-o significa "OU").
+        -exec grep -l ... {} +: Abre os arquivos encontrados e lista apenas os que contêm a palavra.
+
+
+
 
 
 5. Como mudar as permissões de vários arquivos
